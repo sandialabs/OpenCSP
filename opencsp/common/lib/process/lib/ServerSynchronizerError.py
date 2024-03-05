@@ -1,0 +1,2 @@
+class ServerSynchronizerError(RuntimeError):
+    pass

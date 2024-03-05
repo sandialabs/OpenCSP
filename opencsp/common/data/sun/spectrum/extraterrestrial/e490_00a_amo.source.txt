@@ -1,0 +1,1 @@
+https://www.nrel.gov/grid/solar-resource/spectra-astm-e490.html

@@ -1,0 +1,17 @@
+Metadata:
+Figure number: 3
+Name: tsfo015_Heliostat Vector Field
+Title: Heliostat Vector Field
+Code tag: TestSolarFieldOutput.test_heliostat_vector_field()
+View spec: xz
+Path: common\lib\test\data\output\TestSolarFieldOutput\tsfo015_Heliostat_Vector_Field_xz.png
+
+Title:
+Heliostat Vector Field
+
+Caption:
+Rendering of the normal vector at the heliostat origin, for each heliostat in a field of tracking heliostats.
+
+Comments:
+Each heliostat's surface normal, which can be viewed as a vector field.
+

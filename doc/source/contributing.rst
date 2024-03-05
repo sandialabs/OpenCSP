@@ -1,0 +1,206 @@
+Contributing to OpenCSP
+=======================
+
+OpenCSP welcomes all contributions from bug fixes and documentation to new features.
+OpenCSP uses a fork-based development process. To contribute, please create a fork of
+OpenCSP. When you are ready to propose these changes, please open a pull request (PR)
+into the develop branch.
+
+Contribution Requirements
+-------------------------
+
+A PR should contain a set of related changes. For large non-functional changes such as
+code style changes, please open a separate PR from your functional changes. This makes
+reviewing the functional changes less error prone.
+
+Coding Standards
+----------------
+
+We follow and enforce adherence to the PEP8 coding standard.
+
+We highly recommend using Visual Studio Code for development. If using VS Code,
+please install the **"autopep8"** plugin. This will auto format code to PEP8 standards
+upon saving a file in progress. We also recommend installing the **Pylint** plugin for
+cleaner and more uniform code style.
+
+Before opening a pull request, please ensure your code formatting is pep8 compliant. 
+Continuous integration (CI) testing will fail if the changes are not pep8 compliant:
+
+::
+
+    # Apply correct formatting in CI
+    pip install black
+    black /path/to/opencsp
+
+Online OpenCSP documentation is generated using Sphinx. For API documentation, we use
+NumPy-style docstrings with bulleted lists. We require NumPy compliant docstrings for 
+Models, Public Classes, and Public Functions. For more internal and development-facing 
+documentation please use hash tags.
+
+Testing
++++++++
+
+Tests are housed next to the source code that they exercise. Test input data is housed in
+a `data` sub-directory. For example, for testing solely `common/lib/render` functionality, 
+tests go in `common/lib/render/test` and data goes in `common/lib/render/test/data`. For 
+testing both `common/lib/render` and `common/lib/target`, tests go in `common/lib/test`.
+Every PR must pass all tests residing under OpenCSP/opencsp on Windows and Linux. Tests
+are run automatically when you open or update a PR.
+
+How to Run Tests
+++++++++++++++++
+::
+
+    (venv) $ cd /path/to/OpenCSP/opencsp
+    (venv) $ pytest --color=yes
+
+
+How to generate coverage reports
+++++++++++++++++++++++++++++++++
+
+Install pytest-cov in your virtual environment:
+::
+
+    (venv) $ pip install pytest-cov
+
+
+Collect coverage for entire code base:
+::
+
+    (venv) $ cd /path/to/OpenCSP/opencsp
+    (venv) $ pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
+
+
+Collect coverage for the sofast application:
+::
+
+    (venv) $ cd /path/to/OpenCSP/opencsp
+    (venv) $ pytest --color=yes -rs -vv --cov=./app/sofast --cov-report term --cov-config=.coveragerc ./app/sofast/
+
+
+Python Version Support
+++++++++++++++++++++++
+OpenCSP supports versions of python 3.10 or greater. OpenCSP tests against python version
+3.10 and the latest stable python release.
+
+Operating System Support
+++++++++++++++++++++++++
+OpenCSP officially supports both Windows and Linux. We primarily test against Ubuntu 22.04
+and Windows 2022.
+
+Using Git Branches, Forks, and Remotes
+--------------------------------------
+
+OpenCSP uses a fork and branch based development model. Topic branches must be created on your
+fork of OpenCSP. For more details on git, I recommend referring to  https://git-scm.com/book/en/v2.
+Another useful reference for visual learners is: https://marklodato.github.io/visual-git-guide/index-en.html.
+
+Topic branches
+++++++++++++++
+A topic branch is a branch where a bug fix, non-functional change, features, or any set of related changes
+are committed. All topic branches should be created from the latest tip of the develop branch. Ideally,
+topic branches should be short lived and merged into the develop branch within a couple weeks from their
+creation. If it is not possible to open a PR for the topic branch within a couple weeks, consider reducing
+the scope of your topic branches. 
+
+Do not merge into topic branches
+++++++++++++++++++++++++++++++++
+If your topic branch is more than a week old, please rebase it on top of the develop branch instead of 
+merging the develop branch into your topic branch. A git rebase effectively places your
+topic branch commits on-top of the current commits in develop. Just like with a merge, conflicts may
+need to be resolved. In general, these are the commands for rebasing on top of develop:
+
+::
+
+    (venv) $ git checkout my-new-topic
+    (venv) $ git fetch upstream
+    (venv) $ git rebase upstream/develop
+
+Please see 'Working with remotes' below, if you're not familiar with `upstream`.
+
+The 'develop' Branch
+++++++++++++++++++++
+The develop branch contains unreleased code that has passed code review and unit testing. Unless you are
+performing a OpenCSP release, your PR should be opened against the develop branch.
+
+The 'main Branch'
++++++++++++++++++
+The main branch contains all OpenCSP releases. The tip main is always the latest release of OpenCSP.
+
+Creating a Fork
++++++++++++++++
+To create a fork of OpenCSP, navigate to https://github.com/sandialabs/OpenCSP
+and, in the top right, click 'Fork'. This will create a fork of OpenCSP under your github account.
+
+Creating a topic branch
++++++++++++++++++++++++
+Now that you have a fork, navigate to https://github.com/<github-username>/OpenCSP and clone the
+fork of OpenCSP. To clone, in the top right, click 'Code', select the 'Local' tab and copy the 
+clone URL. Clone OpenCSP. Navigate to the clone of OpenCSP, checkout the `develop` branch and
+create your topic branch:
+
+::
+
+    cd /path/to/OpenCSP
+    git checkout develop
+    git checkout -b my-new-topic
+
+Working with remotes
+++++++++++++++++++++
+Now that you have a fork of OpenCSP cloned, you have a single remote named `origin`. This remote
+refers to your fork on GitHub: https://github.com/<github-username>/OpenCSP. This fork contains
+the same branches that the upstream repository at https://github.com/sandialabs/OpenCSP contained
+when it was forked. Note that the branches only reflect the state of the upstream repository at 
+the time it was forked. In order to create a new topic branch with the latest changes from upstream, 
+you must use multiple remotes. To create a upstream remote:
+::
+
+    cd /path/to/OpenCSP
+    git remote add upstream-https https://github.com/sandialabs/OpenCSP.git
+
+Setup your develop and main branch to track from upstream:
+
+::
+
+    git checkout develop
+    git branch --set-upstream-to=upstream-https/develop
+
+::
+
+    git checkout main
+    git branch --set-upstream-to=upstream-https/main
+
+
+Create a topic branch and push it to your fork (origin remote):
+::
+
+    git checkout develop
+    git pull --ff-only upstream-https develop
+    git checkout -b my-new-topic
+    git push origin my-new-topic
+
+Rather than typing 'git push origin my-new-topic', you can set your topic branch to track the origin remote:
+::
+
+    git checkout my-new-topic
+    git push origin my-new-topic
+    git branch --set-upstream-to=origin/my-new-topic
+    git push
+
+Review Process
+--------------
+OpenCSP requires at least one approval before a PR is merged.
+
+PR Authors
+++++++++++
+Please write a descriptive PR title and provide a high-level summary of the changes in your PR.
+
+PR Reviewers
+++++++++++++
+After the PR has passed automated testing, please review the code changes primarily for test coverage,
+major defects, design, and code readability. For requested changes outside the scope of the changes within
+the PR, consider filing a follow-on issue.
+
+Release Process
+---------------
+TODO

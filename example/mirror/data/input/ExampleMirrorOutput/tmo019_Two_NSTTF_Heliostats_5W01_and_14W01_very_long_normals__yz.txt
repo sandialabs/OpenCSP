@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 3
+Name: tmo019_Two NSTTF Heliostats: 5W01 and 14W01 (very long normals)
+Title: Two NSTTF Heliostats: 5W01 and 14W01 (very long normals)
+Code tag: ExampleMirrorOutput.example_heliostat_05W01_and_14W01()
+View spec: yz
+
+Title:
+Two NSTTF Heliostats: 5W01 and 14W01 (very long normals)
+
+Caption:
+Two NSTTF heliostats.  5W01 modeled as a symmetric paraboloid with focal length f=55m.  14W01 modeled as a symmetric paraboloid with focal length f=186.8m.  Facet surfaces and canting have the same focal length.
+
+Comments:
+Render mirror surfaces and normals, facet outlines, and heliostat centroid.
+

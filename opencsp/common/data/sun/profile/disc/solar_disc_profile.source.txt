@@ -1,0 +1,9 @@
+
+The 4.65 mrad number comes from:
+
+     Andreas Neumann, Andreas Witzke, Scott A. Jones, and Gregor Schmitt.
+     Representative Terrestrial Solar Brightness Profiles.  
+     Journal of Solar Energy Engineering 124, pp. 198-204, 2002.
+
+See page 198, column 2, first paragraph in the Circumsolar Ratio section.
+The paper provides a pointer to original references.

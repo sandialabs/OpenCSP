@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 1
+Name: trto001_draw_simple_light_path
+Title: draw_simple_light_path
+Code tag: ExampleRayTraceOutput.example_draw_simple_ray()
+View spec: 3d
+
+Title:
+draw_simple_light_path
+
+Caption:
+A facet defined from a parameteric mirror of shape (rectangle 2.0m x 3.0m), with focal length f=2.0m.
+

@@ -1,0 +1,21 @@
+Metadata:
+Figure number: 1
+Name: tsfo012_Selected Heliostats
+Title: Selected Heliostats
+Code tag: ExampleSolarFieldOutput.example_solar_field_subset()
+View spec: 3d
+
+Title:
+Selected Heliostats
+
+Caption:
+View of a selected range of heliostats, demonstrating different rendering for tracking, face up, and stowed heliostats.
+
+Comments:
+A subset of heliostats selected, so that plot is effectively zoomed in.
+Grey heliostat shows mirrored surfaces.
+Blue heliostats are tracking.
+Cyan heliostats are face up.
+Red heliostats are in stow (out of service).
+Green heliostats are in a fixed configuration (az=205.0 deg, el=30.0 deg).
+

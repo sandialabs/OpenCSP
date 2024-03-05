@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 8
+Name: trto009_mirror_tilted_many_rays_side_view
+Title: mirror_tilted_many_rays_side_view
+Code tag: ExampleRayTraceOutput.example_mirror_trace()
+View spec: yz
+
+Title:
+mirror_tilted_many_rays_side_view
+
+Caption:
+mirror_tilted_many_rays_side_view
+

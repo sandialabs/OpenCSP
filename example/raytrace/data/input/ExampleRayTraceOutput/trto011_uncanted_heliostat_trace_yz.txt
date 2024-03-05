@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 1
+Name: trto011_uncanted_heliostat_trace
+Title: uncanted_heliostat_trace
+Code tag: ExampleRayTraceOutput.example_heliostat_trace()
+View spec: yz
+
+Title:
+uncanted_heliostat_trace
+
+Caption:
+uncanted_heliostat_trace
+

@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 2
+Name: trto025_5w1 at 15:02
+Title: 5w1 at 15:02
+Code tag: TestRayTraceOutput._heliostat_at_moment()
+View spec: xz
+
+Title:
+5w1 at 15:02
+
+Caption:
+xz view of the ratrace of 5w1 at 15:02
+

@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 1
+Name: tsfo003_Example Poses and Styles
+Title: Example Poses and Styles
+Code tag: ExampleSolarFieldOutput.example_multi_heliostat()
+View spec: 3d
+
+Title:
+Example Poses and Styles
+
+Caption:
+Example Poses and Styles
+

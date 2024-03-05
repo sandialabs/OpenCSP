@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 3
+Name: trto015_canted_heliostat_trace
+Title: canted_heliostat_trace
+Code tag: ExampleRayTraceOutput.example_heliostat_trace()
+View spec: yz
+
+Title:
+canted_heliostat_trace
+
+Caption:
+canted_heliostat_trace
+

@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 1
+Name: tmo025_NSTTF Heliostat Short Focal Length, Canted and Lifted
+Title: NSTTF Heliostat Short Focal Length, Canted and Lifted
+Code tag: TestMirrorOutput.test_heliostat_stages()
+View spec: 3d
+
+Title:
+NSTTF Heliostat Short Focal Length, Canted and Lifted
+
+Caption:
+Hypothetical short-focal length NSTTF heliostat modeled as a symmetric paraboloid with focal length f=5m with canting angle and lifted.
+
