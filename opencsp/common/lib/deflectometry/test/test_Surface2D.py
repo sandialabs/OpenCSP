@@ -4,11 +4,11 @@ import unittest
 
 import numpy as np
 
-from   opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
-from   opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
-from   opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
+from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class Test2DSurface(unittest.TestCase):
@@ -17,19 +17,19 @@ class Test2DSurface(unittest.TestCase):
         cls.data_test = [generate_2DParabolic(), generate_2DPlano()]
 
     def test_intersect(self):
-        """Tests the intersection of rays with fit surface.
-        """
+        """Tests the intersection of rays with fit surface."""
         for i, test in enumerate(self.data_test):
             with self.subTest(i=i):
                 # Get data
                 surface: Surface2DAbstract = test[0]
                 data_exp: Vxyz = test[1]
 
-                np.testing.assert_allclose(surface.v_surf_int_pts_optic.data, data_exp.data)
+                np.testing.assert_allclose(
+                    surface.v_surf_int_pts_optic.data, data_exp.data
+                )
 
     def test_calculate_slopes(self):
-        """Tests slope calculations.
-        """
+        """Tests slope calculations."""
         for i, test in enumerate(self.data_test):
             with self.subTest(i=i):
                 # Get data
@@ -39,8 +39,7 @@ class Test2DSurface(unittest.TestCase):
                 np.testing.assert_allclose(surface.slopes, data_exp)
 
     def test_fit_slopes(self):
-        """Tests slope fit
-        """
+        """Tests slope fit"""
         for i, test in enumerate(self.data_test):
             with self.subTest(i=i):
                 # Get data
@@ -50,8 +49,7 @@ class Test2DSurface(unittest.TestCase):
                 np.testing.assert_allclose(surface.slope_coefs, data_exp)
 
     def test_fit_surf(self):
-        """Tests surface fit
-        """
+        """Tests surface fit"""
         for i, test in enumerate(self.data_test):
             with self.subTest(i=i):
                 # Get data
@@ -95,42 +93,60 @@ class Test2DSurface(unittest.TestCase):
                 np.testing.assert_allclose(n_design.data, data_exp.data)
 
 
-def generate_2DParabolic() -> tuple[Surface2DParabolic, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]:
+def generate_2DParabolic() -> (
+    tuple[Surface2DParabolic, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]
+):
     """
     Generates data for 2DParabolic case
     """
     # Generate surface: z = 1/4*x^2 + 1/4*y^2
-    initial_focal_lengths_xy = (1., 1.)
+    initial_focal_lengths_xy = (1.0, 1.0)
     robust_least_squares = False
     downsample = 1
-    surface = Surface2DParabolic(initial_focal_lengths_xy, robust_least_squares, downsample)
+    surface = Surface2DParabolic(
+        initial_focal_lengths_xy, robust_least_squares, downsample
+    )
 
     # Define reflection geometry
     x_int = 2 * (np.sqrt(2) - 1)
-    z_int = 0.25 * x_int ** 2
+    z_int = 0.25 * x_int**2
 
-    u_active_pixel_pointing_optic = Uxyz(([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1]))
-    v_screen_points_optic = Vxyz(([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [1, 1, 1, 1, 1]))
+    u_active_pixel_pointing_optic = Uxyz(
+        ([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1])
+    )
+    v_screen_points_optic = Vxyz(
+        ([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [1, 1, 1, 1, 1])
+    )
     v_optic_cam_optic = Vxyz((0, 0, 1))
     u_measure_pixel_pointing_optic = Uxyz((0, 0, -1))
     v_align_point_optic = Vxyz((0, 0, 0))
     v_optic_screen_optic = Vxyz((0, 0, 1))
 
     # Set spatial data
-    surface.set_spatial_data(u_active_pixel_pointing_optic,
-                             v_screen_points_optic,
-                             v_optic_cam_optic,
-                             u_measure_pixel_pointing_optic,
-                             v_align_point_optic,
-                             v_optic_screen_optic)
+    surface.set_spatial_data(
+        u_active_pixel_pointing_optic,
+        v_screen_points_optic,
+        v_optic_cam_optic,
+        u_measure_pixel_pointing_optic,
+        v_align_point_optic,
+        v_optic_screen_optic,
+    )
 
     # Define expected data
-    v_surf_int_pts_exp = Vxyz(([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [z_int, z_int, z_int, z_int, 0]))
-    slopes_exp = np.array(([-x_int / 2, x_int / 2, 0, 0, 0], [0, 0, -x_int / 2, x_int / 2, 0]))
+    v_surf_int_pts_exp = Vxyz(
+        (
+            [-x_int, x_int, 0, 0, 0],
+            [0, 0, -x_int, x_int, 0],
+            [z_int, z_int, z_int, z_int, 0],
+        )
+    )
+    slopes_exp = np.array(
+        ([-x_int / 2, x_int / 2, 0, 0, 0], [0, 0, -x_int / 2, x_int / 2, 0])
+    )
     slope_coefs_exp = np.array(([0, 0.5, 0], [0, 0, 0.5]))
     surf_coefs_exp = np.array([0, 0, 0.25, 0, 0, 0.25])
-    u_design_exp = Uxyz((0., 0., 1.))
-    u_fit_exp = Uxyz((0., 0., 1.))
+    u_design_exp = Uxyz((0.0, 0.0, 1.0))
+    u_fit_exp = Uxyz((0.0, 0.0, 1.0))
 
     # Calculate surface intersection with initial polynomial shape
     surface.calculate_surface_intersect_points()
@@ -153,7 +169,9 @@ def generate_2DParabolic() -> tuple[Surface2DParabolic, Vxyz, np.ndarray, np.nda
     )
 
 
-def generate_2DPlano() -> tuple[Surface2DPlano, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]:
+def generate_2DPlano() -> (
+    tuple[Surface2DPlano, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]
+):
     """
     Generates data for 2DPlano case
     """
@@ -166,28 +184,44 @@ def generate_2DPlano() -> tuple[Surface2DPlano, Vxyz, np.ndarray, np.ndarray, np
     x_int = 1
     z_int = 0
 
-    u_active_pixel_pointing_optic = Uxyz(([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1]))
-    v_screen_points_optic = Vxyz(([-2 * x_int, 2 * x_int, 0, 0, 0], [0, 0, -2 * x_int, 2 * x_int, 0], [1, 1, 1, 1, 1]))
+    u_active_pixel_pointing_optic = Uxyz(
+        ([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1])
+    )
+    v_screen_points_optic = Vxyz(
+        (
+            [-2 * x_int, 2 * x_int, 0, 0, 0],
+            [0, 0, -2 * x_int, 2 * x_int, 0],
+            [1, 1, 1, 1, 1],
+        )
+    )
     v_optic_cam_optic = Vxyz((0, 0, 1))
     u_measure_pixel_pointing_optic = Uxyz((0, 0, -1))
     v_align_point_optic = Vxyz((0, 0, 0))
     v_optic_screen_optic = Vxyz((0, 0, 1))
 
     # Set spatial data
-    surface.set_spatial_data(u_active_pixel_pointing_optic,
-                             v_screen_points_optic,
-                             v_optic_cam_optic,
-                             u_measure_pixel_pointing_optic,
-                             v_align_point_optic,
-                             v_optic_screen_optic)
+    surface.set_spatial_data(
+        u_active_pixel_pointing_optic,
+        v_screen_points_optic,
+        v_optic_cam_optic,
+        u_measure_pixel_pointing_optic,
+        v_align_point_optic,
+        v_optic_screen_optic,
+    )
 
     # Define expected data
-    v_surf_int_pts_exp = Vxyz(([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [z_int, z_int, z_int, z_int, 0]))
+    v_surf_int_pts_exp = Vxyz(
+        (
+            [-x_int, x_int, 0, 0, 0],
+            [0, 0, -x_int, x_int, 0],
+            [z_int, z_int, z_int, z_int, 0],
+        )
+    )
     slopes_exp = np.array(([0, 0, 0, 0, 0], [0, 0, 0, 0, 0]), dtype=float)
     slope_coefs_exp = np.array(([0, 0]), dtype=float)
     surf_coefs_exp = np.array([0, 0, 0], dtype=float)
-    u_design_exp = Uxyz((0., 0., 1.))
-    u_fit_exp = Uxyz((0., 0., 1.))
+    u_design_exp = Uxyz((0.0, 0.0, 1.0))
+    u_fit_exp = Uxyz((0.0, 0.0, 1.0))
 
     # Calculate surface intersection with initial polynomial shape
     surface.calculate_surface_intersect_points()

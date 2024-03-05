@@ -3,16 +3,18 @@
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
-from   numpy import ndarray
-from   scipy.spatial.transform import Rotation
-from   tqdm import tqdm
+from numpy import ndarray
+from scipy.spatial.transform import Rotation
+from tqdm import tqdm
 
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import FixedPatternDotLocations
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.deflectometry.BlobIndex import BlobIndex
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
+    FixedPatternDotLocations,
+)
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.BlobIndex import BlobIndex
 import opencsp.common.lib.deflectometry.image_processing as ip
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
 
 
@@ -32,16 +34,18 @@ class FixedPatternSetupCalibrate:
     - blob_search_threshold : Search radius to use when searching for blobs (pixels)
     """
 
-    def __init__(self,
-                 images: list[ndarray],
-                 origin_pts: Vxy,
-                 camera: Camera,
-                 pts_xyz_corners: Vxyz,
-                 pts_ids_corners: ndarray,
-                 x_min: int,
-                 x_max: int,
-                 y_min: int,
-                 y_max: int) -> 'FixedPatternSetupCalibrate':
+    def __init__(
+        self,
+        images: list[ndarray],
+        origin_pts: Vxy,
+        camera: Camera,
+        pts_xyz_corners: Vxyz,
+        pts_ids_corners: ndarray,
+        x_min: int,
+        x_max: int,
+        y_min: int,
+        y_max: int,
+    ) -> 'FixedPatternSetupCalibrate':
         """Instantiates the calibration class
 
         Parameters
@@ -78,7 +82,10 @@ class FixedPatternSetupCalibrate:
         self.verbose = 0
         self.intersection_threshold = 0.002  # meters
         self.figures = []
-        self.marker_detection_params = {'adaptive_thresh_constant': 10, 'min_marker_perimeter_rate': 0.01}
+        self.marker_detection_params = {
+            'adaptive_thresh_constant': 10,
+            'min_marker_perimeter_rate': 0.01,
+        }
         self.blob_search_threshold = 20  # pixels
 
         # Blob detection parameters
@@ -97,7 +104,9 @@ class FixedPatternSetupCalibrate:
         self._dot_image_points_indices: Vxy
         self._dot_image_points_indices_x: ndarray
         self._dot_image_points_indices_y: ndarray
-        self._dot_points_xyz_mat = np.ndarray((x_max - x_min + 1, y_max - y_min + 1, 3)) * np.nan
+        self._dot_points_xyz_mat = (
+            np.ndarray((x_max - x_min + 1, y_max - y_min + 1, 3)) * np.nan
+        )
         self._num_dots: int
         self._marker_ids: list[ndarray] = []
         self._marker_corner_ids: list[ndarray] = []
@@ -119,7 +128,9 @@ class FixedPatternSetupCalibrate:
             pts = ip.detect_blobs(image, self.blob_detector)
 
             # Index all found points
-            blob_index = BlobIndex(pts, -self._x_max, -self._x_min, self._y_min, self._y_max)
+            blob_index = BlobIndex(
+                pts, -self._x_max, -self._x_min, self._y_min, self._y_max
+            )
             blob_index.search_thresh = self.blob_search_threshold
             blob_index.verbose = False
             blob_index.run(origin_pt)
@@ -141,7 +152,9 @@ class FixedPatternSetupCalibrate:
         for idx in range(self._num_images):
             dot_image_points_x = dot_image_points_xy_mat[idx][mask_all_assigned, 0]
             dot_image_points_y = dot_image_points_xy_mat[idx][mask_all_assigned, 1]
-            self._dot_image_points_xy.append(Vxy((dot_image_points_x, dot_image_points_y)))
+            self._dot_image_points_xy.append(
+                Vxy((dot_image_points_x, dot_image_points_y))
+            )
 
         # Save common indices as vector
         indices_x = indices[mask_all_assigned, 0]
@@ -160,7 +173,11 @@ class FixedPatternSetupCalibrate:
                 print(f'Finding marker corners in image: {idx:d}')
 
             # Find markers in image
-            ids, pts = ph.find_aruco_marker(image, self.marker_detection_params['adaptive_thresh_constant'], self.marker_detection_params['min_marker_perimeter_rate'])
+            ids, pts = ph.find_aruco_marker(
+                image,
+                self.marker_detection_params['adaptive_thresh_constant'],
+                self.marker_detection_params['min_marker_perimeter_rate'],
+            )
             # Save point locations and IDs
             marker_ids = np.repeat(ids, 4)
             marker_corner_ids = np.repeat(ids * 4, 4) + np.tile(ids_add, ids.size)
@@ -168,7 +185,9 @@ class FixedPatternSetupCalibrate:
             # Save xyz locations
             point_idxs = []
             for marker_corner_id in marker_corner_ids:
-                point_idxs.append(np.where(self._pts_ids_corners == marker_corner_id)[0][0])
+                point_idxs.append(
+                    np.where(self._pts_ids_corners == marker_corner_id)[0][0]
+                )
 
             self._marker_ids.append(marker_ids)
             self._marker_corner_ids.append(marker_corner_ids)
@@ -179,13 +198,21 @@ class FixedPatternSetupCalibrate:
         """Calculates 3d camera poses"""
         for cam_idx in range(self._num_images):
             if self.verbose in [0, 2]:
-                print(f'Calculating camera {cam_idx:d} pose with {len(self._marker_corners_xyz[cam_idx]):d} points')
+                print(
+                    f'Calculating camera {cam_idx:d} pose with {len(self._marker_corners_xyz[cam_idx]):d} points'
+                )
 
             # Attempt to solve for camera pose
-            ret, rvec, tvec = cv.solvePnP(self._marker_corners_xyz[cam_idx].data.T, self._marker_corners_xy[cam_idx].data.T,
-                                          self._camera.intrinsic_mat, self._camera.distortion_coef)
+            ret, rvec, tvec = cv.solvePnP(
+                self._marker_corners_xyz[cam_idx].data.T,
+                self._marker_corners_xy[cam_idx].data.T,
+                self._camera.intrinsic_mat,
+                self._camera.distortion_coef,
+            )
             if not ret:
-                raise ValueError(f'Camera calibration was not successful for image {cam_idx:d}')
+                raise ValueError(
+                    f'Camera calibration was not successful for image {cam_idx:d}'
+                )
 
             self._rots_cams.append(Rotation.from_rotvec(rvec.squeeze()))
             self._vecs_cams.append(Vxyz(tvec))
@@ -196,7 +223,12 @@ class FixedPatternSetupCalibrate:
         int_dists = []
         for dot_idx in tqdm(range(self._num_dots), desc='Intersecting rays'):
             dot_image_pts_xy = [pt[dot_idx] for pt in self._dot_image_points_xy]
-            point, dists = ph.triangulate([self._camera] * self._num_images, self._rots_cams, self._vecs_cams, dot_image_pts_xy)
+            point, dists = ph.triangulate(
+                [self._camera] * self._num_images,
+                self._rots_cams,
+                self._vecs_cams,
+                dot_image_pts_xy,
+            )
             points_xyz.append(point)
             int_dists.append(dists)
             # Save xyz point in matrix
@@ -210,7 +242,9 @@ class FixedPatternSetupCalibrate:
 
     def _plot_common_dots(self) -> None:
         """Plots common dots on images"""
-        for idx, (image, pts) in enumerate(zip(self._images, self._dot_image_points_xy)):
+        for idx, (image, pts) in enumerate(
+            zip(self._images, self._dot_image_points_xy)
+        ):
             fig = plt.figure(f'image_{idx:d}_annotated_dots')
             plt.imshow(image, cmap='gray')
             plt.scatter(*pts.data, marker='.', color='red')
@@ -228,7 +262,9 @@ class FixedPatternSetupCalibrate:
         """Plots all input xyz points and located cameras"""
         fig = plt.figure('cameras_and_points')
         ax = fig.add_subplot(111, projection='3d')
-        ph.plot_pts_3d(ax, self._pts_xyz_corners.data.T, self._rots_cams, self._vecs_cams)
+        ph.plot_pts_3d(
+            ax, self._pts_xyz_corners.data.T, self._rots_cams, self._vecs_cams
+        )
         ax.set_xlabel('x (meter)')
         ax.set_ylabel('y (meter)')
         ax.set_zlabel('z (meter)')
@@ -262,7 +298,16 @@ class FixedPatternSetupCalibrate:
     def _plot_xyz_indices(self) -> None:
         """Plots z value per dot on grid"""
         fig = plt.figure('dot_index_map')
-        plt.imshow(self._dot_points_xyz_mat[..., 2], extent=(self._x_min - 0.5, self._x_max + 0.5, self._y_min - 0.5, self._y_max + 0.5), origin='lower')
+        plt.imshow(
+            self._dot_points_xyz_mat[..., 2],
+            extent=(
+                self._x_min - 0.5,
+                self._x_max + 0.5,
+                self._y_min - 0.5,
+                self._y_max + 0.5,
+            ),
+            origin='lower',
+        )
         cb = plt.colorbar()
         cb.set_label('Z height (meter)')
         plt.xlabel('x index')
@@ -282,11 +327,19 @@ class FixedPatternSetupCalibrate:
         ndarray
             (N, M, 3) array of dot xyz locations
         """
-        return self._dot_image_points_indices_x, self._dot_image_points_indices_y, self._dot_points_xyz_mat
+        return (
+            self._dot_image_points_indices_x,
+            self._dot_image_points_indices_y,
+            self._dot_points_xyz_mat,
+        )
 
     def get_dot_location_object(self) -> FixedPatternDotLocations:
         """Returns FixedPatternDotLocations object with calibrated data"""
-        return FixedPatternDotLocations(self._dot_image_points_indices_x, self._dot_image_points_indices_y, self._dot_points_xyz_mat)
+        return FixedPatternDotLocations(
+            self._dot_image_points_indices_x,
+            self._dot_image_points_indices_y,
+            self._dot_points_xyz_mat,
+        )
 
     def run(self) -> None:
         """Runs full calibration sequence"""

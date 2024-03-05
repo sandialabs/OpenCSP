@@ -1,21 +1,28 @@
-from   glob import glob
+from glob import glob
 import os
-from   os.path import join
+from os.path import join
 
 import matplotlib
 import numpy as np
-from   numpy import ndarray
+from numpy import ndarray
 
 import opencsp
-from   opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
-from   opencsp.common.lib.deflectometry.CalibrationCameraPosition import CalibrationCameraPosition
-from   opencsp.app.sofast.calibration.lib.CalibrationScreenShape import CalibrationScreenShape, DataInput
-from   opencsp.app.sofast.calibration.lib.save_physical_setup_file import save_physical_setup_file
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
+from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
+from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
+    CalibrationCameraPosition,
+)
+from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
+    CalibrationScreenShape,
+    DataInput,
+)
+from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
+    save_physical_setup_file,
+)
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
 
 
 def run_scene_reconstruction(dir_input: str, verbose: int) -> SceneReconstruction:
@@ -30,7 +37,9 @@ def run_scene_reconstruction(dir_input: str, verbose: int) -> SceneReconstructio
     # Load components
     camera = Camera.load_from_hdf(file_camera)
     known_point_locations = np.loadtxt(file_known_points, delimiter=',', skiprows=1)
-    point_pair_distances = np.loadtxt(file_point_pair_distances, delimiter=',', skiprows=1)
+    point_pair_distances = np.loadtxt(
+        file_point_pair_distances, delimiter=',', skiprows=1
+    )
     alignment_points = np.loadtxt(file_alignment_points, delimiter=',', skiprows=1)
 
     # Perform marker position calibration
@@ -50,7 +59,9 @@ def run_scene_reconstruction(dir_input: str, verbose: int) -> SceneReconstructio
     return cal
 
 
-def run_screen_shape_cal(pts_marker_data: ndarray, dir_input: str, verbose: int) -> CalibrationScreenShape:
+def run_screen_shape_cal(
+    pts_marker_data: ndarray, dir_input: str, verbose: int
+) -> CalibrationScreenShape:
     """Runs screen shape calibration
 
     Parameters:
@@ -63,12 +74,16 @@ def run_screen_shape_cal(pts_marker_data: ndarray, dir_input: str, verbose: int)
     file_screen_cal_point_pairs = join(dir_input, 'screen_calibration_point_pairs.csv')
     file_camera_distortion = join(dir_input, 'camera_screen_shape.h5')
     file_image_projection = join(dir_input, 'image_projection.h5')
-    files_screen_shape_measurement = glob(join(dir_input, 'screen_shape_sofast_measurements/pose_*.h5'))
+    files_screen_shape_measurement = glob(
+        join(dir_input, 'screen_shape_sofast_measurements/pose_*.h5')
+    )
 
     # Load input data
     pts_xyz_marker = Vxyz(pts_marker_data[:, 2:].T)
     corner_ids = pts_marker_data[:, 1]
-    screen_cal_point_pairs = np.loadtxt(file_screen_cal_point_pairs, delimiter=',', skiprows=1).astype(int)
+    screen_cal_point_pairs = np.loadtxt(
+        file_screen_cal_point_pairs, delimiter=',', skiprows=1
+    ).astype(int)
     camera = Camera.load_from_hdf(file_camera_distortion)
     image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
 
@@ -90,7 +105,9 @@ def run_screen_shape_cal(pts_marker_data: ndarray, dir_input: str, verbose: int)
     return cal
 
 
-def run_camera_position_cal(pts_marker_data: ndarray, dir_input: str, verbose: int) -> CalibrationCameraPosition:
+def run_camera_position_cal(
+    pts_marker_data: ndarray, dir_input: str, verbose: int
+) -> CalibrationCameraPosition:
     """Calibrates the position of the camera"""
     # Define inputs
     file_camera_sofast = join(dir_input, 'camera_sofast.h5')
@@ -112,18 +129,26 @@ def run_camera_position_cal(pts_marker_data: ndarray, dir_input: str, verbose: i
 def example_driver():
     """Example script that runs full Sofast photogrammetric calibration routine
 
-        1. Marker position calibration
-        2. Screen position calibration
-        3. Camera position calibration
-        4. Saves Display object
+    1. Marker position calibration
+    2. Screen position calibration
+    3. Camera position calibration
+    4. Saves Display object
 
     """
     # Define input file directories
-    base_dir_scene_recon = join(os.path.dirname(opencsp.__file__), 'app/scene_reconstruction/test/data/data_measurement')  # low-res test data
-    base_dir_sofast = join(os.path.dirname(opencsp.__file__), 'common/lib/deflectometry/test/data/data_measurement')  # low-res test data
+    base_dir_scene_recon = join(
+        os.path.dirname(opencsp.__file__),
+        'app/scene_reconstruction/test/data/data_measurement',
+    )  # low-res test data
+    base_dir_sofast = join(
+        os.path.dirname(opencsp.__file__),
+        'common/lib/deflectometry/test/data/data_measurement',
+    )  # low-res test data
 
     # Define save path
-    save_dir = join(os.path.dirname(__file__), 'data/output/photogrammetric_calibration')
+    save_dir = join(
+        os.path.dirname(__file__), 'data/output/photogrammetric_calibration'
+    )
     if not os.path.exists(save_dir):
         os.makedirs(save_dir)
 
@@ -145,7 +170,9 @@ def example_driver():
     rvec, tvec = cal_camera_pose.get_data()
 
     # Save calibration figures
-    for fig in cal_scene_recon.figures + cal_screen_shape.figures + cal_camera_pose.figures:
+    for fig in (
+        cal_scene_recon.figures + cal_screen_shape.figures + cal_camera_pose.figures
+    ):
         fig.savefig(join(save_dir, fig.get_label() + '.png'))
 
     # Save data
@@ -156,6 +183,7 @@ def example_driver():
     # Save display file
     file_save = join(save_dir, 'example_physical_setup_file.h5')
     save_physical_setup_file(screen_distortion_data, NAME, rvec, tvec, file_save)
+
 
 if __name__ == '__main__':
     example_driver()

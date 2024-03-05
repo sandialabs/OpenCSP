@@ -1,22 +1,24 @@
 """Library of functions used to calibation a machine vision camera.
 Functions are based off OpenCV library.
 """
-from   typing import Iterable
+from typing import Iterable
 
 import cv2 as cv
-from   matplotlib.axes import Axes
+from matplotlib.axes import Axes
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-def calibrate_camera(p_object: Iterable[Vxyz],
-                     p_image: Iterable[Vxy],
-                     img_shape_xy: tuple[int, int],
-                     name: str) -> tuple[Camera, Iterable[Rotation], Iterable[Vxyz], float]:
+def calibrate_camera(
+    p_object: Iterable[Vxyz],
+    p_image: Iterable[Vxy],
+    img_shape_xy: tuple[int, int],
+    name: str,
+) -> tuple[Camera, Iterable[Rotation], Iterable[Vxyz], float]:
     """
     Performs 4 term camera calibration for non-fisheye lens.
     Calculates only distortion coefficients, [K1, K2, P1, P2] (K3 = 0). Higher
@@ -50,7 +52,14 @@ def calibrate_camera(p_object: Iterable[Vxyz],
     obj_pts_list = [v.data.T for v in p_object]
     img_pts_list = [v.data.T for v in p_image]
     dist_input = np.zeros(4, dtype=np.float32)
-    error, mtx, dist, rvecs, tvecs = cv.calibrateCamera(obj_pts_list, img_pts_list, img_shape_xy, None, dist_input, flags=cv.CALIB_FIX_K3)
+    error, mtx, dist, rvecs, tvecs = cv.calibrateCamera(
+        obj_pts_list,
+        img_pts_list,
+        img_shape_xy,
+        None,
+        dist_input,
+        flags=cv.CALIB_FIX_K3,
+    )
     # Keep only first four distortion coefficients
     dist = dist[:4].squeeze()
 
@@ -66,7 +75,9 @@ def calibrate_camera(p_object: Iterable[Vxyz],
     return camera, r_cam_object, v_cam_object_cam, error
 
 
-def view_distortion(camera: Camera, ax1: Axes, ax2: Axes, ax3: Axes, num_samps: int = 12):
+def view_distortion(
+    camera: Camera, ax1: Axes, ax2: Axes, ax3: Axes, num_samps: int = 12
+):
     """
     Plots the radial/tangential distortion of a camera object.
 
@@ -111,7 +122,7 @@ def view_distortion(camera: Camera, ax1: Axes, ax2: Axes, ax3: Axes, num_samps: 
             np.eye(3).astype(np.float32),
             camera.intrinsic_mat,
             img_shape,
-            cv.CV_32FC1
+            cv.CV_32FC1,
         )
 
         mx_cal -= np.float32(camera.intrinsic_mat[0, 2])
@@ -133,7 +144,9 @@ def view_distortion(camera: Camera, ax1: Axes, ax2: Axes, ax3: Axes, num_samps: 
     dx_tot, dy_tot = calc_dx_dy(camera.distortion_coef)
 
     # Plot radial distortion
-    ax1.quiver(mx[y1::N, x1::N], my[y1::N, x1::N], dx_rad[y1::N, x1::N], dy_rad[y1::N, x1::N])
+    ax1.quiver(
+        mx[y1::N, x1::N], my[y1::N, x1::N], dx_rad[y1::N, x1::N], dy_rad[y1::N, x1::N]
+    )
     ax1.set_ylim(0, img_shape[1])
     ax1.set_xlim(0, img_shape[0])
     ax1.set_xlabel('X (pixel)')
@@ -143,7 +156,9 @@ def view_distortion(camera: Camera, ax1: Axes, ax2: Axes, ax3: Axes, num_samps: 
     ax1.grid()
 
     # Plot tangential distortion
-    ax2.quiver(mx[y1::N, x1::N], my[y1::N, x1::N], dx_tan[y1::N, x1::N], dy_tan[y1::N, x1::N])
+    ax2.quiver(
+        mx[y1::N, x1::N], my[y1::N, x1::N], dx_tan[y1::N, x1::N], dy_tan[y1::N, x1::N]
+    )
     ax2.set_ylim(0, img_shape[1])
     ax2.set_xlim(0, img_shape[0])
     ax2.set_xlabel('X (pixel)')
@@ -153,7 +168,9 @@ def view_distortion(camera: Camera, ax1: Axes, ax2: Axes, ax3: Axes, num_samps: 
     ax2.grid()
 
     # Plot total distortion
-    ax3.quiver(mx[y1::N, x1::N], my[y1::N, x1::N], dx_tot[y1::N, x1::N], dy_tot[y1::N, x1::N])
+    ax3.quiver(
+        mx[y1::N, x1::N], my[y1::N, x1::N], dx_tot[y1::N, x1::N], dy_tot[y1::N, x1::N]
+    )
     ax3.set_ylim(0, img_shape[1])
     ax3.set_xlim(0, img_shape[0])
     ax3.set_xlabel('X (pixel)')

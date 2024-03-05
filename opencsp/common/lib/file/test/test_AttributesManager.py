@@ -24,15 +24,14 @@ class SimpleAttributeParser(aap.AbstractAttributeParser):
     def has_contents(self) -> bool:
         return True
 
-    def parse_my_contents(self, file_path_name_ext: str, raw_contents: str, my_contents: any):
+    def parse_my_contents(
+        self, file_path_name_ext: str, raw_contents: str, my_contents: any
+    ):
         self.strval = my_contents["strval"]
         self.listval = my_contents["listval"]
 
     def my_contents_to_json(self, file_path_name_ext: str) -> any:
-        my_contents = {
-            "strval": self.strval,
-            "listval": self.listval
-        }
+        my_contents = {"strval": self.strval, "listval": self.listval}
         return my_contents
 
 

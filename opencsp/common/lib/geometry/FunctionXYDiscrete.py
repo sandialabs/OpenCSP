@@ -3,8 +3,7 @@ from typing import Callable, Iterable
 import numpy as np
 import sympy
 
-from opencsp.common.lib.geometry.FunctionXYAbstract import \
-    FunctionXYAbstract
+from opencsp.common.lib.geometry.FunctionXYAbstract import FunctionXYAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.render.View3d import View3d
 
@@ -25,10 +24,14 @@ class FunctionXYDiscrete(FunctionXYAbstract):
     # def interpolate() -> FunctionXYAnalytic:
     #     ...
 
-    def value_at(self, x: float | Iterable[float], y: float | Iterable[float]) -> float | np.ndarray[float]:
+    def value_at(
+        self, x: float | Iterable[float], y: float | Iterable[float]
+    ) -> float | np.ndarray[float]:
         if isinstance(x, Iterable) and isinstance(y, Iterable):
             if len(x) != len(y):
-                raise ValueError(f"The length of x and y must be the same. x length {len(x)} does not match y length {len(y)}")
+                raise ValueError(
+                    f"The length of x and y must be the same. x length {len(x)} does not match y length {len(y)}"
+                )
             return np.array([self.value_at(xi, yi) for xi, yi in zip(x, y)])
         else:
             if self.in_domain(x, y):
@@ -48,7 +51,12 @@ class FunctionXYDiscrete(FunctionXYAbstract):
                 for iy, y in enumerate(sorted(self.y_domain)):
                     arr[iy, ix] = self.value_at(x, y)
             # A = self.as_callable()(X,Y)
-            extent = [min(self.x_domain), max(self.x_domain), min(self.y_domain), max(self.y_domain)]
+            extent = [
+                min(self.x_domain),
+                max(self.x_domain),
+                min(self.y_domain),
+                max(self.y_domain),
+            ]
             # view.pcolormesh(list(self.x_domain), list(self.y_domain), arr, colorbar=True, cmap='jet', )
             view.imshow(arr, colorbar=True, cmap='jet')
 
@@ -64,7 +72,9 @@ class FunctionXYDiscrete(FunctionXYAbstract):
         values: 2d array, the values that will be returned when x and y are used
         """
         if len(values) != len(y_domain) or len(values[0]) != len(x_domain):
-            raise ValueError("Size of the domain does not match size of the value array.")
+            raise ValueError(
+                "Size of the domain does not match size of the value array."
+            )
         else:
             d = dict()
             for iy, y in enumerate(y_domain):

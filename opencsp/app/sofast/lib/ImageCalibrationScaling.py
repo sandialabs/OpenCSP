@@ -1,8 +1,8 @@
-from   numpy import ndarray
+from numpy import ndarray
 import numpy as np
 
-from   opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-from   opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
+from opencsp.app.sofast.lib.Measurement import Measurement
 
 
 class ImageCalibrationScaling(ImageCalibrationAbstract):
@@ -32,9 +32,15 @@ class ImageCalibrationScaling(ImageCalibrationAbstract):
 
         """
         # Convert camera images to observed display values
-        im_dark_disp = self.response_function(measurement.mask_images[..., 0:1])  # M x N x 1
-        im_light_disp = self.response_function(measurement.mask_images[..., 1:2])  # M x N x 1
-        fringe_images_disp = self.response_function(measurement.fringe_images)  # M x N x n
+        im_dark_disp = self.response_function(
+            measurement.mask_images[..., 0:1]
+        )  # M x N x 1
+        im_light_disp = self.response_function(
+            measurement.mask_images[..., 1:2]
+        )  # M x N x 1
+        fringe_images_disp = self.response_function(
+            measurement.fringe_images
+        )  # M x N x n
 
         # Calculate delta image
         im_delta_disp = im_light_disp - im_dark_disp  # M x N x 1

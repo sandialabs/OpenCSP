@@ -1,14 +1,14 @@
 """Tests the photogrammetric reconstruction of xyz marker positions.
 """
 import os
-from   os.path import join
+from os.path import join
 import unittest
 
 import numpy as np
 
-from   opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class TestSceneReconstruction(unittest.TestCase):
@@ -48,13 +48,21 @@ class TestSceneReconstruction(unittest.TestCase):
 
         # Load components
         camera = Camera.load_from_hdf(join(dir_input, 'camera.h5'))
-        known_point_locations = np.loadtxt(join(dir_input, 'known_point_locations.csv'), delimiter=',', skiprows=1)
+        known_point_locations = np.loadtxt(
+            join(dir_input, 'known_point_locations.csv'), delimiter=',', skiprows=1
+        )
         image_filter_path = join(dir_input, 'aruco_marker_images', '*.JPG')
-        point_pair_distances = np.loadtxt(join(dir_input, 'point_pair_distances.csv'), delimiter=',', skiprows=1)
-        alignment_points = np.loadtxt(join(dir_input, 'alignment_points.csv'), delimiter=',', skiprows=1)
+        point_pair_distances = np.loadtxt(
+            join(dir_input, 'point_pair_distances.csv'), delimiter=',', skiprows=1
+        )
+        alignment_points = np.loadtxt(
+            join(dir_input, 'alignment_points.csv'), delimiter=',', skiprows=1
+        )
 
         # Perform marker position calibration
-        scene_recon = SceneReconstruction(camera, known_point_locations, image_filter_path)
+        scene_recon = SceneReconstruction(
+            camera, known_point_locations, image_filter_path
+        )
         scene_recon.run_calibration(verbose)
 
         # Scale points
@@ -68,7 +76,9 @@ class TestSceneReconstruction(unittest.TestCase):
         scene_recon.align_points(marker_ids, alignment_values, verbose=verbose)
 
         # Test results
-        cls.pts_exp = np.loadtxt(join(dir_output, 'point_locations.csv'), delimiter=',', skiprows=1)
+        cls.pts_exp = np.loadtxt(
+            join(dir_output, 'point_locations.csv'), delimiter=',', skiprows=1
+        )
         cls.pts_meas = scene_recon.get_data()
 
     def test_calibrated_corner_locations(self):

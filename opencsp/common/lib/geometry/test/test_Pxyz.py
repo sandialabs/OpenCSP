@@ -1,7 +1,7 @@
 import numpy as np
 
-from   opencsp.common.lib.geometry.Pxyz import Pxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class TestPxyz:

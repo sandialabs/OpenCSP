@@ -5,22 +5,24 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
-from   opencsp.common.lib.deflectometry.FacetData import FacetData
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.app.sofast.lib.Sofast import Sofast
-from   opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.camera.Camera import Camera
 
 
-def generate_dataset(file_measurement: str,
-                     file_camera: str,
-                     file_display: str,
-                     file_calibration: str,
-                     file_facet: str,
-                     file_ensemble: str,
-                     file_dataset_out: str):
+def generate_dataset(
+    file_measurement: str,
+    file_camera: str,
+    file_display: str,
+    file_calibration: str,
+    file_facet: str,
+    file_ensemble: str,
+    file_dataset_out: str,
+):
     """Generates and saves test data"""
     # Load components
     camera = Camera.load_from_hdf(file_camera)
@@ -38,16 +40,20 @@ def generate_dataset(file_measurement: str,
 
     # Update image processing parameters
     S.params.mask_hist_thresh = 0.83
-    S.params.perimeter_refine_perpendicular_search_dist = 10.
+    S.params.perimeter_refine_perpendicular_search_dist = 10.0
     S.params.facet_corns_refine_frac_keep = 1.0
-    S.params.facet_corns_refine_perpendicular_search_dist = 3.
-    S.params.facet_corns_refine_step_length = 5.
+    S.params.facet_corns_refine_perpendicular_search_dist = 3.0
+    S.params.facet_corns_refine_step_length = 5.0
 
     # Define surface data
-    surface_data = [dict(surface_type='parabolic',
-                         initial_focal_lengths_xy=(100., 100.),
-                         robust_least_squares=False,
-                         downsample=10)] * ensemble_data.num_facets
+    surface_data = [
+        dict(
+            surface_type='parabolic',
+            initial_focal_lengths_xy=(100.0, 100.0),
+            robust_least_squares=False,
+            downsample=10,
+        )
+    ] * ensemble_data.num_facets
 
     # Process optic data
     S.process_optic_multifacet(facet_data, ensemble_data, surface_data)
@@ -69,7 +75,7 @@ def generate_dataset(file_measurement: str,
     for idx in range(S.num_facets):
         mask = S.data_image_processing_facet[idx]['mask_processed']
         slopes_xy = S.data_characterization_facet[idx]['slopes_facet_xy']
-        slopes = np.sqrt(np.sum(slopes_xy ** 2, 0))
+        slopes = np.sqrt(np.sum(slopes_xy**2, 0))
         image[mask] = slopes
 
     plt.figure()

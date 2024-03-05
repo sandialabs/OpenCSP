@@ -2,7 +2,7 @@
 Finds all aruco markes and annotates image with labeled IDs and aruco marker corners.
 Saves all images to destination folder.
 """
-from   glob import glob
+from glob import glob
 import os
 
 import argparse
@@ -13,7 +13,13 @@ import numpy as np
 import opencsp.common.lib.photogrammetry.photogrammetry as pg
 
 
-def main(source_pattern: str, save_dir: str, line_width: int = 1, font_thickness: int = 2, font_scale: float = 1.25):
+def main(
+    source_pattern: str,
+    save_dir: str,
+    line_width: int = 1,
+    font_thickness: int = 2,
+    font_scale: float = 1.25,
+):
     """Finds aruco markers, annotates edges, labels, and saves into destination folder
 
     Parameters
@@ -68,8 +74,15 @@ def main(source_pattern: str, save_dir: str, line_width: int = 1, font_thickness
 
             # Add text
             orig = (int(pt_img[:, 0].min()), int(pt_img[:, 1].min() - 5))
-            cv.putText(img_rgb, str(id_), orig, font_type,
-                       font_scale, (0, 0, 255), font_thickness)
+            cv.putText(
+                img_rgb,
+                str(id_),
+                orig,
+                font_type,
+                font_scale,
+                (0, 0, 255),
+                font_thickness,
+            )
 
         # Save image
         save_name = os.path.basename(file)
@@ -79,13 +92,49 @@ def main(source_pattern: str, save_dir: str, line_width: int = 1, font_thickness
 
 if __name__ == "__main__":
     # Parse arguments
-    parser = argparse.ArgumentParser(description='Finds all aruco markers in files matching the given source file pattern. Saves annotated images to destination folder.')
-    parser.add_argument('source_pattern', metavar='src', type=str, help='Source file pattern.')
-    parser.add_argument('save_dir', metavar='dst', type=str, help='Destination folder to save annotated images.')
-    parser.add_argument('-w', '--line-width', metavar='width', type=int, default=1, help='Width of annotation lines in pixels (default=1)')
-    parser.add_argument('-t', '--font-thickness', metavar='thickness', type=int, default=6, help='Thickness of font in pixels (default=6)')
-    parser.add_argument('-s', '--font-scale', metavar='scale', type=float, default=5, help='Font size scale value (default=5)')
+    parser = argparse.ArgumentParser(
+        description='Finds all aruco markers in files matching the given source file pattern. Saves annotated images to destination folder.'
+    )
+    parser.add_argument(
+        'source_pattern', metavar='src', type=str, help='Source file pattern.'
+    )
+    parser.add_argument(
+        'save_dir',
+        metavar='dst',
+        type=str,
+        help='Destination folder to save annotated images.',
+    )
+    parser.add_argument(
+        '-w',
+        '--line-width',
+        metavar='width',
+        type=int,
+        default=1,
+        help='Width of annotation lines in pixels (default=1)',
+    )
+    parser.add_argument(
+        '-t',
+        '--font-thickness',
+        metavar='thickness',
+        type=int,
+        default=6,
+        help='Thickness of font in pixels (default=6)',
+    )
+    parser.add_argument(
+        '-s',
+        '--font-scale',
+        metavar='scale',
+        type=float,
+        default=5,
+        help='Font size scale value (default=5)',
+    )
     args = parser.parse_args()
 
     # Annotate images
-    main(args.source_pattern, args.save_dir, args.line_width, args.font_thickness, args.font_scale)
+    main(
+        args.source_pattern,
+        args.save_dir,
+        args.line_width,
+        args.font_thickness,
+        args.font_scale,
+    )

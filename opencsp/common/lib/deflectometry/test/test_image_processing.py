@@ -1,33 +1,36 @@
 """Unit test suite to test image_processing library
 """
 import os
-from   os.path import join
+from os.path import join
 import unittest
 
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 import opencsp
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.app.sofast.lib.SofastParams import SofastParams
-from   opencsp.common.lib.camera.Camera import Camera
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.SofastParams import SofastParams
+from opencsp.common.lib.camera.Camera import Camera
 import opencsp.common.lib.deflectometry.image_processing as ip
-from   opencsp.common.lib.geometry.LoopXY import LoopXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
 class TestImageProcessing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
-
         # Get test data location
-        base_dir = os.path.join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements')
+        base_dir = os.path.join(
+            os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+        )
 
         # Define calculation data files
         cls.data_file_facet = join(base_dir, 'calculations_facet/data.h5')
-        cls.data_file_undefined = join(base_dir, 'calculations_undefined_mirror/data.h5')
+        cls.data_file_undefined = join(
+            base_dir, 'calculations_undefined_mirror/data.h5'
+        )
         cls.data_file_multi = join(base_dir, 'calculations_facet_ensemble/data.h5')
 
         # Define component files
@@ -47,7 +50,7 @@ class TestImageProcessing(unittest.TestCase):
         mask_raw = ip.calc_mask_raw(data['mask_images'])
 
         # Test
-        datasets = ['DataSofastCalculation/image_processing/general/mask_raw',]
+        datasets = ['DataSofastCalculation/image_processing/general/mask_raw']
         data = load_hdf5_datasets(datasets, self.data_file_facet)
         np.testing.assert_allclose(data['mask_raw'], mask_raw)
 
@@ -55,7 +58,7 @@ class TestImageProcessing(unittest.TestCase):
         """Tests image_processing.centroid_mask()"""
         datasets = [
             'DataSofastCalculation/image_processing/general/v_mask_centroid_image',
-            'DataSofastCalculation/image_processing/general/mask_raw'
+            'DataSofastCalculation/image_processing/general/mask_raw',
         ]
 
         # Load test data
@@ -71,7 +74,7 @@ class TestImageProcessing(unittest.TestCase):
         """Tests image_processing.keep_largest_mask_area()"""
         datasets = [
             'DataSofastCalculation/image_processing/facet_000/mask_processed',
-            'DataSofastCalculation/image_processing/general/mask_raw'
+            'DataSofastCalculation/image_processing/general/mask_raw',
         ]
 
         # Load test data
@@ -88,7 +91,7 @@ class TestImageProcessing(unittest.TestCase):
         """Tests image_processing.edges_from_mask()"""
         datasets = [
             'DataSofastCalculation/image_processing/general/v_edges_image',
-            'DataSofastCalculation/image_processing/general/mask_raw'
+            'DataSofastCalculation/image_processing/general/mask_raw',
         ]
 
         # Load test data
@@ -105,7 +108,7 @@ class TestImageProcessing(unittest.TestCase):
         datasets = [
             'DataSofastCalculation/image_processing/general/v_edges_image',
             'DataSofastCalculation/image_processing/general/loop_optic_image_exp',
-            'DataSofastCalculation/image_processing/facet_000/loop_facet_image_refine'
+            'DataSofastCalculation/image_processing/facet_000/loop_facet_image_refine',
         ]
 
         # Get default parameters from Sofast class
@@ -120,7 +123,9 @@ class TestImageProcessing(unittest.TestCase):
 
         # Perform calculation
         loop_facet_exp = LoopXY.from_vertices(Vxy(data['loop_optic_image_exp']))
-        loop_facet_refine = ip.refine_mask_perimeter(loop_facet_exp, Vxy(data['v_edges_image']), *args).vertices.data.squeeze()
+        loop_facet_refine = ip.refine_mask_perimeter(
+            loop_facet_exp, Vxy(data['v_edges_image']), *args
+        ).vertices.data.squeeze()
 
         # Test
         np.testing.assert_allclose(data['loop_facet_image_refine'], loop_facet_refine)
@@ -167,7 +172,12 @@ class TestImageProcessing(unittest.TestCase):
             data_exp.append(data['loop_facet_image_refine'])
 
             # Perform calculation
-            reg = ip.refine_facet_corners(v_facet_corners_image_exp, v_facet_centroid_image_exp, v_edges_image, *args)
+            reg = ip.refine_facet_corners(
+                v_facet_corners_image_exp,
+                v_facet_centroid_image_exp,
+                v_edges_image,
+                *args,
+            )
             data_calc.append(reg.vertices.data)
 
         data_exp = np.concatenate(data_exp, axis=1)
@@ -203,7 +213,9 @@ class TestImageProcessing(unittest.TestCase):
         v_display_pts = np.array([screen_xs, screen_ys])
 
         # Test
-        np.testing.assert_allclose(data['v_screen_points_fractional_screens'], v_display_pts, rtol=1e-06)
+        np.testing.assert_allclose(
+            data['v_screen_points_fractional_screens'], v_display_pts, rtol=1e-06
+        )
 
     def test_calculate_active_pixel_pointing_vectors(self):
         """Tests image_processing.calculate_active_pixel_pointing_vectors()"""
@@ -224,4 +236,6 @@ class TestImageProcessing(unittest.TestCase):
         u_pixel_pointing_optic = u_pixel_pointing_cam.rotate(r_cam_optic).data.squeeze()
 
         # Test
-        np.testing.assert_allclose(data['u_pixel_pointing_facet'], u_pixel_pointing_optic)
+        np.testing.assert_allclose(
+            data['u_pixel_pointing_facet'], u_pixel_pointing_optic
+        )

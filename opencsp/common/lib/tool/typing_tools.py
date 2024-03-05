@@ -8,9 +8,11 @@ import opencsp.common.lib.tool.log_tools as lt
 T = TypeVar("T")
 
 
-def default(primary: T | Callable[[], T] | None, *default: T | Callable[[], T] | None) -> T | None:
+def default(
+    primary: T | Callable[[], T] | None, *default: T | Callable[[], T] | None
+) -> T | None:
     # TODO should this be in a different module?
-    """ Get the default value if the primary value is None or if the value is a
+    """Get the default value if the primary value is None or if the value is a
     callable that raises an error.
 
     Examples::
@@ -74,8 +76,11 @@ def default(primary: T | Callable[[], T] | None, *default: T | Callable[[], T] |
         # Is more readable than this:
         #
         #     default(dval[3])
-        lt.error_and_raise(ValueError, "Error in typing_tools.default(): " +
-                           "at least one alternative for a default value must be provided.")
+        lt.error_and_raise(
+            ValueError,
+            "Error in typing_tools.default(): "
+            + "at least one alternative for a default value must be provided.",
+        )
 
     for val in all_vals:
         if val is None:
@@ -109,24 +114,24 @@ def strict_types(func):
     '''
     Decoratorates functions to make them strictly typed.
 
-    Takes in keyword arguments with associated types. 
-    If the argument applied to the function does not pass an 
+    Takes in keyword arguments with associated types.
+    If the argument applied to the function does not pass an
     isinstance test against the defined type, the function will raise a TypeError.
     # TODO tristan: does not apply strictness to return value
 
     Important
     ---------
-    In general it is important to understand that this decorator is not robust, but 
+    In general it is important to understand that this decorator is not robust, but
     if it fails it should be very clear. In that case do not bother troubleshooting,
     I recommend simply removing the decorator, as it is likely a bug in the decorator.
 
     Notes
     -----
-    * Using this decorator will block some information about the decorated function 
+    * Using this decorator will block some information about the decorated function
     from some python functions that return function information.
-    * A type represented with a string of itself (i.e. `'Vxyz'`) will 
+    * A type represented with a string of itself (i.e. `'Vxyz'`) will
     not recognize subclasses properly, and in some instaces could break entirely.
-    * Beware of using types that contain a secondary type within (e.x. `list[int]`), 
+    * Beware of using types that contain a secondary type within (e.x. `list[int]`),
     the inner types will be ignored and in some cases could fail entirely.
     * The function does not do any checks on the `return` value. (Might add in the future)
 
@@ -155,6 +160,7 @@ def strict_types(func):
 
     ```
     '''
+
     @functools.wraps(func)
     def wrapper(*posargs, **kwargs):
         argspecs = inspect.getfullargspec(func)
@@ -170,19 +176,25 @@ def strict_types(func):
         for i, (arg, argname) in enumerate(zip(posargs, argnames)):
             # print(argname in kwargtypes)
             if argname in kwargtypes:
-                if (arg != None and
-                    type(arg).__name__ != kwargtypes[argname]  # for cases of types represented as strings
-                        if type(kwargtypes[argname]) == str
-                        else not isinstance(arg, kwargtypes[argname])):
+                if (
+                    arg != None
+                    and type(arg).__name__
+                    != kwargtypes[argname]  # for cases of types represented as strings
+                    if type(kwargtypes[argname]) == str
+                    else not isinstance(arg, kwargtypes[argname])
+                ):
                     positional_type_mismatches.append((i, kwargtypes[argname]))
 
         # second we look at the key word arguments
         for kw in kwargs:
             if kw in kwargtypes:
-                if (kwargs[kw] != None and
-                    type(kwargs[kw]).__name__ != kwargtypes[kw]  # for cases of types represented as strings
-                        if type(kwargtypes[kw]) == str
-                        else not isinstance(kwargs[kw], kwargtypes[kw])):
+                if (
+                    kwargs[kw] != None
+                    and type(kwargs[kw]).__name__
+                    != kwargtypes[kw]  # for cases of types represented as strings
+                    if type(kwargtypes[kw]) == str
+                    else not isinstance(kwargs[kw], kwargtypes[kw])
+                ):
                     key_word_type_mismatches.append((kw, kwargtypes[kw]))
 
         # if there are no type mismatches just run the function
@@ -197,6 +209,7 @@ def strict_types(func):
 
             raise TypeError(error_info)
         return func(*posargs, **kwargs)
+
     if wrapper.__doc__ == None:
         wrapper.__doc__ = ""
     wrapper.__doc__ += "\nThis function uses strictly enforced types, using the @strict_types decorator."
@@ -223,7 +236,9 @@ def ensure_not_string(t: type | str, class_container: type) -> type:
     if type(t) == str and t == name:
         t = class_container
     if type(t) == str and t != name:
-        raise TypeError("@strict_types cannot decorate a function "
-                        "that uses a string for the type of an argument "
-                        "that is not the class containing the function")
+        raise TypeError(
+            "@strict_types cannot decorate a function "
+            "that uses a string for the type of an argument "
+            "that is not the class containing the function"
+        )
     return t

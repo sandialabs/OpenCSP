@@ -1,14 +1,16 @@
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool import hdf5_tools
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool import hdf5_tools
 
 
 class SpatialOrientation:
     """Holds relative orientations of camera, screen, and optic for deflectometry systems"""
 
-    def __init__(self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz) -> 'SpatialOrientation':
+    def __init__(
+        self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz
+    ) -> 'SpatialOrientation':
         """Instantiates Spatial Orienatation object
 
         Parameters
@@ -56,7 +58,9 @@ class SpatialOrientation:
 
         self.trans_screen_cam: TransformXYZ
 
-    def _orient_screen_cam(self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz) -> None:
+    def _orient_screen_cam(
+        self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz
+    ) -> None:
         """Orients the screen and camera
 
         Parameters
@@ -76,7 +80,9 @@ class SpatialOrientation:
         self.v_cam_screen_screen = v_cam_screen_cam.rotate(r_cam_screen)
         self.v_screen_cam_screen = -self.v_cam_screen_screen
 
-        self.trans_screen_cam = TransformXYZ.from_R_V(self.r_screen_cam, self.v_cam_screen_cam)
+        self.trans_screen_cam = TransformXYZ.from_R_V(
+            self.r_screen_cam, self.v_cam_screen_cam
+        )
 
     def orient_optic_cam(self, r_cam_optic: Rotation, v_cam_optic_cam: Vxyz) -> None:
         """Orients the optic and camera, and thus the optic and screen
@@ -99,24 +105,31 @@ class SpatialOrientation:
         self.v_cam_optic_optic = v_cam_optic_cam.rotate(r_cam_optic)
         self.v_optic_cam_optic = -self.v_cam_optic_optic
 
-        self.trans_cam_optic = TransformXYZ.from_R_V(self.r_cam_optic, self.v_optic_cam_optic)
+        self.trans_cam_optic = TransformXYZ.from_R_V(
+            self.r_cam_optic, self.v_optic_cam_optic
+        )
 
         self._orient_optic_screen()
 
     def _orient_optic_screen(self) -> None:
-        """Orients the optic and screen (must be called last)
-        """
+        """Orients the optic and screen (must be called last)"""
         # Optic-screen orientation
         self.r_optic_screen = self.r_cam_screen * self.r_optic_cam
         self.r_screen_optic = self.r_optic_screen.inv()
 
-        self.v_optic_screen_optic = self.v_optic_cam_optic + self.v_cam_screen_cam.rotate(self.r_cam_optic)
+        self.v_optic_screen_optic = (
+            self.v_optic_cam_optic + self.v_cam_screen_cam.rotate(self.r_cam_optic)
+        )
         self.v_screen_optic_optic = -self.v_optic_screen_optic
 
-        self.v_optic_screen_screen = self.v_optic_screen_optic.rotate(self.r_optic_screen)
+        self.v_optic_screen_screen = self.v_optic_screen_optic.rotate(
+            self.r_optic_screen
+        )
         self.v_screen_optic_screen = -self.v_optic_screen_screen
 
-        self.trans_screen_optic = TransformXYZ.from_R_V(self.r_screen_optic, self.v_optic_screen_optic)
+        self.trans_screen_optic = TransformXYZ.from_R_V(
+            self.r_screen_optic, self.v_optic_screen_optic
+        )
 
     def save_to_hdf(self, file: str, prefix: str = '') -> None:
         """Saves only camera-screen orientation data to HDF file. Data is stored as prefix + SpatialOrientation/...
@@ -134,10 +147,7 @@ class SpatialOrientation:
             prefix + 'SpatialOrientation/v_cam_screen_cam',
         ]
 
-        data = [
-            self.r_cam_screen.as_rotvec(),
-            self.v_cam_screen_cam.data,
-        ]
+        data = [self.r_cam_screen.as_rotvec(), self.v_cam_screen_cam.data]
 
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
@@ -155,7 +165,6 @@ class SpatialOrientation:
         datasets = [
             prefix + 'SpatialOrientation/r_cam_screen',
             prefix + 'SpatialOrientation/v_cam_screen_cam',
-
             prefix + 'SpatialOrientation/r_cam_optic',
             prefix + 'SpatialOrientation/v_cam_optic_cam',
         ]
@@ -163,7 +172,6 @@ class SpatialOrientation:
         data = [
             self.r_cam_screen.as_rotvec(),
             self.v_cam_screen_cam.data,
-
             self.r_cam_optic.as_rotvec(),
             self.v_cam_optic_cam.data,
         ]
@@ -188,7 +196,6 @@ class SpatialOrientation:
         datasets = [
             'SpatialOrientation/r_cam_screen',
             'SpatialOrientation/v_cam_screen_cam',
-
             'SpatialOrientation/r_cam_optic',
             'SpatialOrientation/v_cam_optic_cam',
         ]

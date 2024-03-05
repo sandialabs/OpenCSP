@@ -2,14 +2,14 @@ import os
 from os.path import join
 
 import opencsp
-from   opencsp.app.sofast.lib.visualize_setup import visualize_setup
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.app.sofast.lib.Sofast import Sofast
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.csp.Facet import Facet
+from opencsp.app.sofast.lib.visualize_setup import visualize_setup
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.csp.Facet import Facet
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
@@ -26,7 +26,9 @@ def example_driver():
     4. Plots slope magnitude, physical setup
     """
     # Define sample data directory
-    sample_data_dir = join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/')
+    sample_data_dir = join(
+        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/'
+    )
 
     # Directory Setup
     file_measurement = join(sample_data_dir, 'measurement_facet.h5')
@@ -46,7 +48,12 @@ def example_driver():
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
 
     # Define surface definition (parabolic surface)
-    surface_data = dict(surface_type='parabolic', initial_focal_lengths_xy=(300., 300), robust_least_squares=True, downsample=10)
+    surface_data = dict(
+        surface_type='parabolic',
+        initial_focal_lengths_xy=(300.0, 300),
+        robust_least_squares=True,
+        downsample=10,
+    )
 
     # Calibrate fringes
     measurement.calibrate_fringe_images(calibration)
@@ -71,17 +78,21 @@ def example_driver():
 
     # Generate plots
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
-    mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
+    mirror_control = rcm.RenderControlMirror(
+        centroid=True, surface_normals=True, norm_res=1
+    )
     axis_control_m = rca.meters()
 
     # Visualize setup
     fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
     spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
-    visualize_setup(display,
-                    camera,
-                    spatial_ori.v_screen_optic_screen,
-                    spatial_ori.r_optic_screen,
-                    ax=fig_record.axis)
+    visualize_setup(
+        display,
+        camera,
+        spatial_ori.v_screen_optic_screen,
+        spatial_ori.r_optic_screen,
+        ax=fig_record.axis,
+    )
     fig_record.save(dir_save, 'physical_setup_layout', 'png')
 
     # Plot slope map
@@ -91,6 +102,7 @@ def example_driver():
 
     # Save data
     sofast.save_data_to_hdf(f'{dir_save}/data_undefined.h5')
+
 
 if __name__ == '__main__':
     example_driver()

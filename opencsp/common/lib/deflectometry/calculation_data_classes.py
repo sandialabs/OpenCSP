@@ -4,11 +4,11 @@ from warnings import warn
 from numpy import ndarray
 from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.geometry.LoopXY import LoopXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
@@ -16,6 +16,7 @@ import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 class CalculationDataGeometryGeneral:
     """Data class used in deflectometry measurments. Saves general geometry and
     orientation data associated with a measurement."""
+
     v_cam_optic_centroid_cam_exp: Vxyz = None
     r_optic_cam_exp: Rotation = None
     v_cam_optic_cam_exp: Vxyz = None
@@ -63,6 +64,7 @@ class CalculationDataGeometryFacet:
     """Data class used in deflectometry calculations of a single facet. Holds
     geometric/orientation data of a single facet measurement setup.
     """
+
     u_cam_measure_point_facet: Uxyz = None
     measure_point_screen_distance: float = None
     spatial_orientation: SpatialOrientation = None
@@ -100,7 +102,9 @@ class CalculationDataGeometryFacet:
             prefix + 'CalculationDataGeometryFacet/u_pixel_pointing_facet',
             prefix + 'CalculationDataGeometryFacet/v_screen_points_facet',
         ]
-        self.spatial_orientation.save_all_to_hdf(file, prefix + 'CalculationDataGeometryFacet/')
+        self.spatial_orientation.save_all_to_hdf(
+            file, prefix + 'CalculationDataGeometryFacet/'
+        )
         _save_data_in_file(data, datasets, file)
 
 
@@ -109,6 +113,7 @@ class CalculationError:
     """Data class used in deflectometry calculations. Holds data on measurement/calculation
     errors during deflectometry calculations.
     """
+
     error_optic_screen_dist_1: float = None
     error_optic_screen_dist_2: float = None
     error_optic_screen_dist_3: float = None
@@ -150,6 +155,7 @@ class CalculationsImageProcessingFacet:
     """Data class used in deflectometry calculations of a single facet. Holds
     image processing data of a single facet measurement.
     """
+
     loop_facet_image_refine: LoopXY = None
     mask_fitted: ndarray = None
     mask_processed: ndarray = None
@@ -191,6 +197,7 @@ class CalculationsImageProcessingGeneral:
     """Data class used in deflectometry calculations. Holds general image processing
     calculations from a deflectometry measurement.
     """
+
     mask_raw: ndarray = None
     v_edges_image: Vxyz = None
     v_mask_centroid_image: Vxy = None
@@ -240,10 +247,16 @@ def _save_data_in_file(data_in: list, datasets_in: list, file: str) -> None:
             elif isinstance(d, float) or isinstance(d, int) or isinstance(d, ndarray):
                 data.append(d)
             else:
-                raise ValueError(f'Unrecognized data type {type(d)} could not be saved.')
+                raise ValueError(
+                    f'Unrecognized data type {type(d)} could not be saved.'
+                )
             datasets.append(ds)
 
     if len(data) > 0:
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
     else:
-        warn(f'Length 0 dataset was not saved to file "{file:s}"', UserWarning, stacklevel=2)
+        warn(
+            f'Length 0 dataset was not saved to file "{file:s}"',
+            UserWarning,
+            stacklevel=2,
+        )

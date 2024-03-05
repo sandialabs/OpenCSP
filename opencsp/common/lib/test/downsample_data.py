@@ -1,9 +1,9 @@
 """Library of functions to downsample high-res image and other data
 """
 import numpy as np
-from   scipy.signal import convolve2d
+from scipy.signal import convolve2d
 
-from   opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.camera.Camera import Camera
 
 
 def downsample_camera(file: str, n: int) -> Camera:
@@ -28,7 +28,7 @@ def downsample_camera(file: str, n: int) -> Camera:
         intrinsic_mat=camera_orig.intrinsic_mat / float(n),
         distortion_coef=camera_orig.distortion_coef,
         image_shape_xy=np.floor(camera_orig.image_shape_xy / float(n)).astype(int),
-        name=camera_orig.name
+        name=camera_orig.name,
     )
 
 
@@ -47,7 +47,7 @@ def downsample_images(images: np.ndarray, n: int) -> np.ndarray:
     np.ndarray
         Downsampled m x n( x N) image array as uint8
     """
-    ker = np.ones((n, n), float) / float(n ** 2)
+    ker = np.ones((n, n), float) / float(n**2)
     images_ds_list = []
 
     if np.ndim(images) == 2:  # one, single 2d image
@@ -57,7 +57,11 @@ def downsample_images(images: np.ndarray, n: int) -> np.ndarray:
         n_images = images.shape[2]
 
     for idx_im in range(n_images):
-        images_ds_list.append(convolve2d(images[..., idx_im], ker, mode='valid')[::n, ::n, None].astype('uint8'))
+        images_ds_list.append(
+            convolve2d(images[..., idx_im], ker, mode='valid')[::n, ::n, None].astype(
+                'uint8'
+            )
+        )
 
     images_out = np.concatenate(images_ds_list, 2)
 

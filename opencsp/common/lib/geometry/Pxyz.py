@@ -8,9 +8,9 @@ class Pxyz(Vxyz):
 
     def __repr__(self):
         return '3D Point:\n' + self._data.__repr__()
-    
+
     def distance(self, data_in: "Pxyz") -> float:
-        """ Calculates the euclidian distance between this point and the data_in point. """
+        """Calculates the euclidian distance between this point and the data_in point."""
         self._check_is_Vxyz(data_in)
         return (self - data_in).magnitude()[0]
 
@@ -19,6 +19,4 @@ class Pxyz(Vxyz):
 
     @classmethod
     def empty(cls):
-        return Pxyz([[],[],[]])
-    
-    
+        return Pxyz([[], [], []])

@@ -4,23 +4,25 @@ import os
 import unittest
 
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 import opencsp
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from   opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
 class TestSlopeSolver(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements')
+        base_dir = os.path.join(
+            os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+        )
 
         # Define test data files for single facet processing
         cls.data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
@@ -51,14 +53,18 @@ class TestSlopeSolver(unittest.TestCase):
 
         # Perform calculations
         if data['surface_type'] == 'parabolic':
-            surface_data = dict(surface_type=data['surface_type'],
-                                initial_focal_lengths_xy=data['initial_focal_lengths_xy'],
-                                robust_least_squares=bool(data['robust_least_squares']),
-                                downsample=data['downsample'])
+            surface_data = dict(
+                surface_type=data['surface_type'],
+                initial_focal_lengths_xy=data['initial_focal_lengths_xy'],
+                robust_least_squares=bool(data['robust_least_squares']),
+                downsample=data['downsample'],
+            )
         elif data['surface_type'] == 'plano':
-            surface_data = dict(surface_type=data['surface_type'],
-                                robust_least_squares=bool(data['robust_least_squares']),
-                                downsample=data['downsample'])
+            surface_data = dict(
+                surface_type=data['surface_type'],
+                robust_least_squares=bool(data['robust_least_squares']),
+                downsample=data['downsample'],
+            )
         kwargs = {
             'v_optic_cam_optic': ori.v_optic_cam_optic,
             'u_active_pixel_pointing_optic': Uxyz(data['u_pixel_pointing_facet']),
@@ -77,16 +83,35 @@ class TestSlopeSolver(unittest.TestCase):
         cls.data_slope = ss.get_data()
 
     def test_transform_alignment(self):
-        data = load_hdf5_datasets([
-            'DataSofastCalculation/facet/facet_000/trans_alignment'
-        ], self.data_file_facet)
+        data = load_hdf5_datasets(
+            ['DataSofastCalculation/facet/facet_000/trans_alignment'],
+            self.data_file_facet,
+        )
 
-        np.testing.assert_allclose(data['trans_alignment'], self.data_slope.trans_alignment.matrix, atol=1e-8, rtol=0)
+        np.testing.assert_allclose(
+            data['trans_alignment'],
+            self.data_slope.trans_alignment.matrix,
+            atol=1e-8,
+            rtol=0,
+        )
 
     def test_int_pts(self):
-        data = load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/v_surf_points_facet'], self.data_file_facet)
-        np.testing.assert_allclose(data['v_surf_points_facet'], self.data_slope.v_surf_points_facet.data, atol=1e-8, rtol=0)
+        data = load_hdf5_datasets(
+            ['DataSofastCalculation/facet/facet_000/v_surf_points_facet'],
+            self.data_file_facet,
+        )
+        np.testing.assert_allclose(
+            data['v_surf_points_facet'],
+            self.data_slope.v_surf_points_facet.data,
+            atol=1e-8,
+            rtol=0,
+        )
 
     def test_slopes(self):
-        data = load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/slopes_facet_xy'], self.data_file_facet)
-        np.testing.assert_allclose(data['slopes_facet_xy'], self.data_slope.slopes_facet_xy, atol=1e-8, rtol=0)
+        data = load_hdf5_datasets(
+            ['DataSofastCalculation/facet/facet_000/slopes_facet_xy'],
+            self.data_file_facet,
+        )
+        np.testing.assert_allclose(
+            data['slopes_facet_xy'], self.data_slope.slopes_facet_xy, atol=1e-8, rtol=0
+        )

@@ -3,33 +3,38 @@ and data capture. Can capture datasets and save to HDF format.
 """
 import datetime as dt
 import tkinter
-from   tkinter import messagebox, simpledialog
-from   tkinter.filedialog import askopenfilename, asksaveasfilename
+from tkinter import messagebox, simpledialog
+from tkinter.filedialog import askopenfilename, asksaveasfilename
 
 import imageio
 import matplotlib.pyplot as plt
 import numpy as np
 
-from   opencsp.app.sofast.lib.Fringes import Fringes
-from   opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
-from   opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as ImageAcquisition_DCAM
-from   opencsp.common.lib.camera.ImageAcquisition_DCAM_color import ImageAcquisition as ImageAcquisition_DCAM_color
-from   opencsp.common.lib.camera.ImageAcquisition_MSMF import ImageAcquisition as ImageAcquisition_MSMF
-from   opencsp.common.lib.camera.image_processing import highlight_saturation
-from   opencsp.common.lib.camera.LiveView import LiveView
-from   opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-from   opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.System import System
-from   opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool import hdf5_tools
-from   opencsp.common.lib.tool.TkToolTip import TkToolTip
+from opencsp.app.sofast.lib.Fringes import Fringes
+from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import (
+    ImageAcquisition as ImageAcquisition_DCAM,
+)
+from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import (
+    ImageAcquisition as ImageAcquisition_DCAM_color,
+)
+from opencsp.common.lib.camera.ImageAcquisition_MSMF import (
+    ImageAcquisition as ImageAcquisition_MSMF,
+)
+from opencsp.common.lib.camera.image_processing import highlight_saturation
+from opencsp.common.lib.camera.LiveView import LiveView
+from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
+from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.System import System
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool import hdf5_tools
+from opencsp.common.lib.tool.TkToolTip import TkToolTip
 
 
 class SofastGUI:
-    """Class that contains SOFAST GUI controls and methods
-    """
+    """Class that contains SOFAST GUI controls and methods"""
 
     def __init__(self) -> 'SofastGUI':
         """
@@ -48,14 +53,8 @@ class SofastGUI:
         ]
 
         # Define calibration objects to use
-        self.cal_options = [
-            'Global',
-            'Scaling',
-        ]
-        self.cal_objects = [
-            ImageCalibrationGlobal,
-            ImageCalibrationScaling,
-        ]
+        self.cal_options = ['Global', 'Scaling']
+        self.cal_objects = [ImageCalibrationGlobal, ImageCalibrationScaling]
 
         # Create tkinter object
         self.root = tkinter.Tk()
@@ -119,12 +118,14 @@ class SofastGUI:
         ax.set_ylabel('Counts')
         ax.set_title('Image Histogram')
 
-    def _plot_image(self,
-                    ax: plt.Axes,
-                    image: np.ndarray,
-                    title: str = '',
-                    xlabel: str = '',
-                    ylabel: str = '') -> None:
+    def _plot_image(
+        self,
+        ax: plt.Axes,
+        image: np.ndarray,
+        title: str = '',
+        xlabel: str = '',
+        ylabel: str = '',
+    ) -> None:
         """
         Plots image on given axes.
 
@@ -164,40 +165,74 @@ class SofastGUI:
         label_frame_run.grid(row=3, column=0, sticky='nesw', padx=5, pady=5)
         # Settings label frame
         label_frame_settings = tkinter.LabelFrame(self.root, text='Settings')
-        label_frame_settings.grid(row=0, column=1, rowspan=3, sticky='nesw', padx=5, pady=5)
+        label_frame_settings.grid(
+            row=0, column=1, rowspan=3, sticky='nesw', padx=5, pady=5
+        )
 
         # =============== First Column - Load components ===============
         r = 0
         # Connect camera button
-        self.btn_load_image_acquisition = tkinter.Button(label_frame_load_system, text='Connect Camera', command=self.load_image_acquisition)
-        self.btn_load_image_acquisition.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_load_image_acquisition, 'Select the type of camera in the dropdown menu to the right. Click to connect to the camera.')
+        self.btn_load_image_acquisition = tkinter.Button(
+            label_frame_load_system,
+            text='Connect Camera',
+            command=self.load_image_acquisition,
+        )
+        self.btn_load_image_acquisition.grid(
+            row=r, column=0, pady=2, padx=2, sticky='nesw'
+        )
+        TkToolTip(
+            self.btn_load_image_acquisition,
+            'Select the type of camera in the dropdown menu to the right. Click to connect to the camera.',
+        )
         r += 1
 
         # Load physical layout
-        self.btn_load_image_projection = tkinter.Button(label_frame_load_system, text='Load ImageProjection', command=self.load_image_projection)
-        self.btn_load_image_projection.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_load_image_projection, 'Select an ImageProjection HDF file to load and display.')
+        self.btn_load_image_projection = tkinter.Button(
+            label_frame_load_system,
+            text='Load ImageProjection',
+            command=self.load_image_projection,
+        )
+        self.btn_load_image_projection.grid(
+            row=r, column=0, pady=2, padx=2, sticky='nesw'
+        )
+        TkToolTip(
+            self.btn_load_image_projection,
+            'Select an ImageProjection HDF file to load and display.',
+        )
         r += 1
 
         # =============== First Column - Projection controls ===============
         r = 0
-        self.btn_show_cal_image = tkinter.Button(label_frame_projector, text='Show Calibration Image', command=self.show_calibration_image)
+        self.btn_show_cal_image = tkinter.Button(
+            label_frame_projector,
+            text='Show Calibration Image',
+            command=self.show_calibration_image,
+        )
         self.btn_show_cal_image.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_show_cal_image, 'Shows calibration image on projection window.')
+        TkToolTip(
+            self.btn_show_cal_image, 'Shows calibration image on projection window.'
+        )
         r += 1
 
-        self.btn_show_axes = tkinter.Button(label_frame_projector, text='Show Screen Axes', command=self.show_axes)
+        self.btn_show_axes = tkinter.Button(
+            label_frame_projector, text='Show Screen Axes', command=self.show_axes
+        )
         self.btn_show_axes.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         TkToolTip(self.btn_show_axes, 'Shows screen axes on projection window.')
         r += 1
 
-        self.btn_show_crosshairs = tkinter.Button(label_frame_projector, text='Show Crosshairs', command=self.show_crosshairs)
+        self.btn_show_crosshairs = tkinter.Button(
+            label_frame_projector, text='Show Crosshairs', command=self.show_crosshairs
+        )
         self.btn_show_crosshairs.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         TkToolTip(self.btn_show_crosshairs, 'Shows crosshairs on projection window.')
         r += 1
 
-        self.btn_close_projection = tkinter.Button(label_frame_projector, text='Close Display Window', command=self.close_projection_window)
+        self.btn_close_projection = tkinter.Button(
+            label_frame_projector,
+            text='Close Display Window',
+            command=self.close_projection_window,
+        )
         self.btn_close_projection.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         TkToolTip(self.btn_close_projection, 'Close only projection window.')
         r += 1
@@ -205,37 +240,61 @@ class SofastGUI:
         # =============== First Column - Camera controls ===============
         r = 0
         # Perform exposure calibration
-        self.btn_exposure_cal = tkinter.Button(label_frame_camera, text='Calibrate Exposure Time', command=self.run_exposure_cal)
+        self.btn_exposure_cal = tkinter.Button(
+            label_frame_camera,
+            text='Calibrate Exposure Time',
+            command=self.run_exposure_cal,
+        )
         self.btn_exposure_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_exposure_cal, 'Automatically performs camera exposure calibration.')
+        TkToolTip(
+            self.btn_exposure_cal, 'Automatically performs camera exposure calibration.'
+        )
         r += 1
 
         # Set camera exposure
-        self.btn_set_exposure = tkinter.Button(label_frame_camera, text='Set Exposure Time', command=self.set_exposure)
+        self.btn_set_exposure = tkinter.Button(
+            label_frame_camera, text='Set Exposure Time', command=self.set_exposure
+        )
         self.btn_set_exposure.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_set_exposure, 'Set the camera exposure time value. The current value is displayed when clicked.')
+        TkToolTip(
+            self.btn_set_exposure,
+            'Set the camera exposure time value. The current value is displayed when clicked.',
+        )
         r += 1
 
         # Show snapshot button
-        self.btn_show_snapshot = tkinter.Button(label_frame_camera, text='Show Snapshot', command=self.show_snapshot)
+        self.btn_show_snapshot = tkinter.Button(
+            label_frame_camera, text='Show Snapshot', command=self.show_snapshot
+        )
         self.btn_show_snapshot.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_show_snapshot, 'Shows a camera image and pixel brightness histogram.')
+        TkToolTip(
+            self.btn_show_snapshot,
+            'Shows a camera image and pixel brightness histogram.',
+        )
         r += 1
 
         # Save snapshot button
-        self.btn_save_snapshot = tkinter.Button(label_frame_camera, text='Save Snapshot', command=self.save_snapshot)
+        self.btn_save_snapshot = tkinter.Button(
+            label_frame_camera, text='Save Snapshot', command=self.save_snapshot
+        )
         self.btn_save_snapshot.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         TkToolTip(self.btn_save_snapshot, 'Saves image from camera as a PNG.')
         r += 1
 
         # Live view button
-        self.btn_live_view = tkinter.Button(label_frame_camera, text='Live View', command=self.live_view)
+        self.btn_live_view = tkinter.Button(
+            label_frame_camera, text='Live View', command=self.live_view
+        )
         self.btn_live_view.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         TkToolTip(self.btn_live_view, 'Shows live view from connected camera.')
         r += 1
 
         # Perform exposure calibration
-        self.btn_close_camera = tkinter.Button(label_frame_camera, text='Close Camera', command=self.close_image_acquisition)
+        self.btn_close_camera = tkinter.Button(
+            label_frame_camera,
+            text='Close Camera',
+            command=self.close_image_acquisition,
+        )
         self.btn_close_camera.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         TkToolTip(self.btn_close_camera, 'Closes connection to camera.')
         r += 1
@@ -243,27 +302,57 @@ class SofastGUI:
         # =============== First Column - System run controls ===============
         r = 0
         # Run sofast capture
-        self.btn_run_measurement = tkinter.Button(label_frame_run, text='Run Data Capture', command=self.run_measurement)
+        self.btn_run_measurement = tkinter.Button(
+            label_frame_run, text='Run Data Capture', command=self.run_measurement
+        )
         self.btn_run_measurement.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_run_measurement, 'Runs SOFAST data capture. Mask then fringes are captured.')
+        TkToolTip(
+            self.btn_run_measurement,
+            'Runs SOFAST data capture. Mask then fringes are captured.',
+        )
         r += 1
 
         # Perform projector-camera brightness calibration
-        self.btn_gray_levels_cal = tkinter.Button(label_frame_run, text='Run Response Calibration', command=self.run_gray_levels_cal)
+        self.btn_gray_levels_cal = tkinter.Button(
+            label_frame_run,
+            text='Run Response Calibration',
+            command=self.run_gray_levels_cal,
+        )
         self.btn_gray_levels_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_gray_levels_cal, 'Performs Projector-Camera Brightness Calibration sequence. Must select a destination HDF file first.')
+        TkToolTip(
+            self.btn_gray_levels_cal,
+            'Performs Projector-Camera Brightness Calibration sequence. Must select a destination HDF file first.',
+        )
         r += 1
 
         # Load projector-camera brightness calibration
-        self.btn_load_gray_levels_cal = tkinter.Button(label_frame_run, text='Load Response Calibration', command=self.load_gray_levels_cal)
-        self.btn_load_gray_levels_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_load_gray_levels_cal, 'Loads a previously saved Projector-Camera Brightness Calibration sequence data file.')
+        self.btn_load_gray_levels_cal = tkinter.Button(
+            label_frame_run,
+            text='Load Response Calibration',
+            command=self.load_gray_levels_cal,
+        )
+        self.btn_load_gray_levels_cal.grid(
+            row=r, column=0, pady=2, padx=2, sticky='nesw'
+        )
+        TkToolTip(
+            self.btn_load_gray_levels_cal,
+            'Loads a previously saved Projector-Camera Brightness Calibration sequence data file.',
+        )
         r += 1
 
         # View projector-camera brightness calibration
-        self.btn_view_gray_levels_cal = tkinter.Button(label_frame_run, text='View Response Calibration', command=self.view_gray_levels_cal)
-        self.btn_view_gray_levels_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_view_gray_levels_cal, 'Views current Projector-Camera Brightness Calibration sequence data file.')
+        self.btn_view_gray_levels_cal = tkinter.Button(
+            label_frame_run,
+            text='View Response Calibration',
+            command=self.view_gray_levels_cal,
+        )
+        self.btn_view_gray_levels_cal.grid(
+            row=r, column=0, pady=2, padx=2, sticky='nesw'
+        )
+        TkToolTip(
+            self.btn_view_gray_levels_cal,
+            'Views current Projector-Camera Brightness Calibration sequence data file.',
+        )
         r += 1
 
         # =============== First Column - Close button ===============
@@ -276,8 +365,12 @@ class SofastGUI:
         r = 0
         # Camera type dropdown
         self.var_cam_select = tkinter.StringVar(value=self.cam_options[0])
-        lbl_camera_type = tkinter.Label(label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold'))
-        drop_camera_type = tkinter.OptionMenu(label_frame_settings, self.var_cam_select, *self.cam_options)
+        lbl_camera_type = tkinter.Label(
+            label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold')
+        )
+        drop_camera_type = tkinter.OptionMenu(
+            label_frame_settings, self.var_cam_select, *self.cam_options
+        )
         TkToolTip(drop_camera_type, 'Select type of camera object to load.')
 
         lbl_camera_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
@@ -286,9 +379,18 @@ class SofastGUI:
 
         # Calibration type dropdown
         self.var_cal_select = tkinter.StringVar(value=self.cal_options[0])
-        lbl_cal_type = tkinter.Label(label_frame_settings, text='Select calibration method:', font=('calibre', 10, 'bold'))
-        drop_cal_type = tkinter.OptionMenu(label_frame_settings, self.var_cal_select, *self.cal_options)
-        TkToolTip(drop_cal_type, 'Select type of Projector-Camera Brightness Calibration process to use.')
+        lbl_cal_type = tkinter.Label(
+            label_frame_settings,
+            text='Select calibration method:',
+            font=('calibre', 10, 'bold'),
+        )
+        drop_cal_type = tkinter.OptionMenu(
+            label_frame_settings, self.var_cal_select, *self.cal_options
+        )
+        TkToolTip(
+            drop_cal_type,
+            'Select type of Projector-Camera Brightness Calibration process to use.',
+        )
 
         lbl_cal_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
         drop_cal_type.grid(row=r, column=2, pady=2, padx=2, sticky='nsw')
@@ -297,12 +399,36 @@ class SofastGUI:
         # Fringe periods input box
         self.var_fringe_periods_x = tkinter.IntVar(value=4)
         self.var_fringe_periods_y = tkinter.IntVar(value=4)
-        lbl_fringe_x = tkinter.Label(label_frame_settings, text='Fringe X periods:', font=('calibre', 10, 'bold'))
-        lbl_fringe_y = tkinter.Label(label_frame_settings, text='Fringe Y periods:', font=('calibre', 10, 'bold'))
-        entry_fringe_x = tkinter.Spinbox(label_frame_settings, textvariable=self.var_fringe_periods_x, font=('calibre', 10, 'normal'), from_=1, to=100, width=5)
-        entry_fringe_y = tkinter.Spinbox(label_frame_settings, textvariable=self.var_fringe_periods_y, font=('calibre', 10, 'normal'), from_=1, to=100, width=5)
-        TkToolTip(entry_fringe_x, 'Number of fringe X periods to show during a data capture. Each fringe period will always be phase shifted four times.')
-        TkToolTip(entry_fringe_y, 'Number of fringe Y periods to show during a data capture. Each fringe period will always be phase shifted four times.')
+        lbl_fringe_x = tkinter.Label(
+            label_frame_settings, text='Fringe X periods:', font=('calibre', 10, 'bold')
+        )
+        lbl_fringe_y = tkinter.Label(
+            label_frame_settings, text='Fringe Y periods:', font=('calibre', 10, 'bold')
+        )
+        entry_fringe_x = tkinter.Spinbox(
+            label_frame_settings,
+            textvariable=self.var_fringe_periods_x,
+            font=('calibre', 10, 'normal'),
+            from_=1,
+            to=100,
+            width=5,
+        )
+        entry_fringe_y = tkinter.Spinbox(
+            label_frame_settings,
+            textvariable=self.var_fringe_periods_y,
+            font=('calibre', 10, 'normal'),
+            from_=1,
+            to=100,
+            width=5,
+        )
+        TkToolTip(
+            entry_fringe_x,
+            'Number of fringe X periods to show during a data capture. Each fringe period will always be phase shifted four times.',
+        )
+        TkToolTip(
+            entry_fringe_y,
+            'Number of fringe Y periods to show during a data capture. Each fringe period will always be phase shifted four times.',
+        )
 
         lbl_fringe_x.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
         entry_fringe_x.grid(row=r, column=2, pady=2, padx=2, sticky='nsw')
@@ -312,17 +438,35 @@ class SofastGUI:
         r += 1
 
         # Camera calibration input box
-        self.var_gray_lvl_cal_status = tkinter.StringVar(value='Calibration data: No Data')
-        lbl_gray_lvl_cal_status = tkinter.Label(label_frame_settings, textvariable=self.var_gray_lvl_cal_status, font=('calibre', 10, 'bold'))
+        self.var_gray_lvl_cal_status = tkinter.StringVar(
+            value='Calibration data: No Data'
+        )
+        lbl_gray_lvl_cal_status = tkinter.Label(
+            label_frame_settings,
+            textvariable=self.var_gray_lvl_cal_status,
+            font=('calibre', 10, 'bold'),
+        )
 
-        lbl_gray_lvl_cal_status.grid(row=r, column=1, pady=2, padx=2, sticky='nsw', columnspan=2)
+        lbl_gray_lvl_cal_status.grid(
+            row=r, column=1, pady=2, padx=2, sticky='nsw', columnspan=2
+        )
         r += 1
 
         # Measure point input
         self.var_meas_pt = tkinter.StringVar(value='0.0, 0.0, 0.0')
-        lbl_meas_pt = tkinter.Label(label_frame_settings, text='Measure Point XYZ', font=('calibre', 10, 'bold'))
-        entry_meas_pt = tkinter.Entry(label_frame_settings, textvariable=self.var_meas_pt, font=('calibre', 10, 'normal'), width=20)
-        TkToolTip(entry_meas_pt, 'Location, in mirror coordinates (meters), of the point on the mirror where the "mirror-to-screen distance" is measured.')
+        lbl_meas_pt = tkinter.Label(
+            label_frame_settings, text='Measure Point XYZ', font=('calibre', 10, 'bold')
+        )
+        entry_meas_pt = tkinter.Entry(
+            label_frame_settings,
+            textvariable=self.var_meas_pt,
+            font=('calibre', 10, 'normal'),
+            width=20,
+        )
+        TkToolTip(
+            entry_meas_pt,
+            'Location, in mirror coordinates (meters), of the point on the mirror where the "mirror-to-screen distance" is measured.',
+        )
 
         lbl_meas_pt.grid(row=r, column=1, pady=2, padx=2, sticky='nsw', columnspan=2)
         r += 1
@@ -331,9 +475,21 @@ class SofastGUI:
 
         # Distance input
         self.var_meas_dist = tkinter.StringVar(value='10.0')
-        lbl_meas_dist = tkinter.Label(label_frame_settings, text='Measured mirror-screen distance', font=('calibre', 10, 'bold'))
-        entry_meas_dist = tkinter.Entry(label_frame_settings, textvariable=self.var_meas_dist, font=('calibre', 10, 'normal'), width=20)
-        TkToolTip(entry_meas_dist, 'The distance in meters from the display crosshairs to the "Measure Point XYZ" location on the mirror.')
+        lbl_meas_dist = tkinter.Label(
+            label_frame_settings,
+            text='Measured mirror-screen distance',
+            font=('calibre', 10, 'bold'),
+        )
+        entry_meas_dist = tkinter.Entry(
+            label_frame_settings,
+            textvariable=self.var_meas_dist,
+            font=('calibre', 10, 'normal'),
+            width=20,
+        )
+        TkToolTip(
+            entry_meas_dist,
+            'The distance in meters from the display crosshairs to the "Measure Point XYZ" location on the mirror.',
+        )
 
         lbl_meas_dist.grid(row=r, column=1, pady=2, padx=2, sticky='nsw', columnspan=2)
         r += 1
@@ -342,9 +498,19 @@ class SofastGUI:
 
         # Measurement name
         self.var_meas_name = tkinter.StringVar(value='')
-        lbl_meas_name = tkinter.Label(label_frame_settings, text='Measurement name', font=('calibre', 10, 'bold'))
-        entry_meas_name = tkinter.Entry(label_frame_settings, textvariable=self.var_meas_name, font=('calibre', 10, 'normal'), width=20)
-        TkToolTip(entry_meas_name, 'The name of the measurement to be saved in the measurement HDF file.')
+        lbl_meas_name = tkinter.Label(
+            label_frame_settings, text='Measurement name', font=('calibre', 10, 'bold')
+        )
+        entry_meas_name = tkinter.Entry(
+            label_frame_settings,
+            textvariable=self.var_meas_name,
+            font=('calibre', 10, 'normal'),
+            width=20,
+        )
+        TkToolTip(
+            entry_meas_name,
+            'The name of the measurement to be saved in the measurement HDF file.',
+        )
 
         lbl_meas_name.grid(row=r, column=1, pady=2, padx=2, sticky='nsw', columnspan=2)
         r += 1
@@ -396,7 +562,9 @@ class SofastGUI:
     def _check_system_loaded(self) -> None:
         """Checks if the system class has been instantiated"""
         if self.system is None:
-            messagebox.showerror('Error', 'Both ImageAcquisiton and ImageProjection must both be loaded.')
+            messagebox.showerror(
+                'Error', 'Both ImageAcquisiton and ImageProjection must both be loaded.'
+            )
             return
 
     def _check_calibration_loaded(self) -> bool:
@@ -404,7 +572,9 @@ class SofastGUI:
         returns False and shows error message if not loaded.
         """
         if self.calibration is None:  # Not loaded
-            messagebox.showerror('Error', 'Camera-Projector calibration must be loaded/performed.')
+            messagebox.showerror(
+                'Error', 'Camera-Projector calibration must be loaded/performed.'
+            )
             return False
         else:  # Loaded
             return True
@@ -421,7 +591,10 @@ class SofastGUI:
     def _save_measurement_data(self, file: str) -> None:
         """Saves last measurement to HDF file"""
         # Check measurement images have been captured
-        if self.system.fringe_images_captured is None or self.system.mask_images_captured is None:
+        if (
+            self.system.fringe_images_captured is None
+            or self.system.mask_images_captured is None
+        ):
             raise ValueError('Measurement data has not been captured.')
         elif self.calibration is None:
             raise ValueError('Calibration data has not been processed.')
@@ -461,7 +634,9 @@ class SofastGUI:
     def load_image_projection(self) -> None:
         """Loads and displays ImageProjection"""
         # Get file name
-        file = askopenfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
+        file = askopenfilename(
+            defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")]
+        )
 
         # Load file and display
         if file != '':
@@ -470,7 +645,9 @@ class SofastGUI:
             # Create new window
             projector_root = tkinter.Toplevel(self.root)
             # Show window
-            self.image_projection = ImageProjection(projector_root, image_projection_data)
+            self.image_projection = ImageProjection(
+                projector_root, image_projection_data
+            )
 
             print(f'ImageProjection loaded:\n    {file}')
 
@@ -504,7 +681,9 @@ class SofastGUI:
         """Runs data collect and saved data."""
 
         # Get save file name
-        file = asksaveasfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
+        file = asksaveasfilename(
+            defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")]
+        )
         if file == '':
             return
 
@@ -516,8 +695,8 @@ class SofastGUI:
             return
 
         # Get fringe periods
-        periods_x = [4 ** idx for idx in range(self.var_fringe_periods_x.get())]
-        periods_y = [4 ** idx for idx in range(self.var_fringe_periods_y.get())]
+        periods_x = [4**idx for idx in range(self.var_fringe_periods_x.get())]
+        periods_y = [4**idx for idx in range(self.var_fringe_periods_y.get())]
         periods_x[0] -= 0.1
         periods_y[0] -= 0.1
 
@@ -559,8 +738,12 @@ class SofastGUI:
     def run_gray_levels_cal(self) -> None:
         """Runs the projector-camera intensity calibration"""
         # Get save file name
-        file_default = dt.datetime.now().strftime('projector_camera_response_%Y_%m_%d-%H_%M_%S.h5')
-        file = asksaveasfilename(initialfile=file_default, filetypes=[("HDF5 File", "*.h5")])
+        file_default = dt.datetime.now().strftime(
+            'projector_camera_response_%Y_%m_%d-%H_%M_%S.h5'
+        )
+        file = asksaveasfilename(
+            initialfile=file_default, filetypes=[("HDF5 File", "*.h5")]
+        )
 
         if file == '':
             print('No file selected.')
@@ -576,20 +759,29 @@ class SofastGUI:
         # Capture images
         def _func_0():
             print('Calibrating...')
-            self.system.run_display_camera_response_calibration(res=10, run_next=self.system.run_next_in_queue)
+            self.system.run_display_camera_response_calibration(
+                res=10, run_next=self.system.run_next_in_queue
+            )
 
         # Process data
         def _func_1():
             print('Processing calibration data')
             # Get calibration images from System
-            calibration_images = self.system.get_calibration_images()[0]  # only calibrating one camera
+            calibration_images = self.system.get_calibration_images()[
+                0
+            ]  # only calibrating one camera
             # Load calibration object
-            self.calibration = cal_object.from_data(calibration_images, self.system.calibration_display_values)
+            self.calibration = cal_object.from_data(
+                calibration_images, self.system.calibration_display_values
+            )
             # Save calibration object
             self.calibration.save_to_hdf(file)
             # Save calibration raw data
             data = [self.system.calibration_display_values, calibration_images]
-            datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
+            datasets = [
+                'CalibrationRawData/display_values',
+                'CalibrationRawData/images',
+            ]
             hdf5_tools.save_hdf5_datasets(data, datasets, file)
             # Show crosshairs
             self.show_crosshairs()
@@ -605,13 +797,17 @@ class SofastGUI:
     def load_gray_levels_cal(self) -> None:
         """Loads saved results of a projector-camera intensity calibration"""
         # Get file name
-        file = askopenfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
+        file = askopenfilename(
+            defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")]
+        )
 
         if file == '':
             return
 
         # Load file
-        cal_type = hdf5_tools.load_hdf5_datasets(['Calibration/calibration_type'], file)['calibration_type']
+        cal_type = hdf5_tools.load_hdf5_datasets(
+            ['Calibration/calibration_type'], file
+        )['calibration_type']
 
         if cal_type == 'ImageCalibrationGlobal':
             self.calibration = ImageCalibrationGlobal.load_from_hdf(file)
@@ -648,7 +844,10 @@ class SofastGUI:
         cur_exp = self.image_acquisition.exposure_time
 
         # Get new exposure_time value
-        new_exp = simpledialog.askfloat(title="Set exposure value", prompt=f"Current exposure: {cur_exp:.1f}. New Value:")
+        new_exp = simpledialog.askfloat(
+            title="Set exposure value",
+            prompt=f"Current exposure: {cur_exp:.1f}. New Value:",
+        )
 
         # Set new exposure_time value
         if new_exp is not None:
@@ -660,7 +859,9 @@ class SofastGUI:
         frame = self._get_frame()
 
         # Get save file name
-        file = asksaveasfilename(defaultextension='.png', filetypes=[("All tpyes", "*.*")])
+        file = asksaveasfilename(
+            defaultextension='.png', filetypes=[("All tpyes", "*.*")]
+        )
 
         # Save image
         if file != '':
@@ -688,7 +889,9 @@ class SofastGUI:
         ax2 = fig.add_subplot(122)
 
         # Plot image
-        self._plot_image(ax1, frame_rgb, 'Current camera view', 'X (pixels)', 'Y (pixels)')
+        self._plot_image(
+            ax1, frame_rgb, 'Current camera view', 'X (pixels)', 'Y (pixels)'
+        )
 
         # Plot histogram
         self._plot_hist(ax2, frame)

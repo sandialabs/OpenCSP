@@ -3,8 +3,12 @@ import os
 import numpy as np
 
 import opencsp
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import FixedPatternDotLocations
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import FixedPatternScreenProjection
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
+    FixedPatternDotLocations,
+)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
+    FixedPatternScreenProjection,
+)
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.geometry.Vxy import Vxy
 
@@ -13,18 +17,28 @@ def test_FixedPatternDotLocations():
     # Generate test data
     xv = np.array([-2, -1, 0, 1, 2])
     yv = np.array([-3, -2, -1, 0, 1, 2])
-    x = np.array([[1, 2, 3, 4, 5],
-                  [1, 2, 3, 4, 5],
-                  [1, 2, 3, 4, 5],
-                  [1, 2, 3, 4, 5],
-                  [1, 2, 3, 4, 5],
-                  [1, 2, 3, 4, 5]], dtype=float)
-    y = np.array([[11, 11, 11, 11, 11],
-                  [12, 12, 12, 12, 12],
-                  [13, 13, 13, 13, 13],
-                  [14, 14, 14, 14, 14],
-                  [15, 15, 15, 15, 15],
-                  [16, 16, 16, 16, 16]], dtype=float)
+    x = np.array(
+        [
+            [1, 2, 3, 4, 5],
+            [1, 2, 3, 4, 5],
+            [1, 2, 3, 4, 5],
+            [1, 2, 3, 4, 5],
+            [1, 2, 3, 4, 5],
+            [1, 2, 3, 4, 5],
+        ],
+        dtype=float,
+    )
+    y = np.array(
+        [
+            [11, 11, 11, 11, 11],
+            [12, 12, 12, 12, 12],
+            [13, 13, 13, 13, 13],
+            [14, 14, 14, 14, 14],
+            [15, 15, 15, 15, 15],
+            [16, 16, 16, 16, 16],
+        ],
+        dtype=float,
+    )
     z = np.zeros((6, 5)) + 0.1
     xyz = np.concatenate((x[..., None], y[..., None], z[..., None]), axis=2)
 
@@ -51,23 +65,34 @@ def test_FixedPatternDotLocations():
 
 def test_from_Display():
     # Load display
-    file_disp = os.path.join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/display_distorted_3d.h5')
+    file_disp = os.path.join(
+        os.path.dirname(opencsp.__file__),
+        'test/data/sofast_measurements/display_distorted_3d.h5',
+    )
     display = Display.load_from_hdf(file_disp)
     fp_proj = FixedPatternScreenProjection(30, 30, 5, 5)
 
     fp = FixedPatternDotLocations.from_projection_and_display(fp_proj, display)
 
     # Test
-    x_exp = np.array([[-3.20926192, -0.29103971, 2.61672562],
-                      [-3.2057312, -0.2908884, 2.61473907],
-                      [-3.20352939, -0.29055366, 2.61233896]])
-    y_exp = np.array([[-1.28036655, -1.27780583, -1.27613219],
-                      [-0.11836353, -0.11801777, -0.11784412],
-                      [1.04289668, 1.04089699, 1.03854907]])
-    z_exp = np.array([[0., 0., 0.,],
-                      [0., 0., 0.,],
-                      [0., 0., 0.,]])
-    xyz_exp = np.concatenate((x_exp[..., None], y_exp[..., None], z_exp[..., None]), axis=2)
+    x_exp = np.array(
+        [
+            [-3.20926192, -0.29103971, 2.61672562],
+            [-3.2057312, -0.2908884, 2.61473907],
+            [-3.20352939, -0.29055366, 2.61233896],
+        ]
+    )
+    y_exp = np.array(
+        [
+            [-1.28036655, -1.27780583, -1.27613219],
+            [-0.11836353, -0.11801777, -0.11784412],
+            [1.04289668, 1.04089699, 1.03854907],
+        ]
+    )
+    z_exp = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
+    xyz_exp = np.concatenate(
+        (x_exp[..., None], y_exp[..., None], z_exp[..., None]), axis=2
+    )
     np.testing.assert_allclose(fp.xyz_dot_loc, xyz_exp, atol=1e-6, rtol=0)
 
 

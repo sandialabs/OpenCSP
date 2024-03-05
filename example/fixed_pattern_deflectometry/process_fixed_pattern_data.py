@@ -3,24 +3,32 @@
 from os.path import join, dirname
 
 import opencsp
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import FixedPatternDotLocations
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import FixedPatternMeasurement
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcess import FixedPatternProcess
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.deflectometry.FacetData import FacetData
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
+    FixedPatternDotLocations,
+)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
+    FixedPatternMeasurement,
+)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcess import (
+    FixedPatternProcess,
+)
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 
 
-def process(file_camera: str,
-            file_facet: str,
-            file_dot_locs: str,
-            file_ori: str,
-            file_meas: str,
-            save_dir: str,
-            surface_data: dict) -> FixedPatternProcess:
+def process(
+    file_camera: str,
+    file_facet: str,
+    file_dot_locs: str,
+    file_ori: str,
+    file_meas: str,
+    save_dir: str,
+    surface_data: dict,
+) -> FixedPatternProcess:
     """Performs fixed pattern deflectometry processing"""
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -30,7 +38,9 @@ def process(file_camera: str,
     measurement = FixedPatternMeasurement.load_from_hdf(file_meas)
 
     # Instantiate class
-    fixed_pattern = FixedPatternProcess(orientation, camera, fixed_pattern_dot_locs, facet_data)
+    fixed_pattern = FixedPatternProcess(
+        orientation, camera, fixed_pattern_dot_locs, facet_data
+    )
     fixed_pattern.load_measurement_data(measurement)
 
     # Process
@@ -60,7 +70,9 @@ def example_process_fixed_pattern_printed_target():
     """Example function that processes a fixed pattern data collect using a physical,
     printed dot target.
     """
-    dir_base = join(dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab')
+    dir_base = join(
+        dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab'
+    )
 
     file_camera = join(dir_base, "calibration_files/camera.h5")
     file_facet = join(dir_base, "calibration_files/Facet_NSTTF.json")
@@ -69,26 +81,58 @@ def example_process_fixed_pattern_printed_target():
     file_meas = join(dir_base, 'fixed_pattern/measurement_printed_target_1.h5')
     dir_output = join(dirname(__file__), 'data/output/printed_target')
 
-    surface_data = dict(surface_type='parabolic', initial_focal_lengths_xy=(150., 150), robust_least_squares=False, downsample=1)
+    surface_data = dict(
+        surface_type='parabolic',
+        initial_focal_lengths_xy=(150.0, 150),
+        robust_least_squares=False,
+        downsample=1,
+    )
 
-    process(file_camera, file_facet, file_dot_locs, file_ori, file_meas, dir_output, surface_data)
+    process(
+        file_camera,
+        file_facet,
+        file_dot_locs,
+        file_ori,
+        file_meas,
+        dir_output,
+        surface_data,
+    )
 
 
 def example_process_fixed_pattern_screen_target():
     """Loads data and calls processing function"""
-    dir_base = join(dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab')
+    dir_base = join(
+        dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab'
+    )
 
     # Define files
     file_camera = join(dir_base, "calibration_files/camera.h5")
     file_facet = join(dir_base, "calibration_files/Facet_NSTTF.json")
     file_ori = join(dir_base, 'fixed_pattern/spatial_orientation.h5')
-    file_dot_locs = join(dir_base, 'fixed_pattern/dot_locations_screen_square_width3_space6.h5')
-    file_meas = join(dir_base, 'fixed_pattern/measurement_screen_square_width3_space6.h5')
+    file_dot_locs = join(
+        dir_base, 'fixed_pattern/dot_locations_screen_square_width3_space6.h5'
+    )
+    file_meas = join(
+        dir_base, 'fixed_pattern/measurement_screen_square_width3_space6.h5'
+    )
     dir_output = join(dirname(__file__), 'data/output/screen_target')
 
-    surface_data = dict(surface_type='parabolic', initial_focal_lengths_xy=(150., 150), robust_least_squares=False, downsample=1)
+    surface_data = dict(
+        surface_type='parabolic',
+        initial_focal_lengths_xy=(150.0, 150),
+        robust_least_squares=False,
+        downsample=1,
+    )
 
-    process(file_camera, file_facet, file_dot_locs, file_ori, file_meas, dir_output, surface_data)
+    process(
+        file_camera,
+        file_facet,
+        file_dot_locs,
+        file_ori,
+        file_meas,
+        dir_output,
+        surface_data,
+    )
 
 
 if __name__ == '__main__':

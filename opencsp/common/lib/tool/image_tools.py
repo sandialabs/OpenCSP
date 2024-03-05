@@ -11,20 +11,71 @@ from PIL import Image
 import opencsp.common.lib.tool.log_tools as lt
 
 # from https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
-pil_image_formats_rw = ["blp", "bmp", "dds", "dib", "eps", "gif", "icns", "ico", "im", "jpg", "jpeg", "msp", "pcx", "png", "apng", "pbm", "pgm", "ppm", "pnm", "sgi", "spider", "tga", "tiff", "webp", "xbm"]
+pil_image_formats_rw = [
+    "blp",
+    "bmp",
+    "dds",
+    "dib",
+    "eps",
+    "gif",
+    "icns",
+    "ico",
+    "im",
+    "jpg",
+    "jpeg",
+    "msp",
+    "pcx",
+    "png",
+    "apng",
+    "pbm",
+    "pgm",
+    "ppm",
+    "pnm",
+    "sgi",
+    "spider",
+    "tga",
+    "tiff",
+    "webp",
+    "xbm",
+]
 """ A list of all image image formats that can be read and written by the Python Imaging Library (PIL) """
-pil_image_formats_readable = pil_image_formats_rw + ["cur", "dcx", "fits", "fli", "flc", "fpx", "ftex", "gbr", "gd", "imt", "iptc", "naa", "mcidas", "mic", "mpo", "pcd", "pixar", "psd", "sun", "wal", "wmf", "emf", "xpm"]
+pil_image_formats_readable = pil_image_formats_rw + [
+    "cur",
+    "dcx",
+    "fits",
+    "fli",
+    "flc",
+    "fpx",
+    "ftex",
+    "gbr",
+    "gd",
+    "imt",
+    "iptc",
+    "naa",
+    "mcidas",
+    "mic",
+    "mpo",
+    "pcd",
+    "pixar",
+    "psd",
+    "sun",
+    "wal",
+    "wmf",
+    "emf",
+    "xpm",
+]
 """ A list of all image image formats that can be read by the Python Imaging Library (PIL). Note that not all of these formats can be written by PIL. """
 pil_image_formats_writable = pil_image_formats_rw + ["palm", "pdf", "xv"]
 """ A list of all image image formats that can be written by the Python Imaging Library (PIL). Note that not all of these formats can be ready by PIL. """
 
+
 def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
-    """ Convert the numpy representation of an image to a Pillow Image.
+    """Convert the numpy representation of an image to a Pillow Image.
 
     Coverts the given arr to an Image. The array is converted to an integer
     type, as necessary. The color information is then rescaled/clipd to fit
     within an 8-bit color depth.
-    
+
     In theory, images can be saved with higher bit-depth information using
     opencv imwrite('12bitimage.png', arr), but I (BGB) haven't tried very hard
     and haven't had any luck getting this to work.
@@ -47,8 +98,17 @@ def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
     image: PIL.Image
         The image representation of the input array.
     """
-    allowed_int_types = [np.int8, np.uint8, np.int16, np.uint16, np.int32, np.uint32, np.int64, np.uint64]
-    
+    allowed_int_types = [
+        np.int8,
+        np.uint8,
+        np.int16,
+        np.uint16,
+        np.int32,
+        np.uint32,
+        np.int64,
+        np.uint64,
+    ]
+
     # get the current integer size, and convert to integer type
     if not np.issubdtype(arr.dtype, np.integer):
         maxval = np.max(arr)
@@ -71,12 +131,15 @@ def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
         else:
             arr = np.clip(arr, 0, 255)
             arr = arr.astype(np.uint8)
-    
+
     img = Image.fromarray(arr)
     return img
-    
-def images_are_identical(image_1: np.ndarray, image_2: np.ndarray, tolerance_pixel: int):
-    """ Checks if two images are identical.
+
+
+def images_are_identical(
+    image_1: np.ndarray, image_2: np.ndarray, tolerance_pixel: int
+):
+    """Checks if two images are identical.
 
     Args:
         - image_1 (matrix): The first image to compare, such as from cv.imread().
@@ -86,7 +149,7 @@ def images_are_identical(image_1: np.ndarray, image_2: np.ndarray, tolerance_pix
     Returns:
         - bool: True if identical, False otherwise
     """
-    if (image_1.shape != image_2.shape):
+    if image_1.shape != image_2.shape:
         # Different shapes.
         return False
     else:
@@ -97,29 +160,34 @@ def images_are_identical(image_1: np.ndarray, image_2: np.ndarray, tolerance_pix
         else:
             return False
 
+
 def dims_and_nchannels(image: np.ndarray):
-    """ Get the (x,y) dimensions of the image, and the number of color channels.
-    
+    """Get the (x,y) dimensions of the image, and the number of color channels.
+
     Raises:
     -------
     ValueError
-        If the given array doesn't have the correct number of dimensions (2 or 3). """
+        If the given array doesn't have the correct number of dimensions (2 or 3)."""
     shape = image.shape
-    
+
     nchannels = 1
     if len(shape) == 2:
         nchannels = 1
     elif len(shape) == 3:
         nchannels = shape[2]
     else:
-        lt.error_and_raise(ValueError, f"Error in image_tools.dims_and_nchannels(): expected image to have 2-3 dimensions (x, y, and color), but {shape=}!")
-    
+        lt.error_and_raise(
+            ValueError,
+            f"Error in image_tools.dims_and_nchannels(): expected image to have 2-3 dimensions (x, y, and color), but {shape=}!",
+        )
+
     xdim = shape[0]
     ydim = shape[1]
     return (xdim, ydim), nchannels
 
+
 def min_max_colors(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
-    """ Get the minimum and maximum values for each of the color channels in the given image.
+    """Get the minimum and maximum values for each of the color channels in the given image.
 
     Parameters
     ----------
@@ -137,21 +205,34 @@ def min_max_colors(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
     """
     _, nchannels = dims_and_nchannels(image)
     if nchannels == 1:
-        min_color: np.ndarray = np.array([ np.min(image) ])
-        max_color: np.ndarray = np.array([ np.max(image) ])
+        min_color: np.ndarray = np.array([np.min(image)])
+        max_color: np.ndarray = np.array([np.max(image)])
         if max_color.ndim != 1 or max_color.shape[0] != 1:
-            lt.error_and_raise(RuntimeError, "Programmer error in image_tools.min_max(): " + \
-                f"Returned value should have shape=(1), but is instead {max_color.shape=}")
+            lt.error_and_raise(
+                RuntimeError,
+                "Programmer error in image_tools.min_max(): "
+                + f"Returned value should have shape=(1), but is instead {max_color.shape=}",
+            )
         return min_color, max_color
     else:
         if image.ndim != 3:
-            lt.error_and_raise(RuntimeError, "Programmer error in image_tools.min_max(): " + \
-                f"I really expected the image array to have 3 dimensions, but found {image.ndim=}!")
+            lt.error_and_raise(
+                RuntimeError,
+                "Programmer error in image_tools.min_max(): "
+                + f"I really expected the image array to have 3 dimensions, but found {image.ndim=}!",
+            )
         min_per_row: np.ndarray = np.min(image, axis=1)
         max_per_row: np.ndarray = np.max(image, axis=1)
         min_colors: np.ndarray = np.min(min_per_row, axis=0)
         max_colors: np.ndarray = np.max(max_per_row, axis=0)
-        if max_colors.ndim != 1 or max_colors.shape[0] != nchannels or max_colors.shape[0] <= 1:
-            lt.error_and_raise(RuntimeError, "Programmer error in image_tools.min_max(): " + \
-                f"Returned value should have shape=(3), but is instead {max_colors.shape=}")
+        if (
+            max_colors.ndim != 1
+            or max_colors.shape[0] != nchannels
+            or max_colors.shape[0] <= 1
+        ):
+            lt.error_and_raise(
+                RuntimeError,
+                "Programmer error in image_tools.min_max(): "
+                + f"Returned value should have shape=(3), but is instead {max_colors.shape=}",
+            )
         return min_colors, max_colors

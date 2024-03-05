@@ -27,11 +27,15 @@ def robust_arccos(x: float) -> float:
     """
     if (x < (-1.0 - INVERSE_TRIG_TOLERANCE)) or (x > (1.0 + INVERSE_TRIG_TOLERANCE)):
         # TODO RCB: REPLACE THIS WITH LOG/EXCEPTION THROW.
-        print('ERROR: In robust_arccos(), input value ' + str(x) + ' is out of valid range [-1,1].')
+        print(
+            'ERROR: In robust_arccos(), input value '
+            + str(x)
+            + ' is out of valid range [-1,1].'
+        )
         assert False
-    elif (x < -1.0):
+    elif x < -1.0:
         return np.pi
-    elif (x > 1.0):
+    elif x > 1.0:
         return 0.0
     else:
         return np.arccos(x)
@@ -43,11 +47,15 @@ def robust_arcsin(x: float) -> float:
     """
     if (x < (-1.0 - INVERSE_TRIG_TOLERANCE)) or (x > (1.0 + INVERSE_TRIG_TOLERANCE)):
         # TODO RCB: REPLACE THIS WITH LOG/EXCEPTION THROW.
-        print('ERROR: In robust_arcsin(), input value ' + str(x) + ' is out of valid range [-1,1].')
+        print(
+            'ERROR: In robust_arcsin(), input value '
+            + str(x)
+            + ' is out of valid range [-1,1].'
+        )
         assert False
-    elif (x < -1.0):
+    elif x < -1.0:
         return -(np.pi / 2.0)
-    elif (x > 1.0):
+    elif x > 1.0:
         return np.pi / 2.0
     else:
         return np.arcsin(x)
@@ -68,12 +76,13 @@ def clamp(x, x_min, x_max):
         return x
 
 
-def overlapping_range(range1: tuple[float, float] | list[float],
-                      range2: tuple[float, float] | list[float],
-                      *rangeN: tuple[float, float] | list[float],
-                      default=None) -> \
-        list[float]:
-    """ Find the overlapping region of two or more ranges of numbers.
+def overlapping_range(
+    range1: tuple[float, float] | list[float],
+    range2: tuple[float, float] | list[float],
+    *rangeN: tuple[float, float] | list[float],
+    default=None,
+) -> list[float]:
+    """Find the overlapping region of two or more ranges of numbers.
 
     Example::
 
@@ -97,9 +106,11 @@ def overlapping_range(range1: tuple[float, float] | list[float],
 
     Returns:
     --------
-        - overlap (list[float,float]|list): The overlapping range. If there is no overlap, returns an empty list. """
-    if (len(range1) == 0 or len(range2) == 0) or \
-       (range2[0] > range1[1] or range1[0] > range2[1]):
+        - overlap (list[float,float]|list): The overlapping range. If there is no overlap, returns an empty list.
+    """
+    if (len(range1) == 0 or len(range2) == 0) or (
+        range2[0] > range1[1] or range1[0] > range2[1]
+    ):
         if default is None:
             default = []
         return default
@@ -224,7 +235,7 @@ def rms(error_list):
 
 
 def gaussian_convolution(num_points: int):
-    """ Get the probability-density-function (y-values) of the normal distribution covering 98+% of all probabilities.
+    """Get the probability-density-function (y-values) of the normal distribution covering 98+% of all probabilities.
 
     Example::
 
@@ -241,12 +252,16 @@ def gaussian_convolution(num_points: int):
     Returns:
     --------
         - pdf (list[float]): probability that the value at index i is chosen, where:
-                             i follows a gaussian curve, i is greatest at len/2, and 0.98 < sum(pdf) <= 1.00 """
+                             i follows a gaussian curve, i is greatest at len/2, and 0.98 < sum(pdf) <= 1.00
+    """
     y_vals: list[float] = []
 
     # validate input
     if num_points < 1:
-        lt.error_and_raise(ValueError, f"Error: in math_tools.gaussian_convolution(), num_points must be positive >= 1 but is {num_points}")
+        lt.error_and_raise(
+            ValueError,
+            f"Error: in math_tools.gaussian_convolution(), num_points must be positive >= 1 but is {num_points}",
+        )
     if num_points == 1:
         return [1.0]
 
@@ -261,7 +276,7 @@ def gaussian_convolution(num_points: int):
 
 
 def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int):
-    """ Compute the rolling average over all values in the given list.
+    """Compute the rolling average over all values in the given list.
 
     For each point x at index i, assign a new value equal to sum([i-w/2:i+w/2]) / 2.
     That is, assign the average of the surrounding window_size values.
@@ -278,12 +293,16 @@ def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int
 
     Returns:
     --------
-        - averaged_data (list|np.ndarray): the averaged values, of the same length and type as the input data """
+        - averaged_data (list|np.ndarray): the averaged values, of the same length and type as the input data
+    """
     # validate input
     if len(data) == 0 or window_size == 1:
         return data
     if window_size < 1:
-        lt.error_and_raise(ValueError, f"Error: in math_tools.rolling_average(), window_size must be >= 1, but is {window_size}")
+        lt.error_and_raise(
+            ValueError,
+            f"Error: in math_tools.rolling_average(), window_size must be >= 1, but is {window_size}",
+        )
     window_size = min(window_size, len(data))
 
     # build the output list
@@ -313,7 +332,9 @@ def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int
 
 
 @strict_types
-def lambda_symmetric_paraboloid(focal_length: numbers.Number) -> Callable[[float, float], float]:
+def lambda_symmetric_paraboloid(
+    focal_length: numbers.Number,
+) -> Callable[[float, float], float]:
     a = 1.0 / (4 * focal_length)
     return lambda x, y: a * (x**2 + y**2)
     # return FunctionXYContinuous(f"{a} * (x**2 + y**2)")

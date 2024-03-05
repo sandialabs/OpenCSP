@@ -1,8 +1,8 @@
 import numpy as np
-from   pypylon import pylon
+from pypylon import pylon
 
-from   opencsp.common.lib.camera.image_processing import encode_RG_to_RGB
-from   opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+from opencsp.common.lib.camera.image_processing import encode_RG_to_RGB
+from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 
 
 class ImageAcquisition(ImageAcquisitionAbstract):
@@ -41,7 +41,9 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
         # Check number of instances
         if instance >= len(devices):
-            raise ValueError(f'Cannot load instance {instance:d}. Only {len(devices):d} devices found.')
+            raise ValueError(
+                f'Cannot load instance {instance:d}. Only {len(devices):d} devices found.'
+            )
 
         # Connect to camera
         self.cap = pylon.InstantCamera(tlFactory.CreateDevice(devices[instance]))
@@ -59,7 +61,9 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         # Set exposure values to be stepped over when performing exposure calibration
         shutter_min = self.cap.ExposureTimeRaw.Min
         shutter_max = self.cap.ExposureTimeRaw.Max
-        self._shutter_cal_values = np.linspace(shutter_min, shutter_max, 2**13).astype(int)
+        self._shutter_cal_values = np.linspace(
+            shutter_min, shutter_max, 2**13
+        ).astype(int)
 
     def get_frame(self, encode: bool = True) -> np.ndarray:
         # Start frame capture

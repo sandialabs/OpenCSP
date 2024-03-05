@@ -1,8 +1,8 @@
 import numpy as np
 import unittest
 
-from   opencsp.common.lib.geometry.LineXY import LineXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.LineXY import LineXY
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class TestLineXY(unittest.TestCase):
@@ -18,21 +18,36 @@ class TestLineXY(unittest.TestCase):
         np.testing.assert_almost_equal(line.n_vec.data, n_vec.data)
 
     def test_from_points(self):
-        pts = Vxy([
-            np.arange(16),
-            [1.1, 2.4, 3.1, 4.6, 5.2, 6.8, 7.3, 8.7, 9.9, 10.3, 11.5, 12.1, 13.8, 14.4, 15.0, 16.5]
-        ])
+        pts = Vxy(
+            [
+                np.arange(16),
+                [
+                    1.1,
+                    2.4,
+                    3.1,
+                    4.6,
+                    5.2,
+                    6.8,
+                    7.3,
+                    8.7,
+                    9.9,
+                    10.3,
+                    11.5,
+                    12.1,
+                    13.8,
+                    14.4,
+                    15.0,
+                    16.5,
+                ],
+            ]
+        )
 
         with np.testing.assert_raises(ValueError):
             LineXY.fit_from_points(pts[:5])
 
         # Test fitting a line
         line = LineXY.fit_from_points(pts)
-        ABC_exp = np.array([
-            0.7097406177,
-            -0.7044630974,
-            0.9598756044
-        ])
+        ABC_exp = np.array([0.7097406177, -0.7044630974, 0.9598756044])
         np.testing.assert_almost_equal(line.ABC, ABC_exp)
 
     def test_from_two_points(self):
@@ -41,19 +56,19 @@ class TestLineXY(unittest.TestCase):
         line = LineXY.from_two_points(pt1, pt2)
         ABC_exp = np.array([1 / np.sqrt(2), 1 / np.sqrt(2), -1 / np.sqrt(2)])
         np.testing.assert_almost_equal(line.ABC, ABC_exp)
-    
+
     def test_from_two_points_edge_case(self):
         pth1 = Vxy((0, 1))
         pth2 = Vxy((2, 1))
         ptv1 = Vxy((1, 0))
         ptv2 = Vxy((1, 2))
-        
+
         # horizontal line
         # y = (-Ax - C) / B
         lineh = LineXY.from_two_points(pth1, pth2)
         self.assertAlmostEqual(-lineh.C / lineh.B, 1)
         self.assertAlmostEqual(lineh.A, 0)
-        
+
         # vertical line
         # x = (-By - C) / A
         linev = LineXY.from_two_points(ptv1, ptv2)
@@ -137,16 +152,16 @@ class TestLineXY(unittest.TestCase):
         dists = line.dist_from_signed(pts)
         dists_exp = np.array([2, 1, 0, -1, -2])
         np.testing.assert_almost_equal(dists, dists_exp)
-    
+
     def test_intersect(self):
         # x = (-By - C) / A
         # y = (-Ax - C) / B
-        line_h = LineXY(0, 1, -1) # horizontal line through y=1
-        line_v = LineXY(1, 0, -1) # vertical line through x=1
-        
+        line_h = LineXY(0, 1, -1)  # horizontal line through y=1
+        line_v = LineXY(1, 0, -1)  # vertical line through x=1
+
         p1 = line_h.intersect_with(line_v)
         p2 = line_v.intersect_with(line_h)
-        
+
         self.assertAlmostEqual(p1.x, 1.0)
         self.assertAlmostEqual(p1.y, 1.0)
         self.assertAlmostEqual(p2.x, 1.0)
@@ -177,6 +192,7 @@ class TestLineXY(unittest.TestCase):
         line = LineXY(*ABC.copy())
         line.flip()
         np.testing.assert_almost_equal(line.ABC, -ABC)
+
 
 if __name__ == '__main__':
     unittest.main()

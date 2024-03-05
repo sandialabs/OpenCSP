@@ -8,8 +8,8 @@ import os
 import matplotlib.pyplot as plt
 
 import opencsp
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 import opencsp.app.sofast.test.downsample_sofast_data as ds
 import opencsp.common.lib.test.downsample_data as dd
 
@@ -59,17 +59,31 @@ def downsample_dataset_1(base_dir):
     plt.title('Ensemble Mask Image')
 
     # Save data
-    measurement_facet.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_measurement_facet)))
-    measurement_ensemble.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_measurement_ensemble)))
+    measurement_facet.save_to_hdf(
+        os.path.join(dir_dataset_out, os.path.basename(file_measurement_facet))
+    )
+    measurement_ensemble.save_to_hdf(
+        os.path.join(dir_dataset_out, os.path.basename(file_measurement_ensemble))
+    )
     camera.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_camera)))
-    display_1.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_display_1)))
-    display_2.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_display_2)))
-    display_3.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_display_3)))
-    calibration.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_calibration)))
+    display_1.save_to_hdf(
+        os.path.join(dir_dataset_out, os.path.basename(file_display_1))
+    )
+    display_2.save_to_hdf(
+        os.path.join(dir_dataset_out, os.path.basename(file_display_2))
+    )
+    display_3.save_to_hdf(
+        os.path.join(dir_dataset_out, os.path.basename(file_display_3))
+    )
+    calibration.save_to_hdf(
+        os.path.join(dir_dataset_out, os.path.basename(file_calibration))
+    )
 
     plt.show()
 
 
 if __name__ == '__main__':
-    dir_sample_data = os.path.join(os.path.dirname(opencsp.__file__), '../../sample_data/sofast/measurement_set_1')
+    dir_sample_data = os.path.join(
+        os.path.dirname(opencsp.__file__), '../../sample_data/sofast/measurement_set_1'
+    )
     downsample_dataset_1(dir_sample_data)

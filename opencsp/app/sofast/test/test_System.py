@@ -5,16 +5,18 @@ import os
 import pytest
 
 import opencsp
-from   opencsp.app.sofast.lib.Fringes import Fringes
-from   opencsp.app.sofast.lib.System import System
-from   opencsp.app.sofast.test.ImageAcquisition_no_camera import ImageAcquisition
-from   opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.app.sofast.lib.Fringes import Fringes
+from opencsp.app.sofast.lib.System import System
+from opencsp.app.sofast.test.ImageAcquisition_no_camera import ImageAcquisition
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 
 
 @pytest.mark.no_xvfb
 def test_System():
     # Get test data location
-    base_dir = os.path.join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements')
+    base_dir = os.path.join(
+        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+    )
 
     # Create fringe object
     periods_x = [0.9, 3.9]
@@ -22,7 +24,9 @@ def test_System():
     F = Fringes(periods_x, periods_y)
 
     # Instantiate image projection class
-    im_proj = ImageProjection.load_from_hdf_and_display(os.path.join(base_dir, 'general/image_projection_test.h5'))
+    im_proj = ImageProjection.load_from_hdf_and_display(
+        os.path.join(base_dir, 'general/image_projection_test.h5')
+    )
 
     # Instantiate image acquisition class
     im_aq = ImageAcquisition()

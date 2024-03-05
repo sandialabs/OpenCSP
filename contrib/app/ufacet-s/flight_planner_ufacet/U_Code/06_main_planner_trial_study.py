@@ -50,6 +50,7 @@ import opencsp.common.lib.render.view_spec as vs
 
 # RENDERING
 
+
 def setup_render_control_scan_xy_analysis():
     # Setup render control.
     render_control_scan_xy_analysis = rcsxa.RenderControlScanXyAnalysis()
@@ -78,12 +79,12 @@ def setup_render_control_scan_section_analysis():
     # analysis_render_control.draw_context_mnsa_ray = False
     # analysis_render_control.draw_context_mxsa_ray = False
     # analysis_render_control.draw_single_heliostat_analysis = False
-#analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
-# single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
-# analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
-#analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
+    # single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
+    # analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
     analysis_render_control.draw_single_heliostat_constraints = False  # KEY DETAIL
     # analysis_render_control.draw_single_heliostat_constraints_heliostats = False
     # analysis_render_control.draw_single_heliostat_constraints_mnsa_ray = False
@@ -92,7 +93,9 @@ def setup_render_control_scan_section_analysis():
     # analysis_render_control.draw_single_heliostat_constraints_assessed_normals = False
     # analysis_render_control.draw_single_heliostat_constraints_detail = False
     # analysis_render_control.draw_single_heliostat_constraints_all_targets = False
-    analysis_render_control.draw_single_heliostat_constraints_summary = False  # KEY SUMMARY
+    analysis_render_control.draw_single_heliostat_constraints_summary = (
+        False  # KEY SUMMARY
+    )
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example = False
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example_C = C_draw
     analysis_render_control.draw_single_heliostat_constraints_legend = False
@@ -114,7 +117,9 @@ def setup_render_control_scan_section_analysis():
     analysis_render_control.draw_multi_heliostat_gaze_angle_example = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_fill = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_legend = False
-    analysis_render_control.draw_multi_heliostat_vertical_fov_required = False  # KEY SUMMARY
+    analysis_render_control.draw_multi_heliostat_vertical_fov_required = (
+        False  # KEY SUMMARY
+    )
     analysis_render_control.draw_multi_heliostat_vertical_fov_required_legend = False
     # analysis_render_control.draw_multi_heliostat_select_gaze = False  # KEY SUMMARY
     # analysis_render_control.draw_multi_heliostat_select_gaze_per_heliostat = False
@@ -143,7 +148,6 @@ def setup_render_control_scan_section_analysis():
 #
 
 
-
 # -------------------------------------------------------------------------------------------------------
 # MAIN PROGRAM
 #
@@ -154,65 +158,81 @@ if __name__ == "__main__":
     # figure_control = rcfg.RenderControlFigure(tile_array=(2,2), tile_square=False)
 
     # Figure control.
-    tile_array=(2,2)
-#    tile_array=(1,1)
-#    tile_array=(2,1)
+    tile_array = (2, 2)
+    #    tile_array=(1,1)
+    #    tile_array=(2,1)
 
     render_control_top_level = rctl.RenderControlTopLevel()
     render_control_top_level.draw_ufacet_xy_analysis = False
     render_control_top_level.draw_ufacet_section_construction = False
-#    render_control_top_level.draw_ufacet_scan = False
-#    render_control_top_level.draw_flight_plan = False
-#    render_control_top_level.save_flight_plan = False
-#    render_control_top_level.summarize_figures = True
-#    render_control_top_level.save_figures = False
+    #    render_control_top_level.draw_ufacet_scan = False
+    #    render_control_top_level.draw_flight_plan = False
+    #    render_control_top_level.save_flight_plan = False
+    #    render_control_top_level.summarize_figures = True
+    #    render_control_top_level.save_figures = False
     render_control_scan_xy_analysis = setup_render_control_scan_xy_analysis()
     render_control_scan_section_setup = setup_render_control_scan_section_setup()
     render_control_scan_section_analysis = setup_render_control_scan_section_analysis()
 
     # Per-run input parameters.
-    elevation_offset = 0.0 # m.
+    elevation_offset = 0.0  # m.
 
     # Scan control parameters.
     # Raster.
-#    scan_type = 'Raster'
-    raster_scan_parameter_file = 'DUMMY FILL IN LATER' # ?? SCAFFOLDING RCB -- TEMPORARY
+    #    scan_type = 'Raster'
+    raster_scan_parameter_file = (
+        'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
+    )
     # UFACET.
     scan_type = 'UFACET'
-    ufacet_scan_parameter_file = 'DUMMY FILL IN LATER' # ?? SCAFFOLDING RCB -- TEMPORARY
+    ufacet_scan_parameter_file = (
+        'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
+    )
     # Define UFACET control flags.
     ufacet_control_parameters = {}
     # Seed points.
     # Define key points for gaze curve construction.
     ufacet_curve_keys_x = np.linspace(-131.7, 131.7, 28)
-#    ufacet_curve_keys_x = [-43.9] # ?? SCAFFOLDING RCB -- TEMPORARY
-##    ufacet_curve_keys_x = [73.2] # ?? SCAFFOLDING RCB -- TEMPORARY
-#    ufacet_curve_keys_x = [92.7] # ?? SCAFFOLDING RCB -- TEMPORARY
-#    ufacet_curve_keys_x = [112.2] # ?? SCAFFOLDING RCB -- TEMPORARY
-    ufacet_curve_keys_y = ([136.9] * len(ufacet_curve_keys_x))
-    ufacet_curve_key_xy_list = [[key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)]
+    #    ufacet_curve_keys_x = [-43.9] # ?? SCAFFOLDING RCB -- TEMPORARY
+    ##    ufacet_curve_keys_x = [73.2] # ?? SCAFFOLDING RCB -- TEMPORARY
+    #    ufacet_curve_keys_x = [92.7] # ?? SCAFFOLDING RCB -- TEMPORARY
+    #    ufacet_curve_keys_x = [112.2] # ?? SCAFFOLDING RCB -- TEMPORARY
+    ufacet_curve_keys_y = [136.9] * len(ufacet_curve_keys_x)
+    ufacet_curve_key_xy_list = [
+        [key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)
+    ]
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
-    ufacet_control_parameters['maximum_altitude'] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters[
+        'maximum_altitude'
+    ] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
-    ufacet_control_parameters['delta_eta'] = np.deg2rad(0.0)  # deg.  Offset to add to gaze angle eta.  Set to zero for no offset.
+    ufacet_control_parameters['delta_eta'] = np.deg2rad(
+        0.0
+    )  # deg.  Offset to add to gaze angle eta.  Set to zero for no offset.
 
     # Define solar field.
     solar_field_spec = {}
-    solar_field_spec['name']                       = 'Sandia NSTTF'
-    solar_field_spec['short_name']                 = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat']       = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_origin_lon_lat']       = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_heliostat_file']       = './data/NSTTF_Heliostats.csv'
+    solar_field_spec['name'] = 'Sandia NSTTF'
+    solar_field_spec['short_name'] = 'NSTTF'
+    solar_field_spec['field_origin_lon_lat'] = (
+        nll.LON_NSTTF_ORIGIN,
+        nll.LAT_NSTTF_ORIGIN,
+    )
+    solar_field_spec['field_origin_lon_lat'] = (
+        nll.LON_NSTTF_ORIGIN,
+        nll.LAT_NSTTF_ORIGIN,
+    )
+    solar_field_spec['field_heliostat_file'] = './data/NSTTF_Heliostats.csv'
     solar_field_spec['field_facet_centroids_file'] = './data/NSTTF_Facet_Centroids.csv'
 
     # Define tracking parameters.
     # Aim point.
-#    aimpoint_xyz = [60.0, 8.8, 7]     # For debugging
+    #    aimpoint_xyz = [60.0, 8.8, 7]     # For debugging
     aimpoint_xyz = [60.0, 8.8, 28.9]  # NSTTF BCS standby - low
-#    aimpoint_xyz = [60.0, 8.8, 60]    # NSTTF BCS standby - high
-#    aimpoint_xyz = [60.0, 8.8, 100]   # For debugging
+    #    aimpoint_xyz = [60.0, 8.8, 60]    # NSTTF BCS standby - high
+    #    aimpoint_xyz = [60.0, 8.8, 100]   # For debugging
 
     # Time.
     # (year, month, day, hour, minute, second, timezone) tuple.
@@ -221,11 +241,11 @@ if __name__ == "__main__":
     # Zone: Mountain Daylight Time (MDT) = -6,  Mountain Standard Time (MST) = -7
     #
     #               year, month, day, hour, minute, second, zone]
-#    when_ymdhmsz = [2021,   5,   13,    9,    0,       0,    -6]
-#    when_ymdhmsz = [2021,   5,   13,   11,    0,       0,    -6]
-    when_ymdhmsz = [2021,   5,   13,   13,    0,       0,    -6]
-#    when_ymdhmsz = [2021,   5,   13,   15,    0,       0,    -6]
-#    when_ymdhmsz = [2021,   5,   13,   17,    0,       0,    -6]
+    #    when_ymdhmsz = [2021,   5,   13,    9,    0,       0,    -6]
+    #    when_ymdhmsz = [2021,   5,   13,   11,    0,       0,    -6]
+    when_ymdhmsz = [2021, 5, 13, 13, 0, 0, -6]
+    #    when_ymdhmsz = [2021,   5,   13,   15,    0,       0,    -6]
+    #    when_ymdhmsz = [2021,   5,   13,   17,    0,       0,    -6]
 
     # Define fixed heliostat orientation.
     # synch_az = np.deg2rad(205)
@@ -257,84 +277,84 @@ if __name__ == "__main__":
     #                     render_control_scan_section_analysis)
 
     # Multiple trials.
-    trial_spec_z_aim_idx  = 0
-    trial_spec_z_max_idx  = 1
-    trial_spec_hour_idx   = 2
+    trial_spec_z_aim_idx = 0
+    trial_spec_z_max_idx = 1
+    trial_spec_hour_idx = 2
     trial_spec_minute_idx = 3
-    trial_spec_list = [ [ 28.9,  19.0,  10,  0 ],
-                        [ 28.9,  19.0,  10, 30 ],
-                        [ 28.9,  19.0,  11,  0 ],
-                        [ 28.9,  19.0,  11, 30 ],
-                        [ 28.9,  19.0,  12,  0 ],
-                        [ 28.9,  19.0,  12, 30 ],
-                        [ 28.9,  19.0,  13,  0 ],
-                        [ 28.9,  19.0,  13, 30 ],
-                        [ 28.9,  19.0,  14,  0 ],
-                        [ 28.9,  19.0,  14, 30 ],
-                        [ 28.9,  19.0,  15,  0 ],
-                        [ 28.9,  19.0,  15, 30 ],
-                        [ 28.9,  19.0,  16,  0 ],
-                        [ 28.9,  19.0,  16, 30 ],
-                        [ 28.9,  19.0,  17,  0 ],
-                        [ 28.9,  19.0,  17, 30 ],
-        
-                        [ 45.0, 25.0,  10,  0 ],
-                        [ 45.0, 25.0,  10, 30 ],
-                        [ 45.0, 25.0,  11,  0 ],
-                        [ 45.0, 25.0,  11, 30 ],
-                        [ 45.0, 25.0,  12,  0 ],
-                        [ 45.0, 25.0,  12, 30 ],
-                        [ 45.0, 25.0,  13,  0 ],
-                        [ 45.0, 25.0,  13, 30 ],
-                        [ 45.0, 25.0,  14,  0 ],
-                        [ 45.0, 25.0,  14, 30 ],
-                        [ 45.0, 25.0,  15,  0 ],
-                        [ 45.0, 25.0,  15, 30 ],
-                        [ 45.0, 25.0,  16,  0 ],
-                        [ 45.0, 25.0,  16, 30 ],
-                        [ 45.0, 25.0,  17,  0 ],
-                        [ 45.0, 25.0,  17, 30 ],
-        
-                        [ 60.0,  25.0,  10,  0 ],
-                        [ 60.0,  25.0,  10, 30 ],
-                        [ 60.0,  25.0,  11,  0 ],
-                        [ 60.0,  25.0,  11, 30 ],
-                        [ 60.0,  25.0,  12,  0 ],
-                        [ 60.0,  25.0,  12, 30 ],
-                        [ 60.0,  25.0,  13,  0 ],
-                        [ 60.0,  25.0,  13, 30 ],
-                        [ 60.0,  25.0,  14,  0 ],
-                        [ 60.0,  25.0,  14, 30 ],
-                        [ 60.0,  25.0,  15,  0 ],
-                        [ 60.0,  25.0,  15, 30 ],
-                        [ 60.0,  25.0,  16,  0 ],
-                        [ 60.0,  25.0,  16, 30 ],
-                        [ 60.0,  25.0,  17,  0 ],
-                        [ 60.0,  25.0,  17, 30 ],
-                      ]
+    trial_spec_list = [
+        [28.9, 19.0, 10, 0],
+        [28.9, 19.0, 10, 30],
+        [28.9, 19.0, 11, 0],
+        [28.9, 19.0, 11, 30],
+        [28.9, 19.0, 12, 0],
+        [28.9, 19.0, 12, 30],
+        [28.9, 19.0, 13, 0],
+        [28.9, 19.0, 13, 30],
+        [28.9, 19.0, 14, 0],
+        [28.9, 19.0, 14, 30],
+        [28.9, 19.0, 15, 0],
+        [28.9, 19.0, 15, 30],
+        [28.9, 19.0, 16, 0],
+        [28.9, 19.0, 16, 30],
+        [28.9, 19.0, 17, 0],
+        [28.9, 19.0, 17, 30],
+        [45.0, 25.0, 10, 0],
+        [45.0, 25.0, 10, 30],
+        [45.0, 25.0, 11, 0],
+        [45.0, 25.0, 11, 30],
+        [45.0, 25.0, 12, 0],
+        [45.0, 25.0, 12, 30],
+        [45.0, 25.0, 13, 0],
+        [45.0, 25.0, 13, 30],
+        [45.0, 25.0, 14, 0],
+        [45.0, 25.0, 14, 30],
+        [45.0, 25.0, 15, 0],
+        [45.0, 25.0, 15, 30],
+        [45.0, 25.0, 16, 0],
+        [45.0, 25.0, 16, 30],
+        [45.0, 25.0, 17, 0],
+        [45.0, 25.0, 17, 30],
+        [60.0, 25.0, 10, 0],
+        [60.0, 25.0, 10, 30],
+        [60.0, 25.0, 11, 0],
+        [60.0, 25.0, 11, 30],
+        [60.0, 25.0, 12, 0],
+        [60.0, 25.0, 12, 30],
+        [60.0, 25.0, 13, 0],
+        [60.0, 25.0, 13, 30],
+        [60.0, 25.0, 14, 0],
+        [60.0, 25.0, 14, 30],
+        [60.0, 25.0, 15, 0],
+        [60.0, 25.0, 15, 30],
+        [60.0, 25.0, 16, 0],
+        [60.0, 25.0, 16, 30],
+        [60.0, 25.0, 17, 0],
+        [60.0, 25.0, 17, 30],
+    ]
 
-                
     for trial_spec in trial_spec_list:
-        aimpoint_xyz_2  = aimpoint_xyz
+        aimpoint_xyz_2 = aimpoint_xyz
         when_ymdhmsz_2 = when_ymdhmsz.copy()
-        when_hour_idx   = 3
+        when_hour_idx = 3
         when_minute_idx = 4
-        when_ymdhmsz_2[when_hour_idx]                 = trial_spec[trial_spec_hour_idx]
-        when_ymdhmsz_2[when_minute_idx]               = trial_spec[trial_spec_minute_idx]
-        aimpoint_xyz_2[2]                              = trial_spec[trial_spec_z_aim_idx]
+        when_ymdhmsz_2[when_hour_idx] = trial_spec[trial_spec_hour_idx]
+        when_ymdhmsz_2[when_minute_idx] = trial_spec[trial_spec_minute_idx]
+        aimpoint_xyz_2[2] = trial_spec[trial_spec_z_aim_idx]
         ufacet_control_parameters['maximum_altitude'] = trial_spec[trial_spec_z_max_idx]
-        pars.scan_plan_trial(tile_array,
-                            solar_field_spec,
-                            aimpoint_xyz_2,
-                            when_ymdhmsz_2,
-                            synch_azelhnames,
-                            up_azelhnames,
-                            elevation_offset,
-                            scan_type,
-                            raster_scan_parameter_file,
-                            ufacet_scan_parameter_file,
-                            ufacet_control_parameters,
-                            render_control_top_level,
-                            render_control_scan_xy_analysis,
-                            render_control_scan_section_setup,
-                            render_control_scan_section_analysis)
+        pars.scan_plan_trial(
+            tile_array,
+            solar_field_spec,
+            aimpoint_xyz_2,
+            when_ymdhmsz_2,
+            synch_azelhnames,
+            up_azelhnames,
+            elevation_offset,
+            scan_type,
+            raster_scan_parameter_file,
+            ufacet_scan_parameter_file,
+            ufacet_control_parameters,
+            render_control_top_level,
+            render_control_scan_xy_analysis,
+            render_control_scan_section_setup,
+            render_control_scan_section_analysis,
+        )

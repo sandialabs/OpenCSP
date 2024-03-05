@@ -14,27 +14,30 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class RenderControlFigureRecord():
+class RenderControlFigureRecord:
     """
     Tracks figures that have been generated.
     """
 
-    def __init__(self,
-                 name: str,        # Figure handle and title of figure window.
-                 title: str,       # Title of plot.
-                 caption: str,     # Caption for plot.
-                 figure_num: int,  # Number of this figure in generated sequence.  A unique key.
-                 figure: Figure,   # Matplotlib figure object.
-                 axis_control=None):  # Axis control instance used in figure_management.setup_figure
-        """ Register for a render figure.
+    def __init__(
+        self,
+        name: str,  # Figure handle and title of figure window.
+        title: str,  # Title of plot.
+        caption: str,  # Caption for plot.
+        figure_num: int,  # Number of this figure in generated sequence.  A unique key.
+        figure: Figure,  # Matplotlib figure object.
+        axis_control=None,
+    ):  # Axis control instance used in figure_management.setup_figure
+        """Register for a render figure.
 
         You probably don't want to instantiate this class directly.
         Most likely what you want is one of:
          - figure_management.setup_figure()
-         - figure_management.setup_figure_for_3d_data() """
+         - figure_management.setup_figure_for_3d_data()"""
 
         # in-situ imports to avoid import cycles
         import opencsp.common.lib.render_control.RenderControlAxis as rca
+
         axis_control: rca.RenderControlAxis = axis_control
 
         super(RenderControlFigureRecord, self).__init__()
@@ -47,14 +50,20 @@ class RenderControlFigureRecord():
         self.figure = figure
         self.axis_control = axis_control
         """ Axis control instance used in figure_management.setup_figure. Can be None|RenderControlAxis. """
-        self.metadata: list[str] = []  # A list of standard string fields -- name, figure number, file path, etc.
-        self.comments: list[str] = []  # A list of caller-defined strings, to be filled in later.
-        self.axis: plt.Axes = None     # Matplotlib plot axes object.  Set later.
-        self.view: View3d = None       # View3d object.                Set later.
-        self.equal = None             # Whether to make axes equal.   Set later.
-        self.x_limits = None          # X-axis limits (optional).     Set later.
-        self.y_limits = None          # Y-axis limits (optional).     Set later.
-        self.z_limits = None          # Z-axis limits (optional).     Set later.
+        self.metadata: list[
+            str
+        ] = (
+            []
+        )  # A list of standard string fields -- name, figure number, file path, etc.
+        self.comments: list[
+            str
+        ] = []  # A list of caller-defined strings, to be filled in later.
+        self.axis: plt.Axes = None  # Matplotlib plot axes object.  Set later.
+        self.view: View3d = None  # View3d object.                Set later.
+        self.equal = None  # Whether to make axes equal.   Set later.
+        self.x_limits = None  # X-axis limits (optional).     Set later.
+        self.y_limits = None  # Y-axis limits (optional).     Set later.
+        self.z_limits = None  # Z-axis limits (optional).     Set later.
 
     def add_metadata_line(self, metadata_line: str) -> None:
         self.metadata.append(metadata_line)
@@ -66,8 +75,15 @@ class RenderControlFigureRecord():
         for comment_line in self.comments:
             lt.info(comment_line)
 
-    def save(self, output_dir: str, output_file_body: str = None, format: str = None, dpi=600, close_after_save=True):
-        """ Saves this figure record to an image file.
+    def save(
+        self,
+        output_dir: str,
+        output_file_body: str = None,
+        format: str = None,
+        dpi=600,
+        close_after_save=True,
+    ):
+        """Saves this figure record to an image file.
 
         Args:
             - output_dir (str): The directory to save to.
@@ -102,16 +118,18 @@ class RenderControlFigureRecord():
 
         # If this is a 3-d plot, add the projection choice.
         if self.view != None:
-            output_figure_dir_body_ext = self.view.save(output_dir, output_figure_body, format=format, dpi=dpi)
+            output_figure_dir_body_ext = self.view.save(
+                output_dir, output_figure_body, format=format, dpi=dpi
+            )
         else:
             # Make the figure current.
             plt.figure(self.name)
             # Save the current figure.
             output_figure_dir_body_ext = output_figure_dir_body + '.' + format
-# TODO RCB: THIS CODE IS DEPRECATED AS OF 11/20/2022.  ONCE IT'S CLEAR WE DON'T WANT IT, DELETE THE FOLLOWING COMMENTED-OUT LINES.
-# if ft.file_exists(output_figure_dir_body_ext):
-#     print('Skipping save of existing figure: ' + output_figure_dir_body_ext)
-# else:
+            # TODO RCB: THIS CODE IS DEPRECATED AS OF 11/20/2022.  ONCE IT'S CLEAR WE DON'T WANT IT, DELETE THE FOLLOWING COMMENTED-OUT LINES.
+            # if ft.file_exists(output_figure_dir_body_ext):
+            #     print('Skipping save of existing figure: ' + output_figure_dir_body_ext)
+            # else:
             output_figure_dir_body_ext = output_figure_dir_body + '.' + format
             lt.info('Saving figure: ' + output_figure_dir_body_ext)
             plt.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
@@ -124,14 +142,20 @@ class RenderControlFigureRecord():
         if orig_format.lower() == "gif":
             im = PilImage.open(output_figure_dir_body_ext)
             png_file = output_figure_dir_body_ext
-            output_figure_dir_body_ext = png_file.rstrip("." + format) + "." + orig_format
+            output_figure_dir_body_ext = (
+                png_file.rstrip("." + format) + "." + orig_format
+            )
             im.save(output_figure_dir_body_ext)
             ft.delete_file(png_file)
 
         # Save the figure explanation.
-        output_figure_dir, output_figure_body, output_figure_ext = ft.path_components(output_figure_dir_body_ext)
+        output_figure_dir, output_figure_body, output_figure_ext = ft.path_components(
+            output_figure_dir_body_ext
+        )
         output_figure_text_body_ext = output_figure_body + '.txt'
-        output_figure_text_dir_body_ext = os.path.join(output_figure_dir, output_figure_text_body_ext)
+        output_figure_text_dir_body_ext = os.path.join(
+            output_figure_dir, output_figure_text_body_ext
+        )
         lt.info('Saving figure text: ' + output_figure_text_dir_body_ext)
         with open(output_figure_text_dir_body_ext, 'w') as output_stream:
             # Save the figure metadata.

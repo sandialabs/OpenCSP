@@ -8,41 +8,45 @@ import opencsp.common.lib.render_control.RenderControlText as rctxt
 
 
 # Constants
-DEFAULT_heading_scale = 2 # m
-DEFAULT_CORNER_NORMAL_LENGTH  = 1 # m
+DEFAULT_heading_scale = 2  # m
+DEFAULT_CORNER_NORMAL_LENGTH = 1  # m
 
 
-class RenderControlWayPoint():
+class RenderControlWayPoint:
     """
     Render control for flight path way points.
     """
 
-    def __init__(self, 
-                 draw_position = True,
-                 position_style = rcps.marker(marker='.'),
-                 draw_stop = True,
-                 stop_style = rcps.marker(color='r', marker='x', markersize=7),  # Same color as heading.
-                 draw_heading = True,
-                 heading_scale = 3,
-                 heading_style = rcps.outline(color='r'),
-                 draw_gaze = True,
-                 gaze_length = 6,
-                 gaze_style = rcps.outline(color='g'),
-                 # draw_heading_at_corners = True,
-                 # corner_normal_length = 2,
-                 # corner_normal_style = rcps.outline(),
-                 # corner_normal_base_style = rcps.marker(),
-                 # draw_outline = True,
-                 # outline_style = rcps.outline(),
-                 draw_idx=True,
-                 idx_style=rctxt.RenderControlText(color='k',
-                                                   fontsize='small',
-                                                   horizontalalignment='right', 
-                                                   verticalalignment='top'),
-                 ):
-
+    def __init__(
+        self,
+        draw_position=True,
+        position_style=rcps.marker(marker='.'),
+        draw_stop=True,
+        stop_style=rcps.marker(
+            color='r', marker='x', markersize=7
+        ),  # Same color as heading.
+        draw_heading=True,
+        heading_scale=3,
+        heading_style=rcps.outline(color='r'),
+        draw_gaze=True,
+        gaze_length=6,
+        gaze_style=rcps.outline(color='g'),
+        # draw_heading_at_corners = True,
+        # corner_normal_length = 2,
+        # corner_normal_style = rcps.outline(),
+        # corner_normal_base_style = rcps.marker(),
+        # draw_outline = True,
+        # outline_style = rcps.outline(),
+        draw_idx=True,
+        idx_style=rctxt.RenderControlText(
+            color='k',
+            fontsize='small',
+            horizontalalignment='right',
+            verticalalignment='top',
+        ),
+    ):
         super(RenderControlWayPoint, self).__init__()
-        
+
         self.draw_position = draw_position
         self.position_style = position_style
         self.draw_stop = draw_stop
@@ -65,6 +69,7 @@ class RenderControlWayPoint():
 
 # COMMON CASES
 
+
 def default():
     return RenderControlWayPoint()
 
@@ -76,8 +81,8 @@ def default():
 #                                draw_outline = True,
 #                                outline_style = rcps.outline(color=color),
 #                                draw_idx=False)
-# 
-# 
+#
+#
 # def outline_name(color='k'):
 #     return RenderControlWayPoint(draw_position = False,
 #                                draw_heading = False,
@@ -86,8 +91,8 @@ def default():
 #                                draw_outline = True,
 #                                outline_style = rcps.outline(color=color),
 #                                idx_style=rctxt.default(color=color))
-# 
-# 
+#
+#
 # def normal_outline(color='k'):
 #     return RenderControlWayPoint(draw_position = False,
 #                                draw_heading = True,
@@ -98,8 +103,8 @@ def default():
 #                                draw_outline = True,
 #                                outline_style = rcps.outline(color=color),
 #                                draw_idx=False)
-# 
-# 
+#
+#
 # def corner_normals_outline(color='k'):
 #     return RenderControlWayPoint(draw_position = False,
 #                                draw_heading = False,
@@ -110,8 +115,8 @@ def default():
 #                                draw_outline = True,
 #                                outline_style = rcps.outline(color=color),
 #                                draw_idx=False)
-# 
-# 
+#
+#
 # def corner_normals_outline_name(color='k'):
 #     return RenderControlWayPoint(draw_position = False,
 #                                draw_heading = False,
@@ -123,8 +128,8 @@ def default():
 #                                draw_outline = True,
 #                                outline_style = rcps.outline(color=color),
 #                                idx_style=rctxt.default(color=color))
-# 
-# 
+#
+#
 # def highlight(color='b'):
 #     return RenderControlWayPoint(position_style = rcps.marker(color=color),
 #                                heading_base_style = rcps.marker(color=color),
@@ -133,4 +138,4 @@ def default():
 #                                outline_style = rcps.outline(color=color),
 #                                heading_style = rcps.outline(color=color),
 #                                idx_style=rctxt.default(color=color))
-# 
+#

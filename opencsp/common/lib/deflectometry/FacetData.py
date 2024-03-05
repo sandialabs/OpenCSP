@@ -26,10 +26,7 @@ class FacetData:
 
     def copy(self) -> 'FacetData':
         """Returns copy of class"""
-        return FacetData(
-            self.v_facet_corners.copy(),
-            self.v_facet_centroid.copy(),
-        )
+        return FacetData(self.v_facet_corners.copy(), self.v_facet_centroid.copy())
 
     @classmethod
     def load_from_json(cls, file: str) -> 'FacetData':
@@ -75,11 +72,7 @@ class FacetData:
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:
-    d = {
-        'x': V.x.tolist(),
-        'y': V.y.tolist(),
-        'z': V.z.tolist(),
-    }
+    d = {'x': V.x.tolist(), 'y': V.y.tolist(), 'z': V.z.tolist()}
     return d
 
 

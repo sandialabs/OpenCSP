@@ -1,11 +1,11 @@
-from   abc import abstractmethod, ABC
+from abc import abstractmethod, ABC
 
 import matplotlib.pyplot as plt
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class Surface2DAbstract(ABC):
@@ -27,19 +27,19 @@ class Surface2DAbstract(ABC):
         self.slope_coefs: np.ndarray
 
     @abstractmethod
-    def set_spatial_data(self,
-                         u_active_pixel_pointing_optic: Uxyz,
-                         v_screen_points_optic: Vxyz,
-                         v_optic_cam_optic: Vxyz,
-                         u_measure_pixel_pointing_optic: Uxyz,
-                         v_align_point_optic: Vxyz,
-                         v_optic_screen_optic: Vxyz) -> None:
+    def set_spatial_data(
+        self,
+        u_active_pixel_pointing_optic: Uxyz,
+        v_screen_points_optic: Vxyz,
+        v_optic_cam_optic: Vxyz,
+        u_measure_pixel_pointing_optic: Uxyz,
+        v_align_point_optic: Vxyz,
+        v_optic_screen_optic: Vxyz,
+    ) -> None:
         """Saves spatial data in class"""
 
     @abstractmethod
-    def intersect(self,
-                  u_pixel_pointing: Uxyz,
-                  v_origin: Vxyz) -> Vxyz:
+    def intersect(self, u_pixel_pointing: Uxyz, v_origin: Vxyz) -> Vxyz:
         """Intersects rays with the surface"""
 
     @abstractmethod
@@ -70,10 +70,13 @@ class Surface2DAbstract(ABC):
     def shift_all(self, v_align_optic_step: Vxyz) -> None:
         """Shifts all data vectors"""
 
-    def plot_intersection_points(self, axes: plt.Axes,
-                                 downsample: int = 50,
-                                 camera_ray_length: float = 0.,
-                                 plot_camera_screen_points: bool = False) -> None:
+    def plot_intersection_points(
+        self,
+        axes: plt.Axes,
+        downsample: int = 50,
+        camera_ray_length: float = 0.0,
+        plot_camera_screen_points: bool = False,
+    ) -> None:
         """Plots calculated intersection points with surface and align point. Optionally
         plots camera rays and screen/camera locations.
 
@@ -93,32 +96,60 @@ class Surface2DAbstract(ABC):
         Matplotlib axes
         """
         # Plot intersection points surface
-        axes.plot_trisurf(*self.v_surf_int_pts_optic[::downsample].data, edgecolor='none', alpha=0.5, linewidth=0, antialiased=False)
+        axes.plot_trisurf(
+            *self.v_surf_int_pts_optic[::downsample].data,
+            edgecolor='none',
+            alpha=0.5,
+            linewidth=0,
+            antialiased=False
+        )
 
         # Plot camera rays
         if camera_ray_length != 0:
             for ray in self.u_active_pixel_pointing_optic[::downsample]:
-                x = [self.v_optic_cam_optic.x, self.v_optic_cam_optic.x + ray.x * camera_ray_length]
-                y = [self.v_optic_cam_optic.y, self.v_optic_cam_optic.y + ray.y * camera_ray_length]
-                z = [self.v_optic_cam_optic.z, self.v_optic_cam_optic.z + ray.z * camera_ray_length]
+                x = [
+                    self.v_optic_cam_optic.x,
+                    self.v_optic_cam_optic.x + ray.x * camera_ray_length,
+                ]
+                y = [
+                    self.v_optic_cam_optic.y,
+                    self.v_optic_cam_optic.y + ray.y * camera_ray_length,
+                ]
+                z = [
+                    self.v_optic_cam_optic.z,
+                    self.v_optic_cam_optic.z + ray.z * camera_ray_length,
+                ]
                 axes.plot(x, y, z, color='gray', alpha=0.3)
 
         # Plot fit normal at align point
         v_fit = self.normal_fit_at_align_point()
         pt1 = self.v_align_point_optic
         pt2 = self.v_align_point_optic + v_fit
-        axes.plot([pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color='k', linestyle='-')
+        axes.plot(
+            [pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color='k', linestyle='-'
+        )
         # Plot design normal at align point
         v_des = self.normal_design_at_align_point()
         pt1 = self.v_align_point_optic
         pt2 = self.v_align_point_optic + v_des
-        axes.plot([pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color='k', linestyle='--')
+        axes.plot(
+            [pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color='k', linestyle='--'
+        )
 
         # Plot other points
-        axes.scatter(*self.v_align_point_optic.data, marker='o', color='r', label='Align Point')
+        axes.scatter(
+            *self.v_align_point_optic.data, marker='o', color='r', label='Align Point'
+        )
         if plot_camera_screen_points:
-            axes.scatter(*self.v_optic_cam_optic.data, marker='*', color='k', label='Camera')
-            axes.scatter(*self.v_optic_screen_optic.data, marker='+', color='b', label='Screen Center')
+            axes.scatter(
+                *self.v_optic_cam_optic.data, marker='*', color='k', label='Camera'
+            )
+            axes.scatter(
+                *self.v_optic_screen_optic.data,
+                marker='+',
+                color='b',
+                label='Screen Center'
+            )
 
         # Format
         axes.axis('equal')

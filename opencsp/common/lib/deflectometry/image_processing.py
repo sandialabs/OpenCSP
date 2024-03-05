@@ -1,21 +1,23 @@
-from   warnings import warn
+from warnings import warn
 
 import cv2 as cv
 import numpy as np
-from   scipy.signal import find_peaks
+from scipy.signal import find_peaks
 
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.LineXY import LineXY
-from   opencsp.common.lib.geometry.LoopXY import LoopXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.LineXY import LineXY
+from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Uxyz import Uxyz
 
 
-def calc_mask_raw(mask_images: np.ndarray,
-                  hist_thresh: float = 0.5,
-                  filt_width: int = 9,
-                  filt_thresh: int = 4,
-                  thresh_active_pixels: float = 0.05) -> np.ndarray:
+def calc_mask_raw(
+    mask_images: np.ndarray,
+    hist_thresh: float = 0.5,
+    filt_width: int = 9,
+    filt_thresh: int = 4,
+    thresh_active_pixels: float = 0.05,
+) -> np.ndarray:
     """
     Calculates the active pixels given a light and a dark image.
 
@@ -42,10 +44,14 @@ def calc_mask_raw(mask_images: np.ndarray,
     # Define constants
     N_BINS_IMAGE = 100  # Number of bins to create histogram of image pixels
     N_PEAK_STEP = 10  # Width of steps to take when finding dark and light peaks in image histogram
-    HIST_PEAK_THRESH = 0.002  # Min height of difference image histogram to consider a peak.
+    HIST_PEAK_THRESH = (
+        0.002  # Min height of difference image histogram to consider a peak.
+    )
 
     # Create delta image
-    delta = mask_images[..., 1].astype(np.float32) - mask_images[..., 0].astype(np.float32)
+    delta = mask_images[..., 1].astype(np.float32) - mask_images[..., 0].astype(
+        np.float32
+    )
 
     # Check if only two values exist (light and dark regions)
     if np.unique(delta).size == 2:
@@ -60,10 +66,12 @@ def calc_mask_raw(mask_images: np.ndarray,
             if len(peaks) == 2:
                 break
         if len(peaks) != 2:
-            raise ValueError('Not enough distinction between dark and light pixels in mask images.')
+            raise ValueError(
+                'Not enough distinction between dark and light pixels in mask images.'
+            )
 
         # Calculate minimum between two peaks
-        idx_hist_min = np.argmin(hist[peaks[0]:peaks[1]]) + peaks[0]
+        idx_hist_min = np.argmin(hist[peaks[0] : peaks[1]]) + peaks[0]
 
         # Find index of histogram that is "hist_thresh" the way between the min and max
         thresh_hist_min = edges[idx_hist_min + 1]
@@ -74,8 +82,10 @@ def calc_mask_raw(mask_images: np.ndarray,
         mask_thresh = delta > thresh
 
     # Filter to remove small active areas outside of main mask area
-    k = np.ones((filt_width, filt_width), dtype=np.float32) / float(filt_width ** 2)
-    mask_filt = cv.filter2D(mask_thresh.astype(np.float32), -1, k) > float(filt_thresh / (filt_width ** 2))
+    k = np.ones((filt_width, filt_width), dtype=np.float32) / float(filt_width**2)
+    mask_filt = cv.filter2D(mask_thresh.astype(np.float32), -1, k) > float(
+        filt_thresh / (filt_width**2)
+    )
 
     # Combine both masks
     mask_raw = np.logical_and(mask_filt, mask_thresh)
@@ -83,7 +93,10 @@ def calc_mask_raw(mask_images: np.ndarray,
     # Check for enough active pixels
     thresh_active_pixels = int(mask_raw.size * thresh_active_pixels)
     if mask_raw.sum() < thresh_active_pixels:
-        warn('Mask contains less than {:d} active pixels.'.format(thresh_active_pixels), stacklevel=2)
+        warn(
+            'Mask contains less than {:d} active pixels.'.format(thresh_active_pixels),
+            stacklevel=2,
+        )
 
     # Return raw, unprocessed mask
     return mask_raw
@@ -105,7 +118,9 @@ def keep_largest_mask_area(mask: np.ndarray) -> np.ndarray:
 
     """
     # Find contours of each cluster in mask
-    cnts = cv.findContours(mask.astype(np.uint8), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE)[0]
+    cnts = cv.findContours(
+        mask.astype(np.uint8), cv.RETR_EXTERNAL, cv.CHAIN_APPROX_NONE
+    )[0]
 
     # Find largest contour
     cnt = max(cnts, key=cv.contourArea)
@@ -162,11 +177,13 @@ def edges_from_mask(mask: np.ndarray) -> Vxy:
         np.array([[-1], [1]], np.float32),
         np.array([[1], [-1]], np.float32),
         np.array([[-1, 1]], np.float32),
-        np.array([[1, -1]], np.float32)
+        np.array([[1, -1]], np.float32),
     ]
 
     # Find edges
-    mask_edges = [(cv.filter2D(mask.astype(np.float32), -1, k) == 1)[..., np.newaxis] for k in ks]
+    mask_edges = [
+        (cv.filter2D(mask.astype(np.float32), -1, k) == 1)[..., np.newaxis] for k in ks
+    ]
     mask_edges = np.concatenate(mask_edges, 2)
     mask_edge = mask_edges.sum(2).astype(bool)
 
@@ -180,13 +197,12 @@ def edges_from_mask(mask: np.ndarray) -> Vxy:
     return Puv_edges
 
 
-def refine_mask_perimeter(loop_outline_exp: LoopXY,
-                          Puv_edges: Vxy,
-                          d_ax: float,
-                          d_perp: float) -> LoopXY:
+def refine_mask_perimeter(
+    loop_outline_exp: LoopXY, Puv_edges: Vxy, d_ax: float, d_perp: float
+) -> LoopXY:
     """
     Given mask edge points and an expected 2D PERIMETER region, this function refines the perimeter region.
-    
+
         1. Each line of the region is converted to a rectangular area of
            interest.
         2. All points within the area of interest are fit to a line.
@@ -222,19 +238,23 @@ def refine_mask_perimeter(loop_outline_exp: LoopXY,
 
         # Find points in loop
         pts_mask = loop.is_inside(Puv_edges)
-        lines.append(LineXY.fit_from_points(Puv_edges[pts_mask], neighbor_dist=neighbor_dist))
+        lines.append(
+            LineXY.fit_from_points(Puv_edges[pts_mask], neighbor_dist=neighbor_dist)
+        )
 
     # Create updated region
     return LoopXY.from_lines(lines)
 
 
-def keep_closest_points(p1: Vxy,
-                        p2: Vxy,
-                        Puv_edge: Vxy,
-                        Puv_cent: Vxy,
-                        step: float,
-                        d_perp: float,
-                        frac_keep: float) -> Vxy:
+def keep_closest_points(
+    p1: Vxy,
+    p2: Vxy,
+    Puv_edge: Vxy,
+    Puv_cent: Vxy,
+    step: float,
+    d_perp: float,
+    frac_keep: float,
+) -> Vxy:
     """
     Keeps points closest to centroid along direction perpendicular to line
     drawn between p1 and p2. This is used to find the edge of a facet where
@@ -298,12 +318,14 @@ def keep_closest_points(p1: Vxy,
     return Vxy(np.concatenate(Puv_line, axis=1))
 
 
-def refine_facet_corners(Puv_facet_corns_exp: Vxy,
-                         Puv_cent: Vxy,
-                         Puv_edges: Vxy,
-                         step: float,
-                         d_perp: float,
-                         frac_keep: float) -> LoopXY:
+def refine_facet_corners(
+    Puv_facet_corns_exp: Vxy,
+    Puv_cent: Vxy,
+    Puv_edges: Vxy,
+    step: float,
+    d_perp: float,
+    frac_keep: float,
+) -> LoopXY:
     """
     Refines the locations of the facet corners using only points closest to the
     facet centroid. Returns a refined 2D region of the facet.
@@ -334,7 +356,9 @@ def refine_facet_corners(Puv_facet_corns_exp: Vxy,
         p2 = Puv_facet_corns_exp[np.mod(idx + 1, num_corns)]
 
         # Keep points closest to centroid, stepping axially between points
-        Puv_active = keep_closest_points(p1, p2, Puv_edges, Puv_cent, step, d_perp, frac_keep)
+        Puv_active = keep_closest_points(
+            p1, p2, Puv_edges, Puv_cent, step, d_perp, frac_keep
+        )
 
         # Fit active points to line
         lines.append(LineXY.fit_from_points(Puv_active))
@@ -408,7 +432,9 @@ def calculate_active_pixels_vectors(mask: np.ndarray, camera: Camera) -> Uxyz:
     return u_active_pixel_pointing_cam  # camera coordinates
 
 
-def rectangle_loop_from_two_points(p1: Vxy, p2: Vxy, d_ax: float, d_perp: float) -> LoopXY:
+def rectangle_loop_from_two_points(
+    p1: Vxy, p2: Vxy, d_ax: float, d_perp: float
+) -> LoopXY:
     """
     Creates a rectangular loop from two points, and two distances.
 
@@ -471,7 +497,9 @@ def detect_blobs(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> Vxy
     return Vxy(np.array(pts).T)
 
 
-def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> np.ndarray:
+def detect_blobs_annotate(
+    image: np.ndarray, params: cv.SimpleBlobDetector_Params
+) -> np.ndarray:
     """Detects blobs in image
 
     Parameters
@@ -487,10 +515,18 @@ def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Param
         Annotated image of blobs
     """
     keypoints = _detect_blobs_keypoints(image, params)
-    return cv.drawKeypoints(image, keypoints, np.array([]), (0, 0, 255), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+    return cv.drawKeypoints(
+        image,
+        keypoints,
+        np.array([]),
+        (0, 0, 255),
+        cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS,
+    )
 
 
-def _detect_blobs_keypoints(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> list[cv.KeyPoint]:
+def _detect_blobs_keypoints(
+    image: np.ndarray, params: cv.SimpleBlobDetector_Params
+) -> list[cv.KeyPoint]:
     """Detects blobs in image
 
     Parameters

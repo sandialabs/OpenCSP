@@ -5,11 +5,11 @@ import opencsp.common.lib.tool.typing_tools as tt
 
 @tt.strict_types
 def imperative_zero_args():
-    """ A truly zero-arguments function. Not tied to any class and with no "self" argument. """
+    """A truly zero-arguments function. Not tied to any class and with no "self" argument."""
     pass
 
 
-class UserClass1():
+class UserClass1:
     pass
 
 
@@ -17,7 +17,7 @@ class UserClass1_1(UserClass1):
     pass
 
 
-class UserClass2():
+class UserClass2:
     pass
 
 
@@ -46,9 +46,13 @@ class TestTypingTools(unittest.TestCase):
         self.assertEqual("a", tt.default(self.raises_runtime_error, "a"))
         with self.assertRaises(RuntimeError):
             tt.default(self.raises_runtime_error, self.raises_value_error)
-        self.assertEqual(None, tt.default(self.raises_runtime_error, self.raises_value_error, None))
+        self.assertEqual(
+            None, tt.default(self.raises_runtime_error, self.raises_value_error, None)
+        )
         self.assertEqual("a", tt.default("a", self.raises_value_error))
-        self.assertEqual("a", tt.default(None, lambda: lval[4], dval[3], lambda: dval[4], "a"))
+        self.assertEqual(
+            "a", tt.default(None, lambda: lval[4], dval[3], lambda: dval[4], "a")
+        )
 
         with self.assertRaises(ValueError):
             self.assertEqual("a", tt.default("a"))
@@ -57,13 +61,13 @@ class TestTypingTools(unittest.TestCase):
 
     @tt.strict_types
     def zero_args(self):
-        """ A near-zero arguments function. Tied to the testing class with a "self" argument. """
+        """A near-zero arguments function. Tied to the testing class with a "self" argument."""
         pass
 
     @staticmethod
     @tt.strict_types  # TODO allow this to be applied before other decorators
     def static_zero_args():
-        """ A truly zero-arguments function. Tied to the testing class but without a "self" argument. """
+        """A truly zero-arguments function. Tied to the testing class but without a "self" argument."""
         pass
 
     @tt.strict_types
@@ -127,7 +131,16 @@ class TestTypingTools(unittest.TestCase):
     def test_one_arg_bad(self):
         # for each test function, only one of these arguments should not raise an error
         all_args = [1, 1.0, "1", 1j, [], tuple([]), {}, UserClass1(), UserClass2()]
-        all_one_arg_funcs = [self.int_arg, self.float_arg, self.str_arg, self.complex_arg, self.list_arg, self.tuple_arg, self.dict_arg, self.class_arg]
+        all_one_arg_funcs = [
+            self.int_arg,
+            self.float_arg,
+            self.str_arg,
+            self.complex_arg,
+            self.list_arg,
+            self.tuple_arg,
+            self.dict_arg,
+            self.class_arg,
+        ]
 
         for one_arg_func in all_one_arg_funcs:
             passed_args = []
@@ -141,9 +154,14 @@ class TestTypingTools(unittest.TestCase):
                     pass
 
             if len(passed_args) == 0:
-                self.fail(f"In test_typing_tools.test_one_arg_bad: one of the argument types should have passed but none did for function {one_arg_func.__name__}")
-            self.assertEqual(len(
-                passed_args), 1, f"In test_typing_tools.test_one_arg_bad: exactly one of the argument types should have passed for function {one_arg_func.__name__} but {len(passed_args)} did. The passing arguments were {[(arg,type(arg)) for arg in passed_args]}")
+                self.fail(
+                    f"In test_typing_tools.test_one_arg_bad: one of the argument types should have passed but none did for function {one_arg_func.__name__}"
+                )
+            self.assertEqual(
+                len(passed_args),
+                1,
+                f"In test_typing_tools.test_one_arg_bad: exactly one of the argument types should have passed for function {one_arg_func.__name__} but {len(passed_args)} did. The passing arguments were {[(arg,type(arg)) for arg in passed_args]}",
+            )
 
 
 if __name__ == '__main__':

@@ -10,11 +10,9 @@ class FixedPatternScreenProjection:
     in fixed pattern deflectometry.
     """
 
-    def __init__(self,
-                 size_x: int,
-                 size_y: int,
-                 width_pattern: int,
-                 spacing_pattern: int):
+    def __init__(
+        self, size_x: int, size_y: int, width_pattern: int, spacing_pattern: int
+    ):
         """Instantiates FixedPatternScreenProjection class from screen geometry parameters
 
         Parameters
@@ -82,18 +80,28 @@ class FixedPatternScreenProjection:
         and inactive area is 0, dtype float.
         """
         if dot_shape not in ['circle', 'square']:
-            raise ValueError(f'pattern_type must be one of ["circle", "square"], not {dot_shape:s}')
+            raise ValueError(
+                f'pattern_type must be one of ["circle", "square"], not {dot_shape:s}'
+            )
 
         if dot_shape == 'square':
             return np.ones((self.width_pattern, self.width_pattern), dtype=float)
         elif dot_shape == 'circle':
-            x, y = np.meshgrid(np.arange(self.width_pattern, dtype=float), np.arange(self.width_pattern, dtype=float))
+            x, y = np.meshgrid(
+                np.arange(self.width_pattern, dtype=float),
+                np.arange(self.width_pattern, dtype=float),
+            )
             x -= x.mean()
             y -= y.mean()
             r = np.sqrt(x**2 + y**2)
             return (r < float(self.width_pattern) / 2).astype(float)
 
-    def get_image(self, dtype: str, max_int: int, dot_shape: Literal['circle', 'square'] = 'circle') -> ndarray:
+    def get_image(
+        self,
+        dtype: str,
+        max_int: int,
+        dot_shape: Literal['circle', 'square'] = 'circle',
+    ) -> ndarray:
         """Creates a NxMx3 fixed pattern image
 
         Parameters

@@ -1,12 +1,11 @@
 """Representation of a notional camera for image acquisition"""
 import numpy as np
 
-from   opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 
 
 class ImageAcquisition(ImageAcquisitionAbstract):
     def __init__(self):
-
         # Define max saturation value
         self._max_value = 250
 

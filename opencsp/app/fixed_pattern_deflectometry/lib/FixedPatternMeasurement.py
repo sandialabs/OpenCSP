@@ -2,8 +2,8 @@ import datetime as dt
 
 import numpy as np
 
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
@@ -12,13 +12,15 @@ class FixedPatternMeasurement:
     and load to HDF file format.
     """
 
-    def __init__(self,
-                 image: np.ndarray,
-                 v_measure_point_facet: Vxyz,
-                 dist_optic_screen: float,
-                 origin: Vxy,
-                 date: dt.datetime = dt.datetime.now(),
-                 name: str = ''):
+    def __init__(
+        self,
+        image: np.ndarray,
+        v_measure_point_facet: Vxyz,
+        dist_optic_screen: float,
+        origin: Vxy,
+        date: dt.datetime = dt.datetime.now(),
+        name: str = '',
+    ):
         """Saves measurement data in class.
 
         Parameters

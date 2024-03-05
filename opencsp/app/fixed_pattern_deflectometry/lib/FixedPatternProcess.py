@@ -4,33 +4,41 @@ from typing import Literal
 
 import cv2 as cv
 import numpy as np
-from   numpy import ndarray
+from numpy import ndarray
 
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import FixedPatternDotLocations
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import FixedPatternMeasurement
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcessParams import FixedPatternProcessParams
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.csp.MirrorPoint import MirrorPoint
-from   opencsp.common.lib.deflectometry.BlobIndex import BlobIndex
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
+    FixedPatternDotLocations,
+)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
+    FixedPatternMeasurement,
+)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcessParams import (
+    FixedPatternProcessParams,
+)
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
+from opencsp.common.lib.deflectometry.BlobIndex import BlobIndex
 import opencsp.common.lib.deflectometry.calculation_data_classes as cdc
-from   opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.common.lib.deflectometry.FacetData import FacetData
 import opencsp.common.lib.deflectometry.image_processing as ip
 import opencsp.common.lib.deflectometry.process_optics_geometry as pr
-from   opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
-from   opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from   opencsp.common.lib.geometry.RegionXY import RegionXY
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
+from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.Uxyz import Uxyz
 
 
 class FixedPatternProcess:
     """Fixed Pattern Deflectrometry data processing class"""
 
-    def __init__(self,
-                 orientation: SpatialOrientation,
-                 camera: Camera,
-                 fixed_pattern_dot_locs: FixedPatternDotLocations,
-                 facet_data: FacetData) -> 'FixedPatternProcess':
+    def __init__(
+        self,
+        orientation: SpatialOrientation,
+        camera: Camera,
+        fixed_pattern_dot_locs: FixedPatternDotLocations,
+        facet_data: FacetData,
+    ) -> 'FixedPatternProcess':
         """Instantiates class
 
         Parameters
@@ -54,7 +62,9 @@ class FixedPatternProcess:
         self.measurement: FixedPatternMeasurement
 
         # Define blob detector
-        self.blob_detector: cv.SimpleBlobDetector_Params = cv.SimpleBlobDetector_Params()
+        self.blob_detector: cv.SimpleBlobDetector_Params = (
+            cv.SimpleBlobDetector_Params()
+        )
         self.blob_detector.minDistBetweenBlobs = 2
         self.blob_detector.filterByArea = True
         self.blob_detector.minArea = 3
@@ -94,7 +104,9 @@ class FixedPatternProcess:
         """
         # Calculate mask
         im_dark = self.measurement.image * 0
-        images = np.concatenate((im_dark[..., None], self.measurement.image[..., None]), axis=2)
+        images = np.concatenate(
+            (im_dark[..., None], self.measurement.image[..., None]), axis=2
+        )
         params = [
             self.params.mask_hist_thresh,
             self.params.mask_filt_width,
@@ -108,10 +120,8 @@ class FixedPatternProcess:
 
         return mask
 
-    def generate_geometry(self,
-                          blob_index: BlobIndex,
-                          mask_raw: np.ndarray) -> dict:
-        """Generates blob dataset from sofast dataset. 
+    def generate_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> dict:
+        """Generates blob dataset from sofast dataset.
 
         Parameters
         ----------
@@ -136,17 +146,28 @@ class FixedPatternProcess:
         pts_image, pts_index_xy = blob_index.get_data()
 
         # Process optic geometry
-        (self.data_geometry_general,
-         self.data_image_proccessing_general,
-         self.data_geometry_facet,
-         self.data_image_processing_facet,
-         self.data_error) = pr.process_singlefacet_geometry(self.facet_data, mask_raw, self.measurement.v_measure_point_facet,
-                                                            self.measurement.dist_optic_screen, self.orientation, self.camera, debug=self.params.geometry_data_debug)
+        (
+            self.data_geometry_general,
+            self.data_image_proccessing_general,
+            self.data_geometry_facet,
+            self.data_image_processing_facet,
+            self.data_error,
+        ) = pr.process_singlefacet_geometry(
+            self.facet_data,
+            mask_raw,
+            self.measurement.v_measure_point_facet,
+            self.measurement.dist_optic_screen,
+            self.orientation,
+            self.camera,
+            debug=self.params.geometry_data_debug,
+        )
 
         # Define optic orientation w.r.t. camera
         rot_optic_cam = self.data_geometry_general.r_optic_cam_refine_1
         v_cam_optic_cam = self.data_geometry_general.v_cam_optic_cam_refine_2
-        u_cam_measure_point_facet = self.data_geometry_facet[0].u_cam_measure_point_facet
+        u_cam_measure_point_facet = self.data_geometry_facet[
+            0
+        ].u_cam_measure_point_facet
 
         # Get screen-camera pose
         rot_cam_optic = rot_optic_cam.inv()
@@ -158,8 +179,12 @@ class FixedPatternProcess:
         v_optic_screen_optic = v_optic_cam_optic + v_cam_screen_optic
 
         # Calculate xyz screen points
-        v_screen_points_screen = self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
-        v_screen_points_facet = v_optic_screen_optic + v_screen_points_screen.rotate(rot_screen_optic)
+        v_screen_points_screen = (
+            self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
+        )
+        v_screen_points_facet = v_optic_screen_optic + v_screen_points_screen.rotate(
+            rot_screen_optic
+        )
 
         # Calculate active pixel pointing
         u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
@@ -175,7 +200,7 @@ class FixedPatternProcess:
             'v_optic_screen_optic': v_optic_screen_optic,
             'v_align_point_optic': self.facet_data.v_facet_centroid,
             'dist_optic_screen': self.measurement.dist_optic_screen,
-            'debug': self.params.slope_solver_data_debug
+            'debug': self.params.slope_solver_data_debug,
         }
 
     def load_measurement_data(self, measurement: FixedPatternMeasurement) -> None:
@@ -221,12 +246,23 @@ class FixedPatternProcess:
         """
         self.data_slope_solver.save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
         self.data_geometry_general.save_to_hdf(file, 'CalculationsFixedPattern/')
-        self.data_image_proccessing_general.save_to_hdf(file, 'CalculationsFixedPattern/')
-        self.data_geometry_facet[0].save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
-        self.data_image_processing_facet[0].save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
+        self.data_image_proccessing_general.save_to_hdf(
+            file, 'CalculationsFixedPattern/'
+        )
+        self.data_geometry_facet[0].save_to_hdf(
+            file, 'CalculationsFixedPattern/Facet_000/'
+        )
+        self.data_image_processing_facet[0].save_to_hdf(
+            file, 'CalculationsFixedPattern/Facet_000/'
+        )
         self.data_error.save_to_hdf(file, 'CalculationsFixedPattern/')
 
-    def get_mirror(self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest') -> MirrorPoint:
+    def get_mirror(
+        self,
+        interpolation_type: Literal[
+            'given', 'bilinear', 'clough_tocher', 'nearest'
+        ] = 'nearest',
+    ) -> MirrorPoint:
         """Returns mirror object with slope data"""
         v_surf_pts = self.data_slope_solver.v_surf_points_facet
         v_normals_data = np.ones((3, len(v_surf_pts)))

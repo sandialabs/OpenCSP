@@ -6,24 +6,24 @@
 import opencsp.common.lib.tool.file_tools as ft
 
 
-class RenderControlTopLevel():
+class RenderControlTopLevel:
     """
     Overall output control for scan flight planning code.
     """
 
-    def __init__(self, 
-                 draw_ufacet_xy_analysis=True,
-                 draw_ufacet_section_construction=True,
-                 draw_ufacet_scan=True,
-                 draw_flight_plan=True,
-                 xy_solar_field_style=None,  # If defined, overrides default.
-                 flight_plan_output_path=None,  # Defaults to sister output directory with current date and time.
-                 save_flight_plan=True,
-                 summarize_figures=False,
-                 save_figures=True,
-                 figure_output_path=None,  # Defaults to sister output directory with current date and time.
-                 ):
-
+    def __init__(
+        self,
+        draw_ufacet_xy_analysis=True,
+        draw_ufacet_section_construction=True,
+        draw_ufacet_scan=True,
+        draw_flight_plan=True,
+        xy_solar_field_style=None,  # If defined, overrides default.
+        flight_plan_output_path=None,  # Defaults to sister output directory with current date and time.
+        save_flight_plan=True,
+        summarize_figures=False,
+        save_figures=True,
+        figure_output_path=None,  # Defaults to sister output directory with current date and time.
+    ):
         super(RenderControlTopLevel, self).__init__()
 
         self.draw_ufacet_xy_analysis = draw_ufacet_xy_analysis
@@ -49,7 +49,6 @@ class RenderControlTopLevel():
 
 # COMMON CASES
 
+
 def default():
     return RenderControlTopLevel()
-
-

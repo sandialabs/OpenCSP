@@ -7,8 +7,7 @@ from opencsp.common.lib.geometry.Pxy import Pxy
 
 
 class RegionXY:
-    """Representation of a 2D region
-    """
+    """Representation of a 2D region"""
 
     def __init__(self, loop: LoopXY):
         """
@@ -36,7 +35,8 @@ class RegionXY:
 
         """
         raise NotImplementedError(
-            'Cannot add more than one loop to a region currently.')
+            'Cannot add more than one loop to a region currently.'
+        )
 
     def as_mask(self, vx: np.ndarray, vy: np.ndarray):
         """
@@ -111,7 +111,12 @@ class RegionXY:
         """Returns a Vxy of count points per edge per loop defining the region"""
         return Vxy.merge([loop.edge_sample(count) for loop in self.loops])
 
-    def points_sample(self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None) -> Pxy:
+    def points_sample(
+        self,
+        resolution: int,
+        resolution_type: str = 'pixelX',
+        random_seed: int | None = None,
+    ) -> Pxy:
         """Returns a Pxy object of points sampled from inside the region.
 
         Parameters
@@ -147,8 +152,12 @@ class RegionXY:
             x_vals = np.linspace(left + xedge, right - xedge, x_pixel_res)
             y_vals = np.linspace(bottom + yedge, top - yedge, y_pixel_res)
             # all_points is every combination of x and y
-            all_points = Pxy([[x for x in x_vals for _ in y_vals],
-                              [y for _ in x_vals for y in y_vals]])
+            all_points = Pxy(
+                [
+                    [x for x in x_vals for _ in y_vals],
+                    [y for _ in x_vals for y in y_vals],
+                ]
+            )
 
         elif resolution_type == 'pixelX':
             x_pixel_res = resolution
@@ -159,11 +168,17 @@ class RegionXY:
             x_vals = np.linspace(left + xedge, right - xedge, x_pixel_res)
             y_vals = np.linspace(bottom + yedge, top - yedge, y_pixel_res)
             # all_points is every combination of x and y
-            all_points = Pxy([[x for x in x_vals for _ in y_vals],
-                              [y for _ in x_vals for y in y_vals]])
+            all_points = Pxy(
+                [
+                    [x for x in x_vals for _ in y_vals],
+                    [y for _ in x_vals for y in y_vals],
+                ]
+            )
 
         else:
-            raise ValueError(f'Given resolution_type, {resolution_type}, not supported.')
+            raise ValueError(
+                f'Given resolution_type, {resolution_type}, not supported.'
+            )
 
         filtered_points = self.filter_points(all_points)
         return filtered_points
@@ -184,7 +199,7 @@ class RegionXY:
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
         """
         Gives the minnimum bounding envelope for the region. The minnimum
-        bounding envelope is the smallest rectangle that can fit the RegionXY 
+        bounding envelope is the smallest rectangle that can fit the RegionXY
         in question where all sides of the rectangle are parrallel to either the X or Y axes.
 
         Returns
@@ -196,7 +211,8 @@ class RegionXY:
             return self.loops[0].axis_aligned_bounding_box()
         else:
             raise NotImplementedError(
-                'RegionXY.axis_aligned_bounding_box is only implemented for single loop regions.')
+                'RegionXY.axis_aligned_bounding_box is only implemented for single loop regions.'
+            )
 
     # alias for easy use axis_aligned_bounding_box()
     aabbox = axis_aligned_bounding_box
@@ -224,14 +240,12 @@ class RegionXY:
             width = size[0]
             height = size[1]
         else:
-            raise ValueError(
-                "size must be either a scalar or a 2 element list-like.")
+            raise ValueError("size must be either a scalar or a 2 element list-like.")
 
         x = width / 2
         y = height / 2
 
-        vertices = Pxy([[-x, -x, x, x],
-                        [y, -y, -y, y]])
+        vertices = Pxy([[-x, -x, x, x], [y, -y, -y, y]])
 
         loop = LoopXY.from_vertices(vertices)
         return RegionXY(loop)

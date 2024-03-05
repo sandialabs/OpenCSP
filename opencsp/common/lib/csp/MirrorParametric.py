@@ -18,10 +18,14 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 
 class MirrorParametric(MirrorAbstract):
     """
-    Mirror implementation defined by a parametric function and a 2d region. 
+    Mirror implementation defined by a parametric function and a 2d region.
     """
 
-    def __init__(self, surface_function: Callable[[np.ndarray, np.ndarray], np.ndarray], shape: RegionXY) -> 'MirrorParametric':
+    def __init__(
+        self,
+        surface_function: Callable[[np.ndarray, np.ndarray], np.ndarray],
+        shape: RegionXY,
+    ) -> 'MirrorParametric':
         """Instantiates MirrorParametric class
 
         Parameters
@@ -44,7 +48,9 @@ class MirrorParametric(MirrorAbstract):
     def __repr__(self) -> str:
         return f"Parametricly defined mirror defined by the function {inspect.getsourcelines(self._surface_function)[0]}"
 
-    def _define_normals_function(self, surface_function: Callable[[float, float], float]) -> Callable:
+    def _define_normals_function(
+        self, surface_function: Callable[[float, float], float]
+    ) -> Callable:
         """Returns a normal vector generating function given a surface z coordinate
         function
 
@@ -93,7 +99,9 @@ class MirrorParametric(MirrorAbstract):
                 dfdy_n *= np.ones(y.shape)
             # Create constant z coordinate
             z_norm = np.ones(x.shape)
-            return np.concatenate((-dfdx_n[..., None], -dfdy_n[..., None], z_norm[..., None]), axis=-1)
+            return np.concatenate(
+                (-dfdx_n[..., None], -dfdy_n[..., None], z_norm[..., None]), axis=-1
+            )
 
         return _normals_function
 
@@ -114,7 +122,9 @@ class MirrorParametric(MirrorAbstract):
         return self._surface_function(p.x, p.y)
 
     @classmethod
-    def generate_symmetric_paraboloid(cls, focal_length: float, shape: RegionXY) -> 'MirrorParametric':
+    def generate_symmetric_paraboloid(
+        cls, focal_length: float, shape: RegionXY
+    ) -> 'MirrorParametric':
         """Generate a symmetric parabolic mirror with the given focal length
 
         Parameters
@@ -130,7 +140,9 @@ class MirrorParametric(MirrorAbstract):
         """
         # Create surface function
         a = 1.0 / (4 * focal_length)
-        def surface_function(x, y): return a * (x ** 2 + y ** 2)
+
+        def surface_function(x, y):
+            return a * (x**2 + y**2)
 
         return cls(surface_function, shape)
 
@@ -147,7 +159,9 @@ class MirrorParametric(MirrorAbstract):
         -------
         MirrorParametric
         """
+
         # Create a surface function
-        def surface_function(x, y): return x * y * 0
+        def surface_function(x, y):
+            return x * y * 0
 
         return cls(surface_function, shape)
