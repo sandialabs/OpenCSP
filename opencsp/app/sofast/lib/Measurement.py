@@ -4,8 +4,8 @@ import datetime as dt
 
 import numpy as np
 
-from   opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
@@ -14,15 +14,17 @@ class Measurement:
     and metadata about the measurement.
     """
 
-    def __init__(self,
-                 mask_images: np.ndarray,
-                 fringe_images: np.ndarray,
-                 fringe_periods_x: np.ndarray,
-                 fringe_periods_y: np.ndarray,
-                 measure_point: Vxyz,
-                 optic_screen_dist: float,
-                 date: dt.datetime,
-                 name: str = '') -> 'Measurement':
+    def __init__(
+        self,
+        mask_images: np.ndarray,
+        fringe_images: np.ndarray,
+        fringe_periods_x: np.ndarray,
+        fringe_periods_y: np.ndarray,
+        measure_point: Vxyz,
+        optic_screen_dist: float,
+        date: dt.datetime,
+        name: str = '',
+    ) -> 'Measurement':
         """
         A measurement contains 2 (MxN) mask images, n (MxN) images of
         horizontal/vertical fringes.
@@ -47,7 +49,9 @@ class Measurement:
         """
         # Check mask image size
         if mask_images.shape[2] != 2 or np.ndim(mask_images) != 3:
-            raise ValueError(f'Two mask images needed, but {mask_images.shape[2]} given.')
+            raise ValueError(
+                f'Two mask images needed, but {mask_images.shape[2]} given.'
+            )
 
         # Save input measurement data
         self.mask_images = mask_images
@@ -67,8 +71,12 @@ class Measurement:
         self.num_x_ims = self.fringe_periods_x.size * self.phase_shifts
         self.num_fringe_ims = self.fringe_images.shape[2]
         # Check number of input fringes
-        if (self.num_y_ims + self.num_x_ims) != self.num_fringe_ims or np.ndim(fringe_images) != 3:
-            raise ValueError(f'Incorrect number of fringe images given. Fringe images shape = {fringe_images.shape}.')
+        if (self.num_y_ims + self.num_x_ims) != self.num_fringe_ims or np.ndim(
+            fringe_images
+        ) != 3:
+            raise ValueError(
+                f'Incorrect number of fringe images given. Fringe images shape = {fringe_images.shape}.'
+            )
 
         # Instantiate calibration objected fringes
         self._fringe_images_calibrated = None
@@ -79,12 +87,12 @@ class Measurement:
     @property
     def fringe_images_y(self) -> np.ndarray:
         """Returns raw y-only fringes"""
-        return self.fringe_images[..., :self.num_y_ims]
+        return self.fringe_images[..., : self.num_y_ims]
 
     @property
     def fringe_images_x(self) -> np.ndarray:
         """Returns raw x-only fringes"""
-        return self.fringe_images[..., self.num_y_ims:]
+        return self.fringe_images[..., self.num_y_ims :]
 
     @property
     def fringe_images_calibrated(self) -> np.ndarray:
@@ -97,14 +105,16 @@ class Measurement:
     @property
     def fringe_images_y_calibrated(self) -> np.ndarray:
         """Returns calibrated y-only fringes"""
-        return self.fringe_images_calibrated[..., :self.num_y_ims]
+        return self.fringe_images_calibrated[..., : self.num_y_ims]
 
     @property
     def fringe_images_x_calibrated(self) -> np.ndarray:
         """Returns calibrated x-only fringes"""
-        return self.fringe_images_calibrated[..., self.num_y_ims:]
+        return self.fringe_images_calibrated[..., self.num_y_ims :]
 
-    def calibrate_fringe_images(self, calibration: ImageCalibrationAbstract, **kwargs) -> None:
+    def calibrate_fringe_images(
+        self, calibration: ImageCalibrationAbstract, **kwargs
+    ) -> None:
         """
         Performs brightness level calibration on the raw captured fringes.
 
@@ -118,7 +128,9 @@ class Measurement:
 
         """
         if not isinstance(calibration, ImageCalibrationAbstract):
-            raise ValueError('Input calibration must be instance of ImageCalibrationAbstract.')
+            raise ValueError(
+                'Input calibration must be instance of ImageCalibrationAbstract.'
+            )
 
         self._fringe_images_calibrated = calibration.apply_to_images(self, **kwargs)
 

@@ -12,6 +12,4 @@ allowed_binaries_file: Where to find the sensitive_strings_allowed_binary_files.
 cache_file: Greatly improves the speed of searching for sensitive strings by remembering which files were checked previously, for use with opencsp_code/contrib/scripts/sensitive_strings.
 """
 
-_settings_list = [
-    [_ss_settings_key, _ss_settings_default]
-]
+_settings_list = [[_ss_settings_key, _ss_settings_default]]

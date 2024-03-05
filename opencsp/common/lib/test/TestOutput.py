@@ -14,23 +14,27 @@ import os
 import opencsp.common.lib.opencsp_path.opencsp_root_path as ort
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
-from   opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
+from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-from   opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from   opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
+from opencsp.common.lib.render_control.RenderControlFigureRecord import (
+    RenderControlFigureRecord,
+)
 import opencsp.common.lib.test.support_test as stest
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class TestOutput():
+class TestOutput:
     @classmethod
-    def setup_class(self,
-                    source_file_body: str,
-                    figure_prefix_root: str,
-                    interactive=False,
-                    verify=True,
-                    output_path=os.path.dirname(__file__)):
+    def setup_class(
+        self,
+        source_file_body: str,
+        figure_prefix_root: str,
+        interactive=False,
+        verify=True,
+        output_path=os.path.dirname(__file__),
+    ):
         # Capture input.
         self.source_file_body = source_file_body
         self.figure_prefix_root = figure_prefix_root
@@ -39,11 +43,17 @@ class TestOutput():
         self.output_path = output_path
 
         # Set the location to save files.
-        self.expected_output_dir = os.path.join(self.output_path, 'data', 'input', self.source_file_body)
-        self.actual_output_dir = os.path.join(self.output_path, 'data', 'output', self.source_file_body)
-    
+        self.expected_output_dir = os.path.join(
+            self.output_path, 'data', 'input', self.source_file_body
+        )
+        self.actual_output_dir = os.path.join(
+            self.output_path, 'data', 'output', self.source_file_body
+        )
+
         # Setup log reporting.
-        log_file_dir_body_ext = os.path.join(self.actual_output_dir, self.source_file_body + '.log')
+        log_file_dir_body_ext = os.path.join(
+            self.actual_output_dir, self.source_file_body + '.log'
+        )
         print('log_file_dir_body_ext = ', log_file_dir_body_ext)
         lt.logger(log_file_dir_body_ext, delete_existing_log=True)
 
@@ -56,8 +66,12 @@ class TestOutput():
 
         # Set the figure and axis control for all figures.
         lt.info('Initializing render control structures...')
-        self.figure_control: RenderControlFigure = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
-        self.figure_control_large: RenderControlFigure = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=False)
+        self.figure_control: RenderControlFigure = rcfg.RenderControlFigure(
+            tile_array=(2, 1), tile_square=True
+        )
+        self.figure_control_large: RenderControlFigure = rcfg.RenderControlFigure(
+            tile_array=(1, 1), tile_square=False
+        )
         self.axis_control_m: RenderControlAxis = rca.meters()
 
         # Note: It is tempting to put the "Reset rendering" code lines here, to avoid redundant
@@ -70,7 +84,9 @@ class TestOutput():
 
     def start_test(self, close=True):
         # Tag to enable users inspecting the output data to find the calling routine, based on the saved metadata.
-        test_routine_name = inspect.stack()[1][3]  # See https://stackoverflow.com/questions/5067604/determine-function-name-from-within-that-function-without-using-traceback
+        test_routine_name = inspect.stack()[1][
+            3
+        ]  # See https://stackoverflow.com/questions/5067604/determine-function-name-from-within-that-function-without-using-traceback
         self.code_tag = self.source_file_body + '.' + test_routine_name + '()'
         lt.info('\n\nStarting ' + self.code_tag + '...')
 
@@ -106,23 +122,39 @@ class TestOutput():
         #
         return self.figure_prefix_root + '{0:03d}'.format(figure_num)
 
-    def show_save_and_check_figure(self, fig_record: RenderControlFigureRecord, dpi=600) -> None:
+    def show_save_and_check_figure(
+        self, fig_record: RenderControlFigureRecord, dpi=600
+    ) -> None:
         """
         Once a figure is drawn, this routine wraps up the test.
         """
         # Show the figure, save it to disk, and verify that it matches expectations.
-        stest.show_save_and_check_figure(fig_record, self.actual_output_dir, self.expected_output_dir, self.verify, show_figs=True, dpi=dpi)
+        stest.show_save_and_check_figure(
+            fig_record,
+            self.actual_output_dir,
+            self.expected_output_dir,
+            self.verify,
+            show_figs=True,
+            dpi=dpi,
+        )
         # Clear.
         if not self.interactive:
             plt.close('all')
-
 
     def save_and_check_image(self, image, dpm, output_file_body, output_ext) -> None:
         """
         Once an image is generated, this routine wraps up the test.
         """
         # Save the image to disk, and verify that it matches expectations.
-        stest.save_and_check_image(image, dpm, self.actual_output_dir, self.expected_output_dir, output_file_body, output_ext, self.verify)
+        stest.save_and_check_image(
+            image,
+            dpm,
+            self.actual_output_dir,
+            self.expected_output_dir,
+            output_file_body,
+            output_ext,
+            self.verify,
+        )
         # Clear.
         if not self.interactive:
             plt.close('all')

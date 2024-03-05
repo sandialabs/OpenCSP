@@ -5,15 +5,20 @@ import opencsp.common.lib.render.lib.PowerpointShape as pps
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
-class PowerpointText(pps.PowerpointShape):
-    _tmp_save_path = os.path.join(orp.opencsp_temporary_dir(), "PowerpointTexts", "texts", "tmp")
 
-    def __init__(self,
-                 val: str=None,
-                 dims: tuple[float,float,float,float]=None,
-                 cell_dims: tuple[float,float,float,float]=None,
-                 is_title=False,
-                 parent_slide=None):
+class PowerpointText(pps.PowerpointShape):
+    _tmp_save_path = os.path.join(
+        orp.opencsp_temporary_dir(), "PowerpointTexts", "texts", "tmp"
+    )
+
+    def __init__(
+        self,
+        val: str = None,
+        dims: tuple[float, float, float, float] = None,
+        cell_dims: tuple[float, float, float, float] = None,
+        is_title=False,
+        parent_slide=None,
+    ):
         super().__init__(cell_dims)
         self._val = val
         self.dims = dims
@@ -23,12 +28,13 @@ class PowerpointText(pps.PowerpointShape):
 
         # do this import here to avoid a circular import loop
         import opencsp.common.lib.render.PowerpointSlide as pps
+
         self.parent_slide: pps.PowerpointSlide = parent_slide
 
     def has_val(self):
         return self._val != None
 
-    def get_val(self) -> str|None:
+    def get_val(self) -> str | None:
         return self._val
 
     def set_val(self, val: str):
@@ -37,23 +43,23 @@ class PowerpointText(pps.PowerpointShape):
 
     def has_dims(self):
         return self.dims is not None
-    
+
     def dims_pptx(self):
-        """ Returns the powerpoint-style inches to place this text at (left, top, width, height). """
+        """Returns the powerpoint-style inches to place this text at (left, top, width, height)."""
         return self._pptx_inches(self.dims)
 
     @staticmethod
-    def compute_height(font_pnt: int, nlines: int=1):
-        """ Attempts to calculate a height, in inches, based on the given font size. """
+    def compute_height(font_pnt: int, nlines: int = 1):
+        """Attempts to calculate a height, in inches, based on the given font size."""
         # experimental results:
         #     single line of pnt 30 font: 0.62"
         #     each additional line: 0.5"
         per_line = font_pnt / 30 * 0.5
-        padding_top_bot = font_pnt / 30 * (0.62-0.5)
+        padding_top_bot = font_pnt / 30 * (0.62 - 0.5)
         return (nlines * per_line) + padding_top_bot
-    
+
     def compute_and_assign_height(self, font_pnt: int):
-        """ Attempts to calculate a height, in inches, for this text based on the given font size. """
+        """Attempts to calculate a height, in inches, for this text based on the given font size."""
         if self.has_val():
             nlines = len(self._val.split("\n"))
         else:
@@ -65,40 +71,54 @@ class PowerpointText(pps.PowerpointShape):
 
     def is_saved_to_file(self):
         return self._saved_name_ext != None
-    
+
     def get_text_file_path(self) -> str:
         if not self.is_saved_to_file():
             return None
         return os.path.join(self._tmp_save_path, self._saved_name_ext)
-    
+
     def _to_text_file(self, path_name_ext: str):
-        """ Serializes this instance to a file. """
+        """Serializes this instance to a file."""
         path, _, _ = ft.path_components(path_name_ext)
         ft.create_directories_if_necessary(path)
         with open(path_name_ext, "w") as fout:
             fout.write("PowerpointText\n")
             fout.write("v1\n")
-            for v in [self._dims_to_str(self.dims), self._dims_to_str(self.cell_dims), self.is_title, self.has_val()]:
+            for v in [
+                self._dims_to_str(self.dims),
+                self._dims_to_str(self.cell_dims),
+                self.is_title,
+                self.has_val(),
+            ]:
                 fout.write(f"{v}\n")
             fout.write(f"{self.get_val()}")
-    
+
     @classmethod
     def from_txt_file(cls, path_name_ext: str):
-        """ Given the text file from get_text_file_path(), this reconstructs a PowerpointText instance. """
+        """Given the text file from get_text_file_path(), this reconstructs a PowerpointText instance."""
         path, _, _ = ft.path_components(path_name_ext)
 
         with open(path_name_ext, "r") as fin:
             lines = fin.readlines()
         slines = [line.strip() for line in lines]
         if len(slines) < 2:
-            lt.error_and_raise(RuntimeError, f"Error: in PowerpointSlide.from_txt_file(), not enough lines in file {path_name_ext}")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in PowerpointSlide.from_txt_file(), not enough lines in file {path_name_ext}",
+            )
 
         file_type = slines[0]
         if file_type != "PowerpointText":
-            lt.error_and_raise(RuntimeError, f"Error: in PowerpointText.from_txt_file(), bad file type {file_type} in {path_name_ext}, expected type PowerpointText")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in PowerpointText.from_txt_file(), bad file type {file_type} in {path_name_ext}, expected type PowerpointText",
+            )
         version = slines[1]
         if version != "v1":
-            lt.error_and_raise(RuntimeError, f"Error: in PowerpointText.from_txt_file(), bad version {version} in {path_name_ext}, expected version v1")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in PowerpointText.from_txt_file(), bad version {version} in {path_name_ext}, expected version v1",
+            )
         dims = cls._str_to_dims(None, slines[2])
         cell_dims = cls._str_to_dims(None, slines[3])
         is_title = slines[4] == 'True'
@@ -112,17 +132,18 @@ class PowerpointText(pps.PowerpointShape):
             to_rename = [self.get_text_file_path()]
             for path_name_ext in to_rename:
                 _, name, ext = ft.path_components(path_name_ext)
-                ft.rename_file(path_name_ext, os.path.join(save_path, name+ext))
-                
+                ft.rename_file(path_name_ext, os.path.join(save_path, name + ext))
+
         self._tmp_save_path = save_path
 
     def save(self):
-        """ Saves this instance to a text file, as necessary.
+        """Saves this instance to a text file, as necessary.
         It can then be reconstructed by calling from_text_file() with the returned path_name_ext.
-        
+
         Returns:
         --------
-            ppt_path_name_ext (str|None): The path to the serialized instance. None if saving failed. """
+            ppt_path_name_ext (str|None): The path to the serialized instance. None if saving failed.
+        """
         # first check if we need to save
         if self.is_saved_to_file():
             return self.get_text_file_path()
@@ -134,30 +155,33 @@ class PowerpointText(pps.PowerpointShape):
                 slide_idx = self.parent_slide.slide_control.slide_index
         if slide_idx < 0:
             return None
-        
+
         # find an available slot to save to
         found_open_spot = False
-        for i in range(20): # probably don't need more than 20 texts per slide
+        for i in range(20):  # probably don't need more than 20 texts per slide
             path_name_ext = os.path.join(self._tmp_save_path, f"{slide_idx}_{i}.txt")
             if not ft.file_exists(path_name_ext):
                 found_open_spot = True
                 break
         if not found_open_spot:
-            lt.error_and_raise(RuntimeError, f"Unable to find a spot in {self._tmp_save_path} to save this powerpoint text for slide {slide_idx} to.")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Unable to find a spot in {self._tmp_save_path} to save this powerpoint text for slide {slide_idx} to.",
+            )
 
         _, name, ext = ft.path_components(path_name_ext)
         self._to_text_file(path_name_ext)
-        self._saved_name_ext = name+ext
+        self._saved_name_ext = name + ext
         return self.get_text_file_path()
-    
+
     def clear_tmp_save(self):
         if self._saved_name_ext != None:
             ft.delete_file(self._saved_name_ext, error_on_not_exists=False)
             self._saved_name_ext = None
-    
+
     def append_tmp_path(self, append_dir: str):
         self._tmp_save_path = os.path.join(self._tmp_save_path, append_dir)
-        
+
     @classmethod
     def clear_tmp_save_all(cls):
         if ft.directory_exists(cls._tmp_save_path, error_if_exists_as_file=False):

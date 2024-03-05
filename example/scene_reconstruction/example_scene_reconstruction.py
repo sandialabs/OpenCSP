@@ -10,10 +10,12 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 def example_scene_reconstruction():
-    """Example script that reconstructs the XYZ locations of Aruco markers in a scene.
-    """
+    """Example script that reconstructs the XYZ locations of Aruco markers in a scene."""
     # Define input directory
-    dir_input = join(os.path.dirname(opencsp.__file__), 'app/scene_reconstruction/test/data/data_measurement')
+    dir_input = join(
+        os.path.dirname(opencsp.__file__),
+        'app/scene_reconstruction/test/data/data_measurement',
+    )
 
     # Define output directory
     save_dir = join(os.path.dirname(__file__), 'data/output')
@@ -24,13 +26,21 @@ def example_scene_reconstruction():
 
     # Load components
     camera = Camera.load_from_hdf(join(dir_input, 'camera.h5'))
-    known_point_locations = np.loadtxt(join(dir_input, 'known_point_locations.csv'), delimiter=',', skiprows=1)
+    known_point_locations = np.loadtxt(
+        join(dir_input, 'known_point_locations.csv'), delimiter=',', skiprows=1
+    )
     image_filter_path = join(dir_input, 'aruco_marker_images', '*.JPG')
-    point_pair_distances = np.loadtxt(join(dir_input, 'point_pair_distances.csv'), delimiter=',', skiprows=1)
-    alignment_points = np.loadtxt(join(dir_input, 'alignment_points.csv'), delimiter=',', skiprows=1)
+    point_pair_distances = np.loadtxt(
+        join(dir_input, 'point_pair_distances.csv'), delimiter=',', skiprows=1
+    )
+    alignment_points = np.loadtxt(
+        join(dir_input, 'alignment_points.csv'), delimiter=',', skiprows=1
+    )
 
     # Perform marker position calibration
-    cal_scene_recon = SceneReconstruction(camera, known_point_locations, image_filter_path)
+    cal_scene_recon = SceneReconstruction(
+        camera, known_point_locations, image_filter_path
+    )
     cal_scene_recon.run_calibration(VERBOSITY)
 
     # Scale points
@@ -49,6 +59,7 @@ def example_scene_reconstruction():
     # Save calibrtion figures
     for fig in cal_scene_recon.figures:
         fig.savefig(join(save_dir, fig.get_label() + '.png'))
+
 
 if __name__ == '__main__':
     example_optics_and_ray_tracing_driver()

@@ -20,10 +20,12 @@ global_singleprocessing_logger: log.Logger = None
 global_multiprocessing_logger: log.Logger = None
 
 
-def logger(log_dir_body_ext: str = None,
-           level: int = log.INFO,  # Level 10 yields lots of spurious log information.
-           delete_existing_log: bool = True) -> None:
-    """ Initialize logging for single-process programs.
+def logger(
+    log_dir_body_ext: str = None,
+    level: int = log.INFO,  # Level 10 yields lots of spurious log information.
+    delete_existing_log: bool = True,
+) -> None:
+    """Initialize logging for single-process programs.
 
     Creates a fresh log file, deleting the existing log file if it exists as indicated by delete_existing_log_file.
     Once this method is called, then the info(), warn(), and error() methods will use the logger created here.
@@ -39,10 +41,10 @@ def logger(log_dir_body_ext: str = None,
             Level values::
 
                 10 debug    Detailed information, typically of interest only when diagnosing problem1s.
-                            Can lead to lots of system-generated information in the log file, such as 
+                            Can lead to lots of system-generated information in the log file, such as
                             matplotlib font declarations, etc.
                 20 info     Confirmation that things are working as expected.
-                30 warning  An indication that something unexpected happened, or indicative of some problem in the 
+                30 warning  An indication that something unexpected happened, or indicative of some problem in the
                             near future (e.g. 'disk space low'). The software is still working as expected.
                 40 error    Due to a more serious problem, the software has not been able to perform some function.
                 50 critical A serious error, indicating that the program itself may be unable to continue running.
@@ -61,6 +63,7 @@ def logger(log_dir_body_ext: str = None,
     # Default log name
     if log_dir_body_ext == None:
         import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
+
         log_body_ext = tdt.current_date_time_string_forfile() + "_log.txt"
         log_dir_body_ext = os.path.join(orp.opencsp_code_dir(), "..", log_body_ext)
 
@@ -89,7 +92,7 @@ def logger(log_dir_body_ext: str = None,
 
 
 def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO):
-    """ Create a logger for logging across many processes.
+    """Create a logger for logging across many processes.
 
     For multiprocessing logs, it is recommended that the existing log is deleted by the user or a batch process script.
     Once this method is called, then the info(), warn(), and error() methods will use the logger created here.
@@ -129,7 +132,8 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO):
 
     # Set formatter.
     formatter = log.Formatter(
-        f"[%(asctime)s| %(levelname)s| {process_name}] %(message)s")
+        f"[%(asctime)s| %(levelname)s| {process_name}] %(message)s"
+    )
     if log_dir_body_ext != None:
         handler = log.FileHandler(log_dir_body_ext)
         handler.setFormatter(formatter)
@@ -149,10 +153,13 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO):
     return global_multiprocessing_logger
 
 
-def _add_stream_handlers(logger: log.Logger, level: int, formatter: log.Formatter = None):
-    """ Adds the stdout and stderr streams to the given logger.
+def _add_stream_handlers(
+    logger: log.Logger, level: int, formatter: log.Formatter = None
+):
+    """Adds the stdout and stderr streams to the given logger.
 
-    From https://stackoverflow.com/questions/16061641/python-logging-split-between-stdout-and-stderr """
+    From https://stackoverflow.com/questions/16061641/python-logging-split-between-stdout-and-stderr
+    """
     # stdout log
     h1 = log.StreamHandler(sys.stdout)
     h1.setLevel(log.DEBUG)
@@ -189,8 +196,9 @@ def _add_stream_handlers(logger: log.Logger, level: int, formatter: log.Formatte
 #     else:
 #         global_singleprocessing_logger = None
 
+
 def debug(*vargs, **kwargs):
-    """ Output debugging information, both to console and log file.
+    """Output debugging information, both to console and log file.
 
     This is for logging detailed information, typically of interest only when
     diagnosing problems. Can lead to lots of system-generated information in
@@ -214,7 +222,7 @@ def debug(*vargs, **kwargs):
 
 
 def info(*vargs, **kwargs):
-    """ Report program progress, both to console and log file.
+    """Report program progress, both to console and log file.
 
     Use this level to confirm that things are working as expected.
 
@@ -235,7 +243,7 @@ def info(*vargs, **kwargs):
 
 
 def warn(*vargs, **kwargs):
-    """ Warning message, both to console and log file.
+    """Warning message, both to console and log file.
 
     Use this level as an indication that something unexpected happened, or
     indicative of some problem in the near future (e.g. 'disk space low').
@@ -258,7 +266,7 @@ def warn(*vargs, **kwargs):
 
 
 def error(*vargs, **kwargs):
-    """ Error message, both to console and log file.
+    """Error message, both to console and log file.
 
     Due to a more serious problem, the software has not been able to perform some function.
 
@@ -281,7 +289,7 @@ def error(*vargs, **kwargs):
 
 
 def critical(*vargs, **kwargs):
-    """ Critical error message, both to console and log file.
+    """Critical error message, both to console and log file.
 
     A serious error, indicating that the program itself may be unable to continue running.
     You should most likely be using the critical_and_raise version of this function.
@@ -305,7 +313,7 @@ def critical(*vargs, **kwargs):
 
 
 def error_and_raise(exception_class: Exception.__class__, msg: str):
-    """ Logs the given message at the "error" level and raises the given exception, also with this message.
+    """Logs the given message at the "error" level and raises the given exception, also with this message.
 
     Args:
         exception_class (Exception.__class__): An exception class. See below for built-in exception types.
@@ -396,7 +404,7 @@ def error_and_raise(exception_class: Exception.__class__, msg: str):
 
 
 def critical_and_raise(exception_class: Exception.__class__, msg: str):
-    """ Logs the given message at the "error" level and raises the given exception, also with this message.
+    """Logs the given message at the "error" level and raises the given exception, also with this message.
 
     Args:
         exception_class (Exception.__class__): An exception class. See error_and_raise() for a description of built-in exceptions.

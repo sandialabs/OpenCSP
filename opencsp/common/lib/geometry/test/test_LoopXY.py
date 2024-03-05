@@ -2,10 +2,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import unittest
 
-from   opencsp.common.lib.geometry.EdgeXY import EdgeXY
-from   opencsp.common.lib.geometry.LoopXY import LoopXY
-from   opencsp.common.lib.geometry.LineXY import LineXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.EdgeXY import EdgeXY
+from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.LineXY import LineXY
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class TestLoopXY(unittest.TestCase):
@@ -44,8 +44,7 @@ class TestLoopXY(unittest.TestCase):
         l4 = LineXY.from_two_points(v4, v1)
 
         loop = LoopXY.from_lines([l1, l2, l3, l4])
-        vert_exp = np.array(([1, 0, 0, 1],
-                             [1, 1, 0, 0]), dtype=float)
+        vert_exp = np.array(([1, 0, 0, 1], [1, 1, 0, 0]), dtype=float)
 
         np.testing.assert_allclose(loop.vertices.data, vert_exp)
 
@@ -53,15 +52,13 @@ class TestLoopXY(unittest.TestCase):
         verts = Vxy(([1, 0, 0, 1], [1, 0, 1, 0]))
 
         loop = LoopXY.from_vertices(verts)
-        vert_exp = np.array(([1, 0, 0, 1],
-                             [1, 1, 0, 0]), dtype=float)
+        vert_exp = np.array(([1, 0, 0, 1], [1, 1, 0, 0]), dtype=float)
 
         np.testing.assert_allclose(loop.vertices.data, vert_exp)
-    
+
     def test_from_rectangle(self):
         loop = LoopXY.from_rectangle(2, 3, 4, 5)
-        vert_exp = np.array(([6, 2, 2, 6],
-                             [8, 8, 3, 3]), dtype=float)
+        vert_exp = np.array(([6, 2, 2, 6], [8, 8, 3, 3]), dtype=float)
 
         np.testing.assert_allclose(loop.vertices.data, vert_exp)
 
@@ -96,12 +93,16 @@ class TestLoopXY(unittest.TestCase):
         loop = LoopXY.from_vertices(verts)
         vx = vy = np.array([0, 0.3, 0.6, 0.9, 1.2, 1.5])
 
-        mask_exp = np.array([[False, False, False, False, False, False],
-                             [False, True, True, True, False, False],
-                             [False, True, True, True, False, False],
-                             [False, True, True, True, False, False],
-                             [False, False, False, False, False, False],
-                             [False, False, False, False, False, False]])
+        mask_exp = np.array(
+            [
+                [False, False, False, False, False, False],
+                [False, True, True, True, False, False],
+                [False, True, True, True, False, False],
+                [False, True, True, True, False, False],
+                [False, False, False, False, False, False],
+                [False, False, False, False, False, False],
+            ]
+        )
         mask = loop.as_mask(vx, vy)
 
         np.testing.assert_array_equal(mask, mask_exp)
@@ -128,23 +129,24 @@ class TestLoopXY(unittest.TestCase):
         plt.close(fig)
 
     def test_intersect_line(self):
-        """ For the lines:
+        """For the lines:
             - horizontal y=1,
             - diagonal x=y
-        Get their intersection points through a 2x2 square loop. """
+        Get their intersection points through a 2x2 square loop."""
         loop = LoopXY.from_rectangle(0, 0, 2, 2)
         line_h = LineXY(0, 1, -1)
         line_xy = LineXY(-1, 1, 0)
 
         verts_h_act = loop.intersect_line(line_h).data
         verts_xy_act = loop.intersect_line(line_xy).data
-        verts_h_act = np.sort(verts_h_act, axis=1) # sort by x value
+        verts_h_act = np.sort(verts_h_act, axis=1)  # sort by x value
         verts_xy_act = np.sort(verts_xy_act, axis=1)
 
         self.assertEqual(verts_h_act.shape[0], 2)
         self.assertEqual(verts_xy_act.shape[0], 2)
-        np.testing.assert_almost_equal(verts_h_act,  np.array([[0, 2], [1, 1]]))
+        np.testing.assert_almost_equal(verts_h_act, np.array([[0, 2], [1, 1]]))
         np.testing.assert_almost_equal(verts_xy_act, np.array([[0, 2], [0, 2]]))
+
 
 if __name__ == '__main__':
     unittest.main()

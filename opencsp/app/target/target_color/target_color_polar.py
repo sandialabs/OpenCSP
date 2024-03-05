@@ -49,7 +49,7 @@ Demonstrate Solar Field Plotting Routines
 #    print('Saving file:', output_file_dir_body_ext)
 #    plt.imsave(output_file_dir_body_ext, img, dpi=dpi)
 #    print('Done.')
-# 
+#
 #     # Color by angle
 #     for row in range(0,n_rows):
 #         for col in range(0,n_cols):

@@ -1,13 +1,12 @@
 import numpy as np
 
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-def propagate_rays_to_plane(u_ray: Uxyz,
-                            v_origin: Vxyz,
-                            v_plane: Vxyz,
-                            u_plane: Uxyz) -> Vxyz:
+def propagate_rays_to_plane(
+    u_ray: Uxyz, v_origin: Vxyz, v_plane: Vxyz, u_plane: Uxyz
+) -> Vxyz:
     """
     Propagates rays to their intersection with a plane
 
@@ -31,7 +30,9 @@ def propagate_rays_to_plane(u_ray: Uxyz,
     if type(u_ray) is not Uxyz:
         raise TypeError('u_ray must be type {} not type {}.'.format(Uxyz, type(u_ray)))
     if type(u_plane) is not Uxyz:
-        raise TypeError('u_plane must be type {} not type {}.'.format(Uxyz, type(u_plane)))
+        raise TypeError(
+            'u_plane must be type {} not type {}.'.format(Uxyz, type(u_plane))
+        )
 
     v_origin_plane = v_plane - v_origin
     w_dot = u_plane.dot(v_origin_plane)
@@ -41,9 +42,9 @@ def propagate_rays_to_plane(u_ray: Uxyz,
     return int_pts
 
 
-def calc_slopes(v_surf_int_pts_optic: Vxyz,
-                v_optic_cam_optic: Vxyz,
-                v_screen_points_optic: Vxyz) -> np.ndarray:
+def calc_slopes(
+    v_surf_int_pts_optic: Vxyz, v_optic_cam_optic: Vxyz, v_screen_points_optic: Vxyz
+) -> np.ndarray:
     """
     Calculate slopes of every measurement point. The normal of the surface is
     calculated sa the vector between the camera-to-optic vector and the
@@ -76,19 +77,25 @@ def calc_slopes(v_surf_int_pts_optic: Vxyz,
     return np.array((slope_x, slope_y))
 
 
-def fit_slope_robust_ls(slope_fit_poly_order: int,
-                        slope: np.ndarray,
-                        weights: np.ndarray,
-                        v_surf_int_pts_optic: Vxyz) -> np.ndarray:
+def fit_slope_robust_ls(
+    slope_fit_poly_order: int,
+    slope: np.ndarray,
+    weights: np.ndarray,
+    v_surf_int_pts_optic: Vxyz,
+) -> np.ndarray:
     # Check lengths match
     if slope.size != weights.size or slope.size != len(v_surf_int_pts_optic):
-        raise ValueError(f'Input data lengths must be same size, but sizes were {slope.size:d}, {weights.size:d}, {len(v_surf_int_pts_optic):d}.')
+        raise ValueError(
+            f'Input data lengths must be same size, but sizes were {slope.size:d}, {weights.size:d}, {len(v_surf_int_pts_optic):d}.'
+        )
 
     # Calculate number of points
     num_pts = len(v_surf_int_pts_optic)
 
     # Create terms
-    terms = poly_terms(slope_fit_poly_order, v_surf_int_pts_optic.x, v_surf_int_pts_optic.y)
+    terms = poly_terms(
+        slope_fit_poly_order, v_surf_int_pts_optic.x, v_surf_int_pts_optic.y
+    )
 
     # Robust least squares fit
     c1 = 4.685
@@ -122,7 +129,7 @@ def fit_slope_robust_ls(slope_fit_poly_order: int,
         # Compute standardized residuals
         res_sta = res_adj / (c1 * robust_var)  # shape (N,)
         # Compute weights
-        weights = (1 - res_sta ** 2) ** 2
+        weights = (1 - res_sta**2) ** 2
         weights[np.abs(res_sta) >= 1] = 0
 
     if loop_idx == max_iter:
@@ -131,15 +138,17 @@ def fit_slope_robust_ls(slope_fit_poly_order: int,
     return coefficients, weights
 
 
-def fit_slope_ls(slope_fit_poly_order: int,
-                 slope: np.ndarray,
-                 v_surf_int_pts_optic: Vxyz) -> np.ndarray:
+def fit_slope_ls(
+    slope_fit_poly_order: int, slope: np.ndarray, v_surf_int_pts_optic: Vxyz
+) -> np.ndarray:
     """
     Returns best fit slope coefficients to measured slope points using least
     squared fitting.
     """
     # Create terms
-    terms = poly_terms(slope_fit_poly_order, v_surf_int_pts_optic.x, v_surf_int_pts_optic.y)
+    terms = poly_terms(
+        slope_fit_poly_order, v_surf_int_pts_optic.x, v_surf_int_pts_optic.y
+    )
 
     # Simple least squares fit
     #   a @ x = b
@@ -182,7 +191,7 @@ def poly_terms(poly_order: int, x: np.ndarray, y: np.ndarray):
     col_n = 0
     for yi in range(poly_order + 1):
         for xi in range(poly_order - yi + 1):
-            terms[:, col_n] = y ** yi * x ** xi
+            terms[:, col_n] = y**yi * x**xi
             col_n += 1
 
     return terms
@@ -211,12 +220,14 @@ def coef_to_points(Pxy: Vxyz, coefficients: np.ndarray, poly_order: int) -> np.n
     return np.matmul(terms, coefficients.reshape((coefficients.size, -1))).squeeze()
 
 
-def optic_screen_dist_error(scale: float,
-                            dist_meas: float,
-                            v_align_point_optic: Vxyz,
-                            v_optic_cam_optic: Vxyz,
-                            v_optic_screen_optic: Vxyz,
-                            v_meas_pts_surf_int_optic: Vxyz) -> float:
+def optic_screen_dist_error(
+    scale: float,
+    dist_meas: float,
+    v_align_point_optic: Vxyz,
+    v_optic_cam_optic: Vxyz,
+    v_optic_screen_optic: Vxyz,
+    v_meas_pts_surf_int_optic: Vxyz,
+) -> float:
     """
     Calculates the optic to screen distance error.
 
@@ -245,6 +256,9 @@ def optic_screen_dist_error(scale: float,
     v_align_point_cam = v_optic_cam_optic - v_align_point_optic
     dv_align_point_cam = v_align_point_cam * (scale - 1)
     v_optic_screen_new = v_optic_screen_optic + dv_align_point_cam
-    error = np.linalg.norm((v_optic_screen_new - v_meas_pts_surf_int_optic).data) - dist_meas
+    error = (
+        np.linalg.norm((v_optic_screen_new - v_meas_pts_surf_int_optic).data)
+        - dist_meas
+    )
 
     return np.abs(error)

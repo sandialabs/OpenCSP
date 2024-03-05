@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class TestVxy:
@@ -124,7 +124,7 @@ class TestVxy:
 
     def test_magnitude(self):
         mag = self.V1.magnitude()
-        mag_exp = np.array([np.sqrt(np.sum(self.V1_array ** 2))])
+        mag_exp = np.array([np.sqrt(np.sum(self.V1_array**2))])
         np.testing.assert_almost_equal(mag, mag_exp)
 
     def test_normalize(self):
@@ -137,7 +137,7 @@ class TestVxy:
         V = Vxy(array)
 
         norm = V.normalize()
-        norm_exp = array / np.sqrt(np.sum(array ** 2))
+        norm_exp = array / np.sqrt(np.sum(array**2))
 
         np.testing.assert_almost_equal(norm.data.squeeze(), norm_exp)
 
@@ -147,7 +147,7 @@ class TestVxy:
         V = Vxy(array)
 
         V.normalize_in_place()
-        norm_exp = array / np.sqrt(np.sum(array ** 2))
+        norm_exp = array / np.sqrt(np.sum(array**2))
 
         np.testing.assert_almost_equal(V.data.squeeze(), norm_exp)
 
@@ -224,7 +224,7 @@ class TestVxy:
         np.testing.assert_almost_equal(dot, np.zeros(N))
 
         dot = Vy.dot(Vy)
-        np.testing.assert_almost_equal(dot, y ** 2)
+        np.testing.assert_almost_equal(dot, y**2)
 
         # Length N dot length 1
         N = 5

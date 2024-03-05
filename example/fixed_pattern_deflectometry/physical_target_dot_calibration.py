@@ -5,15 +5,19 @@ from os.path import join, dirname, exists
 
 import cv2 as cv
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 import opencsp
-from   opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import FixedPatternSetupCalibrate
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.deflectometry.CalibrationCameraPosition import CalibrationCameraPosition
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import (
+    FixedPatternSetupCalibrate,
+)
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
+    CalibrationCameraPosition,
+)
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 def example_perform_calibration():
@@ -21,18 +25,35 @@ def example_perform_calibration():
     # Define dot location images and origins
     base_dir = join(dirname(opencsp.__file__), '../../sample_data/deflectometry')
     files = [
-        join(base_dir, 'calibration_dot_locations/data_measurement/images/DSC03965.JPG'),
-        join(base_dir, 'calibration_dot_locations/data_measurement/images/DSC03967.JPG'),
-        join(base_dir, 'calibration_dot_locations/data_measurement/images/DSC03970.JPG'),
-        join(base_dir, 'calibration_dot_locations/data_measurement/images/DSC03972.JPG'),
+        join(
+            base_dir, 'calibration_dot_locations/data_measurement/images/DSC03965.JPG'
+        ),
+        join(
+            base_dir, 'calibration_dot_locations/data_measurement/images/DSC03967.JPG'
+        ),
+        join(
+            base_dir, 'calibration_dot_locations/data_measurement/images/DSC03970.JPG'
+        ),
+        join(
+            base_dir, 'calibration_dot_locations/data_measurement/images/DSC03972.JPG'
+        ),
     ]
     origins = Vxy(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]))
 
     # Define other files
-    file_camera_position = join(base_dir, 'calibration_dot_locations/data_measurement/image_deflectometry_camera.png')
-    file_camera_marker = join(base_dir, 'calibration_dot_locations/data_measurement/camera_calibration.h5')
-    file_camera_system = join(base_dir, 'calibration_dot_locations/data_measurement/camera_deflectometry.h5')
-    file_xyz_points = join(base_dir, 'calibration_dot_locations/data_measurement/point_locations.csv')
+    file_camera_position = join(
+        base_dir,
+        'calibration_dot_locations/data_measurement/image_deflectometry_camera.png',
+    )
+    file_camera_marker = join(
+        base_dir, 'calibration_dot_locations/data_measurement/camera_calibration.h5'
+    )
+    file_camera_system = join(
+        base_dir, 'calibration_dot_locations/data_measurement/camera_deflectometry.h5'
+    )
+    file_xyz_points = join(
+        base_dir, 'calibration_dot_locations/data_measurement/point_locations.csv'
+    )
     dir_save = join(dirname(__file__), 'data/output/dot_location_calibraiton')
 
     if not exists(dir_save):
@@ -54,12 +75,16 @@ def example_perform_calibration():
     camera_system = Camera.load_from_hdf(file_camera_system)
 
     # Perform dot location calibration
-    cal_dot_locs = FixedPatternSetupCalibrate(images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32)
+    cal_dot_locs = FixedPatternSetupCalibrate(
+        images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
+    )
     cal_dot_locs.verbose = 1
     cal_dot_locs.run()
 
     # Perform camera position calibration
-    cal_camera = CalibrationCameraPosition(camera_system, pts_xyz_corners, ids_corners, image_camera_position)
+    cal_camera = CalibrationCameraPosition(
+        camera_system, pts_xyz_corners, ids_corners, image_camera_position
+    )
     cal_camera.run_calibration(2)
 
     # Create spatial orientation object

@@ -4,20 +4,21 @@ from os.path import join
 import matplotlib
 
 import opencsp
-from   opencsp.app.sofast.lib.visualize_setup import visualize_setup
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
-from   opencsp.common.lib.deflectometry.FacetData import FacetData
-from   opencsp.app.sofast.lib.Sofast import Sofast
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
+from opencsp.app.sofast.lib.visualize_setup import visualize_setup
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
+
 
 def example_driver():
     """Example SOFAST script
@@ -30,8 +31,9 @@ def example_driver():
 
     """
     # Define sample data directory
-    sample_data_dir = join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/')
-
+    sample_data_dir = join(
+        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/'
+    )
 
     # Directory setup
     file_measurement = join(sample_data_dir, 'measurement_ensemble.h5')
@@ -59,7 +61,14 @@ def example_driver():
     # Define surface data (plano)
     # surface_data = [dict(surface_type='plano', robust_least_squares=False, downsample=20)] * ensemble_data.num_facets
     # Define surface data (parabolic)
-    surface_data = [dict(surface_type='parabolic', initial_focal_lengths_xy=(100., 100.), robust_least_squares=False, downsample=20)] * ensemble_data.num_facets
+    surface_data = [
+        dict(
+            surface_type='parabolic',
+            initial_focal_lengths_xy=(100.0, 100.0),
+            robust_least_squares=False,
+            downsample=20,
+        )
+    ] * ensemble_data.num_facets
 
     # Calibrate fringes
     measurement.calibrate_fringe_images(calibration)
@@ -69,10 +78,10 @@ def example_driver():
 
     # Update search parameters
     sofast.params.mask_hist_thresh = 0.83
-    sofast.params.perimeter_refine_perpendicular_search_dist = 10.
+    sofast.params.perimeter_refine_perpendicular_search_dist = 10.0
     sofast.params.facet_corns_refine_frac_keep = 1.0
-    sofast.params.facet_corns_refine_perpendicular_search_dist = 3.
-    sofast.params.facet_corns_refine_step_length = 5.
+    sofast.params.facet_corns_refine_perpendicular_search_dist = 3.0
+    sofast.params.facet_corns_refine_step_length = 5.0
 
     # Process
     sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
@@ -91,21 +100,29 @@ def example_driver():
 
     # Generate plots
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
-    mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
+    mirror_control = rcm.RenderControlMirror(
+        centroid=True, surface_normals=True, norm_res=1
+    )
     axis_control_m = rca.meters()
 
     # Visualize setup
     fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
-    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0]['spatial_orientation']
-    visualize_setup(display,
-                    camera,
-                    spatial_ori.v_screen_optic_screen,
-                    spatial_ori.r_optic_screen,
-                    ax=fig_record.axis)
+    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0][
+        'spatial_orientation'
+    ]
+    visualize_setup(
+        display,
+        camera,
+        spatial_ori.v_screen_optic_screen,
+        spatial_ori.r_optic_screen,
+        ax=fig_record.axis,
+    )
     fig_record.save(dir_save, 'physical_setup_layout', 'png')
 
     # Plot scenario
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='Facet Ensemble')
+    fig_record = fm.setup_figure_for_3d_data(
+        figure_control, axis_control_m, title='Facet Ensemble'
+    )
     ensemble.draw(fig_record.view, mirror_control)
     fig_record.axis.axis('equal')
     fig_record.save(dir_save, 'facet_ensemble', 'png')
@@ -117,6 +134,7 @@ def example_driver():
 
     # Save data (optionally)
     sofast.save_data_to_hdf(f'{dir_save}/data_multifacet.h5')
+
 
 if __name__ == '__main__':
     example_driver()

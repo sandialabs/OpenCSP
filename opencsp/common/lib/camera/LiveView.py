@@ -1,14 +1,19 @@
-from   matplotlib.animation import FuncAnimation
-from   matplotlib.backend_bases import KeyEvent
+from matplotlib.animation import FuncAnimation
+from matplotlib.backend_bases import KeyEvent
 import matplotlib.pyplot as plt
 import numpy as np
 
-from   opencsp.common.lib.camera.image_processing import highlight_saturation
-from   opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+from opencsp.common.lib.camera.image_processing import highlight_saturation
+from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 
 
 class LiveView:
-    def __init__(self, image_acquisition: ImageAcquisitionAbstract, update_ms: int = 20, highlight_saturation: bool = True):
+    def __init__(
+        self,
+        image_acquisition: ImageAcquisitionAbstract,
+        update_ms: int = 20,
+        highlight_saturation: bool = True,
+    ):
         """
         Shows live stream from a camera. Escape key closes window.
 
@@ -34,7 +39,9 @@ class LiveView:
         self.im = self.ax.imshow(self.grab_frame(), cmap='gray')
 
         # Create animation object (must be defined to variable)
-        self.anim = FuncAnimation(self.fig, self.update, interval=update_ms, cache_frame_data=False)
+        self.anim = FuncAnimation(
+            self.fig, self.update, interval=update_ms, cache_frame_data=False
+        )
 
         # Define close function and bind to keystroke
         self.fig.canvas.mpl_connect("key_press_event", self.close)
@@ -67,4 +74,6 @@ class LiveView:
         if self.highlight_saturation:
             return highlight_saturation(frame, self.image_acquisition.max_value)
         else:
-            return frame.astype(np.float32) / np.float32(self.image_acquisition.max_value)
+            return frame.astype(np.float32) / np.float32(
+                self.image_acquisition.max_value
+            )

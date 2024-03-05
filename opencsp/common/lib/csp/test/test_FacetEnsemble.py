@@ -5,5 +5,4 @@ from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 
 
 class TestFacetEnsemble:
-    """Tests FacetEnsemble class methods
-    """
+    """Tests FacetEnsemble class methods"""

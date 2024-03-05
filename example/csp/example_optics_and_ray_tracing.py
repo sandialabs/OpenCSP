@@ -11,29 +11,32 @@ import os
 
 import numpy as np
 import pytz
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.csp.Facet import Facet
-from   opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
-from   opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from   opencsp.common.lib.csp.MirrorParametric import MirrorParametric
+from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
+from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
+from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 import opencsp.common.lib.csp.RayTrace as rt
-from   opencsp.common.lib.csp.Scene import Scene
-from   opencsp.common.lib.geometry.RegionXY import RegionXY
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.csp.Scene import Scene
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-from   opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
+from opencsp.common.lib.render_control.RenderControlLightPath import (
+    RenderControlLightPath,
+)
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
-from   opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
+from opencsp.common.lib.render_control.RenderControlRayTrace import (
+    RenderControlRayTrace,
+)
 
 
 def visualize_mirror() -> None:
-    """Draws image of, plots slope, and ray traces mirror
-    """
+    """Draws image of, plots slope, and ray traces mirror"""
     # Define mirror
     mirror = define_mirror(100)
 
@@ -45,7 +48,9 @@ def visualize_mirror() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate mirror pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
+    v_sun = Vxyz((0, 1, 0)).rotate(
+        Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True)
+    )
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
@@ -71,8 +76,7 @@ def visualize_mirror() -> None:
 
 
 def visualize_facet() -> None:
-    """Draws image of, plots slope, and ray traces facet
-    """
+    """Draws image of, plots slope, and ray traces facet"""
     # Define facet
     facet = define_facet(100)
 
@@ -84,7 +88,9 @@ def visualize_facet() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate facet pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
+    v_sun = Vxyz((0, 1, 0)).rotate(
+        Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True)
+    )
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
@@ -113,8 +119,7 @@ def visualize_facet() -> None:
 
 
 def visualize_mirror_array() -> None:
-    """Draws image of, plots slope, and ray traces mirror_array
-    """
+    """Draws image of, plots slope, and ray traces mirror_array"""
     # Define mirror_array
     mirror_array = define_mirror_array(100)
 
@@ -126,7 +131,9 @@ def visualize_mirror_array() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate mirror_array pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
+    v_sun = Vxyz((0, 1, 0)).rotate(
+        Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True)
+    )
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
@@ -155,22 +162,21 @@ def visualize_mirror_array() -> None:
 
 
 def define_mirror(focal_length: float) -> MirrorParametric:
-    """Creates parametric mirror with given focal length
-    """
-    region_mirror = RegionXY.from_vertices(Vxy(([-0.6, -0.6, 0.6, 0.6], [-0.6, 0.6, 0.6, -0.6])))
+    """Creates parametric mirror with given focal length"""
+    region_mirror = RegionXY.from_vertices(
+        Vxy(([-0.6, -0.6, 0.6, 0.6], [-0.6, 0.6, 0.6, -0.6]))
+    )
     return MirrorParametric.generate_symmetric_paraboloid(focal_length, region_mirror)
 
 
 def define_facet(focal_length: float) -> Facet:
-    """Creates facet containing a parametric mirror with given focal length
-    """
+    """Creates facet containing a parametric mirror with given focal length"""
     mirror = define_mirror(focal_length)
     return Facet.generate_rotation_defined(mirror)
 
 
 def define_mirror_array(focal_length: float) -> FacetEnsemble:
-    """Creates an array of on-axis canted facets with the given focal length
-    """
+    """Creates an array of on-axis canted facets with the given focal length"""
     x_locs = np.array([-2.15, -1, 0, 1, 2.15]) * 1.3
     y_locs = np.array([-2, -1, 0, 1, 2]) * 1.3
 
@@ -202,7 +208,9 @@ def define_source_sun_time(res: int = 10) -> LightSourceSun:
     return LightSourceSun.from_location_time(loc, time, resolution=res)
 
 
-def ray_trace_obj(scene: Scene, v_targ_cent: Vxyz, v_targ_norm: Uxyz, obj_res: int = 20) -> tuple[np.ndarray, rt.RayTrace]:
+def ray_trace_obj(
+    scene: Scene, v_targ_cent: Vxyz, v_targ_norm: Uxyz, obj_res: int = 20
+) -> tuple[np.ndarray, rt.RayTrace]:
     # Trace scene
     trace = rt.trace_scene(scene, obj_resolution=obj_res)
 
@@ -219,21 +227,31 @@ def ray_trace_obj(scene: Scene, v_targ_cent: Vxyz, v_targ_norm: Uxyz, obj_res: i
     return image, trace
 
 
-def plot_ray_trace(scene: Scene, image: np.ndarray, trace: rt.RayTrace, title: str, plot_rays: bool = False) -> None:
+def plot_ray_trace(
+    scene: Scene,
+    image: np.ndarray,
+    trace: rt.RayTrace,
+    title: str,
+    plot_rays: bool = False,
+) -> None:
     """Plots and saves images"""
     # Define save directory
     save_dir = os.path.join(os.path.dirname(__file__), 'data/output')
 
     # Define visualization controls
     figure_control = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
-    mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
+    mirror_control = rcm.RenderControlMirror(
+        centroid=True, surface_normals=True, norm_res=1
+    )
     axis_control_m = rca.meters()
     if plot_rays:
         light_path_control = RenderControlLightPath(current_length=10)
         ray_trace_control = RenderControlRayTrace(light_path_control=light_path_control)
 
     # Plot scenario
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title=title + ': Ray Trace')
+    fig_record = fm.setup_figure_for_3d_data(
+        figure_control, axis_control_m, title=title + ': Ray Trace'
+    )
     if plot_rays:
         trace.draw(fig_record.view, ray_trace_control)
     scene.objects[0].draw(fig_record.view, mirror_control)
@@ -241,16 +259,19 @@ def plot_ray_trace(scene: Scene, image: np.ndarray, trace: rt.RayTrace, title: s
     fig_record.save(save_dir, 'ray_trace_' + title, 'png')
 
     # Plot image
-    fig_record = fm.setup_figure(figure_control, axis_control_m, title=title + ': Sun Image')
+    fig_record = fm.setup_figure(
+        figure_control, axis_control_m, title=title + ': Sun Image'
+    )
     fig_record.axis.imshow(image, cmap='jet')
     fig_record.save(save_dir, 'sun_image_' + title, 'png')
 
 
 def example_optics_and_ray_tracing_driver():
-    #"""A driver for the OpenCSP optics and ray tracing example"""
+    # """A driver for the OpenCSP optics and ray tracing example"""
     visualize_mirror()
     visualize_facet()
     visualize_mirror_array()
+
 
 if __name__ == '__main__':
     example_optics_and_ray_tracing_driver()

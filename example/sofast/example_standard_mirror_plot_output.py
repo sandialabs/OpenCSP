@@ -1,17 +1,19 @@
 import os
-from   os.path import join
+from os.path import join
 
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 import opencsp
 import opencsp.app.sofast.lib.load_saved_data as lsd
 import opencsp.common.lib.csp.standard_output as so
-from   opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-def plot_sofast_single_facet(data_file: str, dir_save: str, focal_length_paraboloid: float) -> None:
+def plot_sofast_single_facet(
+    data_file: str, dir_save: str, focal_length_paraboloid: float
+) -> None:
     """Loads and visualizes CSP optic from saved SOFAST HDF file
     containing measured data of an NSTTF Facet.
 
@@ -58,16 +60,22 @@ def plot_sofast_single_facet(data_file: str, dir_save: str, focal_length_parabol
         options.output_dir = dir_save
 
     # Create standard output plots
-    so.standard_output(optic_meas, optic_ref, source, v_target_center, v_target_normal, options)
+    so.standard_output(
+        optic_meas, optic_ref, source, v_target_center, v_target_normal, options
+    )
 
 
-def plot_sofast_facet_ensemble(data_file: str, dir_save: str, focal_length_paraboloid: float) -> None:
+def plot_sofast_facet_ensemble(
+    data_file: str, dir_save: str, focal_length_paraboloid: float
+) -> None:
     """Loads and visualizes CSP optic from saved SOFAST HDF file
     containing measured data of an NSTTF Heliostat.
     """
     # Load data
     optic_meas = lsd.load_facet_ensemble_from_hdf(data_file)
-    optic_ref = lsd.load_ideal_facet_ensemble_from_hdf(data_file, focal_length_paraboloid)
+    optic_ref = lsd.load_ideal_facet_ensemble_from_hdf(
+        data_file, focal_length_paraboloid
+    )
 
     # Define scene
     v_target_center = Vxyz((0, 0, 56.57))
@@ -99,7 +107,9 @@ def plot_sofast_facet_ensemble(data_file: str, dir_save: str, focal_length_parab
         options.output_dir = dir_save
 
     # Create standard output plots
-    so.standard_output(optic_meas, optic_ref, source, v_target_center, v_target_normal, options)
+    so.standard_output(
+        optic_meas, optic_ref, source, v_target_center, v_target_normal, options
+    )
 
 
 def example_driver():
@@ -116,17 +126,19 @@ def example_driver():
 
     """
     # Define measured and reference data
-    sample_data_dir = join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/')
+    sample_data_dir = join(
+        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/'
+    )
 
     save_dir = join(os.path.dirname(__file__), 'data/output/standard_output')
 
     # SOFAST collect of NSTTF Facet
     file_data = join(sample_data_dir, 'calculations_facet/data.h5')
-    plot_sofast_single_facet(file_data, join(save_dir, 'facet'), 100.)
+    plot_sofast_single_facet(file_data, join(save_dir, 'facet'), 100.0)
 
     # SOFAST collect of lab heliostat
     file_data = join(sample_data_dir, 'calculations_facet_ensemble/data.h5')
-    plot_sofast_facet_ensemble(file_data, join(save_dir, 'ensemble'), 1000.)
+    plot_sofast_facet_ensemble(file_data, join(save_dir, 'ensemble'), 1000.0)
 
 
 if __name__ == '__main__':

@@ -12,7 +12,11 @@ class MirrorParametricRectangular(MirrorParametric):
     Mirror implementation defined by a parametric function and rectangular side lengths.
     """
 
-    def __init__(self, surface_function: Callable[[float, float], float], size: tuple[float, float] | float) -> None:
+    def __init__(
+        self,
+        surface_function: Callable[[float, float], float],
+        size: tuple[float, float] | float,
+    ) -> None:
         """Instantiates a MirrorParametricRectangular object.
 
         Parameters

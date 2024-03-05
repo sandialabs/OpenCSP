@@ -1,7 +1,7 @@
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class TestVxyz:
@@ -129,7 +129,7 @@ class TestVxyz:
 
     def test_magnitude(self):
         mag = self.V1.magnitude()
-        mag_exp = np.array([np.sqrt(np.sum(self.V1_array ** 2))])
+        mag_exp = np.array([np.sqrt(np.sum(self.V1_array**2))])
         np.testing.assert_almost_equal(mag, mag_exp)
 
     def test_normalize(self):
@@ -142,7 +142,7 @@ class TestVxyz:
         V = Vxyz(array)
 
         norm = V.normalize()
-        norm_exp = array / np.sqrt(np.sum(array ** 2))
+        norm_exp = array / np.sqrt(np.sum(array**2))
 
         np.testing.assert_almost_equal(norm.data.squeeze(), norm_exp)
 
@@ -152,7 +152,7 @@ class TestVxyz:
         V = Vxyz(array)
 
         V.normalize_in_place()
-        norm_exp = array / np.sqrt(np.sum(array ** 2))
+        norm_exp = array / np.sqrt(np.sum(array**2))
 
         np.testing.assert_almost_equal(V.data.squeeze(), norm_exp)
 
@@ -223,7 +223,7 @@ class TestVxyz:
         np.testing.assert_almost_equal(dot, np.zeros(N))
 
         dot = Vy.dot(Vy)
-        np.testing.assert_almost_equal(dot, y ** 2)
+        np.testing.assert_almost_equal(dot, y**2)
 
         # Length N dot length 1
         N = 5

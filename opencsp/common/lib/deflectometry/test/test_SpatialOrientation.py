@@ -4,20 +4,22 @@ import os
 import unittest
 
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 import opencsp
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
 class TestSpatialOrientation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements')
+        base_dir = os.path.join(
+            os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+        )
 
         # Define test data files for single facet processing
         data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
@@ -25,7 +27,7 @@ class TestSpatialOrientation(unittest.TestCase):
         # Create spatial orientation objects
         datasets = [
             'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2'
+            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
         ]
         # Load data
         data = load_hdf5_datasets(datasets, data_file_facet)
@@ -41,12 +43,20 @@ class TestSpatialOrientation(unittest.TestCase):
 
     def test_translation_ring_1(self):
         v_exp = np.zeros(3)
-        v_calc = self.so.v_cam_optic_cam + self.so.v_optic_screen_optic.rotate(self.so.r_optic_cam) + self.so.v_screen_cam_cam
+        v_calc = (
+            self.so.v_cam_optic_cam
+            + self.so.v_optic_screen_optic.rotate(self.so.r_optic_cam)
+            + self.so.v_screen_cam_cam
+        )
         np.testing.assert_allclose(v_exp, v_calc.data.squeeze(), rtol=0, atol=1e-10)
 
     def test_translation_ring_2(self):
         v_exp = np.zeros(3)
-        v_calc = self.so.v_cam_screen_cam + self.so.v_screen_optic_optic.rotate(self.so.r_optic_cam) + self.so.v_optic_cam_cam
+        v_calc = (
+            self.so.v_cam_screen_cam
+            + self.so.v_screen_optic_optic.rotate(self.so.r_optic_cam)
+            + self.so.v_optic_cam_cam
+        )
         np.testing.assert_allclose(v_exp, v_calc.data.squeeze(), rtol=0, atol=1e-10)
 
     def test_rotation_ring_1(self):

@@ -17,7 +17,7 @@ Features include:
 from opencsp.common.lib.csp.ufacet.Facet import Facet
 
 
-class RenderControlFigure():
+class RenderControlFigure:
     """Facet class
     *Assuming rectangular facet*
 
@@ -29,7 +29,6 @@ class RenderControlFigure():
     """
 
     def __init__(self, name, centroid_offset=[], width=0, height=0):
-
         super(Facet, self).__init__()
 
         self.name = name
@@ -47,12 +46,14 @@ class RenderControlFigure():
         # Fill in here
 
 
-def initialize_render_control(tile=True,          # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
-                              tile_array=(3, 2),   # (n_x, n_y)
-                              tile_square=False,  # Set to True for equal-axis 3d plots.
-                              figsize=(6.4, 4.8),  # inch.
-                              upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
-                              grid=True):          # Whether or not to draw grid lines.
+def initialize_render_control(
+    tile=True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
+    tile_array=(3, 2),  # (n_x, n_y)
+    tile_square=False,  # Set to True for equal-axis 3d plots.
+    figsize=(6.4, 4.8),  # inch.
+    upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
+    grid=True,
+):  # Whether or not to draw grid lines.
     render_control = {}
     # Figure management.
     render_control['figure_names'] = []

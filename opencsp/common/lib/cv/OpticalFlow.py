@@ -18,17 +18,31 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.system_tools as st
 
-class OpticalFlow():
+
+class OpticalFlow:
     _max_cache_count = 10
 
-    def __init__(self,
-                 frame1_dir: str, frame1_name_ext: str, frame2_dir: str, frame2_name_ext: str,
-                 grayscale_normalization: Callable[[np.ndarray], np.ndarray] = None,
-                 # Parameters for sparse optical flow
-                 #prevPts, nextPts, status, err, sparse_winSize=None, maxLevel=3, criteria=None, sparse_flags=0, minEigThreshold=1e-4,
-                 # Parameters for dense optical flow
-                 prev_flow=None, pyr_scale=0.5, levels=5, dense_winsize=15, iterations=3, poly_n=5, poly_sigma=1.2, dense_flags=0, cache=False):
-        """ Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
+    def __init__(
+        self,
+        frame1_dir: str,
+        frame1_name_ext: str,
+        frame2_dir: str,
+        frame2_name_ext: str,
+        grayscale_normalization: Callable[[np.ndarray], np.ndarray] = None,
+        # Parameters for sparse optical flow
+        # prevPts, nextPts, status, err, sparse_winSize=None, maxLevel=3, criteria=None, sparse_flags=0, minEigThreshold=1e-4,
+        # Parameters for dense optical flow
+        prev_flow=None,
+        pyr_scale=0.5,
+        levels=5,
+        dense_winsize=15,
+        iterations=3,
+        poly_n=5,
+        poly_sigma=1.2,
+        dense_flags=0,
+        cache=False,
+    ):
+        """Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
 
         Note: opencsp is not compatible with the multiprocessing library on linux. Typical error message::
             "global /io/opencv/modules/core/src/parallel_impl.cpp (240) WorkerThread 6: Can't spawn new thread: res = 11"
@@ -87,8 +101,11 @@ class OpticalFlow():
 
         if st.is_production_run():
             if cache:
-                lt.error_and_raise(ValueError, "OpticalFlow(cache=True) should not be used in production code!")
-    
+                lt.error_and_raise(
+                    ValueError,
+                    "OpticalFlow(cache=True) should not be used in production code!",
+                )
+
     def clear_cache(self):
         if ft.directory_exists(self._cache_dir):
             ft.delete_files_in_directory(self._cache_dir, "cache*")
@@ -104,11 +121,15 @@ class OpticalFlow():
             cache_dat_file = os.path.join(self._cache_dir, f"cache{i}.pickle")
             if ft.file_exists(cache_txt_file):
                 lines = [l.strip() for l in ft.read_text_file(cache_txt_file)]
-                if lines[0] == self._frame1_dir and lines[1] == self._frame1_name_ext and \
-                   lines[2] == self._frame2_dir and lines[3] == self._frame2_name_ext and \
-                   lines[4] == str(self._grayscale_normalization == None):
+                if (
+                    lines[0] == self._frame1_dir
+                    and lines[1] == self._frame1_name_ext
+                    and lines[2] == self._frame2_dir
+                    and lines[3] == self._frame2_name_ext
+                    and lines[4] == str(self._grayscale_normalization == None)
+                ):
                     return cache_dat_file, i
-            
+
         return None, -1
 
     def _load_from_cache(self):
@@ -130,11 +151,11 @@ class OpticalFlow():
             cache_dat_file = os.path.join(self._cache_dir, f"cache{prev_idx}.pickle")
             ft.delete_file(cache_txt_file, error_on_not_exists=False)
             ft.delete_file(cache_dat_file, error_on_not_exists=False)
-        
+
         # shuffle previous files down the stack
         stop = prev_idx if prev_idx > -1 else self.__class__._max_cache_count
-        stop = stop-1
-        for i in range(stop,-1,-1):
+        stop = stop - 1
+        for i in range(stop, -1, -1):
             cache_txt_file = os.path.join(self._cache_dir, f"cache{i}.txt")
             cache_dat_file = os.path.join(self._cache_dir, f"cache{i}.pickle")
             if i == 4:
@@ -143,101 +164,127 @@ class OpticalFlow():
                     ft.delete_file(cache_dat_file, error_on_not_exists=False)
             else:
                 cache_txt_file_down = os.path.join(self._cache_dir, f"cache{i+1}.txt")
-                cache_dat_file_down = os.path.join(self._cache_dir, f"cache{i+1}.pickle")
+                cache_dat_file_down = os.path.join(
+                    self._cache_dir, f"cache{i+1}.pickle"
+                )
                 if ft.file_exists(cache_txt_file):
                     shutil.move(cache_txt_file, cache_txt_file_down)
                     shutil.move(cache_dat_file, cache_dat_file_down)
-        
+
         # save to the cache
         cache_txt_file = os.path.join(self._cache_dir, f"cache0.txt")
         cache_dat_file = os.path.join(self._cache_dir, f"cache0.pickle")
         with open(cache_txt_file, "w") as fout:
-            fout.write("\n".join([
-                self._frame1_dir, self._frame1_name_ext,
-                self._frame2_dir, self._frame2_name_ext,
-                str(self._grayscale_normalization == None)
-            ]))
+            fout.write(
+                "\n".join(
+                    [
+                        self._frame1_dir,
+                        self._frame1_name_ext,
+                        self._frame2_dir,
+                        self._frame2_name_ext,
+                        str(self._grayscale_normalization == None),
+                    ]
+                )
+            )
         with open(cache_dat_file, "wb") as fout:
             pickle.dump((self._mag, self._ang), fout)
 
     def _load_image(self, f1_or_f2=1) -> npt.NDArray[np.int_]:
-        """ Loads either frame 1 or frame 2, converts to grayscale, and applies normalization.
-        
+        """Loads either frame 1 or frame 2, converts to grayscale, and applies normalization.
+
         Returns:
         --------
-            frame: [np.ndarray] An opencv matrix shape=(h,w) dtype=uint8 """
+            frame: [np.ndarray] An opencv matrix shape=(h,w) dtype=uint8"""
         if f1_or_f2 == 1:
             path_name_ext_frame = os.path.join(self._frame1_dir, self._frame1_name_ext)
         else:
             path_name_ext_frame = os.path.join(self._frame2_dir, self._frame2_name_ext)
-        
+
         # verify the image exists
         if not ft.file_exists(path_name_ext_frame):
-            lt.error_and_raise(FileNotFoundError, f"Error: in OpticalFlow._load_image(), Can't find the frame file \"{path_name_ext_frame}\" for frame {f1_or_f2}")
+            lt.error_and_raise(
+                FileNotFoundError,
+                f"Error: in OpticalFlow._load_image(), Can't find the frame file \"{path_name_ext_frame}\" for frame {f1_or_f2}",
+            )
 
         # load
         img = cv.imread(path_name_ext_frame)
 
         # convert to grayscale
-        if (len(img.shape) > 2 and img.shape[2] == 3):
+        if len(img.shape) > 2 and img.shape[2] == 3:
             img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-            
+
         # normalize the image colors
         if self._grayscale_normalization != None:
             img = self._grayscale_normalization(img)
-        
+
         return img
 
-    def dense(self) -> tuple[np.ndarray,np.ndarray]:
-        """ Computes the optical flow between two images on a pixel-by-pixel basis using the Gunnar Farneback's algorithm.
+    def dense(self) -> tuple[np.ndarray, np.ndarray]:
+        """Computes the optical flow between two images on a pixel-by-pixel basis using the Gunnar Farneback's algorithm.
         https://docs.opencv.org/3.4/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af
-        
+
         Returns:
         --------
             - np.ndarray: self.mag, the magnitude of the flow per pixel (pixels)
-            - np.ndarray: self.ang, the direction of the flow per pixel (radians, 0 to the right, positive counter-clockwise) """
-        if self._mag is None: # use "is", with "==" numpy does an element-wise comparison
+            - np.ndarray: self.ang, the direction of the flow per pixel (radians, 0 to the right, positive counter-clockwise)
+        """
+        if (
+            self._mag is None
+        ):  # use "is", with "==" numpy does an element-wise comparison
             if not self._load_from_cache():
                 # load the images
                 frame1 = self._load_image(1)
                 frame2 = self._load_image(2)
 
                 # compute the flow
-                flow = cv.calcOpticalFlowFarneback(frame1, frame2, self._prev_flow,
-                                                self._pyr_scale, self._levels, self._dense_winsize, self._iterations,
-                                                self._poly_n, self._poly_sigma, self._dense_flags)
+                flow = cv.calcOpticalFlowFarneback(
+                    frame1,
+                    frame2,
+                    self._prev_flow,
+                    self._pyr_scale,
+                    self._levels,
+                    self._dense_winsize,
+                    self._iterations,
+                    self._poly_n,
+                    self._poly_sigma,
+                    self._dense_flags,
+                )
                 self._mag, self._ang = cv.cartToPolar(flow[..., 0], flow[..., 1])
 
                 # Computing flow takes a long time, and BGB wants to iterate quickly on a small set of images on his laptop.
                 # Cache these results.
                 self._save_to_cache()
-        
+
         # magnitude is correct
         self.mag = np.array(self._mag)
 
         # opencv returns an angle where 0 is on the positive x axis, increasing clockwise
         # we want the angle to increase counter-clockwise
-        self.ang = np.array(-self._ang) + (2*np.pi)
-            
+        self.ang = np.array(-self._ang) + (2 * np.pi)
+
         return self.mag, self.ang
-    
+
     def limit_by_magnitude(self, lower: float, upper: float, keep="inside"):
-        """ Sets any magnitudes not in the keep range (and the corresponding angles) to 0.
-        
+        """Sets any magnitudes not in the keep range (and the corresponding angles) to 0.
+
         Once applied, you can run dense() again to recover the original values.
-         
+
         Arguments:
         ----------
             - lower (float): The bottom of the range of values to include.
             - upper (float): The top of the range of values to include.
             - keep (str): Either "inside" or "outside". If "inside", then values <lower or >upper will
                 be set to 0. If "outside", then values >lower and <upper will be set to 0.
-                
+
         Returns:
         --------
-            np.ndarray: The indicies that were set to 0. """
+            np.ndarray: The indicies that were set to 0."""
         if lower > upper:
-            lt.error_and_raise(RuntimeError, f"Error: in OpticalFlow.limit_by_magnitude: lower ({lower}) must be less than upper ({upper})!")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in OpticalFlow.limit_by_magnitude: lower ({lower}) must be less than upper ({upper})!",
+            )
 
         if keep == "inside":
             bad_indicies = (self.mag < lower) | (self.mag > upper)
@@ -247,13 +294,19 @@ class OpticalFlow():
         self.ang[bad_indicies] = 0
 
         return bad_indicies
-    
+
     def limit_by_angle(self, lower: float, upper: float, keep="inside"):
-        """ Same as limit_by_magnitude, but for angle instead. """
+        """Same as limit_by_magnitude, but for angle instead."""
         if lower > upper:
-            lt.error_and_raise(RuntimeError, f"Error: in OpticalFlow.limit_by_magnitude: lower ({lower}) must be less than upper ({upper})!")
-        if upper - lower > np.pi*2:
-            lt.error_and_raise(RuntimeError, f"Error: in OpticalFlow.limit_by_magnitude: lower ({lower}) must be within 2pi of upper ({upper})!")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in OpticalFlow.limit_by_magnitude: lower ({lower}) must be less than upper ({upper})!",
+            )
+        if upper - lower > np.pi * 2:
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in OpticalFlow.limit_by_magnitude: lower ({lower}) must be within 2pi of upper ({upper})!",
+            )
 
         if lower < 0:
             lower = angle.normalize(lower)
@@ -270,16 +323,16 @@ class OpticalFlow():
         self.ang[bad_indicies] = 0
 
         return bad_indicies
-    
-    def to_img(self, mag_render_clip: tuple[float,float]=None):
-        """ Converts the flow to an image by mapping:
+
+    def to_img(self, mag_render_clip: tuple[float, float] = None):
+        """Converts the flow to an image by mapping:
             - magnitude of movement to value/intensity
             - angle of movement to hue
                 - up: green
                 - down: red
                 - left: blue
                 - right: yellow
-        
+
         Note: must call dense() first.
 
         Args:
@@ -297,13 +350,15 @@ class OpticalFlow():
         # HSV range is 0-179 (H), 0-255 (S), 0-255 (V)
         # https://docs.opencv.org/3.4/df/d9d/tutorial_py_colorspaces.html
         if not isinstance(self.mag, np.ndarray):
-            raise RuntimeError("Error: in OpticalFlow.to_img: self.mag is not an np.ndarray, must call dense() first!")
+            raise RuntimeError(
+                "Error: in OpticalFlow.to_img: self.mag is not an np.ndarray, must call dense() first!"
+            )
 
         h, w = self.mag.shape
-        hsv = np.zeros(shape=(h,w,3), dtype=np.uint8)
+        hsv = np.zeros(shape=(h, w, 3), dtype=np.uint8)
         hsv[..., 1] = 255
-        
-        hsv[..., 0] = (self.ang / (2*np.pi) * 179).astype(int)
+
+        hsv[..., 0] = (self.ang / (2 * np.pi) * 179).astype(int)
 
         if mag_render_clip != None:
             clip_low, clip_high = min(mag_render_clip), max(mag_render_clip)
@@ -318,28 +373,28 @@ class OpticalFlow():
             # clamp values between 0 and 255
             hsv[..., 2] = np.round(hsv[..., 2]).clip(0, 255)
             hsv = hsv.astype(np.uint8)
-        
+
         else:
             hsv[..., 2] = cv.normalize(self.mag, None, 0, 255, cv.NORM_MINMAX)
 
         bgr = cv.cvtColor(hsv, cv.COLOR_HSV2BGR)
         return bgr
-    
+
     def draw_flow_angle_reference(self):
         r = 500
-        h = r*2
-        w = r*2
+        h = r * 2
+        w = r * 2
 
         # initialize the circle image, magnitude image, and radians image
-        circle_hsv = np.zeros(shape=(h,w,3), dtype=np.uint8)
-        mag = np.zeros(shape=(h,w), dtype=np.float32)
-        ang = np.zeros(shape=(h,w), dtype=np.float32)
+        circle_hsv = np.zeros(shape=(h, w, 3), dtype=np.uint8)
+        mag = np.zeros(shape=(h, w), dtype=np.float32)
+        ang = np.zeros(shape=(h, w), dtype=np.float32)
 
         # generate the magnitudes and colors
         for x in range(w):
             for y in range(h):
-                x_dist = abs(x-r)
-                y_dist = abs(y-r)
+                x_dist = abs(x - r)
+                y_dist = abs(y - r)
 
                 dist = math.sqrt(x_dist**2 + y_dist**2)
                 if dist > r:
@@ -356,22 +411,22 @@ class OpticalFlow():
                     else:
                         rad = math.atan(y_dist / x_dist)
                     if x > r:
-                        if y < r: # first quadrant
+                        if y < r:  # first quadrant
                             pass
-                        else: # fourth quadrant
+                        else:  # fourth quadrant
                             rad = (np.pi * 1 / 2) - rad + (np.pi * 3 / 2)
                     else:
-                        if y < r: # second quadrant
+                        if y < r:  # second quadrant
                             rad = (np.pi * 1 / 2) - rad + (np.pi * 1 / 2)
-                        else: # third quadrant
+                        else:  # third quadrant
                             rad = rad + (np.pi * 2 / 2)
-                
+
                 mag[y][x] = dist
                 ang[y][x] = rad
-        
+
         # convert to HSV space
         circle_hsv[..., 1] = 255
-        circle_hsv[..., 0] = (ang / (2*np.pi) * 179).astype(int)
+        circle_hsv[..., 0] = (ang / (2 * np.pi) * 179).astype(int)
         circle_hsv[..., 2] = cv.normalize(mag, None, 0, 255, cv.NORM_MINMAX)
 
         # convert to RGB space
@@ -380,51 +435,84 @@ class OpticalFlow():
         # set values outside the circle to all white
         for x in range(w):
             for y in range(h):
-                x_dist = abs(x-r)
-                y_dist = abs(y-r)
+                x_dist = abs(x - r)
+                y_dist = abs(y - r)
                 dist = math.sqrt(x_dist**2 + y_dist**2)
                 if dist > r:
                     circle_rgb[y][x][...] = 255
-    
+
         # copy image onto a larger image, so that we can add text
         r2 = r + 100
-        square_rgb = np.zeros_like(circle_rgb, shape=(r2*2,r2*2,3))
+        square_rgb = np.zeros_like(circle_rgb, shape=(r2 * 2, r2 * 2, 3))
         square_rgb.fill(255)
-        square_rgb[100:100+w,100:100+h,:] = circle_rgb
+        square_rgb[100 : 100 + w, 100 : 100 + h, :] = circle_rgb
 
         # plot it!
         axis_control = rca.image(grid=False)
         figure_control = rcfg.RenderControlFigure()
         view_spec_2d = vs.view_spec_xy()
-        fig_record = fm.setup_figure(figure_control, axis_control, view_spec_2d, title="Optical Flow Reference", code_tag=f"{__file__}", equal=False)
+        fig_record = fm.setup_figure(
+            figure_control,
+            axis_control,
+            view_spec_2d,
+            title="Optical Flow Reference",
+            code_tag=f"{__file__}",
+            equal=False,
+        )
         fig_record.view.draw_image(square_rgb)
 
-        fig_record.view.draw_pq_text((1,0.5), "0", style=rct.RenderControlText(color='k', fontsize=20, horizontalalignment='right'))
-        fig_record.view.draw_pq_text((0.5,1), "π/2", style=rct.RenderControlText(color='k', fontsize=20, verticalalignment='top'))
-        fig_record.view.draw_pq_text((0,0.5), "π", style=rct.RenderControlText(color='k', fontsize=20, horizontalalignment='left'))
-        fig_record.view.draw_pq_text((0.5,0), "3π/2", style=rct.RenderControlText(color='k', fontsize=20, verticalalignment='bottom'))
-        
+        fig_record.view.draw_pq_text(
+            (1, 0.5),
+            "0",
+            style=rct.RenderControlText(
+                color='k', fontsize=20, horizontalalignment='right'
+            ),
+        )
+        fig_record.view.draw_pq_text(
+            (0.5, 1),
+            "π/2",
+            style=rct.RenderControlText(
+                color='k', fontsize=20, verticalalignment='top'
+            ),
+        )
+        fig_record.view.draw_pq_text(
+            (0, 0.5),
+            "π",
+            style=rct.RenderControlText(
+                color='k', fontsize=20, horizontalalignment='left'
+            ),
+        )
+        fig_record.view.draw_pq_text(
+            (0.5, 0),
+            "3π/2",
+            style=rct.RenderControlText(
+                color='k', fontsize=20, verticalalignment='bottom'
+            ),
+        )
+
         ang = 0
         prev_ang = ang
-        while (ang := ang + 0.2) < np.pi*2:
-            x = r2 + (r+30)*math.cos(ang)
-            y = r2 + (r+30)*math.sin(ang)
-            x = x/(2*r2)
-            y = y/(2*r2)
+        while (ang := ang + 0.2) < np.pi * 2:
+            x = r2 + (r + 30) * math.cos(ang)
+            y = r2 + (r + 30) * math.sin(ang)
+            x = x / (2 * r2)
+            y = y / (2 * r2)
             sang = "%.1f" % ang
-            if math.floor(ang+0.01) == math.floor(prev_ang+0.01):
+            if math.floor(ang + 0.01) == math.floor(prev_ang + 0.01):
                 sang = "." + sang.split(".")[1]
             else:
                 sang = "%d" % int(ang)
-            fig_record.view.draw_pq_text((x,y), sang, style=rct.RenderControlText(color='k', fontsize=20))
+            fig_record.view.draw_pq_text(
+                (x, y), sang, style=rct.RenderControlText(color='k', fontsize=20)
+            )
             prev_ang = ang
 
         fig_record.view.show(block=True)
 
     @staticmethod
     def get_save_file_name_ext(frame1_name_maybe_ext: str):
-        """ Get the file name used to save the results from this
-        flow analysis in save(), given the frame1 name. """
+        """Get the file name used to save the results from this
+        flow analysis in save(), given the frame1 name."""
         return frame1_name_maybe_ext + "_optflow.npy"
 
     def _default_save_file_name_ext(self, name_ext=""):
@@ -433,7 +521,7 @@ class OpticalFlow():
         return name_ext
 
     def save(self, dir: str, name_ext="", overwrite=False):
-        """ Saves the magnitude and angle matrices computed in the dense() method to the given file.
+        """Saves the magnitude and angle matrices computed in the dense() method to the given file.
 
         Note that this saves the matrices exactly as they were computed in dense (aka
         does not save them as after limit_by_magnitude or limit_by_angle are applied).
@@ -443,7 +531,7 @@ class OpticalFlow():
             dir (str): The directory to save to.
             name_ext (str, optional): The file to save to. Defaults to get_save_file_name_ext().
             overwrite (bool, optional): True to overwrite the existing optical flow save file. Defaults to False.
-        
+
         Returns:
         --------
             saved_path_name_ext (str): The location for the saved file.
@@ -453,14 +541,19 @@ class OpticalFlow():
         # 7680x4320 image with a NVME drive are:
         #                  | saving | loading | size(MB)
         # save             |  0.98s | 0.10s   | 265
-        # savez            |  1.03s | 0.27s   | 265 
+        # savez            |  1.03s | 0.27s   | 265
         # savez_compressed | 14.5s  | 1.75s   | 210
         name_ext = self._default_save_file_name_ext(name_ext)
         dir_name_ext = os.path.join(dir, name_ext)
 
         # sanity check
-        if self._mag is None: # "is" instead of "==" to avoid np.ndarray element-wise comparison
-            lt.error_and_raise(RuntimeError, "Error: in OpticalFlow.save: unable to save non-existant matrices 'magnitude' and 'angle'. Run dense() first!")
+        if (
+            self._mag is None
+        ):  # "is" instead of "==" to avoid np.ndarray element-wise comparison
+            lt.error_and_raise(
+                RuntimeError,
+                "Error: in OpticalFlow.save: unable to save non-existant matrices 'magnitude' and 'angle'. Run dense() first!",
+            )
 
         # create the directory as necessary
         ft.create_directories_if_necessary(dir)
@@ -470,8 +563,11 @@ class OpticalFlow():
             if overwrite:
                 ft.delete_file(dir_name_ext)
             else:
-                lt.error_and_raise(RuntimeError, f"Error: in OpticalFlow.save: unable to save to file \"{dir_name_ext}\", file already exists!")
-        
+                lt.error_and_raise(
+                    RuntimeError,
+                    f"Error: in OpticalFlow.save: unable to save to file \"{dir_name_ext}\", file already exists!",
+                )
+
         # save!
         with open(dir_name_ext, "wb") as fout:
             np.save(fout, self._mag, allow_pickle=False)
@@ -484,9 +580,9 @@ class OpticalFlow():
         ret = cls("", "a", "", "b")
         ret.load(dir, name_ext, error_on_not_exist)
         return ret
-    
-    def load(self, dir: str, name_ext: str="", error_on_not_exist=True):
-        """ Loads the magnitude and angle matrices from the given file into this instance.
+
+    def load(self, dir: str, name_ext: str = "", error_on_not_exist=True):
+        """Loads the magnitude and angle matrices from the given file into this instance.
 
         Args:
             dir (str): The directory to save to.
@@ -504,13 +600,16 @@ class OpticalFlow():
         # check that the file exists
         if not ft.file_exists(dir_name_ext):
             if error_on_not_exist:
-                lt.error_and_raise(RuntimeError, f"Error: in OpticalFlow.load: file \"{dir_name_ext}\" doesn't exist!")
+                lt.error_and_raise(
+                    RuntimeError,
+                    f"Error: in OpticalFlow.load: file \"{dir_name_ext}\" doesn't exist!",
+                )
             return None, None
-        
+
         # load!
         with open(dir_name_ext, "rb") as fin:
             self._mag: np.ndarray = np.load(fin, allow_pickle=False)
             self._ang: np.ndarray = np.load(fin, allow_pickle=False)
-            self.dense() # populate self.mag and self.dense
-        
+            self.dense()  # populate self.mag and self.dense
+
         return self.mag, self.ang

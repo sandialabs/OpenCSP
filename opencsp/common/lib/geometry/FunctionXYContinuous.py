@@ -22,7 +22,7 @@ class FunctionXYContinuous(FunctionXYAbstract):
     ----------
     funcXY_string: str
         String that contains the function that is supposed to be represented. \n
-        `Note:` The function must use "x" and "y" as the vareiables. 
+        `Note:` The function must use "x" and "y" as the vareiables.
     """
 
     def __init__(self, funcXY_string: str, domain: list[RegionXY] = None) -> None:
@@ -69,7 +69,12 @@ class FunctionXYContinuous(FunctionXYAbstract):
                 for iy, y in enumerate(sorted(self.y_domain)):
                     arr[iy, ix] = self.value_at(x, y)
             # A = self.as_callable()(X,Y)
-            extent = [min(self.x_domain), max(self.x_domain), min(self.y_domain), max(self.y_domain)]
+            extent = [
+                min(self.x_domain),
+                max(self.x_domain),
+                min(self.y_domain),
+                max(self.y_domain),
+            ]
             # view.pcolormesh(list(self.x_domain), list(self.y_domain), arr, colorbar=True, cmap='jet', )
             view.imshow(arr, colorbar=True, cmap='jet')
 
@@ -85,7 +90,9 @@ class FunctionXYContinuous(FunctionXYAbstract):
         values: 2d array, the values that will be returned when x and y are used
         """
         if len(values) != len(y_domain) or len(values[0]) != len(x_domain):
-            raise ValueError("Size of the domain does not match size of the value array.")
+            raise ValueError(
+                "Size of the domain does not match size of the value array."
+            )
         else:
             d = dict()
             for iy, y in enumerate(y_domain):

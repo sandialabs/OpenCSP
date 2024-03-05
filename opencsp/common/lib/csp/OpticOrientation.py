@@ -43,23 +43,32 @@ class OpticOrientation:
         if self.no_child:
             out += 'Child to Base: None\n'
         else:
-            out += 'Child to Base: ' + str(self.transform_child_to_base.R.as_rotvec().round(3)) + '\n'
+            out += (
+                'Child to Base: '
+                + str(self.transform_child_to_base.R.as_rotvec().round(3))
+                + '\n'
+            )
         # Base to parent
         if self.no_parent:
             out += 'Base to parent: None\n'
         else:
-            out += 'Base to parent: ' + str(self.transform_base_to_parent.R.as_rotvec().round(3)) + '\n'
+            out += (
+                'Base to parent: '
+                + str(self.transform_base_to_parent.R.as_rotvec().round(3))
+                + '\n'
+            )
         # Child to parent
         if self.no_child or self.no_parent:
             out += 'Child to parent: None'
         else:
-            out += 'Child to parent: ' + str(self.transform_child_to_base.R.as_rotvec().round(3))
+            out += 'Child to parent: ' + str(
+                self.transform_child_to_base.R.as_rotvec().round(3)
+            )
         return out
 
     @property
     def transform_child_to_base(self) -> TransformXYZ:
-        """Transform coordinates from child mount to base mount
-        """
+        """Transform coordinates from child mount to base mount"""
         if self.no_child:
             raise ValueError('Optic does not have child mount.')
         return self._transform_child_to_base
@@ -69,13 +78,14 @@ class OpticOrientation:
         if self.no_child:
             raise ValueError('Optic does not have child mount.')
         if not isinstance(transform, TransformXYZ):
-            raise TypeError(f'Input transform must be type {TransformXYZ} but is type {type(transform)}')
+            raise TypeError(
+                f'Input transform must be type {TransformXYZ} but is type {type(transform)}'
+            )
         self._transform_child_to_base = transform.copy()
 
     @property
     def transform_base_to_parent(self) -> TransformXYZ:
-        """Transform coordinates from base mount to parent mount
-        """
+        """Transform coordinates from base mount to parent mount"""
         if self.no_parent:
             raise ValueError('Optic does not have parent mount.')
         return self._transform_base_to_parent
@@ -85,13 +95,14 @@ class OpticOrientation:
         if self.no_parent:
             raise ValueError('Optic does not have parent mount.')
         if not isinstance(transform, TransformXYZ):
-            raise TypeError(f'Input transform must be type {TransformXYZ} but is type {type(transform)}')
+            raise TypeError(
+                f'Input transform must be type {TransformXYZ} but is type {type(transform)}'
+            )
         self._transform_base_to_parent = transform.copy()
 
     @property
     def transform_child_to_parent(self) -> TransformXYZ:
-        """Transform coordinatges from child mount to parent mount
-        """
+        """Transform coordinatges from child mount to parent mount"""
         if self.no_child or self.no_parent:
             raise ValueError('Optic does not have both a child and parent platform.')
         return self._transform_base_to_parent * self._transform_child_to_base

@@ -1,11 +1,11 @@
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Pxyz import Pxyz
-from   opencsp.common.lib.geometry.Pxy import Pxy
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.Pxy import Pxy
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class TestVxyz:
@@ -13,21 +13,15 @@ class TestVxyz:
     def setup_class(cls):
         # Create camera parameters: f=1000 pixels, 1000 x 1000 pixels
         intrinsic_mat = np.array([[1000, 0, 500.5], [0, 1000, 250.5], [0, 0, 1]])
-        distortion_coef_zeros = np.array([0., 0., 0., 0.])
+        distortion_coef_zeros = np.array([0.0, 0.0, 0.0, 0.0])
         distortion_coef_real = np.array([0.01, 0.02, 0.001, 0.002])
         image_shape_xy = (1000, 500)
 
         cls.camera_ideal = Camera(
-            intrinsic_mat,
-            distortion_coef_zeros,
-            image_shape_xy,
-            'Test Ideal Camera'
+            intrinsic_mat, distortion_coef_zeros, image_shape_xy, 'Test Ideal Camera'
         )
         cls.camera_real = Camera(
-            intrinsic_mat,
-            distortion_coef_real,
-            image_shape_xy,
-            'Test Real Camera'
+            intrinsic_mat, distortion_coef_real, image_shape_xy, 'Test Real Camera'
         )
 
         # Define upper left 3D point and image location

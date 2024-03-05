@@ -50,6 +50,7 @@ import opencsp.common.lib.render.view_spec as vs
 
 # RENDERING
 
+
 def setup_render_control_scan_xy_analysis():
     # Setup render control.
     render_control_scan_xy_analysis = rcsxa.RenderControlScanXyAnalysis()
@@ -78,12 +79,12 @@ def setup_render_control_scan_section_analysis():
     # analysis_render_control.draw_context_mnsa_ray = False
     # analysis_render_control.draw_context_mxsa_ray = False
     # analysis_render_control.draw_single_heliostat_analysis = False
-#analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
-# single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
-# analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
-#analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
+    # single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
+    # analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
     analysis_render_control.draw_single_heliostat_constraints = False
     # analysis_render_control.draw_single_heliostat_constraints_heliostats = False
     # analysis_render_control.draw_single_heliostat_constraints_mnsa_ray = False
@@ -113,7 +114,9 @@ def setup_render_control_scan_section_analysis():
     analysis_render_control.draw_multi_heliostat_gaze_angle_example = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_fill = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_legend = False
-    analysis_render_control.draw_multi_heliostat_vertical_fov_required = False  # KEY SUMMARY
+    analysis_render_control.draw_multi_heliostat_vertical_fov_required = (
+        False  # KEY SUMMARY
+    )
     analysis_render_control.draw_multi_heliostat_vertical_fov_required_legend = False
     analysis_render_control.draw_multi_heliostat_select_gaze = False  # KEY SUMMARY
     # analysis_render_control.draw_multi_heliostat_select_gaze_per_heliostat = False
@@ -141,7 +144,6 @@ def setup_render_control_scan_section_analysis():
 #
 
 
-
 # -------------------------------------------------------------------------------------------------------
 # MAIN PROGRAM
 #
@@ -152,44 +154,54 @@ if __name__ == "__main__":
     # figure_control = rcfg.RenderControlFigure(tile_array=(2,2), tile_square=False)
 
     # Figure control.
-    tile_array=(2,2)
-#    tile_array=(1,1)
-#    tile_array=(2,1)
+    tile_array = (2, 2)
+    #    tile_array=(1,1)
+    #    tile_array=(2,1)
 
     render_control_top_level = rctl.RenderControlTopLevel()
-#    render_control_top_level.draw_ufacet_xy_analysis = False
-#    render_control_top_level.draw_ufacet_section_construction = False
-#    render_control_top_level.draw_ufacet_scan = False
-#    render_control_top_level.draw_flight_plan = False
-#    render_control_top_level.save_flight_plan = False
-#    render_control_top_level.summarize_figures = True
-#    render_control_top_level.save_figures = False
+    #    render_control_top_level.draw_ufacet_xy_analysis = False
+    #    render_control_top_level.draw_ufacet_section_construction = False
+    #    render_control_top_level.draw_ufacet_scan = False
+    #    render_control_top_level.draw_flight_plan = False
+    #    render_control_top_level.save_flight_plan = False
+    #    render_control_top_level.summarize_figures = True
+    #    render_control_top_level.save_figures = False
     render_control_scan_xy_analysis = setup_render_control_scan_xy_analysis()
     render_control_scan_section_setup = setup_render_control_scan_section_setup()
     render_control_scan_section_analysis = setup_render_control_scan_section_analysis()
 
     # Per-run input parameters.
-#    scan_type = 'Raster'
-    raster_scan_parameter_file = 'DUMMY FILL IN LATER' # ?? SCAFFOLDING RCB -- TEMPORARY
+    #    scan_type = 'Raster'
+    raster_scan_parameter_file = (
+        'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
+    )
     scan_type = 'UFACET'
-    ufacet_scan_parameter_file = 'DUMMY FILL IN LATER' # ?? SCAFFOLDING RCB -- TEMPORARY
-    elevation_offset = 0.0 # m.
+    ufacet_scan_parameter_file = (
+        'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
+    )
+    elevation_offset = 0.0  # m.
 
     # Define solar field.
     solar_field_spec = {}
-    solar_field_spec['name']                       = 'Sandia NSTTF'
-    solar_field_spec['short_name']                 = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat']       = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_origin_lon_lat']       = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_heliostat_file']       = './data/NSTTF_Heliostats.csv'
+    solar_field_spec['name'] = 'Sandia NSTTF'
+    solar_field_spec['short_name'] = 'NSTTF'
+    solar_field_spec['field_origin_lon_lat'] = (
+        nll.LON_NSTTF_ORIGIN,
+        nll.LAT_NSTTF_ORIGIN,
+    )
+    solar_field_spec['field_origin_lon_lat'] = (
+        nll.LON_NSTTF_ORIGIN,
+        nll.LAT_NSTTF_ORIGIN,
+    )
+    solar_field_spec['field_heliostat_file'] = './data/NSTTF_Heliostats.csv'
     solar_field_spec['field_facet_centroids_file'] = './data/NSTTF_Facet_Centroids.csv'
 
     # Define tracking parameters.
     # Aim point.
-#    aimpoint_xyz = [60.0, 8.8, 7]     # For debugging
-#    aimpoint_xyz = [60.0, 8.8, 28.9]  # NSTTF BCS standby - low
-    aimpoint_xyz = [60.0, 8.8, 60]    # NSTTF BCS standby - high
-#    aimpoint_xyz = [60.0, 8.8, 100]   # For debugging
+    #    aimpoint_xyz = [60.0, 8.8, 7]     # For debugging
+    #    aimpoint_xyz = [60.0, 8.8, 28.9]  # NSTTF BCS standby - low
+    aimpoint_xyz = [60.0, 8.8, 60]  # NSTTF BCS standby - high
+    #    aimpoint_xyz = [60.0, 8.8, 100]   # For debugging
 
     # Time.
     # (year, month, day, hour, minute, second, timezone) tuple.
@@ -198,11 +210,11 @@ if __name__ == "__main__":
     # Zone: Mountain Daylight Time (MDT) = -6,  Mountain Standard Time (MST) = -7
     #
     #               year, month, day, hour, minute, second, zone]
-#    when_ymdhmsz = [2021,   5,   13,    9,    0,       0,    -6]
-#    when_ymdhmsz = [2021,   5,   13,   11,    0,       0,    -6]
-    when_ymdhmsz = [2021,   5,   13,   13,    0,       0,    -6]
-#    when_ymdhmsz = [2021,   5,   13,   15,    0,       0,    -6]
-#    when_ymdhmsz = [2021,   5,   13,   17,    0,       0,    -6]
+    #    when_ymdhmsz = [2021,   5,   13,    9,    0,       0,    -6]
+    #    when_ymdhmsz = [2021,   5,   13,   11,    0,       0,    -6]
+    when_ymdhmsz = [2021, 5, 13, 13, 0, 0, -6]
+    #    when_ymdhmsz = [2021,   5,   13,   15,    0,       0,    -6]
+    #    when_ymdhmsz = [2021,   5,   13,   17,    0,       0,    -6]
 
     # Define fixed heliostat orientation.
     # synch_az = np.deg2rad(205)
@@ -215,18 +227,20 @@ if __name__ == "__main__":
     # up_el = np.deg2rad(90)
     # up_azelhnames = [up_az, up_el, ['7E6', '12W7']]
     up_azelhnames = None
-    
-    pars.scan_plan_trial(tile_array,
-                         solar_field_spec,
-                         aimpoint_xyz,
-                         when_ymdhmsz,
-                         synch_azelhnames,
-                         up_azelhnames,
-                         scan_type,
-                         raster_scan_parameter_file,
-                         ufacet_scan_parameter_file,
-                         elevation_offset,
-                         render_control_top_level,
-                         render_control_scan_xy_analysis,
-                         render_control_scan_section_setup,
-                         render_control_scan_section_analysis)
+
+    pars.scan_plan_trial(
+        tile_array,
+        solar_field_spec,
+        aimpoint_xyz,
+        when_ymdhmsz,
+        synch_azelhnames,
+        up_azelhnames,
+        scan_type,
+        raster_scan_parameter_file,
+        ufacet_scan_parameter_file,
+        elevation_offset,
+        render_control_top_level,
+        render_control_scan_xy_analysis,
+        render_control_scan_section_setup,
+        render_control_scan_section_analysis,
+    )

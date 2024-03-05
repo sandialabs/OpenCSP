@@ -7,7 +7,9 @@ from os.path import join, dirname
 import pytest
 
 import opencsp
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import FixedPatternScreenProjection
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
+    FixedPatternScreenProjection,
+)
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 
 
@@ -15,14 +17,19 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 def example_project_fixed_pattern():
     """Projects fixed pattern image on display"""
     # Set pattern parameters
-    file_image_projection = join(dirname(opencsp.__file__), "test/data/sofast_measurements/general/Image_Projection_test.h5")
+    file_image_projection = join(
+        dirname(opencsp.__file__),
+        "test/data/sofast_measurements/general/Image_Projection_test.h5",
+    )
     width_pattern = 3
     spacing_pattern = 6
 
     # Load ImageProjection
     im_proj = ImageProjection.load_from_hdf_and_display(file_image_projection)
 
-    fixed_pattern = FixedPatternScreenProjection(im_proj.size_x, im_proj.size_y, width_pattern, spacing_pattern)
+    fixed_pattern = FixedPatternScreenProjection(
+        im_proj.size_x, im_proj.size_y, width_pattern, spacing_pattern
+    )
     image = fixed_pattern.get_image('uint8', 255, 'square')
 
     # Project image

@@ -9,13 +9,15 @@ import opencsp.common.lib.tool.typing_tools as tt
 
 
 class ImageAttributeParser(aap.AbstractAttributeParser):
-    def __init__(self,
-                 current_image_source: str = None,
-                 original_image_source: str = None,
-                 date_collected: datetime.datetime = None,
-                 experiment_name: str = None,
-                 notes: str = None):
-        """ Manager for the most common attributes associated with processed
+    def __init__(
+        self,
+        current_image_source: str = None,
+        original_image_source: str = None,
+        date_collected: datetime.datetime = None,
+        experiment_name: str = None,
+        notes: str = None,
+    ):
+        """Manager for the most common attributes associated with processed
         images, for maintaining the context and history of the image.
 
         Parameters
@@ -58,15 +60,20 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
         except:
             pass
         if self._previous_attr != None:
-            prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(ImageAttributeParser)
+            prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(
+                ImageAttributeParser
+            )
 
             # Sanity check: are we trying to overwrite the "original_image_source" value?
             if prev_image_attr != None:
                 if prev_image_attr.original_image_source != None:
                     if self.original_image_source != None:
-                        lt.error_and_raise(ValueError, "Error in ImageAttributeParser.__init__(): " +
-                                           f"can't overwrite existing original_image_source value ('{prev_image_attr.original_image_source}') " +
-                                           f"with new original_image_source ('{self.original_image_source}')!")
+                        lt.error_and_raise(
+                            ValueError,
+                            "Error in ImageAttributeParser.__init__(): "
+                            + f"can't overwrite existing original_image_source value ('{prev_image_attr.original_image_source}') "
+                            + f"with new original_image_source ('{self.original_image_source}')!",
+                        )
 
             self.set_defaults(prev_image_attr)
 
@@ -77,26 +84,36 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
         # Specifically for image attributes, for original image source, we
         # really want to maintain the absolute original image source throughout
         # all processing steps and files.
-        self.original_image_source = tt.default(other.original_image_source, self.original_image_source)
+        self.original_image_source = tt.default(
+            other.original_image_source, self.original_image_source
+        )
         # the rest of these attributes can be set as normal
-        self.current_image_source = tt.default(self.current_image_source, other.current_image_source)
+        self.current_image_source = tt.default(
+            self.current_image_source, other.current_image_source
+        )
         self.date_collected = tt.default(self.date_collected, other.date_collected)
         self.experiment_name = tt.default(self.experiment_name, other.experiment_name)
         self.notes = tt.default(self.notes, other.notes)
 
     def has_contents(self) -> bool:
-        return (self.current_image_source != None) or \
-               (self.original_image_source != None) or \
-               (self.date_collected != None) or \
-               (self.experiment_name != None) or \
-               (self.notes != None)
+        return (
+            (self.current_image_source != None)
+            or (self.original_image_source != None)
+            or (self.date_collected != None)
+            or (self.experiment_name != None)
+            or (self.notes != None)
+        )
 
-    def parse_my_contents(self, file_path_name_ext: str, raw_contents: str, my_contents: any):
+    def parse_my_contents(
+        self, file_path_name_ext: str, raw_contents: str, my_contents: any
+    ):
         self.current_image_source = my_contents['current_image_source']
         self.original_image_source = my_contents['original_image_source']
         self.date_collected = None
         if my_contents['date_collected'] != None:
-            self.date_collected = datetime.datetime.fromisoformat(my_contents['date_collected'])
+            self.date_collected = datetime.datetime.fromisoformat(
+                my_contents['date_collected']
+            )
         self.experiment_name = my_contents['experiment_name']
         self.notes = my_contents['notes']
 
@@ -107,7 +124,7 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
             'original_image_source': self.original_image_source,
             'date_collected': date_collected_str,
             'experiment_name': self.experiment_name,
-            'notes': self.notes
+            'notes': self.notes,
         }
         return ret
 

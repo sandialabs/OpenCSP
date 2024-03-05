@@ -1,16 +1,14 @@
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 import opencsp.common.lib.deflectometry.slope_fitting_2d as sf2
-from   opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class Surface2DPlano(Surface2DAbstract):
-    def __init__(self,
-                 robust_least_squares: bool,
-                 downsample: int):
+    def __init__(self, robust_least_squares: bool, downsample: int):
         """
         Representation of 2D plano surface.
 
@@ -34,13 +32,15 @@ class Surface2DPlano(Surface2DAbstract):
         self.robust_least_squares = robust_least_squares
         self.downsample = downsample
 
-    def set_spatial_data(self,
-                         u_active_pixel_pointing_optic: Uxyz,
-                         v_screen_points_optic: Vxyz,
-                         v_optic_cam_optic,
-                         u_measure_pixel_pointing_optic,
-                         v_align_point_optic,
-                         v_optic_screen_optic):
+    def set_spatial_data(
+        self,
+        u_active_pixel_pointing_optic: Uxyz,
+        v_screen_points_optic: Vxyz,
+        v_optic_cam_optic,
+        u_measure_pixel_pointing_optic,
+        v_align_point_optic,
+        v_optic_screen_optic,
+    ):
         """
         Saves all spatial orientation information in object.
 
@@ -61,8 +61,10 @@ class Surface2DPlano(Surface2DAbstract):
 
         """
         # Downsample and save measurement data
-        self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic[::self.downsample]
-        self.v_screen_points_optic = v_screen_points_optic[::self.downsample]
+        self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic[
+            :: self.downsample
+        ]
+        self.v_screen_points_optic = v_screen_points_optic[:: self.downsample]
 
         # Save position data
         self.v_optic_cam_optic = v_optic_cam_optic
@@ -74,9 +76,7 @@ class Surface2DPlano(Surface2DAbstract):
             self.num_pts = len(self.u_active_pixel_pointing_optic)
             self.weights = np.ones(self.num_pts)
 
-    def intersect(self,
-                  u_pixel_pointing: Uxyz,
-                  v_origin: Vxyz) -> Vxyz:
+    def intersect(self, u_pixel_pointing: Uxyz, v_origin: Vxyz) -> Vxyz:
         """
         Intersects incoming rays with parabolic surface.
 
@@ -130,16 +130,20 @@ class Surface2DPlano(Surface2DAbstract):
 
         """
         # Calculate pixel intersection points with existing fitting function
-        self.v_surf_int_pts_optic = self.intersect(self.u_active_pixel_pointing_optic, self.v_optic_cam_optic)
+        self.v_surf_int_pts_optic = self.intersect(
+            self.u_active_pixel_pointing_optic, self.v_optic_cam_optic
+        )
 
     def calculate_slopes(self) -> tuple[Vxyz, np.ndarray]:
         """
         Calculate slopes of each measurement point.
 
         """
-        self.slopes = sf2.calc_slopes(self.v_surf_int_pts_optic,
-                                      self.v_optic_cam_optic,
-                                      self.v_screen_points_optic)
+        self.slopes = sf2.calc_slopes(
+            self.v_surf_int_pts_optic,
+            self.v_optic_cam_optic,
+            self.v_screen_points_optic,
+        )
 
     def fit_slopes(self) -> dict:
         """
@@ -148,12 +152,26 @@ class Surface2DPlano(Surface2DAbstract):
         """
         # Fit Nth order surfaces to slope distributions in X and Y
         if self.robust_least_squares:
-            slope_coefs_x, weights_x = sf2.fit_slope_robust_ls(self.slope_fit_poly_order, self.slopes[0], self.weights.copy(), self.v_surf_int_pts_optic)
-            slope_coefs_y, weights_y = sf2.fit_slope_robust_ls(self.slope_fit_poly_order, self.slopes[1], self.weights.copy(), self.v_surf_int_pts_optic)
+            slope_coefs_x, weights_x = sf2.fit_slope_robust_ls(
+                self.slope_fit_poly_order,
+                self.slopes[0],
+                self.weights.copy(),
+                self.v_surf_int_pts_optic,
+            )
+            slope_coefs_y, weights_y = sf2.fit_slope_robust_ls(
+                self.slope_fit_poly_order,
+                self.slopes[1],
+                self.weights.copy(),
+                self.v_surf_int_pts_optic,
+            )
             self.weights = np.array((weights_x, weights_y)).min(0)
         else:
-            slope_coefs_x = sf2.fit_slope_ls(self.slope_fit_poly_order, self.slopes[0], self.v_surf_int_pts_optic)
-            slope_coefs_y = sf2.fit_slope_ls(self.slope_fit_poly_order, self.slopes[1], self.v_surf_int_pts_optic)
+            slope_coefs_x = sf2.fit_slope_ls(
+                self.slope_fit_poly_order, self.slopes[0], self.v_surf_int_pts_optic
+            )
+            slope_coefs_y = sf2.fit_slope_ls(
+                self.slope_fit_poly_order, self.slopes[1], self.v_surf_int_pts_optic
+            )
 
         # Save slope coefficients
         self.slope_coefs = np.array([slope_coefs_x[0], slope_coefs_y[0]])
@@ -162,7 +180,9 @@ class Surface2DPlano(Surface2DAbstract):
         self.surf_coefs = np.array([0, slope_coefs_x[0], slope_coefs_x[0]])
 
         # Calculate z coordinate
-        z_pt = self.v_align_point_optic.z[0] - sf2.coef_to_points(self.v_align_point_optic, self.surf_coefs, 1)
+        z_pt = self.v_align_point_optic.z[0] - sf2.coef_to_points(
+            self.v_align_point_optic, self.surf_coefs, 1
+        )
         self.surf_coefs[0] = z_pt
 
     def rotate_all(self, r_align_step: Rotation) -> None:
@@ -175,11 +195,25 @@ class Surface2DPlano(Surface2DAbstract):
             Rotation object to rotate all vectors by.
 
         """
-        self.v_optic_cam_optic = self.v_optic_cam_optic.rotate_about(r_align_step, self.v_align_point_optic)
-        self.v_screen_points_optic = self.v_screen_points_optic.rotate_about(r_align_step, self.v_align_point_optic)
-        self.u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate_about(r_align_step, self.v_align_point_optic)
-        self.u_measure_pixel_pointing_optic = self.u_measure_pixel_pointing_optic.rotate_about(r_align_step, self.v_align_point_optic)
-        self.v_optic_screen_optic = self.v_optic_screen_optic.rotate_about(r_align_step, self.v_align_point_optic)
+        self.v_optic_cam_optic = self.v_optic_cam_optic.rotate_about(
+            r_align_step, self.v_align_point_optic
+        )
+        self.v_screen_points_optic = self.v_screen_points_optic.rotate_about(
+            r_align_step, self.v_align_point_optic
+        )
+        self.u_active_pixel_pointing_optic = (
+            self.u_active_pixel_pointing_optic.rotate_about(
+                r_align_step, self.v_align_point_optic
+            )
+        )
+        self.u_measure_pixel_pointing_optic = (
+            self.u_measure_pixel_pointing_optic.rotate_about(
+                r_align_step, self.v_align_point_optic
+            )
+        )
+        self.v_optic_screen_optic = self.v_optic_screen_optic.rotate_about(
+            r_align_step, self.v_align_point_optic
+        )
 
     def shift_all(self, v_align_optic_step: Vxyz) -> None:
         """

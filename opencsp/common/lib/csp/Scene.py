@@ -3,7 +3,7 @@ from opencsp.common.lib.csp.LightSource import LightSource
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 
 
-class Scene():
+class Scene:
     def __init__(self) -> None:
         self.objects: list[RayTraceable] = []
         self.light_sources: list[LightSource] = []

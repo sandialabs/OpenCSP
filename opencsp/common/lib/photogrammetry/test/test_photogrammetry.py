@@ -7,7 +7,7 @@ from numpy import nan
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.photogrammetry import photogrammetry as ph
@@ -15,11 +15,7 @@ from opencsp.common.lib.photogrammetry import photogrammetry as ph
 
 def get_test_camera() -> Camera:
     """Creates a test camera with focal length of 1 pixel"""
-    mat = np.array([
-        [1, 0, 0],
-        [0, 1, 0],
-        [0, 1, 1],
-    ], dtype=float)
+    mat = np.array([[1, 0, 0], [0, 1, 0], [0, 1, 1]], dtype=float)
     return Camera(mat, np.zeros(4), (100, 100), 'Test Camera')
 
 
@@ -35,35 +31,17 @@ def test_find_aruco_marker():
     # Test IDs
     np.testing.assert_equal(np.array([19, 17, 20, 18, 15, 14, 16]), ids)
     # Test corners
-    corns_exp = np.array([
-        [[759., 1049.],
-         [897., 1050.],
-         [898., 1190.],
-         [760., 1189.]],
-        [[1015., 872.],
-         [1095., 876.],
-         [1091., 957.],
-         [1011., 953.]],
-        [[330., 847.],
-         [470., 845.],
-         [474., 984.],
-         [334., 987.]],
-        [[757., 601.],
-         [892., 601.],
-         [896., 737.],
-         [761., 737.]],
-        [[1305., 546.],
-         [1386., 546.],
-         [1385., 627.],
-         [1305., 626.]],
-        [[1116., 543.],
-         [1196., 548.],
-         [1192., 629.],
-         [1111., 623.]],
-        [[1421., 892.],
-         [1502., 889.],
-         [1505., 969.],
-         [1424., 972.]]])
+    corns_exp = np.array(
+        [
+            [[759.0, 1049.0], [897.0, 1050.0], [898.0, 1190.0], [760.0, 1189.0]],
+            [[1015.0, 872.0], [1095.0, 876.0], [1091.0, 957.0], [1011.0, 953.0]],
+            [[330.0, 847.0], [470.0, 845.0], [474.0, 984.0], [334.0, 987.0]],
+            [[757.0, 601.0], [892.0, 601.0], [896.0, 737.0], [761.0, 737.0]],
+            [[1305.0, 546.0], [1386.0, 546.0], [1385.0, 627.0], [1305.0, 626.0]],
+            [[1116.0, 543.0], [1196.0, 548.0], [1192.0, 629.0], [1111.0, 623.0]],
+            [[1421.0, 892.0], [1502.0, 889.0], [1505.0, 969.0], [1424.0, 972.0]],
+        ]
+    )
     np.testing.assert_equal(corns_exp, np.array(corners))
 
 
@@ -90,19 +68,23 @@ def test_reprojection_errors():
     camera = get_test_camera()
     rvecs = np.zeros((2, 3))
     tvecs = np.zeros((2, 3))
-    pts_obj = np.array([[0., 0., 1.], [0., 0., 1.]])
+    pts_obj = np.array([[0.0, 0.0, 1.0], [0.0, 0.0, 1.0]])
     camera_indices = np.array([0, 0, 1, 1])
     point_indices = np.array([0, 1, 0, 1])
 
     # Perfect case
     points_2d = np.zeros((4, 2))
-    errors = ph.reprojection_errors(rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d)
+    errors = ph.reprojection_errors(
+        rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d
+    )
     np.testing.assert_equal(errors, np.zeros((4, 2)))
 
     # 1 pixel off in x on camera 0
     points_2d = np.zeros((4, 2))
     points_2d[:2, 0] = 1
-    errors = ph.reprojection_errors(rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d)
+    errors = ph.reprojection_errors(
+        rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d
+    )
     errors_exp = np.zeros((4, 2))
     errors_exp[:2, 0] = -1
     np.testing.assert_equal(errors, errors_exp)
@@ -119,8 +101,10 @@ def test_align_points_no_scale():
     pts_obj_optimized = trans.apply(pts_obj)
 
     np.testing.assert_allclose(error, np.zeros(3), atol=1e-6, rtol=0)
-    np.testing.assert_equal(scale, 1.)
-    np.testing.assert_allclose(pts_obj_aligned.data, pts_obj_optimized.data, atol=1e-6, rtol=0)
+    np.testing.assert_equal(scale, 1.0)
+    np.testing.assert_allclose(
+        pts_obj_aligned.data, pts_obj_optimized.data, atol=1e-6, rtol=0
+    )
 
 
 def test_align_points_with_scale():
@@ -134,8 +118,10 @@ def test_align_points_with_scale():
     pts_obj_optimized = trans.apply(pts_obj * scale)
 
     np.testing.assert_allclose(error, np.zeros(3), atol=1e-6, rtol=0)
-    np.testing.assert_almost_equal(scale, 2., 6)
-    np.testing.assert_allclose(pts_obj_aligned.data * 2, pts_obj_optimized.data, atol=1e-6, rtol=0)
+    np.testing.assert_almost_equal(scale, 2.0, 6)
+    np.testing.assert_allclose(
+        pts_obj_aligned.data * 2, pts_obj_optimized.data, atol=1e-6, rtol=0
+    )
 
 
 def test_scale_points():
@@ -164,8 +150,10 @@ def test_triangulate():
     pts_img = Vxy([[0, 1], [0, 1]])
     pt, dists = ph.triangulate(cameras, rots, tvecs, pts_img)
 
-    np.testing.assert_allclose(pt.data.squeeze(), np.array([0, 0, 1]), rtol=0, atol=1e-6)
-    np.testing.assert_allclose(dists, np.array([0., 0.]), rtol=0, atol=1e-6)
+    np.testing.assert_allclose(
+        pt.data.squeeze(), np.array([0, 0, 1]), rtol=0, atol=1e-6
+    )
+    np.testing.assert_allclose(dists, np.array([0.0, 0.0]), rtol=0, atol=1e-6)
 
 
 def test_nearest_ray_intersection():
@@ -174,5 +162,7 @@ def test_nearest_ray_intersection():
 
     pt, dists = ph.nearest_ray_intersection(p_origins, u_dirs)
 
-    np.testing.assert_allclose(pt.data.squeeze(), np.array([0, 0, 1]), atol=1e-6, rtol=0)
+    np.testing.assert_allclose(
+        pt.data.squeeze(), np.array([0, 0, 1]), atol=1e-6, rtol=0
+    )
     np.testing.assert_allclose(dists, np.array([0, 0]), atol=1e-6, rtol=0)

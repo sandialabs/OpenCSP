@@ -14,6 +14,7 @@ import opencsp.common.lib.tool.log_tools as lt
 _T = TypeVar("_T")
 _V = TypeVar("_V")
 
+
 def remove_duplicates(list):
     result = []
     for x in list:
@@ -30,7 +31,7 @@ def zamboni_shuffle(segment_list):
     """
     Shuffle elements so input consecutive elements are separated.
     Inspired by the path of a Zamboni in an ice rink.
-    
+
     Examples:
         zamboni_shuffle([1,2,3,4,5,6])  -->  [1, 4, 2, 5, 3, 6]
 
@@ -44,13 +45,19 @@ def zamboni_shuffle(segment_list):
         shuffled_segment_list = []
         for idx in range(0, idx_offset):
             shuffled_segment_list.append(segment_list[idx])
-            if (idx+idx_offset) < n_segments:
-                shuffled_segment_list.append(segment_list[idx+idx_offset])
+            if (idx + idx_offset) < n_segments:
+                shuffled_segment_list.append(segment_list[idx + idx_offset])
         return shuffled_segment_list
 
 
-def binary_search(sorted_list: list[_T], search_val: _V, comparator: Callable[[_T, _V], int] = None, key: Callable[[_T], _V] = None, err_if_not_equal = False):
-    """ Does a binary search to get the index and item in the list corresponding to the given search_val.
+def binary_search(
+    sorted_list: list[_T],
+    search_val: _V,
+    comparator: Callable[[_T, _V], int] = None,
+    key: Callable[[_T], _V] = None,
+    err_if_not_equal=False,
+):
+    """Does a binary search to get the index and item in the list corresponding to the given search_val.
 
     This only works when sorted_list is sorted by the desired search key. If it is not,
     then there is no guarantee that this will return anything useful and list.indexof
@@ -70,7 +77,7 @@ def binary_search(sorted_list: list[_T], search_val: _V, comparator: Callable[[_
         - int: index of the list for the closest matching
         - _T: the closest matching item
     """
-    left, middle, right = 0, 0, len(sorted_list)-1
+    left, middle, right = 0, 0, len(sorted_list) - 1
     if key == None:
         key = lambda t: t
     if comparator == None:
@@ -79,30 +86,35 @@ def binary_search(sorted_list: list[_T], search_val: _V, comparator: Callable[[_
     # base case
     if len(sorted_list) == 0:
         if err_if_not_equal:
-            lt.error_and_raise(RuntimeError, f"Error: in list_tools.binary_search: empty list, can't find search value {search_val}")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in list_tools.binary_search: empty list, can't find search value {search_val}",
+            )
         return -1, None
 
     # binary search
-    while right > left+1:
+    while right > left + 1:
         # find the middle index
-        middle = int((right-left) / 2)
-        middle = max(middle, left+1)
-        
+        middle = int((right - left) / 2)
+        middle = max(middle, left + 1)
+
         # determine which way to split
         if comparator(sorted_list[middle], search_val) < 0:
             left = middle
         else:
             right = middle
-    
+
     ret = None, None
 
     # if there's only one value left, return it
     if right == left:
         ret = right, sorted_list[middle]
-    
+
     # if split between two values, choose the closer one
     else:
-        if isinstance(sorted_list[left], (int, float, complex)) and not isinstance(sorted_list[left], bool):
+        if isinstance(sorted_list[left], (int, float, complex)) and not isinstance(
+            sorted_list[left], bool
+        ):
             # list instances are numbers, so we can evaluate which is closer
             lv = sorted_list[left]
             rv = sorted_list[right]
@@ -118,22 +130,30 @@ def binary_search(sorted_list: list[_T], search_val: _V, comparator: Callable[[_
                 ret = right, sorted_list[right]
             else:
                 ret = left, sorted_list[left]
-    
+
     # check for equality
     if err_if_not_equal:
         if ret[1] != search_val:
-            lt.error_and_raise(RuntimeError, f"Error: in list_tools.binary_search: Found value {ret[1]} at index {ret[0]} != search value {search_val}")
-    
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error: in list_tools.binary_search: Found value {ret[1]} at index {ret[0]} != search value {search_val}",
+            )
+
     return ret
 
 
-def get_range(data_keys: list[float], data_values: list[_T], key_subset_range: tuple[float,float], exclude_outside_range = False) -> tuple[list[float],list[_T]]:
-    """ Select a subset of the data_keys[] and data_values[], limited to the given key_subset_range.
+def get_range(
+    data_keys: list[float],
+    data_values: list[_T],
+    key_subset_range: tuple[float, float],
+    exclude_outside_range=False,
+) -> tuple[list[float], list[_T]]:
+    """Select a subset of the data_keys[] and data_values[], limited to the given key_subset_range.
     Chooses the keys closest to the given range start and end points, inclusively.
-    
+
     Ideally, the input data_keys and data_values lists should be the same length.
     The returned data_keys and data_values lists should be the same length.
-    
+
     Parameters:
     -----------
         - data_keys (list[float]): The list of keys for the corresponding data_values points in \"data_values\". This list must be sorted.
@@ -141,54 +161,60 @@ def get_range(data_keys: list[float], data_values: list[_T], key_subset_range: t
         - key_subset_range (tuple[float,float]): The start and end range to include in the returned subset.
         - exclude_outside_range (bool, optional): If False, then values outside the range could be included based on the closest key match.
                                                   If True, then only values in the range will be returned. Default False.
-    
+
     Returns:
     --------
         - data_keys_subset (list[float]): A subset of the input data_keys, approximately limited to the given key_subset_range
-        - data_values_subset (list[float]): A subset of the input data_values, approximately limited to the given key_subset_range """
+        - data_values_subset (list[float]): A subset of the input data_values, approximately limited to the given key_subset_range
+    """
     # validate input
     if len(data_keys) == 0:
         return data_keys, data_values
-        
+
     # search for the range
     start_idx, _ = binary_search(data_keys, key_subset_range[0])
     stop_idx, _ = binary_search(data_keys, key_subset_range[1])
     if stop_idx < len(data_keys):
         stop_idx += 1
-        
+
     # inclusive only?
     if exclude_outside_range:
-        while (start_idx < len(data_keys)) and (data_keys[start_idx] < key_subset_range[0]):
+        while (start_idx < len(data_keys)) and (
+            data_keys[start_idx] < key_subset_range[0]
+        ):
             start_idx += 1
-        while (stop_idx > 0) and (data_keys[stop_idx-1] > key_subset_range[1]):
+        while (stop_idx > 0) and (data_keys[stop_idx - 1] > key_subset_range[1]):
             stop_idx -= 1
-        
+
     return data_keys[start_idx:stop_idx], data_values[start_idx:stop_idx]
 
 
 def rindex(values: list, needle):
-    """ Like values.index(needle), but search for the last occurance. """
-    for i in range(len(values)-1, -1, -1):
+    """Like values.index(needle), but search for the last occurance."""
+    for i in range(len(values) - 1, -1, -1):
         if needle == values[i]:
             return i
     return -1
 
 
 def natural_sort(values: list[str]):
-    """ Sorts the given list naturally, so that numbers are sorted from lowest to highest.
-    
-    Adapted from https://stackoverflow.com/questions/11150239/natural-sorting """
-    convert = lambda text: int(text) if text.isdigit() else text.lower() 
-    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)] 
+    """Sorts the given list naturally, so that numbers are sorted from lowest to highest.
+
+    Adapted from https://stackoverflow.com/questions/11150239/natural-sorting"""
+    convert = lambda text: int(text) if text.isdigit() else text.lower()
+    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
     return sorted(values, key=alphanum_key)
 
 
 # PRINT
 
-def print_list(input_list,          # List to print.
-               max_items=10,        # Maximum number of elements to print.  Elipsis after that.
-               max_item_length=70,  # Maximum item length to print.  Elipsis after that.
-               indent=None):        # Number of blanks to print at the beginning of each line.
+
+def print_list(
+    input_list,  # List to print.
+    max_items=10,  # Maximum number of elements to print.  Elipsis after that.
+    max_item_length=70,  # Maximum item length to print.  Elipsis after that.
+    indent=None,
+):  # Number of blanks to print at the beginning of each line.
     """
     Prints a list, limiting print-out length both laterally and vertically.
     """
@@ -207,10 +233,8 @@ def print_list(input_list,          # List to print.
         if indent == None:
             indent_str = ''
         else:
-            indent_str = (' ' * indent)
+            indent_str = ' ' * indent
         print(indent_str + trimmed_item_str)
     # Postamble.
     if max_items < len(input_list):
         print(indent_str + '...')
-
-

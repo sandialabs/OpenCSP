@@ -1,5 +1,5 @@
 import numpy as np
-from   numpy import ndarray
+from numpy import ndarray
 
 
 def rotate(points: ndarray, rot_vecs: ndarray) -> ndarray:
@@ -33,4 +33,6 @@ def rotate(points: ndarray, rot_vecs: ndarray) -> ndarray:
     cos_theta = np.cos(theta)
     sin_theta = np.sin(theta)
 
-    return cos_theta * points + sin_theta * np.cross(v, points) + dot * (1 - cos_theta) * v
+    return (
+        cos_theta * points + sin_theta * np.cross(v, points) + dot * (1 - cos_theta) * v
+    )

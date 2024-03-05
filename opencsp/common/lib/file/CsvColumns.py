@@ -6,9 +6,9 @@ import opencsp.common.lib.tool.log_tools as lt
 _ColumnHeader = namedtuple('ColumnHeader', ['name', 'aliases', 'idx'])
 
 
-class CsvColumns():
+class CsvColumns:
     def __init__(self, columns: dict[str, list[str | re.Pattern]]):
-        """ Helps to parse csv files that have a tentative structure to them by finding column name matches.
+        """Helps to parse csv files that have a tentative structure to them by finding column name matches.
 
         Example::
 
@@ -28,7 +28,7 @@ class CsvColumns():
 
     @classmethod
     def SimpleColumns(cls, header_row: list[str]):
-        """ Simple constructor that creates columns and column names from the header. """
+        """Simple constructor that creates columns and column names from the header."""
         columns = {v: [v] for v in header_row}
         ret = cls(columns)
         ret.parse_header(header_row)
@@ -45,7 +45,9 @@ class CsvColumns():
 
         if last_matched_idx < len(data_row) - 1:
             if row_idx > -1:
-                lt.debug(f"Found {len(data_row)-last_matched_idx-1} extra values in row {row_idx}")
+                lt.debug(
+                    f"Found {len(data_row)-last_matched_idx-1} extra values in row {row_idx}"
+                )
             last_column = sorted(self.columns.values(), key=lambda c: c.idx)[-1]
             cnt = 2
             for i in range(last_matched_idx + 1, len(data_row)):
@@ -54,7 +56,13 @@ class CsvColumns():
 
         return ret
 
-    def parse_header(self, header_row: list[str], error_on_not_found: bool | list[str] = True, ok_if_not_found: list[str] = None, alternatives: dict[str, list[str]] = None):
+    def parse_header(
+        self,
+        header_row: list[str],
+        error_on_not_found: bool | list[str] = True,
+        ok_if_not_found: list[str] = None,
+        alternatives: dict[str, list[str]] = None,
+    ):
         # add reverse values for the alternatives, if any
         if alternatives != None:
             ks = list(alternatives.keys())
@@ -79,7 +87,7 @@ class CsvColumns():
                 found = False
                 for alias in column.aliases:
                     if isinstance(alias, re.Pattern):
-                        found = (alias.match(slheader) != None)
+                        found = alias.match(slheader) != None
                     else:
                         found = alias.lower() in slheader
                     if found:
@@ -92,7 +100,9 @@ class CsvColumns():
             if column.idx < 0:
                 dbg_msg += f"    {column.name}: -1\n"
             else:
-                dbg_msg += f"    {column.name}: {header_row[column.idx]} ({column.idx})\n"
+                dbg_msg += (
+                    f"    {column.name}: {header_row[column.idx]} ({column.idx})\n"
+                )
         lt.debug(dbg_msg)
 
         # check that we found all the columns
@@ -112,7 +122,10 @@ class CsvColumns():
                     found = False
                     others = alternatives[column.name]
                     for alternative in others:
-                        if alternative in self.columns and self.columns[alternative] != -1:
+                        if (
+                            alternative in self.columns
+                            and self.columns[alternative] != -1
+                        ):
                             found = True
                             break
                     if found:

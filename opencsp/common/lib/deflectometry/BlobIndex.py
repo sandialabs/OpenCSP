@@ -11,7 +11,9 @@ class BlobIndex:
     """Class containing blob indexing algorithms to _assign indices to blobs in a rough grid pattern.
     X/Y axes correspond to image axes; +x is to right, +y is down."""
 
-    def __init__(self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int) -> 'BlobIndex':
+    def __init__(
+        self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int
+    ) -> 'BlobIndex':
         """Instantiates BlobIndex class
 
         Parameters
@@ -31,10 +33,12 @@ class BlobIndex:
         self._idx_x = np.zeros(self._num_pts) * np.nan
         self._idx_y = np.zeros(self._num_pts) * np.nan
         self._is_assigned = np.zeros(self._num_pts, dtype=bool)
-        self._neighbor_dists = np.zeros((self._num_pts, 4)) * np.nan  # left, right, up, down
+        self._neighbor_dists = (
+            np.zeros((self._num_pts, 4)) * np.nan
+        )  # left, right, up, down
 
-        self.search_thresh = 5.  # pixels
-        self.search_perp_axis_ratio = 3.
+        self.search_thresh = 5.0  # pixels
+        self.search_perp_axis_ratio = 3.0
         self.apply_filter = False
         self.verbose = True
 
@@ -44,7 +48,9 @@ class BlobIndex:
         idx_y_vec = np.arange(y_min, y_max + 1)
         self._idx_x_mat, self._idx_y_mat = np.meshgrid(idx_x_vec, idx_y_vec)
         self._points_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan
-        self._point_indices_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan
+        self._point_indices_mat = (
+            np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan
+        )
 
     def _get_assigned_point_indices(self) -> np.ndarray[int]:
         """Returns found point indices"""
@@ -71,7 +77,9 @@ class BlobIndex:
 
         return idxs[idx], dists[idx]
 
-    def _nearest_unassigned_idx_from_xy_point_direction(self, pt_cur: Vxy, pt_exp: Vxy) -> tuple[bool, tuple[int, float]]:
+    def _nearest_unassigned_idx_from_xy_point_direction(
+        self, pt_cur: Vxy, pt_exp: Vxy
+    ) -> tuple[bool, tuple[int, float]]:
         """Returns the point index and distance of unassigned point nearest to given xy
         point in direction form current to expected point.
 
@@ -92,11 +100,15 @@ class BlobIndex:
         # Calculate xy deltas for expected/current point
         points_rel = points - pt_cur  # Vectors, current point to all points
         v_search = pt_exp - pt_cur  # Vector, from current point to expected point
-        v_perp = v_search.rotate(np.array([[0, -1], [1, 0]]))  # Vector, perpendicular to search axis
+        v_perp = v_search.rotate(
+            np.array([[0, -1], [1, 0]])
+        )  # Vector, perpendicular to search axis
         dists_axis = v_search.dot(points_rel)  # Distance of points along search axis
         dists_perp = np.abs(v_perp.dot(points_rel))  # Distance of points from line
         # Make mask of valid points
-        mask = np.logical_and(dists_axis > 0, dists_axis / dists_perp > self.search_perp_axis_ratio)
+        mask = np.logical_and(
+            dists_axis > 0, dists_axis / dists_perp > self.search_perp_axis_ratio
+        )
         # Check there are points to find
         if mask.sum() == 0:
             return False, (None, None)
@@ -120,7 +132,9 @@ class BlobIndex:
         self._idx_y[idx_pt] = idx_y
         self._is_assigned[idx_pt] = True
         # Assign matrices
-        self._points_mat[idx_y + self._offset_y, idx_x + self._offset_x] = self._points[idx_pt].data.squeeze()
+        self._points_mat[idx_y + self._offset_y, idx_x + self._offset_x] = self._points[
+            idx_pt
+        ].data.squeeze()
         self._point_indices_mat[idx_y + self._offset_y, idx_x + self._offset_x] = idx_pt
 
         if self.verbose:
@@ -135,7 +149,9 @@ class BlobIndex:
         if np.isnan(idx_mat_x) or np.isnan(idx_mat_y):
             return
 
-        self._points_mat[int(idx_mat_y), int(idx_mat_x)] = self._points[idx_pt].data.squeeze()
+        self._points_mat[int(idx_mat_y), int(idx_mat_x)] = self._points[
+            idx_pt
+        ].data.squeeze()
         self._point_indices_mat[int(idx_mat_y), int(idx_mat_x)] = idx_pt
 
         # Unassign vectors
@@ -150,10 +166,14 @@ class BlobIndex:
         """Assigns the center point to (0, 0)"""
         idx, dist = self._nearest_unassigned_idx_from_xy_point(pt_origin)
         if dist > self.search_thresh:
-            warn(f'Assigning point {idx:d} to index (0, 0) resulted in {dist:.2f} pixels error.')
+            warn(
+                f'Assigning point {idx:d} to index (0, 0) resulted in {dist:.2f} pixels error.'
+            )
         self._assign(idx, 0, 0)
 
-    def _find_nearest_in_direction(self, idx_pt: int, direction: str = Literal['right', 'left', 'up', 'down']) -> tuple[int, int, int]:
+    def _find_nearest_in_direction(
+        self, idx_pt: int, direction: str = Literal['right', 'left', 'up', 'down']
+    ) -> tuple[int, int, int]:
         """Finds the directly nearest point index to given point
         in left, right, up, down direction. Can return already found points"""
         # Find possible points
@@ -164,20 +184,32 @@ class BlobIndex:
         idx_y = self._idx_y[idx_pt]
 
         if direction == 'right':
-            mask = np.logical_and(unassigned_deltas.x > 0, unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)))
+            mask = np.logical_and(
+                unassigned_deltas.x > 0,
+                unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)),
+            )
             idx_x_out = idx_x + 1
             idx_y_out = idx_y
         elif direction == 'left':
-            mask = np.logical_and(unassigned_deltas.x < 0, -unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)))
+            mask = np.logical_and(
+                unassigned_deltas.x < 0,
+                -unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)),
+            )
             idx_x_out = idx_x - 1
             idx_y_out = idx_y
         elif direction == 'up':
-            mask = np.logical_and(unassigned_deltas.y > 0, unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
+            mask = np.logical_and(
+                unassigned_deltas.y > 0,
+                unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)),
+            )
             idx_x_out = idx_x
             idx_y_out = idx_y + 1
         # Down
         elif direction == 'down':
-            mask = np.logical_and(unassigned_deltas.y < 0, -unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
+            mask = np.logical_and(
+                unassigned_deltas.y < 0,
+                -unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)),
+            )
             idx_x_out = idx_x
             idx_y_out = idx_y - 1
 
@@ -243,7 +275,9 @@ class BlobIndex:
             idxs_a = self._idx_x
             idxs_b = self._idx_y
         else:
-            raise ValueError(f'Given "direction" must be either "x" or "y", not {direction}')
+            raise ValueError(
+                f'Given "direction" must be either "x" or "y", not {direction}'
+            )
 
         # Step through direction
         # TODO Can speed up with matrix data storage
@@ -258,7 +292,9 @@ class BlobIndex:
                     idx_b_prev = i_b - step  # Index used for slope calc
                     if idx_b_prev in is_b:  # If history exists, find points
                         for idx_b_next in range(500):
-                            if idx_b_next == 0:  # First iteration, use previously assigned points
+                            if (
+                                idx_b_next == 0
+                            ):  # First iteration, use previously assigned points
                                 pt_cur = pts[is_b == i_b]
                                 pt_prev = pts[is_b == idx_b_prev]
                             else:  # Next iterations, use new points
@@ -266,7 +302,12 @@ class BlobIndex:
                                 pt_cur = self._points[idx_new]
                             # Calculate deltas
                             pt_exp = self._exp_pt_from_pt_pair(pt_cur, pt_prev)
-                            success, (idx_new, dist) = self._nearest_unassigned_idx_from_xy_point_direction(pt_cur, pt_exp)
+                            success, (
+                                idx_new,
+                                dist,
+                            ) = self._nearest_unassigned_idx_from_xy_point_direction(
+                                pt_cur, pt_exp
+                            )
                             if not success:
                                 break
                             # Assign point
@@ -302,8 +343,12 @@ class BlobIndex:
         mask_bad_pixels_y = np.abs(del_2_y) > thresh
 
         # Calculate mask of bad pixels using x and y derivatives
-        mask_bad_pixels_x = np.concatenate((np.zeros((ny, 2, 2), dtype=bool), mask_bad_pixels_x), axis=1)
-        mask_bad_pixels_y = np.concatenate((np.zeros((2, nx, 2), dtype=bool), mask_bad_pixels_y), axis=0)
+        mask_bad_pixels_x = np.concatenate(
+            (np.zeros((ny, 2, 2), dtype=bool), mask_bad_pixels_x), axis=1
+        )
+        mask_bad_pixels_y = np.concatenate(
+            (np.zeros((2, nx, 2), dtype=bool), mask_bad_pixels_y), axis=0
+        )
 
         # Combine into one mask
         mask_bad_pixels = (mask_bad_pixels_x + mask_bad_pixels_y).max(2)
@@ -344,7 +389,11 @@ class BlobIndex:
         """Plots points and labels"""
         plt.scatter(*self._points[self._is_assigned].data, color='blue')
         if labels:
-            for x, y, pt in zip(self._idx_x[self._is_assigned], self._idx_y[self._is_assigned], self._points[self._is_assigned]):
+            for x, y, pt in zip(
+                self._idx_x[self._is_assigned],
+                self._idx_y[self._is_assigned],
+                self._points[self._is_assigned],
+            ):
                 plt.text(*pt.data, f'({x:.0f}, {y:.0f})')
 
     def plot_points_connections(self, labels: bool = False) -> None:

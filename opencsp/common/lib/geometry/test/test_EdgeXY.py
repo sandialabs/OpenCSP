@@ -1,8 +1,8 @@
 import numpy as np
 
-from   opencsp.common.lib.geometry.EdgeXY import EdgeXY
-from   opencsp.common.lib.geometry.LineXY import LineXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.EdgeXY import EdgeXY
+from opencsp.common.lib.geometry.LineXY import LineXY
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class TestEdgeXY:

@@ -7,8 +7,8 @@ import opencsp.common.lib.tool.file_tools as ft
 _registered_parser_classes: set[aap.AbstractAttributeParser] = set()
 
 
-class AttributesManager():
-    """ A class for managing writing and reading attributes .txt files, such as those found next to saved images.
+class AttributesManager:
+    """A class for managing writing and reading attributes .txt files, such as those found next to saved images.
 
     The purpose of an attributes file is to record the context of a file in a
     human-readable format (we use JSON for this format). For images, this might
@@ -42,8 +42,12 @@ class AttributesManager():
 
     def __init__(self, *parsers: aap.AbstractAttributeParser):
         input_parsers = {parser.__class__: parser for parser in parsers}
-        self.specific_parsers: dict[type[aap.AbstractAttributeParser], aap.AbstractAttributeParser] = input_parsers
-        self.generic_parsers: dict[type[aap.AbstractAttributeParser], aap.AbstractAttributeParser] = {}
+        self.specific_parsers: dict[
+            type[aap.AbstractAttributeParser], aap.AbstractAttributeParser
+        ] = input_parsers
+        self.generic_parsers: dict[
+            type[aap.AbstractAttributeParser], aap.AbstractAttributeParser
+        ] = {}
 
         # add parsers whose instance's haven't been passed in yet
         for parser_class in _registered_parser_classes:
@@ -52,8 +56,8 @@ class AttributesManager():
 
     @property
     def parsers(self):
-        """ Returns the list of all parsers for this instance. Parsers that were
-        passed in the constructor or in set_parser() are returned first. """
+        """Returns the list of all parsers for this instance. Parsers that were
+        passed in the constructor or in set_parser() are returned first."""
         ret = list(self.specific_parsers.values())
         ret += list(self.generic_parsers.values())
         return ret
@@ -62,8 +66,10 @@ class AttributesManager():
     def _register_parser_class(cls, parser_class: type[aap.AbstractAttributeParser]):
         _registered_parser_classes.add(parser_class)
 
-    def get_parser(self, parser_class: type[aap.AbstractAttributeParser], error_on_not_found=True) -> aap.AbstractAttributeParser:
-        """ Returns the parser instance matching the given parser_class.
+    def get_parser(
+        self, parser_class: type[aap.AbstractAttributeParser], error_on_not_found=True
+    ) -> aap.AbstractAttributeParser:
+        """Returns the parser instance matching the given parser_class.
 
         Example::
 
@@ -87,25 +93,30 @@ class AttributesManager():
             return subclass_parsers[0]
         if len(subclass_parsers) == 0:
             if error_on_not_found:
-                lt.error_and_raise(RuntimeError, "Programmer error in AttributesManager.get_parser(): " +
-                                   f"there is an unregistered parser class {parser_class}! All AbstractAttributeParsers should " +
-                                   "register themselves with RegisterClass() when their file is imported to prevent this error.")
+                lt.error_and_raise(
+                    RuntimeError,
+                    "Programmer error in AttributesManager.get_parser(): "
+                    + f"there is an unregistered parser class {parser_class}! All AbstractAttributeParsers should "
+                    + "register themselves with RegisterClass() when their file is imported to prevent this error.",
+                )
             else:
                 return None
 
         # more than one subclass found, just return the first one
-        lt.debug(f"In AttributesManager.get_parser(): found more than one parser matching parser class {parser_class}")
+        lt.debug(
+            f"In AttributesManager.get_parser(): found more than one parser matching parser class {parser_class}"
+        )
         return subclass_parsers[0]
 
     def set_parser(self, parser: aap.AbstractAttributeParser):
-        """ Sets the given parser as the default parser for the given class. """
+        """Sets the given parser as the default parser for the given class."""
         parser_class = parser.__class__
         if parser_class in self.generic_parsers:
             del self.generic_parsers[parser_class]
         self.specific_parsers[parser_class] = parser
 
     def get_attributes_dict(self, attributes_file_path_name_ext: str = None):
-        """ Get the attributes for all this instance's parsers that have contents.
+        """Get the attributes for all this instance's parsers that have contents.
 
         Parameters
         ----------
@@ -122,11 +133,13 @@ class AttributesManager():
         for parser in self.parsers:
             if not parser.has_contents():
                 continue
-            contents = parser.append_contents_for_writing(attributes_file_path_name_ext, contents)
+            contents = parser.append_contents_for_writing(
+                attributes_file_path_name_ext, contents
+            )
         return contents
 
     def save(self, attributes_file_path_name_ext: str, overwrite=False):
-        """ Saves the attributes from this instance's parsers into the given file.
+        """Saves the attributes from this instance's parsers into the given file.
 
         Parameters
         ----------
@@ -142,13 +155,18 @@ class AttributesManager():
         """
         # check the name of the file
         if not attributes_file_path_name_ext.endswith(".txt"):
-            lt.debug(f"In AttributesManager.save(): it is highly suggested that the attributes file name end with '.txt', but {attributes_file_path_name_ext=}")
+            lt.debug(
+                f"In AttributesManager.save(): it is highly suggested that the attributes file name end with '.txt', but {attributes_file_path_name_ext=}"
+            )
 
         # check if the file already exists
         if ft.file_exists(attributes_file_path_name_ext):
             if not overwrite:
-                lt.error_and_raise(FileExistsError, f"Error in AttributesManager.save(): " +
-                                   f"file {attributes_file_path_name_ext} already exists!")
+                lt.error_and_raise(
+                    FileExistsError,
+                    f"Error in AttributesManager.save(): "
+                    + f"file {attributes_file_path_name_ext} already exists!",
+                )
 
         # collect the contents to be saved
         contents = self.get_attributes_dict(attributes_file_path_name_ext)
@@ -161,7 +179,7 @@ class AttributesManager():
             fout.write(contents)
 
     def load(self, attributes_file_path_name_ext: str):
-        """ Loads the attributes from the given file into the parsers for this
+        """Loads the attributes from the given file into the parsers for this
         instance. The attributes can then be retrieved from the desired parser
         with self.get_parser(), or from all parsers with self.parsers.
 
@@ -170,7 +188,7 @@ class AttributesManager():
         FileExistsError:
             The given file does not exist.
         json.decoder.JSONDecodeError:
-            The given file is not in JSON format. """
+            The given file is not in JSON format."""
         # get the raw string value of the file
         str_contents = ""
         if not ft.file_exists(attributes_file_path_name_ext):
@@ -184,7 +202,11 @@ class AttributesManager():
         try:
             json_contents: dict[str, any] = json.loads(str_contents)
         except json.decoder.JSONDecodeError:
-            lt.info(f"In AttributesManager.load(): failed to parse attributes file {attributes_file_path_name_ext}")
+            lt.info(
+                f"In AttributesManager.load(): failed to parse attributes file {attributes_file_path_name_ext}"
+            )
             raise
         for parser in self.parsers:
-            json_contents = parser.parse_attributes_file(attributes_file_path_name_ext, str_contents, json_contents)
+            json_contents = parser.parse_attributes_file(
+                attributes_file_path_name_ext, str_contents, json_contents
+            )

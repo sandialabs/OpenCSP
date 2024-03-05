@@ -1,20 +1,22 @@
 import numpy as np
-from   scipy.interpolate import LinearNDInterpolator
-from   scipy.spatial.transform import Rotation
+from scipy.interpolate import LinearNDInterpolator
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
 class Display:
     """Representation of a screen/projector for deflectometry."""
 
-    def __init__(self,
-                 v_cam_screen_screen: Vxyz,
-                 r_screen_cam: Rotation,
-                 grid_data: dict,
-                 name: str = ''):
+    def __init__(
+        self,
+        v_cam_screen_screen: Vxyz,
+        r_screen_cam: Rotation,
+        grid_data: dict,
+        name: str = '',
+    ):
         """
         Instantiates deflectometry display representation.
 
@@ -85,7 +87,6 @@ class Display:
         return 'Display: { ' + self.name + ' }'
 
     def _init_interp_func(self):
-
         # Rectangular (undistorted) screen model
         if self.grid_data['screen_model'] == 'rectangular2D':
             self.interp_func = self._interp_func_rectangular2D
@@ -122,7 +123,9 @@ class Display:
             self.interp_func = lambda Vuv: self._interp_func_3D(Vuv, Fxyz)
 
         else:
-            raise ValueError('Unknown screen model: "{:s}"'.format(self.grid_data['screen_model']))
+            raise ValueError(
+                'Unknown screen model: "{:s}"'.format(self.grid_data['screen_model'])
+            )
 
     def _interp_func_rectangular2D(self, Vuv_display_pts: Vxy) -> Vxyz:
         """
@@ -201,10 +204,7 @@ class Display:
 
         # Rectangular
         if grid_data['screen_model'] == 'rectangular2D':
-            datasets = [
-                'Display/Grid/screen_x',
-                'Display/Grid/screen_y'
-            ]
+            datasets = ['Display/Grid/screen_x', 'Display/Grid/screen_y']
             grid_data.update(hdf5_tools.load_hdf5_datasets(datasets, file))
 
         # Distorted 2D
@@ -228,13 +228,15 @@ class Display:
             grid_data['Pxyz_screen_coords'] = Vxyz(grid_data['Pxyz_screen_coords'])
 
         else:
-            raise ValueError('Model "{}" not supported.'.format(grid_data['screen_model']))
+            raise ValueError(
+                'Model "{}" not supported.'.format(grid_data['screen_model'])
+            )
 
         # Load display parameters
         datasets = [
             'Display/rvec_screen_cam',
             'Display/tvec_cam_screen_screen',
-            'Display/name'
+            'Display/name',
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
 
@@ -263,7 +265,10 @@ class Display:
         data = []
         for dataset in self.grid_data.keys():
             datasets.append('Display/Grid/' + dataset)
-            if type(self.grid_data[dataset]) is Vxy or type(self.grid_data[dataset]) is Vxyz:
+            if (
+                type(self.grid_data[dataset]) is Vxy
+                or type(self.grid_data[dataset]) is Vxyz
+            ):
                 data.append(self.grid_data[dataset].data)
             else:
                 data.append(self.grid_data[dataset])
@@ -272,12 +277,12 @@ class Display:
         datasets += [
             'Display/rvec_screen_cam',
             'Display/tvec_cam_screen_screen',
-            'Display/name'
+            'Display/name',
         ]
         data += [
             self.r_screen_cam.as_rotvec(),
             self.v_cam_screen_screen.data,
-            self.name
+            self.name,
         ]
 
         # Save data

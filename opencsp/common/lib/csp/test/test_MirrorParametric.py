@@ -13,12 +13,16 @@ class TestMirrorParametric:
 
     def get_region_test_mirror(self) -> RegionXY:
         """Returns a test mirror region"""
-        return RegionXY.from_vertices(Vxy(([0.5, -0.5, -0.5, 0.5], [-0.5, -0.5, 0.5, 0.5])))
+        return RegionXY.from_vertices(
+            Vxy(([0.5, -0.5, -0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]))
+        )
 
     def get_test_flat_mirror(self, height: float) -> MirrorParametric:
         """Returns a flat mirror with defined height"""
+
         def surf_func_flat(x, y):
             return height
+
         region = self.get_region_test_mirror()
         return MirrorParametric(surf_func_flat, region)
 
@@ -53,12 +57,12 @@ class TestMirrorParametric:
 
     def test_surface_displacement_at_parabolic(self):
         """Tests z height of parabolic mirror"""
-        focal_length = 100.
+        focal_length = 100.0
         region = self.get_region_test_mirror()
         mirror = MirrorParametric.generate_symmetric_paraboloid(focal_length, region)
         x = np.arange(-0.5, 0.5, 0.1)
         y = np.zeros(x.shape)
-        z_exp = x ** 2 / (4 * focal_length)
+        z_exp = x**2 / (4 * focal_length)
         # Calculate z
         p_samp = Vxy((x, y))
         z_calc = mirror.surface_displacement_at(p_samp)
@@ -67,7 +71,7 @@ class TestMirrorParametric:
 
     def test_surface_norm_at_parabolic(self):
         """Tests normal vectors of parabolic mirror"""
-        focal_length = 100.
+        focal_length = 100.0
         region = self.get_region_test_mirror()
         mirror = MirrorParametric.generate_symmetric_paraboloid(focal_length, region)
         x = np.arange(-0.5, 0.5, 0.1)

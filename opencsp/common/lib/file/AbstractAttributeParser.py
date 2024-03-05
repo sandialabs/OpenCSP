@@ -8,7 +8,7 @@ import opencsp.common.lib.tool.typing_tools as tt
 
 
 class AbstractAttributeParser(ABC):
-    """ Class for parsing attributes related to specific data processing steps,
+    """Class for parsing attributes related to specific data processing steps,
     for writing the context of that data processing to adjacent 'attributes' .txt
     files.
 
@@ -40,26 +40,28 @@ class AbstractAttributeParser(ABC):
 
     @abstractmethod
     def attributes_key(self) -> str:
-        """ Returns the key this class (or this instance) uses to index into the
-        attributes file. This key should closely match the class name. """
+        """Returns the key this class (or this instance) uses to index into the
+        attributes file. This key should closely match the class name."""
         pass
 
     @abstractmethod
     def set_defaults(self, other: 'AbstractAttributeParser'):
-        """ Replaces this instance's None-valued contents with non-None-valued
-        contents from the given other of the same parser type. """
+        """Replaces this instance's None-valued contents with non-None-valued
+        contents from the given other of the same parser type."""
         raise NotImplementedError()
 
     @abstractmethod
     def has_contents(self) -> bool:
-        """ Returns True if there are contents that have been set for this
+        """Returns True if there are contents that have been set for this
         instance. False to skip this instance when saving out an attributes
-        file. """
+        file."""
         pass
 
     @abstractmethod
-    def parse_my_contents(self, file_path_name_ext: str, raw_contents: str, my_contents: any):
-        """ Parse this attribute parser's specific contents.
+    def parse_my_contents(
+        self, file_path_name_ext: str, raw_contents: str, my_contents: any
+    ):
+        """Parse this attribute parser's specific contents.
 
         Parameters
         ----------
@@ -68,12 +70,12 @@ class AbstractAttributeParser(ABC):
         raw_contents : str
             The unparsed string contents of the attributes file.
         my_contents : any
-            The JSON interpretted value for the attributes_key() in the raw_contents. """
+            The JSON interpretted value for the attributes_key() in the raw_contents."""
         pass
 
     @abstractmethod
     def my_contents_to_json(self, file_path_name_ext: str) -> any:
-        """ Prepare the contents from this parser to be written to an attributes file.
+        """Prepare the contents from this parser to be written to an attributes file.
         If has_contents() == False, then this parser will be skipped.
 
         _extended_summary_
@@ -90,8 +92,10 @@ class AbstractAttributeParser(ABC):
         """
         pass
 
-    def parse_attributes_file(self, file_path_name_ext: str, raw_contents: str, json_contents: dict[str, any]) -> dict[str, any]:
-        """ Parse this attribute parser's specific contents out of the given
+    def parse_attributes_file(
+        self, file_path_name_ext: str, raw_contents: str, json_contents: dict[str, any]
+    ) -> dict[str, any]:
+        """Parse this attribute parser's specific contents out of the given
         json_contents. Once this parser's contents have been registered with
         this instance, then they can be removed from the dict and the modified
         dict returned.
@@ -121,7 +125,7 @@ class AbstractAttributeParser(ABC):
         return json_contents
 
     def save(self, attributes_file_path_name_ext: str, overwrite=None):
-        """ Loads and parses the given file, then writes the file back with this instance's contents.
+        """Loads and parses the given file, then writes the file back with this instance's contents.
 
         Parameters
         ----------
@@ -156,7 +160,7 @@ class AbstractAttributeParser(ABC):
         attr.save(attributes_file_path_name_ext, overwrite=overwrite)
 
     def load(self, attributes_file_path_name_ext: str):
-        """ Loads and parses the given file, populating this instance with that file's contents.
+        """Loads and parses the given file, populating this instance with that file's contents.
 
         Raises
         ------
@@ -168,8 +172,10 @@ class AbstractAttributeParser(ABC):
         attr = am.AttributesManager(self)
         attr.load(attributes_file_path_name_ext)
 
-    def append_contents_for_writing(self, file_path_name_ext: str, contents: dict[str, any]) -> dict[str, any]:
-        """ Add the contents from this parser to be written to an attributes file.
+    def append_contents_for_writing(
+        self, file_path_name_ext: str, contents: dict[str, any]
+    ) -> dict[str, any]:
+        """Add the contents from this parser to be written to an attributes file.
         If has_contents() == False, then this parser will be skipped.
 
         Parameters
@@ -188,8 +194,10 @@ class AbstractAttributeParser(ABC):
             return contents
         my_contents = self.my_contents_to_json(file_path_name_ext)
         if my_contents == None:
-            lt.debug(f"In {self.__class__.__name__}.my_contents_to_json(): " +
-                     "self.has_contents() returned True, but my_contents_to_json() returned None!")
+            lt.debug(
+                f"In {self.__class__.__name__}.my_contents_to_json(): "
+                + "self.has_contents() returned True, but my_contents_to_json() returned None!"
+            )
         ret = copy.copy(contents)
         ret[self.attributes_key()] = my_contents
         return ret
@@ -197,4 +205,5 @@ class AbstractAttributeParser(ABC):
     @classmethod
     def RegisterClass(cls):
         import opencsp.common.lib.file.AttributesManager as am
+
         am.AttributesManager._register_parser_class(cls)

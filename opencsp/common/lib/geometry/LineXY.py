@@ -1,8 +1,8 @@
 import numpy as np
-from   numpy.random import RandomState, SeedSequence, MT19937
-from   scipy.optimize import minimize
+from numpy.random import RandomState, SeedSequence, MT19937
+from scipy.optimize import minimize
 
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class LineXY:
@@ -37,7 +37,14 @@ class LineXY:
         self.C = C / mag
 
     def __repr__(self):
-        return '2D Line: ' + self.A.__repr__() + ', ' + self.B.__repr__() + ', ' + self.C.__repr__()
+        return (
+            '2D Line: '
+            + self.A.__repr__()
+            + ', '
+            + self.B.__repr__()
+            + ', '
+            + self.C.__repr__()
+        )
 
     @property
     def n_vec(self) -> Vxy:
@@ -64,16 +71,16 @@ class LineXY:
 
         """
         return np.array([self.A, self.B, self.C])
-    
+
     @property
     def slope(self) -> float:
-        """ Get the slope of the line (could be infinity!) """
+        """Get the slope of the line (could be infinity!)"""
         if abs(self.B) < 1e-10:
             return np.inf
-        return -self.A/self.B
+        return -self.A / self.B
 
     @classmethod
-    def fit_from_points(cls, Pxy: Vxy, seed: int = 1, neighbor_dist: float = 1.):
+    def fit_from_points(cls, Pxy: Vxy, seed: int = 1, neighbor_dist: float = 1.0):
         """
         Fits a LineXY to a set of points using Ransac method.
 
@@ -98,7 +105,9 @@ class LineXY:
         n = len(Pxy)
         thresh = int(0.99 * n)
         if n <= 15:
-            raise ValueError(f'To fit line from points, must have > 15 points, but {n:d} were given.')
+            raise ValueError(
+                f'To fit line from points, must have > 15 points, but {n:d} were given.'
+            )
 
         # Fit from random combinations of points, keeping the best
         best_active = 0
@@ -106,7 +115,10 @@ class LineXY:
             # Find two separate points
             i1 = np.floor(rs.rand() * n).astype(int)
             i2 = np.floor(rs.rand() * n).astype(int)
-            while Pxy.data[0, i1] == Pxy.data[0, i2] and Pxy.data[1, i1] == Pxy.data[1, i2]:
+            while (
+                Pxy.data[0, i1] == Pxy.data[0, i2]
+                and Pxy.data[1, i1] == Pxy.data[1, i2]
+            ):
                 i2 = np.floor(rs.rand() * n).astype(int)
 
             # Fit line to two poins
@@ -146,7 +158,7 @@ class LineXY:
 
             # Calculate RMS error
             dists = L.dist_from(Pxy)
-            return np.mean(dists ** 2)
+            return np.mean(dists**2)
 
         # Least squares linear fit to active points
         Pxy_active = Pxy[active_mask]
@@ -190,7 +202,7 @@ class LineXY:
 
         return LineXY(*ABC)
 
-    def y_from_x(self, xs: np.ndarray|float) -> np.ndarray|float:
+    def y_from_x(self, xs: np.ndarray | float) -> np.ndarray | float:
         """
         Returns y points that lie on line given corresponding x points.
 
@@ -207,7 +219,7 @@ class LineXY:
         """
         return (-self.A * xs - self.C) / self.B
 
-    def x_from_y(self, ys: np.ndarray|float) -> np.ndarray|float:
+    def x_from_y(self, ys: np.ndarray | float) -> np.ndarray | float:
         """
         Returns x points that lie on line given corresponding y points.
 
@@ -259,7 +271,7 @@ class LineXY:
         """
         return Pxy.dot(self.n_vec) + self.C
 
-    def intersect_with(self, Lxy: 'LineXY') -> Vxy|None:
+    def intersect_with(self, Lxy: 'LineXY') -> Vxy | None:
         """
         Calculates intersection point of two 2D lines.
 
@@ -276,15 +288,16 @@ class LineXY:
         """
         # test if the two lines are parallel
         # horizontal line A=0, vertical line B=0
-        if (abs(self.A) < 1e-10 and abs(Lxy.A) < 1e-10) or \
-           (abs(self.B) < 1e-10 and abs(Lxy.B) < 1e-10) or \
-           (abs(self.slope - Lxy.slope) < 1e-10):
+        if (
+            (abs(self.A) < 1e-10 and abs(Lxy.A) < 1e-10)
+            or (abs(self.B) < 1e-10 and abs(Lxy.B) < 1e-10)
+            or (abs(self.slope - Lxy.slope) < 1e-10)
+        ):
             return None
-        
+
         # find the intersection
         v = np.cross(self.ABC, Lxy.ABC)
         return Vxy(v[:2] / v[2])
-
 
     def flip(self):
         """

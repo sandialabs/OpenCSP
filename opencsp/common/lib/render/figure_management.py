@@ -12,11 +12,13 @@ Features include:
 
 """
 
-#import matplotlib
+# import matplotlib
 import matplotlib.pyplot as plt
 import numpy as np
 
-from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlFigureRecord import (
+    RenderControlFigureRecord,
+)
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
@@ -29,20 +31,23 @@ import opencsp.common.lib.tool.log_tools as lt
 figure_tile_idx = 0
 show_figures = True
 
+
 def reset_figure_tiles():
     global figure_tile_idx
     figure_tile_idx = 0
 
-def do_show_figures(flag:bool=True):
+
+def do_show_figures(flag: bool = True):
     global show_figures
     show_figures = flag
 
 
 # Global variables used for documentation.
 figure_num = 0
-fig_record_list:list[RenderControlFigureRecord] = []
+fig_record_list: list[RenderControlFigureRecord] = []
 
 figure_tile_idx = 0  # Used for tile control.
+
 
 def reset_figure_management():
     reset_figure_tiles()
@@ -52,13 +57,21 @@ def reset_figure_management():
     fig_record_list = []
 
 
-def tile_figure(name=None,                                       # Handle and title of figure window.
-                tile_array:tuple[int, int] = (3,2),              # (n_y, n_x) ~ (columns, rows)
-                tile_square:bool=False,                          # Force figure to have equal x:y aspect ratio.
-                screen_size:tuple[float, float]=(19.0, 10.0),    # Screen (width, height) in "inches."  Set by experimentation.
-                header_height:float=0.8,                         # Height of window title and display tool header, in "inches."
-                screen_pixels:tuple[float, float]=(1920, 1080),  # (n_x, n_y).  Subtract task bar pixels from y.
-                task_bar_pixels:float=40):             # Height of task bar in pixels.
+def tile_figure(
+    name=None,  # Handle and title of figure window.
+    tile_array: tuple[int, int] = (3, 2),  # (n_y, n_x) ~ (columns, rows)
+    tile_square: bool = False,  # Force figure to have equal x:y aspect ratio.
+    screen_size: tuple[float, float] = (
+        19.0,
+        10.0,
+    ),  # Screen (width, height) in "inches."  Set by experimentation.
+    header_height: float = 0.8,  # Height of window title and display tool header, in "inches."
+    screen_pixels: tuple[float, float] = (
+        1920,
+        1080,
+    ),  # (n_x, n_y).  Subtract task bar pixels from y.
+    task_bar_pixels: float = 40,
+):  # Height of task bar in pixels.
     """
     Places figures in a regular tile pattern on screen.
     """
@@ -80,22 +93,22 @@ def tile_figure(name=None,                                       # Handle and ti
     global figure_tile_idx
     figure_pos_idx = figure_tile_idx % n
     figure_tile_idx += 1
-    y     = figure_pos_idx / n_x
+    y = figure_pos_idx / n_x
     y_idx = int(y)
-    x     = (y - y_idx) * n_x
+    x = (y - y_idx) * n_x
     x_idx = round(x)
     y_idx = int(y)  # Don't use round()
     size_x_pixels = int(screen_pixels[0] / n_x)
-    size_y_pixels = int((screen_pixels[1]-task_bar_pixels) / n_y)
+    size_y_pixels = int((screen_pixels[1] - task_bar_pixels) / n_y)
     ul_x = size_x_pixels * x_idx
     ul_y = size_y_pixels * y_idx
 
     # Create figure.
     # fig = plt.figure(constrained_layout=True).subplots(5, 5)
-    fig = plt.figure(name, figsize=(size_x,plot_size_y))
-    # Turn off the axis around the plot drawing area.  This leads to confusing duplicate, mismatched, 
+    fig = plt.figure(name, figsize=(size_x, plot_size_y))
+    # Turn off the axis around the plot drawing area.  This leads to confusing duplicate, mismatched,
     # axis information.  Why this suddenly appeared is beyond me. - RCB
-    # The command below does not suppress the actual plot axes.  
+    # The command below does not suppress the actual plot axes.
     plt.axis('off')
 
     # Set the x,y offset of the figure
@@ -105,31 +118,45 @@ def tile_figure(name=None,                                       # Handle and ti
         if hasattr(mnger.window, 'wm_geometry'):
             mnger.window.wm_geometry(f"+{ul_x}+{ul_y}")
         elif hasattr(mnger.window, 'geometry'):
-            curr_dims = mnger.window.geometry().getRect() # x, y, w, h
+            curr_dims = mnger.window.geometry().getRect()  # x, y, w, h
             mnger.window.setGeometry(curr_dims[0], curr_dims[1], ul_x, ul_y)
 
     # matplotlib.use("wx")
-    # fig.canvas.manager.window.move(ul_x, ul_y) # Used to make the plots display in a productive setup 
+    # fig.canvas.manager.window.move(ul_x, ul_y) # Used to make the plots display in a productive setup
 
     # TODO TJL: find a native matplolib method to make the plots display properly
     return fig
 
 
-def display_image(image: np.ndarray | str,
-                  name:str=None,           # Figure handle and title of figure window.
-                  title:str=None,          # Title of plot. Used for name if name is None.
-                  figsize:tuple[float, float]=(6.4, 4.8),  # inch.
-                  tile:bool=True,           # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
-                  tile_array:tuple[int, int]=(3,2),    # (n_x, n_y)
-                  upper_left_xy:tuple[float, float]=None,  # pixel.  (0,0) --> Upper left corner of screen.
-                  cmap=None,               # Color scheme to use.
-                  block=False) -> plt.Figure:
-    """ If all you want to do is draw an image to the screen, then this is the method for you. """
+def display_image(
+    image: np.ndarray | str,
+    name: str = None,  # Figure handle and title of figure window.
+    title: str = None,  # Title of plot. Used for name if name is None.
+    figsize: tuple[float, float] = (6.4, 4.8),  # inch.
+    tile: bool = True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
+    tile_array: tuple[int, int] = (3, 2),  # (n_x, n_y)
+    upper_left_xy: tuple[
+        float, float
+    ] = None,  # pixel.  (0,0) --> Upper left corner of screen.
+    cmap=None,  # Color scheme to use.
+    block=False,
+) -> plt.Figure:
+    """If all you want to do is draw an image to the screen, then this is the method for you."""
     # set up the figure
     axis_control = rca.image(grid=False)
-    figure_control = RenderControlFigure(tile=tile, tile_array=tile_array, figsize=figsize, upper_left_xy=upper_left_xy)
+    figure_control = RenderControlFigure(
+        tile=tile, tile_array=tile_array, figsize=figsize, upper_left_xy=upper_left_xy
+    )
     view_spec_2d = vs.view_spec_im()
-    fig_record = setup_figure(figure_control, axis_control, view_spec_2d, name=name, title=title, code_tag=f"{__file__}.display_image", equal=False)
+    fig_record = setup_figure(
+        figure_control,
+        axis_control,
+        view_spec_2d,
+        name=name,
+        title=title,
+        code_tag=f"{__file__}.display_image",
+        equal=False,
+    )
 
     # draw the image
     view = fig_record.view
@@ -138,18 +165,21 @@ def display_image(image: np.ndarray | str,
         view.show(block=block)
 
 
-def _setup_figure(figure_control:RenderControlFigure,
-                  axis_control:rca.RenderControlAxis = None,
-                  equal:bool=True,
-                  number_in_name:bool=True,  # Include figure index in the figure name.
-                  input_prefix:str=None,     # Prefix to include at beginning of figure name, before number is added.
-                  name:str=None,             # Figure handle and title of figure window.  If none, use title.
-                  title:str=None,            # Title of plot (before number is added, if applicable).
-                  caption:str=None,          # Caption providing concise descrption plot.  Optional details may be added via comments.
-                  comments:list[str]=None,   # List of strings including comments to associate with the figure.
-                  code_tag:str=None,         # String of form "code_file.function_name()" showing where to look in code for call that generated this figure.
-                  ) -> RenderControlFigureRecord:
-    """ Common figure setup for 2D and 3D data. """
+def _setup_figure(
+    figure_control: RenderControlFigure,
+    axis_control: rca.RenderControlAxis = None,
+    equal: bool = True,
+    number_in_name: bool = True,  # Include figure index in the figure name.
+    input_prefix: str = None,  # Prefix to include at beginning of figure name, before number is added.
+    name: str = None,  # Figure handle and title of figure window.  If none, use title.
+    title: str = None,  # Title of plot (before number is added, if applicable).
+    caption: str = None,  # Caption providing concise descrption plot.  Optional details may be added via comments.
+    comments: list[
+        str
+    ] = None,  # List of strings including comments to associate with the figure.
+    code_tag: str = None,  # String of form "code_file.function_name()" showing where to look in code for call that generated this figure.
+) -> RenderControlFigureRecord:
+    """Common figure setup for 2D and 3D data."""
     # defaults
     axis_control = axis_control if axis_control != None else rca.RenderControlAxis()
     comments = comments if comments != None else []
@@ -175,16 +205,18 @@ def _setup_figure(figure_control:RenderControlFigure,
 
     # Create figure.
     if figure_control.tile:
-        fig = tile_figure(name,
-                          tile_array=figure_control.tile_array, 
-                          tile_square=figure_control.tile_square)
+        fig = tile_figure(
+            name,
+            tile_array=figure_control.tile_array,
+            tile_square=figure_control.tile_square,
+        )
     else:
         fig = plt.figure(name, figsize=figure_control.figsize)
         if figure_control.upper_left_xy:
             upper_left_xy = figure_control.upper_left_xy
             x = upper_left_xy[0]
             y = upper_left_xy[1]
-            fig.canvas.manager.window.move(x,y)
+            fig.canvas.manager.window.move(x, y)
         # Copying this command, as from Randy, which suppresses duplicate axes in tile_figure(). ~ BGB
         plt.axis('off')
 
@@ -195,7 +227,9 @@ def _setup_figure(figure_control:RenderControlFigure,
         plt.grid()
 
     # Update figure collection variables.
-    fig_record = rcfr.RenderControlFigureRecord(name, title, caption, figure_num, fig, axis_control)
+    fig_record = rcfr.RenderControlFigureRecord(
+        name, title, caption, figure_num, fig, axis_control
+    )
     global fig_record_list
     fig_record_list.append(fig_record)
 
@@ -215,19 +249,20 @@ def _setup_figure(figure_control:RenderControlFigure,
     return fig_record
 
 
-def setup_figure(figure_control:RenderControlFigure,
-                 axis_control=None,
-                 view_spec=None,
-                 equal:bool=True,
-                 number_in_name:bool=True,
-                 input_prefix:str=None,
-                 name:str=None,
-                 title:str=None,
-                 caption:str=None,
-                 comments:list[str]=None,
-                 code_tag:str=None,
-                 ) -> RenderControlFigureRecord:
-    """ Create and setup a new RenderControlFigureRecord for rendering on a 2D graph.
+def setup_figure(
+    figure_control: RenderControlFigure,
+    axis_control=None,
+    view_spec=None,
+    equal: bool = True,
+    number_in_name: bool = True,
+    input_prefix: str = None,
+    name: str = None,
+    title: str = None,
+    caption: str = None,
+    comments: list[str] = None,
+    code_tag: str = None,
+) -> RenderControlFigureRecord:
+    """Create and setup a new RenderControlFigureRecord for rendering on a 2D graph.
 
     Example::
 
@@ -237,50 +272,68 @@ def setup_figure(figure_control:RenderControlFigure,
         figure_control = rcfg.RenderControlFigure()
         view_spec_2d = vs.view_spec_im()
         fig_record = fm.setup_figure(figure_control, axis_control, view_spec_2d, title=img_name, code_tag=f"{__file__}", equal=False)
-        fig_record.view.imshow(img)    
+        fig_record.view.imshow(img)
         fig_record.view.show(block=True)
 
     Arguments:
     ----------
         - view_spec (view_spec dict): Defines how to draw the plot (which axis is horizontal and vertical).  Defaults to view_spec_xy.
         - See setup_figure_for_3d_data() for a description of the other arguments.
-    
+
     See Also:
     ---------
-        A similar function for setting up figures for 3D rendering is `setup_figure_for_3d_data` """
+        A similar function for setting up figures for 3D rendering is `setup_figure_for_3d_data`
+    """
     # defaults
     view_spec = view_spec if view_spec != None else vs.view_spec_xy()
-    
+
     # Setup the figure.
-    fig_record = _setup_figure(figure_control, axis_control, equal, number_in_name, input_prefix,
-                               name, title, caption, comments, code_tag)
+    fig_record = _setup_figure(
+        figure_control,
+        axis_control,
+        equal,
+        number_in_name,
+        input_prefix,
+        name,
+        title,
+        caption,
+        comments,
+        code_tag,
+    )
     axis_control = fig_record.axis_control
 
     # Setup the axes.
     ax = plt.axes()
-    if (view_spec['type'] == 'xy'):
+    if view_spec['type'] == 'xy':
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.y_label)
-    elif (view_spec['type'] == 'xz'):
+    elif view_spec['type'] == 'xz':
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.z_label)
-    elif (view_spec['type'] == 'yz'):
+    elif view_spec['type'] == 'yz':
         ax.set_xlabel(axis_control.y_label)
         ax.set_ylabel(axis_control.z_label)
-    elif (view_spec['type'] == 'vplane'):
+    elif view_spec['type'] == 'vplane':
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif (view_spec['type'] == 'camera'):
+    elif view_spec['type'] == 'camera':
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif (view_spec['type'] == 'image'):
+    elif view_spec['type'] == 'image':
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
     else:
-        lt.error_and_raise(RuntimeError, "ERROR: In setup_figure_for_3d_data(), unrecognized view_spec['type'] = '" + str(view_spec['type']) + "' encountered.")
+        lt.error_and_raise(
+            RuntimeError,
+            "ERROR: In setup_figure_for_3d_data(), unrecognized view_spec['type'] = '"
+            + str(view_spec['type'])
+            + "' encountered.",
+        )
 
     # Create the view object.
-    view = v3d.View3d(fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record)
+    view = v3d.View3d(
+        fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record
+    )
     # Add view to log data.
     fig_record.axis = ax
     fig_record.view = view
@@ -289,19 +342,20 @@ def setup_figure(figure_control:RenderControlFigure,
     return fig_record
 
 
-def setup_figure_for_3d_data(figure_control:RenderControlFigure,
-                             axis_control=None,
-                             view_spec=None,
-                             equal:bool=True,
-                             number_in_name:bool=True,
-                             input_prefix:str=None,
-                             name:str=None,
-                             title:str=None,
-                             caption:str=None,
-                             comments:list[str]=None,
-                             code_tag:str=None,
-                    ) -> RenderControlFigureRecord:
-    """ Create and setup a new RenderControlFigureRecord for rendering on a 3D graph.
+def setup_figure_for_3d_data(
+    figure_control: RenderControlFigure,
+    axis_control=None,
+    view_spec=None,
+    equal: bool = True,
+    number_in_name: bool = True,
+    input_prefix: str = None,
+    name: str = None,
+    title: str = None,
+    caption: str = None,
+    comments: list[str] = None,
+    code_tag: str = None,
+) -> RenderControlFigureRecord:
+    """Create and setup a new RenderControlFigureRecord for rendering on a 3D graph.
 
     Arguments:
     ----------
@@ -316,53 +370,70 @@ def setup_figure_for_3d_data(figure_control:RenderControlFigure,
         - caption (str): Caption providing concise description plot.  Optional details may be added via comments.
         - comments (list[str]): List of strings including comments to associate with the figure.
         - code_tag (str): String of form "code_file.function_name()" showing where to look in code for call that generated this figure.
-    
+
     See Also:
     ---------
-        A similar function for setting up figures for 2D rendering is `setup_figure` """
+        A similar function for setting up figures for 2D rendering is `setup_figure`"""
     # defaults
     view_spec = view_spec if view_spec != None else vs.view_spec_3d()
 
     # Setup the figure.
-    fig_record = _setup_figure(figure_control, axis_control, equal, number_in_name, input_prefix,
-                               name, title, caption, comments, code_tag)
+    fig_record = _setup_figure(
+        figure_control,
+        axis_control,
+        equal,
+        number_in_name,
+        input_prefix,
+        name,
+        title,
+        caption,
+        comments,
+        code_tag,
+    )
     axis_control = fig_record.axis_control
-    
+
     # Setup the axes.
     if view_spec['type'] == '3d':
         ax = plt.axes(projection='3d')
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.y_label)
         ax.set_zlabel(axis_control.z_label)
-    elif (view_spec['type'] == 'xy'):
+    elif view_spec['type'] == 'xy':
         ax = plt.axes()
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.y_label)
-    elif (view_spec['type'] == 'xz'):
+    elif view_spec['type'] == 'xz':
         ax = plt.axes()
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.z_label)
-    elif (view_spec['type'] == 'yz'):
+    elif view_spec['type'] == 'yz':
         ax = plt.axes()
         ax.set_xlabel(axis_control.y_label)
         ax.set_ylabel(axis_control.z_label)
-    elif (view_spec['type'] == 'vplane'):
+    elif view_spec['type'] == 'vplane':
         ax = plt.axes()
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif (view_spec['type'] == 'camera'):
+    elif view_spec['type'] == 'camera':
         ax = plt.axes()
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif (view_spec['type'] == 'image'):
+    elif view_spec['type'] == 'image':
         ax = plt.axes()
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
     else:
-        lt.error_and_raise(RuntimeError, "ERROR: In setup_figure_for_3d_data(), unrecognized view_spec['type'] = '" + str(view_spec['type']) + "' encountered.")
-        
+        lt.error_and_raise(
+            RuntimeError,
+            "ERROR: In setup_figure_for_3d_data(), unrecognized view_spec['type'] = '"
+            + str(view_spec['type'])
+            + "' encountered.",
+        )
+
     # Create the view object.
-    view = v3d.View3d(fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record)
+    view = v3d.View3d(
+        fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record
+    )
     # Add view to log data.
     fig_record.axis = ax
     fig_record.view = view
@@ -372,23 +443,25 @@ def setup_figure_for_3d_data(figure_control:RenderControlFigure,
     return fig_record
 
 
-
-def display_plot(x: float, 
-                 # x_labels, 
-                 y: float,
-                 label=None,          # Legend label for this data series.
-                 name:str=None,           # Figure handle and title of figure window.
-                 title:str=None,          # Title of plot.
-                 figsize:tuple[float, float]=(6.4, 4.8),  # inch.
-                 tile:bool=True,           # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
-                 tile_array:tuple[float, float]=(3,2),    # (n_x, n_y)
-                 upper_left_xy:tuple[float, float]=None,  # pixel.  (0,0) --> Upper left corner of screen.
-                 legend:bool=True,         # Whether to draw a legend.
-                 color='k',
-                 linewidth:float=1,
-                 marker='.',
-                 markersize:float=2,
-                 ) -> plt.Figure:
+def display_plot(
+    x: float,
+    # x_labels,
+    y: float,
+    label=None,  # Legend label for this data series.
+    name: str = None,  # Figure handle and title of figure window.
+    title: str = None,  # Title of plot.
+    figsize: tuple[float, float] = (6.4, 4.8),  # inch.
+    tile: bool = True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
+    tile_array: tuple[float, float] = (3, 2),  # (n_x, n_y)
+    upper_left_xy: tuple[
+        float, float
+    ] = None,  # pixel.  (0,0) --> Upper left corner of screen.
+    legend: bool = True,  # Whether to draw a legend.
+    color='k',
+    linewidth: float = 1,
+    marker='.',
+    markersize: float = 2,
+) -> plt.Figure:
     if tile:
         fig = tile_figure(name, tile_array=tile_array)
     else:
@@ -396,28 +469,32 @@ def display_plot(x: float,
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
-            fig.canvas.manager.window.move(x,y)
+            fig.canvas.manager.window.move(x, y)
     if title and len(title) != 0:
         plt.title(title)
-    line, = plt.plot(x, y, color=color, linewidth=linewidth, marker=marker, markersize=markersize)
+    (line,) = plt.plot(
+        x, y, color=color, linewidth=linewidth, marker=marker, markersize=markersize
+    )
     if label:
         line.set_label(label)
     # # Rotate x-axis tick marks.
     # plt.xticks(rotation=90, ha='right')
     # plt.xticks(x, x_labels)
-    if show_figures: plt.show(block=False)
+    if show_figures:
+        plt.show(block=False)
     return fig
 
 
-def display_bar(x_labels, 
-                y_values,
-                name:str=None,           # Figure handle and title of figure window.
-                title:str=None,          # Title of plot.
-                figsize:tuple[float, float]=(6.4, 4.8),  # inch.
-                tile:bool=True,           # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
-                tile_array:tuple[int, int]=(3,2),    # (n_x, n_y)
-                upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
-                ) -> plt.Figure:
+def display_bar(
+    x_labels,
+    y_values,
+    name: str = None,  # Figure handle and title of figure window.
+    title: str = None,  # Title of plot.
+    figsize: tuple[float, float] = (6.4, 4.8),  # inch.
+    tile: bool = True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
+    tile_array: tuple[int, int] = (3, 2),  # (n_x, n_y)
+    upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
+) -> plt.Figure:
     if tile:
         fig = tile_figure(name, tile_array=tile_array)
     else:
@@ -425,14 +502,15 @@ def display_bar(x_labels,
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
-            fig.canvas.manager.window.move(x,y)
+            fig.canvas.manager.window.move(x, y)
     if title and len(title) != 0:
         plt.title(title)
     # See "Bar Charts in Matplotlib," by Ben Klein.  https://benalexkeen.com/bar-charts-in-matplotlib/
     x_pos = [i for i, _ in enumerate(x_labels)]
     plt.bar(x_pos, y_values)
     plt.xticks(x_pos, x_labels)
-    if show_figures: plt.show(block=False)
+    if show_figures:
+        plt.show(block=False)
     return fig
 
 
@@ -443,8 +521,10 @@ def print_figure_summary() -> None:
         fig_record.print_comments()
 
 
-def save_all_figures(output_path:str, format: str=None, timeout: float=None, raise_on_timeout=False):
-    """ Saves all figures opened with setup_figure (since reset_figure_management) to the given directory.
+def save_all_figures(
+    output_path: str, format: str = None, timeout: float = None, raise_on_timeout=False
+):
+    """Saves all figures opened with setup_figure (since reset_figure_management) to the given directory.
 
     The purpose for timeout is to let the program fail gracefully
     during the rare instances when matplotlib's save routine goes
@@ -474,21 +554,26 @@ def save_all_figures(output_path:str, format: str=None, timeout: float=None, rai
     figs: list[str] = []
     txts: list[str] = []
     failed: list[RenderControlFigureRecord] = []
-    
+
     if timeout == None:
         for fig_record in fig_record_list:
             t1, t2 = fig_record.save(output_path, format=format)
             figs.append(t1)
             txts.append(t2)
-    
+
         return figs, txts
     else:
         # Save each figure with a timeout on how long to wait for the figure to be saved.
         from threading import Thread
+
         for fig_record in fig_record_list:
             # start the save
             results = []
-            t = Thread(target=lambda: results.append( fig_record.save(output_path, format=format) ))
+            t = Thread(
+                target=lambda: results.append(
+                    fig_record.save(output_path, format=format)
+                )
+            )
             t.start()
 
             # wait for the save to finish
@@ -502,7 +587,7 @@ def save_all_figures(output_path:str, format: str=None, timeout: float=None, rai
                 figs.append(t1)
                 txts.append(t2)
                 break
-            
+
             # the figure failed to save before the timeout
             err_msg = f"Error: figure_management.save_all_figures: failed to save figure {fig_record.figure_num} \"{fig_record.name}\""
             if raise_on_timeout:
@@ -510,9 +595,9 @@ def save_all_figures(output_path:str, format: str=None, timeout: float=None, rai
             else:
                 lt.error(err_msg)
             failed.append(fig_record)
-    
-        return figs, txts, failed
-    
 
-def formatted_fig_display(block:bool=False) -> None:
+        return figs, txts, failed
+
+
+def formatted_fig_display(block: bool = False) -> None:
     plt.show(block=block)

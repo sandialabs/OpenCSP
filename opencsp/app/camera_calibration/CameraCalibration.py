@@ -4,21 +4,21 @@ machine vision camera.
 """
 import os
 import tkinter
-from   tkinter.filedialog import askopenfilename, asksaveasfilename
-from   warnings import warn
+from tkinter.filedialog import askopenfilename, asksaveasfilename
+from warnings import warn
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 import opencsp.app.camera_calibration.lib.calibration_camera as cc
 import opencsp.app.camera_calibration.lib.image_processing as ip
-from   opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
+from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
 import opencsp.common.lib.deflectometry.spatial_processing as sp
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class CalibrationGUI:
@@ -73,8 +73,15 @@ class CalibrationGUI:
 
         # Name of camera input
         self.var_cam_name = tkinter.StringVar(value='Camera')
-        lbl_cam_name = tkinter.Label(self.root, text='Camera Name:', font=('calibre', 10, 'bold'))
-        entry_cam_name = tkinter.Entry(self.root, textvariable=self.var_cam_name, font=('calibre', 10, 'normal'), width=40)
+        lbl_cam_name = tkinter.Label(
+            self.root, text='Camera Name:', font=('calibre', 10, 'bold')
+        )
+        entry_cam_name = tkinter.Entry(
+            self.root,
+            textvariable=self.var_cam_name,
+            font=('calibre', 10, 'normal'),
+            width=40,
+        )
 
         lbl_cam_name.grid(row=r, column=0, pady=2, padx=2, sticky='nsw')
         entry_cam_name.grid(row=r, column=1, pady=2, padx=2, sticky='nsw')
@@ -83,10 +90,24 @@ class CalibrationGUI:
         # Number of points input
         self.var_pts_x = tkinter.IntVar(value=18)
         self.var_pts_y = tkinter.IntVar(value=23)
-        lbl_pts_x = tkinter.Label(self.root, text='Number of grid x points:', font=('calibre', 10, 'bold'))
-        lbl_pts_y = tkinter.Label(self.root, text='Number of grid y points:', font=('calibre', 10, 'bold'))
-        entry_pts_x = tkinter.Entry(self.root, textvariable=self.var_pts_x, font=('calibre', 10, 'normal'), width=10)
-        entry_pts_y = tkinter.Entry(self.root, textvariable=self.var_pts_y, font=('calibre', 10, 'normal'), width=10)
+        lbl_pts_x = tkinter.Label(
+            self.root, text='Number of grid x points:', font=('calibre', 10, 'bold')
+        )
+        lbl_pts_y = tkinter.Label(
+            self.root, text='Number of grid y points:', font=('calibre', 10, 'bold')
+        )
+        entry_pts_x = tkinter.Entry(
+            self.root,
+            textvariable=self.var_pts_x,
+            font=('calibre', 10, 'normal'),
+            width=10,
+        )
+        entry_pts_y = tkinter.Entry(
+            self.root,
+            textvariable=self.var_pts_y,
+            font=('calibre', 10, 'normal'),
+            width=10,
+        )
 
         lbl_pts_x.grid(row=r, column=0, pady=2, padx=2, sticky='nsw')
         entry_pts_x.grid(row=r, column=1, pady=2, padx=2, sticky='nsw')
@@ -96,37 +117,51 @@ class CalibrationGUI:
         r += 1
 
         # Select images button
-        self.btn_select_ims = tkinter.Button(self.root, text='Select Images', command=self.select_images)
+        self.btn_select_ims = tkinter.Button(
+            self.root, text='Select Images', command=self.select_images
+        )
         self.btn_select_ims.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Find corners button
-        self.btn_find_corns = tkinter.Button(self.root, text='Find Corners', command=self.find_corners)
+        self.btn_find_corns = tkinter.Button(
+            self.root, text='Find Corners', command=self.find_corners
+        )
         self.btn_find_corns.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # View annotated images button
-        self.btn_view_corns = tkinter.Button(self.root, text='View Found Corners', command=self.view_found_corners)
+        self.btn_view_corns = tkinter.Button(
+            self.root, text='View Found Corners', command=self.view_found_corners
+        )
         self.btn_view_corns.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Calibrate button
-        self.btn_calibrate = tkinter.Button(self.root, text='Calibrate Camera', command=self.calibrate_camera)
+        self.btn_calibrate = tkinter.Button(
+            self.root, text='Calibrate Camera', command=self.calibrate_camera
+        )
         self.btn_calibrate.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Show reprojection error button
-        self.btn_vis_reproj_error = tkinter.Button(self.root, text='Show reprojection error', command=self.show_reproj_error)
+        self.btn_vis_reproj_error = tkinter.Button(
+            self.root, text='Show reprojection error', command=self.show_reproj_error
+        )
         self.btn_vis_reproj_error.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Visualize distortion
-        self.btn_vis_dist = tkinter.Button(self.root, text='Visualize distortion', command=self.visualize_dist)
+        self.btn_vis_dist = tkinter.Button(
+            self.root, text='Visualize distortion', command=self.visualize_dist
+        )
         self.btn_vis_dist.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Save camera button
-        self.btn_save = tkinter.Button(self.root, text='Save Camera', command=self.save_camera)
+        self.btn_save = tkinter.Button(
+            self.root, text='Save Camera', command=self.save_camera
+        )
         self.btn_save.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
@@ -136,9 +171,20 @@ class CalibrationGUI:
         r += 1
 
         # Reprojection error labels
-        lbl = tkinter.Label(text='Reprojection Error', borderwidth=1, relief='solid', font=('calibre', 10, 'bold'))
+        lbl = tkinter.Label(
+            text='Reprojection Error',
+            borderwidth=1,
+            relief='solid',
+            font=('calibre', 10, 'bold'),
+        )
         lbl.grid(row=r, column=0, sticky='nsew', pady=(20, 0))
-        lbl = tkinter.Label(text='Image Name', width=40, borderwidth=1, relief='solid', font=('calibre', 10, 'bold'))
+        lbl = tkinter.Label(
+            text='Image Name',
+            width=40,
+            borderwidth=1,
+            relief='solid',
+            font=('calibre', 10, 'bold'),
+        )
         lbl.grid(row=r, column=1, sticky='nsw', pady=(20, 0))
         r += 1
 
@@ -151,8 +197,19 @@ class CalibrationGUI:
             self.var_reproj_val.append(var_val)
             self.var_reproj_name.append(var_name)
 
-            lbl_val = tkinter.Label(textvariable=var_val, borderwidth=1, relief="solid", font=('calibre', 10, 'normal'))
-            lbl_name = tkinter.Label(textvariable=var_name, borderwidth=1, width=40, relief="solid", font=('calibre', 10, 'normal'))
+            lbl_val = tkinter.Label(
+                textvariable=var_val,
+                borderwidth=1,
+                relief="solid",
+                font=('calibre', 10, 'normal'),
+            )
+            lbl_name = tkinter.Label(
+                textvariable=var_name,
+                borderwidth=1,
+                width=40,
+                relief="solid",
+                font=('calibre', 10, 'normal'),
+            )
 
             lbl_val.grid(row=r, column=0, sticky='nsew')
             lbl_name.grid(row=r, column=1, sticky='nsw')
@@ -187,7 +244,9 @@ class CalibrationGUI:
             ('TIF files', ('*.tif', '*.tiff')),
             ('GIF files', '*.gif'),
         ]
-        files = askopenfilename(filetypes=filetypes, title="Select image files", multiple=True)
+        files = askopenfilename(
+            filetypes=filetypes, title="Select image files", multiple=True
+        )
 
         if len(files) != '':
             # Save files
@@ -291,16 +350,25 @@ class CalibrationGUI:
         cam_name = self.var_cam_name.get()
 
         # Calibrate camera
-        self.camera, self.r_cam_object, self.v_cam_object_cam, self.avg_reproj_error = cc.calibrate_camera(self.p_object, self.p_image, self.img_size_xy, cam_name)
+        (
+            self.camera,
+            self.r_cam_object,
+            self.v_cam_object_cam,
+            self.avg_reproj_error,
+        ) = cc.calibrate_camera(self.p_object, self.p_image, self.img_size_xy, cam_name)
 
         # Calculate reprojection error for each image
         self.reproj_errors = []
-        for R_cam, V_cam, P_object, P_image in zip(self.r_cam_object, self.v_cam_object_cam, self.p_object, self.p_image):
-            error = sp.reprojection_error(self.camera, P_object, P_image, R_cam, V_cam)  # RMS pixels
+        for R_cam, V_cam, P_object, P_image in zip(
+            self.r_cam_object, self.v_cam_object_cam, self.p_object, self.p_image
+        ):
+            error = sp.reprojection_error(
+                self.camera, P_object, P_image, R_cam, V_cam
+            )  # RMS pixels
             self.reproj_errors.append(error)  # RMS pixels
 
         # Find five images with highest reprojection errors
-        idxs = np.flip(np.argsort(self.reproj_errors))[:len(self.var_reproj_name)]
+        idxs = np.flip(np.argsort(self.reproj_errors))[: len(self.var_reproj_name)]
         for idx, name, val in zip(idxs, self.var_reproj_name, self.var_reproj_val):
             name.set(self.used_file_names[idx])
             val.set(f'{self.reproj_errors[idx]:.2f}')
@@ -332,7 +400,9 @@ class CalibrationGUI:
         plt.show(block=False)
 
     def save_camera(self):
-        file = asksaveasfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
+        file = asksaveasfilename(
+            defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")]
+        )
 
         if file != '':
             self.camera.save_to_hdf(file)
@@ -391,7 +461,9 @@ class CalibrationGUI:
 
             self.lbl_num_files.config(text=f'{len(self.files):d} files')
             self.lbl_corns_found.config(text='All corners found')
-            self.lbl_cam_calibrated.config(text=f'Average reprojection error: {self.avg_reproj_error:.2f} pixels')
+            self.lbl_cam_calibrated.config(
+                text=f'Average reprojection error: {self.avg_reproj_error:.2f} pixels'
+            )
 
     def clear_reproj_errors(self):
         for name, val in zip(self.var_reproj_name, self.var_reproj_val):

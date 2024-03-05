@@ -5,25 +5,34 @@
 3. Saves Display object
 
 """
-from   datetime import datetime as dt
-from   glob import glob
+from datetime import datetime as dt
+from glob import glob
 import os
-from   os.path import join
+from os.path import join
 
 import numpy as np
-from   numpy import ndarray
+from numpy import ndarray
 
-from   opencsp.common.lib.deflectometry.CalibrationCameraPosition import CalibrationCameraPosition
-from   opencsp.app.sofast.calibration.lib.CalibrationScreenShape import CalibrationScreenShape, DataInput
-from   opencsp.app.sofast.calibration.lib.save_physical_setup_file import save_physical_setup_file
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
+from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
+    CalibrationCameraPosition,
+)
+from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
+    CalibrationScreenShape,
+    DataInput,
+)
+from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
+    save_physical_setup_file,
+)
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
 
 
-def run_screen_shape_cal(pts_marker_data: ndarray, dir_input: str, verbose: int) -> CalibrationScreenShape:
+def run_screen_shape_cal(
+    pts_marker_data: ndarray, dir_input: str, verbose: int
+) -> CalibrationScreenShape:
     """Runs screen shape calibration
 
     Parameters:
@@ -36,12 +45,16 @@ def run_screen_shape_cal(pts_marker_data: ndarray, dir_input: str, verbose: int)
     file_screen_cal_point_pairs = join(dir_input, 'screen_calibration_point_pairs.csv')
     file_camera_distortion = join(dir_input, 'camera_screen_shape.h5')
     file_image_projection = join(dir_input, 'image_projection.h5')
-    files_screen_shape_measurement = glob(join(dir_input, 'screen_shape_sofast_measurements/pose_*.h5'))
+    files_screen_shape_measurement = glob(
+        join(dir_input, 'screen_shape_sofast_measurements/pose_*.h5')
+    )
 
     # Load input data
     pts_xyz_marker = Vxyz(pts_marker_data[:, 2:].T)
     corner_ids = pts_marker_data[:, 1]
-    screen_cal_point_pairs = np.loadtxt(file_screen_cal_point_pairs, delimiter=',', skiprows=1).astype(int)
+    screen_cal_point_pairs = np.loadtxt(
+        file_screen_cal_point_pairs, delimiter=',', skiprows=1
+    ).astype(int)
     camera = Camera.load_from_hdf(file_camera_distortion)
     image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
 
@@ -54,7 +67,7 @@ def run_screen_shape_cal(pts_marker_data: ndarray, dir_input: str, verbose: int)
         camera,
         image_projection_data,
         [Measurement.load_from_hdf(f) for f in files_screen_shape_measurement],
-        False
+        False,
     )
 
     # Perform screen position calibration
@@ -64,7 +77,9 @@ def run_screen_shape_cal(pts_marker_data: ndarray, dir_input: str, verbose: int)
     return cal
 
 
-def run_camera_position_cal(pts_marker_data: ndarray, dir_input: str, verbose: int) -> CalibrationCameraPosition:
+def run_camera_position_cal(
+    pts_marker_data: ndarray, dir_input: str, verbose: int
+) -> CalibrationCameraPosition:
     """Calibrates the position of the camera"""
     # Define inputs
     file_camera_sofast = join(dir_input, 'camera_sofast.h5')
@@ -87,16 +102,23 @@ if __name__ == '__main__':
     base_dir = os.path.dirname(__file__)
 
     # Define input file directories (high-res sample data)
-    base_dir_sofast = join(base_dir, '../../../sample_data/sofast/data_manual_calibration/data_measurement')
+    base_dir_sofast = join(
+        base_dir, '../../../sample_data/sofast/data_manual_calibration/data_measurement'
+    )
 
-    save_dir = join(base_dir, f'../../../sample_data/sofast/data_manual_calibration/{dt.now().strftime(r"%Y_%m_%d-%H.%M.%S"):s}_data')
+    save_dir = join(
+        base_dir,
+        f'../../../sample_data/sofast/data_manual_calibration/{dt.now().strftime(r"%Y_%m_%d-%H.%M.%S"):s}_data',
+    )
     if not os.path.exists(save_dir):
         os.mkdir(save_dir)
 
     VERBOSITY = 2  # 0=no output, 1=only print outputs, 2=print outputs and show plots, 3=plots only with no printing
 
     # Load manually measured point data
-    pts_data = np.loadtxt(join(base_dir_sofast, 'point_locations.csv'), delimiter=',', skiprows=1)
+    pts_data = np.loadtxt(
+        join(base_dir_sofast, 'point_locations.csv'), delimiter=',', skiprows=1
+    )
 
     # Run screen shape calibration
     cal_screen_shape = run_screen_shape_cal(pts_data, base_dir_sofast, VERBOSITY)

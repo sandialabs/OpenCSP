@@ -1,7 +1,7 @@
 import numpy as np
 
-from   opencsp.common.lib.geometry.Pxy import Pxy
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Pxy import Pxy
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class TestPxy:
