@@ -5,13 +5,23 @@ from typing import Iterator
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor as asaip
+
 # from opencsp.common.lib.cv.spot_analysis.image_processor import * # I suggest importing these dynamically as needed, to reduce startup time
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType, SpotAnalysisImagesStream
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import (
+    ImageType,
+    SpotAnalysisImagesStream,
+)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
+    SpotAnalysisOperable,
+)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import (
+    SpotAnalysisOperablesStream,
+)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import (
+    SpotAnalysisOperableAttributeParser,
+)
 import opencsp.common.lib.render.VideoHandler as vh
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
@@ -19,7 +29,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
-    """ Spot Analysis class for characterizing beams of light.
+    """Spot Analysis class for characterizing beams of light.
 
     This is meant to be a general beam characterization tool that receives as
     input an image (or video) of a single beam, and generates annotations and
@@ -117,11 +127,13 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             new output. Defaults to False.
     """
 
-    def __init__(self,
-                 name: str,
-                 image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor],
-                 save_dir: str = None,
-                 save_overwrite=False):
+    def __init__(
+        self,
+        name: str,
+        image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor],
+        save_dir: str = None,
+        save_overwrite=False,
+    ):
         self.name = name
         """ The name of this instance. For example, this could be one of the use
         cases listed above. """
@@ -159,8 +171,9 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         self.set_image_processors(image_processors)
 
-    def set_image_processors(self,
-                             image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor]):
+    def set_image_processors(
+        self, image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor]
+    ):
         self.image_processors = image_processors
 
         # chain the image processors together
@@ -170,8 +183,13 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             image_processor.assign_inputs(self.image_processors[i - 1])
 
         # limit the amount of memory that image processors utilize
-        from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessorLeger import image_processors_persistant_memory_total
-        mem_per_image_processor = image_processors_persistant_memory_total / len(self.image_processors)
+        from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessorLeger import (
+            image_processors_persistant_memory_total,
+        )
+
+        mem_per_image_processor = image_processors_persistant_memory_total / len(
+            self.image_processors
+        )
         for image_processor in self.image_processors:
             image_processor._allowed_memory_footprint = mem_per_image_processor
 
@@ -180,7 +198,9 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             self._assign_inputs(self.input_stream)
 
     @staticmethod
-    def _images2stream(images: list[str] | list[np.ndarray] | vh.VideoHandler | ImagesStream) -> ImagesStream | ImagesIterable:
+    def _images2stream(
+        images: list[str] | list[np.ndarray] | vh.VideoHandler | ImagesStream,
+    ) -> ImagesStream | ImagesIterable:
         if isinstance(images, ImagesStream):
             return images
         else:
@@ -193,35 +213,46 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         self._prev_result = None
         self.image_processors[0].assign_inputs(self.input_stream)
 
-    def set_primary_images(self, images: list[str] | list[np.ndarray] | vh.VideoHandler | ImagesStream):
-        """ Assigns the images of the spot to be analyzed, in preparation for process_next().
+    def set_primary_images(
+        self, images: list[str] | list[np.ndarray] | vh.VideoHandler | ImagesStream
+    ):
+        """Assigns the images of the spot to be analyzed, in preparation for process_next().
 
-        See also: set_input_operables() """
+        See also: set_input_operables()"""
         primary_images = self._images2stream(images)
         images_stream = SpotAnalysisImagesStream(primary_images, {})
         self._assign_inputs(SpotAnalysisOperablesStream(images_stream))
 
-    def set_input_operables(self, input_operables: SpotAnalysisOperablesStream | list[SpotAnalysisOperable] | Iterator[SpotAnalysisOperable]):
-        """ Assigns primary and supporting images, and other necessary data, in preparation for process_next().
+    def set_input_operables(
+        self,
+        input_operables: SpotAnalysisOperablesStream
+        | list[SpotAnalysisOperable]
+        | Iterator[SpotAnalysisOperable],
+    ):
+        """Assigns primary and supporting images, and other necessary data, in preparation for process_next().
 
-        See also: set_primary_images() """
+        See also: set_primary_images()"""
         self._assign_inputs(input_operables)
 
-    def set_default_support_images(self, support_images: dict[ImageType, CacheableImage]):
-        """ Provides extra support images for use during image processing, as a
+    def set_default_support_images(
+        self, support_images: dict[ImageType, CacheableImage]
+    ):
+        """Provides extra support images for use during image processing, as a
         default for when the support images are not otherwise from the input
         operables. Note that this does not include the primary images or other
-        data. """
+        data."""
         self.input_stream.set_defaults(support_images, self.input_stream.default_data)
 
     def set_default_data(self, operable: SpotAnalysisOperable):
-        """ Provides extra data for use during image processing, as a default
+        """Provides extra data for use during image processing, as a default
         for when the data is not otherwise from the input operables. Note that
-        this does not include the primary or supporting images. """
-        self.input_stream.set_defaults(self.input_stream.default_support_images, operable)
+        this does not include the primary or supporting images."""
+        self.input_stream.set_defaults(
+            self.input_stream.default_support_images, operable
+        )
 
     def process_next(self):
-        """ Attempts to get the next processed image and results data from the
+        """Attempts to get the next processed image and results data from the
         image processors pipeline.
 
         Returns
@@ -235,7 +266,9 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         # Release memory from the previous result
         if self._prev_result != None:
-            self.image_processors[-1].cache_image_to_disk_as_necessary(self._prev_result)
+            self.image_processors[-1].cache_image_to_disk_as_necessary(
+                self._prev_result
+            )
             self._prev_result = None
 
         # Attempt to get the next image. Raises StopIteration if there are no
@@ -248,13 +281,19 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         self._prev_result = result
         return result
 
-    def _save_image(self, save_path_name_ext: str, image: CacheableImage, description: str):
+    def _save_image(
+        self, save_path_name_ext: str, image: CacheableImage, description: str
+    ):
         # check for overwrite
         if ft.file_exists(save_path_name_ext):
             if self.save_overwrite:
-                lt.debug(f"In SpotAnalaysis._save_image(): saving over existing {description} file {save_path_name_ext}")
+                lt.debug(
+                    f"In SpotAnalaysis._save_image(): saving over existing {description} file {save_path_name_ext}"
+                )
             else:
-                lt.info(f"In SpotAnalaysis._save_image(): not saving over existing {description} file {save_path_name_ext}")
+                lt.info(
+                    f"In SpotAnalaysis._save_image(): not saving over existing {description} file {save_path_name_ext}"
+                )
                 return False
 
         # save the image
@@ -266,13 +305,15 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         return True
 
-    def save_image(self,
-                   operable: SpotAnalysisOperable,
-                   save_dir: str = None,
-                   save_ext: str = "png",
-                   also_save_supporting_images=True,
-                   also_save_attributes_file=True):
-        """ Saves the primary image from the given operable.
+    def save_image(
+        self,
+        operable: SpotAnalysisOperable,
+        save_dir: str = None,
+        save_ext: str = "png",
+        also_save_supporting_images=True,
+        also_save_attributes_file=True,
+    ):
+        """Saves the primary image from the given operable.
 
         Parameters
         ----------
@@ -306,7 +347,9 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             # Get the original file name
             orig_image_path_name = ""
             if operable.primary_image.source_path != None:
-                _, orig_image_path_name, _ = ft.path_components(operable.primary_image.source_path)
+                _, orig_image_path_name, _ = ft.path_components(
+                    operable.primary_image.source_path
+                )
                 orig_image_path_name += "_"
 
             # Get the output name of the file to save to
@@ -319,7 +362,9 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             image_path_name_ext = os.path.join(save_dir, f"{image_name}.{save_ext}")
 
             # Try to save the image
-            if not self._save_image(image_path_name_ext, operable.primary_image, "primary image"):
+            if not self._save_image(
+                image_path_name_ext, operable.primary_image, "primary image"
+            ):
                 return
 
             # Save supporting images
@@ -331,10 +376,16 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
                     if supporting_image == None:
                         continue
                     supporting_image_name = ImageType(image_type).name
-                    supporting_image_path_name_ext = os.path.join(save_dir, f"{image_name}_{supporting_image_name}.{save_ext}")
+                    supporting_image_path_name_ext = os.path.join(
+                        save_dir, f"{image_name}_{supporting_image_name}.{save_ext}"
+                    )
 
                     # save the image
-                    self._save_image(supporting_image_path_name_ext, supporting_image, f"{supporting_image_name} supporting image")
+                    self._save_image(
+                        supporting_image_path_name_ext,
+                        supporting_image,
+                        f"{supporting_image_name} supporting image",
+                    )
 
             # Save associated attributes
             if also_save_attributes_file:
@@ -359,22 +410,30 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 if __name__ == "__main__":
     # TODO write at least three input examples (eg laser, bcs, something else) to make sure this architecture isn't limited
     from opencsp.common.lib.cv.spot_analysis.image_processor import *
+
     lt.logger()
 
     collaborative = collaborative_dir()
     # indir = collaborative + "/Experiments/2023-05-12_SpringEquinoxMidSummerSolstice/2_Data/BCS_data/Measure_01/20230512_071442 5W01_off/Raw Images"
-    indir = collaborative + "/Experiments/2023-05-12_SpringEquinoxMidSummerSolstice/2_Data/BCS_data/Measure_01/20230512_071638 5W01_000_880_2890/Raw Images"
+    indir = (
+        collaborative
+        + "/Experiments/2023-05-12_SpringEquinoxMidSummerSolstice/2_Data/BCS_data/Measure_01/20230512_071638 5W01_000_880_2890/Raw Images"
+    )
     outdir = tmp_dir()
 
     image_processors = [
         PopulationStatisticsImageProcessor(min_pop_size=-1),
         EchoImageProcessor(),
         LogScaleImageProcessor(),
-        FalseColorImageProcessor()
+        FalseColorImageProcessor(),
     ]
-    sa = SpotAnalysis("BCS Test", image_processors, save_dir=outdir, save_overwrite=True)
+    sa = SpotAnalysis(
+        "BCS Test", image_processors, save_dir=outdir, save_overwrite=True
+    )
     image_name_exts = ft.files_in_directory(indir)
-    image_path_name_exts = [os.path.join(indir, image_name_ext) for image_name_ext in image_name_exts]
+    image_path_name_exts = [
+        os.path.join(indir, image_name_ext) for image_name_ext in image_name_exts
+    ]
     sa.set_primary_images(image_path_name_exts)
 
     # Iterating through the returned results causes the images to be processed
@@ -384,7 +443,9 @@ if __name__ == "__main__":
         # save out the images and associated attributes
         save_path = sa.save_image(result)
         if save_path is None:
-            lt.warn(f"Failed to save image. Maybe SpotAnalaysis.save_overwrite is False? ({sa.save_overwrite=})")
+            lt.warn(
+                f"Failed to save image. Maybe SpotAnalaysis.save_overwrite is False? ({sa.save_overwrite=})"
+            )
         else:
             lt.info(f"Saved image to {save_path}")
 

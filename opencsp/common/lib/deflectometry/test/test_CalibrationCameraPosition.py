@@ -1,15 +1,17 @@
 """Tests the calculation of the Sofast camera position from known points
 """
 import os
-from   os.path import join
+from os.path import join
 import unittest
 
 import numpy as np
 
-from   opencsp.common.lib.deflectometry.CalibrationCameraPosition import CalibrationCameraPosition
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
+from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
+    CalibrationCameraPosition,
+)
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
 
 
 class TestCalibrationCameraPosition(unittest.TestCase):
@@ -52,20 +54,26 @@ class TestCalibrationCameraPosition(unittest.TestCase):
 
         # Load input data
         camera = Camera.load_from_hdf(file_camera_sofast)
-        pts_marker_data = np.loadtxt(file_point_locations, delimiter=',', dtype=float, skiprows=1)
+        pts_marker_data = np.loadtxt(
+            file_point_locations, delimiter=',', dtype=float, skiprows=1
+        )
         pts_xyz_marker = Vxyz(pts_marker_data[:, 2:].T)
         corner_ids = pts_marker_data[:, 1]
         image = load_image_grayscale(file_cal_image)
 
         # Perform camera position calibraiton
-        cal_camera_position = CalibrationCameraPosition(camera, pts_xyz_marker, corner_ids, image)
+        cal_camera_position = CalibrationCameraPosition(
+            camera, pts_xyz_marker, corner_ids, image
+        )
         cal_camera_position.run_calibration(verbose)
 
         # Get calculated vectors
         rvec, tvec = cal_camera_position.get_data()
 
         # Test data
-        cls.data_exp = np.loadtxt(join(dir_output, 'camera_rvec_tvec.csv'), delimiter=',')
+        cls.data_exp = np.loadtxt(
+            join(dir_output, 'camera_rvec_tvec.csv'), delimiter=','
+        )
         cls.data_meas = np.vstack((rvec, tvec))
 
     def test_camera_rvec_tvec(self):

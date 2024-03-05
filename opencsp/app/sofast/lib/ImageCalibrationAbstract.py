@@ -1,9 +1,9 @@
-from   abc import abstractmethod, ABC
-from   warnings import warn
+from abc import abstractmethod, ABC
+from warnings import warn
 
-from   numpy import ndarray
+from numpy import ndarray
 import numpy as np
-from   scipy import interpolate
+from scipy import interpolate
 
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
@@ -53,14 +53,21 @@ class ImageCalibrationAbstract(ABC):
         display_values_clip = np.delete(self.display_values, idxs)
 
         # Create interpolation function
-        self.response_function = interpolate.interp1d(camera_values_clip, display_values_clip, bounds_error=False, fill_value=(display_min, display_max))
+        self.response_function = interpolate.interp1d(
+            camera_values_clip,
+            display_values_clip,
+            bounds_error=False,
+            fill_value=(display_min, display_max),
+        )
 
     @classmethod
-    def from_data(cls,
-                  images_cal: ndarray,
-                  display_values: ndarray,
-                  mask: ndarray | None = None,
-                  num_samps: int = 1000) -> 'ImageCalibrationAbstract':
+    def from_data(
+        cls,
+        images_cal: ndarray,
+        display_values: ndarray,
+        mask: ndarray | None = None,
+        num_samps: int = 1000,
+    ) -> 'ImageCalibrationAbstract':
         """
         Calculates camera values from calibration images. Returns
         ImageCalibration object.
@@ -97,7 +104,10 @@ class ImageCalibrationAbstract(ABC):
         idx_0 = idx_1 - num_samps
         if idx_0 < 0:
             idx_0 = 0
-            warn(f'Number of samples smaller than n_samps. Using {idx_1:d} samples instead.', stacklevel=2)
+            warn(
+                f'Number of samples smaller than n_samps. Using {idx_1:d} samples instead.',
+                stacklevel=2,
+            )
 
         # Get brightness values corresponding to indices
         vals_sort = np.sort(im_1.flatten())
@@ -115,7 +125,9 @@ class ImageCalibrationAbstract(ABC):
 
         return cls(camera_values.astype(float), display_values.astype(float))
 
-    def calculate_min_display_camera_values(self, derivative_thresh: float = 0.4) -> tuple[float, float]:
+    def calculate_min_display_camera_values(
+        self, derivative_thresh: float = 0.4
+    ) -> tuple[float, float]:
         """
         Calculates the minimum display and camera brightness values to be used
         in a valid calibration. Values lower than these values are too close to
@@ -134,8 +146,12 @@ class ImageCalibrationAbstract(ABC):
 
         """
         # Calculate normalized differential
-        camera_values_norm = self.camera_values.astype(float) / self.camera_values.astype(float).max()
-        display_values_norm = self.display_values.astype(float) / self.display_values.astype(float).max()
+        camera_values_norm = (
+            self.camera_values.astype(float) / self.camera_values.astype(float).max()
+        )
+        display_values_norm = (
+            self.display_values.astype(float) / self.display_values.astype(float).max()
+        )
         dy_dx = np.diff(camera_values_norm) / np.diff(display_values_norm)
 
         # Calculate data points that are below threshold
@@ -162,9 +178,7 @@ class ImageCalibrationAbstract(ABC):
 
         """
         # Check calibration type
-        datasets = [
-            'Calibration/calibration_type',
-        ]
+        datasets = ['Calibration/calibration_type']
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         calibration_name = cls.get_calibration_name()
 
@@ -172,10 +186,7 @@ class ImageCalibrationAbstract(ABC):
             raise ValueError(f'Calibration file is not of type {calibration_name:s}')
 
         # Load grid data
-        datasets = [
-            'Calibration/camera_values',
-            'Calibration/display_values',
-        ]
+        datasets = ['Calibration/camera_values', 'Calibration/display_values']
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
 
         return cls(**kwargs)
@@ -193,13 +204,9 @@ class ImageCalibrationAbstract(ABC):
         datasets = [
             'Calibration/camera_values',
             'Calibration/display_values',
-            'Calibration/calibration_type'
+            'Calibration/calibration_type',
         ]
-        data = [
-            self.camera_values,
-            self.display_values,
-            self.get_calibration_name(),
-        ]
+        data = [self.camera_values, self.display_values, self.get_calibration_name()]
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)

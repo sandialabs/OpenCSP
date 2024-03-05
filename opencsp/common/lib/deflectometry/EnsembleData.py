@@ -12,12 +12,13 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 class EnsembleData:
     """Facet Ensemble definition for Sofast"""
 
-    def __init__(self,
-                 v_facet_locations: Vxyz,
-                 r_facet_ensemble: list[Rotation],
-                 ensemble_perimeter: np.ndarray,
-                 v_centroid_ensemble: Vxyz,
-                 ) -> 'EnsembleData':
+    def __init__(
+        self,
+        v_facet_locations: Vxyz,
+        r_facet_ensemble: list[Rotation],
+        ensemble_perimeter: np.ndarray,
+        v_centroid_ensemble: Vxyz,
+    ) -> 'EnsembleData':
         """Creates Facet Ensemble object from data
 
         Optic Data Definitions
@@ -27,7 +28,7 @@ class EnsembleData:
         r_facet_ensemble : list[Rotation]
             Rotation to convert ensemble to facet coordinates
         ensemble_perimeter : list[tuple[int, int], ...]
-            List of facet/corner indices that define the overall perimeter of 
+            List of facet/corner indices that define the overall perimeter of
             the mirror ensemble. [(facet_index, facet_corner_index), ...]
         v_centroid_ensemble : Vxyz
             Location of ensemble centroid in ensemble coordinates
@@ -42,7 +43,9 @@ class EnsembleData:
         self.v_centroid_ensemble = v_centroid_ensemble
 
         if len(v_facet_locations) != len(r_facet_ensemble):
-            raise ValueError(f'Number of facet locations, {len(v_facet_locations):d}, does not match number of facet rotations, {len(r_facet_ensemble):d}.')
+            raise ValueError(
+                f'Number of facet locations, {len(v_facet_locations):d}, does not match number of facet rotations, {len(r_facet_ensemble):d}.'
+            )
 
         self.num_facets = len(r_facet_ensemble)
 
@@ -70,17 +73,19 @@ class EnsembleData:
         with open(file, 'r', encoding='utf-8') as f:
             data_json = json.load(f)
 
-        ensemble_perimeter = np.array((
-            data_json['ensemble_perimeter']['facet_indices'],
-            data_json['ensemble_perimeter']['corner_indices'],
-        )).T  # Nx2 ndarray
+        ensemble_perimeter = np.array(
+            (
+                data_json['ensemble_perimeter']['facet_indices'],
+                data_json['ensemble_perimeter']['corner_indices'],
+            )
+        ).T  # Nx2 ndarray
 
         # Put data in dictionary
         return cls(
             v_facet_locations=_Vxyz_from_dict(data_json['v_facet_locations']),
             r_facet_ensemble=_rot_list_from_dict(data_json['r_facet_ensemble']),
             ensemble_perimeter=ensemble_perimeter,
-            v_centroid_ensemble=_Vxyz_from_dict(data_json['v_centroid_ensemble'])
+            v_centroid_ensemble=_Vxyz_from_dict(data_json['v_centroid_ensemble']),
         )
 
     def save_to_json(self, file: str) -> None:
@@ -97,7 +102,9 @@ class EnsembleData:
 
         data_dict = {
             'v_facet_locations': _Vxyz_to_dict(self.v_facet_locations),  # Vxyz
-            'r_facet_ensemble': _rot_list_to_dict(self.r_facet_ensemble),  # list[Rotation]
+            'r_facet_ensemble': _rot_list_to_dict(
+                self.r_facet_ensemble
+            ),  # list[Rotation]
             'ensemble_perimeter': {
                 'facet_indices': ensemble_perimeter[:, 0].tolist(),  # list
                 'corner_indices': ensemble_perimeter[:, 1].tolist(),  # list
@@ -111,11 +118,7 @@ class EnsembleData:
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:
-    d = {
-        'x': V.x.tolist(),
-        'y': V.y.tolist(),
-        'z': V.z.tolist(),
-    }
+    d = {'x': V.x.tolist(), 'y': V.y.tolist(), 'z': V.z.tolist()}
     return d
 
 

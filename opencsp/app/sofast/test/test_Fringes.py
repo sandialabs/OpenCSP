@@ -1,12 +1,11 @@
 """Unit test suite to test Fringes class
 """
-from   opencsp.app.sofast.lib.Fringes import Fringes
+from opencsp.app.sofast.lib.Fringes import Fringes
 
 
 def test_load_from_csv():
-
     # Create fringe object
-    fringe = Fringes([2.], [2.])
+    fringe = Fringes([2.0], [2.0])
 
     # Create frame
     range_ = [25, 250]

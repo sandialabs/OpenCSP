@@ -7,14 +7,14 @@ import unittest
 import numpy as np
 
 import opencsp
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.common.lib.deflectometry.FacetData import FacetData
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.app.sofast.lib.Sofast import Sofast
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
 class TestSingle(unittest.TestCase):
@@ -30,10 +30,14 @@ class TestSingle(unittest.TestCase):
         """
         # Get test data location
         if base_dir is None:
-            base_dir = os.path.join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements')
+            base_dir = os.path.join(
+                os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+            )
 
         # Find all test files
-        cls.files_dataset = glob.glob(os.path.join(base_dir, 'calculations_facet/data*.h5'))
+        cls.files_dataset = glob.glob(
+            os.path.join(base_dir, 'calculations_facet/data*.h5')
+        )
         if len(cls.files_dataset) == 0:
             raise ValueError('No single-facet datsets found.')
         else:
@@ -68,18 +72,34 @@ class TestSingle(unittest.TestCase):
                     'DataSofastInput/surface_params/facet_000/surface_type',
                     'DataSofastInput/surface_params/facet_000/robust_least_squares',
                     'DataSofastInput/surface_params/facet_000/downsample',
-                ], file_dataset)
-            surface_data['robust_least_squares'] = bool(surface_data['robust_least_squares'])
+                ],
+                file_dataset,
+            )
+            surface_data['robust_least_squares'] = bool(
+                surface_data['robust_least_squares']
+            )
             if surface_data['surface_type'] == 'parabolic':
-                surface_data.update(load_hdf5_datasets(['DataSofastInput/surface_params/facet_000/initial_focal_lengths_xy'], file_dataset))
+                surface_data.update(
+                    load_hdf5_datasets(
+                        [
+                            'DataSofastInput/surface_params/facet_000/initial_focal_lengths_xy'
+                        ],
+                        file_dataset,
+                    )
+                )
 
             # Load optic data
             facet_data = load_hdf5_datasets(
                 [
                     'DataSofastInput/optic_definition/facet_000/v_centroid_facet',
                     'DataSofastInput/optic_definition/facet_000/v_facet_corners',
-                ], file_dataset)
-            facet_data = FacetData(Vxyz(facet_data['v_facet_corners']), Vxyz(facet_data['v_centroid_facet']))
+                ],
+                file_dataset,
+            )
+            facet_data = FacetData(
+                Vxyz(facet_data['v_facet_corners']),
+                Vxyz(facet_data['v_centroid_facet']),
+            )
 
             # Load sofast params
             datasets = [
@@ -103,49 +123,68 @@ class TestSingle(unittest.TestCase):
             sofast.params.mask_hist_thresh = params['mask_hist_thresh']
             sofast.params.mask_filt_width = params['mask_filt_width']
             sofast.params.mask_filt_thresh = params['mask_filt_thresh']
-            sofast.params.mask_thresh_active_pixels = params['mask_thresh_active_pixels']
+            sofast.params.mask_thresh_active_pixels = params[
+                'mask_thresh_active_pixels'
+            ]
             sofast.params.mask_keep_largest_area = params['mask_keep_largest_area']
 
-            sofast.params.geometry_params.perimeter_refine_axial_search_dist = params['perimeter_refine_axial_search_dist']
-            sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = params['perimeter_refine_perpendicular_search_dist']
-            sofast.params.geometry_params.facet_corns_refine_step_length = params['facet_corns_refine_step_length']
-            sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = params['facet_corns_refine_perpendicular_search_dist']
-            sofast.params.geometry_params.facet_corns_refine_frac_keep = params['facet_corns_refine_frac_keep']
+            sofast.params.geometry_params.perimeter_refine_axial_search_dist = params[
+                'perimeter_refine_axial_search_dist'
+            ]
+            sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = (
+                params['perimeter_refine_perpendicular_search_dist']
+            )
+            sofast.params.geometry_params.facet_corns_refine_step_length = params[
+                'facet_corns_refine_step_length'
+            ]
+            sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = params[
+                'facet_corns_refine_perpendicular_search_dist'
+            ]
+            sofast.params.geometry_params.facet_corns_refine_frac_keep = params[
+                'facet_corns_refine_frac_keep'
+            ]
 
             # Run SOFAST
             sofast.process_optic_singlefacet(facet_data, surface_data)
 
             # Store test data
             cls.slopes.append(sofast.data_characterization_facet[0].slopes_facet_xy)
-            cls.surf_coefs.append(sofast.data_characterization_facet[0].surf_coefs_facet)
-            cls.v_surf_points_facet.append(sofast.data_characterization_facet[0].v_surf_points_facet.data)
+            cls.surf_coefs.append(
+                sofast.data_characterization_facet[0].surf_coefs_facet
+            )
+            cls.v_surf_points_facet.append(
+                sofast.data_characterization_facet[0].v_surf_points_facet.data
+            )
 
     def test_slopes(self):
-        datasets = [
-            'DataSofastCalculation/facet/facet_000/slopes_facet_xy',
-        ]
+        datasets = ['DataSofastCalculation/facet/facet_000/slopes_facet_xy']
         for idx, file in enumerate(self.files_dataset):
             with self.subTest(i=idx):
                 data = load_hdf5_datasets(datasets, file)
-                np.testing.assert_allclose(data['slopes_facet_xy'], self.slopes[idx], atol=1e-7, rtol=0)
+                np.testing.assert_allclose(
+                    data['slopes_facet_xy'], self.slopes[idx], atol=1e-7, rtol=0
+                )
 
     def test_surf_coefs(self):
-        datasets = [
-            'DataSofastCalculation/facet/facet_000/surf_coefs_facet',
-        ]
+        datasets = ['DataSofastCalculation/facet/facet_000/surf_coefs_facet']
         for idx, file in enumerate(self.files_dataset):
             with self.subTest(i=idx):
                 data = load_hdf5_datasets(datasets, file)
-                np.testing.assert_allclose(data['surf_coefs_facet'], self.surf_coefs[idx], atol=1e-8, rtol=0)
+                np.testing.assert_allclose(
+                    data['surf_coefs_facet'], self.surf_coefs[idx], atol=1e-8, rtol=0
+                )
 
     def test_int_points(self):
-        datasets = [
-            'DataSofastCalculation/facet/facet_000/v_surf_points_facet',
-        ]
+        datasets = ['DataSofastCalculation/facet/facet_000/v_surf_points_facet']
         for idx, file in enumerate(self.files_dataset):
             with self.subTest(i=idx):
                 data = load_hdf5_datasets(datasets, file)
-                np.testing.assert_allclose(data['v_surf_points_facet'], self.v_surf_points_facet[idx], atol=1e-8, rtol=0)
+                np.testing.assert_allclose(
+                    data['v_surf_points_facet'],
+                    self.v_surf_points_facet[idx],
+                    atol=1e-8,
+                    rtol=0,
+                )
 
 
 if __name__ == '__main__':

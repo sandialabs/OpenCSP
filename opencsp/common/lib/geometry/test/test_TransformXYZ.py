@@ -1,8 +1,8 @@
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
 
 class TestTransformXYZ:
@@ -17,11 +17,11 @@ class TestTransformXYZ:
 
     def test_mul(self):
         R = Rotation.from_rotvec([0.1, 0.2, 0.3])
-        V = Vxyz((1., 2., 3.))
+        V = Vxyz((1.0, 2.0, 3.0))
         t1 = TransformXYZ.from_R_V(R, V)
 
         R = Rotation.from_rotvec([0.4, 0.5, 0.6])
-        V = Vxyz((4., 5., 6.))
+        V = Vxyz((4.0, 5.0, 6.0))
         t2 = TransformXYZ.from_R_V(R, V)
 
         matrix = (t1 * t2).matrix

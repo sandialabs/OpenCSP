@@ -3,17 +3,17 @@
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
-from   numpy import ndarray
-from   scipy.optimize import minimize
-from   scipy.spatial.transform import Rotation
+from numpy import ndarray
+from scipy.optimize import minimize
+from scipy.spatial.transform import Rotation
 
 import opencsp.common.lib.photogrammetry.bundle_adjustment as ba
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.geometry.Pxyz import Pxyz
-from   opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
 
 def load_image_grayscale(file: str) -> ndarray:
@@ -30,9 +30,11 @@ def load_image_grayscale(file: str) -> ndarray:
         return img
 
 
-def find_aruco_marker(image: ndarray,
-                      adaptiveThreshConstant: float = 10,
-                      minMarkerPerimeterRate: float = 0.01) -> tuple[ndarray[int], list[ndarray]]:  # ,
+def find_aruco_marker(
+    image: ndarray,
+    adaptiveThreshConstant: float = 10,
+    minMarkerPerimeterRate: float = 0.01,
+) -> tuple[ndarray[int], list[ndarray]]:  # ,
     """
     Finds aruco marker corners in given image to the nearest pixel.
 
@@ -61,14 +63,16 @@ def find_aruco_marker(image: ndarray,
     aruco_detect_params.minMarkerPerimeterRate = minMarkerPerimeterRate
 
     # Find targets
-    (corners, ids, _) = cv.aruco.detectMarkers(image, aruco_dict, parameters=aruco_detect_params)
+    (corners, ids, _) = cv.aruco.detectMarkers(
+        image, aruco_dict, parameters=aruco_detect_params
+    )
 
     # Refine corner locations (inaccurate using cv.cornerSubPix)
-#     criteria = (cv.TERM_CRITERIA_EPS + cv.TermCriteria_COUNT, max_iterations, precision)
-#     corners_orig = []
-#     for corner in corners:
-#         corners_orig.append(corner.copy())
-#         cv.cornerSubPix(image, corner, window_size, (-1, -1), criteria)
+    #     criteria = (cv.TERM_CRITERIA_EPS + cv.TermCriteria_COUNT, max_iterations, precision)
+    #     corners_orig = []
+    #     for corner in corners:
+    #         corners_orig.append(corner.copy())
+    #         cv.cornerSubPix(image, corner, window_size, (-1, -1), criteria)
 
     # Reshape and resize
     pts = []
@@ -78,13 +82,15 @@ def find_aruco_marker(image: ndarray,
     return ids.squeeze().astype(int), pts
 
 
-def valid_camera_pose(camera: Camera,
-                      rvec: ndarray,
-                      tvec: ndarray,
-                      pts_image: ndarray,
-                      pts_object: ndarray,
-                      reproj_thresh: float = 100.,
-                      verbose: bool = False) -> bool:
+def valid_camera_pose(
+    camera: Camera,
+    rvec: ndarray,
+    tvec: ndarray,
+    pts_image: ndarray,
+    pts_object: ndarray,
+    reproj_thresh: float = 100.0,
+    verbose: bool = False,
+) -> bool:
     """
     Returns image IDs that have points behind the camera or have high
     reprojection error.
@@ -132,13 +138,15 @@ def valid_camera_pose(camera: Camera,
     return valid
 
 
-def reprojection_errors(rvecs: ndarray,
-                        tvecs: ndarray,
-                        pts_obj: ndarray,
-                        camera: Camera,
-                        camera_indices: ndarray,
-                        point_indices: ndarray,
-                        points_2d: ndarray) -> ndarray:
+def reprojection_errors(
+    rvecs: ndarray,
+    tvecs: ndarray,
+    pts_obj: ndarray,
+    camera: Camera,
+    camera_indices: ndarray,
+    point_indices: ndarray,
+    points_2d: ndarray,
+) -> ndarray:
     """
     Calculates the xy reprojection error for each point.
     See bundle_adjustment.bundle_adjust() for more information.
@@ -152,17 +160,27 @@ def reprojection_errors(rvecs: ndarray,
     # Calculate errors
     a = np.hstack((rvecs, tvecs))
     x = np.hstack((a.ravel(), pts_obj.ravel()))
-    pts = ba.fun(x, rvecs.shape[0], pts_obj.shape[0], camera_indices, point_indices, points_2d,
-                 camera.intrinsic_mat, camera.distortion_coef)
+    pts = ba.fun(
+        x,
+        rvecs.shape[0],
+        pts_obj.shape[0],
+        camera_indices,
+        point_indices,
+        points_2d,
+        camera.intrinsic_mat,
+        camera.distortion_coef,
+    )
 
     return pts.reshape((-1, 2))
 
 
-def plot_pts_3d(ax: plt.Axes,
-                pts_obj: ndarray,
-                rots: list[Rotation],
-                tvecs: Vxyz,
-                needle_length: float = 1) -> None:
+def plot_pts_3d(
+    ax: plt.Axes,
+    pts_obj: ndarray,
+    rots: list[Rotation],
+    tvecs: Vxyz,
+    needle_length: float = 1,
+) -> None:
     """
     Plots 3D points and camera poses (points with needles defined by rvec/tvec).
 
@@ -204,7 +222,9 @@ def plot_pts_3d(ax: plt.Axes,
     ax.set_zlabel('z')
 
 
-def align_points(pts_obj: Vxyz, vals: Vxyz, scale: bool = False) -> tuple[TransformXYZ, float, ndarray[float]]:
+def align_points(
+    pts_obj: Vxyz, vals: Vxyz, scale: bool = False
+) -> tuple[TransformXYZ, float, ndarray[float]]:
     """
     Returns 2D homogeneous transform to apply to input data according to
     alignment criteria. Values are scaled (if applicable) FIRST, then
@@ -231,6 +251,7 @@ def align_points(pts_obj: Vxyz, vals: Vxyz, scale: bool = False) -> tuple[Transf
         Point alignment error, meters
 
     """
+
     def calc_point_errors(vec: ndarray):
         """Calculate alignment errors for each point
 
@@ -258,7 +279,7 @@ def align_points(pts_obj: Vxyz, vals: Vxyz, scale: bool = False) -> tuple[Transf
         e = calc_point_errors(vec)
 
         # Calculate RMS error
-        return np.sqrt(np.mean(e ** 2))
+        return np.sqrt(np.mean(e**2))
 
     # Optimize points
     vec = np.array([0, 0, 0, 0, 0, 0, 1], dtype=float)
@@ -295,12 +316,14 @@ def _ref_coord_error(pts_obj: Vxyz, pts_exp: Vxyz) -> np.ndarray:
     error = []
     for pt_obj, coord in zip(pts_obj.data.T, pts_exp.data.T):
         e: ndarray = pt_obj - coord
-        e = np.nan_to_num(e, nan=0.)
-        error.append(np.sqrt(np.sum(e ** 2)))
+        e = np.nan_to_num(e, nan=0.0)
+        error.append(np.sqrt(np.sum(e**2)))
     return np.array(error)
 
 
-def scale_points(pts_obj: Vxyz, point_ids: ndarray, point_pairs: ndarray, dists: ndarray) -> ndarray[float]:
+def scale_points(
+    pts_obj: Vxyz, point_ids: ndarray, point_pairs: ndarray, dists: ndarray
+) -> ndarray[float]:
     """
     Scales object points and tvecs. A list of point pairs is given, and the
     corresponding expected distance between them. The object points are scaled
@@ -325,7 +348,7 @@ def scale_points(pts_obj: Vxyz, point_ids: ndarray, point_pairs: ndarray, dists:
     """
     # Calculate distances between all scale index pairs
     dists_cur = []
-    for (i1, i2) in point_pairs:
+    for i1, i2 in point_pairs:
         mask_1 = point_ids == i1
         mask_2 = point_ids == i2
         d = pts_obj[mask_1] - pts_obj[mask_2]  # xyz delta, meters
@@ -335,9 +358,7 @@ def scale_points(pts_obj: Vxyz, point_ids: ndarray, point_pairs: ndarray, dists:
     return np.array(dists) / np.array(dists_cur)
 
 
-def dist_from_rays(v_pt: Vxyz,
-                   u_ray_dir: Vxyz | Uxyz,
-                   v_ray_ori: Vxyz) -> ndarray:
+def dist_from_rays(v_pt: Vxyz, u_ray_dir: Vxyz | Uxyz, v_ray_ori: Vxyz) -> ndarray:
     """
     Calculates perpendicular distances from a point to N rays.
 
@@ -369,10 +390,12 @@ def dist_from_rays(v_pt: Vxyz,
     return (v_cam_int_pt_screen - v_cam_pt_screen).magnitude()
 
 
-def triangulate(cameras: list[Camera],
-                rots: list[Rotation],
-                tvecs: Vxyz | list[Vxyz],
-                pts_img: Vxy | list[Vxy]) -> tuple[Vxyz, ndarray]:
+def triangulate(
+    cameras: list[Camera],
+    rots: list[Rotation],
+    tvecs: Vxyz | list[Vxyz],
+    pts_img: Vxy | list[Vxy],
+) -> tuple[Vxyz, ndarray]:
     """Triangulates position of unknown marker.
 
     Parameters
@@ -389,14 +412,16 @@ def triangulate(cameras: list[Camera],
     Returns
     -------
     tuple[Vxyz, ndarray]
-        Intersection point, perpendicular distances from point to rays 
+        Intersection point, perpendicular distances from point to rays
     """
     # Create data containers
     pts_origins = np.zeros((3, len(cameras)))  # location of cameras
     u_rays = np.zeros((3, len(cameras)))  # direction of rays
 
     # Collect rays/origins and convert to lab reference frame
-    for idx, (camera, rvec, tvec, pt_img) in enumerate(zip(cameras, rots, tvecs, pts_img)):
+    for idx, (camera, rvec, tvec, pt_img) in enumerate(
+        zip(cameras, rots, tvecs, pts_img)
+    ):
         # Calculate camera position and rays in object reference frame
         r_cam_world = rvec.inv()
         v_world_cam_world = -tvec.rotate(r_cam_world)
@@ -417,7 +442,9 @@ def triangulate(cameras: list[Camera],
     return pt_int, dists
 
 
-def nearest_ray_intersection(p_origins: Vxyz, u_dirs: Vxyz | Uxyz) -> tuple[Vxyz, ndarray]:
+def nearest_ray_intersection(
+    p_origins: Vxyz, u_dirs: Vxyz | Uxyz
+) -> tuple[Vxyz, ndarray]:
     """
     Finds the least squares point of intersection between N skew rays. And
     calculates residuals.
@@ -452,7 +479,8 @@ def nearest_ray_intersection(p_origins: Vxyz, u_dirs: Vxyz | Uxyz) -> tuple[Vxyz
     p_int = np.linalg.lstsq(
         a=(i_mat - u_dirs_mat).sum(axis=0),
         b=((i_mat - u_dirs_mat) @ p_origins_mat).sum(axis=0),
-        rcond=None)[0]
+        rcond=None,
+    )[0]
 
     # Calculate intersection errors (perpendicular distances to rays)
     p_int = Vxyz(p_int.squeeze())

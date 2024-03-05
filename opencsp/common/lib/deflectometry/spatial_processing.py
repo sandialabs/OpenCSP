@@ -1,17 +1,16 @@
 import cv2 as cv
 import numpy as np
-from   scipy.optimize import minimize
-from   scipy.spatial.transform import Rotation
+from scipy.optimize import minimize
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-def t_from_distance(Puv_cam: Vxy,
-                    dist: float,
-                    camera: Camera,
-                    v_cam_screen_cam: Vxyz) -> Vxyz:
+def t_from_distance(
+    Puv_cam: Vxy, dist: float, camera: Camera, v_cam_screen_cam: Vxyz
+) -> Vxyz:
     """
     Calculates the 3D point given a 2D camera pixel location and a distance
     from the center of the screen.
@@ -37,7 +36,11 @@ def t_from_distance(Puv_cam: Vxy,
     u_cam = camera.vector_from_pixel(Puv_cam).as_Vxyz()
 
     # Calculate location of point relative to camera
-    a = np.sqrt(u_cam.dot(v_cam_screen_cam) ** 2 - v_cam_screen_cam.dot(v_cam_screen_cam) + dist ** 2)
+    a = np.sqrt(
+        u_cam.dot(v_cam_screen_cam) ** 2
+        - v_cam_screen_cam.dot(v_cam_screen_cam)
+        + dist**2
+    )
     cam_facet_dist = u_cam.dot(v_cam_screen_cam) + a
 
     # Calculate position of point relative to camera
@@ -46,8 +49,7 @@ def t_from_distance(Puv_cam: Vxy,
     return v_cam_optic_cam
 
 
-def r_from_position(v_cam_optic_cam: Vxyz,
-                    v_cam_screen_cam: Vxyz) -> Rotation:
+def r_from_position(v_cam_optic_cam: Vxyz, v_cam_screen_cam: Vxyz) -> Rotation:
     """
     Calculates the 3D rotation of a mirror given the relative locations of
     the mirror and screen from the camera.
@@ -77,16 +79,18 @@ def r_from_position(v_cam_optic_cam: Vxyz,
     r_align = u_optic_cam_cam.align_to(u_optic_norm)
 
     # Rotate points about approximate center (optic coordinates are flipped 180 about x axis)
-    Rx = Rotation.from_rotvec(np.array([np.pi, 0., 0.]))
+    Rx = Rotation.from_rotvec(np.array([np.pi, 0.0, 0.0]))
     r_cam_optic = r_align * Rx
 
     return r_cam_optic
 
 
-def refine_v_distance(v_cam_optic_cam: Vxyz,
-                      optic_screen_dist: float,
-                      v_cam_screen_cam: Vxyz,
-                      v_meas_pt_optic_cam: Vxyz) -> Vxyz:
+def refine_v_distance(
+    v_cam_optic_cam: Vxyz,
+    optic_screen_dist: float,
+    v_cam_screen_cam: Vxyz,
+    v_meas_pt_optic_cam: Vxyz,
+) -> Vxyz:
     """
     Refines the camera to optic translation vector so that measured optic
     screen distance exactly matches calculated value.
@@ -108,6 +112,7 @@ def refine_v_distance(v_cam_optic_cam: Vxyz,
         Scaled v_cam_optic_cam.
 
     """
+
     def error_func(scale):
         # Calculate the distance error
         v_cam_meas_pt_cam = (v_cam_optic_cam * scale) + v_meas_pt_optic_cam
@@ -122,9 +127,9 @@ def refine_v_distance(v_cam_optic_cam: Vxyz,
     return v_cam_optic_cam * out.x
 
 
-def calc_rt_from_img_pts(pts_image: Vxy,
-                         pts_object: Vxyz,
-                         camera: Camera) -> tuple[Rotation, Vxyz]:
+def calc_rt_from_img_pts(
+    pts_image: Vxy, pts_object: Vxyz, camera: Camera
+) -> tuple[Rotation, Vxyz]:
     """
     Calculates Translation and Rotation given object and image points.
 
@@ -145,7 +150,12 @@ def calc_rt_from_img_pts(pts_image: Vxy,
         Camera-to-object cector in camera coordinates.
 
     """
-    ret, rvec, tvec = cv.solvePnP(pts_object.data.T, pts_image.data.T, camera.intrinsic_mat, camera.distortion_coef)
+    ret, rvec, tvec = cv.solvePnP(
+        pts_object.data.T,
+        pts_image.data.T,
+        camera.intrinsic_mat,
+        camera.distortion_coef,
+    )
 
     if not ret:
         raise ValueError('Could not find position of optic relative to camera.')
@@ -153,11 +163,13 @@ def calc_rt_from_img_pts(pts_image: Vxy,
     return Rotation.from_rotvec(rvec.squeeze()), Vxyz(tvec.squeeze())
 
 
-def calc_r_from_img_pts(Puv_image: Vxy,
-                        P_object: Vxyz,
-                        r_object_cam_0: Rotation,
-                        v_cam_object_cam: Vxyz,
-                        camera: Camera) -> Rotation:
+def calc_r_from_img_pts(
+    Puv_image: Vxy,
+    P_object: Vxyz,
+    r_object_cam_0: Rotation,
+    v_cam_object_cam: Vxyz,
+    camera: Camera,
+) -> Rotation:
     """
     Calculates Rotation from points in image.
 
@@ -180,10 +192,13 @@ def calc_r_from_img_pts(Puv_image: Vxy,
         Object-to-camera rotation.
 
     """
+
     def error_func(rvec):
         # Calculate reprojection error
         r_object_cam = Rotation.from_rotvec(rvec)
-        reproj_error = reprojection_error(camera, P_object, Puv_image, r_object_cam, v_cam_object_cam)  # RSS pixels
+        reproj_error = reprojection_error(
+            camera, P_object, Puv_image, r_object_cam, v_cam_object_cam
+        )  # RSS pixels
 
         return reproj_error
 
@@ -193,9 +208,9 @@ def calc_r_from_img_pts(Puv_image: Vxy,
     return Rotation.from_rotvec(out.x)
 
 
-def distance_error(v_cam_screen_cam: Vxyz,
-                   v_cam_meas_pt_cam: Vxyz,
-                   dist: float) -> float:
+def distance_error(
+    v_cam_screen_cam: Vxyz, v_cam_meas_pt_cam: Vxyz, dist: float
+) -> float:
     """
     Calculates optic to screen distance error as
     Error = MeasuredDistance - CalculatedDistance
@@ -223,11 +238,13 @@ def distance_error(v_cam_screen_cam: Vxyz,
     return dist - dist_calc  # meters
 
 
-def reprojection_error(camera: Camera,
-                       P_object: Vxyz,
-                       Puv_image: Vxy,
-                       r_object_cam: Rotation,
-                       v_cam_object_cam: Vxyz) -> float:
+def reprojection_error(
+    camera: Camera,
+    P_object: Vxyz,
+    Puv_image: Vxy,
+    r_object_cam: Rotation,
+    v_cam_object_cam: Vxyz,
+) -> float:
     """
     Calculates reprojection error as RMS pixels.
 

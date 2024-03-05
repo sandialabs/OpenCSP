@@ -1,19 +1,19 @@
 """Photogrammetric reconstruction class based on images of Aruco markers
 """
-from   glob import glob
-from   os.path import join
-from   typing import Iterable
+from glob import glob
+from os.path import join
+from typing import Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
-from   numpy import ndarray
-from   scipy.spatial.transform import Rotation
-from   tqdm import tqdm
+from numpy import ndarray
+from scipy.spatial.transform import Rotation
+from tqdm import tqdm
 
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.photogrammetry.ImageMarker import ImageMarker
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.photogrammetry.ImageMarker import ImageMarker
 import opencsp.common.lib.photogrammetry.bundle_adjustment as ba
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
 
@@ -23,10 +23,9 @@ class SceneReconstruction:
     scene of Aruco markers.
     """
 
-    def __init__(self,
-                 camera: Camera,
-                 known_point_locations: ndarray,
-                 image_filter_path: str) -> 'SceneReconstruction':
+    def __init__(
+        self, camera: Camera, known_point_locations: ndarray, image_filter_path: str
+    ) -> 'SceneReconstruction':
         """Instantiates SceneReconstruction class
 
         Parameters
@@ -82,15 +81,21 @@ class SceneReconstruction:
     @property
     def unlocated_marker_ids(self) -> ndarray:
         """Returns all unlocated marker IDs"""
-        return np.unique(np.hstack([image.unlocated_point_ids for image in self.images]))
+        return np.unique(
+            np.hstack([image.unlocated_point_ids for image in self.images])
+        )
 
     def convert_to_four_corners(self) -> None:
         """Converts all images to four corner images instead of single points"""
         for image in self.images:
             image.convert_to_four_corner()
 
-        self.unique_point_ids = np.unique(np.hstack([im.point_ids for im in self.images]))
-        self.unique_marker_ids = np.floor(self.unique_point_ids.astype(float) / 4).astype(int)
+        self.unique_point_ids = np.unique(
+            np.hstack([im.point_ids for im in self.images])
+        )
+        self.unique_marker_ids = np.floor(
+            self.unique_point_ids.astype(float) / 4
+        ).astype(int)
 
         mask_nan = np.array([1, np.nan, np.nan, np.nan] * self.num_points)
         mask_zero = np.array([1, 0, 0, 0] * self.num_points)
@@ -98,7 +103,9 @@ class SceneReconstruction:
         self.num_points = self.unique_point_ids.size
         self.points_xyz = np.repeat(self.points_xyz, 4, axis=0) * mask_nan[:, None]
         self.located_point_ids = self.located_point_ids * 4
-        self.located_point_mask = (np.repeat(self.located_point_mask, 4) * mask_zero).astype(bool)
+        self.located_point_mask = (
+            np.repeat(self.located_point_mask, 4) * mask_zero
+        ).astype(bool)
 
     def set_id_known(self, id_: int, pt: np.ndarray, verbose=False) -> None:
         """Sets given ID as known in all images
@@ -149,11 +156,15 @@ class SceneReconstruction:
     def load_images(self) -> None:
         """Saves loaded dataset in class"""
         self.images: list[ImageMarker] = []
-        for idx, file in enumerate(tqdm(self.image_paths, desc='Loading marker images')):
+        for idx, file in enumerate(
+            tqdm(self.image_paths, desc='Loading marker images')
+        ):
             self.images.append(ImageMarker.load_aruco_origin(file, idx, self.camera))
 
         # Save unique markers
-        self.unique_point_ids = np.unique(np.hstack([im.point_ids for im in self.images]))
+        self.unique_point_ids = np.unique(
+            np.hstack([im.point_ids for im in self.images])
+        )
         self.unique_marker_ids = self.unique_point_ids.copy()
         self.num_markers = self.unique_point_ids.size
         self.num_points = self.unique_point_ids.size
@@ -187,7 +198,9 @@ class SceneReconstruction:
         for image in self.images:
             image.attempt_calculate_pose(verbose)
 
-    def attempt_all_points_triangulation(self, intersect_thres: float = 0.02, verbose=False) -> None:
+    def attempt_all_points_triangulation(
+        self, intersect_thres: float = 0.02, verbose=False
+    ) -> None:
         """Attemps to calculate position of all unknown points using ray intersection
 
         Parameters
@@ -213,7 +226,9 @@ class SceneReconstruction:
             tvecs = []
             pts_img = []
             for im in images:
-                idx = im.point_ids.tolist().index(id_)  # Index of point in current image
+                idx = im.point_ids.tolist().index(
+                    id_
+                )  # Index of point in current image
                 pts_img.append(im.pts_im_xy[idx])  # Location of 2d point in image
                 rots.append(Rotation.from_rotvec(im.rvec))
                 tvecs.append(im.tvec)
@@ -248,7 +263,9 @@ class SceneReconstruction:
             camera_idxs.append([image.img_id] * image.num_located_markers)
             # Point (0-based) index for every point observation that has been located
             pt_ids = image.located_point_ids  # ID number
-            pt_idxs = [self.unique_point_ids.tolist().index(pt_id) for pt_id in pt_ids]  # index
+            pt_idxs = [
+                self.unique_point_ids.tolist().index(pt_id) for pt_id in pt_ids
+            ]  # index
             point_indices.append(pt_idxs)
             # 2d image points of every point observation
             points2d.append(image.pts_im_xy[image.located_markers_mask])
@@ -271,11 +288,13 @@ class SceneReconstruction:
             self.camera.intrinsic_mat,
             self.camera.distortion_coef,
             'both',
-            verbose
+            verbose,
         )
 
         # Update 3d marker points
-        self.set_ids_known(self.located_point_ids, pts_marker_opt[self.located_point_mask])
+        self.set_ids_known(
+            self.located_point_ids, pts_marker_opt[self.located_point_mask]
+        )
 
         # Update rvec/tvec
         for idx in self.located_camera_idxs:
@@ -290,7 +309,9 @@ class SceneReconstruction:
                 errors[idx] = image.calc_reprojection_errors().mean()
         return np.array(errors)
 
-    def scale_points(self, point_pairs: ndarray[int], distances: ndarray[float], verbose: int = 0) -> None:
+    def scale_points(
+        self, point_pairs: ndarray[int], distances: ndarray[float], verbose: int = 0
+    ) -> None:
         """Scales point locations to match measured distances between pairs
         of Aruco marker origin points (corner 0).
         (Must be applied after conversion to the four point model)
@@ -305,7 +326,9 @@ class SceneReconstruction:
             To print status updates, by default 0
         """
         # Calculate scales
-        scales = ph.scale_points(Vxyz(self.points_xyz.T), self.unique_point_ids, point_pairs * 4, distances)
+        scales = ph.scale_points(
+            Vxyz(self.points_xyz.T), self.unique_point_ids, point_pairs * 4, distances
+        )
 
         if verbose in [1, 2]:
             print('Point scaling complete:')
@@ -315,11 +338,13 @@ class SceneReconstruction:
         # Apply scale to points
         self.points_xyz *= scales.mean()
 
-    def align_points(self,
-                     marker_ids: ndarray[int],
-                     alignment_values: Vxyz,
-                     apply_scale: bool = False,
-                     verbose: int = 0) -> None:
+    def align_points(
+        self,
+        marker_ids: ndarray[int],
+        alignment_values: Vxyz,
+        apply_scale: bool = False,
+        verbose: int = 0,
+    ) -> None:
         """Aligns selected markers origin points (corner index 0) within
         point cloud to match given alignment values. Set to NAN for floating.
         Points are aligned FIRST, then transformed.
@@ -359,7 +384,9 @@ class SceneReconstruction:
             print(f'   Rotation: {trans.R.magnitude():.4f} radians')
             print(f'   Translation: {trans.V.magnitude()[0]:.4f} meters')
             print(f'   Average alignment errors: {errors.mean():.4f} meters')
-            print(f'   STDEV of alignment errors (N={errors.size:d}): {errors.std():.4f} meters')
+            print(
+                f'   STDEV of alignment errors (N={errors.size:d}): {errors.std():.4f} meters'
+            )
 
     def print_reprojection_error_summary(self) -> None:
         """Prints reprojection error summary"""
@@ -368,7 +395,9 @@ class SceneReconstruction:
         print(f'   Average: {np.nanmean(errors):.2f} pixels')
         print(f'   Min: {np.nanmin(errors):.2f} pixels')
         print(f'   Max: {np.nanmax(errors):.2f} pixels')
-        print(f'   STDEV (N={np.logical_not(np.isnan(errors)).size:d}): {np.nanstd(errors):.2f} pixels')
+        print(
+            f'   STDEV (N={np.logical_not(np.isnan(errors)).size:d}): {np.nanstd(errors):.2f} pixels'
+        )
 
     def print_located_points_cameras(self) -> None:
         """Prints currently located cameras and markers"""
@@ -381,8 +410,7 @@ class SceneReconstruction:
         print('Number of located points:', len(self.located_point_ids))
 
     def plot_point_camera_summary(self) -> None:
-        """Plots situational summary: Camera poses and point locations
-        """
+        """Plots situational summary: Camera poses and point locations"""
         # Create axes
         fig = plt.figure('Scene_Reconstruction_Summary')
         ax = fig.add_subplot(projection='3d')
@@ -396,12 +424,14 @@ class SceneReconstruction:
             rvec = image.rvec
             rot_cam_to_world = Rotation.from_rotvec(rvec).inv()
             tvec_world = rot_cam_to_world.apply(-tvec[None, :])
-            z_vec = rot_cam_to_world.apply(np.array([[0., 0., 1.]]))
+            z_vec = rot_cam_to_world.apply(np.array([[0.0, 0.0, 1.0]]))
             ax.scatter(*tvec_world.T, color='orange')
-            ax.plot([tvec_world[0, 0], tvec_world[0, 0] + z_vec[0, 0]],
-                    [tvec_world[0, 1], tvec_world[0, 1] + z_vec[0, 1]],
-                    [tvec_world[0, 2], tvec_world[0, 2] + z_vec[0, 2]],
-                    color='black')
+            ax.plot(
+                [tvec_world[0, 0], tvec_world[0, 0] + z_vec[0, 0]],
+                [tvec_world[0, 1], tvec_world[0, 1] + z_vec[0, 1]],
+                [tvec_world[0, 2], tvec_world[0, 2] + z_vec[0, 2]],
+                color='black',
+            )
 
         # Plot located points
         ax.scatter(*self.points_xyz.T)
@@ -433,8 +463,14 @@ class SceneReconstruction:
         """Saves the location of all marker points in given CSV file. Columns are
         [Marker ID, Corner ID, x, y, z]
         """
-        np.savetxt(file, self.get_data(), delimiter=',', header='Marker ID,Corner ID,x (meter),y (meter),z (meter)',
-                   encoding='utf-8', fmt=['%.0f', '%.0f', '%.8f', '%.8f', '%.8f'])
+        np.savetxt(
+            file,
+            self.get_data(),
+            delimiter=',',
+            header='Marker ID,Corner ID,x (meter),y (meter),z (meter)',
+            encoding='utf-8',
+            fmt=['%.0f', '%.0f', '%.8f', '%.8f', '%.8f'],
+        )
 
     def optimize(self, intersect_thresh: float = 0.02, verbose: bool = False) -> None:
         """Runs point location optimization routine
@@ -477,7 +513,9 @@ class SceneReconstruction:
 
         # Check that all markers have been found
         if (self.unlocated_marker_ids.size != 0) and verbose:
-            print(f'Not all markers have been found, {self.unlocated_marker_ids.size:d} remain. More camera images may be needed.')
+            print(
+                f'Not all markers have been found, {self.unlocated_marker_ids.size:d} remain. More camera images may be needed.'
+            )
 
         # Convert to 4-corner model
         if verbose:
@@ -490,7 +528,9 @@ class SceneReconstruction:
         # Bundle adjust
         self.refine_located_poses_and_points(verbose)
 
-    def run_calibration(self, verbose: int = 0, intersect_thresh: float = 0.02) -> ndarray:
+    def run_calibration(
+        self, verbose: int = 0, intersect_thresh: float = 0.02
+    ) -> ndarray:
         """Runs the calibration sequence
 
         Parameters
@@ -532,4 +572,10 @@ class SceneReconstruction:
             Marker ID, point ID, X, Y, Z
 
         """
-        return np.hstack((self.unique_marker_ids[:, None], self.unique_point_ids[:, None], self.points_xyz))
+        return np.hstack(
+            (
+                self.unique_marker_ids[:, None],
+                self.unique_point_ids[:, None],
+                self.points_xyz,
+            )
+        )

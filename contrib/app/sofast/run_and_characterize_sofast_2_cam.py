@@ -11,28 +11,34 @@ import os
 
 import numpy as np
 
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.common.lib.deflectometry.FacetData import FacetData
-from   opencsp.app.sofast.lib.Fringes import Fringes
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.Sofast import Sofast
-from   opencsp.app.sofast.lib.System import System
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from   opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
-from   opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.Fringes import Fringes
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.app.sofast.lib.System import System
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
+from opencsp.common.lib.geometry.Pxyz import Pxyz
 
 
 def main():
     # Define file locations
     data_dir = '../../sofast_2_system_calibration_files/'
 
-    file_image_projection = os.path.join(data_dir, 'Image_Projection_optics_lab_landscape_rectangular.h5')
+    file_image_projection = os.path.join(
+        data_dir, 'Image_Projection_optics_lab_landscape_rectangular.h5'
+    )
 
-    file_display_0 = os.path.join(data_dir, 'Display_optics_lab_landscape_distorted2D.h5')
+    file_display_0 = os.path.join(
+        data_dir, 'Display_optics_lab_landscape_distorted2D.h5'
+    )
     file_camera_0 = os.path.join(data_dir, 'Camera_optics_lab_landscape.h5')
 
-    file_display_1 = os.path.join(data_dir, 'Display_optics_lab_landscape_distorted2D.h5')
+    file_display_1 = os.path.join(
+        data_dir, 'Display_optics_lab_landscape_distorted2D.h5'
+    )
     file_camera_1 = os.path.join(data_dir, 'Camera_optics_lab_landscape.h5')
 
     file_facet = os.path.join(data_dir, 'Facet_NSTTF.json')
@@ -57,11 +63,18 @@ def main():
     facet_data = FacetData.load_from_json(file_facet)
 
     # Define surface fitting parameters
-    surface_data = [dict(surface_type='parabolic', initial_focal_lengths_xy=(100., 100.), robust_least_squares=False, downsample=10)]
+    surface_data = [
+        dict(
+            surface_type='parabolic',
+            initial_focal_lengths_xy=(100.0, 100.0),
+            robust_least_squares=False,
+            downsample=10,
+        )
+    ]
 
     # Create fringe object
-    periods_x = [0.9, 4., 16., 64.]
-    periods_y = [0.9, 4., 16., 64.]
+    periods_x = [0.9, 4.0, 16.0, 64.0]
+    periods_y = [0.9, 4.0, 16.0, 64.0]
     fringes = Fringes(periods_x, periods_y)
 
     # Load ImageProjection
@@ -94,14 +107,20 @@ def main():
     # Capture calibration data
     def func_capture_calibration_frames():
         print('Capturing display-camera response calibration data')
-        system.run_display_camera_response_calibration(res=10, run_next=system.run_next_in_queue)
+        system.run_display_camera_response_calibration(
+            res=10, run_next=system.run_next_in_queue
+        )
 
     # Process calibration data
     def func_process_calibration_data():
         print('Processing calibration data')
         calibration_images = system.get_calibration_images()
         for ims in calibration_images:
-            calibrations.append(ImageCalibrationScaling.from_data(ims, system.calibration_display_values))
+            calibrations.append(
+                ImageCalibrationScaling.from_data(
+                    ims, system.calibration_display_values
+                )
+            )
         system.run_next_in_queue()
 
     # Load fringe object
@@ -147,7 +166,9 @@ def main():
     print('Saving Data')
 
     # Get Measurement object
-    measurements = system.get_measurements(optic_measure_point, optic_screen_dist, optic_name)
+    measurements = system.get_measurements(
+        optic_measure_point, optic_screen_dist, optic_name
+    )
 
     # Process data
     print('Processing data')

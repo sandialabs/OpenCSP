@@ -1,4 +1,4 @@
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class Uxyz(Vxyz):

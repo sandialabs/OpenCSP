@@ -1,20 +1,23 @@
 """Tests Sofast screen distortion calibration
 """
-from   glob import glob
+from glob import glob
 import os
-from   os.path import join
+from os.path import join
 import unittest
 import pytest
 
 import numpy as np
 
 import opencsp
-from   opencsp.app.sofast.calibration.lib.CalibrationScreenShape import CalibrationScreenShape, DataInput
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
+    CalibrationScreenShape,
+    DataInput,
+)
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
 class TestCalibrationScreenShape(unittest.TestCase):
@@ -46,7 +49,9 @@ class TestCalibrationScreenShape(unittest.TestCase):
         """
         if (dir_input is None) or (dir_output is None):
             # Define default data directories
-            base_dir = join(os.path.dirname(opencsp.__file__), 'common/lib/deflectometry/test')
+            base_dir = join(
+                os.path.dirname(opencsp.__file__), 'common/lib/deflectometry/test'
+            )
             dir_input = join(base_dir, 'data/data_measurement')
             dir_output = join(base_dir, 'data/data_expected')
 
@@ -54,17 +59,25 @@ class TestCalibrationScreenShape(unittest.TestCase):
 
         # Define input files
         resolution_xy = [100, 100]  # sample density of screen
-        file_screen_cal_point_pairs = join(dir_input, 'screen_calibration_point_pairs.csv')
+        file_screen_cal_point_pairs = join(
+            dir_input, 'screen_calibration_point_pairs.csv'
+        )
         file_point_locations = join(dir_input, 'point_locations.csv')
         file_camera_distortion = join(dir_input, 'camera_screen_shape.h5')
         file_image_projection = join(dir_input, 'image_projection.h5')
-        files_screen_shape_measurement = glob(join(dir_input, 'screen_shape_sofast_measurements/pose_*.h5'))
+        files_screen_shape_measurement = glob(
+            join(dir_input, 'screen_shape_sofast_measurements/pose_*.h5')
+        )
 
         # Load input data
-        pts_marker_data = np.loadtxt(file_point_locations, delimiter=',', dtype=float, skiprows=1)
+        pts_marker_data = np.loadtxt(
+            file_point_locations, delimiter=',', dtype=float, skiprows=1
+        )
         pts_xyz_marker = Vxyz(pts_marker_data[:, 2:].T)
         corner_ids = pts_marker_data[:, 1]
-        screen_cal_point_pairs = np.loadtxt(file_screen_cal_point_pairs, delimiter=',', skiprows=1).astype(int)
+        screen_cal_point_pairs = np.loadtxt(
+            file_screen_cal_point_pairs, delimiter=',', skiprows=1
+        ).astype(int)
         camera = Camera.load_from_hdf(file_camera_distortion)
         image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
 
@@ -87,15 +100,27 @@ class TestCalibrationScreenShape(unittest.TestCase):
         dist_data = cal_screen_position.get_data()
 
         # Test screen distortion information
-        cls.data_exp = load_hdf5_datasets(['pts_xy_screen_fraction', 'pts_xyz_screen_coords'],
-                                          join(dir_output, 'screen_distortion_data_100_100.h5'))
+        cls.data_exp = load_hdf5_datasets(
+            ['pts_xy_screen_fraction', 'pts_xyz_screen_coords'],
+            join(dir_output, 'screen_distortion_data_100_100.h5'),
+        )
         cls.data_meas = dist_data
 
     @pytest.mark.no_xvfb
     def test_screen_distortion_data(self):
         """Tests screen calibration data"""
-        np.testing.assert_allclose(self.data_meas['pts_xy_screen_fraction'].data, self.data_exp['pts_xy_screen_fraction'], rtol=0, atol=1e-6)
-        np.testing.assert_allclose(self.data_meas['pts_xyz_screen_coords'].data, self.data_exp['pts_xyz_screen_coords'], rtol=0, atol=1e-6)
+        np.testing.assert_allclose(
+            self.data_meas['pts_xy_screen_fraction'].data,
+            self.data_exp['pts_xy_screen_fraction'],
+            rtol=0,
+            atol=1e-6,
+        )
+        np.testing.assert_allclose(
+            self.data_meas['pts_xyz_screen_coords'].data,
+            self.data_exp['pts_xyz_screen_coords'],
+            rtol=0,
+            atol=1e-6,
+        )
         print('Distortion data tested successfully.')
 
 

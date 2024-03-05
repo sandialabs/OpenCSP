@@ -1,5 +1,13 @@
-class RenderControlVideo():
-    def __init__(self, framerate: int = 30, width=None, height=None, min_scale=False, codec: str = 'H.264', low_bitrate: bool = False):
+class RenderControlVideo:
+    def __init__(
+        self,
+        framerate: int = 30,
+        width=None,
+        height=None,
+        min_scale=False,
+        codec: str = 'H.264',
+        low_bitrate: bool = False,
+    ):
         """_summary_
 
         Args:
@@ -21,17 +29,22 @@ class RenderControlVideo():
         if codec not in ['undefined', 'H.264', 'H.265', 'copy']:
             raise RuntimeError(f"Unrecognized codec option '{self.codec}'")
         if low_bitrate and codec in ["undefined", "copy"]:
-            raise RuntimeError("Codec must be specified in order to use low_bitrate=True")
+            raise RuntimeError(
+                "Codec must be specified in order to use low_bitrate=True"
+            )
 
     def _get_original_video_width_height(self, video_or_image_path_name_ext: str):
         if self._original_video_width_height == None:
             import opencsp.common.lib.render.VideoHandler as vh
+
             handler = vh.VideoHandler.VideoInspector(video_or_image_path_name_ext)
             self._original_video_width_height = handler.get_width_height()
         return self._original_video_width_height
 
-    def get_ffmpeg_args(self, video_or_image_path_name_ext: str = "") -> tuple[str, dict[str, str]]:
-        """ Get the arguments and directories to be passed to ffmpeg.
+    def get_ffmpeg_args(
+        self, video_or_image_path_name_ext: str = ""
+    ) -> tuple[str, dict[str, str]]:
+        """Get the arguments and directories to be passed to ffmpeg.
 
         Args:
             video_or_image_path_name_ext (str, optional): Needed for width or height relative to the original video. Defaults to "".
@@ -58,11 +71,20 @@ class RenderControlVideo():
             elif self.code == "H.265":
                 ret.append("-crf 40")
 
-        if (self.width != None or self.height != None):
+        if self.width != None or self.height != None:
             width, height = self.width, self.height
             if video_or_image_path_name_ext != "":
-                def owidth(): return self._get_original_video_width_height(video_or_image_path_name_ext)[0]
-                def oheight(): return self._get_original_video_width_height(video_or_image_path_name_ext)[1]
+
+                def owidth():
+                    return self._get_original_video_width_height(
+                        video_or_image_path_name_ext
+                    )[0]
+
+                def oheight():
+                    return self._get_original_video_width_height(
+                        video_or_image_path_name_ext
+                    )[1]
+
                 if self.min_scale:
                     if width != None:
                         width = min(width, owidth())
@@ -81,7 +103,7 @@ class RenderControlVideo():
         return " ".join(ret), {}
 
     def get_frames_to_video_parameters(self):
-        """ Get the duration for the desired framerate to generate a video from a set of images.
+        """Get the duration for the desired framerate to generate a video from a set of images.
 
         Returns:
             tuple[float,str]: How long each image should be shown for, and the ffmpeg files list line for that duration
@@ -98,6 +120,15 @@ class RenderControlVideo():
         return cls()
 
     @classmethod
-    def power_point(cls, framerate=10, width=320, height=None, codec='H.264', low_bitrate=False):
-        """ Returns a set of defaults suitable for embedding videos into powerpoint. """
-        return cls(framerate=framerate, width=width, height=height, min_scale=True, codec=codec, low_bitrate=low_bitrate)
+    def power_point(
+        cls, framerate=10, width=320, height=None, codec='H.264', low_bitrate=False
+    ):
+        """Returns a set of defaults suitable for embedding videos into powerpoint."""
+        return cls(
+            framerate=framerate,
+            width=width,
+            height=height,
+            min_scale=True,
+            codec=codec,
+            low_bitrate=low_bitrate,
+        )

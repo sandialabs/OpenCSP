@@ -1,16 +1,21 @@
 import opencsp.common.lib.tool.log_tools as lt
 
-class RenderControlPowerpointSlide():
-    def __init__(self,
-                 title_size=30, title_location: tuple[float,float]=(.48,.25),
-                 text_size=16, text_location: tuple[float,float]=(.53,.83),
-                 image_caption_size=14,
-                 is_title_slide=False,
-                 slide_index=-1,
-                 slide_size: tuple[float,float]=(13.33,7.5),
-                 inter_cell_buffer: float=0.35,
-                 reduced_image_size_scale: float=-1):
-        """ Controls for how to render a power slide.
+
+class RenderControlPowerpointSlide:
+    def __init__(
+        self,
+        title_size=30,
+        title_location: tuple[float, float] = (0.48, 0.25),
+        text_size=16,
+        text_location: tuple[float, float] = (0.53, 0.83),
+        image_caption_size=14,
+        is_title_slide=False,
+        slide_index=-1,
+        slide_size: tuple[float, float] = (13.33, 7.5),
+        inter_cell_buffer: float = 0.35,
+        reduced_image_size_scale: float = -1,
+    ):
+        """Controls for how to render a power slide.
 
         Args:
             title_size (int): Font size of the title text box. Defaults to 30.
@@ -47,16 +52,20 @@ class RenderControlPowerpointSlide():
         """ When images are reduced to save on disk space, this is the cutoff threshold at which images are scaled down. """
         self.slide_dpi = 300
         """ Assumed dots per inch of the slide """
-    
+
     @classmethod
     def title_slide(cls):
-        """ Default settings for the first frame slide """
-        return cls(24, (.77,5.7), 18, (.77,6.3), is_title_slide=True)
-    
+        """Default settings for the first frame slide"""
+        return cls(24, (0.77, 5.7), 18, (0.77, 6.3), is_title_slide=True)
+
     def get_title_dims(self):
-        """ Get the [x,y,width,height] of the title text box. """
-        return [*self.title_location, self.slide_size[0]-self.title_location[0], 0.62]
-    
+        """Get the [x,y,width,height] of the title text box."""
+        return [*self.title_location, self.slide_size[0] - self.title_location[0], 0.62]
+
     def get_text_dims(self):
-        """ Get the [x,y,width,height] of the contents text box. """
-        return [*self.text_location, self.slide_size[0]-self.text_location[0], self.slide_size[1]-self.text_location[1]]
+        """Get the [x,y,width,height] of the contents text box."""
+        return [
+            *self.text_location,
+            self.slide_size[0] - self.text_location[0],
+            self.slide_size[1] - self.text_location[1],
+        ]

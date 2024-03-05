@@ -2,16 +2,24 @@ import dataclasses
 import numpy as np
 
 import opencsp.common.lib.tool.image_tools as it
-from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImagesProcessor
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
+from opencsp.common.lib.cv.spot_analysis.image_processor import (
+    AbstractSpotAnalysisImagesProcessor,
+)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
+    SpotAnalysisOperable,
+)
+
 
 class LogScaleImageProcessor(AbstractSpotAnalysisImagesProcessor):
-    """ Converts the input images into a log scale. """
-    def __init__(self,
-                 max_value_input=0,
-                 cummulative_max_value_input=False,
-                 max_value_output=65535):
-        """ A video processor that adjusts the scale of input images to a log scale.
+    """Converts the input images into a log scale."""
+
+    def __init__(
+        self,
+        max_value_input=0,
+        cummulative_max_value_input=False,
+        max_value_output=65535,
+    ):
+        """A video processor that adjusts the scale of input images to a log scale.
 
         Args::
             max_value_input: int
@@ -37,34 +45,40 @@ class LogScaleImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.max_value_input = max_value_input
         self.cummulative_max_value_input = cummulative_max_value_input
         self.max_value_output = max_value_output
-        
-    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[np.ndarray]:
+
+    def _execute(
+        self, operable: SpotAnalysisOperable, is_last: bool
+    ) -> list[np.ndarray]:
         primary_image: np.ndarray = operable.primary_image.nparray
         current_max_value_input = operable.max_popf
-        
+
         # update input maximum values to the largest observed value
         if self.original_max_value_input == 0:
             if self.cummulative_max_value_input:
                 if operable.population_statistics != None:
                     self.max_value_input = current_max_value_input
                 else:
-                    self.max_value_input = np.max([self.max_value_input, current_max_value_input])
+                    self.max_value_input = np.max(
+                        [self.max_value_input, current_max_value_input]
+                    )
             else:
                 self.max_value_input = current_max_value_input
-        
+
         # determine the necessary output bit depth
         for data_type in [np.uint8, np.uint16, np.uint32, np.uint64]:
             if np.iinfo(data_type).max >= self.max_value_output:
                 break
         if primary_image.dtype != data_type:
             primary_image = primary_image.astype(data_type)
-        
+
         # log and rescale the image
         log_image = np.log(primary_image + 1)
         log_max = np.max(log_image)
-        target_max_val = self.max_value_output * (current_max_value_input / self.max_value_input)
+        target_max_val = self.max_value_output * (
+            current_max_value_input / self.max_value_input
+        )
         scalar = target_max_val / log_max
         processed_image = scalar * log_image
-        
+
         ret = dataclasses.replace(operable, primary_image=processed_image)
         return [ret]

@@ -21,7 +21,9 @@ class FunctionXYGrid(FunctionXYAbstract):
         in the form (smallest x, largest x, smallest y, largest y)
     """
 
-    def __init__(self, values: np.ndarray, limits: tuple[float, float, float, float] = None) -> None:
+    def __init__(
+        self, values: np.ndarray, limits: tuple[float, float, float, float] = None
+    ) -> None:
         """Represents a discrete function of equispaced points in its domain.
         Defined by an array and the location of the 4 corners
         of that array in the funciton space.
@@ -37,7 +39,7 @@ class FunctionXYGrid(FunctionXYAbstract):
         self.x_count = len(values[0]) + 0.0
         self.y_count = len(values) + 0.0
         if limits == None:  # default is to treat the array just as an array
-            limits = (0., self.x_count, 0., self.y_count)
+            limits = (0.0, self.x_count, 0.0, self.y_count)
         # if we know the first and last x & y values in the domain
         # and we assume all values are equispaced, this gives all
         # the information needed
@@ -53,12 +55,15 @@ class FunctionXYGrid(FunctionXYAbstract):
     #     ...
 
     # override
-    def value_at(self, x: float | Iterable[float], y: float | Iterable[float]) -> float | np.ndarray[float]:
+    def value_at(
+        self, x: float | Iterable[float], y: float | Iterable[float]
+    ) -> float | np.ndarray[float]:
         # array case
         if isinstance(x, Iterable) or isinstance(y, Iterable):
             if len(x) != len(y):
                 raise ValueError(
-                    f"The length of x and y must be the same. x length {len(x)} does not match y length {len(y)}")
+                    f"The length of x and y must be the same. x length {len(x)} does not match y length {len(y)}"
+                )
             return np.array([self.value_at(xi, yi) for xi, yi in zip(x, y)])
         # scalar case
         if self.in_domain(x, y):
@@ -80,12 +85,16 @@ class FunctionXYGrid(FunctionXYAbstract):
     # override
     def __getstate__(self) -> dict:
         """Returns a serializable object for pickleing."""
-        raise NotImplementedError("__getstate__ has not been implemented for FunctionXYGrid")
+        raise NotImplementedError(
+            "__getstate__ has not been implemented for FunctionXYGrid"
+        )
 
     # override
     def __setstate__(self, state: dict):
         """Takes in __getstate__(self)'s output to recreate the object `self` that was passed into __getstate__"""
-        raise NotImplementedError("__setstate__ has not been implemented for FunctionXYGrid")
+        raise NotImplementedError(
+            "__setstate__ has not been implemented for FunctionXYGrid"
+        )
 
     def to_index_values(self, x: float, y: float) -> tuple[int, int]:
         x_index = (x - self.x0) / self.x_step
@@ -94,7 +103,9 @@ class FunctionXYGrid(FunctionXYAbstract):
             return False
         return (int(x_index), int(y_index))
 
-    def draw(self, view: View3d, functionXY_style: rcfxy.RenderControlFunctionXY = None):
+    def draw(
+        self, view: View3d, functionXY_style: rcfxy.RenderControlFunctionXY = None
+    ):
         if functionXY_style == None:
             functionXY_style = rcfxy.RenderControlFunctionXY()
 
@@ -114,21 +125,24 @@ class FunctionXYGrid(FunctionXYAbstract):
 
         # draw
         if functionXY_style.draw_heatmap:
-            view.imshow(self.values,
-                        colorbar=functionXY_style.colorbar,
-                        vmin=vmin,
-                        vmax=vmax,
-                        cmap=functionXY_style.cmap,
-                        extent=extent,
-                        # norm=colors.LogNorm()
-                        )
+            view.imshow(
+                self.values,
+                colorbar=functionXY_style.colorbar,
+                vmin=vmin,
+                vmax=vmax,
+                cmap=functionXY_style.cmap,
+                extent=extent,
+                # norm=colors.LogNorm()
+            )
 
         if functionXY_style.draw_contours:
-            view.contour(np.flipud(self.values),
-                         colorbar=functionXY_style.colorbar,
-                         vmin=vmin,
-                         levels=3,  # TODO tjlarki: add to render control
-                         vmax=vmax,
-                         colors="black",  # TODO tjlarki: add to render control
-                         #  cmap=functionXY_style.cmap,
-                         extent=extent,)
+            view.contour(
+                np.flipud(self.values),
+                colorbar=functionXY_style.colorbar,
+                vmin=vmin,
+                levels=3,  # TODO tjlarki: add to render control
+                vmax=vmax,
+                colors="black",  # TODO tjlarki: add to render control
+                #  cmap=functionXY_style.cmap,
+                extent=extent,
+            )

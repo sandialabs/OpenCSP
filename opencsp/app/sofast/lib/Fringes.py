@@ -25,7 +25,9 @@ class Fringes:
         self.num_y_images = np.size(periods_y) * self.phase_shifts_y
         self.num_images = self.num_y_images + self.num_x_images
 
-    def get_frames(self, x: int, y: int, dtype: str, range_: list[float, float]) -> np.ndarray:
+    def get_frames(
+        self, x: int, y: int, dtype: str, range_: list[float, float]
+    ) -> np.ndarray:
         """
         Returns 3D ndarray of scaled, monochrome fringe images.
 
@@ -48,8 +50,12 @@ class Fringes:
         images = np.ones((y, x, self.num_images))  # float
 
         # Create sinusoids [-1, 1]
-        y_sinusoids = self.get_sinusoids(y, self.periods_y, self.phase_shifts_y)  # float
-        x_sinusoids = self.get_sinusoids(x, self.periods_x, self.phase_shifts_x)  # float
+        y_sinusoids = self.get_sinusoids(
+            y, self.periods_y, self.phase_shifts_y
+        )  # float
+        x_sinusoids = self.get_sinusoids(
+            x, self.periods_x, self.phase_shifts_x
+        )  # float
 
         # Create y fringes [-1, 1]
         for idx, sinusoid in enumerate(y_sinusoids):
@@ -63,7 +69,7 @@ class Fringes:
         images = images / 2 + 0.5  # float
 
         # Apply scaling function [value_min, value_max]
-        images *= (range_[1] - range_[0])  # float
+        images *= range_[1] - range_[0]  # float
         images += range_[0]  # float
 
         # Convert to output data_type
@@ -72,7 +78,9 @@ class Fringes:
         return images
 
     @staticmethod
-    def get_sinusoids(length: int, periods: list[float], phase_shifts: int) -> list[np.ndarray]:
+    def get_sinusoids(
+        length: int, periods: list[float], phase_shifts: int
+    ) -> list[np.ndarray]:
         """
         Creates list of phase shifted sinusoids for given periods ranging from
         -1 to 1.

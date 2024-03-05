@@ -2,7 +2,8 @@
 Files for string manipulation.
 """
 
-def add_to_last_sentence(base:str, add:str) -> str:
+
+def add_to_last_sentence(base: str, add: str) -> str:
     """
     Adds "add" string to "base" string, inserting before final period if present.
 

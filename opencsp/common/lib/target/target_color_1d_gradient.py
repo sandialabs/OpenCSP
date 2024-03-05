@@ -25,7 +25,7 @@ import opencsp.common.lib.target.target_image as ti
 #    print('Saving file:', output_file_dir_body_ext)
 #    plt.imsave(output_file_dir_body_ext, img, dpi=dpi)
 #    print('Done.')
-#    
+#
 #    # Green spectrum
 #    for row in range(0,n_rows):
 #        for col in range(0,n_cols):
@@ -39,7 +39,7 @@ import opencsp.common.lib.target.target_image as ti
 #    print('Saving file:', output_file_dir_body_ext)
 #    plt.imsave(output_file_dir_body_ext, img, dpi=dpi)
 #    print('Done.')
-#    
+#
 #    # Green to red
 #    for row in range(0,n_rows):
 #        for col in range(0,n_cols):

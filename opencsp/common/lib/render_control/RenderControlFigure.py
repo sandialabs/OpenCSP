@@ -3,22 +3,25 @@
 
 """
 
-class RenderControlFigure():
+
+class RenderControlFigure:
     """
     Render control for figures.
     """
 
-    def __init__(self,
-                 tile=True,           # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
-                 tile_array=(3,2),    # (n_x, n_y)
-                 tile_square=False,   # Set to True for equal-axis 3d plots.
-                 figsize=(6.4, 4.8),  # inch.
-                 upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
-                 grid=True):          # Whether or not to draw grid lines.
-        """ Set of controls for how to render figures.
+    def __init__(
+        self,
+        tile=True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
+        tile_array=(3, 2),  # (n_x, n_y)
+        tile_square=False,  # Set to True for equal-axis 3d plots.
+        figsize=(6.4, 4.8),  # inch.
+        upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
+        grid=True,
+    ):  # Whether or not to draw grid lines.
+        """Set of controls for how to render figures.
 
         Example::
-        
+
             plt.close('all')
             fm.reset_figure_management()
             figure_control = rcfg.RenderControlFigure()
@@ -42,20 +45,19 @@ class RenderControlFigure():
         """
 
         super(RenderControlFigure, self).__init__()
-        
+
         # Figure management.
         self.figure_names = []
-        self.tile         = tile
-        self.tile_array   = tile_array
-        self.tile_square  = tile_square
-    
+        self.tile = tile
+        self.tile_array = tile_array
+        self.tile_square = tile_square
+
         # Figure size and placement.
-        self.figsize       = figsize
+        self.figsize = figsize
         self.upper_left_xy = upper_left_xy
-        
+
         # Axis control.
         self.x_label = 'x (m)'
         self.y_label = 'y (m)'
         self.z_label = 'z (m)'
         self.grid = grid
-

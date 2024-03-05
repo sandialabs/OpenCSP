@@ -33,5 +33,5 @@ def downsample_measurement(file: str, n: int) -> Measurement:
         measure_point=measurement_orig.measure_point,
         optic_screen_dist=measurement_orig.optic_screen_dist,
         date=measurement_orig.date,
-        name=measurement_orig.name
+        name=measurement_orig.name,
     )

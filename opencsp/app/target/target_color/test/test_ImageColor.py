@@ -2,18 +2,17 @@
 """
 import numpy as np
 
-from   opencsp.app.target.target_color.lib.ImageColor import ImageColor
-from   opencsp.common.lib.geometry.LoopXY import LoopXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.app.target.target_color.lib.ImageColor import ImageColor
+from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class TestImageColor:
-    """Tests the ImageColor class
-    """
+    """Tests the ImageColor class"""
+
     @classmethod
     def setup_class(cls) -> 'TestImageColor':
-        """Creates test RGB image and loads into ImageColor
-        """
+        """Creates test RGB image and loads into ImageColor"""
         # Create RGB image with six bands
         # White, gray, black, red, off-red 1, off-red
         rgb = np.zeros((600, 400, 3)).astype(np.uint8)
@@ -36,8 +35,7 @@ class TestImageColor:
         return cls()
 
     def test_normalize(self) -> None:
-        """Tests image color normalization of all patches
-        """
+        """Tests image color normalization of all patches"""
         # White
         actual = self.image.image_norm[50, 200]
         desired = np.ones(3) / np.sqrt(3)
@@ -66,8 +64,7 @@ class TestImageColor:
         np.testing.assert_allclose(actual, desired)
 
     def test_cropping_image(self):
-        """Tests cropping of image
-        """
+        """Tests cropping of image"""
         # Create test image
         rgb = np.ones((50, 50, 3), dtype=np.uint8)
         image = ImageColor(rgb)
@@ -88,8 +85,7 @@ class TestImageColor:
         np.testing.assert_array_equal(actual, desired)
 
     def test_smooth_image(self):
-        """Tests smoothing of the image
-        """
+        """Tests smoothing of the image"""
         # Create test image
         rgb = np.zeros((50, 50, 3), dtype=np.float32)
         rgb[25, 25] = np.ones(3, dtype=np.float32)
@@ -97,7 +93,7 @@ class TestImageColor:
 
         # Smooth image
         n = 10
-        ker = np.ones((n, n), dtype=np.float32) / (n ** 2)
+        ker = np.ones((n, n), dtype=np.float32) / (n**2)
         image.smooth_image(ker)
 
         # Test smoothed value
@@ -106,14 +102,12 @@ class TestImageColor:
         np.testing.assert_array_equal(actual, desired)
 
     def test_plotting(self):
-        """Tests plotting of the images
-        """
+        """Tests plotting of the images"""
         self.image.plot_normalized()
         self.image.plot_unprocessed()
 
     def test_matching(self):
-        """Tests pixel matching in images
-        """
+        """Tests pixel matching in images"""
         # Test white/gray
         rgb = np.array([1, 1, 1], dtype=float)
         thresh = 1e-8

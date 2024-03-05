@@ -7,6 +7,7 @@ from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.typing_tools as tt
 
+
 class ImageType(Enum):
     PRIMARY = 1
     REFERENCE = 2
@@ -14,12 +15,16 @@ class ImageType(Enum):
     COMPARISON = 4
     BACKGROUND_MASK = 5
 
-class SpotAnalysisImagesStream(Iterator[dict[ImageType,CacheableImage]]):
+
+class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
     tt.strict_types
-    def __init__(self,
-                 primary_iterator: ImagesIterable | ImagesStream,
-                 other_iterators: dict[ImageType,ImagesIterable|ImagesStream]=None):
-        """ This class combines the image streams for several ImageTypes into
+
+    def __init__(
+        self,
+        primary_iterator: ImagesIterable | ImagesStream,
+        other_iterators: dict[ImageType, ImagesIterable | ImagesStream] = None,
+    ):
+        """This class combines the image streams for several ImageTypes into
         one convenient package. This helps to guarantee that images that are
         supposed to be processed together stay together for the entirety of the
         SpotAnalysis pipeline.
@@ -33,22 +38,26 @@ class SpotAnalysisImagesStream(Iterator[dict[ImageType,CacheableImage]]):
         """
         if other_iterators == None:
             other_iterators = {}
-        
+
         self.primary_iterator = primary_iterator
         self.other_iterators = other_iterators
         if ImageType.PRIMARY in other_iterators:
-            lt.warn("Warning in SpotAnalysisImagesStream: the other_iterators \"PRIMARY\" type will be ignored in favor of the primary_iterator")
+            lt.warn(
+                "Warning in SpotAnalysisImagesStream: the other_iterators \"PRIMARY\" type will be ignored in favor of the primary_iterator"
+            )
             del other_iterators[ImageType.PRIMARY]
-        
-        self.current_iterators: dict[ImageType,ImagesIterable|ImagesStream] = {ImageType.PRIMARY: None}
-    
+
+        self.current_iterators: dict[ImageType, ImagesIterable | ImagesStream] = {
+            ImageType.PRIMARY: None
+        }
+
     def __iter__(self):
         self.current_iterators = {}
         for img_t in self.other_iterators:
             self.current_iterators[img_t] = iter(self.other_iterators[img_t])
         self.current_iterators[ImageType.PRIMARY] = iter(self.primary_iterator)
         return self
-        
+
     def __next__(self):
         ret: dict[ImageType, CacheableImage] = {}
         for img_t in self.current_iterators:

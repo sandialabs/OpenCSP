@@ -2,9 +2,10 @@ import multiprocessing
 import time
 from typing import Callable, Iterable
 
-class MultiprocessNonDaemonic():
+
+class MultiprocessNonDaemonic:
     def __init__(self, num_processes: int):
-        """ This class is like multiprocessing.Pool, but the processes it uses aren't daemonic.
+        """This class is like multiprocessing.Pool, but the processes it uses aren't daemonic.
 
         Some properties of daemonic processes include:
             - When a process exits, it attempts to terminate all of its daemonic child processes.
@@ -27,7 +28,7 @@ class MultiprocessNonDaemonic():
         self.num_processes = num_processes
         self.queue = multiprocessing.Queue()
         """ Allows us to collect results from processes (from https://stackoverflow.com/questions/10415028/how-to-get-the-return-value-of-a-function-passed-to-multiprocessing-process) """
-    
+
     def _close_dead_procs(self):
         num_dead = 0
         to_remove = []
@@ -46,10 +47,10 @@ class MultiprocessNonDaemonic():
 
     @staticmethod
     def _do_work(func, queue, i, vargs):
-        """ worker function """
+        """worker function"""
         ret = func(*vargs)
         queue.put([i, ret])
-    
+
     def starmap(self, func: Callable, args: Iterable[Iterable]):
         results = []
 
@@ -59,7 +60,7 @@ class MultiprocessNonDaemonic():
                 if self._close_dead_procs() > 0:
                     break
                 time.sleep(0.1)
-            
+
             # create a new process and start it
             args2 = [func, self.queue, proc_idx, proc_args]
             proc = multiprocessing.Process(target=self._do_work, args=args2)
@@ -78,5 +79,5 @@ class MultiprocessNonDaemonic():
             rets.append([idx, ret])
         rets = sorted(rets, key=lambda v: v[0])
         rets = [ret[1] for ret in rets]
-        
+
         return rets

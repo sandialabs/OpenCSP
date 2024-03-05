@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from   opencsp.common.lib.geometry.LoopXY import LoopXY
-from   opencsp.common.lib.geometry.RegionXY import RegionXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class TestRegionXY:

@@ -10,8 +10,14 @@ import numpy as np
 from warnings import warn
 
 
-def axisrotation(unit_vector, angle):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BETWEEN "AXIS" AND "ROTATION"
-    warn('transform_3d.axisrotation is deprecated. Replace with scipy.spatial.transform.Rotation', DeprecationWarning, stacklevel=2)
+def axisrotation(
+    unit_vector, angle
+):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BETWEEN "AXIS" AND "ROTATION"
+    warn(
+        'transform_3d.axisrotation is deprecated. Replace with scipy.spatial.transform.Rotation',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # The original version of the routine used the left-hand rule.
     # This is reflected in the detailed code below.  Here we negate
     # the angle so that we use the right-hand rule.
@@ -27,7 +33,12 @@ def axisrotation(unit_vector, angle):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BE
     # The input vector must be a unit vector.
     norm = np.sqrt(ux**2 + uy**2 + uz**2)
     if abs(norm - 1.0) > 1e-9:  # tolerance
-        print('ERROR: In axisrotation(), input unit_vector =', unit_vector, ' is not of unit length.  Length =', norm)
+        print(
+            'ERROR: In axisrotation(), input unit_vector =',
+            unit_vector,
+            ' is not of unit length.  Length =',
+            norm,
+        )
 
     c = np.cos(lhr_angle)
     s = np.sin(lhr_angle)
@@ -50,12 +61,16 @@ def rotation_matrix_to_euler_angles(R):
     See https://learnopencv.com/rotation-matrix-to-euler-angles/
 
     """
-    warn('transform_3d.rotation_matrix_to_euler_angles is deprecated. Replace with scipy.spatial.transform.Rotation.', DeprecationWarning, stacklevel=2)
-    assert(is_rotation_matrix(R))
+    warn(
+        'transform_3d.rotation_matrix_to_euler_angles is deprecated. Replace with scipy.spatial.transform.Rotation.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
+    assert is_rotation_matrix(R)
 
     sy = math.sqrt(R[0, 0] * R[0, 0] + R[1, 0] * R[1, 0])
     singular = sy < 1e-6
-    if  not singular:
+    if not singular:
         rot_x = math.atan2(R[2, 1], R[2, 2])
         rot_y = math.atan2(-R[2, 0], sy)
         rot_z = math.atan2(R[1, 0], R[0, 0])
@@ -74,7 +89,11 @@ def is_rotation_matrix(R):
     See https://learnopencv.com/rotation-matrix-to-euler-angles/
 
     """
-    warn('transform_3d.is_rotation_matrix is deprecated. Replace with scipy.spatial.transform.Rotation.', DeprecationWarning, stacklevel=2)
+    warn(
+        'transform_3d.is_rotation_matrix is deprecated. Replace with scipy.spatial.transform.Rotation.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     Rt = np.transpose(R)
     shouldBeIdentity = np.dot(Rt, R)
     I = np.identity(3, dtype=R.dtype)

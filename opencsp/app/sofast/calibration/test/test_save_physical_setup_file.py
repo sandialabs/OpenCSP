@@ -4,10 +4,12 @@ from os.path import join
 import numpy as np
 
 import opencsp
-from   opencsp.app.sofast.calibration.lib.save_physical_setup_file import save_physical_setup_file
-from   opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
+    save_physical_setup_file,
+)
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.file_tools as ft
 
 
@@ -27,7 +29,9 @@ def test_save_physical_setup_file():
 
     # Load data
     name = 'Test Physical Setup File'
-    data_dist = load_hdf5_datasets(['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], file_screen_distortion_data)
+    data_dist = load_hdf5_datasets(
+        ['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], file_screen_distortion_data
+    )
     screen_distortion_data = {
         'pts_xy_screen_fraction': Vxy(data_dist['pts_xy_screen_fraction']),
         'pts_xyz_screen_coords': Vxyz(data_dist['pts_xyz_screen_coords']),

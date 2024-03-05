@@ -1,9 +1,9 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-from   opencsp.common.lib.geometry.EdgeXY import EdgeXY
-from   opencsp.common.lib.geometry.LineXY import LineXY
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.EdgeXY import EdgeXY
+from opencsp.common.lib.geometry.LineXY import LineXY
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class LoopXY:
@@ -53,7 +53,11 @@ class LoopXY:
             P_1 = self._edges[idx1].vertices[1]
             P_2 = self._edges[idx2].vertices[0]
             if P_1.x != P_2.x or P_1.y != P_2.y:
-                raise ValueError('The second vertex of line index {:d} does not match the first vertex of line index {:d}.'.format(idx1, idx2))
+                raise ValueError(
+                    'The second vertex of line index {:d} does not match the first vertex of line index {:d}.'.format(
+                        idx1, idx2
+                    )
+                )
 
     def _check_convex(self) -> None:
         """
@@ -75,8 +79,12 @@ class LoopXY:
         for idx1 in range(self.num_edges):
             idx2 = np.mod(idx1 + 1, self.num_edges)
             # Calcualte edge vectors
-            V_1 = (self._edges[idx1]._vertices[1] - self._edges[idx1]._vertices[0]).normalize()
-            V_2 = (self._edges[idx2]._vertices[1] - self._edges[idx2]._vertices[0]).normalize()
+            V_1 = (
+                self._edges[idx1]._vertices[1] - self._edges[idx1]._vertices[0]
+            ).normalize()
+            V_2 = (
+                self._edges[idx2]._vertices[1] - self._edges[idx2]._vertices[0]
+            ).normalize()
             # Calculate cross product
             cross_prod_data[idx2] = V_1.cross(V_2)[0]
 
@@ -119,10 +127,13 @@ class LoopXY:
         edges = []
         for idx1 in range(len(vertices)):
             idx2 = np.mod(idx1 + 1, len(vertices))
-            edges.append(EdgeXY(
-                vertices=vertices[[idx1, idx2]],
-                curve_data={'type': 'line'},
-                closed=False))
+            edges.append(
+                EdgeXY(
+                    vertices=vertices[[idx1, idx2]],
+                    curve_data={'type': 'line'},
+                    closed=False,
+                )
+            )
 
         return cls(edges=edges)
 
@@ -150,15 +161,20 @@ class LoopXY:
         edges = []
         for idx1 in range(len(vertices)):
             idx2 = np.mod(idx1 + 1, len(vertices))
-            edges.append(EdgeXY(
-                vertices=vertices[[idx1, idx2]],
-                curve_data={'type': 'line'},
-                closed=False))
+            edges.append(
+                EdgeXY(
+                    vertices=vertices[[idx1, idx2]],
+                    curve_data={'type': 'line'},
+                    closed=False,
+                )
+            )
 
         return cls(edges=edges)
 
     @classmethod
-    def from_rectangle(cls, x: float, y: float, width: float, height: float) -> 'LoopXY':
+    def from_rectangle(
+        cls, x: float, y: float, width: float, height: float
+    ) -> 'LoopXY':
         """Returns rectangular loop
 
         Parameters
@@ -174,8 +190,7 @@ class LoopXY:
         -------
         LoopXY
         """
-        vertices = Vxy(([x, x + width, x + width, x],
-                        [y, y, y + height, y + height]))
+        vertices = Vxy(([x, x + width, x + width, x], [y, y, y + height, y + height]))
         return cls.from_vertices(vertices)
 
     @property
@@ -186,7 +201,7 @@ class LoopXY:
         """
         vertex_xy_data = np.zeros((2, self.num_edges))
         for idx, edge in enumerate(self._edges):
-            vertex_xy_data[:, idx:idx + 1] = edge.vertices[0].data
+            vertex_xy_data[:, idx : idx + 1] = edge.vertices[0].data
         return Vxy(vertex_xy_data)
 
     @property
@@ -334,7 +349,17 @@ class LoopXY:
             dx = x2 - x1
             dy = y2 - y1
             # Plot arrow
-            ax.arrow(x1, y1, dx, dy, facecolor=linecolor, edgecolor=linecolor, length_includes_head=True, head_length=length, head_width=length / 2)
+            ax.arrow(
+                x1,
+                y1,
+                dx,
+                dy,
+                facecolor=linecolor,
+                edgecolor=linecolor,
+                length_includes_head=True,
+                head_length=length,
+                head_width=length / 2,
+            )
 
         # Plot starting point as green dot
         ax.scatter(*self.vertices.data[:, 0:1], color='green')
@@ -381,7 +406,7 @@ class LoopXY:
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
         """
         Gives the minnimum bounding envelope for the region. The minnimum
-        bounding envelope is the smallest rectangle that can fit the LoopXY 
+        bounding envelope is the smallest rectangle that can fit the LoopXY
         in question where all sides of the rectangle are parrallel to either the X or Y axes.
 
         Returns
@@ -426,11 +451,15 @@ class LoopXY:
                     intersect_xs.append(intersect_point.x[0])
                     intersect_ys.append(intersect_point.y[0])
             else:
-                raise NotImplementedError("Intersections of non-line edges not yet supported in this method")
+                raise NotImplementedError(
+                    "Intersections of non-line edges not yet supported in this method"
+                )
         intersect_points = Vxy((intersect_xs, intersect_ys))
 
         # Limit to internal (or border) intersections
-        intersect_points = intersect_points[self.is_inside_or_on_border(intersect_points)]
+        intersect_points = intersect_points[
+            self.is_inside_or_on_border(intersect_points)
+        ]
 
         # De-duplicate intersections
         keep_xs: list[float] = []

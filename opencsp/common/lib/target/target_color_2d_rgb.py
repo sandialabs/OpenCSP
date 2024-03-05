@@ -5,21 +5,25 @@ Creates a 2D color target
 import imageio.v3 as imageio
 import matplotlib.pyplot as plt
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
 
-def construct_blue_under_red_cross_green(nx, ny):  # ?? SCAFFOLDING RCB -- MAKE PARAMETER NAMES CONSISTENT WITH CONTEXT CODE
+def construct_blue_under_red_cross_green(
+    nx, ny
+):  # ?? SCAFFOLDING RCB -- MAKE PARAMETER NAMES CONSISTENT WITH CONTEXT CODE
     """
     # ?? SCAFFOLDING RCB -- IMPROVE THIS COMMENT
 
     Blue underlying red cross green.
     """
-    print("In construct_blue_under_red_cross_green()...")  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print(
+        "In construct_blue_under_red_cross_green()..."
+    )  # ?? SCAFFOLDING RCB -- TEMPORARY
 
     # Create an empty image.
     n_rows = ny
     n_cols = nx
-    image = np.zeros([n_rows, n_cols,3])
+    image = np.zeros([n_rows, n_cols, 3])
 
     # Size in (x,y) coordinates.
     x_max = n_cols
@@ -29,16 +33,18 @@ def construct_blue_under_red_cross_green(nx, ny):  # ?? SCAFFOLDING RCB -- MAKE 
     max_intensity = 1.0
 
     # FIll in blue underlying red cross green
-    for row in range(0,n_rows):
-        for col in range(0,n_cols):
+    for row in range(0, n_rows):
+        for col in range(0, n_cols):
             x = col
             y = n_rows - row
-            x_frac = (x/x_max)
-            y_frac = (y/y_max)
-            diagonal_frac = np.sqrt(x*x + y*y) / np.sqrt(x_max*x_max + y_max*y_max)
-            image[row,col,0] = x_frac * max_intensity
-            image[row,col,1] = y_frac * max_intensity
-            image[row,col,2] = (1-diagonal_frac) * max_intensity
+            x_frac = x / x_max
+            y_frac = y / y_max
+            diagonal_frac = np.sqrt(x * x + y * y) / np.sqrt(
+                x_max * x_max + y_max * y_max
+            )
+            image[row, col, 0] = x_frac * max_intensity
+            image[row, col, 1] = y_frac * max_intensity
+            image[row, col, 2] = (1 - diagonal_frac) * max_intensity
 
     # Convert to uint8
     image_uint8 = np.uint8(image * 255)
@@ -46,15 +52,19 @@ def construct_blue_under_red_cross_green(nx, ny):  # ?? SCAFFOLDING RCB -- MAKE 
     return image_uint8
 
 
-def construct_rgb_cube_inscribed_square_image(nx, ny, project_to_cube):  # ?? SCAFFOLDING RCB -- MAKE PARAMETER NAMES CONSISTENT WITH CONTEXT CODE
+def construct_rgb_cube_inscribed_square_image(
+    nx, ny, project_to_cube
+):  # ?? SCAFFOLDING RCB -- MAKE PARAMETER NAMES CONSISTENT WITH CONTEXT CODE
     """
     # ?? SCAFFOLDING RCB -- IMPROVE THIS COMMENT
 
-    Image defined by a square inscribed in the hexagon in [R,G,B] space formed by 
-    the Red, Green, and Blue basis vectors, and their pairwise combinations to 
+    Image defined by a square inscribed in the hexagon in [R,G,B] space formed by
+    the Red, Green, and Blue basis vectors, and their pairwise combinations to
     form Cyan, Magenta, and Yellow secondary vectors.
     """
-    print("In construct_rgb_cube_inscribed_square_image()...")  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print(
+        "In construct_rgb_cube_inscribed_square_image()..."
+    )  # ?? SCAFFOLDING RCB -- TEMPORARY
 
     # Create container for color vectors
     l = 0.4
@@ -69,7 +79,14 @@ def construct_rgb_cube_inscribed_square_image(nx, ny, project_to_cube):  # ?? SC
     vecs += np.array([[0.5, 0.5, 0.5]])
 
     # Create mask for non-valid points
-    mask = (vecs[:, 0] > 1) + (vecs[:, 0] < 0) + (vecs[:, 1] > 1) + (vecs[:, 1] < 0) + (vecs[:, 2] > 1) + (vecs[:, 2] < 0)
+    mask = (
+        (vecs[:, 0] > 1)
+        + (vecs[:, 0] < 0)
+        + (vecs[:, 1] > 1)
+        + (vecs[:, 1] < 0)
+        + (vecs[:, 2] > 1)
+        + (vecs[:, 2] < 0)
+    )
 
     # Apply mask
     vecs[mask] = np.nan
@@ -111,7 +128,14 @@ if __name__ == "__main__":
     vecs += np.array([[0.5, 0.5, 0.5]])
 
     # Create mask for non-valid points
-    mask = (vecs[:, 0] > 1) + (vecs[:, 0] < 0) + (vecs[:, 1] > 1) + (vecs[:, 1] < 0) + (vecs[:, 2] > 1) + (vecs[:, 2] < 0)
+    mask = (
+        (vecs[:, 0] > 1)
+        + (vecs[:, 0] < 0)
+        + (vecs[:, 1] > 1)
+        + (vecs[:, 1] < 0)
+        + (vecs[:, 2] > 1)
+        + (vecs[:, 2] < 0)
+    )
 
     # Apply mask
     vecs[mask] = np.nan

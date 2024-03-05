@@ -8,9 +8,9 @@ class Pxy(Vxy):
 
     def __repr__(self):
         return '2D Point:\n' + self._data.__repr__()
-    
+
     def distance(self, data_in: "Pxy") -> float:
-        """ Calculates the euclidian distance between this point and the data_in point. """
+        """Calculates the euclidian distance between this point and the data_in point."""
         self._check_is_Vxy(data_in)
         return (self - data_in).magnitude()[0]
 

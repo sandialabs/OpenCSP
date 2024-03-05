@@ -1,5 +1,7 @@
 """Parameters class for FixedPatternScreen class"""
-from opencsp.common.lib.deflectometry.GeometryProcessingParams import GeometryProcessingParams
+from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
+    GeometryProcessingParams,
+)
 from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 
@@ -22,8 +24,8 @@ class FixedPatternProcessParams:
         geometry_params : GeometryProcessingParams
             Parameters to use when processing geometry of facet
         """
-        self.blob_search_thresh: float = 5.
-        self.search_perp_axis_ratio: float = 3.
+        self.blob_search_thresh: float = 5.0
+        self.search_perp_axis_ratio: float = 3.0
         self.mask_hist_thresh: float = 0.5
         self.mask_filt_width: int = 9
         self.mask_filt_thresh: int = 4

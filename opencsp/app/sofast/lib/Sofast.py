@@ -1,34 +1,34 @@
 """Controls the processing of Sofast measurement data
 to calculate surface slopes.
 """
-from   typing import Literal, Any
+from typing import Literal, Any
 import warnings
 
 import numpy as np
-from   scipy.spatial.transform import Rotation
+from scipy.spatial.transform import Rotation
 
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.app.sofast.lib.SofastParams import SofastParams
-from   opencsp.common.lib.camera.Camera import Camera
-from   opencsp.common.lib.csp.Facet import Facet
-from   opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
-from   opencsp.common.lib.csp.MirrorPoint import MirrorPoint
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.SofastParams import SofastParams
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
+from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 import opencsp.common.lib.deflectometry.calculation_data_classes as cdc
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
-from   opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
+from opencsp.common.lib.deflectometry.FacetData import FacetData
 import opencsp.common.lib.deflectometry.image_processing as ip
 import opencsp.common.lib.deflectometry.process_optics_geometry as po
-from   opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
-from   opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
-from   opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from   opencsp.common.lib.geometry.LoopXY import LoopXY
-from   opencsp.common.lib.geometry.RegionXY import RegionXY
-from   opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets
+from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
+from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets
 
 
 class Sofast:
@@ -39,7 +39,7 @@ class Sofast:
     -----------
     - 0 - No outputs.
     - 1 - Just Sofast image processing plots
-    - 2 - Just slope solving plots 
+    - 2 - Just slope solving plots
     - 3 - All plots
 
     Processing types
@@ -155,7 +155,9 @@ class Sofast:
                 - v_facet_pointing_ensemble
     """
 
-    def __init__(self, measurement: Measurement, camera: Camera, display: Display) -> 'Sofast':
+    def __init__(
+        self, measurement: Measurement, camera: Camera, display: Display
+    ) -> 'Sofast':
         """
         SOFAST processing class.
 
@@ -173,7 +175,9 @@ class Sofast:
         self.measurement = measurement
         self.display = display
         self.camera = camera
-        self.orientation = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
+        self.orientation = SpatialOrientation(
+            display.r_cam_screen, display.v_cam_screen_cam
+        )
 
         # Define default calculation parameters
         self.params = SofastParams()
@@ -206,18 +210,27 @@ class Sofast:
             raise ValueError('Missing "surface_type" key in surface_data dictionary.')
 
         if surf_data['surface_type'] == 'parabolic':
-            fields_exp = ['surface_type', 'initial_focal_lengths_xy', 'robust_least_squares', 'downsample']
+            fields_exp = [
+                'surface_type',
+                'initial_focal_lengths_xy',
+                'robust_least_squares',
+                'downsample',
+            ]
         elif surf_data['surface_type'] == 'plano':
             fields_exp = ['surface_type', 'robust_least_squares', 'downsample']
         else:
-            raise ValueError(f'Given surface type {surf_data["surface_type"]} is not supported.')
+            raise ValueError(
+                f'Given surface type {surf_data["surface_type"]} is not supported.'
+            )
 
         for k in surf_data.keys():
             if k in fields_exp:
                 idx = fields_exp.index(k)
                 fields_exp.pop(idx)
             else:
-                raise ValueError(f'Unrecognized field, {k}, in surface_data dictionary.')
+                raise ValueError(
+                    f'Unrecognized field, {k}, in surface_data dictionary.'
+                )
 
         if len(fields_exp) > 0:
             raise ValueError(f'Missing fields in surface_data dictionary: {fields_exp}')
@@ -245,7 +258,9 @@ class Sofast:
         # Solve slopes
         self._solve_slopes([surface_data])
 
-    def process_optic_singlefacet(self, facet_data: FacetData, surface_data: dict) -> None:
+    def process_optic_singlefacet(
+        self, facet_data: FacetData, surface_data: dict
+    ) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
         for slops for single facet optic.
@@ -270,7 +285,12 @@ class Sofast:
         # Solve slopes
         self._solve_slopes([surface_data])
 
-    def process_optic_multifacet(self, facet_data: list[FacetData], ensemble_data: EnsembleData, surface_data: list[dict]) -> None:
+    def process_optic_multifacet(
+        self,
+        facet_data: list[FacetData],
+        ensemble_data: EnsembleData,
+        surface_data: list[dict],
+    ) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
         for slops for multi-facet optic.
@@ -287,7 +307,9 @@ class Sofast:
         """
         # Check inputs
         if len(facet_data) != len(surface_data):
-            raise ValueError(f'Length of facet_data does not equal length of surface data; facet_data={len(facet_data)}, surface_data={len(surface_data)}')
+            raise ValueError(
+                f'Length of facet_data does not equal length of surface data; facet_data={len(facet_data)}, surface_data={len(surface_data)}'
+            )
         list(map(self._check_surface_data, surface_data))
 
         # Process optic/setup geometry
@@ -321,12 +343,20 @@ class Sofast:
         mask_raw = ip.calc_mask_raw(self.measurement.mask_images, *params)
 
         # Process optic geometry
-        (self.data_geometry_general,
-         self.data_image_processing_general,
-         self.data_geometry_facet,
-         self.data_image_processing_facet,
-         self.data_error) = po.process_undefined_geometry(mask_raw, self.params.mask_keep_largest_area, self.measurement.optic_screen_dist,
-                                                          self.orientation, self.camera, self.params.geometry_data_debug)
+        (
+            self.data_geometry_general,
+            self.data_image_processing_general,
+            self.data_geometry_facet,
+            self.data_image_processing_facet,
+            self.data_error,
+        ) = po.process_undefined_geometry(
+            mask_raw,
+            self.params.mask_keep_largest_area,
+            self.measurement.optic_screen_dist,
+            self.orientation,
+            self.camera,
+            self.params.geometry_data_debug,
+        )
 
         # Save data
         self.data_facet_def = None
@@ -365,19 +395,30 @@ class Sofast:
             mask_raw2 = ip.keep_largest_mask_area(mask_raw)
             mask_raw = np.logical_and(mask_raw, mask_raw2)
 
-        (self.data_geometry_general,
-         self.data_image_processing_general,
-         self.data_geometry_facet,
-         self.data_image_processing_facet,
-         self.data_error) = po.process_singlefacet_geometry(facet_data, mask_raw, self.measurement.measure_point,
-                                                            self.measurement.optic_screen_dist, self.orientation,
-                                                            self.camera, self.params.geometry_params, self.params.geometry_data_debug)
+        (
+            self.data_geometry_general,
+            self.data_image_processing_general,
+            self.data_geometry_facet,
+            self.data_image_processing_facet,
+            self.data_error,
+        ) = po.process_singlefacet_geometry(
+            facet_data,
+            mask_raw,
+            self.measurement.measure_point,
+            self.measurement.optic_screen_dist,
+            self.orientation,
+            self.camera,
+            self.params.geometry_params,
+            self.params.geometry_data_debug,
+        )
 
         # Save data
         self.data_facet_def = [facet_data.copy()]
         self.data_ensemble_def = None
 
-    def _process_optic_multifacet_geometry(self, facet_data: list[FacetData], ensemble_data: EnsembleData) -> None:
+    def _process_optic_multifacet_geometry(
+        self, facet_data: list[FacetData], ensemble_data: EnsembleData
+    ) -> None:
         """
         Processes optic geometry for an ensemble of facets.
 
@@ -395,7 +436,9 @@ class Sofast:
 
         # Check inputs
         if len(facet_data) != self.num_facets:
-            raise ValueError(f'Given length of facet data is {len(facet_data):d} but ensemble_data expects {ensemble_data.num_facets:d} facets.')
+            raise ValueError(
+                f'Given length of facet data is {len(facet_data):d} but ensemble_data expects {ensemble_data.num_facets:d} facets.'
+            )
 
         # Calculate mask
         params = [
@@ -407,15 +450,29 @@ class Sofast:
         mask_raw = ip.calc_mask_raw(self.measurement.mask_images, *params)
 
         if self.params.mask_keep_largest_area:
-            warnings.warn('"keep_largest_area" mask processing option cannot be used for multifacet ensembles. This will be turned off.', stacklevel=2)
+            warnings.warn(
+                '"keep_largest_area" mask processing option cannot be used for multifacet ensembles. This will be turned off.',
+                stacklevel=2,
+            )
             self.params.mask_keep_largest_area = False
 
-        (self.data_geometry_general,
-         self.data_image_processing_general,
-         self.data_geometry_facet,
-         self.data_image_processing_facet,
-         self.data_error) = po.process_multifacet_geometry(facet_data, ensemble_data, mask_raw, self.measurement.measure_point, self.orientation, self.camera,
-                                                           self.measurement.optic_screen_dist, self.params.geometry_params, self.params.geometry_data_debug)
+        (
+            self.data_geometry_general,
+            self.data_image_processing_general,
+            self.data_geometry_facet,
+            self.data_image_processing_facet,
+            self.data_error,
+        ) = po.process_multifacet_geometry(
+            facet_data,
+            ensemble_data,
+            mask_raw,
+            self.measurement.measure_point,
+            self.orientation,
+            self.camera,
+            self.measurement.optic_screen_dist,
+            self.params.geometry_params,
+            self.params.geometry_data_debug,
+        )
 
         # Initialize data dictionaries
         self.data_facet_def = [f.copy() for f in facet_data]
@@ -444,36 +501,63 @@ class Sofast:
             screen_ys = 1.0 - screen_ys
             # Store screen points in Vxy
             v_screen_points_fractional_screens = Vxy((screen_xs, screen_ys))
-            self.data_geometry_facet[idx_facet].v_screen_points_fractional_screens = v_screen_points_fractional_screens
+            self.data_geometry_facet[
+                idx_facet
+            ].v_screen_points_fractional_screens = v_screen_points_fractional_screens
 
             # Undistort screen points (display coordinates)
-            v_screen_points_screen = self.display.interp_func(v_screen_points_fractional_screens)  # meters, display coordinates
-            self.data_geometry_facet[idx_facet].v_screen_points_screen = v_screen_points_screen
+            v_screen_points_screen = self.display.interp_func(
+                v_screen_points_fractional_screens
+            )  # meters, display coordinates
+            self.data_geometry_facet[
+                idx_facet
+            ].v_screen_points_screen = v_screen_points_screen
 
             # Check for nans returning from screen point calculation
             nan_mask = np.isnan(v_screen_points_screen.data).sum(0).astype(bool)
             mask_bad_pixels = np.zeros(mask_processed.shape, dtype=bool)
             if np.any(nan_mask):
-                warnings.warn(f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated screen points for facet {idx_facet:d}. These data points will be removed.', stacklevel=2)
+                warnings.warn(
+                    f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated screen points for facet {idx_facet:d}. These data points will be removed.',
+                    stacklevel=2,
+                )
                 # Make mask of NANs
                 mask_bad_pixels[mask_processed] = nan_mask
                 # Update processed mask
                 mask_processed[mask_bad_pixels] = False
                 # Remove nan data points from screen points
-                self.data_geometry_facet[idx_facet].v_screen_points_fractional_screens = v_screen_points_fractional_screens[np.logical_not(nan_mask)]
-                self.data_geometry_facet[idx_facet].v_screen_points_screen = v_screen_points_screen[np.logical_not(nan_mask)]
+                self.data_geometry_facet[
+                    idx_facet
+                ].v_screen_points_fractional_screens = v_screen_points_fractional_screens[
+                    np.logical_not(nan_mask)
+                ]
+                self.data_geometry_facet[
+                    idx_facet
+                ].v_screen_points_screen = v_screen_points_screen[
+                    np.logical_not(nan_mask)
+                ]
             # Save bad pixel mask
-            self.data_image_processing_facet[idx_facet].mask_bad_pixels = mask_bad_pixels
+            self.data_image_processing_facet[
+                idx_facet
+            ].mask_bad_pixels = mask_bad_pixels
 
             # Calculate pixel pointing directions (camera coordinates)
-            u_pixel_pointing_cam = ip.calculate_active_pixels_vectors(mask_processed, self.camera)
+            u_pixel_pointing_cam = ip.calculate_active_pixels_vectors(
+                mask_processed, self.camera
+            )
             # Convert to optic coordinates
             u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(ori.r_cam_optic)
-            self.data_geometry_facet[idx_facet].u_pixel_pointing_facet = u_pixel_pointing_facet
+            self.data_geometry_facet[
+                idx_facet
+            ].u_pixel_pointing_facet = u_pixel_pointing_facet
 
             # Convert to optic coordinates
-            v_screen_points_facet = ori.trans_screen_optic.apply(self.data_geometry_facet[idx_facet].v_screen_points_screen)
-            self.data_geometry_facet[idx_facet].v_screen_points_facet = v_screen_points_facet
+            v_screen_points_facet = ori.trans_screen_optic.apply(
+                self.data_geometry_facet[idx_facet].v_screen_points_screen
+            )
+            self.data_geometry_facet[
+                idx_facet
+            ].v_screen_points_facet = v_screen_points_facet
 
     def _solve_slopes(self, surface_data: list[dict]) -> None:
         """
@@ -495,17 +579,33 @@ class Sofast:
         for facet_idx in range(self.num_facets):
             # Check debug status
             if self.params.slope_solver_data_debug.debug_active:
-                self.params.slope_solver_data_debug.optic_data = self.data_facet_def[facet_idx]
+                self.params.slope_solver_data_debug.optic_data = self.data_facet_def[
+                    facet_idx
+                ]
 
             # Instantiate slope solver object
             kwargs = {
-                'v_optic_cam_optic': self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_cam_optic,
-                'u_active_pixel_pointing_optic': self.data_geometry_facet[facet_idx].u_pixel_pointing_facet,
-                'u_measure_pixel_pointing_optic': self.data_geometry_facet[facet_idx].u_cam_measure_point_facet,
-                'v_screen_points_facet': self.data_geometry_facet[facet_idx].v_screen_points_facet,
-                'v_optic_screen_optic': self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_screen_optic,
-                'v_align_point_optic': self.data_geometry_facet[facet_idx].v_align_point_facet,
-                'dist_optic_screen': self.data_geometry_facet[facet_idx].measure_point_screen_distance,
+                'v_optic_cam_optic': self.data_geometry_facet[
+                    facet_idx
+                ].spatial_orientation.v_optic_cam_optic,
+                'u_active_pixel_pointing_optic': self.data_geometry_facet[
+                    facet_idx
+                ].u_pixel_pointing_facet,
+                'u_measure_pixel_pointing_optic': self.data_geometry_facet[
+                    facet_idx
+                ].u_cam_measure_point_facet,
+                'v_screen_points_facet': self.data_geometry_facet[
+                    facet_idx
+                ].v_screen_points_facet,
+                'v_optic_screen_optic': self.data_geometry_facet[
+                    facet_idx
+                ].spatial_orientation.v_optic_screen_optic,
+                'v_align_point_optic': self.data_geometry_facet[
+                    facet_idx
+                ].v_align_point_facet,
+                'dist_optic_screen': self.data_geometry_facet[
+                    facet_idx
+                ].measure_point_screen_distance,
                 'surface_data': surface_data[facet_idx],
                 'debug': self.params.slope_solver_data_debug,
             }
@@ -525,7 +625,9 @@ class Sofast:
         # Save input surface parameters data
         self.data_surface_params = [s.copy() for s in surface_data]
 
-    def _calculate_facet_pointing(self, reference: Literal['average'] | int = 'average') -> None:
+    def _calculate_facet_pointing(
+        self, reference: Literal['average'] | int = 'average'
+    ) -> None:
         """
         Calculates facet pointing relative to the given reference.
 
@@ -542,7 +644,9 @@ class Sofast:
         if reference != 'average' and not isinstance(reference, int):
             raise ValueError('Given reference must be int or "average".')
         if isinstance(reference, int) and reference >= self.num_facets:
-            raise ValueError(f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.')
+            raise ValueError(
+                f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.'
+            )
 
         # Instantiate data dictionary
         self.data_characterization_ensemble = [{} for idx in range(self.num_facets)]
@@ -551,10 +655,15 @@ class Sofast:
         v_pointing_matrix = np.zeros((3, self.num_facets))
         for idx in range(self.num_facets):
             # Get transformation from user-input and slope solving
-            trans_1 = TransformXYZ.from_R_V(self.data_ensemble_def.r_facet_ensemble[idx], self.data_ensemble_def.v_facet_locations[idx])
+            trans_1 = TransformXYZ.from_R_V(
+                self.data_ensemble_def.r_facet_ensemble[idx],
+                self.data_ensemble_def.v_facet_locations[idx],
+            )
             trans_2 = self.data_characterization_facet[idx].trans_alignment
             # Calculate inverse of slope solving transform
-            trans_2 = TransformXYZ.from_V(-trans_2.V) * TransformXYZ.from_R(trans_2.R.inv())
+            trans_2 = TransformXYZ.from_V(-trans_2.V) * TransformXYZ.from_R(
+                trans_2.R.inv()
+            )
             # Create local to global transformation
             trans_facet_ensemble_list.append(trans_2 * trans_1)
 
@@ -572,12 +681,16 @@ class Sofast:
         trans_align_pointing = TransformXYZ.from_R(r_align_pointing)
 
         # Apply alignment rotation to total transformation
-        trans_facet_ensemble_list = [trans_align_pointing * t for t in trans_facet_ensemble_list]
+        trans_facet_ensemble_list = [
+            trans_align_pointing * t for t in trans_facet_ensemble_list
+        ]
 
         # Calculate global slope and surface points
         for idx in range(self.num_facets):
             # Get slope data
-            slopes = self.data_characterization_facet[idx].slopes_facet_xy  # facet coordinats
+            slopes = self.data_characterization_facet[
+                idx
+            ].slopes_facet_xy  # facet coordinats
 
             # Calculate surface normals in local (facet) coordinates
             u_surf_norms = np.ones((3, slopes.shape[1]))
@@ -587,13 +700,19 @@ class Sofast:
             # Apply rotation to normal vectors
             u_surf_norms_global = u_surf_norms.rotate(trans_facet_ensemble_list[idx].R)
             # Convert normal vectors to global (ensemble) slopes
-            slopes_ensemble_xy = -u_surf_norms_global.data[:2] / u_surf_norms_global.data[2:]
+            slopes_ensemble_xy = (
+                -u_surf_norms_global.data[:2] / u_surf_norms_global.data[2:]
+            )
 
             # Convert surface points to global (ensemble) coordinates
-            v_surf_points_ensemble = trans_facet_ensemble_list[idx].apply(self.data_characterization_facet[idx].v_surf_points_facet)
+            v_surf_points_ensemble = trans_facet_ensemble_list[idx].apply(
+                self.data_characterization_facet[idx].v_surf_points_facet
+            )
 
             # Calculate pointing vectors in ensemble coordinates
-            v_facet_pointing_ensemble = Vxyz((0, 0, 1)).rotate(trans_facet_ensemble_list[idx].R)
+            v_facet_pointing_ensemble = Vxyz((0, 0, 1)).rotate(
+                trans_facet_ensemble_list[idx].R
+            )
 
             self.data_characterization_ensemble[idx].update(
                 {
@@ -604,7 +723,9 @@ class Sofast:
                 }
             )
 
-    def get_optic(self, interp_type: Literal['bilinear', 'clough_tocher', 'nearest'] = 'nearest') -> FacetEnsemble | Facet:
+    def get_optic(
+        self, interp_type: Literal['bilinear', 'clough_tocher', 'nearest'] = 'nearest'
+    ) -> FacetEnsemble | Facet:
         """Returns the OpenCSP representation of the optic under test. For
         single facet data collects, returns a Facet object, and for multi-facet
         collects, returns a FacetEnsemble object. Each mirror is represented
@@ -648,7 +769,9 @@ class Sofast:
             facet = Facet(mirror)
             # Locate facet
             if self.optic_type == 'multi':
-                trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror]['trans_facet_ensemble']
+                trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror][
+                    'trans_facet_ensemble'
+                ]
                 facet.set_position_in_space(trans.V, trans.R)
             # Save facets
             facets.append(facet)
@@ -674,14 +797,14 @@ class Sofast:
 
         def save_dict_data(d: dict, prefix: str) -> None:
             if d is not None:
-                for v, n in  zip(d.values(), d.keys()):
+                for v, n in zip(d.values(), d.keys()):
                     values.append(v)
                     names.append(f'{prefix}/{n}')
 
         def save_list_data(l: list[dict], prefix: str) -> None:
             if l is not None:
                 for idx, d in enumerate(l):
-                    for v, n in  zip(d.values(), d.keys()):
+                    for v, n in zip(d.values(), d.keys()):
                         values.append(v)
                         names.append(f'{prefix}/facet_{idx:03d}/{n}')
 
@@ -689,10 +812,12 @@ class Sofast:
         if self.data_facet_def is not None:
             data_facet_def_dict = []
             for data in self.data_facet_def:
-                data_facet_def_dict.append({
-                    'v_facet_corners': data.v_facet_corners,
-                    'v_centroid_facet': data.v_facet_centroid,
-                })
+                data_facet_def_dict.append(
+                    {
+                        'v_facet_corners': data.v_facet_corners,
+                        'v_centroid_facet': data.v_facet_centroid,
+                    }
+                )
         else:
             data_facet_def_dict = None
 
@@ -700,7 +825,9 @@ class Sofast:
         if self.data_ensemble_def is not None:
             data_ensemble_def_dict = {
                 'ensemble_perimeter': self.data_ensemble_def.ensemble_perimeter,
-                'r_facet_ensemble': np.array([r.as_rotvec() for r in self.data_ensemble_def.r_facet_ensemble]),
+                'r_facet_ensemble': np.array(
+                    [r.as_rotvec() for r in self.data_ensemble_def.r_facet_ensemble]
+                ),
                 'v_centroid_ensemble': self.data_ensemble_def.v_centroid_ensemble,
                 'v_facet_locations': self.data_ensemble_def.v_facet_locations,
             }
@@ -712,17 +839,28 @@ class Sofast:
         data_params_dict.pop('debug')
 
         # Collect all data
-        save_dict_data(data_ensemble_def_dict, 'DataSofastInput/optic_definition/ensemble')
+        save_dict_data(
+            data_ensemble_def_dict, 'DataSofastInput/optic_definition/ensemble'
+        )
         save_list_data(data_facet_def_dict, 'DataSofastInput/optic_definition')
         save_dict_data(data_params_dict, 'DataSofastInput/sofast_params')
         save_list_data(self.data_surface_params, 'DataSofastInput/surface_params')
-        save_dict_data(self.data_geometry_general, 'DataSofastCalculation/geometry/general')
+        save_dict_data(
+            self.data_geometry_general, 'DataSofastCalculation/geometry/general'
+        )
         save_list_data(self.data_geometry_facet, 'DataSofastCalculation/geometry')
         save_dict_data(self.data_error, 'DataSofastCalculation/error')
-        save_dict_data(self.data_image_processing_general, 'DataSofastCalculation/image_processing/general')
-        save_list_data(self.data_image_processing_facet, 'DataSofastCalculation/image_processing')
+        save_dict_data(
+            self.data_image_processing_general,
+            'DataSofastCalculation/image_processing/general',
+        )
+        save_list_data(
+            self.data_image_processing_facet, 'DataSofastCalculation/image_processing'
+        )
         save_list_data(self.data_characterization_facet, 'DataSofastCalculation/facet')
-        save_list_data(self.data_characterization_ensemble, 'DataSofastCalculation/ensemble')
+        save_list_data(
+            self.data_characterization_ensemble, 'DataSofastCalculation/ensemble'
+        )
 
         # Format data
         values_formatted = []

@@ -7,11 +7,11 @@ to select image and find key points.
 
 """
 import tkinter as tk
-from   tkinter.filedialog import askopenfilename
+from tkinter.filedialog import askopenfilename
 import os
 
 import PIL
-from   PIL import Image, ImageTk
+from PIL import Image, ImageTk
 import imageio.v3 as imageio
 import numpy as np
 import rawpy
@@ -42,7 +42,10 @@ class SelectImagePoints:
         # Define system parameters
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
-        self.win_size_max = (int(screen_width * frac_window), int(screen_height * frac_window))
+        self.win_size_max = (
+            int(screen_width * frac_window),
+            int(screen_height * frac_window),
+        )
         self.roi_width = int(min(screen_height, screen_width) * frac_roi)  # pixels
         self.save_name = os.path.basename(file_name).split('.')[-2]
         self.image_file_name = file_name
@@ -53,7 +56,9 @@ class SelectImagePoints:
         self.root.overrideredirect(1)
         self.root.bind("<Escape>", lambda e: self.close())
         self.root.bind("s", lambda e: self.save())
-        self.root.geometry(f'+{int(screen_width * (1 - frac_window) / 2):d}+{int(screen_height * (1 - frac_window) / 2):d}')
+        self.root.geometry(
+            f'+{int(screen_width * (1 - frac_window) / 2):d}+{int(screen_height * (1 - frac_window) / 2):d}'
+        )
 
         # Create canvas
         self.canvas = tk.Canvas(self.root)
@@ -80,7 +85,9 @@ class SelectImagePoints:
         """
         Updates the current displayed image to current loaded image
         """
-        self.image_display = self.canvas.create_image(0, 0, anchor='nw', image=self.image_tk)
+        self.image_display = self.canvas.create_image(
+            0, 0, anchor='nw', image=self.image_tk
+        )
 
     def click(self, event) -> None:
         """
@@ -97,7 +104,9 @@ class SelectImagePoints:
         """
         Called when fine res image is clicked
         """
-        self.pts[-1] += np.array([event.x / self.scale, event.y / self.scale]).astype(int)  # image pixels
+        self.pts[-1] += np.array([event.x / self.scale, event.y / self.scale]).astype(
+            int
+        )  # image pixels
         self.revert_main_image()
 
     def click_rough(self, event):
@@ -134,10 +143,17 @@ class SelectImagePoints:
         image_pil = Image.fromarray(image.copy(), 'RGB')
 
         # Resize image
-        size_x = float(self.win_size_max[0]) / image_pil.size[0]  # window pixels / image pixels
-        size_y = float(self.win_size_max[1]) / image_pil.size[1]  # window pixels / image pixels
+        size_x = (
+            float(self.win_size_max[0]) / image_pil.size[0]
+        )  # window pixels / image pixels
+        size_y = (
+            float(self.win_size_max[1]) / image_pil.size[1]
+        )  # window pixels / image pixels
         self.scale = min(size_x, size_y)  # window pixels / image pixels
-        shape = (int(float(image_pil.size[0]) * self.scale), int(float(image_pil.size[1]) * self.scale))  # window pixels
+        shape = (
+            int(float(image_pil.size[0]) * self.scale),
+            int(float(image_pil.size[1]) * self.scale),
+        )  # window pixels
         image_pil = image_pil.resize(shape, PIL.Image.NEAREST)
 
         # Resize canvas
@@ -156,7 +172,7 @@ class SelectImagePoints:
         else:
             im_array = imageio.imread(file)
 
-        im_array = (im_array.astype(float) / float(np.percentile(im_array, 98)) * 255)
+        im_array = im_array.astype(float) / float(np.percentile(im_array, 98)) * 255
         im_array[im_array > 255] = 255
 
         if np.ndim(im_array) == 2:
@@ -189,7 +205,10 @@ class SelectImagePoints:
 
 if __name__ == '__main__':
     # Select file name
-    file_selected = askopenfilename(title='Select file to open', filetypes=[('RAW', '*.NEF'), ('RAW', '*.RAW'), ('All Files', '*.*')])
+    file_selected = askopenfilename(
+        title='Select file to open',
+        filetypes=[('RAW', '*.NEF'), ('RAW', '*.RAW'), ('All Files', '*.*')],
+    )
     if file_selected != '':
         # Create window
         win = SelectImagePoints(tk.Tk(), file_selected)

@@ -48,12 +48,12 @@ def setup_render_control_scan_section_analysis():
     # analysis_render_control.draw_context_mnsa_ray = False
     # analysis_render_control.draw_context_mxsa_ray = False
     # analysis_render_control.draw_single_heliostat_analysis = False
-#analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
-# single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
-# analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
-#analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
+    # single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
+    # analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
     analysis_render_control.draw_single_heliostat_constraints = False  # KEY DETAIL
     # analysis_render_control.draw_single_heliostat_constraints_heliostats = False
     # analysis_render_control.draw_single_heliostat_constraints_mnsa_ray = False
@@ -62,7 +62,9 @@ def setup_render_control_scan_section_analysis():
     # analysis_render_control.draw_single_heliostat_constraints_assessed_normals = False
     # analysis_render_control.draw_single_heliostat_constraints_detail = False
     # analysis_render_control.draw_single_heliostat_constraints_all_targets = False
-    analysis_render_control.draw_single_heliostat_constraints_summary = False  # KEY SUMMARY
+    analysis_render_control.draw_single_heliostat_constraints_summary = (
+        False  # KEY SUMMARY
+    )
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example = False
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example_C = C_draw
     analysis_render_control.draw_single_heliostat_constraints_legend = False
@@ -84,7 +86,9 @@ def setup_render_control_scan_section_analysis():
     analysis_render_control.draw_multi_heliostat_gaze_angle_example = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_fill = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_legend = False
-    analysis_render_control.draw_multi_heliostat_vertical_fov_required = False  # KEY SUMMARY
+    analysis_render_control.draw_multi_heliostat_vertical_fov_required = (
+        False  # KEY SUMMARY
+    )
     analysis_render_control.draw_multi_heliostat_vertical_fov_required_legend = False
     analysis_render_control.draw_multi_heliostat_select_gaze = False  # KEY SUMMARY
     # analysis_render_control.draw_multi_heliostat_select_gaze_per_heliostat = False
@@ -116,12 +120,12 @@ def setup_render_control_scan_section_analysis_section_plus_flight_4view():
     # analysis_render_control.draw_context_mnsa_ray = False
     # analysis_render_control.draw_context_mxsa_ray = False
     # analysis_render_control.draw_single_heliostat_analysis = False
-#analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
-# single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
-# analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
-#analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
+    # single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
+    # analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
     analysis_render_control.draw_single_heliostat_constraints = False  # KEY DETAIL
     # analysis_render_control.draw_single_heliostat_constraints_heliostats = False
     # analysis_render_control.draw_single_heliostat_constraints_mnsa_ray = False
@@ -152,7 +156,9 @@ def setup_render_control_scan_section_analysis_section_plus_flight_4view():
     analysis_render_control.draw_multi_heliostat_gaze_angle_example = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_fill = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_legend = False
-    analysis_render_control.draw_multi_heliostat_vertical_fov_required = False  # KEY SUMMARY
+    analysis_render_control.draw_multi_heliostat_vertical_fov_required = (
+        False  # KEY SUMMARY
+    )
     analysis_render_control.draw_multi_heliostat_vertical_fov_required_legend = False
     # analysis_render_control.draw_multi_heliostat_select_gaze = False  # KEY SUMMARY
     # analysis_render_control.draw_multi_heliostat_select_gaze_per_heliostat = False
@@ -184,12 +190,12 @@ def setup_render_control_scan_section_analysis_flight_4view():
     # analysis_render_control.draw_context_mnsa_ray = False
     # analysis_render_control.draw_context_mxsa_ray = False
     # analysis_render_control.draw_single_heliostat_analysis = False
-#analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
-#analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
-# single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
-# analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
-#analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['5E6', '6E6', '7E6', '8E6', '13E6', '14E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['10E6']
+    # analysis_render_control.draw_single_heliostat_analysis_list = ['12E6', '13E6']
+    # single_heliostat_render_pass = scan.passes[0].ufacet_scan_pass()
+    # analysis_render_control.draw_single_heliostat_analysis_list = single_heliostat_render_pass.heliostat_name_list
+    # analysis_render_control.draw_single_heliostat_analysis_list = ufacet_pass_E06.heliostat_name_list
     analysis_render_control.draw_single_heliostat_constraints = False  # KEY DETAIL
     # analysis_render_control.draw_single_heliostat_constraints_heliostats = False
     # analysis_render_control.draw_single_heliostat_constraints_mnsa_ray = False
@@ -198,7 +204,9 @@ def setup_render_control_scan_section_analysis_flight_4view():
     # analysis_render_control.draw_single_heliostat_constraints_assessed_normals = False
     # analysis_render_control.draw_single_heliostat_constraints_detail = False
     # analysis_render_control.draw_single_heliostat_constraints_all_targets = False
-    analysis_render_control.draw_single_heliostat_constraints_summary = False  # KEY SUMMARY
+    analysis_render_control.draw_single_heliostat_constraints_summary = (
+        False  # KEY SUMMARY
+    )
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example = False
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example_C = C_draw
     analysis_render_control.draw_single_heliostat_constraints_legend = False
@@ -220,7 +228,9 @@ def setup_render_control_scan_section_analysis_flight_4view():
     analysis_render_control.draw_multi_heliostat_gaze_angle_example = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_fill = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_legend = False
-    analysis_render_control.draw_multi_heliostat_vertical_fov_required = False  # KEY SUMMARY
+    analysis_render_control.draw_multi_heliostat_vertical_fov_required = (
+        False  # KEY SUMMARY
+    )
     analysis_render_control.draw_multi_heliostat_vertical_fov_required_legend = False
     analysis_render_control.draw_multi_heliostat_select_gaze = False  # KEY SUMMARY
     # analysis_render_control.draw_multi_heliostat_select_gaze_per_heliostat = False

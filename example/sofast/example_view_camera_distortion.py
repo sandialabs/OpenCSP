@@ -3,8 +3,9 @@ import os
 import matplotlib.pyplot as plt
 
 import opencsp
-from   opencsp.app.camera_calibration.lib.calibration_camera import view_distortion
-from   opencsp.common.lib.camera.Camera import Camera
+from opencsp.app.camera_calibration.lib.calibration_camera import view_distortion
+from opencsp.common.lib.camera.Camera import Camera
+
 
 def example_driver():
     """Example SOFAST script
@@ -15,7 +16,9 @@ def example_driver():
 
     """
     # Define input camera file
-    file = os.path.join(os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/camera.h5')
+    file = os.path.join(
+        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/camera.h5'
+    )
 
     # Load camera
     cam = Camera.load_from_hdf(file)
@@ -34,6 +37,7 @@ def example_driver():
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     fig.savefig(os.path.join(dir_save, 'distortion_plot.png'))
+
 
 if __name__ == '__main__':
     example_driver()

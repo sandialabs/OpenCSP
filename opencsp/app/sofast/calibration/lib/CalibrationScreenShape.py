@@ -1,25 +1,25 @@
 """Class containing all screen distortion calibration routines.
 Saves distortion data and calibrated markers for camera position calibration.
 """
-from   dataclasses import dataclass
+from dataclasses import dataclass
 import os
-from   warnings import warn
+from warnings import warn
 
 import cv2 as cv
 import h5py
 import matplotlib.pyplot as plt
 import numpy as np
-from   numpy import ndarray
-from   scipy.spatial.transform import Rotation
-from   tqdm import tqdm
+from numpy import ndarray
+from scipy.spatial.transform import Rotation
+from tqdm import tqdm
 
 import opencsp.app.sofast.calibration.lib.screen_distortion_calculations as sd
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.common.lib.camera.Camera import Camera
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.common.lib.camera.Camera import Camera
 import opencsp.common.lib.deflectometry.image_processing as ip
-from   opencsp.common.lib.deflectometry.ImageProjection import CalParams
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.deflectometry.ImageProjection import CalParams
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
 import opencsp.common.lib.photogrammetry.bundle_adjustment as ba
 
@@ -49,6 +49,7 @@ class DataInput:
     ray_intersection_threshold : float
         Threshold to consider a valid intersection, meters, by default 0.001.
     """
+
     corner_ids: ndarray
     screen_cal_point_pairs: ndarray
     resolution_xy: tuple[int, int]
@@ -63,6 +64,7 @@ class DataInput:
 @dataclass
 class DataCalculation:
     """Data class storing calculation data"""
+
     pts_screen_frac_x: ndarray = None
     pts_screen_frac_y: ndarray = None
     cal_pattern_params: CalParams = None
@@ -96,14 +98,16 @@ class CalibrationScreenShape:
         self.data_input = data_input
 
         # Load cal params
-        cal_pattern_params = CalParams(self.data_input.image_projection_data['size_x'],
-                                       self.data_input.image_projection_data['size_y'])
+        cal_pattern_params = CalParams(
+            self.data_input.image_projection_data['size_x'],
+            self.data_input.image_projection_data['size_y'],
+        )
 
         # Initialize calculation data structure
         self.data_calculation = DataCalculation(
             pts_screen_frac_x=np.linspace(0.01, 0.99, data_input.resolution_xy[0]),
             pts_screen_frac_y=np.linspace(0.01, 0.99, data_input.resolution_xy[1]),
-            cal_pattern_params=cal_pattern_params
+            cal_pattern_params=cal_pattern_params,
         )
 
         # Save figures
@@ -142,19 +146,34 @@ class CalibrationScreenShape:
             im_y[mask] = y_pos
 
             # Interpolate orientation points
-            pts_uv_pixel_ori.append(sd.interp_xy_screen_positions(im_x, im_y, self.data_calculation.cal_pattern_params.x_screen_axis,
-                                                                  self.data_calculation.cal_pattern_params.y_screen_axis))
+            pts_uv_pixel_ori.append(
+                sd.interp_xy_screen_positions(
+                    im_x,
+                    im_y,
+                    self.data_calculation.cal_pattern_params.x_screen_axis,
+                    self.data_calculation.cal_pattern_params.y_screen_axis,
+                )
+            )
 
             # Interpolate full resolution points
-            pts_uv_pixel_full.append(sd.interp_xy_screen_positions(im_x, im_y, self.data_calculation.pts_screen_frac_x,
-                                                                   self.data_calculation.pts_screen_frac_y))
+            pts_uv_pixel_full.append(
+                sd.interp_xy_screen_positions(
+                    im_x,
+                    im_y,
+                    self.data_calculation.pts_screen_frac_x,
+                    self.data_calculation.pts_screen_frac_y,
+                )
+            )
 
         # Save interpolated points
         self.data_calculation.pts_uv_pixel_orientation = pts_uv_pixel_ori
         self.data_calculation.pts_uv_pixel = pts_uv_pixel_full
 
         # Save number of points
-        self.data_calculation.num_points_screen = self.data_calculation.pts_screen_frac_x.size * self.data_calculation.pts_screen_frac_y.size
+        self.data_calculation.num_points_screen = (
+            self.data_calculation.pts_screen_frac_x.size
+            * self.data_calculation.pts_screen_frac_y.size
+        )
         self.data_calculation.num_poses = len(pts_uv_pixel_ori)
 
     def locate_camera_positions(self, verbose: bool = False) -> None:
@@ -176,7 +195,8 @@ class CalibrationScreenShape:
                 pts_obj_ori_0,
                 pts_img_used.data.T,
                 self.data_input.camera.intrinsic_mat,
-                self.data_input.camera.distortion_coef)
+                self.data_input.camera.distortion_coef,
+            )
             if not ret:
                 warn('Camera position did not solve correctly.')
             rvecs_0.append(rvec.squeeze())
@@ -185,13 +205,30 @@ class CalibrationScreenShape:
         tvecs_0 = np.array(tvecs_0)
 
         # Format data for optimization
-        point_indices = np.tile(np.arange(pts_used_idxs.size), self.data_calculation.num_poses)
-        camera_indices = np.repeat(np.arange(self.data_calculation.num_poses), pts_used_idxs.size)
-        points_2d = np.vstack([vec[pts_used_idxs].data.T for vec in self.data_calculation.pts_uv_pixel_orientation])
+        point_indices = np.tile(
+            np.arange(pts_used_idxs.size), self.data_calculation.num_poses
+        )
+        camera_indices = np.repeat(
+            np.arange(self.data_calculation.num_poses), pts_used_idxs.size
+        )
+        points_2d = np.vstack(
+            [
+                vec[pts_used_idxs].data.T
+                for vec in self.data_calculation.pts_uv_pixel_orientation
+            ]
+        )
 
         # Calculate error after rough camera alignment
-        errors_0 = ph.reprojection_errors(rvecs_0, tvecs_0, pts_obj_ori_0, self.data_input.camera, camera_indices, point_indices, points_2d)
-        error_0 = np.sqrt(np.mean(errors_0 ** 2))
+        errors_0 = ph.reprojection_errors(
+            rvecs_0,
+            tvecs_0,
+            pts_obj_ori_0,
+            self.data_input.camera,
+            camera_indices,
+            point_indices,
+            points_2d,
+        )
+        error_0 = np.sqrt(np.mean(errors_0**2))
         if verbose:
             print(f'Reprojection error stage 1 rough alignment: {error_0:.2f} pixels')
 
@@ -200,13 +237,30 @@ class CalibrationScreenShape:
             type_ = 'camera'  # only optimize camera location
         else:
             type_ = 'both'  # optimize camera and point locations
-        rvecs_1, tvecs_1, pts_obj_ori_1 = ba.bundle_adjust(rvecs_0, tvecs_0, pts_obj_ori_0, camera_indices,
-                                                           point_indices, points_2d, self.data_input.camera.intrinsic_mat,
-                                                           self.data_input.camera.distortion_coef, type_, verbose)
+        rvecs_1, tvecs_1, pts_obj_ori_1 = ba.bundle_adjust(
+            rvecs_0,
+            tvecs_0,
+            pts_obj_ori_0,
+            camera_indices,
+            point_indices,
+            points_2d,
+            self.data_input.camera.intrinsic_mat,
+            self.data_input.camera.distortion_coef,
+            type_,
+            verbose,
+        )
 
         # Calculate error
-        errors_1 = ph.reprojection_errors(rvecs_1, tvecs_1, pts_obj_ori_1, self.data_input.camera, camera_indices, point_indices, points_2d)
-        error_1 = np.sqrt(np.mean(errors_1 ** 2))
+        errors_1 = ph.reprojection_errors(
+            rvecs_1,
+            tvecs_1,
+            pts_obj_ori_1,
+            self.data_input.camera,
+            camera_indices,
+            point_indices,
+            points_2d,
+        )
+        error_1 = np.sqrt(np.mean(errors_1**2))
         if verbose:
             print(f'Reprojection error stage 2 bundle adjustment: {error_1:.2f} pixels')
 
@@ -226,10 +280,18 @@ class CalibrationScreenShape:
         v_screen_cam_screen = Vxyz(np.concatenate(v_screen_cam_screen, 1))
 
         # Find pointing vectors for points in screen coordinates
-        u_cam_pt_screen_mat = np.zeros((self.data_calculation.num_points_screen, self.data_calculation.num_poses, 3))
+        u_cam_pt_screen_mat = np.zeros(
+            (
+                self.data_calculation.num_points_screen,
+                self.data_calculation.num_poses,
+                3,
+            )
+        )
 
         # Loop through all camera poses
-        for idx_pose, (pts, rot) in enumerate(zip(self.data_calculation.pts_uv_pixel, self.data_calculation.rvecs)):
+        for idx_pose, (pts, rot) in enumerate(
+            zip(self.data_calculation.pts_uv_pixel, self.data_calculation.rvecs)
+        ):
             # Get camera pointing vectors in camera coordinates
             v_cam_pt_cam = self.data_input.camera.vector_from_pixel(pts)
 
@@ -241,13 +303,17 @@ class CalibrationScreenShape:
 
         # Calculate high-res intersection points
         v_screen_pt_screen_mat = np.zeros((self.data_calculation.num_points_screen, 3))
-        intersection_dists = np.zeros((self.data_calculation.num_points_screen, self.data_calculation.num_poses))
+        intersection_dists = np.zeros(
+            (self.data_calculation.num_points_screen, self.data_calculation.num_poses)
+        )
 
-        for idx_pt in tqdm(range(self.data_calculation.num_points_screen), desc='Intersecting rays'):
+        for idx_pt in tqdm(
+            range(self.data_calculation.num_points_screen), desc='Intersecting rays'
+        ):
             # Intersect points
             pt, dists = ph.nearest_ray_intersection(
                 v_screen_cam_screen,  # length N
-                Vxyz(u_cam_pt_screen_mat[idx_pt].T)  # length N
+                Vxyz(u_cam_pt_screen_mat[idx_pt].T),  # length N
             )
 
             v_screen_pt_screen_mat[idx_pt] = pt.data.squeeze()
@@ -259,7 +325,9 @@ class CalibrationScreenShape:
         # Save data
         self.data_calculation.pts_xyz_screen_aligned = Vxyz(v_screen_pt_screen_mat.T)
         self.data_calculation.intersection_dists_mean = dist_error_mean
-        self.data_calculation.intersection_points_mask = dist_error_mean < self.data_input.ray_intersection_threshold
+        self.data_calculation.intersection_points_mask = (
+            dist_error_mean < self.data_input.ray_intersection_threshold
+        )
 
     def assemble_xyz_data_into_images(self) -> None:
         """Assembles data into 2d arrays"""
@@ -284,10 +352,21 @@ class CalibrationScreenShape:
         - pts_xy_screen_fraction: Vxy
         - pts_xyz_screen_coords: Vxyz
         """
-        pts_x_screen_frac, pts_y_screen_frac = np.meshgrid(self.data_calculation.pts_screen_frac_x, self.data_calculation.pts_screen_frac_y)  # Screen fractions
+        pts_x_screen_frac, pts_y_screen_frac = np.meshgrid(
+            self.data_calculation.pts_screen_frac_x,
+            self.data_calculation.pts_screen_frac_y,
+        )  # Screen fractions
         pts_y_screen_frac = np.flip(pts_y_screen_frac, axis=0)  # Flip y coordinate only
-        pts_xy_screen_fraction = Vxy(np.array((pts_x_screen_frac.flatten(), pts_y_screen_frac.flatten()))[:, self.data_calculation.intersection_points_mask])
-        pts_xyz_screen = Vxyz(self.data_calculation.pts_xyz_screen_aligned.data[:, self.data_calculation.intersection_points_mask])
+        pts_xy_screen_fraction = Vxy(
+            np.array((pts_x_screen_frac.flatten(), pts_y_screen_frac.flatten()))[
+                :, self.data_calculation.intersection_points_mask
+            ]
+        )
+        pts_xyz_screen = Vxyz(
+            self.data_calculation.pts_xyz_screen_aligned.data[
+                :, self.data_calculation.intersection_points_mask
+            ]
+        )
 
         return {
             'pts_xy_screen_fraction': pts_xy_screen_fraction,
@@ -301,8 +380,12 @@ class CalibrationScreenShape:
 
         # Save distortion data
         with h5py.File(file, 'w') as f:
-            f.create_dataset('pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data)
-            f.create_dataset('pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data)
+            f.create_dataset(
+                'pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data
+            )
+            f.create_dataset(
+                'pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data
+            )
         print(f'Saved distortion data to: {os.path.abspath(file):s}')
 
     def visualize_located_cameras(self) -> None:
@@ -312,7 +395,13 @@ class CalibrationScreenShape:
         self.figures.append(fig)
         ax = fig.add_subplot(111, projection='3d')
 
-        ph.plot_pts_3d(ax, self.data_calculation.pts_xyz_screen_orientation.data.T, self.data_calculation.rvecs, self.data_calculation.tvecs, 2)
+        ph.plot_pts_3d(
+            ax,
+            self.data_calculation.pts_xyz_screen_orientation.data.T,
+            self.data_calculation.rvecs,
+            self.data_calculation.tvecs,
+            2,
+        )
         plt.title('Calculated Camera Positions')
         ax.axis('equal')
 
@@ -320,7 +409,9 @@ class CalibrationScreenShape:
         """Annotates images of screen with screen points"""
         # Visualize each camera pose
         for idx_pose in range(self.data_calculation.num_poses):
-            fig = plt.figure(f'CalibrationScreenShape_Annotated_Camera_{idx_pose:d}_Images')
+            fig = plt.figure(
+                f'CalibrationScreenShape_Annotated_Camera_{idx_pose:d}_Images'
+            )
             self.figures.append(fig)
             ax = fig.gca()
             # Get measurement
@@ -328,13 +419,18 @@ class CalibrationScreenShape:
             # Plot all white mask image
             ax.imshow(meas.mask_images[..., 1], cmap='gray')
             # Plot points
-            for idx_point, pt in zip(self.data_calculation.cal_pattern_params.index, self.data_calculation.pts_uv_pixel_orientation[idx_pose]):
+            for idx_point, pt in zip(
+                self.data_calculation.cal_pattern_params.index,
+                self.data_calculation.pts_uv_pixel_orientation[idx_pose],
+            ):
                 ax.scatter(*pt.data, color='k', s=20)
                 ax.text(*(pt + Vxy([5, -10])).data, idx_point, size=8, color='w')
 
     def plot_ray_intersection_errors(self) -> None:
         """Plots camera ray intersection errors"""
-        fig = plt.figure('CalibrationScreenShape_Ray_Intersection_Errors', figsize=(9, 3))
+        fig = plt.figure(
+            'CalibrationScreenShape_Ray_Intersection_Errors', figsize=(9, 3)
+        )
         self.figures.append(fig)
         ax = fig.gca()
 
@@ -362,8 +458,15 @@ class CalibrationScreenShape:
         x = pts_screen[mask_int_pts].x
         y = pts_screen[mask_int_pts].y
 
-        ax.scatter(*pts_screen[mask_int_pts].data[:2], marker='.', c='r', s=1, alpha=0.3)  # Intersection points
-        ax.scatter(*pts_screen_orientation.data[:2], marker='s', s=20, label='Calibration Points')  # Screen calibration points
+        ax.scatter(
+            *pts_screen[mask_int_pts].data[:2], marker='.', c='r', s=1, alpha=0.3
+        )  # Intersection points
+        ax.scatter(
+            *pts_screen_orientation.data[:2],
+            marker='s',
+            s=20,
+            label='Calibration Points',
+        )  # Screen calibration points
         ax.set_title('Screen Points Summary')
         ax.grid()
         ax.set_xlim(x.max() * 1.05, x.min() * 1.05)
@@ -408,7 +511,9 @@ class CalibrationScreenShape:
         fig = plt.figure('CalibrationScreenShape_Screen_Map_Z')
         self.figures.append(fig)
         ax = fig.gca()
-        im = ax.imshow(self.data_calculation.im_z_screen_pts * 1000, extent=extent, cmap='jet')
+        im = ax.imshow(
+            self.data_calculation.im_z_screen_pts * 1000, extent=extent, cmap='jet'
+        )
         format_image(ax, im)
         im.set_clim(-z_clim, z_clim)
         ax.set_title('Z (mm)')

@@ -1,4 +1,4 @@
-from   opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class Uxy(Vxy):

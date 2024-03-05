@@ -1,4 +1,4 @@
-from   abc import abstractmethod, ABC, abstractproperty
+from abc import abstractmethod, ABC, abstractproperty
 import numpy as np
 
 
@@ -9,6 +9,7 @@ class ImageAcquisitionAbstract(ABC):
         saturation threshold. Uses a binary search algorithm.
 
         """
+
         def _get_exposure_idxs():
             """Returns indices of under/over exposed images"""
             # Under exposed
@@ -46,7 +47,9 @@ class ImageAcquisitionAbstract(ABC):
         self.exposure_time = exposure_values[0]
         im = self.get_frame()
         if _check_saturated(im):
-            raise ValueError('Minimum exposure value is too high; image still saturated.')
+            raise ValueError(
+                'Minimum exposure value is too high; image still saturated.'
+            )
 
         # Checks that the maximum value is over-exposed
         self.exposure_time = exposure_values[-1]
@@ -70,10 +73,10 @@ class ImageAcquisitionAbstract(ABC):
             # Check if saturated
             if _check_saturated(im):
                 # Saturated
-                exposure_out[idx:idx + 1] = np.array([1])
+                exposure_out[idx : idx + 1] = np.array([1])
             else:
                 # Under-saturated
-                exposure_out[idx:idx + 1] = np.array([-1])
+                exposure_out[idx : idx + 1] = np.array([-1])
 
             # Check if exposure is set
             if _check_exposure_set():

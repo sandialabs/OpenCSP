@@ -4,7 +4,9 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.csp.OpticOrientation import OpticOrientation
-from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import VisualizeOrthorectifiedSlopeAbstract
+from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import (
+    VisualizeOrthorectifiedSlopeAbstract,
+)
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.geometry.LoopXY import LoopXY
@@ -18,9 +20,7 @@ from opencsp.common.lib.render_control.RenderControlMirror import RenderControlM
 
 
 class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
-    """Ensemble of facets that holds Facet objects.
-
-    """
+    """Ensemble of facets that holds Facet objects."""
 
     def __init__(self, facets: list[Facet]):
         """Instantiates FacetEnsemble class
@@ -43,11 +43,17 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
 
     @property
     def transform_mirror_base_to_base(self) -> list[TransformXYZ]:
-        return [self.ori.transform_child_to_base * trans for trans in self.transform_mirror_base_to_child]
+        return [
+            self.ori.transform_child_to_base * trans
+            for trans in self.transform_mirror_base_to_child
+        ]
 
     @property
     def transform_mirror_base_to_parent(self) -> list[TransformXYZ]:
-        return [self.ori.transform_child_to_parent * trans for trans in self.transform_mirror_base_to_child]
+        return [
+            self.ori.transform_child_to_parent * trans
+            for trans in self.transform_mirror_base_to_child
+        ]
 
     @property
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
@@ -63,47 +69,82 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         xyz = []  # ensemble child
         for facet in self.facets:
             # Get all mirror region vertices
-            points_xy = Pxy.merge([loop.vertices for loop in facet.mirror.region.loops])  # mirror base
+            points_xy = Pxy.merge(
+                [loop.vertices for loop in facet.mirror.region.loops]
+            )  # mirror base
             points_z = facet.mirror.surface_displacement_at(points_xy)  # mirror base
             points_xyz = Pxyz((points_xy.x, points_xy.y, points_z))  # mirror base
-            points_xyz = facet.transform_mirror_base_to_parent.apply(points_xyz)  # ensemble child
+            points_xyz = facet.transform_mirror_base_to_parent.apply(
+                points_xyz
+            )  # ensemble child
             xyz.append(points_xyz)  # ensemble child
         xyz = Pxyz.merge(xyz)  # ensemble child
 
         # Find bounding box
         return xyz.x.min(), xyz.x.max(), xyz.y.min(), xyz.y.max()  # ensemble child
 
-    def survey_of_points(self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None) -> tuple[Pxyz, Vxyz]:
+    def survey_of_points(
+        self,
+        resolution: int,
+        resolution_type: str = 'pixelX',
+        random_seed: int | None = None,
+    ) -> tuple[Pxyz, Vxyz]:
         # Get sample point locations (z=0 plane in "ensemble child" reference frame)
         bbox = self.axis_aligned_bounding_box  # left, right, bottom, top
         width = bbox[1] - bbox[0]
         height = bbox[3] - bbox[2]
-        region = RegionXY(LoopXY.from_rectangle(bbox[0], bbox[2], width, height))  # ensemble child
-        points_samp_xy = region.points_sample(resolution, resolution_type, random_seed)  # ensemble child
-        points_samp_xyz = Vxyz((points_samp_xy.x, points_samp_xy.y, np.zeros(len(points_samp_xy))))  # ensemble child
+        region = RegionXY(
+            LoopXY.from_rectangle(bbox[0], bbox[2], width, height)
+        )  # ensemble child
+        points_samp_xy = region.points_sample(
+            resolution, resolution_type, random_seed
+        )  # ensemble child
+        points_samp_xyz = Vxyz(
+            (points_samp_xy.x, points_samp_xy.y, np.zeros(len(points_samp_xy)))
+        )  # ensemble child
 
         idx_facet = 0
         points_list = []
         normals_list = []
         for idx_facet in range(self.num_facets):
             # Filter points that are inside mirror region
-            points_mirror_base = self.transform_mirror_base_to_child[idx_facet].inv().apply(points_samp_xyz)  # mirror base
-            mask = self.facets[idx_facet].mirror.region.is_inside_or_on_border(points_mirror_base.projXY())
+            points_mirror_base = (
+                self.transform_mirror_base_to_child[idx_facet]
+                .inv()
+                .apply(points_samp_xyz)
+            )  # mirror base
+            mask = self.facets[idx_facet].mirror.region.is_inside_or_on_border(
+                points_mirror_base.projXY()
+            )
             points_mirror_base = points_mirror_base[mask]  # mirror base
 
             # Calculate points and normals at sample locations
-            points_mirror_base = self.facets[idx_facet].mirror.location_at(points_mirror_base.projXY())  # mirror base
-            normals_mirror_base = self.facets[idx_facet].mirror.surface_norm_at(points_mirror_base.projXY())  # mirror base
+            points_mirror_base = self.facets[idx_facet].mirror.location_at(
+                points_mirror_base.projXY()
+            )  # mirror base
+            normals_mirror_base = self.facets[idx_facet].mirror.surface_norm_at(
+                points_mirror_base.projXY()
+            )  # mirror base
 
             # Convert from mirror to world reference frame
-            points_list.append(self.transform_mirror_base_to_parent[idx_facet].apply(points_mirror_base))  # ensemble parent
-            normals_list.append(normals_mirror_base.rotate(self.transform_mirror_base_to_parent[idx_facet].R))  # ensemble parent
+            points_list.append(
+                self.transform_mirror_base_to_parent[idx_facet].apply(
+                    points_mirror_base
+                )
+            )  # ensemble parent
+            normals_list.append(
+                normals_mirror_base.rotate(
+                    self.transform_mirror_base_to_parent[idx_facet].R
+                )
+            )  # ensemble parent
 
         points = Vxyz.merge(points_list)
         normals = Vxyz.merge(normals_list)
         return points, normals  # world coordinates
 
-    def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
+    def orthorectified_slope_array(
+        self, x_vec: np.ndarray, y_vec: np.ndarray
+    ) -> np.ndarray:
         # Get sample points
         x_mat, y_mat = np.meshgrid(x_vec, y_vec)  # ensemble child
         z_mat = np.zeros(x_mat.shape)  # ensemble child
@@ -112,28 +153,43 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         slope_data = np.zeros((2, len(points_samp))) * np.nan  # ensemble child
         for idx_facet in range(self.num_facets):
             # Get mask of points on mirror
-            points_samp_mirror = self.transform_mirror_base_to_child[idx_facet].inv().apply(points_samp)  # mirror base
+            points_samp_mirror = (
+                self.transform_mirror_base_to_child[idx_facet].inv().apply(points_samp)
+            )  # mirror base
             mask = self.facets[idx_facet].mirror.in_bounds(points_samp_mirror.projXY())
             points_samp_mirror = points_samp_mirror[mask]
 
             # Get normal vectors
-            normals = self.facets[idx_facet].mirror.surface_norm_at(points_samp_mirror.projXY())  # mirror base
-            normals.rotate_in_place(self.transform_mirror_base_to_child[idx_facet].R)  # ensemble child
+            normals = self.facets[idx_facet].mirror.surface_norm_at(
+                points_samp_mirror.projXY()
+            )  # mirror base
+            normals.rotate_in_place(
+                self.transform_mirror_base_to_child[idx_facet].R
+            )  # ensemble child
 
             # Calculate slopes and output as 2D array
-            slope_data[:, mask] = -normals.data[:2] / normals.data[2:3]  # ensemble child
+            slope_data[:, mask] = (
+                -normals.data[:2] / normals.data[2:3]
+            )  # ensemble child
 
-        slope_data = np.reshape(slope_data, (2, y_vec.size, x_vec.size))  # ensemble child
+        slope_data = np.reshape(
+            slope_data, (2, y_vec.size, x_vec.size)
+        )  # ensemble child
         return slope_data  # ensemble child
 
-    def draw(self, view: View3d, mirror_style: RenderControlMirror, transform: list[TransformXYZ] | None = None) -> None:
+    def draw(
+        self,
+        view: View3d,
+        mirror_style: RenderControlMirror,
+        transform: list[TransformXYZ] | None = None,
+    ) -> None:
         """
         Draws facet ensemble onto a View3d object.
 
         Parameters:
         -----------
         view : View3d
-            A view 3d object that holds the figure. 
+            A view 3d object that holds the figure.
         mirror_styles : RenderControlMirror
             Holds attibutes about the 3d graph.
         transform : list[TransformXYZ] | None
@@ -168,7 +224,9 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         self.ori.transform_child_to_base using the given arguments.
         """
         if self.pointing_function is None:
-            raise ValueError('self.pointing_function is not defined. Use self.define_pointing_function.')
+            raise ValueError(
+                'self.pointing_function is not defined. Use self.define_pointing_function.'
+            )
 
         self.ori.transform_child_to_base = self.pointing_function(*args)
 
@@ -180,6 +238,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
             - az - float - azimuth angle (rotation about z axis) in radians
             - el - float - elevation angle (rotation about x axis) in radians
         """
+
         def pointing_function(az: float, el: float) -> TransformXYZ:
             r = Rotation.from_euler('zx', [az, el], degrees=False)
             return TransformXYZ.from_R(r)
@@ -196,6 +255,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         The "pointing_function" accessed by self.set_pointing has the following input
             - rotation - scipy.spatial.transform.Rotation
         """
+
         def pointing_function(rotation: Rotation) -> TransformXYZ:
             return TransformXYZ.from_R(rotation)
 

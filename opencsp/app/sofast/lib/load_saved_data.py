@@ -4,16 +4,16 @@ and return OpenCSP optics classes.
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.csp.Facet import Facet
-from   opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
-from   opencsp.common.lib.csp.MirrorParametric import MirrorParametric
-from   opencsp.common.lib.csp.MirrorPoint import MirrorPoint
-from   opencsp.common.lib.geometry.RegionXY import RegionXY
-from   opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
-from   opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
+from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
+from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
 def load_ideal_facet_ensemble_from_hdf(file: str, focal_length: float) -> FacetEnsemble:
@@ -38,25 +38,31 @@ def load_ideal_facet_ensemble_from_hdf(file: str, focal_length: float) -> FacetE
         [
             'DataSofastInput/optic_definition/ensemble/r_facet_ensemble',
             'DataSofastInput/optic_definition/ensemble/v_facet_locations',
-        ], file)
+        ],
+        file,
+    )
     vs_facet_loc = Vxyz(data_ensemble['v_facet_locations'])
-    rs_facet_ensemble = [Rotation.from_rotvec(v) for v in data_ensemble['r_facet_ensemble']]
+    rs_facet_ensemble = [
+        Rotation.from_rotvec(v) for v in data_ensemble['r_facet_ensemble']
+    ]
 
     # Load ensemble definition data
     num_facets = len(vs_facet_loc)
     facets = []
     for idx_facet in range(num_facets):
         data = load_hdf5_datasets(
-            [
-                f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/v_facet_corners',
-            ], file)
+            [f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/v_facet_corners'],
+            file,
+        )
 
         # Create mirror region
         v_facet_corners = Vxy(data['v_facet_corners'][:2])
         region_facet = RegionXY.from_vertices(v_facet_corners)
 
         # Create mirror
-        mirror = MirrorParametric.generate_symmetric_paraboloid(focal_length, region_facet)
+        mirror = MirrorParametric.generate_symmetric_paraboloid(
+            focal_length, region_facet
+        )
 
         # Create facet
         facet = Facet(mirror)
@@ -92,7 +98,8 @@ def load_facet_ensemble_from_hdf(file: str) -> FacetEnsemble:
     """
     # Get number of facets
     data_ensemble = load_hdf5_datasets(
-        ['DataSofastInput/optic_definition/ensemble/v_facet_locations'], file)
+        ['DataSofastInput/optic_definition/ensemble/v_facet_locations'], file
+    )
     num_facets = data_ensemble['v_facet_locations'].shape[1]
 
     facets = []
@@ -103,7 +110,9 @@ def load_facet_ensemble_from_hdf(file: str) -> FacetEnsemble:
                 f'DataSofastCalculation/ensemble/facet_{idx_facet:03d}/trans_facet_ensemble',
                 f'DataSofastCalculation/facet/facet_{idx_facet:03d}/slopes_facet_xy',
                 f'DataSofastCalculation/facet/facet_{idx_facet:03d}/v_surf_points_facet',
-            ], file)
+            ],
+            file,
+        )
 
         # Create facet region
         v_facet_corners = Vxy(data['v_facet_corners'][:2])
@@ -151,7 +160,8 @@ def load_ideal_facet_from_hdf(file: str, focal_length: float) -> Facet:
     """
     # Load facet corners
     data = load_hdf5_datasets(
-        ['DataSofastInput/optic_definition/facet_000/v_facet_corners'], file)
+        ['DataSofastInput/optic_definition/facet_000/v_facet_corners'], file
+    )
 
     # Create mirror
     v_facet_corners = Vxy(data['v_facet_corners'][:2])
@@ -181,7 +191,9 @@ def load_facet_from_hdf(file: str) -> Facet:
             'DataSofastInput/optic_definition/facet_000/v_facet_corners',
             'DataSofastCalculation/facet/facet_000/slopes_facet_xy',
             'DataSofastCalculation/facet/facet_000/v_surf_points_facet',
-        ], file)
+        ],
+        file,
+    )
 
     # Create facet region
     v_facet_corners = Vxy(data['v_facet_corners'][:2])

@@ -1,18 +1,20 @@
 """Script that saves a Sofast physical setup file from previously processed data
 """
-from   numpy import ndarray
-from   scipy.spatial.transform import Rotation
+from numpy import ndarray
+from scipy.spatial.transform import Rotation
 
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-def save_physical_setup_file(screen_distortion_data: dict,
-                             name: str,
-                             rvec: ndarray,
-                             tvec: ndarray,
-                             file_save: str) -> None:
+def save_physical_setup_file(
+    screen_distortion_data: dict,
+    name: str,
+    rvec: ndarray,
+    tvec: ndarray,
+    file_save: str,
+) -> None:
     """Constructs and saves Display file
 
     Parameters

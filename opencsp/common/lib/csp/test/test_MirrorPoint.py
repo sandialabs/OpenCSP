@@ -1,12 +1,12 @@
 """Unit test to test the MirrorPoint class"""
 import numpy as np
 
-from   opencsp.common.lib.csp.MirrorPoint import MirrorPoint
-from   opencsp.common.lib.geometry.RegionXY import RegionXY
-from   opencsp.common.lib.geometry.Pxyz import Pxyz
-from   opencsp.common.lib.geometry.Vxy import Vxy
-from   opencsp.common.lib.geometry.Uxyz import Uxyz
-from   opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class TestMirrorPoint:
@@ -14,9 +14,13 @@ class TestMirrorPoint:
 
     def get_region_test_mirror(self) -> RegionXY:
         """Returns test mirror region"""
-        return RegionXY.from_vertices(Vxy(([0.5, -0.5, -0.5, 0.5], [-0.5, -0.5, 0.5, 0.5])))
+        return RegionXY.from_vertices(
+            Vxy(([0.5, -0.5, -0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]))
+        )
 
-    def get_test_mirror_flat(self, height: float, interpolation_type: str) -> MirrorPoint:
+    def get_test_mirror_flat(
+        self, height: float, interpolation_type: str
+    ) -> MirrorPoint:
         """Returns a test instance of a MirrorPoint object"""
         # Calculate surface xyz points
         xv = yv = np.arange(-0.5, 0.5, 0.1)

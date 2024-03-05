@@ -18,6 +18,7 @@ import opencsp.common.lib.geometry.geometry_2d as g2d
 
 # COMMON VIEWS
 
+
 def view_spec_3d() -> dict:
     spec = {}
     spec['type'] = '3d'
@@ -59,7 +60,7 @@ def view_spec_vplane(segment_xy) -> dict:  # A vertical plane containing the seg
     line_A = line[0]
     line_B = line[1]
     line_C = line[2]
-    perpendicular_ray = [[0,0], [line_A, line_B]]
+    perpendicular_ray = [[0, 0], [line_A, line_B]]
     origin_xy = g2d.intersect_rays(segment_xy, perpendicular_ray)
     origin_xyz = [origin_xy[0], origin_xy[1], 0]
 
@@ -73,8 +74,8 @@ def view_spec_vplane(segment_xy) -> dict:  # A vertical plane containing the seg
     segment_y1 = segment_xy1[1]
     segment_dx = segment_x1 - segment_x0
     segment_dy = segment_y1 - segment_y0
-    segment_d  = np.sqrt((segment_dx*segment_dx) + (segment_dy*segment_dy))
-    p_uxyz = [segment_dx/segment_d, segment_dy/segment_d, 0]
+    segment_d = np.sqrt((segment_dx * segment_dx) + (segment_dy * segment_dy))
+    p_uxyz = [segment_dx / segment_d, segment_dy / segment_d, 0]
     # The q axis points straight up.
     q_uxyz = [0, 0, 1]
     # The w axis points perpendicular to the p and q axes, following the right-hand rule.
@@ -83,7 +84,7 @@ def view_spec_vplane(segment_xy) -> dict:  # A vertical plane containing the seg
     # Construct the section 3-d plane.
     plane_A = line_A  # x component of surface normal.
     plane_B = line_B  # y component of surface normal.
-    plane_C = 0       # z component of surface normal.
+    plane_C = 0  # z component of surface normal.
     plane_D = line_C  # Distance to origin.
     plane = [plane_A, plane_B, plane_C, plane_D]
 
@@ -103,31 +104,34 @@ def view_spec_vplane(segment_xy) -> dict:  # A vertical plane containing the seg
 
 def view_spec_camera(camera, camera_xform) -> dict:
     spec = {}
-    spec['type']         = 'camera'
-    spec['camera']       = camera
+    spec['type'] = 'camera'
+    spec['camera'] = camera
     spec['camera_xform'] = camera_xform
     return spec
 
 
 # XYZ <---> PQ CONVERSION
 
+
 def xyz2pqw(xyz, view_spec):
     # Enforces the right-hand rule in all conversions.
     # That is, [p,q,w] is a right-handed coordinate system.
     if view_spec['type'] == '3d':
         return xyz
-    elif (view_spec['type'] == 'xy'):
+    elif view_spec['type'] == 'xy':
         return [xyz[0], xyz[1], xyz[2]]
-    elif (view_spec['type'] == 'xz'):
+    elif view_spec['type'] == 'xz':
         return [xyz[0], xyz[2], -xyz[1]]
-    elif (view_spec['type'] == 'yz'):
+    elif view_spec['type'] == 'yz':
         return [xyz[1], xyz[2], xyz[0]]
-    elif (view_spec['type'] == 'vplane'):
+    elif view_spec['type'] == 'vplane':
         # Fetch section coordinate system.
-        origin_xyz = np.array(view_spec['origin_xyz'])  # Make arrays so we can do simple vactor math.
-        p_uxyz = np.array(view_spec['p_uxyz'])          #
-        q_uxyz = np.array(view_spec['q_uxyz'])          #
-        w_uxyz = np.array(view_spec['w_uxyz'])          #
+        origin_xyz = np.array(
+            view_spec['origin_xyz']
+        )  # Make arrays so we can do simple vactor math.
+        p_uxyz = np.array(view_spec['p_uxyz'])  #
+        q_uxyz = np.array(view_spec['q_uxyz'])  #
+        w_uxyz = np.array(view_spec['w_uxyz'])  #
         # Construct vector from origin to xyz.
         vxyz = np.array(xyz) - origin_xyz
         # Construct (p,q,w) components.
@@ -135,8 +139,8 @@ def xyz2pqw(xyz, view_spec):
         q = vxyz.dot(q_uxyz)
         w = vxyz.dot(w_uxyz)
         return [p, q, w]
-    elif (view_spec['type'] == 'camera'):
-        camera       = view_spec['camera']
+    elif view_spec['type'] == 'camera':
+        camera = view_spec['camera']
         camera_xform = view_spec['camera_xform']
         pq = camera_xform.pq_or_none(camera, xyz)
         if pq == None:
@@ -149,7 +153,11 @@ def xyz2pqw(xyz, view_spec):
             # Return.
             return [p, q, w]
     else:
-        print("ERROR: In xyz2pqw(), unrecognized view_spec['type'] = '" + str(view_spec['type']) + "' encountered.")
+        print(
+            "ERROR: In xyz2pqw(), unrecognized view_spec['type'] = '"
+            + str(view_spec['type'])
+            + "' encountered."
+        )
         assert False
 
 
@@ -166,27 +174,33 @@ def pqw2xyz(pqw, view_spec):
     # That is, [p,q,w] is viewed as a right-handed coordinate system.
     if view_spec['type'] == '3d':
         return pqw
-    elif (view_spec['type'] == 'xy'):
+    elif view_spec['type'] == 'xy':
         return [pqw[0], pqw[1], pqw[2]]
-    elif (view_spec['type'] == 'xz'):
+    elif view_spec['type'] == 'xz':
         return [pqw[0], -pqw[2], pqw[1]]
-    elif (view_spec['type'] == 'yz'):
+    elif view_spec['type'] == 'yz':
         return [pqw[2], pqw[0], pqw[1]]
-    elif (view_spec['type'] == 'vplane'):
+    elif view_spec['type'] == 'vplane':
         # Fetch section coordinate system.
-        origin_xyz = np.array(view_spec['origin_xyz'])  # Make arrays so we can do simple vactor math.
-        p_uxyz = np.array(view_spec['p_uxyz'])          #
-        q_uxyz = np.array(view_spec['q_uxyz'])          #
-        w_uxyz = np.array(view_spec['w_uxyz'])          #
+        origin_xyz = np.array(
+            view_spec['origin_xyz']
+        )  # Make arrays so we can do simple vactor math.
+        p_uxyz = np.array(view_spec['p_uxyz'])  #
+        q_uxyz = np.array(view_spec['q_uxyz'])  #
+        w_uxyz = np.array(view_spec['w_uxyz'])  #
         # Extract (p,q,w) components.
         p = pqw[0]
         q = pqw[1]
         w = pqw[2]
         # Construct (x,y,z) components.
-        xyz = origin_xyz + (p*p_uxyz) + (q*q_uxyz) + (w*w_uxyz)
+        xyz = origin_xyz + (p * p_uxyz) + (q * q_uxyz) + (w * w_uxyz)
         return [xyz[0], xyz[1], xyz[2]]
     else:
-        print("ERROR: In pqw2xyz(), unrecognized view_spec['type'] = '" + str(view_spec['type']) + "' encountered.")
+        print(
+            "ERROR: In pqw2xyz(), unrecognized view_spec['type'] = '"
+            + str(view_spec['type'])
+            + "' encountered."
+        )
         assert False
 
 

@@ -1,3 +1,3 @@
 #
-# Ensure pytest adds root directory to the system path. 
+# Ensure pytest adds root directory to the system path.
 #

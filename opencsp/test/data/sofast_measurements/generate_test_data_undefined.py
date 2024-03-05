@@ -5,18 +5,20 @@ import os
 import matplotlib.pyplot as plt
 import numpy as np
 
-from   opencsp.common.lib.deflectometry.Display import Display
-from   opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from   opencsp.app.sofast.lib.Measurement import Measurement
-from   opencsp.app.sofast.lib.Sofast import Sofast
-from   opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.camera.Camera import Camera
 
 
-def generate_dataset(file_measurement: str,
-                     file_camera: str,
-                     file_display: str,
-                     file_calibration: str,
-                     file_dataset_out: str):
+def generate_dataset(
+    file_measurement: str,
+    file_camera: str,
+    file_display: str,
+    file_calibration: str,
+    file_dataset_out: str,
+):
     """Generates and saves dataset"""
     # Load components
     camera = Camera.load_from_hdf(file_camera)
@@ -34,10 +36,12 @@ def generate_dataset(file_measurement: str,
     S.params.mask_keep_largest_area = True
 
     # Define surface data
-    surface_data = dict(surface_type='parabolic',
-                        initial_focal_lengths_xy=(100., 100.),
-                        robust_least_squares=False,
-                        downsample=10)
+    surface_data = dict(
+        surface_type='parabolic',
+        initial_focal_lengths_xy=(100.0, 100.0),
+        robust_least_squares=False,
+        downsample=10,
+    )
 
     # Process optic data
     S.process_optic_undefined(surface_data)
@@ -56,7 +60,7 @@ def generate_dataset(file_measurement: str,
     # Show slope map
     mask = S.data_image_processing_facet[0]['mask_processed']
     slopes_xy = S.data_characterization_facet[0]['slopes_facet_xy']
-    slopes = np.sqrt(np.sum(slopes_xy ** 2, 0))
+    slopes = np.sqrt(np.sum(slopes_xy**2, 0))
     image = np.zeros(mask.shape) * np.nan
     image[mask] = slopes
 
@@ -75,5 +79,7 @@ if __name__ == '__main__':
         file_camera=os.path.join(base_dir, 'camera.h5'),
         file_display=os.path.join(base_dir, 'display_distorted_2d.h5'),
         file_calibration=os.path.join(base_dir, 'calibration.h5'),
-        file_dataset_out=os.path.join(base_dir, 'calculations_undefined_mirror/data.h5'),
+        file_dataset_out=os.path.join(
+            base_dir, 'calculations_undefined_mirror/data.h5'
+        ),
     )

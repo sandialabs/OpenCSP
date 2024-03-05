@@ -13,13 +13,17 @@ class test_ImageAttributeParser(unittest.TestCase):
         path, _, _ = ft.path_components(__file__)
         self.data_dir = os.path.join(path, "data", "input", "ImageAttributeParser")
         self.out_dir = os.path.join(path, "data", "output", "ImageAttributeParser")
-        self.img_file = os.path.join(self.out_dir, f"nonexistant_image_{self._testMethodName}.png")
-        self.attr_file = os.path.join(self.data_dir, f"nonexistant_image_{self._testMethodName}.txt")
+        self.img_file = os.path.join(
+            self.out_dir, f"nonexistant_image_{self._testMethodName}.png"
+        )
+        self.attr_file = os.path.join(
+            self.data_dir, f"nonexistant_image_{self._testMethodName}.txt"
+        )
 
         ft.create_directories_if_necessary(self.out_dir)
 
     def test_no_attrfile(self):
-        """ Contructor succeeds even without attributes file """
+        """Contructor succeeds even without attributes file"""
         parser = iap.ImageAttributeParser(self.img_file)
         self.assertEqual(self.img_file, parser.current_image_source)
         self.assertEqual(None, parser.original_image_source)
@@ -43,7 +47,7 @@ class test_ImageAttributeParser(unittest.TestCase):
         self.assertEqual(True, parser.has_contents())
 
     def test_with_attrfile(self):
-        """ Load all values from the associated attributes file. Use the new current_image_source value. """
+        """Load all values from the associated attributes file. Use the new current_image_source value."""
         parser = iap.ImageAttributeParser(current_image_source=self.img_file)
 
         # Not 'a' as is in the attributes file associated with self.img_file,
@@ -52,16 +56,20 @@ class test_ImageAttributeParser(unittest.TestCase):
         self.assertEqual(self.img_file, parser.current_image_source)
         # The rest of these values should be set by the attributes file, since
         # they are not given in the ImageAttributeParser constructor.
-        self.assertEqual(datetime.datetime.fromisoformat('2024-02-17'), parser.date_collected)
+        self.assertEqual(
+            datetime.datetime.fromisoformat('2024-02-17'), parser.date_collected
+        )
         self.assertEqual('c', parser.experiment_name)
         self.assertEqual('d', parser.notes)
 
         # Should raise an error when trying to replace the original_image_source.
         with self.assertRaises(ValueError):
-            iap.ImageAttributeParser(current_image_source=self.img_file, original_image_source='z')
+            iap.ImageAttributeParser(
+                current_image_source=self.img_file, original_image_source='z'
+            )
 
     def test_partial_attrfile(self):
-        """ Constructor pulls in non-None values from existing attributes file """
+        """Constructor pulls in non-None values from existing attributes file"""
         pass
 
 

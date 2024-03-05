@@ -16,8 +16,13 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 # HOMOGEONEOUS LINE CALCULATIONS
 #
 
+
 def homogeneous_line(xy1, xy2):
-    warn('geometry_2d.homogeneous_line is deprecated. Use LineXY instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.homogeneous_line is deprecated. Use LineXY instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # Returns homogeneous line coeffcients, in normalized form.
     x1 = xy1[0]
     y1 = xy1[1]
@@ -28,7 +33,11 @@ def homogeneous_line(xy1, xy2):
     C = (x2 * y1) - (x1 * y2)
     n = np.sqrt((A * A) + (B * B))
     if n == 0:
-        print('\nERROR: In homogeneous_line, degenerate case encountered.', DeprecationWarning, stacklevel=2)
+        print(
+            '\nERROR: In homogeneous_line, degenerate case encountered.',
+            DeprecationWarning,
+            stacklevel=2,
+        )
         print('   xy1 =', xy1)
         print('   xy2 =', xy2)
         print('\n')
@@ -40,13 +49,21 @@ def homogeneous_line(xy1, xy2):
 
 
 def flip_homogeneous_line(line):
-    warn('geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # Reverse the sense of the homogeneous line.
     return [-x for x in line]
 
 
 def homogeneous_line_signed_distance_to_xy(xy, line):
-    warn('geometry_2d.homogeneous_line_signed_distance_to_xy is deprecated. Use LineXY.dist_from_line_signed() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.homogeneous_line_signed_distance_to_xy is deprecated. Use LineXY.dist_from_line_signed() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     x = xy[0]
     y = xy[1]
     A = line[0]
@@ -56,7 +73,11 @@ def homogeneous_line_signed_distance_to_xy(xy, line):
 
 
 def homogeneous_line_y_given_x(x, line):
-    warn('geometry_2d.homogeneous_line_y_given_x is deprecated. Use LineXY.y_from_x() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.homogeneous_line_y_given_x is deprecated. Use LineXY.y_from_x() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     A = line[0]
     B = line[1]
     C = line[2]
@@ -67,7 +88,11 @@ def homogeneous_line_y_given_x(x, line):
 
 
 def homogeneous_line_x_given_y(y, line):
-    warn('geometry_2d.homogeneous_line_x_given_y is deprecated. Use LineXY.x_from_y() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.homogeneous_line_x_given_y is deprecated. Use LineXY.x_from_y() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     A = line[0]
     B = line[1]
     C = line[2]
@@ -78,7 +103,11 @@ def homogeneous_line_x_given_y(y, line):
 
 
 def intersect_lines(line1, line2):
-    warn('geometry_2d.intersect_lines is deprecated. Use LineXY.intersect_with() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.intersect_lines is deprecated. Use LineXY.intersect_with() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # Line 1 coefficients
     A1 = line1[0]
     B1 = line1[1]
@@ -103,7 +132,11 @@ def intersect_lines(line1, line2):
 
 
 def shift_x(ray, dx):
-    warn('geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     x0 = ray[0][0]
     y0 = ray[0][1]
     x1 = ray[1][0]
@@ -112,7 +145,11 @@ def shift_x(ray, dx):
 
 
 def intersect_rays(ray1, ray2):
-    warn('geometry_2d.intersect_rays is deprecated. Use LineXY.intersect_with() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.intersect_rays is deprecated. Use LineXY.intersect_with() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     line1 = homogeneous_line(ray1[0], ray1[1])
     line2 = homogeneous_line(ray2[0], ray2[1])
     return intersect_lines(line1, line2)
@@ -122,23 +159,31 @@ def intersect_rays(ray1, ray2):
 # CLIPPING IN 2-D
 #
 
+
 def draw_clip_xy_box(view, clip_xy_box):
-    warn('geometry_2d.draw_clip_xy_box is deprecated. Should be migrated to another library.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.draw_clip_xy_box is deprecated. Should be migrated to another library.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     xy_min = clip_xy_box[0]
     xy_max = clip_xy_box[1]
     p_min = xy_min[0]
     y_min = xy_min[1]
     p_max = xy_max[0]
     y_max = xy_max[1]
-    xy_list = [[p_min, y_min],
-               [p_max, y_min],
-               [p_max, y_max],
-               [p_min, y_max]]
-    view.draw_pq_list(xy_list, close=True, style=rcps.outline(color='r'), label='Clip Box')
+    xy_list = [[p_min, y_min], [p_max, y_min], [p_max, y_max], [p_min, y_max]]
+    view.draw_pq_list(
+        xy_list, close=True, style=rcps.outline(color='r'), label='Clip Box'
+    )
 
 
 def clip_line_to_xy_box(line, clip_xy_box):
-    warn('geometry_2d.clip_line_to_xy_box is deprecated. Should be migrated to another library.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.clip_line_to_xy_box is deprecated. Should be migrated to another library.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     xy_min = clip_xy_box[0]
     xy_max = clip_xy_box[1]
     x_min = xy_min[0]
@@ -168,7 +213,11 @@ def clip_line_to_xy_box(line, clip_xy_box):
             clip_points.append([x_given_y_max, y_max])
     # Check result.
     if len(clip_points) != 2:
-        print('WARNING: In clip_line_to_xy_box(), unexpected result with ', len(clip_points), ' clip points encountered.')
+        print(
+            'WARNING: In clip_line_to_xy_box(), unexpected result with ',
+            len(clip_points),
+            ' clip points encountered.',
+        )
         print('          line        = ', line)
         print('          clip_xy_box = ', clip_xy_box)
     # Return.
@@ -176,7 +225,11 @@ def clip_line_to_xy_box(line, clip_xy_box):
 
 
 def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
-    warn('geometry_2d.extend_ray is deprecated. Should be migrated to another library.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.extend_ray is deprecated. Should be migrated to another library.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     xy0 = ray[0]
     xy1 = ray[1]
 
@@ -238,6 +291,7 @@ def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
 # BEST-FIT LINE TO 2-D POINTS
 #
 
+
 # Derived from:
 #    https://scipython.com/book/chapter-6-numpy/examples/finding-a-best-fit-straight-line/
 # The above web site assumes the data describe y as a function of x.
@@ -246,7 +300,11 @@ def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
 # this allows code to work if data are a vertical or horizontal line.
 #
 def best_fit_line_segment_A(xy_seq):
-    warn('geometry_2d.best_fit_line_segment_A is deprecated. Use LineXY.fit_from_points() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.best_fit_line_segment_A is deprecated. Use LineXY.fit_from_points() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # Fetch x and y sequences.
     x_seq = [xy[0] for xy in xy_seq]
     y_seq = [xy[1] for xy in xy_seq]
@@ -268,13 +326,15 @@ def best_fit_line_segment_A(xy_seq):
         print('       Ill-conditioned because dx = dy = 0')
         print(' ')
         assert False
-    if (dx > dy):
-        pfit, stats = np.polynomial.Polynomial.fit(x_seq,
-                                                   y_seq,
-                                                   degree,  # linear
-                                                   full=True,
-                                                   window=(x_min, x_max),
-                                                   domain=(x_min, x_max))
+    if dx > dy:
+        pfit, stats = np.polynomial.Polynomial.fit(
+            x_seq,
+            y_seq,
+            degree,  # linear
+            full=True,
+            window=(x_min, x_max),
+            domain=(x_min, x_max),
+        )
         b, m = pfit
         x0 = x_min
         y0 = m * x0 + b
@@ -283,23 +343,25 @@ def best_fit_line_segment_A(xy_seq):
         # Compute residual.
         resid, rank, sing_val, rcond = stats
         rms = np.sqrt(resid[0] / len(x_seq))
-        #print('Fit: y = {:.3f}x + {:.3f}'.format(m, b), ' (rms residual = {:.4f})'.format(rms))
+        # print('Fit: y = {:.3f}x + {:.3f}'.format(m, b), ' (rms residual = {:.4f})'.format(rms))
     else:
-        pfit, stats = np.polynomial.Polynomial.fit(y_seq,   # Transpose x and y
-                                                   x_seq,   #
-                                                   degree,  # linear
-                                                   full=True,
-                                                   window=(y_min, y_max),
-                                                   domain=(y_min, y_max))
+        pfit, stats = np.polynomial.Polynomial.fit(
+            y_seq,  # Transpose x and y
+            x_seq,  #
+            degree,  # linear
+            full=True,
+            window=(y_min, y_max),
+            domain=(y_min, y_max),
+        )
         b, m = pfit
-        y0 = y_min     # Recall x and y are transposed.
+        y0 = y_min  # Recall x and y are transposed.
         x0 = m * y0 + b  #
-        y1 = y_max     #
+        y1 = y_max  #
         x1 = m * y1 + b  #
         # Compute residual.
         resid, rank, sing_val, rcond = stats
         rms = np.sqrt(resid[0] / len(y_seq))
-        #print('Fit: x = {:.3f}y + {:.3f}'.format(m, b), ' (rms residual = {:.4f})'.format(rms))
+        # print('Fit: x = {:.3f}y + {:.3f}'.format(m, b), ' (rms residual = {:.4f})'.format(rms))
 
     # Assemble line segment to return.
     xy0 = [x0, y0]
@@ -308,7 +370,11 @@ def best_fit_line_segment_A(xy_seq):
 
 
 def best_fit_line_segment(xy_list):
-    warn('geometry_2d.best_fit_line_segment is deprecated. Use LineXY.fit_from_points() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.best_fit_line_segment is deprecated. Use LineXY.fit_from_points() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     return best_fit_line_segment_A(xy_list)
 
 
@@ -316,8 +382,13 @@ def best_fit_line_segment(xy_list):
 # TRANSFORMATIONS
 #
 
+
 def rotate_about_origin(xy, theta):
-    warn('geometry_2d.rotate_about_origin is deprecated. Use Vxy.rotate() or TransformXY instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.rotate_about_origin is deprecated. Use Vxy.rotate() or TransformXY instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     c_theta = np.cos(theta)
     s_theta = np.sin(theta)
     x = xy[0]
@@ -328,7 +399,11 @@ def rotate_about_origin(xy, theta):
 
 
 def rotate_about_center(xy, theta, center_xy):
-    warn('geometry_2d.rotate_about_center is deprecated. Use TransformXY instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.rotate_about_center is deprecated. Use TransformXY instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     x = xy[0]
     y = xy[1]
     cx = center_xy[0]
@@ -347,7 +422,11 @@ def rotate_xyz_about_center_xy(xyz, theta, center_xy):
     """
     A planar rotation.  That is, the rotation axis is parallel to the z axis.
     """
-    warn('geometry_2d.rotate_xyz_about_center_xy is deprecated. Use TransformXYZ, TransformXY, Vxyz.rotate() oro Vxy.rotate() instead.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.rotate_xyz_about_center_xy is deprecated. Use TransformXYZ, TransformXY, Vxyz.rotate() oro Vxy.rotate() instead.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     # Fetch coordinates.
     x = xyz[0]
     y = xyz[1]
@@ -367,8 +446,13 @@ def rotate_xyz_about_center_xy(xyz, theta, center_xy):
 # The first vertex does not need to be repeated.
 #
 
+
 def label_point(xy_list):
-    warn('geometry_2d.label_point is deprecated. Should be migrated to another library.', DeprecationWarning, stacklevel=2)
+    warn(
+        'geometry_2d.label_point is deprecated. Should be migrated to another library.',
+        DeprecationWarning,
+        stacklevel=2,
+    )
     """
     A reasonable place to put a central label.
     This is not the centroid of a polygon, but a quick-and-dirty first choice.

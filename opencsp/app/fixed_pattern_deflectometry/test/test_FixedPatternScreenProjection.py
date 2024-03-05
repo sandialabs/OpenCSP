@@ -1,6 +1,8 @@
 import numpy as np
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import FixedPatternScreenProjection
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
+    FixedPatternScreenProjection,
+)
 
 
 def test_FixedPatternDisplay():
@@ -8,8 +10,12 @@ def test_FixedPatternDisplay():
     pattern = FixedPatternScreenProjection(100, 100, 10, 10)
 
     # Test screen fractions
-    np.testing.assert_allclose(pattern.x_locs_frac, np.array([0.09, 0.29, 0.49, 0.69, 0.89]), rtol=0, atol=1e-6)
-    np.testing.assert_allclose(pattern.y_locs_frac, np.array([0.09, 0.29, 0.49, 0.69, 0.89]), rtol=0, atol=1e-6)
+    np.testing.assert_allclose(
+        pattern.x_locs_frac, np.array([0.09, 0.29, 0.49, 0.69, 0.89]), rtol=0, atol=1e-6
+    )
+    np.testing.assert_allclose(
+        pattern.y_locs_frac, np.array([0.09, 0.29, 0.49, 0.69, 0.89]), rtol=0, atol=1e-6
+    )
 
     # Test indices
     np.testing.assert_equal(pattern.x_indices, np.array([-2, -1, 0, 1, 2]))

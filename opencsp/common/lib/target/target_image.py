@@ -13,21 +13,23 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.unit_conversion as uc
 
 
-def construct_target_image(image_width,  # Meters
-                           image_height, # Meters
-                           dpm):         # Dots per meter
-    image_cols = round(image_width  * dpm)
+def construct_target_image(
+    image_width, image_height, dpm  # Meters  # Meters
+):  # Dots per meter
+    image_cols = round(image_width * dpm)
     image_rows = round(image_height * dpm)
-    img = np.uint8(np.zeros([image_rows,image_cols,3]))  # ?? SCAFFOLDING RCB -- IS THIS THE CORRECT PLACE TO DO THIS?  WILL WE LOSE IMAGE PRECISION INTERMEDIATE CALCULATIONS?
-#print('In construct_target_image(), image shape =', img.shape)  # ?? SCAFFOLDING RCB -- TEMPORARY
+    img = np.uint8(
+        np.zeros([image_rows, image_cols, 3])
+    )  # ?? SCAFFOLDING RCB -- IS THIS THE CORRECT PLACE TO DO THIS?  WILL WE LOSE IMAGE PRECISION INTERMEDIATE CALCULATIONS?
+    # print('In construct_target_image(), image shape =', img.shape)  # ?? SCAFFOLDING RCB -- TEMPORARY
     return img
 
 
 def rows_cols(img):
-    n_rows  = img.shape[0]
-    n_cols  = img.shape[1]
+    n_rows = img.shape[0]
+    n_cols = img.shape[1]
     n_bands = img.shape[2]
-    if (n_bands != 3):
+    if n_bands != 3:
         print('ERROR: Number of input image bands is not 3.')
         assert False
     return n_rows, n_cols

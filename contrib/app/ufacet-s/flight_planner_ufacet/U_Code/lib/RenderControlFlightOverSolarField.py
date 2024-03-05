@@ -7,20 +7,20 @@ import opencsp.app.ufacets.flight_planner_ufacet.U_Code.lib.RenderControlFlightP
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
 
 
-class RenderControlFlightOverSolarField():
+class RenderControlFlightOverSolarField:
     """
     Render control for flights over solar fields.
     """
 
-    def __init__(self, 
-                 draw_solar_field=True,
-                 solar_field_style=rcsf.heliostat_centroids(color='grey'),
-                 draw_flight_plan=True,
-                 flight_plan_style=rcfp.default(),
-                 ):
-
+    def __init__(
+        self,
+        draw_solar_field=True,
+        solar_field_style=rcsf.heliostat_centroids(color='grey'),
+        draw_flight_plan=True,
+        flight_plan_style=rcfp.default(),
+    ):
         super(RenderControlFlightOverSolarField, self).__init__()
-        
+
         self.draw_solar_field = draw_solar_field
         self.solar_field_style = solar_field_style
         self.draw_flight_plan = draw_flight_plan
@@ -28,6 +28,7 @@ class RenderControlFlightOverSolarField():
 
 
 # COMMON CASES
+
 
 def default():
     return RenderControlFlightOverSolarField()
