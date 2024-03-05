@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 3
+Name: tmo026_NSTTF Heliostat Short Focal Length, With Canting
+Title: NSTTF Heliostat Short Focal Length, With Canting
+Code tag: ExampleMirrorOutput.example_heliostat_stages()
+View spec: 3d
+
+Title:
+NSTTF Heliostat Short Focal Length, With Canting
+
+Caption:
+Hypothetical short-focal length NSTTF heliostat modeled as a symmetric paraboloid with focal length f=5m with canting.
+

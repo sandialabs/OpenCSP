@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 3
+Name: trto004_mirror_tilted
+Title: mirror_tilted
+Code tag: ExampleRayTraceOutput.example_mirror_trace()
+View spec: 3d
+
+Title:
+mirror_tilted
+
+Caption:
+mirror_tilted
+

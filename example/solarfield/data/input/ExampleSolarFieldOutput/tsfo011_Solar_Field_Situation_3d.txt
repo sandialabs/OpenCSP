@@ -1,0 +1,20 @@
+Metadata:
+Figure number: 1
+Name: tsfo011_Solar Field Situation
+Title: Solar Field Situation
+Code tag: ExampleSolarFieldOutput.example_annotated_solar_field()
+View spec: 3d
+
+Title:
+Solar Field Situation
+
+Caption:
+Rendering of a complex solar field situation, with some heliostats tracking, some face up, and some in stow.  Demonstrates rendering options applied to each.
+
+Comments:
+A solar field situation with heliostats in varying status.
+Blue heliostats are tracking.
+Cyan heliostats are face up.
+Red heliostats are in stow (out of service).
+Green heliostats are in a fixed configuration (az=205.0 deg, el=30.0 deg).
+

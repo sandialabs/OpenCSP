@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 5
+Name: trto006_mirror_facing_up_many_rays
+Title: mirror_facing_up_many_rays
+Code tag: ExampleRayTraceOutput.example_mirror_trace()
+View spec: 3d
+
+Title:
+mirror_facing_up_many_rays
+
+Caption:
+mirror_facing_up_many_rays
+

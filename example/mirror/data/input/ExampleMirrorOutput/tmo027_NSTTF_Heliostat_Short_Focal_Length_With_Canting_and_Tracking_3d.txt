@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 4
+Name: tmo027_NSTTF Heliostat Short Focal Length, With Canting and Tracking
+Title: NSTTF Heliostat Short Focal Length, With Canting and Tracking
+Code tag: ExampleMirrorOutput.example_heliostat_stages()
+View spec: 3d
+
+Title:
+NSTTF Heliostat Short Focal Length, With Canting and Tracking
+
+Caption:
+Hypothetical short-focal length NSTTF heliostat modeled as a symmetric paraboloid with focal length f=5m with canting and tracking.
+
+Comments:
+Heliostats set to track to [60.0, 8.8, 28.9] at ymdhmsz =[2021, 5, 13, 13, 2, 0, -6]
+

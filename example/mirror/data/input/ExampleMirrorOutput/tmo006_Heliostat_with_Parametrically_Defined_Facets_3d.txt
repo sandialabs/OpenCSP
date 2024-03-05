@@ -1,0 +1,17 @@
+Metadata:
+Figure number: 1
+Name: tmo006_Heliostat with Parametrically Defined Facets
+Title: Heliostat with Parametrically Defined Facets
+Code tag: ExampleMirrorOutput.example_heliostat_surface_normals()
+View spec: 3d
+
+Title:
+Heliostat with Parametrically Defined Facets
+
+Caption:
+Heliostat with four facets (rectangle 2.0m x 3.0m), with focal length f=2.0m.
+
+Comments:
+Oriented face west.
+Render mirror surfaces and surface normals, facet normals, and heliostat outline.
+

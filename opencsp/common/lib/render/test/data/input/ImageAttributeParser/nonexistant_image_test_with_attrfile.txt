@@ -1,0 +1,1 @@
+{"image attributes": {"current_image_source": "a", "original_image_source": "b", "date_collected": "2024-02-17", "experiment_name": "c", "notes": "d"}}

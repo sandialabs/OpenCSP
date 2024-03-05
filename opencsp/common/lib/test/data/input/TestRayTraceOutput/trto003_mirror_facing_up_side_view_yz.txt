@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 1
+Name: trto003_mirror_facing_up_side_view
+Title: mirror_facing_up_side_view
+Code tag: TestRayTraceOutput.test_mirror_trace()
+View spec: yz
+
+Title:
+mirror_facing_up_side_view
+
+Caption:
+mirror_facing_up_side_view
+

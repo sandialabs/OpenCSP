@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 2
+Name: trto013_curved_heliostat_trace
+Title: curved_heliostat_trace
+Code tag: ExampleRayTraceOutput.example_heliostat_trace()
+View spec: yz
+
+Title:
+curved_heliostat_trace
+
+Caption:
+curved_heliostat_trace
+

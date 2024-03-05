@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 2
+Name: tmo018_NSTTF Heliostat 14W01 (long normals)
+Title: NSTTF Heliostat 14W01 (long normals)
+Code tag: TestMirrorOutput.test_heliostat_05W01_and_14W01()
+View spec: xy
+
+Title:
+NSTTF Heliostat 14W01 (long normals)
+
+Caption:
+14W01 modeled as a symmetric paraboloid with focal length f=186.8m.
+
+Comments:
+Render mirror surfaces and normals, facet outlines, and heliostat centroid.
+

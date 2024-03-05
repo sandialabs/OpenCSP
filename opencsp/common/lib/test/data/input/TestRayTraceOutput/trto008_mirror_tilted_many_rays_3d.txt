@@ -1,0 +1,13 @@
+Metadata:
+Figure number: 2
+Name: trto008_mirror_tilted_many_rays
+Title: mirror_tilted_many_rays
+Code tag: TestRayTraceOutput.test_mirror_trace()
+View spec: 3d
+
+Title:
+mirror_tilted_many_rays
+
+Caption:
+mirror_tilted_many_rays
+

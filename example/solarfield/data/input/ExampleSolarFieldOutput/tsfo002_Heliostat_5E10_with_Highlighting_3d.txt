@@ -1,0 +1,20 @@
+Metadata:
+Figure number: 1
+Name: tsfo002_Heliostat 5E10, with Highlighting
+Title: Heliostat 5E10, with Highlighting
+Code tag: ExampleSolarFieldOutput.example_annotated_heliostat()
+View spec: 3d
+
+Title:
+Heliostat 5E10, with Highlighting
+
+Caption:
+A single Sandia NSTTF heliostat with rendering options 5E10.
+
+Comments:
+Demonstration of example heliostat annotations.
+Black:   Facet outlines.
+Black:   Overall heliostat surface normal.
+Red:     Highlighted facets and their surface normals.
+Cyan:    Highlighted facet with facet name and facet surface normal drawn at corners.
+

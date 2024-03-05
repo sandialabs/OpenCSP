@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 1
+Name: tsfo017_Dense Tracking Vector Field
+Title: Dense Tracking Vector Field
+Code tag: ExampleSolarFieldOutput.example_dense_vector_field()
+View spec: xy
+
+Title:
+Dense Tracking Vector Field
+
+Caption:
+Grey shows heliostat outlines and surface normals for heliostats tracking to a given aim point.  Blue shows a dense field of hypothetical heliostat origins, with the surface normal that would result from tracking to the same aim point.  Both the actual heliostat surface normals and the hypothetical heliostat surface normals may be thought of as concrete instances within a continuous vector field defined by the tracking aim point.
+
+Comments:
+Dense vector field of tracking surface normals.
+

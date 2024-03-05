@@ -1,0 +1,17 @@
+Metadata:
+Figure number: 1
+Name: tmo001_Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up, Face Up
+Title: Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up, Face Up
+Code tag: ExampleMirrorOutput.example_mirror()
+View spec: 3d
+
+Title:
+Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up, Face Up
+
+Caption:
+A single mirror of shape (rectangle 2.0m x 3.0m), analytically defined with focal length f=2.0m, face up.
+
+Comments:
+Oriented face up.
+Render surface only.
+

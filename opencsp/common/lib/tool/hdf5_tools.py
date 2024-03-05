@@ -1,0 +1,222 @@
+import h5py
+import numpy as np
+import os
+
+import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.image_tools as it
+import opencsp.common.lib.tool.log_tools as lt
+
+
+def save_hdf5_datasets(data: list, datasets: list, file: str):
+    """Saves data to HDF5 file
+    """
+    with h5py.File(file, 'a') as f:
+        # Loop through datasets
+        for d, dataset in zip(data, datasets):
+            if dataset in f:
+                # Delete dataset if it already exists
+                del f[dataset]
+            # Write dataset
+            f.create_dataset(dataset, data=d)
+
+
+def load_hdf5_datasets(datasets: list, file: str):
+    """Loads datasets from HDF5 file
+    """
+    with h5py.File(file, 'r') as f:
+        kwargs: dict[str, str | h5py.Dataset] = {}
+        # Loop through fields to retreive
+        for dataset in datasets:
+            # Get data and get dataset name
+            data = f[dataset]
+            name = dataset.split('/')[-1]
+
+            # Format data shape
+            if np.ndim(data) == 0 and np.size(data) == 1:
+                data = data[()]
+            elif np.ndim(data) > 0 and np.size(data) == 1:
+                data = data[...].flatten()[0]
+            elif np.size(data) > 0:
+                data = data[...].squeeze()
+
+            # Format strings
+            if type(data) is np.bytes_ or type(data) is bytes:
+                data = data.decode()
+
+            # Save in dictionary
+            kwargs.update({name: data})
+
+    return kwargs
+
+
+def is_dataset_and_shape(object: h5py.Group | h5py.Dataset) -> tuple[bool, tuple]:
+    """ Returns whether the given object is an hdf5 dataset and, if it is, then
+    also what it's shape is.
+
+    Parameters
+    ----------
+    object : h5py.Group | h5py.Dataset
+        The object to check the type of.
+
+    Returns
+    -------
+    is_dataset: bool
+        True if object is a dataset, False otherwise
+    shape: tuple[int]
+        The shape of the dataset. Empty tuple() object if not a dataset.
+    """
+    if not isinstance(object, h5py.Group):
+        if isinstance(object, h5py.Dataset):
+            dset: h5py.Dataset = object
+            return True, dset.shape
+        else:
+            return True, tuple()
+    else:
+        return False, tuple()
+
+
+def get_groups_and_datasets(hdf5_path_name_ext: str | h5py.File):
+    """ Get the structure of an HDF5 file, including all group and dataset names, and the dataset shapes.
+
+    Parameters
+    ----------
+    hdf5_path_name_ext : str | h5py.File
+        The HDF5 file to parse the structure of.
+
+    Returns
+    -------
+    group_names: list[str]
+        The absolute names of all the groups in the file. For example: "foo/bar"
+    file_names_and_shapes: list[ tuple[str,tuple[int]] ]
+        The absolute names of all the datasets in the file, and their shapes.
+        For example: "foo/bar/baz", (1920,1080)
+    """
+    group_names: list[str] = []
+    file_names_and_shapes: list[tuple[str, tuple[int]]] = []
+    visited: list[tuple[str, bool, tuple]] = []
+
+    def visitor(name: str, object: h5py.Group | h5py.Dataset):
+        visited.append(tuple([name, *is_dataset_and_shape(object)]))
+        return None
+
+    if isinstance(hdf5_path_name_ext, str):
+        hdf5_path_name_ext = ft.norm_path(hdf5_path_name_ext)
+        with h5py.File(hdf5_path_name_ext, 'r') as fin:
+            fin.visititems(visitor)
+    else:
+        fin: h5py.File = hdf5_path_name_ext
+        fin.visititems(visitor)
+
+    for name, is_dataset, shape in visited:
+        # Add to the file or group names list.
+        # If a dataset, then include its shape.
+        if not is_dataset:
+            group_names.append(name)
+        if is_dataset:
+            file_names_and_shapes.append(tuple([name, shape]))
+
+    return group_names, file_names_and_shapes
+
+
+def _create_dataset_path(base_dir: str, h5_dataset_path_name: str, dataset_ext: str = ".txt"):
+    dataset_location, dataset_name, _ = ft.path_components(h5_dataset_path_name)
+    dataset_path = ft.norm_path(os.path.join(base_dir, dataset_location))
+    ft.create_directories_if_necessary(dataset_path)
+    return ft.norm_path(os.path.join(dataset_path, dataset_name + dataset_ext))
+
+
+def unzip(hdf5_path_name_ext: str, destination_dir: str):
+    """ Unpacks the given HDF5 file into the given destination directory.
+
+    Unpacks the given HDF5 file into the given destination directory. A new
+    directory is created in the destination with the same name as the hdf5 file.
+    String values are extracted as .txt files, and images are extracted as .png
+    files. Everything else is saved with numpy as .npy files.
+
+    Parameters
+    ----------
+    hdf5_path_name_ext : str
+        The HDF5 file to unpack.
+    destination_dir : str
+        The directory in which to create a directory for the HDF5 file.
+
+    Returns
+    -------
+    output_dir: str
+        The path to the newly created directory into which the HDF5 files were
+        extracted into.
+    """
+    norm_path = ft.norm_path(hdf5_path_name_ext)
+    path, name, ext = ft.path_components(norm_path)
+    hdf5_dir = ft.norm_path(os.path.join(destination_dir, name))
+
+    # Get all of what may be strings or images from the h5 file
+    _, dataset_names_and_shapes = get_groups_and_datasets(norm_path)
+    possible_strings: list[tuple[str, tuple[int]]] = []
+    possible_images: list[tuple[str, tuple[int]]] = []
+    other_datasets: list[tuple[str, tuple[int]]] = []
+    for dataset_name, shape in dataset_names_and_shapes:
+        if (len(shape) == 0) or (len(shape) == 1) or (len(shape) == 2 and shape[1] in [0, ""]):
+            possible_strings.append(tuple([dataset_name, shape]))
+        else:
+            possible_images.append(tuple([dataset_name, shape]))
+
+    # Create the HDF5 output directory
+    if ft.file_exists(hdf5_dir):
+        lt.error_and_raise(FileExistsError, f"Error in hdf5_tools.unzip(): output directory {hdf5_dir} already exists!")
+    ft.create_directories_if_necessary(hdf5_dir)
+
+    # Extract strings into .txt files
+    possible_strings_names = [t[0] for t in possible_strings]
+    str_datasets = load_hdf5_datasets(possible_strings_names, norm_path)
+    for i, dataset_name in enumerate(str_datasets):
+        h5_val = str_datasets[dataset_name]
+        if isinstance(h5_val, str):
+            dataset_path_name_ext = _create_dataset_path(hdf5_dir, possible_strings[i][0], ".txt")
+            with open(dataset_path_name_ext, "w") as fout:
+                fout.write(h5_val)
+        else:
+            possible_images.append(possible_strings[i])
+
+    # Extract images into .png files
+    possible_images_names = [t[0] for t in possible_images]
+    img_datasets = load_hdf5_datasets(possible_images_names, norm_path)
+    for i, dataset_name in enumerate(img_datasets):
+        h5_val = img_datasets[dataset_name]
+        shape = possible_images[i][1]
+        if isinstance(h5_val, (h5py.Dataset, np.ndarray)):
+            np_image = np.array(h5_val).squeeze()
+
+            # we assume images have 2 or 3 dimensions
+            if (len(shape) == 2) or (len(shape) == 3):
+
+                # we assume shapes are at least 10x10 pixels and have an aspect ratio of at least 10:1
+                aspect_ratio = max(shape[0], shape[1]) / min(shape[0], shape[1])
+                if (shape[0] >= 10 and shape[1] >= 10) and (aspect_ratio < 10.001):
+                    dataset_path_name_ext = _create_dataset_path(hdf5_dir, possible_images[i][0], ".png")
+                    if (len(shape) == 2) or (shape[2] in [1, 3]):  # assumed grayscale or RGB
+                        img = it.numpy_to_image(np_image)
+                        img.save(dataset_path_name_ext)
+                    else:  # assumed multiple images
+                        dp, dn, de = ft.path_components(dataset_path_name_ext)
+                        for i in range(shape[2]):
+                            dataset_path_name_ext_i = os.path.join(dp, f"{dn}_{i}{de}")
+                            np_single_image = np_image[:, :, i].squeeze()
+                            img = it.numpy_to_image(np_single_image)
+                            img.save(dataset_path_name_ext_i)
+                else:
+                    other_datasets.append(possible_images[i])
+            else:
+                other_datasets.append(possible_images[i])
+        else:
+            other_datasets.append(possible_images[i])
+
+    # Extract everything else into numpy arrays
+    other_dataset_names = [t[0] for t in other_datasets]
+    numpy_datasets = load_hdf5_datasets(other_dataset_names, norm_path)
+    for i, dataset_name in enumerate(numpy_datasets):
+        np_val = np.array(numpy_datasets[dataset_name])
+        dataset_path_name_ext = _create_dataset_path(hdf5_dir, other_datasets[i][0], "")
+        np.save(dataset_path_name_ext, np_val, allow_pickle=False)
+
+    return hdf5_dir

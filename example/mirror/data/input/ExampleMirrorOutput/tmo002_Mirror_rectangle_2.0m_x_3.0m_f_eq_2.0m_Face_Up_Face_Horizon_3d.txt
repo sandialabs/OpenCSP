@@ -1,0 +1,17 @@
+Metadata:
+Figure number: 1
+Name: tmo002_Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up, Face Horizon
+Title: Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up, Face Horizon
+Code tag: ExampleMirrorOutput.example_mirror_halfpi_rotation()
+View spec: 3d
+
+Title:
+Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up, Face Horizon
+
+Caption:
+A single mirror of shape (rectangle 2.0m x 3.0m), analytically defined with focal length f=2.0m, facing the horizon.
+
+Comments:
+Oriented face horizon.
+Render surface only.
+

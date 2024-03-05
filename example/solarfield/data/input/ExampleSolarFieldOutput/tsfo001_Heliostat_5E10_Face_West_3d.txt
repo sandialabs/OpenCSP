@@ -1,0 +1,19 @@
+Metadata:
+Figure number: 1
+Name: tsfo001_Heliostat 5E10, Face West
+Title: Heliostat 5E10, Face West
+Code tag: ExampleSolarFieldOutput.example_single_heliostat()
+View spec: 3d
+
+Title:
+Heliostat 5E10, Face West
+
+Caption:
+A single Sandia NSTTF heliostat 5E10.
+
+Comments:
+Demonstration of heliostat drawing.
+Facet outlines shown, with facet names and overall heliostat surface normal.
+Render mirror surfaces only.
+Green:   Facet outlines and overall surface normal.
+
