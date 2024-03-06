@@ -36,11 +36,13 @@ def run_scene_reconstruction(dir_input: str, verbose: int) -> SceneReconstructio
 
     # Load components
     camera = Camera.load_from_hdf(file_camera)
-    known_point_locations = np.loadtxt(file_known_points, delimiter=',', skiprows=1)
+    known_point_locations = np.loadtxt(
+        file_known_points, delimiter=',', skiprows=1)
     point_pair_distances = np.loadtxt(
         file_point_pair_distances, delimiter=',', skiprows=1
     )
-    alignment_points = np.loadtxt(file_alignment_points, delimiter=',', skiprows=1)
+    alignment_points = np.loadtxt(
+        file_alignment_points, delimiter=',', skiprows=1)
 
     # Perform marker position calibration
     cal = SceneReconstruction(camera, known_point_locations, images_pattern)
@@ -71,7 +73,8 @@ def run_screen_shape_cal(
     """
     # Define input files
     resolution_xy = [100, 100]  # sample density of screen
-    file_screen_cal_point_pairs = join(dir_input, 'screen_calibration_point_pairs.csv')
+    file_screen_cal_point_pairs = join(
+        dir_input, 'screen_calibration_point_pairs.csv')
     file_camera_distortion = join(dir_input, 'camera_screen_shape.h5')
     file_image_projection = join(dir_input, 'image_projection.h5')
     files_screen_shape_measurement = glob(
@@ -85,7 +88,8 @@ def run_screen_shape_cal(
         file_screen_cal_point_pairs, delimiter=',', skiprows=1
     ).astype(int)
     camera = Camera.load_from_hdf(file_camera_distortion)
-    image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
+    image_projection_data = ImageProjection.load_from_hdf(
+        file_image_projection)
 
     # Store input data in data class
     data_input = DataInput(
@@ -121,7 +125,8 @@ def run_camera_position_cal(
 
     # Perform camera position calibraiton
     cal = CalibrationCameraPosition(camera, pts_xyz_marker, corner_ids, image)
-    cal.run_calibration(verbose)
+    cal.verbose = verbose
+    cal.run_calibration()
 
     return cal
 
@@ -159,10 +164,12 @@ def example_driver():
     pts_data = cal_scene_recon.get_data()
 
     # Run screen shape calibration
-    cal_screen_shape = run_screen_shape_cal(pts_data, base_dir_sofast, VERBOSITY)
+    cal_screen_shape = run_screen_shape_cal(
+        pts_data, base_dir_sofast, VERBOSITY)
 
     # Run camera position calibration
-    cal_camera_pose = run_camera_position_cal(pts_data, base_dir_sofast, VERBOSITY)
+    cal_camera_pose = run_camera_position_cal(
+        pts_data, base_dir_sofast, VERBOSITY)
 
     # Get physical setup file data
     NAME = 'Example physical setup file'
@@ -177,12 +184,14 @@ def example_driver():
 
     # Save data
     cal_scene_recon.save_data_as_csv(join(save_dir, 'point_locations.csv'))
-    cal_screen_shape.save_data_as_hdf(join(save_dir, 'screen_distortion_data.h5'))
+    cal_screen_shape.save_data_as_hdf(
+        join(save_dir, 'screen_distortion_data.h5'))
     cal_camera_pose.save_data_as_csv(join(save_dir, 'camera_rvec_tvec.csv'))
 
     # Save display file
     file_save = join(save_dir, 'example_physical_setup_file.h5')
-    save_physical_setup_file(screen_distortion_data, NAME, rvec, tvec, file_save)
+    save_physical_setup_file(screen_distortion_data,
+                             NAME, rvec, tvec, file_save)
 
 
 if __name__ == '__main__':
