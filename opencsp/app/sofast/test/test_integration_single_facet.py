@@ -34,7 +34,7 @@ class TestSingle(unittest.TestCase):
         # Get test data location
         if base_dir is None:
             base_dir = os.path.join(
-                opencsp_code_dir, 'test/data/sofast_measurements'
+                opencsp_code_dir(), 'test/data/sofast_measurements'
             )
 
         # Find all test files

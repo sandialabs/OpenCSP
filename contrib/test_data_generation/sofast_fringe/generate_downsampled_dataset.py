@@ -67,7 +67,7 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
 if __name__ == '__main__':
     downsample_dataset(
         dir_input=join(
-            opencsp_code_dir,
+            opencsp_code_dir(),
             '../../sample_data/sofast/data_photogrammetric_calibration/data_measurement',
         ),
         dir_output=join(opencsp_code_dir, 'test/data/measurements_sofast_fringe'),

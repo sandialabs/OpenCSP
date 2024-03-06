@@ -143,11 +143,11 @@ def example_driver():
     """
     # Define input file directories
     base_dir_scene_recon = join(
-        opencsp_code_dir,
+        opencsp_code_dir(),
         'app/scene_reconstruction/test/data/data_measurement',
     )  # low-res test data
     base_dir_sofast = join(
-        opencsp_code_dir,
+        opencsp_code_dir(),
         'common/lib/deflectometry/test/data/data_measurement',
     )  # low-res test data
 

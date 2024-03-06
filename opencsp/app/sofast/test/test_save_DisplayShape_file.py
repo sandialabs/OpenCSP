@@ -16,7 +16,7 @@ import opencsp.common.lib.tool.file_tools as ft
 def test_save_physical_setup_file():
     """Loads data and saves test Display file"""
     # Define input file directory
-    base_dir = join(opencsp_code_dir, 'common/lib/deflectometry/test')
+    base_dir = join(opencsp_code_dir(), 'common/lib/deflectometry/test')
     dir_input = join(base_dir, 'data', 'data_expected')
     dir_output = join(base_dir, 'data', 'output')
     file_save = join(dir_output, 'test_physical_setup_file.h5')

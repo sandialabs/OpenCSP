@@ -51,7 +51,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         if (dir_input is None) or (dir_output is None):
             # Define default data directories
             base_dir = join(
-                opencsp_code_dir, 'common/lib/deflectometry/test'
+                opencsp_code_dir(), 'common/lib/deflectometry/test'
             )
             dir_input = join(base_dir, 'data/data_measurement')
             dir_output = join(base_dir, 'data/data_expected')

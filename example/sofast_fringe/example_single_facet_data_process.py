@@ -33,7 +33,7 @@ def example_driver():
     """
     # Define sample data directory
     sample_data_dir = join(
-        opencsp_code_dir, 'test/data/sofast_measurements/'
+        opencsp_code_dir(), 'test/data/sofast_measurements/'
     )
 
     # Directory Setup
