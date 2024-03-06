@@ -6,8 +6,10 @@ from os.path import join
 
 import pytest
 
-from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
+    FixedPatternScreenProjection,
+)
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 
 

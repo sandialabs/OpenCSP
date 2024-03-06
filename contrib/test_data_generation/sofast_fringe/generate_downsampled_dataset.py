@@ -8,10 +8,8 @@ import shutil
 import sys
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-
-sys.path.append(join(opencsp_code_dir(), '..'))
-import contrib.test_data_generation.downsample_data_general as ddg  # nopep8
-import contrib.test_data_generation.sofast_fringe.downsample_data as dds  # nopep8
+import opencsp.app.sofast.test.downsample_sofast_data as ds
+import opencsp.common.lib.test.downsample_data as dd
 
 
 def downsample_dataset(dir_input: str, dir_output: str) -> None:
@@ -51,8 +49,9 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
         join(dir_input, 'screen_shape_sofast_measurements/pose_4.h5'),
     ]
     for file_meas in files_meas:
-        print(f'Downsampling sofast measurement: {os.path.basename(file_meas):s}...')
-        meas_ds = dds.downsample_measurement(file_meas, n_sofast)
+        print(
+            f'Downsampling sofast measurement: {os.path.basename(file_meas):s}...')
+        meas_ds = ds.downsample_measurement(file_meas, n_sofast)
         meas_ds.save_to_hdf(
             join(dir_output_screen_measurements, os.path.basename(file_meas))
         )
@@ -68,7 +67,7 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
 if __name__ == '__main__':
     downsample_dataset(
         dir_input=join(
-            opencsp_code_dir(),
+            opencsp_code_dir,
             '../../sample_data/sofast/data_photogrammetric_calibration/data_measurement',
         ),
         dir_output=join(opencsp_code_dir, 'test/data/measurements_sofast_fringe'),

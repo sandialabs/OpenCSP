@@ -6,6 +6,10 @@ import unittest
 from scipy.spatial.transform import Rotation
 import numpy as np
 
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
+from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
@@ -32,11 +36,12 @@ class TestMulti(unittest.TestCase):
         # Get test data location
         if base_dir is None:
             base_dir = os.path.join(
-                opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
+                opencsp_code_dir, 'test/data/sofast_measurements'
             )
 
         # Directory Setup
-        file_dataset = os.path.join(base_dir, 'calculations_facet_ensemble/data.h5')
+        file_dataset = os.path.join(
+            base_dir, 'calculations_facet_ensemble/data.h5')
         file_measurement = os.path.join(base_dir, 'measurement_ensemble.h5')
         print(f'Using dataset: {os.path.abspath(file_dataset)}')
 
@@ -100,7 +105,8 @@ class TestMulti(unittest.TestCase):
         ensemble_data = load_hdf5_datasets(datasets, file_dataset)
         ensemble_data = DefinitionEnsemble(
             Vxyz(ensemble_data['v_facet_locations']),
-            [Rotation.from_rotvec(r) for r in ensemble_data['r_facet_ensemble']],
+            [Rotation.from_rotvec(r)
+             for r in ensemble_data['r_facet_ensemble']],
             ensemble_data['ensemble_perimeter'],
             Vxyz(ensemble_data['v_centroid_ensemble']),
         )
@@ -114,7 +120,8 @@ class TestMulti(unittest.TestCase):
             ]
             data = load_hdf5_datasets(datasets, file_dataset)
             facet_data.append(
-                DefinitionFacet(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet']))
+                FacetData(Vxyz(data['v_facet_corners']),
+                          Vxyz(data['v_centroid_facet']))
             )
 
         # Load surface data
@@ -131,7 +138,8 @@ class TestMulti(unittest.TestCase):
             surface_data.append(data)
 
         # Run SOFAST
-        sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
+        sofast.process_optic_multifacet(
+            facet_data, ensemble_data, surface_data)
 
         # Store data
         cls.data_test = {'slopes_facet_xy': [], 'surf_coefs_facet': []}

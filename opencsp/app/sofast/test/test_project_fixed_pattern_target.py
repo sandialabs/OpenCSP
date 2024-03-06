@@ -5,7 +5,9 @@ import os
 import pytest
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
+    FixedPatternScreenProjection,
+)
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 
 
@@ -13,8 +15,8 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 def test_project_fixed_pattern_target():
     # Set pattern parameters
     file_image_projection = os.path.join(
-        opencsp_code_dir(),
-        "test/data/measurements_sofast_fringe/general/Image_Projection_test.h5",
+        opencsp_code_dir,
+        "test/data/sofast_measurements/general/Image_Projection_test.h5",
     )
 
     # Load ImageProjection

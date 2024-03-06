@@ -3,9 +3,13 @@ import os
 import numpy as np
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
+    FixedPatternDotLocations,
+)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
+    FixedPatternScreenProjection,
+)
+from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.geometry.Vxy import Vxy
 
 
@@ -62,8 +66,8 @@ def test_DotLocationsFixedPattern():
 def test_from_Display():
     # Load display
     file_disp = os.path.join(
-        opencsp_code_dir(),
-        'test/data/measurements_sofast_fringe/display_distorted_3d.h5',
+        opencsp_code_dir,
+        'test/data/sofast_measurements/display_distorted_3d.h5',
     )
     display = Display.load_from_hdf(file_disp)
     fp_proj = SystemSofastFixed(30, 30, 5, 5)

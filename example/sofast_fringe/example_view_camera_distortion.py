@@ -2,6 +2,7 @@ import os
 
 import matplotlib.pyplot as plt
 
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.camera_calibration.lib.calibration_camera import view_distortion
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -17,7 +18,7 @@ def example_driver():
     """
     # Define input camera file
     file = os.path.join(
-        opencsp_code_dir(), 'test/data/measurements_sofast_fringe/camera.h5'
+        opencsp_code_dir, 'test/data/sofast_measurements/camera.h5'
     )
 
     # Load camera
@@ -33,7 +34,8 @@ def example_driver():
     view_distortion(cam, ax1, ax2, ax3)
 
     # Save image
-    dir_save = os.path.join(os.path.dirname(__file__), 'data/output/camera_distortion')
+    dir_save = os.path.join(os.path.dirname(__file__),
+                            'data/output/camera_distortion')
     if not os.path.exists(dir_save):
         os.makedirs(dir_save)
     fig.savefig(os.path.join(dir_save, 'distortion_plot.png'))

@@ -3,6 +3,9 @@ from os.path import join
 
 import matplotlib
 
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+from opencsp.app.sofast.lib.visualize_setup import visualize_setup
+from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
@@ -18,6 +21,7 @@ import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 def example_driver():
@@ -32,7 +36,7 @@ def example_driver():
     """
     # Define sample data directory
     sample_data_dir = join(
-        opencsp_code_dir(), 'test/data/measurements_sofast_fringe/'
+        opencsp_code_dir, 'test/data/sofast_measurements/'
     )
 
     # Directory setup
@@ -56,7 +60,8 @@ def example_driver():
     ensemble_data = DefinitionEnsemble.load_from_json(file_ensemble)
 
     # Define facet data
-    facet_data = [DefinitionFacet.load_from_json(file_facet)] * ensemble_data.num_facets
+    facet_data = [FacetData.load_from_json(
+        file_facet)] * ensemble_data.num_facets
 
     # Define surface data (plano)
     # surface_data = [dict(surface_type='plano', robust_least_squares=False, downsample=20)] * ensemble_data.num_facets
@@ -99,15 +104,19 @@ def example_driver():
     ensemble: FacetEnsemble = sofast.get_optic()
 
     # Generate plots
-    figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
+    figure_control = rcfg.RenderControlFigure(
+        tile_array=(1, 1), tile_square=True)
     mirror_control = rcm.RenderControlMirror(
         centroid=True, surface_normals=True, norm_res=1
     )
     axis_control_m = rca.meters()
 
     # Visualize setup
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
-    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
+    fig_record = fm.setup_figure_for_3d_data(
+        figure_control, axis_control_m, title='')
+    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0][
+        'spatial_orientation'
+    ]
     visualize_setup(
         display,
         camera,

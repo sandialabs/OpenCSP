@@ -7,7 +7,7 @@ import cv2 as cv
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import \
     FixedPatternSetupCalibrate
 

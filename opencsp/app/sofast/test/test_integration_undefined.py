@@ -4,6 +4,8 @@ import os
 
 import numpy as np
 
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
@@ -16,11 +18,12 @@ from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 def test_undefined():
     # Get test data location
     base_dir = os.path.join(
-        opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
+        opencsp_code_dir, 'test/data/sofast_measurements'
     )
 
     # Directory Setup
-    file_dataset = os.path.join(base_dir, 'calculations_undefined_mirror/data.h5')
+    file_dataset = os.path.join(
+        base_dir, 'calculations_undefined_mirror/data.h5')
     file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
 
     # Load data
@@ -105,7 +108,8 @@ def test_undefined():
     slopes = sofast.data_characterization_facet[0].slopes_facet_xy
     slope_coefs = sofast.data_characterization_facet[0].slope_coefs_facet
 
-    np.testing.assert_allclose(data['slopes_facet_xy'], slopes, atol=1e-7, rtol=0)
+    np.testing.assert_allclose(
+        data['slopes_facet_xy'], slopes, atol=1e-7, rtol=0)
     np.testing.assert_allclose(
         data['slope_coefs_facet'], slope_coefs, atol=1e-8, rtol=0
     )

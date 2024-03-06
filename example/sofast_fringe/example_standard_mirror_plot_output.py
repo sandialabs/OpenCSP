@@ -3,6 +3,7 @@ from os.path import join
 
 from scipy.spatial.transform import Rotation
 
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.app.sofast.lib.load_saved_data as lsd
 import opencsp.common.lib.csp.standard_output as so
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
@@ -28,12 +29,14 @@ def plot_sofast_single_facet(
     """
     # Load data
     optic_meas = lsd.load_facet_from_hdf(data_file)
-    optic_ref = lsd.load_ideal_facet_from_hdf(data_file, focal_length_paraboloid)
+    optic_ref = lsd.load_ideal_facet_from_hdf(
+        data_file, focal_length_paraboloid)
 
     # Define scene
     v_target_center = Vxyz((0, 0, 56.57))
     v_target_normal = Vxyz((0, 1, 0))
-    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=20)
+    source = LightSourceSun.from_given_sun_position(
+        Uxyz((0, 0, -1)), resolution=20)
 
     # Define reference optic position/orientation
     rot = Rotation.from_euler('x', [22.5], degrees=True)
@@ -80,7 +83,8 @@ def plot_sofast_facet_ensemble(
     # Define scene
     v_target_center = Vxyz((0, 0, 56.57))
     v_target_normal = Vxyz((0, 1, 0))
-    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=20)
+    source = LightSourceSun.from_given_sun_position(
+        Uxyz((0, 0, -1)), resolution=20)
 
     # Define reference optic position/orientation
     rot = Rotation.from_euler('x', [22.5], degrees=True)
@@ -127,7 +131,7 @@ def example_driver():
     """
     # Define measured and reference data
     sample_data_dir = join(
-        opencsp_code_dir(), 'test/data/measurements_sofast_fringe/'
+        opencsp_code_dir, 'test/data/sofast_measurements/'
     )
 
     save_dir = join(os.path.dirname(__file__), 'data/output/standard_output')

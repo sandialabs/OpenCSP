@@ -6,6 +6,9 @@ import unittest
 
 import numpy as np
 
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
@@ -31,7 +34,7 @@ class TestSingle(unittest.TestCase):
         # Get test data location
         if base_dir is None:
             base_dir = os.path.join(
-                opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
+                opencsp_code_dir, 'test/data/sofast_measurements'
             )
 
         # Find all test files
@@ -148,7 +151,8 @@ class TestSingle(unittest.TestCase):
             sofast.process_optic_singlefacet(facet_data, surface_data)
 
             # Store test data
-            cls.slopes.append(sofast.data_characterization_facet[0].slopes_facet_xy)
+            cls.slopes.append(
+                sofast.data_characterization_facet[0].slopes_facet_xy)
             cls.surf_coefs.append(
                 sofast.data_characterization_facet[0].surf_coefs_facet
             )

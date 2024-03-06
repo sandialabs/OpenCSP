@@ -7,9 +7,11 @@ from glob import glob
 import numpy as np
 import pytest
 
+import numpy as np
+
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.sofast.lib.CalibrateDisplayShape import (
-    CalibrateDisplayShape,
+from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
+    CalibrationScreenShape,
     DataInput,
 )
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
@@ -49,7 +51,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         if (dir_input is None) or (dir_output is None):
             # Define default data directories
             base_dir = join(
-                opencsp_code_dir(), 'common/lib/deflectometry/test'
+                opencsp_code_dir, 'common/lib/deflectometry/test'
             )
             dir_input = join(base_dir, 'data/data_measurement')
             dir_output = join(base_dir, 'data/data_expected')
@@ -78,7 +80,8 @@ class TestCalibrateDisplayShape(unittest.TestCase):
             file_screen_cal_point_pairs, delimiter=',', skiprows=1
         ).astype(int)
         camera = Camera.load_from_hdf(file_camera_distortion)
-        image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
+        image_projection_data = ImageProjection.load_from_hdf(
+            file_image_projection)
 
         # Store input data in data class
         data_input = DataInput(
@@ -88,7 +91,8 @@ class TestCalibrateDisplayShape(unittest.TestCase):
             pts_xyz_marker,
             camera,
             image_projection_data,
-            [Measurement.load_from_hdf(f) for f in files_screen_shape_measurement],
+            [Measurement.load_from_hdf(f)
+             for f in files_screen_shape_measurement],
         )
 
         # Perform screen position calibration

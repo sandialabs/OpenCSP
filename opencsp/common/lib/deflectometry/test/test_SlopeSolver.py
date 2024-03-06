@@ -6,9 +6,10 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -21,11 +22,12 @@ class TestSlopeSolver(unittest.TestCase):
     def setUpClass(cls):
         # Get test data location
         base_dir = os.path.join(
-            opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
+            opencsp_code_dir, 'test/data/sofast_measurements'
         )
 
         # Define test data files for single facet processing
-        cls.data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
+        cls.data_file_facet = os.path.join(
+            base_dir, 'calculations_facet/data.h5')
         data_file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
 
         # Create spatial orientation objects
@@ -48,7 +50,8 @@ class TestSlopeSolver(unittest.TestCase):
         # Create spatial orientation object
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1']).inv()
         v_cam_optic_cam = Vxyz(data['v_cam_optic_cam_refine_2'])
-        ori = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
+        ori = SpatialOrientation(display.r_cam_screen,
+                                 display.v_cam_screen_cam)
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         # Perform calculations
