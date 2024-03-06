@@ -5,7 +5,7 @@ on a screen.
 import os
 from os.path import join, dirname, exists
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
     FixedPatternDotLocations,
 )
@@ -51,11 +51,13 @@ def example_calculate_dot_locs_from_display():
     )
 
     # Calculate spatial orientation
-    orientation = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
+    orientation = SpatialOrientation(
+        display.r_cam_screen, display.v_cam_screen_cam)
 
     # Save data sets
     fixed_pattern_dot_locs.save_to_hdf(
-        join(dir_save, f'fixed_pattern_display_w{width_dot:d}_s{spacing_dot:d}.h5')
+        join(
+            dir_save, f'fixed_pattern_display_w{width_dot:d}_s{spacing_dot:d}.h5')
     )
     orientation.save_to_hdf(join(dir_save, 'spatial_orientation.h5'))
 
