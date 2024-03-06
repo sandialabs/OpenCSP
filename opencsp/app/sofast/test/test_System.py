@@ -4,7 +4,7 @@ import os
 
 import pytest
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.System import System
 from opencsp.app.sofast.test.ImageAcquisition_no_camera import ImageAcquisition
@@ -15,7 +15,7 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 def test_System():
     # Get test data location
     base_dir = os.path.join(
-        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+        opencsp_code_dir, 'test/data/sofast_measurements'
     )
 
     # Create fringe object

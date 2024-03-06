@@ -8,7 +8,7 @@ import pytest
 
 import numpy as np
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
     CalibrationScreenShape,
     DataInput,
@@ -50,7 +50,7 @@ class TestCalibrationScreenShape(unittest.TestCase):
         if (dir_input is None) or (dir_output is None):
             # Define default data directories
             base_dir = join(
-                os.path.dirname(opencsp.__file__), 'common/lib/deflectometry/test'
+                opencsp_code_dir, 'common/lib/deflectometry/test'
             )
             dir_input = join(base_dir, 'data/data_measurement')
             dir_output = join(base_dir, 'data/data_expected')
@@ -79,7 +79,8 @@ class TestCalibrationScreenShape(unittest.TestCase):
             file_screen_cal_point_pairs, delimiter=',', skiprows=1
         ).astype(int)
         camera = Camera.load_from_hdf(file_camera_distortion)
-        image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
+        image_projection_data = ImageProjection.load_from_hdf(
+            file_image_projection)
 
         # Store input data in data class
         data_input = DataInput(
@@ -89,7 +90,8 @@ class TestCalibrationScreenShape(unittest.TestCase):
             pts_xyz_marker,
             camera,
             image_projection_data,
-            [Measurement.load_from_hdf(f) for f in files_screen_shape_measurement],
+            [Measurement.load_from_hdf(f)
+             for f in files_screen_shape_measurement],
         )
 
         # Perform screen position calibration

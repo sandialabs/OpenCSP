@@ -7,7 +7,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 import opencsp.app.sofast.test.downsample_sofast_data as ds
@@ -28,7 +28,8 @@ def downsample_dataset_1(base_dir):
 
     # Define location of sample data
     file_measurement_facet = os.path.join(base_dir, 'measurement_facet.h5')
-    file_measurement_ensemble = os.path.join(base_dir, 'measurement_ensemble.h5')
+    file_measurement_ensemble = os.path.join(
+        base_dir, 'measurement_ensemble.h5')
     file_camera = os.path.join(base_dir, 'camera.h5')
     file_display_1 = os.path.join(base_dir, 'display_distorted_2d.h5')
     file_display_2 = os.path.join(base_dir, 'display_distorted_3d.h5')
@@ -43,7 +44,8 @@ def downsample_dataset_1(base_dir):
     # Load data
     camera = dd.downsample_camera(file_camera, n_ds)
     measurement_facet = ds.downsample_measurement(file_measurement_facet, n_ds)
-    measurement_ensemble = ds.downsample_measurement(file_measurement_ensemble, n_ds)
+    measurement_ensemble = ds.downsample_measurement(
+        file_measurement_ensemble, n_ds)
     display_1 = Display.load_from_hdf(file_display_1)
     display_2 = Display.load_from_hdf(file_display_2)
     display_3 = Display.load_from_hdf(file_display_3)
@@ -63,9 +65,11 @@ def downsample_dataset_1(base_dir):
         os.path.join(dir_dataset_out, os.path.basename(file_measurement_facet))
     )
     measurement_ensemble.save_to_hdf(
-        os.path.join(dir_dataset_out, os.path.basename(file_measurement_ensemble))
+        os.path.join(dir_dataset_out, os.path.basename(
+            file_measurement_ensemble))
     )
-    camera.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_camera)))
+    camera.save_to_hdf(os.path.join(
+        dir_dataset_out, os.path.basename(file_camera)))
     display_1.save_to_hdf(
         os.path.join(dir_dataset_out, os.path.basename(file_display_1))
     )
@@ -84,6 +88,6 @@ def downsample_dataset_1(base_dir):
 
 if __name__ == '__main__':
     dir_sample_data = os.path.join(
-        os.path.dirname(opencsp.__file__), '../../sample_data/sofast/measurement_set_1'
+        opencsp_code_dir, '../../sample_data/sofast/measurement_set_1'
     )
     downsample_dataset_1(dir_sample_data)
