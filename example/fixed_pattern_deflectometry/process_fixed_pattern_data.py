@@ -73,7 +73,7 @@ def example_process_fixed_pattern_printed_target():
     printed dot target.
     """
     dir_base = join(
-        dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab'
+        opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab'
     )
 
     file_camera = join(dir_base, "calibration_files/camera.h5")
@@ -105,7 +105,7 @@ def example_process_fixed_pattern_printed_target():
 def example_process_fixed_pattern_screen_target():
     """Loads data and calls processing function"""
     dir_base = join(
-        dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab'
+        opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab'
     )
 
     # Define files

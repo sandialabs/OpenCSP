@@ -66,7 +66,7 @@ def test_FixedPatternDotLocations():
 def test_from_Display():
     # Load display
     file_disp = os.path.join(
-        opencsp_code_dir,
+        opencsp_code_dir(),
         'test/data/sofast_measurements/display_distorted_3d.h5',
     )
     display = Display.load_from_hdf(file_disp)

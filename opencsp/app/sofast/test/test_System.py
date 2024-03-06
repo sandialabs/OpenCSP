@@ -15,7 +15,7 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 def test_System():
     # Get test data location
     base_dir = os.path.join(
-        opencsp_code_dir, 'test/data/sofast_measurements'
+        opencsp_code_dir(), 'test/data/sofast_measurements'
     )
 
     # Create fringe object
