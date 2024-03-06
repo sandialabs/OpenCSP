@@ -494,10 +494,11 @@ class SensitiveStringsSearcher:
         info_or_warn("Summary:")
         info_or_warn("<<<PASS>>>" if ret == 0 else "<<<FAIL>>>")
         info_or_warn(f"Found {len(matches)} sensitive string matches")
-        info_or_warn(f"Found {len(self.unknown_binary_files)} unknown binary files")
-        info_or_warn(
-            f"Did not find {len(self.unfound_allowed_binary_files)} expected binary files"
-        )
+        if len(self.unfound_allowed_binary_files) > 0:
+            info_or_warn(f"Did not find {len(self.unfound_allowed_binary_files)} expected binary files")
+        else:
+            info_or_warn(f"Found {len(self.allowed_binary_files)} expected binary files")
+        info_or_warn(f"Found {len(self.unknown_binary_files)} unexpected binary files")
 
         # Add a 'match' for any unfound or unknown binary files
         for file_ff in self.unfound_allowed_binary_files:
