@@ -20,7 +20,7 @@ from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientati
 def example_calculate_dot_locs_from_display():
     """Creates a FixedPatternDotLocations object from a previously created Display object"""
     dir_base = join(
-        dirname(opencsp.__file__),
+        opencsp_code_dir(),
         '../../sample_data/deflectometry/sandia_lab/calibration_files',
     )
 

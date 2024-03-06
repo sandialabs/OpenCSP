@@ -88,6 +88,6 @@ def downsample_dataset_1(base_dir):
 
 if __name__ == '__main__':
     dir_sample_data = os.path.join(
-        opencsp_code_dir, '../../sample_data/sofast/measurement_set_1'
+        opencsp_code_dir(), '../../sample_data/sofast/measurement_set_1'
     )
     downsample_dataset_1(dir_sample_data)

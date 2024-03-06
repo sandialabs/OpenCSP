@@ -130,7 +130,7 @@ def example_driver():
     """
     # Define measured and reference data
     sample_data_dir = join(
-        opencsp_code_dir, 'test/data/sofast_measurements/'
+        opencsp_code_dir(), 'test/data/sofast_measurements/'
     )
 
     save_dir = join(os.path.dirname(__file__), 'data/output/standard_output')

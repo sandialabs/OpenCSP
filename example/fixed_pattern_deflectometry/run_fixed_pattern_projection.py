@@ -18,7 +18,7 @@ def example_project_fixed_pattern():
     """Projects fixed pattern image on display"""
     # Set pattern parameters
     file_image_projection = join(
-        dirname(opencsp.__file__),
+        opencsp_code_dir(),
         "test/data/sofast_measurements/general/Image_Projection_test.h5",
     )
     width_pattern = 3
