@@ -23,7 +23,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 def example_perform_calibration():
     """Performs a dot-location calibration using photogrammetry"""
     # Define dot location images and origins
-    base_dir = join(dirname(opencsp.__file__),
+    base_dir = join(opencsp_code_dir(),
                     '../../sample_data/deflectometry/calibration_dot_locations/data_measurement/')
     files = [
         join(base_dir, 'images/DSC03965.JPG'),

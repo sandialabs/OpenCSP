@@ -17,7 +17,7 @@ def example_driver():
     """
     # Define input camera file
     file = os.path.join(
-        opencsp_code_dir, 'test/data/sofast_measurements/camera.h5'
+        opencsp_code_dir(), 'test/data/sofast_measurements/camera.h5'
     )
 
     # Load camera
