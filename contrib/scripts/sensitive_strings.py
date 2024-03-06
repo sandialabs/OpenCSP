@@ -298,13 +298,26 @@ class SensitiveStringsSearcher:
             file_norm_path = self.norm_path(file_ff.relative_path, file_ff.name_ext)
             _, name, ext = ft.path_components(file_norm_path)
             if self._is_img_ext(ext):
-                img = Image.open(file_norm_path).convert('RGB')
-                np_image = np.copy(np.array(img))
-                img.close()
-                return self.interactive_image_sign_off(
-                    np_image=np_image,
-                    description=f"{file_ff.relative_path}/{file_ff.name_ext}",
-                )
+                try:
+                    img = Image.open(file_norm_path).convert('RGB')
+                except:
+                    img = None
+                if img is not None:
+                    np_image = np.copy(np.array(img))
+                    img.close()
+                    return self.interactive_image_sign_off(
+                        np_image=np_image,
+                        description=f"{file_ff.relative_path}/{file_ff.name_ext}",
+                    )
+                else:
+                    lt.info("Unknown image file failed to open. Do you want to sign off on this file anyways (y/n)?")
+                    val = input("")[0]
+                    lt.info(f"    User responded '{val}'")
+                    if val.lower() == 'y':
+                        return True
+                    else:
+                        return False
+                # if img is not None
             else:
                 return False
 
