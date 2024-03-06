@@ -366,7 +366,8 @@ def process_undefined_geometry(
     data_geometry_general.v_cam_optic_cam_exp = v_cam_optic_cam
 
     # Find orientation of optic
-    r_cam_optic = sp.r_from_position(v_cam_optic_cam, orientation.v_cam_screen_cam)
+    r_cam_optic = sp.r_from_position(
+        v_cam_optic_cam, orientation.v_cam_screen_cam)
     data_geometry_general.r_optic_cam_exp = r_cam_optic.inv()
 
     # Orient optic
@@ -376,7 +377,8 @@ def process_undefined_geometry(
     spatial_orientation.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
     # Calculate measure point pointing direction
-    u_cam_measure_point_facet = Uxyz(spatial_orientation.v_cam_optic_optic.data)
+    u_cam_measure_point_facet = Uxyz(
+        spatial_orientation.v_cam_optic_optic.data)
 
     # Save processed optic data
     data_geometry_facet.u_cam_measure_point_facet = u_cam_measure_point_facet
@@ -470,7 +472,8 @@ def process_multifacet_geometry(
                 )
             ).data
         )
-    v_ensemble_corns_ensemble = Vxyz(np.concatenate(v_ensemble_corns_ensemble, axis=1))
+    v_ensemble_corns_ensemble = Vxyz(
+        np.concatenate(v_ensemble_corns_ensemble, axis=1))
 
     # Concatenate all facet corners
     v_ensemble_facet_corns_all = Vxyz(
@@ -554,7 +557,8 @@ def process_multifacet_geometry(
     data_geometry_general.v_cam_optic_cam_refine_1 = v_cam_ensemble_cam_refine_1
 
     # Calculate refined measure point vector in optic coordinates
-    v_meas_pt_ensemble_cam_refine_1 = v_meas_pt_ensemble.rotate(r_ensemble_cam_refine_1)
+    v_meas_pt_ensemble_cam_refine_1 = v_meas_pt_ensemble.rotate(
+        r_ensemble_cam_refine_1)
 
     # Calculate expected location of all facet corners and centroids
     v_facet_corners_image_exp = [
@@ -630,7 +634,8 @@ def process_multifacet_geometry(
     data_geometry_general.v_cam_optic_cam_refine_2 = v_cam_ensemble_cam_refine_2
 
     # Calculate refined measure point location in optic coordinates vector
-    v_meas_pt_ensemble_cam_refine_2 = v_meas_pt_ensemble.rotate(r_ensemble_cam_refine_2)
+    v_meas_pt_ensemble_cam_refine_2 = v_meas_pt_ensemble.rotate(
+        r_ensemble_cam_refine_2)
 
     # Refine T with measured distance
     v_cam_ensemble_cam_refine_3 = sp.refine_v_distance(
@@ -707,10 +712,12 @@ def process_multifacet_geometry(
         facet_ori.orient_optic_cam(r_cam_facet, v_cam_facet_cam)
 
         # Calculate facet measure point pointing direction (measure point defined as facet centroid)
-        v_cam_meas_pt_facet = facet_ori.v_cam_optic_optic + v_facet_centroid_facet[idx]
+        v_cam_meas_pt_facet = facet_ori.v_cam_optic_optic + \
+            v_facet_centroid_facet[idx]
 
         # Calculate facet measure point to screen distance
-        v_cam_screen_optic = facet_ori.v_cam_screen_cam.rotate(facet_ori.r_cam_optic)
+        v_cam_screen_optic = facet_ori.v_cam_screen_cam.rotate(
+            facet_ori.r_cam_optic)
         dist = (v_cam_meas_pt_facet - v_cam_screen_optic).magnitude()[0]
 
         data_geometry_facet[idx].u_cam_measure_point_facet = Uxyz(
