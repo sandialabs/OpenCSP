@@ -83,7 +83,8 @@ class CalibrationCameraPosition:
 
     def find_markers(self) -> None:
         """Finds marker corner locations in image"""
-        self.ids_marker, self.pts_xy_marker_corners_list = find_aruco_marker(self.image)
+        self.ids_marker, self.pts_xy_marker_corners_list = find_aruco_marker(
+            self.image)
 
     def collect_corner_xyz_locations(self) -> None:
         """Collects corner locations of viewed markers"""
@@ -96,7 +97,7 @@ class CalibrationCameraPosition:
             # Extract calibrated corner locations (4 corners per marker)
             self.pts_xyz_active_corner_locations = (
                 self.pts_xyz_active_corner_locations.concatenate(
-                    self.pts_xyz_corners[index:index + 4]
+                    self.pts_xyz_corners[index: index + 4]
                 )
             )
 
@@ -184,7 +185,8 @@ class CalibrationCameraPosition:
         ax.imshow(self.image, cmap='gray')
         for id_, pts in zip(self.ids_marker, self.pts_xy_marker_corners_list):
             plt.scatter(*pts.T, marker='+')
-            plt.text(*pts.mean(0).T + np.array([60, 0]), id_, backgroundcolor='white')
+            plt.text(*pts.mean(0).T +
+                     np.array([60, 0]), id_, backgroundcolor='white')
 
     def plot_reprojection_error(self) -> None:
         """Plots reprojection error"""
