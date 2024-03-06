@@ -3,7 +3,7 @@ from os.path import join
 
 import matplotlib
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.FacetData import FacetData
@@ -30,7 +30,7 @@ def example_driver():
     """
     # Define sample data directory
     sample_data_dir = join(
-        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/'
+        opencsp_code_dir, 'test/data/sofast_measurements/'
     )
 
     # Directory Setup
@@ -81,14 +81,16 @@ def example_driver():
     facet: Facet = sofast.get_optic()
 
     # Generate plots
-    figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
+    figure_control = rcfg.RenderControlFigure(
+        tile_array=(1, 1), tile_square=True)
     mirror_control = rcm.RenderControlMirror(
         centroid=True, surface_normals=True, norm_res=1
     )
     axis_control_m = rca.meters()
 
     # Visualize setup
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
+    fig_record = fm.setup_figure_for_3d_data(
+        figure_control, axis_control_m, title='')
     spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
     visualize_setup(
         display,

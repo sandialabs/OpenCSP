@@ -3,7 +3,7 @@ from os.path import join
 
 import numpy as np
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
     save_physical_setup_file,
 )
@@ -16,7 +16,7 @@ import opencsp.common.lib.tool.file_tools as ft
 def test_save_physical_setup_file():
     """Loads data and saves test Display file"""
     # Define input file directory
-    base_dir = join(os.path.dirname(opencsp.__file__), 'common/lib/deflectometry/test')
+    base_dir = join(opencsp_code_dir, 'common/lib/deflectometry/test')
     dir_input = join(base_dir, 'data', 'data_expected')
     dir_output = join(base_dir, 'data', 'output')
     file_save = join(dir_output, 'test_physical_setup_file.h5')
@@ -24,7 +24,8 @@ def test_save_physical_setup_file():
     ft.create_directories_if_necessary(dir_output)
 
     # Define data files
-    file_screen_distortion_data = join(dir_input, 'screen_distortion_data_100_100.h5')
+    file_screen_distortion_data = join(
+        dir_input, 'screen_distortion_data_100_100.h5')
     file_cam = join(dir_input, 'camera_rvec_tvec.csv')
 
     # Load data
@@ -41,7 +42,8 @@ def test_save_physical_setup_file():
     tvec = data_cam[1]
 
     # Save physical setup file
-    save_physical_setup_file(screen_distortion_data, name, rvec, tvec, file_save)
+    save_physical_setup_file(screen_distortion_data,
+                             name, rvec, tvec, file_save)
     print('Test physical setup file save successfully.')
 
 

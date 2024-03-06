@@ -2,7 +2,7 @@
 """
 from os.path import join, dirname
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
     FixedPatternDotLocations,
 )
@@ -33,7 +33,8 @@ def process(
     # Load data
     camera = Camera.load_from_hdf(file_camera)
     facet_data = FacetData.load_from_json(file_facet)
-    fixed_pattern_dot_locs = FixedPatternDotLocations.load_from_hdf(file_dot_locs)
+    fixed_pattern_dot_locs = FixedPatternDotLocations.load_from_hdf(
+        file_dot_locs)
     orientation = SpatialOrientation.load_from_hdf(file_ori)
     measurement = FixedPatternMeasurement.load_from_hdf(file_meas)
 
@@ -54,7 +55,8 @@ def process(
     print(f'  Y {focal_lengths_xy[1]:.3f} m')
 
     # Plot slope image
-    figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
+    figure_control = rcfg.RenderControlFigure(
+        tile_array=(1, 1), tile_square=True)
     axis_control_m = rca.meters()
 
     fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
@@ -77,7 +79,8 @@ def example_process_fixed_pattern_printed_target():
     file_camera = join(dir_base, "calibration_files/camera.h5")
     file_facet = join(dir_base, "calibration_files/Facet_NSTTF.json")
     file_ori = join(dir_base, 'fixed_pattern/spatial_orientation.h5')
-    file_dot_locs = join(dir_base, 'fixed_pattern/dot_locations_printed_target.h5')
+    file_dot_locs = join(
+        dir_base, 'fixed_pattern/dot_locations_printed_target.h5')
     file_meas = join(dir_base, 'fixed_pattern/measurement_printed_target_1.h5')
     dir_output = join(dirname(__file__), 'data/output/printed_target')
 

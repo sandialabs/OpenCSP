@@ -3,7 +3,7 @@ from os.path import join
 
 import numpy as np
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -13,7 +13,7 @@ def example_scene_reconstruction():
     """Example script that reconstructs the XYZ locations of Aruco markers in a scene."""
     # Define input directory
     dir_input = join(
-        os.path.dirname(opencsp.__file__),
+        opencsp_code_dir,
         'app/scene_reconstruction/test/data/data_measurement',
     )
 
@@ -51,7 +51,8 @@ def example_scene_reconstruction():
     # Align points
     marker_ids = alignment_points[:, 0].astype(int)
     alignment_values = Vxyz(alignment_points[:, 1:4].T)
-    cal_scene_recon.align_points(marker_ids, alignment_values, verbose=VERBOSITY)
+    cal_scene_recon.align_points(
+        marker_ids, alignment_values, verbose=VERBOSITY)
 
     # Save points as CSV
     cal_scene_recon.save_data_as_csv(join(save_dir, 'point_locations.csv'))

@@ -6,7 +6,7 @@ import matplotlib
 import numpy as np
 from numpy import ndarray
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
     CalibrationCameraPosition,
@@ -142,11 +142,11 @@ def example_driver():
     """
     # Define input file directories
     base_dir_scene_recon = join(
-        os.path.dirname(opencsp.__file__),
+        opencsp_code_dir,
         'app/scene_reconstruction/test/data/data_measurement',
     )  # low-res test data
     base_dir_sofast = join(
-        os.path.dirname(opencsp.__file__),
+        opencsp_code_dir,
         'common/lib/deflectometry/test/data/data_measurement',
     )  # low-res test data
 

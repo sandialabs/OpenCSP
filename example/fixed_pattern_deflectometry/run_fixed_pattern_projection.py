@@ -6,7 +6,7 @@ from os.path import join, dirname
 
 import pytest
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
     FixedPatternScreenProjection,
 )
