@@ -7,8 +7,6 @@ from PIL import Image
 import sys
 import time
 
-import FileCache as fc
-import FileFingerprint as ff
 import opencsp.common.lib.file.SimpleCsv as sc
 from opencsp.common.lib.opencsp_path import opencsp_settings
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
@@ -18,7 +16,12 @@ import opencsp.common.lib.tool.hdf5_tools as h5
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.time_date_tools as tdt
-import SensitiveStringMatcher as ssm
+
+sys.path.append('../../')
+import contrib.scripts.AbstractFileFingerprint as aff  # nopep8
+import contrib.scripts.FileCache as fc  # nopep8
+import contrib.scripts.FileFingerprint as ff  # nopep8
+import contrib.scripts.SensitiveStringMatcher as ssm  # nopep8
 
 
 class SensitiveStringsSearcher:

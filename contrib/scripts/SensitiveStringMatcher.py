@@ -1,6 +1,5 @@
 import dataclasses
 import re
-from typing import Callable
 
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -119,7 +118,7 @@ class SensitiveStringMatcher:
             matching: dict[re.Pattern | str, list[int]] = {}
             for pattern in possible_matching:
                 span = possible_matching[pattern]
-                line_part = iline[span[0] : span[1]]
+                line_part = iline[span[0]: span[1]]
                 if len(self._search_patterns(line_part, self.neg_patterns)) == 0:
                     matching[pattern] = span
 
@@ -130,9 +129,9 @@ class SensitiveStringMatcher:
                 start, end = span[0], span[1]
                 line_part = f"`{line[start:end]}`"
                 if start > 0:
-                    line_part = line[max(start - 5, 0) : start] + line_part
+                    line_part = line[max(start - 5, 0): start] + line_part
                 if end < len(line):
-                    line_part = line_part + line[end : min(end + 5, len(line))]
+                    line_part = line_part + line[end: min(end + 5, len(line))]
 
                 match = Match(lineno + 1, start, end, line, line_part, self)
                 self.set_match_msg(match, pattern)
