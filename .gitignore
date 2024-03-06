@@ -1,0 +1,23 @@
+
+# Python cache files.
+*.pyc
+.pytest_cache/
+.spyproject
+
+# Virtual environment
+env/
+
+# Ben's Sublime files.
+sftp-config.json
+
+# Test code scratch output directories.
+actual_output/
+
+# Jupyter checkpoints
+.ipynb_checkpoints/
+
+# pytest-cov data
+.coverage
+
+# test data output
+**/test/data/output/
