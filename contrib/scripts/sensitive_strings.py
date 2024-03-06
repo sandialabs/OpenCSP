@@ -574,6 +574,14 @@ class SensitiveStringsSearcher:
 
 
 if __name__ == "__main__":
+    parser = argparse.ArgumentParser(
+        prog=__file__.rstrip(".py"), description='Sensitive strings searcher'
+    )
+    parser.add_argument('--no-interactive', action='store_true', dest="ninteractive",
+                        help="Don't interactively ask the user about unknown binary files. Simply fail instead.")
+    args = parser.parse_args()
+    not_interactive: bool = args.ninteractive
+
     ss_log_dir = ft.norm_path(
         opencsp_settings['sensitive_strings']['sensitive_strings_dir']
     )
@@ -596,7 +604,7 @@ if __name__ == "__main__":
     searcher = SensitiveStringsSearcher(
         root_search_dir, sensitive_strings_csv, allowed_binary_files_csv, ss_cache_file
     )
-    searcher.interactive = True
+    searcher.interactive = not not_interactive
     searcher.date_time_str = date_time_str
     num_errors = searcher.search_files()
 
