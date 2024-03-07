@@ -397,20 +397,25 @@ class SensitiveStringsSearcher:
     def search_files(self):
         self._init_files_lists()
         if self.git_files_only:
-            git_stdout = st.run(
-                "git ls-tree --full-tree --name-only -r HEAD",
-                cwd=self.root_search_dir,
-                stdout="collect",
-                stderr="print",
-            )
-            files = [line.val for line in git_stdout]
+            # If this script is evaluated form MobaXTerm, then the built-in
+            # 16-bit version of git will fail.
+            git = st.get_executable_path("git", "mobaxterm")
+            git_committed = st.run(
+                f"\"{git}\" ls-tree --full-tree --name-only -r HEAD",
+                cwd=self.root_search_dir, stdout="collect", stderr="print")
+            git_added = st.run(
+                f"\"{git}\" diff --name-only --cached --diff-filter=A",
+                cwd=self.root_search_dir, stdout="collect", stderr="print")
+            files = [line.val for line in git_committed + git_added]
+            # don't include "git rm"'d files
+            files = list(filter(lambda file: ft.file_exists(os.path.join(self.root_search_dir, file)), files))
             lt.info(f"Searching for sensitive strings in {len(files)} tracked files")
         else:
             files = ft.files_in_directory(
                 self.root_search_dir, files_only=True, recursive=True
             )
             lt.info(f"Searching for sensitive strings in {len(files)} files")
-        files = sorted(files)
+        files = sorted(list(set(files)))
 
         # Search for sensitive strings in files
         matches: dict[str, list[ssm.Match]] = {}
