@@ -7,17 +7,15 @@ import cv2 as cv
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import \
     FixedPatternSetupCalibrate
-
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import \
     CalibrationCameraPosition
-
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 def example_perform_calibration():
