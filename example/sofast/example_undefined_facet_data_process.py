@@ -1,19 +1,18 @@
 import os
 from os.path import join
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
-from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-import opencsp.common.lib.render_control.RenderControlMirror as rcm
 
 
 def example_driver():
@@ -77,16 +76,11 @@ def example_driver():
     facet: Facet = sofast.get_optic()
 
     # Generate plots
-    figure_control = rcfg.RenderControlFigure(
-        tile_array=(1, 1), tile_square=True)
-    mirror_control = rcm.RenderControlMirror(
-        centroid=True, surface_normals=True, norm_res=1
-    )
+    figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
     axis_control_m = rca.meters()
 
     # Visualize setup
-    fig_record = fm.setup_figure_for_3d_data(
-        figure_control, axis_control_m, title='')
+    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
     spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
     visualize_setup(
         display,
