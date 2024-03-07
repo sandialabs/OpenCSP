@@ -6,7 +6,6 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -36,8 +35,7 @@ class TestSpatialOrientation(unittest.TestCase):
 
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1']).inv()
         v_cam_optic_cam = Vxyz(data['v_cam_optic_cam_refine_2'])
-        ori = SpatialOrientation(display.r_cam_screen,
-                                 display.v_cam_screen_cam)
+        ori = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         # Save spatial orientation
@@ -50,8 +48,7 @@ class TestSpatialOrientation(unittest.TestCase):
             + self.so.v_optic_screen_optic.rotate(self.so.r_optic_cam)
             + self.so.v_screen_cam_cam
         )
-        np.testing.assert_allclose(
-            v_exp, v_calc.data.squeeze(), rtol=0, atol=1e-10)
+        np.testing.assert_allclose(v_exp, v_calc.data.squeeze(), rtol=0, atol=1e-10)
 
     def test_translation_ring_2(self):
         v_exp = np.zeros(3)
@@ -60,17 +57,14 @@ class TestSpatialOrientation(unittest.TestCase):
             + self.so.v_screen_optic_optic.rotate(self.so.r_optic_cam)
             + self.so.v_optic_cam_cam
         )
-        np.testing.assert_allclose(
-            v_exp, v_calc.data.squeeze(), rtol=0, atol=1e-10)
+        np.testing.assert_allclose(v_exp, v_calc.data.squeeze(), rtol=0, atol=1e-10)
 
     def test_rotation_ring_1(self):
         I_exp = np.eye(3)
         I_calc = self.so.r_optic_screen * self.so.r_cam_optic * self.so.r_screen_cam
-        np.testing.assert_allclose(
-            I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
+        np.testing.assert_allclose(I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
 
     def test_rotation_ring_2(self):
         I_exp = np.eye(3)
         I_calc = self.so.r_cam_screen * self.so.r_optic_cam * self.so.r_screen_optic
-        np.testing.assert_allclose(
-            I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
+        np.testing.assert_allclose(I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
