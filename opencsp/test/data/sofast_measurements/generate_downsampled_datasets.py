@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-import opencsp.app.sofast.test.downsample_sofast_data as ds
+import opencsp.test.data.sofast_measurements.downsample_sofast_data as ds
 import opencsp.common.lib.test.downsample_data as dd
 
 
@@ -28,8 +28,7 @@ def downsample_dataset_1(base_dir):
 
     # Define location of sample data
     file_measurement_facet = os.path.join(base_dir, 'measurement_facet.h5')
-    file_measurement_ensemble = os.path.join(
-        base_dir, 'measurement_ensemble.h5')
+    file_measurement_ensemble = os.path.join(base_dir, 'measurement_ensemble.h5')
     file_camera = os.path.join(base_dir, 'camera.h5')
     file_display_1 = os.path.join(base_dir, 'display_distorted_2d.h5')
     file_display_2 = os.path.join(base_dir, 'display_distorted_3d.h5')
@@ -44,8 +43,7 @@ def downsample_dataset_1(base_dir):
     # Load data
     camera = dd.downsample_camera(file_camera, n_ds)
     measurement_facet = ds.downsample_measurement(file_measurement_facet, n_ds)
-    measurement_ensemble = ds.downsample_measurement(
-        file_measurement_ensemble, n_ds)
+    measurement_ensemble = ds.downsample_measurement(file_measurement_ensemble, n_ds)
     display_1 = Display.load_from_hdf(file_display_1)
     display_2 = Display.load_from_hdf(file_display_2)
     display_3 = Display.load_from_hdf(file_display_3)
@@ -65,11 +63,9 @@ def downsample_dataset_1(base_dir):
         os.path.join(dir_dataset_out, os.path.basename(file_measurement_facet))
     )
     measurement_ensemble.save_to_hdf(
-        os.path.join(dir_dataset_out, os.path.basename(
-            file_measurement_ensemble))
+        os.path.join(dir_dataset_out, os.path.basename(file_measurement_ensemble))
     )
-    camera.save_to_hdf(os.path.join(
-        dir_dataset_out, os.path.basename(file_camera)))
+    camera.save_to_hdf(os.path.join(dir_dataset_out, os.path.basename(file_camera)))
     display_1.save_to_hdf(
         os.path.join(dir_dataset_out, os.path.basename(file_display_1))
     )
