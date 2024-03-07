@@ -8,8 +8,11 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class BlobIndex:
-    """Class containing blob indexing algorithms to _assign indices to blobs in a rough grid pattern.
-    X/Y axes correspond to image axes; +x is to right, +y is down."""
+    """Class containing blob indexing algorithms to assign indices to blobs in a rough grid pattern.
+    X/Y axes correspond to image axes; +x is to right, +y is down. Class takes in points (in units
+    of pixels) that have been previously found with a blob detector and attempts to assign all found
+    xy pixel points with a blob index.
+    """
 
     def __init__(
         self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int
@@ -19,11 +22,11 @@ class BlobIndex:
         Parameters
         ----------
         points : Vxy
-            Points of all possible blobs
+            Points of all possible blobs found with a blob detector, pixels
         origin : Vxy
-            Origin point assumed to have coordinates (0, 0)
+            Origin point assumed to have blob index coordinates (0, 0), pixels
         x_min/x_max/y_min/y_max : int
-            Expected min/max of indices in x/y directions
+            Expected min/max of blob indices in x/y directions
         """
         self._points = points
 
@@ -42,14 +45,14 @@ class BlobIndex:
         self.apply_filter = False
         self.verbose = True
 
-        self._offset_x = -x_min
-        self._offset_y = -y_min
-        idx_x_vec = np.arange(x_min, x_max + 1)
-        idx_y_vec = np.arange(y_min, y_max + 1)
-        self._idx_x_mat, self._idx_y_mat = np.meshgrid(idx_x_vec, idx_y_vec)
-        self._points_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan
+        self._offset_x = -x_min  # index
+        self._offset_y = -y_min  # index
+        idx_x_vec = np.arange(x_min, x_max + 1)  # index
+        idx_y_vec = np.arange(y_min, y_max + 1)  # index
+        self._idx_x_mat, self._idx_y_mat = np.meshgrid(idx_x_vec, idx_y_vec)  # index
+        self._points_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan  # pixels
         self._point_indices_mat = (
-            np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan
+            np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan  # index
         )
 
     def _get_assigned_point_indices(self) -> np.ndarray[int]:
@@ -86,14 +89,14 @@ class BlobIndex:
         Parameters
         ----------
         pt_cur : Vxy
-            Current point
+            Current point, pixels
         pt_exp : Vxy
-            Expected next point
+            Expected next point, pixels
 
         Returns
         -------
         tuple[int, float]
-            Point index and distance from expected point
+            Point index (indexing self._points) and distance from expected point
         """
         points = self._get_unassigned_points()
         idxs = self._get_unassigned_point_indices()
@@ -114,7 +117,7 @@ class BlobIndex:
             return False, (None, None)
         # Find nearest point to current point
         idx = np.argmin(points_rel[mask].magnitude())
-        point = points[mask][idx]
+        point = points[mask][idx]  # pixels
         dist_exp = (point - pt_exp).magnitude()[0]
         idx = idxs[mask][idx]
 
@@ -126,7 +129,17 @@ class BlobIndex:
         return (not np.isnan(idx)), int(idx)
 
     def _assign(self, idx_pt: int, idx_x: int, idx_y: int) -> None:
-        """Assigns given blob index an xy index"""
+        """Assigns given blob index an xy index
+
+        Parameters
+        ----------
+        idx_pt : int
+            Index of point (indexing self._points)
+        idx_x : int
+            X blob index
+        idx_y : int
+            Y blob index
+        """
         # Assign vectors
         self._idx_x[idx_pt] = idx_x
         self._idx_y[idx_pt] = idx_y
@@ -141,7 +154,13 @@ class BlobIndex:
             print(f'Blob number {idx_pt:d} was assigned ({idx_x:d}, {idx_y:d})')
 
     def _unassign(self, idx_pt: int) -> None:
-        """Unassigns a point index"""
+        """Unassigns a point index
+
+        Parameters
+        ----------
+        idx_pt : int
+            Index of point (indexing self._points)
+        """
         # Unassign matrices
         idx_mat_x = self._idx_x[idx_pt] + self._offset_x
         idx_mat_y = self._idx_y[idx_pt] + self._offset_y
@@ -163,7 +182,13 @@ class BlobIndex:
             print(f'Blob number {idx_pt:d} was unassigned')
 
     def _assign_center(self, pt_origin: Vxy) -> None:
-        """Assigns the center point to (0, 0)"""
+        """Assigns the center point to (0, 0)
+
+        Parameters
+        ----------
+        pt_origin : Vxy
+            Location of origin, pixels
+        """
         idx, dist = self._nearest_unassigned_idx_from_xy_point(pt_origin)
         if dist > self.search_thresh:
             warn(
@@ -172,10 +197,27 @@ class BlobIndex:
         self._assign(idx, 0, 0)
 
     def _find_nearest_in_direction(
-        self, idx_pt: int, direction: str = Literal['right', 'left', 'up', 'down']
+        self, idx_pt: int, direction: Literal['right', 'left', 'up', 'down']
     ) -> tuple[int, int, int]:
         """Finds the directly nearest point index to given point
-        in left, right, up, down direction. Can return already found points"""
+        in left, right, up, down direction. Can return already found points
+
+        Parameters
+        ----------
+        idx_pt : int
+            Index of point (indexing self._points) from which to start searching
+        direction : Literal['right', 'left', 'up', 'down']
+            The direction to search from starting point
+
+        Returns
+        -------
+        point_index
+            Index of found point (indexing self._points)
+        index_x
+            X blob index
+        index_y
+            Y blob index
+        """
         # Find possible points
         unassigned_points = self._get_unassigned_points()
         unassigned_deltas = unassigned_points - self._points[idx_pt]
@@ -221,7 +263,7 @@ class BlobIndex:
         return possible_idxs[idx_out], int(idx_x_out), int(idx_y_out)
 
     def _num_unassigned(self) -> int:
-        """Returns number of unassigned points"""
+        """Returns number of unassigned points (referencing self._points)"""
         return np.logical_not(self._is_assigned).sum()
 
     def _find_3x3_center_block(self) -> None:
@@ -258,12 +300,19 @@ class BlobIndex:
         idx_g, x, y = self._find_nearest_in_direction(idx_d, 'down')
         self._assign(idx_g, x, y)
 
-    def _extend_data(self, direction: Literal['x', 'y'], step: Literal[1, -1]) -> bool:
+    def _extend_data(self, direction: Literal['x', 'y'], step: Literal[1, -1]) -> None:
         """Extends found blob rows/collumns in given direction
-         1 = right/down
-        -1 = left/up
 
         Steps in the given axis, a or b
+
+        Parameters
+        ----------
+        direction : Literal['x', 'y']
+            Axis to search
+        step : Literal[1, -1]
+            Direction to search
+            -  1 = right/down
+            - -1 = left/up
         """
         if step not in [-1, 1]:
             raise ValueError(f'Step must be -1 or 1, not {step}')
@@ -323,8 +372,20 @@ class BlobIndex:
                                 break
 
     def _exp_pt_from_pt_pair(self, pt_cur: Vxy, pt_prev: Vxy) -> Vxy:
-        """Calculates the expected point from a given current and previous
-        point pair"""
+        """Calculates the expected point from a given current and previous point pair
+
+        Parameters
+        ----------
+        pt_cur : Vxy
+            Current point, pixels
+        pt_prev : Vxy
+            Previous point, pixels
+
+        Returns
+        -------
+        Vxy
+            Refined expected point location
+        """
         del_y = (pt_cur.y - pt_prev.y)[0]  # pixels
         del_x = (pt_cur.x - pt_prev.x)[0]  # pixels
         return pt_cur + Vxy((del_x, del_y))  # pixels
@@ -359,7 +420,13 @@ class BlobIndex:
             self._unassign(idx)
 
     def run(self, pt_origin: Vxy) -> None:
-        """Runs sequence"""
+        """Runs blob indexing sequence
+
+        Parameters
+        ----------
+        pt_origin : Vxy
+            Location of origin point with blob index of (0, 0), pixels
+        """
         # Assign center point
         self._assign_center(pt_origin)
         # Find 3x3 core point block
@@ -386,7 +453,13 @@ class BlobIndex:
                 prev_num_unassigned = cur_num_unassigned
 
     def plot_points_labels(self, labels: bool = False) -> None:
-        """Plots points and labels"""
+        """Plots points and labels
+
+        Parameters
+        ----------
+        labels : bool, optional
+            To include xy blob index labels, by default False
+        """
         plt.scatter(*self._points[self._is_assigned].data, color='blue')
         if labels:
             for x, y, pt in zip(
@@ -397,7 +470,13 @@ class BlobIndex:
                 plt.text(*pt.data, f'({x:.0f}, {y:.0f})')
 
     def plot_points_connections(self, labels: bool = False) -> None:
-        """Plots points and connections for rows/collumns"""
+        """Plots points and connections for rows/collumns
+
+        Parameters
+        ----------
+        labels : bool, optional
+            To add point index (indexing self._points) labels, by default False
+        """
         for row_idx in np.unique(self._idx_y):
             # Get all points in row
             mask_all = self._idx_y == row_idx
@@ -421,7 +500,7 @@ class BlobIndex:
         points : Vxy
             Lenght N vector, located points xy locations, pixels
         indices_xy : Vxy
-            Length N vector, located points xy indices, int
+            Length N vector, located points xy blob indices, int
         """
         # Get points as vectors
         x_pts_mat = self._points_mat[..., 0]
@@ -451,7 +530,7 @@ class BlobIndex:
         points : Vxy
             Lenght N vector, located points xy locations, pixels
         indices_xy : Vxy
-            Length N vector, located points xy indices, int
+            Length N vector, located points xy blob indices, int
         """
         # Get indices as vectors
         idx_x_mat = self._idx_x_mat
