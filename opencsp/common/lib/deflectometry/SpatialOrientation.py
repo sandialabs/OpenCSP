@@ -133,8 +133,7 @@ class SpatialOrientation:
         self.r_screen_optic = self.r_optic_screen.inv()
 
         self.v_optic_screen_optic = (
-            self.v_optic_cam_optic +
-            self.v_cam_screen_cam.rotate(self.r_cam_optic)
+            self.v_optic_cam_optic + self.v_cam_screen_cam.rotate(self.r_cam_optic)
         )
         self.v_screen_optic_optic = -self.v_optic_screen_optic
 
