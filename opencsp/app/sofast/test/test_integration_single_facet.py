@@ -6,15 +6,12 @@ import unittest
 
 import numpy as np
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.common.lib.deflectometry.Display import Display
-from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
@@ -151,8 +148,7 @@ class TestSingle(unittest.TestCase):
             sofast.process_optic_singlefacet(facet_data, surface_data)
 
             # Store test data
-            cls.slopes.append(
-                sofast.data_characterization_facet[0].slopes_facet_xy)
+            cls.slopes.append(sofast.data_characterization_facet[0].slopes_facet_xy)
             cls.surf_coefs.append(
                 sofast.data_characterization_facet[0].surf_coefs_facet
             )

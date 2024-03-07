@@ -8,8 +8,8 @@ import shutil
 import sys
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-import opencsp.app.sofast.test.downsample_sofast_data as ds
 import opencsp.common.lib.test.downsample_data as dd
+import opencsp.test.data.sofast_measurements.downsample_sofast_data as ds
 
 
 def downsample_dataset(dir_input: str, dir_output: str) -> None:
@@ -49,8 +49,7 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
         join(dir_input, 'screen_shape_sofast_measurements/pose_4.h5'),
     ]
     for file_meas in files_meas:
-        print(
-            f'Downsampling sofast measurement: {os.path.basename(file_meas):s}...')
+        print(f'Downsampling sofast measurement: {os.path.basename(file_meas):s}...')
         meas_ds = ds.downsample_measurement(file_meas, n_sofast)
         meas_ds.save_to_hdf(
             join(dir_output_screen_measurements, os.path.basename(file_meas))
