@@ -2,14 +2,14 @@
 
 NOTE: This example requires a computer screen
 """
-from os.path import join, dirname
+from os.path import join
 
 import pytest
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
     FixedPatternScreenProjection,
 )
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 
 
