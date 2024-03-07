@@ -4,11 +4,11 @@ import os
 
 import pytest
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.System import System
 from opencsp.app.sofast.test.ImageAcquisition_no_camera import ImageAcquisition
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 @pytest.mark.no_xvfb

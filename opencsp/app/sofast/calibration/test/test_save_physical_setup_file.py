@@ -1,15 +1,14 @@
-import os
 from os.path import join
 
 import numpy as np
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
     save_physical_setup_file,
 )
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
 
 
@@ -24,8 +23,7 @@ def test_save_physical_setup_file():
     ft.create_directories_if_necessary(dir_output)
 
     # Define data files
-    file_screen_distortion_data = join(
-        dir_input, 'screen_distortion_data_100_100.h5')
+    file_screen_distortion_data = join(dir_input, 'screen_distortion_data_100_100.h5')
     file_cam = join(dir_input, 'camera_rvec_tvec.csv')
 
     # Load data
@@ -42,10 +40,9 @@ def test_save_physical_setup_file():
     tvec = data_cam[1]
 
     # Save physical setup file
-    save_physical_setup_file(screen_distortion_data,
-                             name, rvec, tvec, file_save)
-    print('Test physical setup file save successfully.')
+    save_physical_setup_file(screen_distortion_data, name, rvec, tvec, file_save)
 
 
 if __name__ == '__main__':
     test_save_physical_setup_file()
+    print('Test physical setup file save successfully.')
