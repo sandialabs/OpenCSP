@@ -52,8 +52,7 @@ def example_scene_reconstruction():
     # Align points
     marker_ids = alignment_points[:, 0].astype(int)
     alignment_values = Vxyz(alignment_points[:, 1:4].T)
-    cal_scene_recon.align_points(
-        marker_ids, alignment_values, verbose=VERBOSITY)
+    cal_scene_recon.align_points(marker_ids, alignment_values, verbose=VERBOSITY)
 
     # Save points as CSV
     cal_scene_recon.save_data_as_csv(join(save_dir, 'point_locations.csv'))
