@@ -42,8 +42,7 @@ def run_screen_shape_cal(
     """
     # Define input files
     resolution_xy = [100, 100]  # sample density of screen
-    file_screen_cal_point_pairs = join(
-        dir_input, 'screen_calibration_point_pairs.csv')
+    file_screen_cal_point_pairs = join(dir_input, 'screen_calibration_point_pairs.csv')
     file_camera_distortion = join(dir_input, 'camera_screen_shape.h5')
     file_image_projection = join(dir_input, 'image_projection.h5')
     files_screen_shape_measurement = glob(
@@ -57,8 +56,7 @@ def run_screen_shape_cal(
         file_screen_cal_point_pairs, delimiter=',', skiprows=1
     ).astype(int)
     camera = Camera.load_from_hdf(file_camera_distortion)
-    image_projection_data = ImageProjection.load_from_hdf(
-        file_image_projection)
+    image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
 
     # Store input data in data class
     data_input = DataInput(
@@ -124,20 +122,17 @@ if __name__ == '__main__':
     )
 
     # Run screen shape calibration
-    cal_screen_shape = run_screen_shape_cal(
-        pts_data, base_dir_sofast, VERBOSITY)
+    cal_screen_shape = run_screen_shape_cal(pts_data, base_dir_sofast, VERBOSITY)
 
     # Run camera position calibration
-    cal_camera_pose = run_camera_position_cal(
-        pts_data, base_dir_sofast, VERBOSITY)
+    cal_camera_pose = run_camera_position_cal(pts_data, base_dir_sofast, VERBOSITY)
 
     # Save calibration figures
     for fig in cal_screen_shape.figures + cal_camera_pose.figures:
         fig.savefig(join(save_dir, fig.get_label() + '.png'))
 
     # Save raw data
-    cal_screen_shape.save_data_as_hdf(
-        join(save_dir, 'screen_distortion_data.h5'))
+    cal_screen_shape.save_data_as_hdf(join(save_dir, 'screen_distortion_data.h5'))
     cal_camera_pose.save_data_as_csv(join(save_dir, 'camera_rvec_tvec.csv'))
 
     # Save physical setup file
@@ -145,5 +140,4 @@ if __name__ == '__main__':
     NAME = 'Example physical setup file'
     screen_distortion_data = cal_screen_shape.get_data()
     rvec, tvec = cal_camera_pose.get_data()
-    save_physical_setup_file(screen_distortion_data,
-                             NAME, rvec, tvec, file_save)
+    save_physical_setup_file(screen_distortion_data, NAME, rvec, tvec, file_save)
