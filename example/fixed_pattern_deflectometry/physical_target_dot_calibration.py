@@ -47,8 +47,7 @@ def example_perform_calibration():
     images = []
     for file in files:
         images.append(cv.imread(file, cv.IMREAD_GRAYSCALE))
-    image_camera_position = cv.imread(
-        file_camera_position, cv.IMREAD_GRAYSCALE)
+    image_camera_position = cv.imread(file_camera_position, cv.IMREAD_GRAYSCALE)
 
     # Load marker corner locations
     data = np.loadtxt(file_xyz_points, delimiter=',')
