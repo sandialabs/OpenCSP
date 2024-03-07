@@ -5,16 +5,13 @@ on a screen.
 import os
 from os.path import join, dirname, exists
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
-    FixedPatternDotLocations,
-)
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
-    FixedPatternScreenProjection,
-)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import \
+    FixedPatternDotLocations
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import \
+    FixedPatternScreenProjection
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
