@@ -1,12 +1,11 @@
 """Tests Sofast screen distortion calibration
 """
-from glob import glob
-import os
 from os.path import join
 import unittest
-import pytest
 
+from glob import glob
 import numpy as np
+import pytest
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
@@ -79,8 +78,7 @@ class TestCalibrationScreenShape(unittest.TestCase):
             file_screen_cal_point_pairs, delimiter=',', skiprows=1
         ).astype(int)
         camera = Camera.load_from_hdf(file_camera_distortion)
-        image_projection_data = ImageProjection.load_from_hdf(
-            file_image_projection)
+        image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
 
         # Store input data in data class
         data_input = DataInput(
@@ -90,8 +88,7 @@ class TestCalibrationScreenShape(unittest.TestCase):
             pts_xyz_marker,
             camera,
             image_projection_data,
-            [Measurement.load_from_hdf(f)
-             for f in files_screen_shape_measurement],
+            [Measurement.load_from_hdf(f) for f in files_screen_shape_measurement],
         )
 
         # Perform screen position calibration
