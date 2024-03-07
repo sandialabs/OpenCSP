@@ -79,8 +79,7 @@ class TestCalibrationCameraPosition(unittest.TestCase):
 
     def test_camera_rvec_tvec(self):
         """Tests the camera position vectors"""
-        np.testing.assert_allclose(
-            self.data_exp, self.data_meas, rtol=0, atol=1e-6)
+        np.testing.assert_allclose(self.data_exp, self.data_meas, rtol=0, atol=1e-6)
         print('rvec/tvec tested successfully.')
 
 
