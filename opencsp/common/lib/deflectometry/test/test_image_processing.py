@@ -7,7 +7,6 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.app.sofast.lib.SofastParams import SofastParams
@@ -15,6 +14,7 @@ from opencsp.common.lib.camera.Camera import Camera
 import opencsp.common.lib.deflectometry.image_processing as ip
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
@@ -31,15 +31,12 @@ class TestImageProcessing(unittest.TestCase):
         cls.data_file_undefined = join(
             base_dir, 'calculations_undefined_mirror/data.h5'
         )
-        cls.data_file_multi = join(
-            base_dir, 'calculations_facet_ensemble/data.h5')
+        cls.data_file_multi = join(base_dir, 'calculations_facet_ensemble/data.h5')
 
         # Define component files
         cls.data_file_camera = join(base_dir, 'camera.h5')
-        cls.data_file_measurement_facet = join(
-            base_dir, 'measurement_facet.h5')
-        cls.data_file_measurement_ensemble = join(
-            base_dir, 'measurement_ensemble.h5')
+        cls.data_file_measurement_facet = join(base_dir, 'measurement_facet.h5')
+        cls.data_file_measurement_ensemble = join(base_dir, 'measurement_ensemble.h5')
         cls.data_file_calibration = join(base_dir, 'calibration.h5')
 
     def test_calc_mask_raw(self):
@@ -125,15 +122,13 @@ class TestImageProcessing(unittest.TestCase):
         data = load_hdf5_datasets(datasets, self.data_file_facet)
 
         # Perform calculation
-        loop_facet_exp = LoopXY.from_vertices(
-            Vxy(data['loop_optic_image_exp']))
+        loop_facet_exp = LoopXY.from_vertices(Vxy(data['loop_optic_image_exp']))
         loop_facet_refine = ip.refine_mask_perimeter(
             loop_facet_exp, Vxy(data['v_edges_image']), *args
         ).vertices.data.squeeze()
 
         # Test
-        np.testing.assert_allclose(
-            data['loop_facet_image_refine'], loop_facet_refine)
+        np.testing.assert_allclose(data['loop_facet_image_refine'], loop_facet_refine)
 
     def test_refine_facet_corners(self):
         """Tests image_processing.refine_facet_corners()"""
@@ -171,8 +166,7 @@ class TestImageProcessing(unittest.TestCase):
             ]
             data = load_hdf5_datasets(datasets, self.data_file_multi)
             v_facet_corners_image_exp = Vxy(data['v_facet_corners_image_exp'])
-            v_facet_centroid_image_exp = Vxy(
-                data['v_facet_centroid_image_exp'])
+            v_facet_centroid_image_exp = Vxy(data['v_facet_centroid_image_exp'])
 
             # Save expected data
             data_exp.append(data['loop_facet_image_refine'])
@@ -201,10 +195,8 @@ class TestImageProcessing(unittest.TestCase):
             'DataSofastCalculation/image_processing/facet_000/mask_processed',
         ]
         data = load_hdf5_datasets(datasets, self.data_file_facet)
-        measurement = Measurement.load_from_hdf(
-            self.data_file_measurement_facet)
-        calibration = ImageCalibrationScaling.load_from_hdf(
-            self.data_file_calibration)
+        measurement = Measurement.load_from_hdf(self.data_file_measurement_facet)
+        calibration = ImageCalibrationScaling.load_from_hdf(self.data_file_calibration)
 
         measurement.calibrate_fringe_images(calibration)
 
@@ -241,8 +233,7 @@ class TestImageProcessing(unittest.TestCase):
         mask = data['mask_processed']
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1']).inv()
         u_pixel_pointing_cam = ip.calculate_active_pixels_vectors(mask, camera)
-        u_pixel_pointing_optic = u_pixel_pointing_cam.rotate(
-            r_cam_optic).data.squeeze()
+        u_pixel_pointing_optic = u_pixel_pointing_cam.rotate(r_cam_optic).data.squeeze()
 
         # Test
         np.testing.assert_allclose(
