@@ -6,9 +6,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
@@ -52,7 +52,7 @@ def generate_dataset(
     sofast.process_optic_undefined(surface_data)
 
     # Save testing data
-    sofast.save_to_hdf(file_dataset_out)
+    sofast.save_data_to_hdf(file_dataset_out)
     display.save_to_hdf(file_dataset_out)
     camera.save_to_hdf(file_dataset_out)
     calibration.save_to_hdf(file_dataset_out)
@@ -71,7 +71,7 @@ def generate_dataset(
 
 if __name__ == '__main__':
     # Generate measurement set 1 data
-    base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+    base_dir = join(opencsp_code_dir(), 'test/data/sofast_measurements')
 
     generate_dataset(
         file_measurement=join(base_dir, 'measurement_facet.h5'),
