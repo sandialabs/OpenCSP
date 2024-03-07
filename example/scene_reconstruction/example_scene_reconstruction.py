@@ -3,7 +3,6 @@ from os.path import join
 
 import numpy as np
 
-from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxyz import Vxyz
