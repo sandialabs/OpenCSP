@@ -17,7 +17,7 @@ import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.time_date_tools as tdt
 
-sys.path.append('../../')
+sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
 import contrib.scripts.FileCache as fc  # nopep8
 import contrib.scripts.FileFingerprint as ff  # nopep8
 import contrib.scripts.SensitiveStringMatcher as ssm  # nopep8

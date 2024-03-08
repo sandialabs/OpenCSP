@@ -3,10 +3,11 @@ import sys
 import unittest
 import unittest.mock
 
+import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 
 # setting path
-sys.path.append('../../../')
+sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
 import contrib.scripts.sensitive_strings as ss  # nopep8
 
 
