@@ -1,11 +1,12 @@
 import argparse
 import copy
-import cv2
 import os
-import numpy as np
-from PIL import Image
 import sys
 import time
+
+import cv2
+import numpy as np
+from PIL import Image
 
 import opencsp.common.lib.file.SimpleCsv as sc
 from opencsp.common.lib.opencsp_path import opencsp_settings
