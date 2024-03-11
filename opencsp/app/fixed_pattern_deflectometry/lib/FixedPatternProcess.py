@@ -76,9 +76,9 @@ class FixedPatternProcess:
         # Calculations
         self.data_slope_solver: SlopeSolverData
         self.data_geometry_general: cdc.CalculationDataGeometryGeneral
-        self.data_image_proccessing_general: cdc.CalculationsImageProcessingGeneral
+        self.data_image_proccessing_general: cdc.CalculationImageProcessingGeneral
         self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet]
-        self.data_image_processing_facet: list[cdc.CalculationsImageProcessingFacet]
+        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet]
         self.data_error: cdc.CalculationError
 
     def find_blobs(self) -> BlobIndex:
