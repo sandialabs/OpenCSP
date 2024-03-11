@@ -26,7 +26,8 @@ class FixedPatternSetupCalibrate:
 
     Attributes
     ----------
-    - verbose : 0=no output, 1=print only output, 2=print and plot output, 3=only plot output
+    - print : bool, to print outputs
+    - plot : bool, to plot outputs
     - intersection_threshold : threshold to consider a ray intersection a success or not (meters)
     - figures : list of figures produced
     - marker_detection_params : parameters used in detecting Aruco markers in images
@@ -79,7 +80,8 @@ class FixedPatternSetupCalibrate:
         self._num_images = len(images)
 
         # Settings
-        self.verbose = 0
+        self.print = False
+        self.plot = False
         self.intersection_threshold = 0.002  # meters
         self.figures = []
         self.marker_detection_params = {
@@ -117,22 +119,12 @@ class FixedPatternSetupCalibrate:
         self._vecs_cams: list[ndarray] = []
         self._dot_intersection_dists: ndarray
 
-    @property
-    def _to_print(self) -> bool:
-        """If verbose printing is turned on"""
-        return self.verbose in [1, 2]
-
-    @property
-    def _to_plot(self) -> bool:
-        """If verbose plotting is turned on"""
-        return self.verbose in [2, 3]
-
     def _find_dots_in_images(self) -> None:
         """Finds dot locations for several camera poses"""
         dot_image_points_xy_mat = []
         masks_unassigned = []
         for idx, (image, origin_pt) in enumerate(zip(self._images, self._origin_pts)):
-            if self.verbose in [1, 2]:
+            if self.print:
                 print(f'Finding dots in image: {idx:d}')
 
             # Find blobs
@@ -180,7 +172,7 @@ class FixedPatternSetupCalibrate:
         """Finds Aruco marker corners in images and assigns xyz points"""
         ids_add = np.array([0, 1, 2, 3])
         for idx, image in enumerate(self._images):
-            if self.verbose in [1, 2]:
+            if self.print:
                 print(f'Finding marker corners in image: {idx:d}')
 
             # Find markers in image
@@ -207,14 +199,14 @@ class FixedPatternSetupCalibrate:
 
                 # Check marker corner ID is in given list of marker corner IDs
                 if idx_mkr_corner.size == 0:
-                    if self._to_print:
+                    if self.print:
                         print(
                             f'Found marker corner ID, {marker_corner_id:d}, is not in given marker corner IDs. This point will be skipped.')
                     continue
 
                 # Check found marker corner ID is assigned a non-nan value in given marker locations
                 if np.any(np.isnan(self._pts_xyz_corners[idx_mkr_corner[0]].data)):
-                    if self._to_print:
+                    if self.print:
                         print(
                             f'Point ID {idx_mkr_corner[0]:d} undefined, point will be skipped')
                     continue
@@ -238,7 +230,7 @@ class FixedPatternSetupCalibrate:
     def _calculate_camera_poses(self) -> None:
         """Calculates 3d camera poses"""
         for cam_idx in range(self._num_images):
-            if self.verbose in [0, 2]:
+            if self.print:
                 print(
                     f'Calculating camera {cam_idx:d} pose with {len(self._marker_corners_xyz[cam_idx]):d} points'
                 )
@@ -420,14 +412,14 @@ class FixedPatternSetupCalibrate:
         self._find_markers_in_images()
 
         self._calculate_camera_poses()
-        if self._to_print:
+        if self.print:
             self._print_camera_pose_reprojection_errors()
 
         self._intersect_rays()
-        if self._to_print:
+        if self.print:
             self._print_ray_intersection_statistics()
 
-        if self._to_plot:
+        if self.plot:
             self._plot_common_dots()
             self._plot_marker_corners()
             self._plot_located_cameras_and_points()
