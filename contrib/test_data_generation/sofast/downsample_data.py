@@ -6,9 +6,8 @@ import sys
 from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
-path = os.path.join(opencsp_code_dir(), '../contrib/test_data_generation')
-sys.path.append(path)
-import downsample_data_general as dd
+sys.path.append(os.path.join(opencsp_code_dir(), '..'))
+import contrib.test_data_generation.downsample_data_general as ddg  # nopep8
 
 
 def downsample_measurement(file: str, n: int) -> Measurement:
@@ -29,8 +28,8 @@ def downsample_measurement(file: str, n: int) -> Measurement:
     measurement_orig = Measurement.load_from_hdf(file)
 
     # Downsample measurement
-    mask_images = dd.downsample_images(measurement_orig.mask_images, n)
-    fringe_images = dd.downsample_images(measurement_orig.fringe_images, n)
+    mask_images = ddg.downsample_images(measurement_orig.mask_images, n)
+    fringe_images = ddg.downsample_images(measurement_orig.fringe_images, n)
     return Measurement(
         mask_images=mask_images,
         fringe_images=fringe_images,
