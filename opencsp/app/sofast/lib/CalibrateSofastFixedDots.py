@@ -29,24 +29,13 @@ class CalibrateSofastFixedDots:
 
     Attributes
     ----------
-    plot : bool
-        To create output plots
-    intersection_threshold : float
-        Threshold to consider a ray intersection a success, by default 0.002 meters.
-    figures : list
-        List of figures produced
-    blob_search_threshold : float
-        Search radius to use when searching for blobs, by default 20 pixels.
-    blob_detector : cv.SimpleBlobDetector_Params
-        Blob detetion settings used to detect blobs in image. By default:
-        - minDistBetweenBlobs = 2
-        - filterByArea = True
-        - minArea = 50
-        - maxArea = 1000
-        - filterByCircularity = True
-        - minCircularity = 0.8
-        - filterByConvexity = False
-        - filterByInertia = False
+    - print : bool, to print outputs
+    - plot : bool, to plot outputs
+    - intersection_threshold : threshold to consider a ray intersection a success or not (meters)
+    - figures : list of figures produced
+    - marker_detection_params : parameters used in detecting Aruco markers in images
+    - blob_detector : cv.SimpleBlobDetector_Params, used to detect blobs in image
+    - blob_search_threshold : Search radius to use when searching for blobs (pixels)
     """
 
     def __init__(
@@ -104,6 +93,7 @@ class CalibrateSofastFixedDots:
         self._num_images = len(self._images)
 
         # Settings
+        self.print = False
         self.plot = False
         self.intersection_threshold = 0.002  # meters
         self.figures: list[plt.Figure] = []
@@ -138,22 +128,13 @@ class CalibrateSofastFixedDots:
         self._vecs_cams: list[ndarray] = []
         self._dot_intersection_dists: ndarray
 
-    @property
-    def _to_print(self) -> bool:
-        """If verbose printing is turned on"""
-        return self.verbose in [1, 2]
-
-    @property
-    def _to_plot(self) -> bool:
-        """If verbose plotting is turned on"""
-        return self.verbose in [2, 3]
-
     def _find_dots_in_images(self) -> None:
         """Finds dot locations for several camera poses"""
         dot_image_points_xy_mat = []
         masks_unassigned = []
-        for idx_image, origin_pt in enumerate(self._origin_pts):
-            lt.info(f'Finding dots in image: {idx_image:d}')
+        for idx, (image, origin_pt) in enumerate(zip(self._images, self._origin_pts)):
+            if self.print:
+                print(f'Finding dots in image: {idx:d}')
 
             # Find blobs
             pts = ip.detect_blobs(self._images[idx_image].image, self.blob_detector)
@@ -200,7 +181,7 @@ class CalibrateSofastFixedDots:
         """Finds Aruco marker corners in images and assigns xyz points"""
         ids_add = np.array([0, 1, 2, 3])
         for idx, image in enumerate(self._images):
-            if self.verbose in [1, 2]:
+            if self.print:
                 print(f'Finding marker corners in image: {idx:d}')
 
             # Find markers in image
@@ -227,14 +208,14 @@ class CalibrateSofastFixedDots:
 
                 # Check marker corner ID is in given list of marker corner IDs
                 if idx_mkr_corner.size == 0:
-                    if self._to_print:
+                    if self.print:
                         print(
                             f'Found marker corner ID, {marker_corner_id:d}, is not in given marker corner IDs. This point will be skipped.')
                     continue
 
                 # Check found marker corner ID is assigned a non-nan value in given marker locations
                 if np.any(np.isnan(self._pts_xyz_corners[idx_mkr_corner[0]].data)):
-                    if self._to_print:
+                    if self.print:
                         print(
                             f'Point ID {idx_mkr_corner[0]:d} undefined, point will be skipped')
                     continue
@@ -258,11 +239,10 @@ class CalibrateSofastFixedDots:
     def _calculate_camera_poses(self) -> None:
         """Calculates 3d camera poses"""
         for cam_idx in range(self._num_images):
-            # Calculate camera pose
-            ret = self._images[cam_idx].attempt_calculate_pose(True)
-            if ret == -1:
-                lt.critical_and_raise(
-                    ValueError, f'Camera pose {cam_idx:d} not calculated successfully')
+            if self.print:
+                print(
+                    f'Calculating camera {cam_idx:d} pose with {len(self._marker_corners_xyz[cam_idx]):d} points'
+                )
 
             self._rots_cams.append(Rotation.from_rotvec(self._images[cam_idx].rvec))
             self._vecs_cams.append(Vxyz(self._images[cam_idx].tvec))
@@ -452,14 +432,14 @@ class CalibrateSofastFixedDots:
         self._find_markers_in_images()
 
         self._calculate_camera_poses()
-        if self._to_print:
+        if self.print:
             self._print_camera_pose_reprojection_errors()
 
         self._intersect_rays()
-        if self._to_print:
+        if self.print:
             self._print_ray_intersection_statistics()
 
-        if self._to_plot:
+        if self.plot:
             self._plot_common_dots()
             self._plot_marker_corners()
             self._plot_located_cameras_and_points()
