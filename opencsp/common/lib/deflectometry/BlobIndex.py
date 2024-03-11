@@ -12,6 +12,18 @@ class BlobIndex:
     X/Y axes correspond to image axes; +x is to right, +y is down. Class takes in points (in units
     of pixels) that have been previously found with a blob detector and attempts to assign all found
     xy pixel points with a blob index.
+
+    Attributes
+    ----------
+    search_thresh : float
+
+    search_perp_axis_ratio : float
+        Ratio of point distances: (perpendicular to axis) / (along axis) used to
+        search for points.
+    apply_filter : bool
+        To filter bad points (experimental)
+    verbose : bool
+        Deprecated
     """
 
     def __init__(
@@ -342,11 +354,14 @@ class BlobIndex:
                     idx_b_prev = i_b - step  # Index used for slope calc
                     if idx_b_prev in is_b:  # If history exists, find points
                         for idx_b_next in range(500):
-                            if (
-                                idx_b_next == 0
-                            ):  # First iteration, use previously assigned points
+                            # First iteration, use previously assigned points
+                            if idx_b_next == 0:
                                 pt_cur = pts[is_b == i_b]
                                 pt_prev = pts[is_b == idx_b_prev]
+                                if (len(pt_cur) > 1) or (len(pt_prev) > 1):
+                                    raise ValueError(f'Point index {idx_a:.0f}, {i_b:.0f} '
+                                                     'was assigned more than once. '
+                                                     'Try tightening dot search settings.')
                             else:  # Next iterations, use new points
                                 pt_prev = pt_cur
                                 pt_cur = self._points[idx_new]
