@@ -14,7 +14,7 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.common.lib.photogrammetry import photogrammetry as ph
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def test_FixedPatternSetupCalibrate():
@@ -45,10 +45,8 @@ def test_FixedPatternSetupCalibrate():
     if not exists(dir_save):
         os.makedirs(dir_save)
 
-    # Load images
-    images = []
-    for file in files:
-        images.append(ph.load_image_grayscale(file))
+    # Set up logger
+    lt.logger(log_dir_body_ext=join(dir_save, 'log.txt'), level=lt.log.INFO)
 
     # Load marker corner locations
     data = np.loadtxt(file_xyz_points, delimiter=',')
@@ -63,17 +61,15 @@ def test_FixedPatternSetupCalibrate():
 
     # Perform dot location calibration
     cal_dot_locs = FixedPatternSetupCalibrate(
-        images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
+        files, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
+    cal_dot_locs.plot = True
     cal_dot_locs.run()
 
     # Save data
     dot_locs = cal_dot_locs.get_dot_location_object()
     dot_locs.save_to_hdf(join(dir_save, 'fixed_pattern_dot_locations.h5'))
-
-    # Save figures
-    for fig in cal_dot_locs.figures:
-        fig.savefig(join(dir_save, fig.get_label() + '.png'))
+    cal_dot_locs.save_figures(dir_save)
 
     # Test
     np.testing.assert_allclose(dot_locs.xyz_dot_loc, dot_locs_exp.xyz_dot_loc)
