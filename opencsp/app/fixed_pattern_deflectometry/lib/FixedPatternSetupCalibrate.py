@@ -1,8 +1,11 @@
 """Fixed pattern dot location calibration.
 """
+import os
+
 import cv2 as cv
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.typing as npt
 from numpy import ndarray
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
@@ -16,6 +19,8 @@ import opencsp.common.lib.deflectometry.image_processing as ip
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
+from opencsp.common.lib.photogrammetry.ImageMarker import ImageMarker
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class FixedPatternSetupCalibrate:
@@ -26,22 +31,20 @@ class FixedPatternSetupCalibrate:
 
     Attributes
     ----------
-    - print : bool, to print outputs
     - plot : bool, to plot outputs
     - intersection_threshold : threshold to consider a ray intersection a success or not (meters)
     - figures : list of figures produced
-    - marker_detection_params : parameters used in detecting Aruco markers in images
     - blob_detector : cv.SimpleBlobDetector_Params, used to detect blobs in image
     - blob_search_threshold : Search radius to use when searching for blobs (pixels)
     """
 
     def __init__(
         self,
-        images: list[ndarray],
+        files_images: list[str],
         origin_pts: Vxy,
         camera: Camera,
         pts_xyz_corners: Vxyz,
-        pts_ids_corners: ndarray,
+        pts_ids_corners: npt.NDArray[np.int_],
         x_min: int,
         x_max: int,
         y_min: int,
@@ -51,8 +54,8 @@ class FixedPatternSetupCalibrate:
 
         Parameters
         ----------
-        images : list[ndarray]
-            Images of Aruco markers and dots
+        files_images : list[str]
+            File paths to images of Aruco markers and dots
         origin_pts : Vxy
             Points on the images corresponding to index (0, 0)
         camera : Camera
@@ -66,8 +69,19 @@ class FixedPatternSetupCalibrate:
         y_min/y_max : int
             Expected min/max y index values (follows screen y axis)
         """
+        # Load images
+        self._images: list[ImageMarker] = []
+        for idx, file in enumerate(files_images):
+            # Load image and find aruco marker corners (pixels)
+            im = ImageMarker.load_aruco_origin(file, idx, camera)
+            im.convert_to_four_corner()
+            self._images.append(im)
+            # Assign xyz corner locations in images (meters)
+            for pt_xyz, pt_id in zip(pts_xyz_corners, pts_ids_corners):
+                im.set_point_id_located(pt_id, pt_xyz.data.squeeze())
+
         # Save data
-        self._images = images
+        self._images_array = [image.image for image in self._images]
         self._origin_pts = origin_pts
         self._camera = camera
         self._pts_xyz_corners = pts_xyz_corners
@@ -77,17 +91,12 @@ class FixedPatternSetupCalibrate:
         self._x_max = x_max
         self._y_max = y_max
 
-        self._num_images = len(images)
+        self._num_images = len(self._images)
 
         # Settings
-        self.print = False
         self.plot = False
         self.intersection_threshold = 0.002  # meters
-        self.figures = []
-        self.marker_detection_params = {
-            'adaptive_thresh_constant': 10,
-            'min_marker_perimeter_rate': 0.01,
-        }
+        self.figures: list[plt.Figure] = []
         self.blob_search_threshold = 20  # pixels
 
         # Blob detection parameters
@@ -110,22 +119,16 @@ class FixedPatternSetupCalibrate:
             np.ndarray((x_max - x_min + 1, y_max - y_min + 1, 3)) * np.nan
         )
         self._num_dots: int
-        self._marker_corner_idxs: list[ndarray] = []
-        self._marker_ids: list[ndarray] = []
-        self._marker_corner_ids: list[ndarray] = []
-        self._marker_corners_xy: list[Vxy] = []
-        self._marker_corners_xyz: list[Vxyz] = []
-        self._rots_cams: list[ndarray] = []
-        self._vecs_cams: list[ndarray] = []
+        self._rots_cams: list[Rotation] = []
+        self._vecs_cams: list[Vxyz] = []
         self._dot_intersection_dists: ndarray
 
     def _find_dots_in_images(self) -> None:
         """Finds dot locations for several camera poses"""
         dot_image_points_xy_mat = []
         masks_unassigned = []
-        for idx, (image, origin_pt) in enumerate(zip(self._images, self._origin_pts)):
-            if self.print:
-                print(f'Finding dots in image: {idx:d}')
+        for idx, (image, origin_pt) in enumerate(zip(self._images_array, self._origin_pts)):
+            lt.info(f'Finding dots in image: {idx:d}')
 
             # Find blobs
             pts = ip.detect_blobs(image, self.blob_detector)
@@ -168,109 +171,26 @@ class FixedPatternSetupCalibrate:
         self._dot_image_points_indices_x = np.arange(self._x_min, self._x_max + 1)
         self._dot_image_points_indices_y = np.arange(self._y_min, self._y_max + 1)
 
-    def _find_markers_in_images(self) -> None:
-        """Finds Aruco marker corners in images and assigns xyz points"""
-        ids_add = np.array([0, 1, 2, 3])
-        for idx, image in enumerate(self._images):
-            if self.print:
-                print(f'Finding marker corners in image: {idx:d}')
-
-            # Find markers in image
-            ids, pts = ph.find_aruco_marker(
-                image,
-                self.marker_detection_params['adaptive_thresh_constant'],
-                self.marker_detection_params['min_marker_perimeter_rate'],
-            )
-            # Save corner locations and corner IDs
-            marker_ids = np.repeat(ids, 4)
-            marker_corner_ids = np.repeat(ids * 4, 4) + np.tile(ids_add, ids.size)
-            marker_corners_xy = Vxy(np.concatenate(pts, 0).T)
-
-            # Save xyz locations
-            marker_corner_ids_cur = []
-            marker_ids_cur = []
-            marker_corner_xy_cur = []
-            marker_corner_xyz_cur = []
-            marker_corner_idxs_cur = []
-            for marker_corner_id, marker_id, marker_corner_xy in zip(marker_corner_ids, marker_ids, marker_corners_xy):
-                # Loop up found marker corner ID
-                idx_mkr_corner = np.where(
-                    self._pts_ids_corners == marker_corner_id)[0]
-
-                # Check marker corner ID is in given list of marker corner IDs
-                if idx_mkr_corner.size == 0:
-                    if self.print:
-                        print(
-                            f'Found marker corner ID, {marker_corner_id:d}, is not in given marker corner IDs. This point will be skipped.')
-                    continue
-
-                # Check found marker corner ID is assigned a non-nan value in given marker locations
-                if np.any(np.isnan(self._pts_xyz_corners[idx_mkr_corner[0]].data)):
-                    if self.print:
-                        print(
-                            f'Point ID {idx_mkr_corner[0]:d} undefined, point will be skipped')
-                    continue
-
-                # Save marker corner ID
-                marker_corner_idxs_cur.append(idx_mkr_corner[0])
-                marker_corner_ids_cur.append(marker_corner_id)
-                marker_ids_cur.append(marker_id)
-                marker_corner_xy_cur.append(marker_corner_xy.data)
-                marker_corner_xyz_cur.append(
-                    self._pts_xyz_corners[idx_mkr_corner[0]].data)
-
-            self._marker_corner_idxs.append(np.array(marker_corner_idxs_cur))
-            self._marker_ids.append(np.array(marker_ids_cur))
-            self._marker_corner_ids.append(np.array(marker_corner_ids_cur))
-            self._marker_corners_xy.append(
-                Vxy(np.concatenate(marker_corner_xy_cur, axis=1)))
-            self._marker_corners_xyz.append(
-                Vxyz(np.concatenate(marker_corner_xyz_cur, axis=1)))
-
     def _calculate_camera_poses(self) -> None:
         """Calculates 3d camera poses"""
         for cam_idx in range(self._num_images):
-            if self.print:
-                print(
-                    f'Calculating camera {cam_idx:d} pose with {len(self._marker_corners_xyz[cam_idx]):d} points'
-                )
+            # Calculate camera pose
+            ret = self._images[cam_idx].attempt_calculate_pose(True)
+            if ret == -1:
+                lt.critical_and_raise(
+                    ValueError, f'Camera pose {cam_idx:d} not calculated successfully')
 
-            # Attempt to solve for camera pose
-            ret, rvec, tvec = cv.solvePnP(
-                self._marker_corners_xyz[cam_idx].data.T,
-                self._marker_corners_xy[cam_idx].data.T,
-                self._camera.intrinsic_mat,
-                self._camera.distortion_coef,
-            )
-            if not ret:
-                raise ValueError(
-                    f'Camera calibration was not successful for image {cam_idx:d}'
-                )
+            self._rots_cams.append(Rotation.from_rotvec(self._images[cam_idx].rvec))
+            self._vecs_cams.append(Vxyz(self._images[cam_idx].tvec))
 
-            self._rots_cams.append(Rotation.from_rotvec(rvec.squeeze()))
-            self._vecs_cams.append(Vxyz(tvec))
-
-    def _print_camera_pose_reprojection_errors(self) -> None:
-        """Prints reprojection errors after finding camera
-        """
-        for idx_cam in range(len(self._images)):
-            # Collect inputs
-            rvecs = self._rots_cams[idx_cam].as_rotvec()[None, :]
-            tvecs = self._vecs_cams[idx_cam].data.T
-            pts_obj = self._pts_xyz_corners.data.T
-            camera_indices = np.zeros(
-                self._marker_corner_ids[idx_cam].size, dtype=int)
-            point_indices = self._marker_corner_idxs[idx_cam]
-            points2d = self._marker_corners_xy[idx_cam].data.T
-
-            # Calculate errors
-            errors = ph.reprojection_errors(
-                rvecs, tvecs, pts_obj, self._camera, camera_indices, point_indices, points2d)
-            errors = Vxy(errors.T)
-
-            # Print errors
-            print(
-                f'Camera {idx_cam:d} average marker reprojection error: {errors.magnitude().mean():.2f} pixels')
+            # Calculate reproj error
+            errors = self._images[cam_idx].calc_reprojection_errors()
+            # Log errors
+            lt.info(f'Camera {cam_idx:d} mean corner reprojection error: {errors.mean():.2f} pixels')
+            lt.info(f'Camera {cam_idx:d} min corner reprojection error: {errors.min():.2f} pixels')
+            lt.info(f'Camera {cam_idx:d} max corner reprojection error: {errors.mean():.2f} pixels')
+            lt.info(
+                f'Camera {cam_idx:d} STDEV corner reprojection error: {errors.mean():.2f} pixels')
 
     def _intersect_rays(self) -> None:
         """Intersects camera rays to find dot xyz locations"""
@@ -294,20 +214,19 @@ class FixedPatternSetupCalibrate:
                 self._dot_points_xyz_mat[idx_y, idx_x, :] = point.data.squeeze()
 
         self._dot_intersection_dists = np.array(int_dists)
-
-    def _print_ray_intersection_statistics(self):
-        """Prints ray intersection mean, average, and standard deviation
-        """
-        print('Dot ray intersections:')
-        print(f'   Mean intersection error: {self._dot_intersection_dists.mean() * 1000:.1f} mm')
-        print(f'   Min intersection error: {self._dot_intersection_dists.min() * 1000:.1f} mm')
-        print(f'   Max intersection error: {self._dot_intersection_dists.max() * 1000:.1f} mm')
-        print(f'   STDEV of intersection error: {self._dot_intersection_dists.std() * 1000:.1f} mm')
+        lt.info('Dot ray intersections mean intersection error: '
+                f'{self._dot_intersection_dists.mean() * 1000:.1f} mm')
+        lt.info('Dot ray intersections min intersection error: '
+                f'{self._dot_intersection_dists.min() * 1000:.1f} mm')
+        lt.info('Dot ray intersections max intersection error: '
+                f'{self._dot_intersection_dists.max() * 1000:.1f} mm')
+        lt.info('Dot ray intersections STDEV of intersection error: '
+                f'{self._dot_intersection_dists.std() * 1000:.1f} mm')
 
     def _plot_common_dots(self) -> None:
         """Plots common dots on images"""
         for idx, (image, pts) in enumerate(
-            zip(self._images, self._dot_image_points_xy)
+            zip(self._images_array, self._dot_image_points_xy)
         ):
             fig = plt.figure(f'image_{idx:d}_annotated_dots')
             plt.imshow(image, cmap='gray')
@@ -316,10 +235,11 @@ class FixedPatternSetupCalibrate:
 
     def _plot_marker_corners(self) -> None:
         """Plots images with annotated marker corners"""
-        for idx_cam, image in enumerate(self._images):
+        for idx_cam, image in enumerate(self._images_array):
             fig = plt.figure(f'image_{idx_cam:d}_annotated_marker_corners')
-            plt.imshow(image, cmap='gray')
-            self._marker_corners_xy[idx_cam].draw()
+            ax = fig.gca()
+            ax.imshow(image, cmap='gray')
+            Vxy(self._images[idx_cam].pts_im_xy.T).draw(ax=ax)
             self.figures.append(fig)
 
     def _plot_located_cameras_and_points(self) -> None:
@@ -405,19 +325,16 @@ class FixedPatternSetupCalibrate:
             self._dot_points_xyz_mat,
         )
 
+    def save_figures(self, dir_save: str) -> None:
+        """Saves figures in given directory"""
+        for fig in self.figures:
+            fig.savefig(os.path.join(dir_save, fig.get_label() + '.png'))
+
     def run(self) -> None:
         """Runs full calibration sequence"""
         self._find_dots_in_images()
-
-        self._find_markers_in_images()
-
         self._calculate_camera_poses()
-        if self.print:
-            self._print_camera_pose_reprojection_errors()
-
         self._intersect_rays()
-        if self.print:
-            self._print_ray_intersection_statistics()
 
         if self.plot:
             self._plot_common_dots()
