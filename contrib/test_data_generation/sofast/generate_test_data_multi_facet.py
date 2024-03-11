@@ -64,7 +64,7 @@ def generate_dataset(
     sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
 
     # Save data
-    sofast.save_data_to_hdf(file_dataset_out)
+    sofast.save_to_hdf(file_dataset_out)
     display.save_to_hdf(file_dataset_out)
     camera.save_to_hdf(file_dataset_out)
     calibration.save_to_hdf(file_dataset_out)
