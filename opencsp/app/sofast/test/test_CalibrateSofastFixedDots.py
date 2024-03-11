@@ -28,7 +28,7 @@ def test_FixedPatternSetupCalibrate():
         opencsp_code_dir(),
         'test',
         'data',
-        'measurements_sofast_fixed',
+        'fixed_pattern_deflectometry',
         'dot_location_calibration',
     )
     files = [
@@ -68,6 +68,9 @@ def test_FixedPatternSetupCalibrate():
         files, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
     cal_dot_locs.plot = True
+    cal_dot_locs.blob_search_threshold = 3.
+    cal_dot_locs.blob_detector.minArea = 3.
+    cal_dot_locs.blob_detector.maxArea = 30.
     cal_dot_locs.run()
 
     # Save data
