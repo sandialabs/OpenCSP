@@ -27,7 +27,7 @@ def generate_data():
     file_point_locs = join(dir_sample_data, 'point_locations.csv')
 
     dir_save = join(opencsp_code_dir(),
-                    'test/data/fixed_pattern_deflectometry_measurements/dot_location_calibration')
+                    'test/data/fixed_pattern_deflectometry_measurements/dot_location_calibration/measurements')
 
     # Downsample marker/dot images
     # n_downsample = 5
