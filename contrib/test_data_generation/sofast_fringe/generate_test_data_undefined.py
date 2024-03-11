@@ -52,7 +52,7 @@ def generate_dataset(
     sofast.process_optic_undefined(surface_data)
 
     # Save testing data
-    sofast.save_data_to_hdf(file_dataset_out)
+    sofast.save_to_hdf(file_dataset_out)
     display.save_to_hdf(file_dataset_out)
     camera.save_to_hdf(file_dataset_out)
     calibration.save_to_hdf(file_dataset_out)

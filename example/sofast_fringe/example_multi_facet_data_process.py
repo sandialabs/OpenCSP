@@ -107,9 +107,7 @@ def example_driver():
 
     # Visualize setup
     fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
-    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0][
-        'spatial_orientation'
-    ]
+    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
     visualize_setup(
         display,
         camera,
