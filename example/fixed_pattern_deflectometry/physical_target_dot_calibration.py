@@ -60,7 +60,8 @@ def example_perform_calibration():
     cal_dot_locs = FixedPatternSetupCalibrate(
         images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
-    cal_dot_locs.verbose = 2
+    cal_dot_locs.print = True
+    cal_dot_locs.plot = True
     cal_dot_locs.run()
 
     # Perform camera position calibration
