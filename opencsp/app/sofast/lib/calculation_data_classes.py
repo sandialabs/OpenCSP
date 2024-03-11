@@ -11,7 +11,7 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
@@ -235,7 +235,7 @@ class CalculationImageProcessingGeneral:
 
 
 @dataclass
-class CalculationFacetEnsemble:
+class CalculationsFacetEnsemble:
     """Data class used in deflectometry calculations. Holds calculations
     relating to facet ensembles.
     """

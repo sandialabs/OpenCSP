@@ -20,7 +20,7 @@ import opencsp.app.sofast.lib.image_processing as ip
 import opencsp.app.sofast.lib.process_optics_geometry as po
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
-from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
@@ -46,7 +46,7 @@ class ProcessSofastFringe:
         Defines surface fitting parameters. See SlopeSolver documentation for more information.
     - params : SofastParams
         Parameters specific to Sofast calculations (facet mask calculation, etc.)
-    - params.geometry_params : ParamsOpticGeometry
+    - params.geometry_params : GeometryProcessingParams
         Parameters specific to finding boundaries of optics, etc.
 
     Internal Data Storage
@@ -91,7 +91,7 @@ class ProcessSofastFringe:
             - mask_hist_thresh
             - mask_keep_largest_area
             - mask_thresh_active_pixels
-            - ParamsOpticGeometry
+            - GeometryProcessingParams
                 - facet_corns_refine_frac_keep
                 - facet_corns_refine_perpendicular_search_dist
                 - facet_corns_refine_step_length
@@ -186,8 +186,8 @@ class ProcessSofastFringe:
         # Instantiate data containers
         self.num_facets: int = 0
         self.optic_type: Literal['undefined', 'single', 'multi'] = None
-        self.data_facet_def: list[DefinitionFacet] = None
-        self.data_ensemble_def: DefinitionEnsemble = None
+        self.data_facet_def: list[FacetData] = None
+        self.data_ensemble_def: EnsembleData = None
 
         self.data_surface_params: list[dict] = None
 
@@ -198,7 +198,7 @@ class ProcessSofastFringe:
         self.data_error: cdc.CalculationError = None
 
         self.data_characterization_facet: list[SlopeSolverData] = None
-        self.data_characterization_ensemble: list[cdc.CalculationFacetEnsemble] = None
+        self.data_characterization_ensemble: list[cdc.CalculationsFacetEnsemble] = None
 
     def help(self) -> None:
         """Prints Sofast doc string"""
@@ -715,7 +715,7 @@ class ProcessSofastFringe:
                 trans_facet_ensemble_list[idx].R
             )
 
-            data = cdc.CalculationFacetEnsemble(
+            data = cdc.CalculationsFacetEnsemble(
                 trans_facet_ensemble_list[idx],
                 slopes_ensemble_xy,
                 v_surf_points_ensemble,

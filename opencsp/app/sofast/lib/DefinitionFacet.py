@@ -72,7 +72,7 @@ class DefinitionFacet:
             json.dump(data_dict, f, indent=3)
 
     def save_to_hdf(self, file: str, prefix: str = '') -> None:
-        """Saves data to given HDF5 file. Data is stored in PREFIX + DefinitionFacet/...
+        """Saves data to given HDF5 file. Data is stored in PREFIX + FacetDefinition/...
 
         Parameters
         ----------
@@ -86,14 +86,14 @@ class DefinitionFacet:
             self.v_facet_centroid.data,
         ]
         datasets = [
-            prefix + 'DefinitionFacet/v_facet_corners',
-            prefix + 'DefinitionFacet/v_facet_centroid',
+            prefix + 'FacetDefinition/v_facet_corners',
+            prefix + 'FacetDefinition/v_facet_centroid',
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str) -> 'DefinitionFacet':
-        """Loads DefinitionFacet object from given file.  Data is stored in PREFIX + DefinitionFacet/...
+    def load_from_hdf(cls, file: str, prefix: str) -> 'FacetData':
+        """Loads FacetData object from given file.  Data is stored in PREFIX + FacetDefinition/...
 
         Parameters
         ----------
@@ -103,8 +103,8 @@ class DefinitionFacet:
             Prefix appended to folder path within HDF file (folders must be separated by "/")
         """
         datasets = [
-            prefix + 'DefinitionFacet/v_facet_corners',
-            prefix + 'DefinitionFacet/v_facet_centroid',
+            prefix + 'FacetDefinition/v_facet_corners',
+            prefix + 'FacetDefinition/v_facet_centroid',
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         v_facet_corners = Vxyz(data['v_facet_corners'])

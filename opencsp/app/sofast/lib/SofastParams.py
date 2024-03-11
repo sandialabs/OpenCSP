@@ -1,0 +1,59 @@
+"""Parameter dataclass for SOFAST
+"""
+from dataclasses import dataclass, field
+
+
+from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
+    GeometryProcessingParams,
+)
+from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
+from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
+import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
+
+
+@dataclass
+class SofastParams:
+    """Parameters for SOFAST processing calculation"""
+
+    mask_hist_thresh: float = 0.5
+    mask_filt_width: int = 9
+    mask_filt_thresh: int = 4
+    mask_thresh_active_pixels: float = 0.05
+    mask_keep_largest_area: bool = False
+    geometry_params: GeometryProcessingParams = field(
+        default_factory=GeometryProcessingParams
+    )
+
+    # Debug objects
+    slope_solver_data_debug: SlopeSolverDataDebug = field(
+        default_factory=SlopeSolverDataDebug
+    )
+    geometry_data_debug: GeometryDataDebug = field(default_factory=GeometryDataDebug)
+
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves data to given HDF5 file. Data is stored in PREFIX + SofastParams/...
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        data = [
+            self.mask_hist_thresh,
+            self.mask_filt_width,
+            self.mask_filt_thresh,
+            self.mask_thresh_active_pixels,
+            self.mask_keep_largest_area,
+        ]
+        datasets = [
+            prefix + 'SofastParams/mask_hist_thresh',
+            prefix + 'SofastParams/mask_filt_width',
+            prefix + 'SofastParams/mask_filt_thresh',
+            prefix + 'SofastParams/mask_thresh_active_pixels',
+            prefix + 'SofastParams/mask_keep_largest_area',
+        ]
+        hdf5_tools.save_hdf5_datasets(data, datasets, file)
+
+        self.geometry_params.save_to_hdf(file, prefix + 'SofastParams/')
