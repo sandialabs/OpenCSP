@@ -143,3 +143,7 @@ def example_driver():
     screen_distortion_data = cal_screen_shape.get_data()
     rvec, tvec = cal_camera_pose.get_data()
     save_physical_setup_file(screen_distortion_data, NAME, rvec, tvec, file_save)
+
+
+if __name__ == '__main__':
+    example_driver()
