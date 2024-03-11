@@ -31,11 +31,24 @@ class FixedPatternSetupCalibrate:
 
     Attributes
     ----------
-    - plot : bool, to plot outputs
-    - intersection_threshold : threshold to consider a ray intersection a success or not (meters)
-    - figures : list of figures produced
-    - blob_detector : cv.SimpleBlobDetector_Params, used to detect blobs in image
-    - blob_search_threshold : Search radius to use when searching for blobs (pixels)
+    plot : bool
+        To create output plots
+    intersection_threshold : float
+        Threshold to consider a ray intersection a success, by default 0.002 meters.
+    figures : list
+        List of figures produced
+    blob_search_threshold : float
+        Search radius to use when searching for blobs, by default 20 pixels.
+    blob_detector : cv.SimpleBlobDetector_Params
+        Blob detetion settings used to detect blobs in image. By default:
+        - minDistBetweenBlobs = 2
+        - filterByArea = True
+        - minArea = 50
+        - maxArea = 1000
+        - filterByCircularity = True
+        - minCircularity = 0.8
+        - filterByConvexity = False
+        - filterByInertia = False
     """
 
     def __init__(
