@@ -5,7 +5,7 @@ from os.path import join, dirname, exists
 
 import cv2 as cv
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
     FixedPatternMeasurement,
 )
@@ -15,7 +15,7 @@ from opencsp.common.lib.deflectometry.image_processing import detect_blobs_annot
 def example_find_blobs_in_image():
     """Finds blobs in image, annotates, and saves image"""
     file_meas = join(
-        dirname(opencsp.__file__),
+        opencsp_code_dir(),
         '../../sample_data/deflectometry/sandia_lab/fixed_pattern/measurement_screen_square_width3_space6.h5',
     )
     file_save = join(

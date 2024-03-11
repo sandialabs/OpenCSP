@@ -1,22 +1,21 @@
-import os
 from os.path import join
 
 import numpy as np
 
-import opencsp
 from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
     save_physical_setup_file,
 )
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
 
 
 def test_save_physical_setup_file():
     """Loads data and saves test Display file"""
     # Define input file directory
-    base_dir = join(os.path.dirname(opencsp.__file__), 'common/lib/deflectometry/test')
+    base_dir = join(opencsp_code_dir(), 'common/lib/deflectometry/test')
     dir_input = join(base_dir, 'data', 'data_expected')
     dir_output = join(base_dir, 'data', 'output')
     file_save = join(dir_output, 'test_physical_setup_file.h5')
@@ -42,8 +41,8 @@ def test_save_physical_setup_file():
 
     # Save physical setup file
     save_physical_setup_file(screen_distortion_data, name, rvec, tvec, file_save)
-    print('Test physical setup file save successfully.')
 
 
 if __name__ == '__main__':
     test_save_physical_setup_file()
+    print('Test physical setup file save successfully.')

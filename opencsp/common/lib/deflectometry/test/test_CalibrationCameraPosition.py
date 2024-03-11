@@ -65,7 +65,8 @@ class TestCalibrationCameraPosition(unittest.TestCase):
         cal_camera_position = CalibrationCameraPosition(
             camera, pts_xyz_marker, corner_ids, image
         )
-        cal_camera_position.run_calibration(verbose)
+        cal_camera_position.verbose = verbose
+        cal_camera_position.run_calibration()
 
         # Get calculated vectors
         rvec, tvec = cal_camera_position.get_data()

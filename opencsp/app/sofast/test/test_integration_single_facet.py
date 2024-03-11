@@ -6,14 +6,14 @@ import unittest
 
 import numpy as np
 
-import opencsp
-from opencsp.common.lib.deflectometry.Display import Display
-from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.app.sofast.lib.Sofast import Sofast
 from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
@@ -31,7 +31,7 @@ class TestSingle(unittest.TestCase):
         # Get test data location
         if base_dir is None:
             base_dir = os.path.join(
-                os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+                opencsp_code_dir(), 'test/data/sofast_measurements'
             )
 
         # Find all test files

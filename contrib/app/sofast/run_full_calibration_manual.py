@@ -93,7 +93,8 @@ def run_camera_position_cal(
 
     # Perform camera position calibraiton
     cal = CalibrationCameraPosition(camera, pts_xyz_marker, corner_ids, image)
-    cal.run_calibration(verbose)
+    cal.verbose = verbose
+    cal.run_calibration()
 
     return cal
 

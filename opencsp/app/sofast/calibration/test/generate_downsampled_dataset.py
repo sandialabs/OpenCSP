@@ -6,9 +6,9 @@ import os
 from os.path import join
 import shutil
 
-import opencsp
-import opencsp.app.sofast.test.downsample_sofast_data as ds
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.test.downsample_data as dd
+import opencsp.test.data.sofast_measurements.downsample_sofast_data as ds
 
 
 def downsample_dataset(dir_input: str, dir_output: str) -> None:
@@ -65,7 +65,7 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
 if __name__ == '__main__':
     downsample_dataset(
         dir_input=join(
-            os.path.dirname(opencsp.__file__),
+            opencsp_code_dir(),
             '../../sample_data/sofast/data_photogrammetric_calibration/data_measurement',
         ),
         dir_output=join(os.path.dirname(__file__), 'data/data_measurement'),

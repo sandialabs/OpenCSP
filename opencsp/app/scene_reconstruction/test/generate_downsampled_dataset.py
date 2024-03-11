@@ -12,7 +12,7 @@ import shutil
 import imageio.v3 as imageio
 from tqdm import tqdm
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.test.downsample_data as dd
 
 
@@ -58,14 +58,15 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
 
     # Downsample aruco marker camera
     print('Downsampling camera...')
-    camera_aruco_ds = dd.downsample_camera(join(dir_input, 'camera.h5'), n_aruco)
+    camera_aruco_ds = dd.downsample_camera(
+        join(dir_input, 'camera.h5'), n_aruco)
     camera_aruco_ds.save_to_hdf(join(dir_output, 'camera.h5'))
 
 
 if __name__ == '__main__':
     downsample_dataset(
         dir_input=join(
-            os.path.dirname(opencsp.__file__),
+            opencsp_code_dir(),
             '../../sample_data/scene_reconstruction/data_measurement',
         ),
         dir_output=join(os.path.dirname(__file__), 'data/data_measurement'),

@@ -3,12 +3,12 @@ from os.path import join
 
 from scipy.spatial.transform import Rotation
 
-import opencsp
 import opencsp.app.sofast.lib.load_saved_data as lsd
 import opencsp.common.lib.csp.standard_output as so
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 def plot_sofast_single_facet(
@@ -127,7 +127,7 @@ def example_driver():
     """
     # Define measured and reference data
     sample_data_dir = join(
-        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/'
+        opencsp_code_dir(), 'test/data/sofast_measurements/'
     )
 
     save_dir = join(os.path.dirname(__file__), 'data/output/standard_output')

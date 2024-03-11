@@ -21,6 +21,13 @@ class CalibrationCameraPosition:
     ----------
         - rvec : rotation vector, screen to camera rotation vector
         - tvec : translation vector, camera to screen (in screen coordinates) translation vector
+
+    Verbose Settings (self.verbose)
+    -------------------------------
+        - 0 no output
+        - 1 print only output
+        - 2 print and plot output
+        - 3 plot only output
     """
 
     def __init__(
@@ -42,7 +49,6 @@ class CalibrationCameraPosition:
             Corner IDs corresponding to pts_xyz_corners
         cal_image : ndarray
             Calibration image captured by camera
-
         """
         # Initialize attributes data types
         self.camera = camera
@@ -62,7 +68,18 @@ class CalibrationCameraPosition:
         self.pts_xy_marker_corners_reprojected: Vxy
 
         # Save figures
+        self.verbose: int = 0
         self.figures: list[plt.Figure] = []
+
+    @property
+    def _to_print(self) -> bool:
+        """If verbose printing is turned on"""
+        return self.verbose in [1, 2]
+
+    @property
+    def _to_plot(self) -> bool:
+        """If verbose plotting is turned on"""
+        return self.verbose in [2, 3]
 
     def find_markers(self) -> None:
         """Finds marker corner locations in image"""
@@ -79,11 +96,11 @@ class CalibrationCameraPosition:
             # Extract calibrated corner locations (4 corners per marker)
             self.pts_xyz_active_corner_locations = (
                 self.pts_xyz_active_corner_locations.concatenate(
-                    self.pts_xyz_corners[index : index + 4]
+                    self.pts_xyz_corners[index:index + 4]
                 )
             )
 
-    def calculate_camera_pose(self, verbose: bool = False) -> None:
+    def calculate_camera_pose(self) -> None:
         """Calculates the camera pose"""
         # Concatenate image points
         pts_img = np.vstack(self.pts_xy_marker_corners_list)
@@ -107,7 +124,7 @@ class CalibrationCameraPosition:
             self.rot_screen_cam.inv()
         )
 
-        if verbose:
+        if self._to_print:
             print('Camera pose calculated:')
             print(f'   rvec: {self.rot_screen_cam.as_rotvec()}')
             print(f'   tvec: {self.v_cam_screen_screen.data.squeeze()}')
@@ -134,7 +151,7 @@ class CalibrationCameraPosition:
 
         print(f'Saved camera rvec and tvec to: {os.path.abspath(file):s}')
 
-    def calculate_reprojection_error(self, verbose: bool = False) -> None:
+    def calculate_reprojection_error(self) -> None:
         """Calculates reprojection error"""
         # Project points
         self.pts_xy_marker_corners_reprojected = self.camera.project(
@@ -148,7 +165,7 @@ class CalibrationCameraPosition:
             np.vstack(self.pts_xy_marker_corners_list).T
         )
 
-        if verbose:
+        if self._to_print:
             errors_mag: ndarray = np.sqrt(
                 (self.errors_reprojection_xy.data.T**2).sum(axis=1)
             )
@@ -199,27 +216,16 @@ class CalibrationCameraPosition:
         ax.legend()
         ax.axis('off')
 
-    def run_calibration(self, verbose: int = 0) -> None:
-        """Runs calibration sequence
-
-        Parameters
-        ----------
-        verbose : int, optional
-            - 0=no output
-            - 1=only print outputs
-            - 2=print outputs and show plots
-            - 3=plots only with no printing
-        """
-        to_print = verbose in [1, 2]
-        to_plot = verbose in [2, 3]
+    def run_calibration(self) -> None:
+        """Runs calibration sequence"""
 
         # Run calibration
         self.find_markers()
         self.collect_corner_xyz_locations()
-        self.calculate_camera_pose(to_print)
-        self.calculate_reprojection_error(to_print)
+        self.calculate_camera_pose()
+        self.calculate_reprojection_error()
 
         # Plot figures
-        if to_plot:
+        if self._to_plot:
             self.plot_found_corners()
             self.plot_reprojection_error()

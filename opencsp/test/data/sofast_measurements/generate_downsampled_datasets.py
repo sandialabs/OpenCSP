@@ -7,10 +7,10 @@ import os
 
 import matplotlib.pyplot as plt
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-import opencsp.app.sofast.test.downsample_sofast_data as ds
+import opencsp.test.data.sofast_measurements.downsample_sofast_data as ds
 import opencsp.common.lib.test.downsample_data as dd
 
 
@@ -84,6 +84,6 @@ def downsample_dataset_1(base_dir):
 
 if __name__ == '__main__':
     dir_sample_data = os.path.join(
-        os.path.dirname(opencsp.__file__), '../../sample_data/sofast/measurement_set_1'
+        opencsp_code_dir(), '../../sample_data/sofast/measurement_set_1'
     )
     downsample_dataset_1(dir_sample_data)

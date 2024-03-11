@@ -58,6 +58,21 @@ class SpatialOrientation:
 
         self.trans_screen_cam: TransformXYZ
 
+    def __copy__(self) -> 'SpatialOrientation':
+        """Returns a copy of spatial orientation"""
+        r_cam_screen = Rotation.from_rotvec(
+            self.r_cam_screen.as_rotvec().copy())
+        v_cam_screen_cam = self.v_cam_screen_cam.copy()
+        ori = SpatialOrientation(r_cam_screen, v_cam_screen_cam)
+
+        if self.optic_oriented:
+            r_cam_optic = Rotation.from_rotve(
+                self.r_cam_optic.as_rotvec().copy())
+            v_cam_optic_cam = self.v_cam_optic_cam.copy()
+            ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
+
+        return ori
+
     def _orient_screen_cam(
         self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz
     ) -> None:
@@ -208,18 +223,5 @@ class SpatialOrientation:
 
         ori = cls(r_cam_screen, v_cam_screen_cam)
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
-
-        return ori
-
-    def copy(self) -> 'SpatialOrientation':
-        """Returns a copy of spatial orientation"""
-        r_cam_screen = Rotation.from_rotvec(self.r_cam_screen.as_rotvec().copy())
-        v_cam_screen_cam = self.v_cam_screen_cam.copy()
-        ori = SpatialOrientation(r_cam_screen, v_cam_screen_cam)
-
-        if self.optic_oriented:
-            r_cam_optic = Rotation.from_rotve(self.r_cam_optic.as_rotvec().copy())
-            v_cam_optic_cam = self.v_cam_optic_cam.copy()
-            ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         return ori

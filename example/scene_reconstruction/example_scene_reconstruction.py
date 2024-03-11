@@ -3,17 +3,17 @@ from os.path import join
 
 import numpy as np
 
-import opencsp
 from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 def example_scene_reconstruction():
     """Example script that reconstructs the XYZ locations of Aruco markers in a scene."""
     # Define input directory
     dir_input = join(
-        os.path.dirname(opencsp.__file__),
+        opencsp_code_dir(),
         'app/scene_reconstruction/test/data/data_measurement',
     )
 
@@ -62,4 +62,4 @@ def example_scene_reconstruction():
 
 
 if __name__ == '__main__':
-    example_optics_and_ray_tracing_driver()
+    example_scene_reconstruction()

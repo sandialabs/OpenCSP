@@ -6,8 +6,8 @@ import matplotlib
 import numpy as np
 from numpy import ndarray
 
-import opencsp
 from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
+from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
     CalibrationCameraPosition,
 )
@@ -18,10 +18,10 @@ from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
 from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
     save_physical_setup_file,
 )
-from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
 
 
@@ -121,7 +121,8 @@ def run_camera_position_cal(
 
     # Perform camera position calibraiton
     cal = CalibrationCameraPosition(camera, pts_xyz_marker, corner_ids, image)
-    cal.run_calibration(verbose)
+    cal.verbose = verbose
+    cal.run_calibration()
 
     return cal
 
@@ -137,11 +138,11 @@ def example_driver():
     """
     # Define input file directories
     base_dir_scene_recon = join(
-        os.path.dirname(opencsp.__file__),
+        opencsp_code_dir(),
         'app/scene_reconstruction/test/data/data_measurement',
     )  # low-res test data
     base_dir_sofast = join(
-        os.path.dirname(opencsp.__file__),
+        opencsp_code_dir(),
         'common/lib/deflectometry/test/data/data_measurement',
     )  # low-res test data
 

@@ -3,17 +3,17 @@ from os.path import join
 
 import matplotlib
 
-import opencsp
-from opencsp.app.sofast.lib.visualize_setup import visualize_setup
-from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.Measurement import Measurement
-from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
-from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.Sofast import Sofast
-from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
+from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
@@ -32,7 +32,7 @@ def example_driver():
     """
     # Define sample data directory
     sample_data_dir = join(
-        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/'
+        opencsp_code_dir(), 'test/data/sofast_measurements/'
     )
 
     # Directory setup

@@ -1,19 +1,18 @@
 import os
 from os.path import join
 
-import opencsp
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
-from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-import opencsp.common.lib.render_control.RenderControlMirror as rcm
 
 
 def example_driver():
@@ -27,7 +26,7 @@ def example_driver():
     """
     # Define sample data directory
     sample_data_dir = join(
-        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/'
+        opencsp_code_dir(), 'test/data/sofast_measurements/'
     )
 
     # Directory Setup
@@ -78,9 +77,6 @@ def example_driver():
 
     # Generate plots
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
-    mirror_control = rcm.RenderControlMirror(
-        centroid=True, surface_normals=True, norm_res=1
-    )
     axis_control_m = rca.meters()
 
     # Visualize setup

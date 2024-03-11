@@ -6,10 +6,10 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-import opencsp
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
@@ -18,7 +18,7 @@ class TestSpatialOrientation(unittest.TestCase):
     def setUpClass(cls):
         # Get test data location
         base_dir = os.path.join(
-            os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements'
+            opencsp_code_dir(), 'test/data/sofast_measurements'
         )
 
         # Define test data files for single facet processing

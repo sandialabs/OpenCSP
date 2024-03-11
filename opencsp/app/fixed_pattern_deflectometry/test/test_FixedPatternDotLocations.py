@@ -2,7 +2,7 @@ import os
 
 import numpy as np
 
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
     FixedPatternDotLocations,
 )
@@ -66,7 +66,7 @@ def test_FixedPatternDotLocations():
 def test_from_Display():
     # Load display
     file_disp = os.path.join(
-        os.path.dirname(opencsp.__file__),
+        opencsp_code_dir(),
         'test/data/sofast_measurements/display_distorted_3d.h5',
     )
     display = Display.load_from_hdf(file_disp)

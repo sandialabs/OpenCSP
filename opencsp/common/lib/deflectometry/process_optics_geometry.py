@@ -1,4 +1,6 @@
 """Library of functions used to process the geometry of a deflectometry setup."""
+from copy import copy
+
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import ndarray
@@ -77,7 +79,7 @@ def process_singlefacet_geometry(
     data_error = cdc.CalculationError()
 
     # Make copy of orientation
-    ori = orientation.copy()
+    ori = copy(orientation)
 
     # Get optic data
     v_facet_corners: Vxyz = (

@@ -2,7 +2,6 @@
 """
 from os.path import join, dirname
 
-import opencsp
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
     FixedPatternDotLocations,
 )
@@ -15,6 +14,7 @@ from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcess import (
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
@@ -71,7 +71,7 @@ def example_process_fixed_pattern_printed_target():
     printed dot target.
     """
     dir_base = join(
-        dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab'
+        opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab'
     )
 
     file_camera = join(dir_base, "calibration_files/camera.h5")
@@ -102,7 +102,7 @@ def example_process_fixed_pattern_printed_target():
 def example_process_fixed_pattern_screen_target():
     """Loads data and calls processing function"""
     dir_base = join(
-        dirname(opencsp.__file__), '../../sample_data/deflectometry/sandia_lab'
+        opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab'
     )
 
     # Define files

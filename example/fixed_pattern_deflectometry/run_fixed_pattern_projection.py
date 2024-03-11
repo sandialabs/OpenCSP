@@ -2,14 +2,14 @@
 
 NOTE: This example requires a computer screen
 """
-from os.path import join, dirname
+from os.path import join
 
 import pytest
 
-import opencsp
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
     FixedPatternScreenProjection,
 )
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 
 
@@ -18,7 +18,7 @@ def example_project_fixed_pattern():
     """Projects fixed pattern image on display"""
     # Set pattern parameters
     file_image_projection = join(
-        dirname(opencsp.__file__),
+        opencsp_code_dir(),
         "test/data/sofast_measurements/general/Image_Projection_test.h5",
     )
     width_pattern = 3

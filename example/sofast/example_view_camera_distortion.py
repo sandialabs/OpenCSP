@@ -2,9 +2,9 @@ import os
 
 import matplotlib.pyplot as plt
 
-import opencsp
 from opencsp.app.camera_calibration.lib.calibration_camera import view_distortion
 from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 def example_driver():
@@ -17,7 +17,7 @@ def example_driver():
     """
     # Define input camera file
     file = os.path.join(
-        os.path.dirname(opencsp.__file__), 'test/data/sofast_measurements/camera.h5'
+        opencsp_code_dir(), 'test/data/sofast_measurements/camera.h5'
     )
 
     # Load camera

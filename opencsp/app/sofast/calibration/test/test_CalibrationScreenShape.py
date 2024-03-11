@@ -1,14 +1,13 @@
 """Tests Sofast screen distortion calibration
 """
-from glob import glob
-import os
 from os.path import join
 import unittest
+
+from glob import glob
+import numpy as np
 import pytest
 
-import numpy as np
-
-import opencsp
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
     CalibrationScreenShape,
     DataInput,
@@ -50,7 +49,7 @@ class TestCalibrationScreenShape(unittest.TestCase):
         if (dir_input is None) or (dir_output is None):
             # Define default data directories
             base_dir = join(
-                os.path.dirname(opencsp.__file__), 'common/lib/deflectometry/test'
+                opencsp_code_dir(), 'common/lib/deflectometry/test'
             )
             dir_input = join(base_dir, 'data/data_measurement')
             dir_output = join(base_dir, 'data/data_expected')
