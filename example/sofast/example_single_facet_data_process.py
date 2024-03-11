@@ -101,7 +101,7 @@ def example_driver():
     fig_record.save(dir_save, 'slope_magnitude', 'png')
 
     # Save data
-    sofast.save_data_to_hdf(f'{dir_save}/data_singlefacet.h5')
+    sofast.save_to_hdf(f'{dir_save}/data_singlefacet.h5')
 
 
 if __name__ == '__main__':

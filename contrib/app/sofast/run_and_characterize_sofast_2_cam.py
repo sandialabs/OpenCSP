@@ -193,7 +193,7 @@ def main():
             c.save_to_hdf()
             m.save_to_hdf(output_files[idx_meas])
         for idx_meas, s in enumerate(sofasts):
-            s.save_data_to_hdf(output_files[idx_meas])
+            s.save_to_hdf(output_files[idx_meas])
 
 
 # Start program
