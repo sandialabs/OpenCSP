@@ -12,6 +12,18 @@ class BlobIndex:
     X/Y axes correspond to image axes; +x is to right, +y is down. Class takes in points (in units
     of pixels) that have been previously found with a blob detector and attempts to assign all found
     xy pixel points with a blob index.
+
+    Attributes
+    ----------
+    search_thresh : float
+
+    search_perp_axis_ratio : float
+        Ratio of point distances: (perpendicular to axis) / (along axis) used to
+        search for points.
+    apply_filter : bool
+        To filter bad points (experimental)
+    verbose : bool
+        Deprecated
     """
 
     def __init__(
