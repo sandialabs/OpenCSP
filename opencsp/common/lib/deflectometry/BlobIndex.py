@@ -110,7 +110,8 @@ class BlobIndex:
         dists_perp = np.abs(v_perp.dot(points_rel))  # Distance of points from line
         # Make mask of valid points
         mask = np.logical_and(
-            dists_axis > 0, dists_axis / dists_perp > self.search_perp_axis_ratio
+            dists_axis > 0,
+            dists_perp / dists_axis <= self.search_perp_axis_ratio
         )
         # Check there are points to find
         if mask.sum() == 0:
