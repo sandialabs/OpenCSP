@@ -235,7 +235,7 @@ class CalculationImageProcessingGeneral:
 
 
 @dataclass
-class CalculationsFacetEnsemble:
+class CalculationFacetEnsemble:
     """Data class used in deflectometry calculations. Holds calculations
     relating to facet ensembles.
     """

@@ -198,7 +198,7 @@ class ProcessSofastFringe:
         self.data_error: cdc.CalculationError = None
 
         self.data_characterization_facet: list[SlopeSolverData] = None
-        self.data_characterization_ensemble: list[cdc.CalculationsFacetEnsemble] = None
+        self.data_characterization_ensemble: list[cdc.CalculationFacetEnsemble] = None
 
     def help(self) -> None:
         """Prints Sofast doc string"""
@@ -715,7 +715,7 @@ class ProcessSofastFringe:
                 trans_facet_ensemble_list[idx].R
             )
 
-            data = cdc.CalculationsFacetEnsemble(
+            data = cdc.CalculationFacetEnsemble(
                 trans_facet_ensemble_list[idx],
                 slopes_ensemble_xy,
                 v_surf_points_ensemble,
