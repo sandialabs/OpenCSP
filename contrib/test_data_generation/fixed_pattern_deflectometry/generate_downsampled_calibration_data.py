@@ -27,7 +27,6 @@ def generate_data():
     file_point_locs = join(dir_sample_data, 'point_locations.csv')
     file_camera_def = join(dir_sample_data, 'camera_deflectometry.h5')
     file_image_def = join(dir_sample_data, 'image_deflectometry_camera.png')
-    file_points = join(dir_sample_data, 'point_locations.csv')
 
     dir_save = join(opencsp_code_dir(),
                     'test/data/fixed_pattern_deflectometry/dot_location_calibration/measurements')
@@ -53,7 +52,6 @@ def generate_data():
     shutil.copy(file_point_locs, join(dir_save, basename(file_point_locs)))
     shutil.copy(file_camera_def, join(dir_save, basename(file_camera_def)))
     shutil.copy(file_image_def, join(dir_save, basename(file_image_def)))
-    shutil.copy(file_points, join(dir_save, basename(file_points)))
 
 
 if __name__ == '__main__':
