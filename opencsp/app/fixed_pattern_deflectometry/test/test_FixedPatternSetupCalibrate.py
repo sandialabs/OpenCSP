@@ -5,6 +5,7 @@ import os
 from os.path import join, dirname, exists
 
 import numpy as np
+import pytest
 
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import \
     FixedPatternDotLocations
@@ -17,6 +18,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.log_tools as lt
 
 
+@pytest.mark.no_xvfb
 def test_FixedPatternSetupCalibrate():
     """Tests dot-location calibration
     """
@@ -25,7 +27,7 @@ def test_FixedPatternSetupCalibrate():
         opencsp_code_dir(),
         'test',
         'data',
-        'fixed_pattern_deflectometry_measurements',
+        'fixed_pattern_deflectometry',
         'dot_location_calibration',
     )
     files = [
@@ -34,7 +36,8 @@ def test_FixedPatternSetupCalibrate():
         join(base_dir, 'measurements/images/DSC03970.JPG'),
         join(base_dir, 'measurements/images/DSC03972.JPG'),
     ]
-    origins = Vxy(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]))
+    origins = np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
+    origins = Vxy(origins.astype(int))
 
     # Define other files
     file_camera_marker = join(base_dir, 'measurements/camera_calibration.h5')
@@ -64,6 +67,9 @@ def test_FixedPatternSetupCalibrate():
         files, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
     cal_dot_locs.plot = True
+    cal_dot_locs.blob_search_threshold = 3.
+    cal_dot_locs.blob_detector.minArea = 3.
+    cal_dot_locs.blob_detector.maxArea = 30.
     cal_dot_locs.run()
 
     # Save data
