@@ -1,13 +1,16 @@
 from dataclasses import dataclass
 from warnings import warn
 
+import numpy as np
 from numpy import ndarray
+import numpy.typing as npt
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
@@ -151,7 +154,7 @@ class CalculationError:
 
 
 @dataclass
-class CalculationsImageProcessingFacet:
+class CalculationImageProcessingFacet:
     """Data class used in deflectometry calculations of a single facet. Holds
     image processing data of a single facet measurement.
     """
@@ -164,7 +167,7 @@ class CalculationsImageProcessingFacet:
     mask_bad_pixels: ndarray = None
 
     def save_to_hdf(self, file: str, prefix: str = ''):
-        """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationsImageProcessingFacet/...
+        """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationImageProcessingFacet/...
 
         Parameters
         ----------
@@ -182,18 +185,18 @@ class CalculationsImageProcessingFacet:
             self.mask_bad_pixels,
         ]
         datasets = [
-            prefix + 'CalculationsImageProcessingFacet/loop_facet_image_refine',
-            prefix + 'CalculationsImageProcessingFacet/mask_fitted',
-            prefix + 'CalculationsImageProcessingFacet/mask_processed',
-            prefix + 'CalculationsImageProcessingFacet/v_facet_corners_image_exp',
-            prefix + 'CalculationsImageProcessingFacet/v_facet_centroid_image_exp',
-            prefix + 'CalculationsImageProcessingFacet/mask_bad_pixels',
+            prefix + 'CalculationImageProcessingFacet/loop_facet_image_refine',
+            prefix + 'CalculationImageProcessingFacet/mask_fitted',
+            prefix + 'CalculationImageProcessingFacet/mask_processed',
+            prefix + 'CalculationImageProcessingFacet/v_facet_corners_image_exp',
+            prefix + 'CalculationImageProcessingFacet/v_facet_centroid_image_exp',
+            prefix + 'CalculationImageProcessingFacet/mask_bad_pixels',
         ]
         _save_data_in_file(data, datasets, file)
 
 
 @dataclass
-class CalculationsImageProcessingGeneral:
+class CalculationImageProcessingGeneral:
     """Data class used in deflectometry calculations. Holds general image processing
     calculations from a deflectometry measurement.
     """
@@ -205,7 +208,7 @@ class CalculationsImageProcessingGeneral:
     loop_optic_image_refine: LoopXY = None
 
     def save_to_hdf(self, file: str, prefix: str = ''):
-        """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationsImageProcessingGeneral/...
+        """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationImageProcessingGeneral/...
 
         Parameters
         ----------
@@ -222,11 +225,47 @@ class CalculationsImageProcessingGeneral:
             self.loop_optic_image_refine,
         ]
         datasets = [
-            prefix + 'CalculationsImageProcessingGeneral/mask_raw',
-            prefix + 'CalculationsImageProcessingGeneral/v_edges_image',
-            prefix + 'CalculationsImageProcessingGeneral/v_mask_centroid_image',
-            prefix + 'CalculationsImageProcessingGeneral/loop_optic_image_exp',
-            prefix + 'CalculationsImageProcessingGeneral/loop_optic_image_refine',
+            prefix + 'CalculationImageProcessingGeneral/mask_raw',
+            prefix + 'CalculationImageProcessingGeneral/v_edges_image',
+            prefix + 'CalculationImageProcessingGeneral/v_mask_centroid_image',
+            prefix + 'CalculationImageProcessingGeneral/loop_optic_image_exp',
+            prefix + 'CalculationImageProcessingGeneral/loop_optic_image_refine',
+        ]
+        _save_data_in_file(data, datasets, file)
+
+
+@dataclass
+class CalculationsFacetEnsemble:
+    """Data class used in deflectometry calculations. Holds calculations
+    relating to facet ensembles.
+    """
+
+    trans_facet_ensemble: TransformXYZ = None
+    slopes_ensemble_xy: npt.NDArray[np.float_] = None
+    v_surf_points_ensemble: Vxyz = None
+    v_facet_pointing_ensemble: Vxyz = None
+
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationEnsemble/...
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        data = [
+            self.trans_facet_ensemble.matrix,
+            self.slopes_ensemble_xy,
+            self.v_surf_points_ensemble.data,
+            self.v_facet_pointing_ensemble.data,
+        ]
+        datasets = [
+            prefix + 'CalculationEnsemble/trans_facet_ensemble',
+            prefix + 'CalculationEnsemble/slopes_ensemble_xy',
+            prefix + 'CalculationEnsemble/v_surf_points_ensemble',
+            prefix + 'CalculationEnsemble/v_facet_pointing_ensemble',
         ]
         _save_data_in_file(data, datasets, file)
 

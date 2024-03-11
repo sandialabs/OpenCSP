@@ -34,9 +34,9 @@ def process_singlefacet_geometry(
     debug: GeometryDataDebug = GeometryDataDebug(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
-    cdc.CalculationsImageProcessingGeneral,
+    cdc.CalculationImageProcessingGeneral,
     list[cdc.CalculationDataGeometryFacet],
-    list[cdc.CalculationsImageProcessingFacet],
+    list[cdc.CalculationImageProcessingFacet],
     cdc.CalculationError,
 ]:
     """Processes optic geometry for single facet
@@ -63,9 +63,9 @@ def process_singlefacet_geometry(
     Returns
     -------
     calculation_data_classes.CalculationDataGeometryGeneral
-    calculation_data_classes.CalculationsImageProcessingGeneral
+    calculation_data_classes.CalculationImageProcessingGeneral
     list[calculation_data_classes.CalculationDataGeometryFacet]
-    list[calculation_data_classes.CalculationsImageProcessingFacet]
+    list[calculation_data_classes.CalculationImageProcessingFacet]
     calculation_data_classes.CalculationError]
     """
     if debug.debug_active:
@@ -73,9 +73,9 @@ def process_singlefacet_geometry(
 
     # Create data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
-    data_image_processing_general = cdc.CalculationsImageProcessingGeneral()
+    data_image_processing_general = cdc.CalculationImageProcessingGeneral()
     data_geometry_facet = cdc.CalculationDataGeometryFacet()
-    data_image_processing_facet = cdc.CalculationsImageProcessingFacet()
+    data_image_processing_facet = cdc.CalculationImageProcessingFacet()
     data_error = cdc.CalculationError()
 
     # Make copy of orientation
@@ -301,9 +301,9 @@ def process_undefined_geometry(
     debug: GeometryDataDebug = GeometryDataDebug(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
-    cdc.CalculationsImageProcessingGeneral,
+    cdc.CalculationImageProcessingGeneral,
     list[cdc.CalculationDataGeometryFacet],
-    list[cdc.CalculationsImageProcessingFacet],
+    list[cdc.CalculationImageProcessingFacet],
     cdc.CalculationError,
 ]:
     """Processes optic geometry for undefined deflectrometry measurement
@@ -326,9 +326,9 @@ def process_undefined_geometry(
     Returns
     -------
     calculation_data_classes.CalculationDataGeometryGeneral
-    calculation_data_classes.CalculationsImageProcessingGeneral
+    calculation_data_classes.CalculationImageProcessingGeneral
     list[calculation_data_classes.CalculationDataGeometryFacet]
-    list[calculation_data_classes.CalculationsImageProcessingFacet]
+    list[calculation_data_classes.CalculationImageProcessingFacet]
     calculation_data_classes.CalculationError]
     """
     if debug.debug_active:
@@ -338,10 +338,10 @@ def process_undefined_geometry(
 
     # Define data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
-    data_image_processing_general = cdc.CalculationsImageProcessingGeneral()
+    data_image_processing_general = cdc.CalculationImageProcessingGeneral()
     data_geometry_facet = cdc.CalculationDataGeometryFacet()
-    data_image_processing_facet = cdc.CalculationsImageProcessingFacet()
-    data_error = cdc.CalculationError()
+    data_image_processing_facet = cdc.CalculationImageProcessingFacet()
+    data_error = None
 
     # Save mask raw
     data_image_processing_general.mask_raw = mask_raw
@@ -405,9 +405,9 @@ def process_multifacet_geometry(
     debug: GeometryDataDebug = GeometryDataDebug(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
-    cdc.CalculationsImageProcessingGeneral,
+    cdc.CalculationImageProcessingGeneral,
     list[cdc.CalculationDataGeometryFacet],
-    list[cdc.CalculationsImageProcessingFacet],
+    list[cdc.CalculationImageProcessingFacet],
     cdc.CalculationError,
 ]:
     if debug.debug_active:
@@ -440,12 +440,12 @@ def process_multifacet_geometry(
 
     # Define data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
-    data_image_processing_general = cdc.CalculationsImageProcessingGeneral()
+    data_image_processing_general = cdc.CalculationImageProcessingGeneral()
     data_geometry_facet = [
         cdc.CalculationDataGeometryFacet() for _ in range(num_facets)
     ]
     data_image_processing_facet = [
-        cdc.CalculationsImageProcessingFacet() for _ in range(num_facets)
+        cdc.CalculationImageProcessingFacet() for _ in range(num_facets)
     ]
     data_error = cdc.CalculationError()
 
