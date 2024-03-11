@@ -74,6 +74,7 @@ def downsample_dataset_1(base_dir):
 
 
 if __name__ == '__main__':
+    # Create downsample dataset 1 (NSTTF Optics Lab data)
     dir_sample_data = join(
         opencsp_code_dir(),
         '../../sample_data/sofast/measurement_set_1'
