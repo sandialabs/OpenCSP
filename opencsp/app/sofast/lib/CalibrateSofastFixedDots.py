@@ -79,7 +79,6 @@ class CalibrateSofastFixedDots:
                 im.set_point_id_located(pt_id, pt_xyz.data.squeeze())
 
         # Save data
-        self._images_array = [image.image for image in self._images]
         self._origin_pts = origin_pts
         self._camera = camera
         self._pts_xyz_corners = pts_xyz_corners
@@ -125,8 +124,8 @@ class CalibrateSofastFixedDots:
         """Finds dot locations for several camera poses"""
         dot_image_points_xy_mat = []
         masks_unassigned = []
-        for idx, (image, origin_pt) in enumerate(zip(self._images_array, self._origin_pts)):
-            lt.info(f'Finding dots in image: {idx:d}')
+        for idx_image, origin_pt in enumerate(self._origin_pts):
+            lt.info(f'Finding dots in image: {idx_image:d}')
 
             # Find blobs
             pts = ip.detect_blobs(self._images[idx_image].image, self.blob_detector)
@@ -223,21 +222,19 @@ class CalibrateSofastFixedDots:
 
     def _plot_common_dots(self) -> None:
         """Plots common dots on images"""
-        for idx, (image, pts) in enumerate(
-            zip(self._images_array, self._dot_image_points_xy)
-        ):
-            fig = plt.figure(f'image_{idx:d}_annotated_dots')
-            plt.imshow(image, cmap='gray')
-            plt.scatter(*pts.data, marker='.', color='red')
+        for idx_image in range(self._num_images):
+            fig = plt.figure(f'image_{idx_image:d}_annotated_dots')
+            plt.imshow(self._images[idx_image].image, cmap='gray')
+            plt.scatter(*self._dot_image_points_xy[idx_image].data, marker='.', color='red')
             self.figures.append(fig)
 
     def _plot_marker_corners(self) -> None:
         """Plots images with annotated marker corners"""
-        for idx_cam, image in enumerate(self._images_array):
-            fig = plt.figure(f'image_{idx_cam:d}_annotated_marker_corners')
+        for idx_image in range(self._num_images):
+            fig = plt.figure(f'image_{idx_image:d}_annotated_marker_corners')
             ax = fig.gca()
-            ax.imshow(image, cmap='gray')
-            Vxy(self._images[idx_cam].pts_im_xy.T).draw(ax=ax)
+            ax.imshow(self._images[idx_image].image, cmap='gray')
+            Vxy(self._images[idx_image].pts_im_xy.T).draw(ax=ax)
             self.figures.append(fig)
 
     def _plot_located_cameras_and_points(self) -> None:
@@ -326,7 +323,9 @@ class CalibrateSofastFixedDots:
     def save_figures(self, dir_save: str) -> None:
         """Saves figures in given directory"""
         for fig in self.figures:
-            fig.savefig(os.path.join(dir_save, fig.get_label() + '.png'))
+            file = os.path.join(dir_save, fig.get_label() + '.png')
+            lt.info(f'Saving figure to file: {file:s}')
+            fig.savefig(file)
 
     def run(self) -> None:
         """Runs full calibration sequence"""
