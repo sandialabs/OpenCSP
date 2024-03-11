@@ -23,14 +23,15 @@ def example_perform_calibration():
     """Performs a dot-location calibration using photogrammetry"""
     # Define dot location images and origins
     base_dir = join(opencsp_code_dir(),
-                    '../../sample_data/deflectometry/calibration_dot_locations/data_measurement/')
+                    'test/data/fixed_pattern_deflectometry/dot_location_calibration/measurements')
     files_cal_images = [
         join(base_dir, 'images/DSC03965.JPG'),
         join(base_dir, 'images/DSC03967.JPG'),
         join(base_dir, 'images/DSC03970.JPG'),
         join(base_dir, 'images/DSC03972.JPG'),
     ]
-    origins = Vxy(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]))
+    origins = np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
+    origins = Vxy(origins.astype(int))
 
     # Define other files
     file_camera_position = join(base_dir, 'image_deflectometry_camera.png')
@@ -43,7 +44,7 @@ def example_perform_calibration():
         os.makedirs(dir_save)
 
     # Set up logger
-    lt.logger(log_dir_body_ext=join(dir_save, 'log.txt'), level=lt.log.WARN)
+    lt.logger(log_dir_body_ext=join(dir_save, 'log.txt'), level=lt.log.INFO)
 
     # Load images
     image_camera_position = ph.load_image_grayscale(file_camera_position)
@@ -62,6 +63,9 @@ def example_perform_calibration():
         files_cal_images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
     cal_dot_locs.plot = True
+    cal_dot_locs.blob_search_threshold = 3.
+    cal_dot_locs.blob_detector.minArea = 3.
+    cal_dot_locs.blob_detector.maxArea = 30.
     cal_dot_locs.run()
 
     # Perform camera position calibration
