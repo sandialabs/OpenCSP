@@ -4,6 +4,7 @@
 import os
 from os.path import join, dirname, exists
 
+import matplotlib
 import numpy as np
 import pytest
 
