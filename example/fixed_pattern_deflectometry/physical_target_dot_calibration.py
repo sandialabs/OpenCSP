@@ -3,7 +3,6 @@
 import os
 from os.path import join, dirname, exists
 
-import cv2 as cv
 import numpy as np
 from scipy.spatial.transform import Rotation
 
@@ -16,6 +15,8 @@ from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientati
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+import opencsp.common.lib.photogrammetry.photogrammetry as ph
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_perform_calibration():
@@ -23,7 +24,7 @@ def example_perform_calibration():
     # Define dot location images and origins
     base_dir = join(opencsp_code_dir(),
                     '../../sample_data/deflectometry/calibration_dot_locations/data_measurement/')
-    files = [
+    files_cal_images = [
         join(base_dir, 'images/DSC03965.JPG'),
         join(base_dir, 'images/DSC03967.JPG'),
         join(base_dir, 'images/DSC03970.JPG'),
@@ -41,11 +42,11 @@ def example_perform_calibration():
     if not exists(dir_save):
         os.makedirs(dir_save)
 
+    # Set up logger
+    lt.logger(log_dir_body_ext=join(dir_save, 'log.txt'), level=lt.log.WARN)
+
     # Load images
-    images = []
-    for file in files:
-        images.append(cv.imread(file, cv.IMREAD_GRAYSCALE))
-    image_camera_position = cv.imread(file_camera_position, cv.IMREAD_GRAYSCALE)
+    image_camera_position = ph.load_image_grayscale(file_camera_position)
 
     # Load marker corner locations
     data = np.loadtxt(file_xyz_points, delimiter=',')
@@ -58,9 +59,8 @@ def example_perform_calibration():
 
     # Perform dot location calibration
     cal_dot_locs = FixedPatternSetupCalibrate(
-        images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
+        files_cal_images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
-    cal_dot_locs.print = True
     cal_dot_locs.plot = True
     cal_dot_locs.run()
 
@@ -82,10 +82,7 @@ def example_perform_calibration():
     dot_locs = cal_dot_locs.get_dot_location_object()
     dot_locs.save_to_hdf(join(dir_save, 'fixed_pattern_dot_locations.h5'))
     orientation.save_to_hdf(join(dir_save, 'spatial_orientation.h5'))
-
-    # Save figures
-    for fig in cal_dot_locs.figures:
-        fig.savefig(join(dir_save, fig.get_label() + '.png'))
+    cal_dot_locs.save_figures(dir_save)
 
 
 if __name__ == '__main__':
