@@ -157,7 +157,7 @@ def main():
     if output_file is not None:
         calibration.save_to_hdf(output_file)
         measurement.save_to_hdf(output_file)
-        sofast.save_data_to_hdf(output_file)
+        sofast.save_to_hdf(output_file)
 
 
 # Start program

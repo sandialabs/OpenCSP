@@ -78,10 +78,10 @@ def example_driver():
 
     # Update search parameters
     sofast.params.mask_hist_thresh = 0.83
-    sofast.params.perimeter_refine_perpendicular_search_dist = 10.0
-    sofast.params.facet_corns_refine_frac_keep = 1.0
-    sofast.params.facet_corns_refine_perpendicular_search_dist = 3.0
-    sofast.params.facet_corns_refine_step_length = 5.0
+    sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = 10.0
+    sofast.params.geometry_params.facet_corns_refine_frac_keep = 1.0
+    sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = 3.0
+    sofast.params.geometry_params.facet_corns_refine_step_length = 5.0
 
     # Process
     sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
@@ -89,7 +89,7 @@ def example_driver():
     # Calculate focal length from parabolic fit
     for idx in range(sofast.num_facets):
         if surface_data[idx]['surface_type'] == 'parabolic':
-            surf_coefs = sofast.data_characterization_facet[idx]['surf_coefs_facet']
+            surf_coefs = sofast.data_characterization_facet[idx].surf_coefs_facet
             focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
             print('Parabolic fit focal lengths:')
             print(f'  X {focal_lengths_xy[0]:.3f} m')
@@ -107,9 +107,7 @@ def example_driver():
 
     # Visualize setup
     fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
-    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0][
-        'spatial_orientation'
-    ]
+    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
     visualize_setup(
         display,
         camera,
@@ -133,7 +131,7 @@ def example_driver():
     fig_record.save(dir_save, 'slope_magnitude', 'png')
 
     # Save data (optionally)
-    sofast.save_data_to_hdf(f'{dir_save}/data_multifacet.h5')
+    sofast.save_to_hdf(f'{dir_save}/data_multifacet.h5')
 
 
 if __name__ == '__main__':
