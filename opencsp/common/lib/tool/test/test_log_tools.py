@@ -6,7 +6,6 @@ import unittest
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
-import opencsp.common.lib.opencsp_path.opencsp_root_path as root_path
 
 
 class TestLogTools(unittest.TestCase):
@@ -164,7 +163,7 @@ class TestLogTools(unittest.TestCase):
         lt.logger(logname)
         try:
             lt.error_and_raise(RuntimeError, "Error, world!")
-        except RuntimeError as e:
+        except RuntimeError:
             lt.info("RuntimeError encountered")
 
     def test_error_and_raise(self):
