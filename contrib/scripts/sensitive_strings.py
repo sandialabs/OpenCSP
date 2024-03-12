@@ -24,7 +24,6 @@ import contrib.scripts.FileCache as fc  # nopep8
 import contrib.scripts.FileFingerprint as ff  # nopep8
 import contrib.scripts.SensitiveStringMatcher as ssm  # nopep8
 
-#testing precommit
 
 
 class SensitiveStringsSearcher:
