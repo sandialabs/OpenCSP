@@ -1,6 +1,5 @@
 import dataclasses
 import re
-from typing import Callable
 
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -119,7 +118,7 @@ class SensitiveStringMatcher:
             matching: dict[re.Pattern | str, list[int]] = {}
             for pattern in possible_matching:
                 span = possible_matching[pattern]
-                line_part = iline[span[0] : span[1]]
+                line_part = iline[span[0]: span[1]]
                 if len(self._search_patterns(line_part, self.neg_patterns)) == 0:
                     matching[pattern] = span
 
@@ -128,22 +127,23 @@ class SensitiveStringMatcher:
                 span = matching[pattern]
 
                 start, end = span[0], span[1]
-                line_part = f"`{line[start:end]}`"
+                line_part = line[start:end]
+                line_context = f"`{line_part}`"
                 if start > 0:
-                    line_part = line[max(start - 5, 0) : start] + line_part
+                    line_context = line[max(start - 5, 0): start] + line_context
                 if end < len(line):
-                    line_part = line_part + line[end : min(end + 5, len(line))]
+                    line_context = line_context + line[end: min(end + 5, len(line))]
 
                 match = Match(lineno + 1, start, end, line, line_part, self)
-                self.set_match_msg(match, pattern)
+                self.set_match_msg(match, pattern, line_context)
                 matches.append(match)
                 self.log(match.msg)
 
         return matches
 
-    def set_match_msg(self, match: Match, pattern: re.Pattern | str):
+    def set_match_msg(self, match: Match, pattern: re.Pattern | str, line_context: str):
         log_msg = (
             f"'{self.name}' string matched to pattern '{pattern}' on line {match.lineno} "
-            + f"[{match.colno}:{match.colend}]: \"{match.line_part.strip()}\" (\"{match.line.strip()}\")"
+            + f"[{match.colno}:{match.colend}]: \"{line_context.strip()}\" (\"{match.line.strip()}\")"
         )
         match.msg = log_msg

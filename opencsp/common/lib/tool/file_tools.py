@@ -280,22 +280,14 @@ def binary_count_items_in_directory(input_dir: str, name_pattern: str, start=1) 
     return curr_val - start + 1
 
 
-def file_size(input_dir_body_ext):
+def file_size(input_dir_body_ext, error_if_exists_as_dir=True):
     """
     Returns the size of the given file in bytes.
     """
-    # TODO RCB: TTHIS IS INEFFICIENT, BECAUSE IT ANALYZES AN ENTIRE DIRECTORY.  MAKE MORE DIRECT USING os.stat() OR SOMETHING.
-    input_dir, input_body, input_ext = path_components(input_dir_body_ext)
-    input_body_ext = input_body + input_ext
-    file_size_pair_list = files_in_directory_with_associated_sizes(input_dir)
-    for file_size_pair in file_size_pair_list:
-        if file_size_pair_name(file_size_pair) == input_body_ext:
-            return file_size_pair_size(file_size_pair)
-    # We fell through the loop, so the file was not found.
-    lt.error_and_raise(
-        'ERROR: In file_size(), input_dir_body_ext was not found.\n\tinput_dir_body_ext ='
-        + input_dir_body_ext
-    )
+    if not file_exists(input_dir_body_ext, error_if_exists_as_dir):
+        lt.error_and_raise(FileNotFoundError, 'ERROR: In file_size(), input_dir_body_ext ' +
+                           'was not found.\n\tinput_dir_body_ext =' + input_dir_body_ext)
+    return os.path.getsize(input_dir_body_ext)
 
 
 def file_size_pair_name(file_size_pair) -> str:
@@ -349,7 +341,14 @@ def files_in_directory(input_dir, sort=True, files_only=False, recursive=False):
         # Walk the directory and all subdirectories and assemble a list of files.
         norm_input_dir = norm_path(input_dir)
         for root, dirnames, file_names_exts in os.walk(norm_input_dir):
-            relative_path: str = root.replace(norm_input_dir, "").lstrip("./\\")
+            # remove the front of the path, in order to get the path relative to the input_dir
+            relative_path: str = root.replace(norm_input_dir, "")
+            # don't include any leading ./
+            if relative_path.startswith("./") or relative_path.startswith(".\\"):
+                relative_path = relative_path[2:]
+            # don't include any leading /
+            relative_path = relative_path.lstrip("\\/")
+
             scanned_files += [
                 os.path.join(relative_path, file_name_ext)
                 for file_name_ext in file_names_exts
@@ -1087,28 +1086,45 @@ def convert_shortcuts_to_symlinks(dirname: str):
 
 # TEXT FILES
 
+def write_text_file(description: str,
+                    output_dir: str,
+                    output_file_body: str,
+                    output_string_list: list[any],
+                    error_if_dir_not_exist=True) -> str:
+    """ Writes a strings to a ".txt" file, with each string on a new line.
 
-def write_text_file(
-    description,  # Explanatory string to include in notification output.  None to skip.
-    output_dir,  # Directory to write file.  See below if not exist.
-    output_file_body,  # Body of output filename; Automatically appends the ".txt" extension.
-    output_string_list,  # List of strings to write, one per line.
-    error_if_dir_not_exist=True,
-):  # If True, error if not exist.  If False, create dir if necessary.
-    """
-    Writes a strings to a ".txt" file, with each string on a new line.
+    Parameters
+    ----------
+    description : str
+        Explanatory string to include in notification output.  None to skip.
+    output_dir : str
+        Which directory to write the file to.  See below if not exist.
+    output_file_body : str
+        Name of the file without an extension. A standard ".txt" extension will
+        be automatically appended.
+    output_string_list : list
+        List of values to write to the file, one per line. Newlines "\\n" will
+        be automatically appended to each line.
+    error_if_dir_not_exist : bool, optional
+        If True and output_dir doesn't exists, raise an error. If False, create
+        output_dir as necessary. By default True.
+
+    Returns
+    -------
+    output_dir_body_ext : str
+        The "path/name.ext" of the newly created file.
     """
     # Check status of output_dir.
     if os.path.isfile(output_dir):
         lt.error_and_raise(
-            RuntimeError,
+            FileExistsError,
             'ERROR: In write_text_file(), requested output path exists and is a file: '
             + str(output_dir),
         )
     if error_if_dir_not_exist == True:
         if not directory_exists(output_dir):
             lt.error_and_raise(
-                RuntimeError,
+                FileNotFoundError,
                 'ERROR: In write_text_file(), requested output directory does not exist: '
                 + str(output_dir),
             )
@@ -1119,13 +1135,12 @@ def write_text_file(
     output_dir_body_ext = os.path.join(output_dir, output_body_ext)
     if description != None:
         print('Saving ' + description + ': ', output_dir_body_ext)
-    output_stream = open(output_dir_body_ext, 'w')
-    # Write strings.
-    for output_str in output_string_list:
-        output_stream.write(
-            str(output_str) + '\n'
-        )  # Call str, just in case somebody passes in a list of ints, etc.
-    output_stream.close()
+    with open(output_dir_body_ext, 'w') as output_stream:
+        # Write strings.
+        for output_str in output_string_list:
+            output_stream.write(
+                str(output_str) + '\n'
+            )  # Call str, just in case somebody passes in a list of ints, etc.
     # Return.
     return output_dir_body_ext
 
