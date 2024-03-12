@@ -1,5 +1,7 @@
 """Example script that performs dot location calibration using photogrammetry.
 
+To create new test data, copy the results from the output folder into the
+"calculations" folder.
 """
 import os
 from os.path import join, dirname, exists
