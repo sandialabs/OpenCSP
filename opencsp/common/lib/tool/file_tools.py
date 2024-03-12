@@ -341,7 +341,14 @@ def files_in_directory(input_dir, sort=True, files_only=False, recursive=False):
         # Walk the directory and all subdirectories and assemble a list of files.
         norm_input_dir = norm_path(input_dir)
         for root, dirnames, file_names_exts in os.walk(norm_input_dir):
-            relative_path: str = root.replace(norm_input_dir, "").lstrip("./\\")
+            # remove the front of the path, in order to get the path relative to the input_dir
+            relative_path: str = root.replace(norm_input_dir, "")
+            # don't include any leading ./
+            if relative_path.startswith("./") or relative_path.startswith(".\\"):
+                relative_path = relative_path[2:]
+            # don't include any leading /
+            relative_path = relative_path.lstrip("\\/")
+
             scanned_files += [
                 os.path.join(relative_path, file_name_ext)
                 for file_name_ext in file_names_exts

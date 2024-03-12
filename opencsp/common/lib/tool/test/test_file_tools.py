@@ -11,38 +11,33 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 
 class TestFileTools(unittest.TestCase):
     def setUp(self) -> None:
-        self.data_dir = os.path.join(
-            orp.opencsp_code_dir(),
-            'common',
-            'lib',
-            'tool',
-            'test',
-            'data',
-            'input',
-            'file_tools',
-        )
-        self.out_dir = os.path.join(
-            orp.opencsp_code_dir(),
-            'common',
-            'lib',
-            'tool',
-            'test',
-            'data',
-            'output',
-            'file_tools',
-        )
+        path, _, _ = ft.path_components(__file__)
+        self.data_dir = os.path.join(path, "data", "input", "file_tools")
+        self.out_dir = os.path.join(path, "data", "output", "file_tools")
 
     def tearDown(self) -> None:
         pass
 
     def test_files_in_directory(self):
         files_name_ext = ft.files_in_directory(self.data_dir)
-        expected = ["a.a", "b.b", "d"]
+        expected = [".dotfile", "a.a", "b.b", "d"]
         self.assertListEqual(expected, files_name_ext)
 
     def test_files_in_directory_files_only(self):
         files_name_ext = ft.files_in_directory(self.data_dir, files_only=True)
-        expected = ["a.a", "b.b"]
+        expected = [".dotfile", "a.a", "b.b"]
+        self.assertListEqual(expected, files_name_ext)
+
+    def test_files_in_directory_recursive(self):
+        files_name_ext = ft.files_in_directory(self.data_dir, recursive=True)
+        files_name_ext = [f.replace("\\", "/") for f in files_name_ext]
+        expected = [".dotfile", "a.a", "b.b", "d", "d/c.c", "d/e", "d/e/f.f"]
+        self.assertListEqual(expected, files_name_ext)
+
+    def test_files_in_directory_recursive_files_only(self):
+        files_name_ext = ft.files_in_directory(self.data_dir, recursive=True, files_only=True)
+        files_name_ext = [f.replace("\\", "/") for f in files_name_ext]
+        expected = [".dotfile", "a.a", "b.b", "d/c.c", "d/e/f.f"]
         self.assertListEqual(expected, files_name_ext)
 
     def test_files_in_directory_by_extension(self):
