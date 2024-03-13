@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
 )
-from opencsp.app.sofast.lib.GeometryDataDebug import GeometryDataDebug
+from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
@@ -28,7 +28,7 @@ class ParamsSofastFringe:
     slope_solver_data_debug: SlopeSolverDataDebug = field(
         default_factory=SlopeSolverDataDebug
     )
-    geometry_data_debug: GeometryDataDebug = field(default_factory=GeometryDataDebug)
+    geometry_data_debug: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsSofastFringe/...

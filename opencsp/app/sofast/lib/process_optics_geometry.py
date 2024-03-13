@@ -13,7 +13,7 @@ from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
 )
-from opencsp.app.sofast.lib.GeometryDataDebug import GeometryDataDebug
+from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 import opencsp.app.sofast.lib.spatial_processing as sp
@@ -31,7 +31,7 @@ def process_singlefacet_geometry(
     orientation: SpatialOrientation,
     camera: Camera,
     params: GeometryProcessingParams = GeometryProcessingParams(),
-    debug: GeometryDataDebug = GeometryDataDebug(),
+    debug: DebugOpticsGeometry = DebugOpticsGeometry(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
     cdc.CalculationImageProcessingGeneral,
@@ -57,8 +57,8 @@ def process_singlefacet_geometry(
         Camera object
     params : GeometryProcessingParams, optional
         GeometryProcessingParams object, by default GeometryProcessingParams()
-    debug : GeometryDataDebug, optional
-        GeometryDataDebug object, by default GeometryDataDebug()
+    debug : DebugOpticsGeometry, optional
+        DebugOpticsGeometry object, by default DebugOpticsGeometry()
 
     Returns
     -------
@@ -298,7 +298,7 @@ def process_undefined_geometry(
     optic_screen_dist: float,
     orientation: SpatialOrientation,
     camera: Camera,
-    debug: GeometryDataDebug = GeometryDataDebug(),
+    debug: DebugOpticsGeometry = DebugOpticsGeometry(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
     cdc.CalculationImageProcessingGeneral,
@@ -320,8 +320,8 @@ def process_undefined_geometry(
         SpatialOrientation object
     camera : Camera
         Camera object
-    debug : GeometryDataDebug, optional
-        GeometryDataDebug object, by default GeometryDataDebug()
+    debug : DebugOpticsGeometry, optional
+        DebugOpticsGeometry object, by default DebugOpticsGeometry()
 
     Returns
     -------
@@ -402,7 +402,7 @@ def process_multifacet_geometry(
     camera: Camera,
     optic_screen_dist: float,
     params: GeometryProcessingParams = GeometryProcessingParams(),
-    debug: GeometryDataDebug = GeometryDataDebug(),
+    debug: DebugOpticsGeometry = DebugOpticsGeometry(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
     cdc.CalculationImageProcessingGeneral,

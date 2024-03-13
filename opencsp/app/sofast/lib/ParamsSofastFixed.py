@@ -2,7 +2,7 @@
 from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
 )
-from opencsp.app.sofast.lib.GeometryDataDebug import GeometryDataDebug
+from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 
 
@@ -33,5 +33,5 @@ class ParamsSofastFixed:
         self.mask_keep_largest_area: bool = False
 
         self.slope_solver_data_debug: SlopeSolverDataDebug = SlopeSolverDataDebug()
-        self.geometry_data_debug: GeometryDataDebug = GeometryDataDebug()
+        self.geometry_data_debug: DebugOpticsGeometry = DebugOpticsGeometry()
         self.geometry_params: GeometryProcessingParams = GeometryProcessingParams()
