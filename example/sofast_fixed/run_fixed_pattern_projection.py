@@ -17,7 +17,7 @@ def example_project_fixed_pattern():
     # Set pattern parameters
     file_image_projection = join(
         opencsp_code_dir(),
-        "test/data/sofast_measurements/general/Image_Projection_test.h5",
+        "test/data/measurements_sofast_fringe/general/Image_Projection_test.h5",
     )
     width_pattern = 3
     spacing_pattern = 6

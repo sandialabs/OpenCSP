@@ -15,7 +15,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 def test_SystemSofastFringe():
     # Get test data location
     base_dir = os.path.join(
-        opencsp_code_dir(), 'test/data/sofast_measurements'
+        opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
     )
 
     # Create fringe object
