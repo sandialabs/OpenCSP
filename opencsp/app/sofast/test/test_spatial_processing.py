@@ -175,3 +175,7 @@ class TestSpatialProcessing(unittest.TestCase):
         np.testing.assert_allclose(
             data['v_cam_optic_cam_refine_2'], v_cam_optic_cam_refine_2
         )
+
+
+if __name__ == '__main__':
+    unittest.main()
