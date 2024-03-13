@@ -1,12 +1,11 @@
-"""Example script that creates and saves a FixedPatternDotLocations flie and a SpaitalOrientation
+"""Example script that creates and saves a DotLocationsFixedPattern flie and a SpaitalOrientation
 file using a previously created Display object. This is only when displaying a fixed dot pattern
 on a screen.
 """
 import os
 from os.path import join, dirname, exists
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import \
-    FixedPatternDotLocations
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import \
     FixedPatternScreenProjection
 from opencsp.common.lib.deflectometry.Display import Display
@@ -16,7 +15,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 def example_calculate_dot_locs_from_display():
-    """Creates a FixedPatternDotLocations object from a previously created Display object"""
+    """Creates a DotLocationsFixedPattern object from a previously created Display object"""
     dir_base = join(
         opencsp_code_dir(),
         '../../sample_data/deflectometry/sandia_lab/calibration_files',
@@ -44,7 +43,7 @@ def example_calculate_dot_locs_from_display():
     projection = FixedPatternScreenProjection(
         im_proj_params['size_x'], im_proj_params['size_y'], width_dot, spacing_dot
     )
-    fixed_pattern_dot_locs = FixedPatternDotLocations.from_projection_and_display(
+    fixed_pattern_dot_locs = DotLocationsFixedPattern.from_projection_and_display(
         projection, display
     )
 

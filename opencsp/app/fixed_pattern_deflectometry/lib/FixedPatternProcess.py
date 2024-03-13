@@ -6,9 +6,7 @@ import cv2 as cv
 import numpy as np
 from numpy import ndarray
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
-    FixedPatternDotLocations,
-)
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
     FixedPatternMeasurement,
 )
@@ -36,7 +34,7 @@ class FixedPatternProcess:
         self,
         orientation: SpatialOrientation,
         camera: Camera,
-        fixed_pattern_dot_locs: FixedPatternDotLocations,
+        fixed_pattern_dot_locs: DotLocationsFixedPattern,
         facet_data: FacetData,
     ) -> 'FixedPatternProcess':
         """Instantiates class
@@ -47,7 +45,7 @@ class FixedPatternProcess:
             SpatialOrientation object
         camera : Camera
             Camera object
-        fixed_pattern_dot_locs : FixedPatternDotLocations
+        fixed_pattern_dot_locs : DotLocationsFixedPattern
             Image projection dictionary
         facet_data : FacetData
             FacetData object
