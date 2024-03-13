@@ -10,8 +10,7 @@ import matplotlib
 import numpy as np
 import pytest
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import \
-    FixedPatternDotLocations
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import \
     FixedPatternSetupCalibrate
 from opencsp.common.lib.camera.Camera import Camera
@@ -60,7 +59,7 @@ def test_FixedPatternSetupCalibrate():
     ids_corners = data[:, 1]
 
     # Load expedted FPD dot locations
-    dot_locs_exp = FixedPatternDotLocations.load_from_hdf(file_fpd_dot_locs_exp)
+    dot_locs_exp = DotLocationsFixedPattern.load_from_hdf(file_fpd_dot_locs_exp)
 
     # Load cameras
     camera_marker = Camera.load_from_hdf(file_camera_marker)
