@@ -1,7 +1,7 @@
 """Class holding debug information for proces_optics_geometry calculations"""
 
 
-class GeometryDataDebug:
+class DebugOpticsGeometry:
     """Class for holding debug data for used in 'process_optics_geometry"""
 
     def __init__(self):
