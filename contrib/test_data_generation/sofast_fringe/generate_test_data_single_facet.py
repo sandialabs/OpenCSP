@@ -83,7 +83,7 @@ def generate_dataset(
 
 if __name__ == '__main__':
     # Generate measurement set 1 data
-    base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+    base_dir = join(opencsp_code_dir(), 'test/data/sofast_measurements')
 
     # Nominal
     generate_dataset(
