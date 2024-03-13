@@ -27,3 +27,4 @@ ENV PYTHONPATH=/code
 
 COPY requirements.txt /code/
 RUN python3 -m pip install -r requirements.txt
+ENV PATH=$HOME/.local/bin:$PATH

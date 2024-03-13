@@ -22,7 +22,7 @@ env:
   UBI8_IMAGE: "ghcr.io/e10harvey/opencsp:${{ github.ref_name }}-ubi8"
 
 jobs:
-  # This pushes the image to GitHub Packages.
+  # TODO: Move this to merge to main and update via requirements.txt only in ubi8-ci.
   ubi8-image:
     runs-on: ubuntu-latest
     permissions:
@@ -57,4 +57,4 @@ jobs:
 
       - name: pytest-cov
         working-directory: OpenCSP/opencsp
-        run: pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
+        run: echo $PATH && pwd && ls -lat && pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
