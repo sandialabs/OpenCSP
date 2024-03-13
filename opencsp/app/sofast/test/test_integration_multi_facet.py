@@ -10,7 +10,7 @@ from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScali
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.geometry.Vxyz import Vxyz
