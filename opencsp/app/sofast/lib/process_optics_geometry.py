@@ -13,7 +13,7 @@ from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
 )
-from opencsp.app.sofast.lib.GeometryDataDebug import GeometryDataDebug
+from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 import opencsp.app.sofast.lib.spatial_processing as sp
@@ -30,7 +30,7 @@ def process_singlefacet_geometry(
     optic_screen_dist: float,
     orientation: SpatialOrientation,
     camera: Camera,
-    params: ParamsOpticGeometry = ParamsOpticGeometry(),
+    params: GeometryProcessingParams = GeometryProcessingParams(),
     debug: DebugOpticsGeometry = DebugOpticsGeometry(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
@@ -55,8 +55,8 @@ def process_singlefacet_geometry(
         SpatialOrientation object
     camera : Camera
         Camera object
-    params : ParamsOpticGeometry, optional
-        ParamsOpticGeometry object, by default ParamsOpticGeometry()
+    params : GeometryProcessingParams, optional
+        GeometryProcessingParams object, by default GeometryProcessingParams()
     debug : DebugOpticsGeometry, optional
         DebugOpticsGeometry object, by default DebugOpticsGeometry()
 
@@ -401,7 +401,7 @@ def process_multifacet_geometry(
     orientation: SpatialOrientation,
     camera: Camera,
     optic_screen_dist: float,
-    params: ParamsOpticGeometry = ParamsOpticGeometry(),
+    params: GeometryProcessingParams = GeometryProcessingParams(),
     debug: DebugOpticsGeometry = DebugOpticsGeometry(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
