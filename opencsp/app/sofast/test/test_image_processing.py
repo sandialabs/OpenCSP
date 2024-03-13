@@ -43,7 +43,7 @@ class TestImageProcessing(unittest.TestCase):
         """Tests image_processing.calc_mask_raw()"""
 
         # Load test data
-        datasets = ['Measurement/mask_images']
+        datasets = ['MeasurementSofastFringe/mask_images']
         data = load_hdf5_datasets(datasets, self.data_file_measurement_facet)
 
         # Perform calculation
@@ -239,3 +239,7 @@ class TestImageProcessing(unittest.TestCase):
         np.testing.assert_allclose(
             data['u_pixel_pointing_facet'], u_pixel_pointing_optic
         )
+
+
+if __name__ == '__main__':
+    unittest.main()
