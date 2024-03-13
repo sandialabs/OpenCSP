@@ -9,7 +9,7 @@ import sys
 import matplotlib.pyplot as plt
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 sys.path.append(join(opencsp_code_dir(), '..'))

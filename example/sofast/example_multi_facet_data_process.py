@@ -9,7 +9,7 @@ from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as So
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation

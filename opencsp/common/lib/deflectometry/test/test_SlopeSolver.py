@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
