@@ -3,10 +3,10 @@
 from dataclasses import dataclass, field
 
 
-from opencsp.app.sofast.lib.ParamsOpticGeometry import (
-    ParamsOpticGeometry,
+from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
+    GeometryProcessingParams,
 )
-from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
+from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
@@ -20,15 +20,15 @@ class ParamsSofastFringe:
     mask_filt_thresh: int = 4
     mask_thresh_active_pixels: float = 0.05
     mask_keep_largest_area: bool = False
-    geometry_params: ParamsOpticGeometry = field(
-        default_factory=ParamsOpticGeometry
+    geometry_params: GeometryProcessingParams = field(
+        default_factory=GeometryProcessingParams
     )
 
     # Debug objects
     slope_solver_data_debug: SlopeSolverDataDebug = field(
         default_factory=SlopeSolverDataDebug
     )
-    geometry_data_debug: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
+    geometry_data_debug: GeometryDataDebug = field(default_factory=GeometryDataDebug)
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsSofastFringe/...
