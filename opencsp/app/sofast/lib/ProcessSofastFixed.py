@@ -11,10 +11,10 @@ from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.ParamsSofastFixed import ParamsSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
-from opencsp.app.sofast.lib.BlobIndex import BlobIndex
-import opencsp.app.sofast.lib.calculation_data_classes as cdc
-from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
-import opencsp.app.sofast.lib.image_processing as ip
+from opencsp.common.lib.deflectometry.BlobIndex import BlobIndex
+import opencsp.common.lib.deflectometry.calculation_data_classes as cdc
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+import opencsp.common.lib.deflectometry.image_processing as ip
 import opencsp.app.sofast.lib.process_optics_geometry as pr
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
