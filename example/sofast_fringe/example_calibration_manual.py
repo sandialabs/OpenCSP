@@ -14,7 +14,7 @@ from opencsp.app.sofast.lib.CalibrateDisplayShape import (
     DataInput,
 )
 from opencsp.app.sofast.lib.save_DisplayShape_file import (
-    save_physical_setup_file,
+    save_DisplayShape_file,
 )
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
@@ -142,7 +142,7 @@ def example_driver():
     NAME = 'Example physical setup file'
     screen_distortion_data = cal_screen_shape.get_data()
     rvec, tvec = cal_camera_pose.get_data()
-    save_physical_setup_file(screen_distortion_data, NAME, rvec, tvec, file_save)
+    save_DisplayShape_file(screen_distortion_data, NAME, rvec, tvec, file_save)
 
 
 if __name__ == '__main__':

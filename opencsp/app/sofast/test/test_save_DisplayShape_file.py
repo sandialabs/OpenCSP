@@ -3,7 +3,7 @@ from os.path import join
 import numpy as np
 
 from opencsp.app.sofast.lib.save_DisplayShape_file import (
-    save_physical_setup_file,
+    save_DisplayShape_file,
 )
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 from opencsp.common.lib.geometry.Vxy import Vxy
@@ -40,7 +40,7 @@ def test_save_physical_setup_file():
     tvec = data_cam[1]
 
     # Save physical setup file
-    save_physical_setup_file(screen_distortion_data, name, rvec, tvec, file_save)
+    save_DisplayShape_file(screen_distortion_data, name, rvec, tvec, file_save)
 
 
 if __name__ == '__main__':
