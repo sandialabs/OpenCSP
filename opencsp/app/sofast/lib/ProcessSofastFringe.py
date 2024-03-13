@@ -7,7 +7,7 @@ import warnings
 import numpy as np
 
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.SofastParams import SofastParams
+from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
@@ -181,7 +181,7 @@ class ProcessSofastFringe:
         )
 
         # Define default calculation parameters
-        self.params = SofastParams()
+        self.params = ParamsSofastFringe()
 
         # Instantiate data containers
         self.num_facets: int = 0
