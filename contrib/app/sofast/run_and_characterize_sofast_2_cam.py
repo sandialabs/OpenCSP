@@ -12,7 +12,7 @@ import os
 import numpy as np
 
 from opencsp.app.sofast.lib.Display import Display
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast

@@ -11,7 +11,7 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.app.sofast.lib.Display import Display
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets

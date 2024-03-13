@@ -6,7 +6,7 @@ from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPat
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
@@ -26,7 +26,7 @@ def process(
     """Performs fixed pattern deflectometry processing"""
     # Load data
     camera = Camera.load_from_hdf(file_camera)
-    facet_data = FacetData.load_from_json(file_facet)
+    facet_data = DefinitionFacet.load_from_json(file_facet)
     fixed_pattern_dot_locs = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
     orientation = SpatialOrientation.load_from_hdf(file_ori)
     measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
