@@ -10,7 +10,7 @@ from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.app.sofast.lib.Display import Display
-from opencsp.app.sofast.lib.EnsembleData import EnsembleData
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
