@@ -1,13 +1,14 @@
 name: github-UBI8
 
 on:
-  pull_request:
-    paths-ignore:
-    - '**/*.rst'
-    - '**/*.md'
-    - '**/requirements.txt'
-    - 'doc/**'
-    types: [ opened, reopened, synchronize ]
+  push
+  #pull_request:
+  #  paths-ignore:
+  #  - '**/*.rst'
+  #  - '**/*.md'
+  #  - '**/requirements.txt'
+  #  - 'doc/**'
+  #  types: [ opened, reopened, synchronize ]
 
 permissions:
   contents: none
@@ -18,11 +19,11 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  UBI8_IMAGE: ghcr.io/sandialabs/OpenCSP:${github.ref_name}-ubi8
+  UBI8_IMAGE: "ghcr.io/e10harvey/opencsp:${{ github.ref_name }}-ubi8"
 
 jobs:
   # This pushes the image to GitHub Packages.
-  docker-image:
+  ubi8-image:
     runs-on: ubuntu-latest
     permissions:
       packages: write
@@ -31,7 +32,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build image
-        run: docker build . --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
+        run:   echo UBI8_IMAGE=$UBI8_IMAGE && docker build . --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
@@ -42,7 +43,7 @@ jobs:
           docker push $UBI8_IMAGE
 
   ubi8-ci:
-    needs: docker-image
+    needs: ubi8-image
     name: ubi8-ci
     runs-on: [ubuntu-latest]
     container:
