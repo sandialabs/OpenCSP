@@ -10,7 +10,7 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.Display import Display
 from opencsp.app.sofast.lib.EnsembleData import EnsembleData
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
@@ -35,7 +35,7 @@ def generate_dataset(
     measurement = Measurement.load_from_hdf(file_measurement)
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
     ensemble_data = EnsembleData.load_from_json(file_ensemble)
-    facet_data = [FacetData.load_from_json(file_facet)] * ensemble_data.num_facets
+    facet_data = [DefinitionFacet.load_from_json(file_facet)] * ensemble_data.num_facets
 
     # Calibrate fringes
     measurement.calibrate_fringe_images(calibration)

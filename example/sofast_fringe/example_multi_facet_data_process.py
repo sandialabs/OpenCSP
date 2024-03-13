@@ -11,7 +11,7 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.app.sofast.lib.Display import Display
 from opencsp.app.sofast.lib.EnsembleData import EnsembleData
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
@@ -56,7 +56,7 @@ def example_driver():
     ensemble_data = EnsembleData.load_from_json(file_ensemble)
 
     # Define facet data
-    facet_data = [FacetData.load_from_json(file_facet)] * ensemble_data.num_facets
+    facet_data = [DefinitionFacet.load_from_json(file_facet)] * ensemble_data.num_facets
 
     # Define surface data (plano)
     # surface_data = [dict(surface_type='plano', robust_least_squares=False, downsample=20)] * ensemble_data.num_facets

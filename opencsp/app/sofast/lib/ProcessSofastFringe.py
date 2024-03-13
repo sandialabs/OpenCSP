@@ -15,7 +15,7 @@ from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.app.sofast.lib.Display import Display
 from opencsp.app.sofast.lib.EnsembleData import EnsembleData
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 import opencsp.app.sofast.lib.image_processing as ip
 import opencsp.app.sofast.lib.process_optics_geometry as po
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
@@ -186,7 +186,7 @@ class ProcessSofastFringe:
         # Instantiate data containers
         self.num_facets: int = 0
         self.optic_type: Literal['undefined', 'single', 'multi'] = None
-        self.data_facet_def: list[FacetData] = None
+        self.data_facet_def: list[DefinitionFacet] = None
         self.data_ensemble_def: EnsembleData = None
 
         self.data_surface_params: list[dict] = None
@@ -260,7 +260,7 @@ class ProcessSofastFringe:
         self._solve_slopes([surface_data])
 
     def process_optic_singlefacet(
-        self, facet_data: FacetData, surface_data: dict
+        self, facet_data: DefinitionFacet, surface_data: dict
     ) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
@@ -268,7 +268,7 @@ class ProcessSofastFringe:
 
         Parameters
         ----------
-        facet_data : FacetData
+        facet_data : DefinitionFacet
             Facet data object.
         surface_data : dict
             See Sofast documentation or Sofast.help() for more details.
@@ -288,7 +288,7 @@ class ProcessSofastFringe:
 
     def process_optic_multifacet(
         self,
-        facet_data: list[FacetData],
+        facet_data: list[DefinitionFacet],
         ensemble_data: EnsembleData,
         surface_data: list[dict],
     ) -> None:
@@ -298,7 +298,7 @@ class ProcessSofastFringe:
 
         Parameters
         ----------
-        facet_data : list[FacetData]
+        facet_data : list[DefinitionFacet]
             List of facet data objects.
         ensemble_data : EnsembleData
             Ensemble data object.
@@ -363,13 +363,13 @@ class ProcessSofastFringe:
         self.data_facet_def = None
         self.data_ensemble_def = None
 
-    def _process_optic_singlefacet_geometry(self, facet_data: FacetData) -> None:
+    def _process_optic_singlefacet_geometry(self, facet_data: DefinitionFacet) -> None:
         """
         Processes optic geometry for single facet.
 
         Parameters
         ----------
-        facet_data : FacetData
+        facet_data : DefinitionFacet
             Facet data object.
 
         """
@@ -418,15 +418,15 @@ class ProcessSofastFringe:
         self.data_ensemble_def = None
 
     def _process_optic_multifacet_geometry(
-        self, facet_data: list[FacetData], ensemble_data: EnsembleData
+        self, facet_data: list[DefinitionFacet], ensemble_data: EnsembleData
     ) -> None:
         """
         Processes optic geometry for an ensemble of facets.
 
         Parameters
         ----------
-        facet_data : list[FacetData]
-            List of FacetData objects.
+        facet_data : list[DefinitionFacet]
+            List of DefinitionFacet objects.
         ensemble_data : EnsembleData
             Ensemble data object.
 

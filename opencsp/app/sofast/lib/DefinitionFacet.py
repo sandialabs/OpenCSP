@@ -6,7 +6,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool import hdf5_tools
 
 
-class FacetData:
+class DefinitionFacet:
     """Single facet optic definition for Sofast"""
 
     def __init__(self, v_facet_corners: Vxyz, v_facet_centroid: Vxyz):
@@ -25,12 +25,12 @@ class FacetData:
         self.v_facet_corners = v_facet_corners
         self.v_facet_centroid = v_facet_centroid
 
-    def copy(self) -> 'FacetData':
+    def copy(self) -> 'DefinitionFacet':
         """Returns copy of class"""
-        return FacetData(self.v_facet_corners.copy(), self.v_facet_centroid.copy())
+        return DefinitionFacet(self.v_facet_corners.copy(), self.v_facet_centroid.copy())
 
     @classmethod
-    def load_from_json(cls, file: str) -> 'FacetData':
+    def load_from_json(cls, file: str) -> 'DefinitionFacet':
         """
         Loads facet definition data from JSON file.
 
@@ -72,7 +72,7 @@ class FacetData:
             json.dump(data_dict, f, indent=3)
 
     def save_to_hdf(self, file: str, prefix: str = '') -> None:
-        """Saves data to given HDF5 file. Data is stored in PREFIX + FacetDefinition/...
+        """Saves data to given HDF5 file. Data is stored in PREFIX + DefinitionFacet/...
 
         Parameters
         ----------
@@ -86,14 +86,14 @@ class FacetData:
             self.v_facet_centroid.data,
         ]
         datasets = [
-            prefix + 'FacetDefinition/v_facet_corners',
-            prefix + 'FacetDefinition/v_facet_centroid',
+            prefix + 'DefinitionFacet/v_facet_corners',
+            prefix + 'DefinitionFacet/v_facet_centroid',
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str) -> 'FacetData':
-        """Loads FacetData object from given file.  Data is stored in PREFIX + FacetDefinition/...
+    def load_from_hdf(cls, file: str, prefix: str) -> 'DefinitionFacet':
+        """Loads DefinitionFacet object from given file.  Data is stored in PREFIX + DefinitionFacet/...
 
         Parameters
         ----------
@@ -103,8 +103,8 @@ class FacetData:
             Prefix appended to folder path within HDF file (folders must be separated by "/")
         """
         datasets = [
-            prefix + 'FacetDefinition/v_facet_corners',
-            prefix + 'FacetDefinition/v_facet_centroid',
+            prefix + 'DefinitionFacet/v_facet_corners',
+            prefix + 'DefinitionFacet/v_facet_centroid',
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         v_facet_corners = Vxyz(data['v_facet_corners'])

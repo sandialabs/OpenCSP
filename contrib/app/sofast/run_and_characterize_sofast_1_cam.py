@@ -12,7 +12,7 @@ import os
 import numpy as np
 
 from opencsp.app.sofast.lib.Display import Display
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
@@ -43,7 +43,7 @@ def main():
     # Load data
     camera = Camera.load_from_hdf(file_camera)
     display = Display.load_from_hdf(file_display)
-    facet_data = FacetData.load_from_json(file_facet)
+    facet_data = DefinitionFacet.load_from_json(file_facet)
 
     # Define surface fitting parameters
     surface_data = dict(
