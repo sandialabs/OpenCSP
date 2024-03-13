@@ -4,9 +4,7 @@ from os.path import join, dirname
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcess import (
-    FixedPatternProcess,
-)
+from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
@@ -24,7 +22,7 @@ def process(
     file_meas: str,
     save_dir: str,
     surface_data: dict,
-) -> FixedPatternProcess:
+) -> ProcessSofastFixed:
     """Performs fixed pattern deflectometry processing"""
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -34,7 +32,7 @@ def process(
     measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
 
     # Instantiate class
-    fixed_pattern = FixedPatternProcess(
+    fixed_pattern = ProcessSofastFixed(
         orientation, camera, fixed_pattern_dot_locs, facet_data
     )
     fixed_pattern.load_measurement_data(measurement)
