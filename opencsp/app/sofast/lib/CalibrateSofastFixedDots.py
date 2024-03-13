@@ -21,7 +21,7 @@ from opencsp.common.lib.photogrammetry.ImageMarker import ImageMarker
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class FixedPatternSetupCalibrate:
+class CalibrateSofastFixedDots:
     """Class to handle calibration of physical fixed pattern display dot locations
 
     Assumes the camera and screen are rotated about the y axis relative to each other. (ONLY the
@@ -60,7 +60,7 @@ class FixedPatternSetupCalibrate:
         x_max: int,
         y_min: int,
         y_max: int,
-    ) -> 'FixedPatternSetupCalibrate':
+    ) -> 'CalibrateSofastFixedDots':
         """Instantiates the calibration class
 
         Parameters
