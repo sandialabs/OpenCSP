@@ -71,5 +71,5 @@ if __name__ == '__main__':
             opencsp_code_dir(),
             '../../sample_data/sofast/data_photogrammetric_calibration/data_measurement',
         ),
-        dir_output=join(opencsp_code_dir, 'test/data/sofast_measurements'),
+        dir_output=join(opencsp_code_dir, 'test/data/measurements_sofast_fringe'),
     )

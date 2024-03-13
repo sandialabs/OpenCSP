@@ -23,7 +23,7 @@ class TestImageProcessing(unittest.TestCase):
     def setUpClass(cls):
         # Get test data location
         base_dir = os.path.join(
-            opencsp_code_dir(), 'test/data/sofast_measurements'
+            opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
         )
 
         # Define calculation data files
