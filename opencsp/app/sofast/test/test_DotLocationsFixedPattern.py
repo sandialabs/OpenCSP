@@ -3,9 +3,7 @@ import os
 import numpy as np
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
-    FixedPatternDotLocations,
-)
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
     FixedPatternScreenProjection,
 )

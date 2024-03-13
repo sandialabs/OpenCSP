@@ -11,7 +11,8 @@ import numpy as np
 import pytest
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.sofast.lib.CalibrateSofastFixedDots import CalibrateSofastFixedDots
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import \
+    FixedPatternSetupCalibrate
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz

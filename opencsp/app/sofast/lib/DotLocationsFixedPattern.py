@@ -60,9 +60,9 @@ class DotLocationsFixedPattern:
 
     @classmethod
     def from_projection_and_display(
-        cls, fixed_pattern_projection: SystemSofastFixed, display: Display
+        cls, fixed_pattern_projection: FixedPatternScreenProjection, display: Display
     ) -> 'DotLocationsFixedPattern':
-        """Instantiates a DotLocationsFixedPattern from a SystemSofastFixed object
+        """Instantiates a DotLocationsFixedPattern from a FixedPatternScreenProjection object
         and a display object. This is used as a convenience if a Display calibration has
         already been done for a screen setup."""
         # Calculate xy points in screen fractions

@@ -5,8 +5,7 @@ on a screen.
 import os
 from os.path import join, dirname, exists
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import \
-    FixedPatternDotLocations
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import \
     FixedPatternScreenProjection
 from opencsp.common.lib.deflectometry.Display import Display

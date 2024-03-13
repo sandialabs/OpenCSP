@@ -7,8 +7,12 @@ import numpy as np
 from numpy import ndarray
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
-from opencsp.app.sofast.lib.ParamsSofastFixed import ParamsSofastFixed
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
+    FixedPatternMeasurement,
+)
+from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcessParams import (
+    FixedPatternProcessParams,
+)
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.app.sofast.lib.BlobIndex import BlobIndex
@@ -31,8 +35,8 @@ class ProcessSofastFixed:
         orientation: SpatialOrientation,
         camera: Camera,
         fixed_pattern_dot_locs: DotLocationsFixedPattern,
-        facet_data: DefinitionFacet,
-    ) -> 'ProcessSofastFixed':
+        facet_data: FacetData,
+    ) -> 'FixedPatternProcess':
         """Instantiates class
 
         Parameters
