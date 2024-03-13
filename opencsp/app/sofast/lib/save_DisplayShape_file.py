@@ -8,7 +8,7 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-def save_physical_setup_file(
+def save_DisplayShape_file(
     screen_distortion_data: dict,
     name: str,
     rvec: ndarray,
