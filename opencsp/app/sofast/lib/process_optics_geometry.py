@@ -8,7 +8,7 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
-from opencsp.app.sofast.lib.EnsembleData import EnsembleData
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
@@ -395,7 +395,7 @@ def process_undefined_geometry(
 
 def process_multifacet_geometry(
     facet_data: DefinitionFacet,
-    ensemble_data: EnsembleData,
+    ensemble_data: DefinitionEnsemble,
     mask_raw: ndarray,
     v_meas_pt_ensemble: Vxyz,
     orientation: SpatialOrientation,
