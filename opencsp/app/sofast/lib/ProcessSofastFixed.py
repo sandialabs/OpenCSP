@@ -34,7 +34,7 @@ class ProcessSofastFixed:
         camera: Camera,
         fixed_pattern_dot_locs: DotLocationsFixedPattern,
         facet_data: FacetData,
-    ) -> 'FixedPatternProcess':
+    ) -> 'ProcessSofastFixed':
         """Instantiates class
 
         Parameters

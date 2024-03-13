@@ -4,9 +4,7 @@ from os.path import join, dirname
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcess import (
-    FixedPatternProcess,
-)
+from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
