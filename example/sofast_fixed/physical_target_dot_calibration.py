@@ -22,7 +22,7 @@ def example_perform_calibration():
     """Performs a dot-location calibration using photogrammetry"""
     # Define dot location images and origins
     base_dir = join(opencsp_code_dir(),
-                    'test/data/measurements_sofast_fixed/dot_location_calibration/measurements')
+                    'test/data/fixed_pattern_deflectometry/dot_location_calibration/measurements')
     files_cal_images = [
         join(base_dir, 'images/DSC03965.JPG'),
         join(base_dir, 'images/DSC03967.JPG'),
