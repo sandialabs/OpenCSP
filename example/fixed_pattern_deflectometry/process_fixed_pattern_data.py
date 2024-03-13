@@ -3,9 +3,7 @@
 from os.path import join, dirname
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
-    FixedPatternMeasurement,
-)
+from opencsp.app.sofast.lib.MeasurementFixedPattern import MeasurementFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcess import (
     FixedPatternProcess,
 )
@@ -33,7 +31,7 @@ def process(
     facet_data = FacetData.load_from_json(file_facet)
     fixed_pattern_dot_locs = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
     orientation = SpatialOrientation.load_from_hdf(file_ori)
-    measurement = FixedPatternMeasurement.load_from_hdf(file_meas)
+    measurement = MeasurementFixedPattern.load_from_hdf(file_meas)
 
     # Instantiate class
     fixed_pattern = FixedPatternProcess(
