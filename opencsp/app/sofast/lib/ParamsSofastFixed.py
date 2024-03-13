@@ -1,6 +1,6 @@
 """Parameters class for FixedPatternScreen class"""
-from opencsp.app.sofast.lib.GeometryProcessingParams import (
-    GeometryProcessingParams,
+from opencsp.app.sofast.lib.ParamsOpticGeometry import (
+    ParamsOpticGeometry,
 )
 from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
@@ -21,7 +21,7 @@ class ParamsSofastFixed:
             to perpendicular distance. Larger value equals narrower search region.
         mask_* : mask finding parameters
         *debug : debug objects
-        geometry_params : GeometryProcessingParams
+        geometry_params : ParamsOpticGeometry
             Parameters to use when processing geometry of facet
         """
         self.blob_search_thresh: float = 5.0
@@ -34,4 +34,4 @@ class ParamsSofastFixed:
 
         self.slope_solver_data_debug: SlopeSolverDataDebug = SlopeSolverDataDebug()
         self.geometry_data_debug: DebugOpticsGeometry = DebugOpticsGeometry()
-        self.geometry_params: GeometryProcessingParams = GeometryProcessingParams()
+        self.geometry_params: ParamsOpticGeometry = ParamsOpticGeometry()
