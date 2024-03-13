@@ -7,9 +7,7 @@ import numpy as np
 from numpy import ndarray
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
-    FixedPatternMeasurement,
-)
+from opencsp.app.sofast.lib.MeasurementFixedPattern import MeasurementFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcessParams import (
     FixedPatternProcessParams,
 )
@@ -57,7 +55,7 @@ class FixedPatternProcess:
         self.params = FixedPatternProcessParams()
 
         # Measurement data
-        self.measurement: FixedPatternMeasurement
+        self.measurement: MeasurementFixedPattern
 
         # Define blob detector
         self.blob_detector: cv.SimpleBlobDetector_Params = (
@@ -201,12 +199,12 @@ class FixedPatternProcess:
             'debug': self.params.slope_solver_data_debug,
         }
 
-    def load_measurement_data(self, measurement: FixedPatternMeasurement) -> None:
+    def load_measurement_data(self, measurement: MeasurementFixedPattern) -> None:
         """Saves measurement data in class
 
         Parameters
         ----------
-        measurement: FixedPatternMeasurement
+        measurement: MeasurementFixedPattern
             Fixed pattern measurement object
         """
         self.measurement = measurement
