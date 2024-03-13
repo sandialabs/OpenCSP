@@ -1,9 +1,7 @@
 import numpy as np
 from numpy import ndarray
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
-    FixedPatternScreenProjection,
-)
+from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -62,9 +60,9 @@ class DotLocationsFixedPattern:
 
     @classmethod
     def from_projection_and_display(
-        cls, fixed_pattern_projection: FixedPatternScreenProjection, display: Display
+        cls, fixed_pattern_projection: SystemSofastFixed, display: Display
     ) -> 'DotLocationsFixedPattern':
-        """Instantiates a DotLocationsFixedPattern from a FixedPatternScreenProjection object
+        """Instantiates a DotLocationsFixedPattern from a SystemSofastFixed object
         and a display object. This is used as a convenience if a Display calibration has
         already been done for a screen setup."""
         # Calculate xy points in screen fractions
