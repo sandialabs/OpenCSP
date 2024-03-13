@@ -9,7 +9,7 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
+from opencsp.app.sofast.lib.SofastParams import SofastParams
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.common.lib.geometry.LoopXY import LoopXY

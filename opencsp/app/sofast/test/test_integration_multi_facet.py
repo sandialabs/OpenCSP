@@ -7,7 +7,7 @@ from scipy.spatial.transform import Rotation
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.Sofast import Sofast
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.Display import Display

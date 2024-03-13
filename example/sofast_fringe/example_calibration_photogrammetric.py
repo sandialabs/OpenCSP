@@ -7,7 +7,7 @@ import numpy as np
 from numpy import ndarray
 
 from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
     CalibrationCameraPosition,
 )
