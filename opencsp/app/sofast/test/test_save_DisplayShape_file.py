@@ -2,7 +2,7 @@ from os.path import join
 
 import numpy as np
 
-from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
+from opencsp.app.sofast.lib.save_DisplayShape_file import (
     save_physical_setup_file,
 )
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets

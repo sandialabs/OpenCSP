@@ -11,12 +11,12 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
     CalibrationCameraPosition,
 )
-from opencsp.app.sofast.calibration.lib.CalibrateDisplayShape import (
+from opencsp.app.sofast.lib.CalibrateDisplayShape import (
     CalibrateDisplayShape,
     DataInput,
 )
 from opencsp.app.sofast.lib.save_DisplayShape_file import (
-    save_DisplayShape_file,
+    save_physical_setup_file,
 )
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
