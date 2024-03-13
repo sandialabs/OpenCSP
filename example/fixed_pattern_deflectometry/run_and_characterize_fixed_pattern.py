@@ -18,7 +18,7 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 

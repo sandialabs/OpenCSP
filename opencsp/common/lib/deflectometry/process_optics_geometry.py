@@ -15,7 +15,7 @@ from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
 )
 from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
 import opencsp.common.lib.deflectometry.image_processing as ip
-from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 import opencsp.common.lib.deflectometry.spatial_processing as sp
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz

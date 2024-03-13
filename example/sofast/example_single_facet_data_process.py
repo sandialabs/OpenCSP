@@ -11,7 +11,7 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.FacetData import FacetData
-from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
