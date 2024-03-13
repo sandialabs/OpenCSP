@@ -5,7 +5,7 @@ import numpy as np
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
-from opencsp.app.sofast.lib.Display import Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.common.lib.geometry.Vxy import Vxy
 
 
