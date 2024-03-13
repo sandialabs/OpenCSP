@@ -11,7 +11,7 @@ from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as So
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.app.sofast.lib.Display import Display
-from opencsp.app.sofast.lib.EnsembleData import EnsembleData
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
@@ -98,7 +98,7 @@ class TestMulti(unittest.TestCase):
             'DataSofastInput/optic_definition/ensemble/v_facet_locations',
         ]
         ensemble_data = load_hdf5_datasets(datasets, file_dataset)
-        ensemble_data = EnsembleData(
+        ensemble_data = DefinitionEnsemble(
             Vxyz(ensemble_data['v_facet_locations']),
             [Rotation.from_rotvec(r) for r in ensemble_data['r_facet_ensemble']],
             ensemble_data['ensemble_perimeter'],
