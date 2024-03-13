@@ -8,8 +8,8 @@ import numpy as np
 import pytest
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
-    CalibrationScreenShape,
+from opencsp.app.sofast.calibration.lib.CalibrateDisplayShape import (
+    CalibrateDisplayShape,
     DataInput,
 )
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
@@ -22,7 +22,7 @@ from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 class TestCalibrationScreenShape(unittest.TestCase):
     @classmethod
     def setUpClass(cls, dir_input: str = None, dir_output: str = None):
-        """Tests the CalibrationScreenShape process. If directories are None,
+        """Tests the CalibrateDisplayShape process. If directories are None,
         uses default test data directory. All input files listed below must be
         on the dir_input path.
 
@@ -92,7 +92,7 @@ class TestCalibrationScreenShape(unittest.TestCase):
         )
 
         # Perform screen position calibration
-        cal_screen_position = CalibrationScreenShape(data_input)
+        cal_screen_position = CalibrateDisplayShape(data_input)
         cal_screen_position.run_calibration(verbose)
 
         # Get distortion data

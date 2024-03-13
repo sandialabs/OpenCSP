@@ -9,8 +9,8 @@ from numpy import ndarray
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
     CalibrationCameraPosition,
 )
-from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
-    CalibrationScreenShape,
+from opencsp.app.sofast.calibration.lib.CalibrateDisplayShape import (
+    CalibrateDisplayShape,
     DataInput,
 )
 from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
@@ -26,7 +26,7 @@ from opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscal
 
 def run_screen_shape_cal(
     pts_marker_data: ndarray, dir_input: str, verbose: int
-) -> CalibrationScreenShape:
+) -> CalibrateDisplayShape:
     """Runs screen shape calibration
 
     Parameters:
@@ -65,7 +65,7 @@ def run_screen_shape_cal(
     )
 
     # Perform screen position calibration
-    cal = CalibrationScreenShape(data_input)
+    cal = CalibrateDisplayShape(data_input)
     cal.run_calibration(verbose)
 
     return cal

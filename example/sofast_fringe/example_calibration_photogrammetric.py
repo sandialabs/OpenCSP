@@ -11,8 +11,8 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
     CalibrationCameraPosition,
 )
-from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
-    CalibrationScreenShape,
+from opencsp.app.sofast.calibration.lib.CalibrateDisplayShape import (
+    CalibrateDisplayShape,
     DataInput,
 )
 from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
@@ -61,7 +61,7 @@ def run_scene_reconstruction(dir_input: str, verbose: int) -> SceneReconstructio
 
 def run_screen_shape_cal(
     pts_marker_data: ndarray, dir_input: str, verbose: int
-) -> CalibrationScreenShape:
+) -> CalibrateDisplayShape:
     """Runs screen shape calibration
 
     Parameters:
@@ -99,7 +99,7 @@ def run_screen_shape_cal(
     )
 
     # Perform screen position calibration
-    cal = CalibrationScreenShape(data_input)
+    cal = CalibrateDisplayShape(data_input)
     cal.run_calibration(verbose)
 
     return cal

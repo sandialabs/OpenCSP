@@ -1,9 +1,9 @@
-opencsp.app.sofast.calibration.lib.CalibrationScreenShape
+opencsp.app.sofast.calibration.lib.CalibrateDisplayShape
 =============================================================
 
-.. currentmodule:: opencsp.app.sofast.calibration.lib.CalibrationScreenShape
+.. currentmodule:: opencsp.app.sofast.calibration.lib.CalibrateDisplayShape
 
-.. automodule:: opencsp.app.sofast.calibration.lib.CalibrationScreenShape
+.. automodule:: opencsp.app.sofast.calibration.lib.CalibrateDisplayShape
    :members:
    :undoc-members:
    :show-inheritance:
