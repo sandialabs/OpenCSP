@@ -46,7 +46,7 @@ class ProcessSofastFringe:
         Defines surface fitting parameters. See SlopeSolver documentation for more information.
     - params : SofastParams
         Parameters specific to Sofast calculations (facet mask calculation, etc.)
-    - params.geometry_params : GeometryProcessingParams
+    - params.geometry_params : ParamsOpticGeometry
         Parameters specific to finding boundaries of optics, etc.
 
     Internal Data Storage
@@ -91,7 +91,7 @@ class ProcessSofastFringe:
             - mask_hist_thresh
             - mask_keep_largest_area
             - mask_thresh_active_pixels
-            - GeometryProcessingParams
+            - ParamsOpticGeometry
                 - facet_corns_refine_frac_keep
                 - facet_corns_refine_perpendicular_search_dist
                 - facet_corns_refine_step_length
