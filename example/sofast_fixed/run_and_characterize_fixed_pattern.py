@@ -11,7 +11,7 @@ import os
 import matplotlib.pyplot as plt
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.sofast.lib.MeasurementFixedPattern import MeasurementFixedPattern
+from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternProcess import (
     FixedPatternProcess,
 )
@@ -39,7 +39,7 @@ def process(
     orientation: SpatialOrientation,
     camera: Camera,
     facet_data: FacetData,
-    measurement: MeasurementFixedPattern,
+    measurement: MeasurementSofastFixed,
     surface_data: dict,
 ) -> None:
     """Performs processing of measured dot data"""
@@ -123,7 +123,7 @@ def run() -> None:
             # Capture image
             frame = image_acquisition.get_frame()
             # Process
-            measurement = MeasurementFixedPattern(
+            measurement = MeasurementSofastFixed(
                 frame,
                 v_measure_point_facet,
                 dist_optic_screen,
