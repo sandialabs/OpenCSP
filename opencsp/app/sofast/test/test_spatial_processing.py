@@ -8,7 +8,7 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-import opencsp.common.lib.deflectometry.spatial_processing as sp
+import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
