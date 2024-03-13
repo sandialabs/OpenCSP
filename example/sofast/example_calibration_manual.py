@@ -16,7 +16,7 @@ from opencsp.app.sofast.calibration.lib.CalibrationScreenShape import (
 from opencsp.app.sofast.calibration.lib.save_physical_setup_file import (
     save_physical_setup_file,
 )
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz

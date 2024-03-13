@@ -8,7 +8,7 @@ from numpy import ndarray
 import numpy as np
 
 from opencsp.app.sofast.lib.Fringes import Fringes
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -226,7 +226,7 @@ class System:
         for idx in range(fringe_images_base.shape[2]):
             # Create image
             self.fringe_images_to_display.append(
-                np.concatenate([fringe_images_base[:, :, idx : idx + 1]] * 3, axis=2)
+                np.concatenate([fringe_images_base[:, :, idx: idx + 1]] * 3, axis=2)
             )
 
     def check_saturation(

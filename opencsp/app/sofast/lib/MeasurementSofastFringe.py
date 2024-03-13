@@ -1,4 +1,4 @@
-"""Measurement class for SOFAST
+"""Measurement class for SofastFringe
 """
 import datetime as dt
 
@@ -9,8 +9,8 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
-class Measurement:
-    """SOFAST measurement data class that contains captured images
+class MeasurementSofastFringe:
+    """SofastFringe measurement data class that contains captured images
     and metadata about the measurement.
     """
 
@@ -24,7 +24,7 @@ class Measurement:
         optic_screen_dist: float,
         date: dt.datetime,
         name: str = '',
-    ) -> 'Measurement':
+    ) -> 'MeasurementSofastFringe':
         """
         A measurement contains 2 (MxN) mask images, n (MxN) images of
         horizontal/vertical fringes.
@@ -82,7 +82,7 @@ class Measurement:
         self._fringe_images_calibrated = None
 
     def __repr__(self) -> str:
-        return 'Measurement: { ' + self.name + ' }'
+        return 'MeasurementSofastFringe: { ' + self.name + ' }'
 
     @property
     def fringe_images_y(self) -> np.ndarray:
@@ -92,7 +92,7 @@ class Measurement:
     @property
     def fringe_images_x(self) -> np.ndarray:
         """Returns raw x-only fringes"""
-        return self.fringe_images[..., self.num_y_ims :]
+        return self.fringe_images[..., self.num_y_ims:]
 
     @property
     def fringe_images_calibrated(self) -> np.ndarray:
@@ -110,7 +110,7 @@ class Measurement:
     @property
     def fringe_images_x_calibrated(self) -> np.ndarray:
         """Returns calibrated x-only fringes"""
-        return self.fringe_images_calibrated[..., self.num_y_ims :]
+        return self.fringe_images_calibrated[..., self.num_y_ims:]
 
     def calibrate_fringe_images(
         self, calibration: ImageCalibrationAbstract, **kwargs
@@ -135,7 +135,7 @@ class Measurement:
         self._fringe_images_calibrated = calibration.apply_to_images(self, **kwargs)
 
     @classmethod
-    def load_from_hdf(cls, file) -> 'Measurement':
+    def load_from_hdf(cls, file) -> 'MeasurementSofastFringe':
         """
         Loads from HDF file
 
@@ -147,14 +147,14 @@ class Measurement:
         """
         # Load grid data
         datasets = [
-            'Measurement/mask_images',
-            'Measurement/fringe_images',
-            'Measurement/fringe_periods_x',
-            'Measurement/fringe_periods_y',
-            'Measurement/measure_point',
-            'Measurement/optic_screen_dist',
-            'Measurement/date',
-            'Measurement/name',
+            'MeasurementSofastFringe/mask_images',
+            'MeasurementSofastFringe/fringe_images',
+            'MeasurementSofastFringe/fringe_periods_x',
+            'MeasurementSofastFringe/fringe_periods_y',
+            'MeasurementSofastFringe/measure_point',
+            'MeasurementSofastFringe/optic_screen_dist',
+            'MeasurementSofastFringe/date',
+            'MeasurementSofastFringe/name',
         ]
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
 
@@ -175,14 +175,14 @@ class Measurement:
         NOTE: Collection date is saved as string in iso-format.
         """
         datasets = [
-            'Measurement/mask_images',
-            'Measurement/fringe_images',
-            'Measurement/fringe_periods_x',
-            'Measurement/fringe_periods_y',
-            'Measurement/measure_point',
-            'Measurement/optic_screen_dist',
-            'Measurement/date',
-            'Measurement/name',
+            'MeasurementSofastFringe/mask_images',
+            'MeasurementSofastFringe/fringe_images',
+            'MeasurementSofastFringe/fringe_periods_x',
+            'MeasurementSofastFringe/fringe_periods_y',
+            'MeasurementSofastFringe/measure_point',
+            'MeasurementSofastFringe/optic_screen_dist',
+            'MeasurementSofastFringe/date',
+            'MeasurementSofastFringe/name',
         ]
         data = [
             self.mask_images,

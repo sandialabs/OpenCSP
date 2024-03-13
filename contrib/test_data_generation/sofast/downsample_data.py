@@ -3,7 +3,7 @@
 import os
 import sys
 
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 sys.path.append(os.path.join(opencsp_code_dir(), '..'))

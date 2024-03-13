@@ -1,7 +1,7 @@
 from numpy import ndarray
 
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 
 
 class ImageCalibrationGlobal(ImageCalibrationAbstract):
