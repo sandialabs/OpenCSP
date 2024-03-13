@@ -6,9 +6,7 @@ from os.path import join, dirname, exists
 import cv2 as cv
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
-    FixedPatternMeasurement,
-)
+from opencsp.app.sofast.lib.MeasurementFixedPattern import MeasurementFixedPattern
 from opencsp.common.lib.deflectometry.image_processing import detect_blobs_annotate
 
 
@@ -26,7 +24,7 @@ def example_find_blobs_in_image():
         os.makedirs(dirname(file_save))
 
     # Load image
-    measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
+    measurement = MeasurementFixedPattern.load_from_hdf(file_meas)
     image = measurement.image
 
     # Detect blobs

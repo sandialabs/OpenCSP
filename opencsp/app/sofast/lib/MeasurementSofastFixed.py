@@ -7,7 +7,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
-class MeasurementSofastFixed:
+class MeasurementFixedPattern:
     """Fixed pattern measuremnt class. Stores measurement data. Can save
     and load to HDF file format.
     """
@@ -46,7 +46,7 @@ class MeasurementSofastFixed:
         self.name = name
 
     @classmethod
-    def load_from_hdf(cls, file) -> 'MeasurementSofastFixed':
+    def load_from_hdf(cls, file) -> 'MeasurementFixedPattern':
         """
         Loads from HDF file
 
@@ -58,12 +58,12 @@ class MeasurementSofastFixed:
         """
         # Load grid data
         datasets = [
-            'MeasurementSofastFixed/image',
-            'MeasurementSofastFixed/v_measure_point_facet',
-            'MeasurementSofastFixed/dist_optic_screen',
-            'MeasurementSofastFixed/origin',
-            'MeasurementSofastFixed/date',
-            'MeasurementSofastFixed/name',
+            'MeasurementFixedPattern/image',
+            'MeasurementFixedPattern/v_measure_point_facet',
+            'MeasurementFixedPattern/dist_optic_screen',
+            'MeasurementFixedPattern/origin',
+            'MeasurementFixedPattern/date',
+            'MeasurementFixedPattern/name',
         ]
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
 
@@ -85,12 +85,12 @@ class MeasurementSofastFixed:
         NOTE: Collection date is saved as string in iso-format.
         """
         datasets = [
-            'MeasurementSofastFixed/image',
-            'MeasurementSofastFixed/v_measure_point_facet',
-            'MeasurementSofastFixed/dist_optic_screen',
-            'MeasurementSofastFixed/origin',
-            'MeasurementSofastFixed/date',
-            'MeasurementSofastFixed/name',
+            'MeasurementFixedPattern/image',
+            'MeasurementFixedPattern/v_measure_point_facet',
+            'MeasurementFixedPattern/dist_optic_screen',
+            'MeasurementFixedPattern/origin',
+            'MeasurementFixedPattern/date',
+            'MeasurementFixedPattern/name',
         ]
         data = [
             self.image,

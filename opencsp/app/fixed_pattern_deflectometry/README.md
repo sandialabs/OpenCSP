@@ -7,7 +7,7 @@ This tool is used to measure the surface slope of mirrors with one image using a
 
 ## Measurement
 - **FixedPatternScreenProjection.py** - Class for creating a monochrome dot pattern to display on a screen. This would be used instead of a physical/printed dot pattern.
-- **FixedPatternMeasurement.py** - Class holding all data taken during a fixed pattern deflectometry measurement. Can be used for either projected or physical/printed targets.
+- **MeasurementFixedPattern.py** - Class holding all data taken during a fixed pattern deflectometry measurement. Can be used for either projected or physical/printed targets.
 
 ## Processing
 - **FixedPatternProcess.py** - Class for processing monochrome dot fixed pattern deflectometry.
