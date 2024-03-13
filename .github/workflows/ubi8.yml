@@ -50,7 +50,7 @@ jobs:
       image: ghcr.io/e10harvey/opencsp:container-ubi8
       credentials:
         username: ${{ github.actor }}
-        password: ${{ secrets.github_token }}
+        password: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: checkout
