@@ -47,7 +47,7 @@ jobs:
     name: ubi8-ci
     runs-on: [ubuntu-latest]
     container:
-      image: ${UBI8_IMAGE}
+      image: ${{ vars.UBI8_IMAGE }}
 
     steps:
       - name: checkout
