@@ -41,8 +41,8 @@ def save_physical_setup_file(
     # Gather display grid data
     grid_data = dict(
         screen_model='distorted3D',
-        Pxy_screen_fraction=pts_xy_screen_fraction,
-        Pxyz_screen_coords=pts_xyz_screen_coords,
+        xy_screen_fraction=pts_xy_screen_fraction,
+        xyz_screen_coords=pts_xyz_screen_coords,
     )
 
     # Create display object
