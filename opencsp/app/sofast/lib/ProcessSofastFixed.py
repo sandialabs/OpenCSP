@@ -25,7 +25,7 @@ from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 
 
-class FixedPatternProcess:
+class ProcessSofastFixed:
     """Fixed Pattern Deflectrometry data processing class"""
 
     def __init__(
@@ -34,7 +34,7 @@ class FixedPatternProcess:
         camera: Camera,
         fixed_pattern_dot_locs: DotLocationsFixedPattern,
         facet_data: FacetData,
-    ) -> 'FixedPatternProcess':
+    ) -> 'ProcessSofastFixed':
         """Instantiates class
 
         Parameters
