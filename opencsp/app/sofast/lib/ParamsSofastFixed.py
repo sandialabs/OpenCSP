@@ -6,10 +6,10 @@ from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 
 
-class FixedPatternProcessParams:
+class ParamsSofastFixed:
     """Parameters for FixedPatternScreenParams"""
 
-    def __init__(self) -> 'FixedPatternProcessParams':
+    def __init__(self) -> 'ParamsSofastFixed':
         """Instantiates class
 
         Attributes
