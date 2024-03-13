@@ -16,7 +16,7 @@ from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
-from opencsp.app.sofast.lib.System import System
+from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
@@ -72,7 +72,7 @@ def main():
     im_acqu.frame_rate = np.max([0.014902, 1.05 / im_acqu.exposure_time])
 
     # Create System
-    system = System(im_proj, im_acqu)
+    system = SystemSofastFringe(im_proj, im_acqu)
 
     # Calibrate camera exposure
     def func_calibrate_exposure():
