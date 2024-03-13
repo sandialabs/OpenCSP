@@ -11,8 +11,7 @@ import numpy as np
 import pytest
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import \
-    FixedPatternSetupCalibrate
+from opencsp.app.sofast.lib.CalibrateSofastFixedDots import CalibrateSofastFixedDots
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -65,7 +64,7 @@ def test_FixedPatternSetupCalibrate():
     camera_marker = Camera.load_from_hdf(file_camera_marker)
 
     # Perform dot location calibration
-    cal_dot_locs = FixedPatternSetupCalibrate(
+    cal_dot_locs = CalibrateSofastFixedDots(
         files, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
     cal_dot_locs.plot = True
