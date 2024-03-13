@@ -46,7 +46,7 @@ jobs:
     needs: ubi8-image
     name: ubi8-ci
     runs-on: [ubuntu-latest]
-    container: ${{ vars.UBI8_IMAGE }}
+    container: ${{ env.UBI8_IMAGE }}
 
     steps:
       - name: checkout
