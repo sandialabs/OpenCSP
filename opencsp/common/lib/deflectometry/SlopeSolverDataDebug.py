@@ -1,5 +1,5 @@
 """Class that holds information for debugging a SlopeSolver calculation."""
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.FacetData import FacetData
 
 
 class SlopeSolverDataDebug:
