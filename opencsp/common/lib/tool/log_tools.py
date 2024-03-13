@@ -393,6 +393,14 @@ def critical_and_raise(exception_class: Exception.__class__, msg: str) -> None:
 
 
 def log_and_raise_value_error(local_logger, msg) -> None:
-    """Deprecated function"""
+    """Logs an error and raises a ValueError with given message
+
+    Parameters
+    ----------
+    local_logger : Logger
+        Unused, kept for backwards compatibility
+    msg : str
+        Error message
+    """
     error(msg)
     raise ValueError(msg)
