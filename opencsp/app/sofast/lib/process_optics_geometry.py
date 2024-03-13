@@ -10,10 +10,10 @@ from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.app.sofast.lib.EnsembleData import EnsembleData
 from opencsp.app.sofast.lib.FacetData import FacetData
-from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
+from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
 )
-from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
+from opencsp.app.sofast.lib.GeometryDataDebug import GeometryDataDebug
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 import opencsp.app.sofast.lib.spatial_processing as sp

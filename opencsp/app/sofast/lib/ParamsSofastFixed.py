@@ -1,8 +1,8 @@
 """Parameters class for FixedPatternScreen class"""
-from opencsp.app.sofast.lib.ParamsOpticGeometry import (
-    ParamsOpticGeometry,
+from opencsp.app.sofast.lib.GeometryProcessingParams import (
+    GeometryProcessingParams,
 )
-from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
+from opencsp.app.sofast.lib.GeometryDataDebug import GeometryDataDebug
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 
 

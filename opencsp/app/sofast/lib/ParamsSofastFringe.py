@@ -3,10 +3,10 @@
 from dataclasses import dataclass, field
 
 
-from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
+from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
 )
-from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
+from opencsp.app.sofast.lib.GeometryDataDebug import GeometryDataDebug
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
