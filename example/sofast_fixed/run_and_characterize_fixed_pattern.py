@@ -13,9 +13,7 @@ import matplotlib.pyplot as plt
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
-    FixedPatternScreenProjection,
-)
+from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet

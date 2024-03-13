@@ -6,8 +6,7 @@ import os
 from os.path import join, dirname, exists
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import \
-    FixedPatternScreenProjection
+from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
