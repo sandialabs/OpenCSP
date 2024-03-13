@@ -12,7 +12,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 @pytest.mark.no_xvfb
-def test_System():
+def test_SystemSofastFringe():
     # Get test data location
     base_dir = os.path.join(
         opencsp_code_dir(), 'test/data/sofast_measurements'
@@ -58,4 +58,4 @@ def test_System():
 
 
 if __name__ == '__main__':
-    test_System()
+    test_SystemSofastFringe()
