@@ -14,14 +14,14 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-class System:
+class SystemSofastFringe:
     def __init__(
         self,
         image_projection: ImageProjection,
         image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract],
-    ):
+    ) -> 'SystemSofastFringe':
         """
-        Instantiates System class.
+        Instantiates SystemSofastFringe class.
 
         Parameters
         ----------

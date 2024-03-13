@@ -5,7 +5,7 @@ import os
 import pytest
 
 from opencsp.app.sofast.lib.Fringes import Fringes
-from opencsp.app.sofast.lib.System import System
+from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.app.sofast.test.ImageAcquisition_no_camera import ImageAcquisition
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -38,7 +38,7 @@ def test_System():
     im_aq.gain = 230
 
     # Create system class
-    system = System(im_proj, im_aq)
+    system = SystemSofastFringe(im_proj, im_aq)
 
     # Load fringes
     system.load_fringes(F, 0)
