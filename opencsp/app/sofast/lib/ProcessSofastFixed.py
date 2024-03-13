@@ -13,7 +13,7 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.app.sofast.lib.BlobIndex import BlobIndex
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.FacetData import FacetData
 import opencsp.app.sofast.lib.image_processing as ip
 import opencsp.app.sofast.lib.process_optics_geometry as pr
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
