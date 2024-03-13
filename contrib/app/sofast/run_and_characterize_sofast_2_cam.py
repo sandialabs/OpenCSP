@@ -11,7 +11,7 @@ import os
 
 import numpy as np
 
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling

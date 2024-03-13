@@ -6,7 +6,7 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
