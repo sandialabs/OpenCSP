@@ -5,10 +5,10 @@ import os
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.Measurement import Measurement
-from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
@@ -16,7 +16,7 @@ from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 def test_undefined():
     # Get test data location
     base_dir = os.path.join(
-        opencsp_code_dir(), 'test/data/sofast_measurements'
+        opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
     )
 
     # Directory Setup

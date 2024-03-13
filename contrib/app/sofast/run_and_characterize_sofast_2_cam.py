@@ -11,12 +11,12 @@ import os
 
 import numpy as np
 
-from opencsp.common.lib.deflectometry.Display import Display
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.Sofast import Sofast
-from opencsp.app.sofast.lib.System import System
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
@@ -60,7 +60,7 @@ def main():
     displays.append(Display.load_from_hdf(file_display_1))
 
     # Load facet JSON
-    facet_data = FacetData.load_from_json(file_facet)
+    facet_data = DefinitionFacet.load_from_json(file_facet)
 
     # Define surface fitting parameters
     surface_data = [
@@ -97,7 +97,7 @@ def main():
     im_acqu_1.frame_rate = np.max([0.014902, 1.05 / im_acqu_1.exposure_time])
 
     # Create System
-    system = System(im_proj, [im_acqu_0, im_acqu_1])
+    system = SystemSofastFringe(im_proj, [im_acqu_0, im_acqu_1])
 
     # Calibrate camera exposure
     def func_calibrate_exposure():

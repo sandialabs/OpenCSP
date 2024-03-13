@@ -7,11 +7,11 @@ import unittest
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.Measurement import Measurement
-from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.Display import Display
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
@@ -31,7 +31,7 @@ class TestSingle(unittest.TestCase):
         # Get test data location
         if base_dir is None:
             base_dir = os.path.join(
-                opencsp_code_dir(), 'test/data/sofast_measurements'
+                opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
             )
 
         # Find all test files
@@ -96,7 +96,7 @@ class TestSingle(unittest.TestCase):
                 ],
                 file_dataset,
             )
-            facet_data = FacetData(
+            facet_data = DefinitionFacet(
                 Vxyz(facet_data['v_facet_corners']),
                 Vxyz(facet_data['v_centroid_facet']),
             )

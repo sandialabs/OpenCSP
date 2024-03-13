@@ -15,7 +15,7 @@ from scipy.spatial.transform import Rotation
 import opencsp.app.camera_calibration.lib.calibration_camera as cc
 import opencsp.app.camera_calibration.lib.image_processing as ip
 from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
-import opencsp.common.lib.deflectometry.spatial_processing as sp
+import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz

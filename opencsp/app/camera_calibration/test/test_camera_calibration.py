@@ -10,7 +10,7 @@ import cv2
 
 import opencsp.app.camera_calibration.lib.calibration_camera as cc
 import opencsp.app.camera_calibration.lib.image_processing as ip
-import opencsp.common.lib.deflectometry.spatial_processing as sp
+import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
 
 

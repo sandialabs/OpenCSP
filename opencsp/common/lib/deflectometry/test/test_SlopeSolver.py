@@ -6,9 +6,9 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.common.lib.deflectometry.Display import Display
-from opencsp.app.sofast.lib.Measurement import Measurement
-from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -21,7 +21,7 @@ class TestSlopeSolver(unittest.TestCase):
     def setUpClass(cls):
         # Get test data location
         base_dir = os.path.join(
-            opencsp_code_dir(), 'test/data/sofast_measurements'
+            opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
         )
 
         # Define test data files for single facet processing

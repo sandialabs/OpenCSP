@@ -7,12 +7,12 @@ from scipy.spatial.transform import Rotation
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.Sofast import Sofast
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.Display import Display
-from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -32,7 +32,7 @@ class TestMulti(unittest.TestCase):
         # Get test data location
         if base_dir is None:
             base_dir = os.path.join(
-                opencsp_code_dir(), 'test/data/sofast_measurements'
+                opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
             )
 
         # Directory Setup
@@ -98,7 +98,7 @@ class TestMulti(unittest.TestCase):
             'DataSofastInput/optic_definition/ensemble/v_facet_locations',
         ]
         ensemble_data = load_hdf5_datasets(datasets, file_dataset)
-        ensemble_data = EnsembleData(
+        ensemble_data = DefinitionEnsemble(
             Vxyz(ensemble_data['v_facet_locations']),
             [Rotation.from_rotvec(r) for r in ensemble_data['r_facet_ensemble']],
             ensemble_data['ensemble_perimeter'],
@@ -114,7 +114,7 @@ class TestMulti(unittest.TestCase):
             ]
             data = load_hdf5_datasets(datasets, file_dataset)
             facet_data.append(
-                FacetData(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet']))
+                DefinitionFacet(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet']))
             )
 
         # Load surface data

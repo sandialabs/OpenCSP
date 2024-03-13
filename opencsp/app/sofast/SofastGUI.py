@@ -26,7 +26,7 @@ from opencsp.common.lib.camera.LiveView import LiveView
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.System import System
+from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool import hdf5_tools
@@ -72,7 +72,7 @@ class SofastGUI:
         self.image_projection: ImageProjection = None
         self.image_acquisition: ImageAcquisitionAbstract = None
         self.calibration: ImageCalibrationAbstract = None
-        self.system: System = None
+        self.system: SystemSofastFringe = None
 
         # Disable buttons
         self._enable_btns()
@@ -586,7 +586,7 @@ class SofastGUI:
 
         """
         if self.image_acquisition is not None and self.image_projection is not None:
-            self.system = System(self.image_projection, self.image_acquisition)
+            self.system = SystemSofastFringe(self.image_projection, self.image_acquisition)
 
     def _save_measurement_data(self, file: str) -> None:
         """Saves last measurement to HDF file"""

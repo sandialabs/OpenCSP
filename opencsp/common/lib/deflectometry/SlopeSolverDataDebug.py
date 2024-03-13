@@ -1,5 +1,5 @@
 """Class that holds information for debugging a SlopeSolver calculation."""
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from typing import Any
 
 
 class SlopeSolverDataDebug:
@@ -7,7 +7,7 @@ class SlopeSolverDataDebug:
 
     def __init__(self):
         self.debug_active: bool = False
-        self.optic_data: FacetData = None
+        self.optic_data: Any = None
         self.slope_solver_figures: list = []
         self.slope_solver_camera_rays_length: float = 0.0
         self.slope_solver_plot_camera_screen_points: bool = False
