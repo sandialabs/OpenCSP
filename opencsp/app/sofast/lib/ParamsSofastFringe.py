@@ -1,4 +1,4 @@
-"""Parameter dataclass for SOFAST
+"""Parameter dataclass for SofastFringe
 """
 from dataclasses import dataclass, field
 
@@ -12,8 +12,8 @@ import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
 @dataclass
-class SofastParams:
-    """Parameters for SOFAST processing calculation"""
+class ParamsSofastFringe:
+    """Parameters for SofastFringe processing calculation"""
 
     mask_hist_thresh: float = 0.5
     mask_filt_width: int = 9
@@ -31,7 +31,7 @@ class SofastParams:
     geometry_data_debug: GeometryDataDebug = field(default_factory=GeometryDataDebug)
 
     def save_to_hdf(self, file: str, prefix: str = ''):
-        """Saves data to given HDF5 file. Data is stored in PREFIX + SofastParams/...
+        """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsSofastFringe/...
 
         Parameters
         ----------
@@ -48,12 +48,12 @@ class SofastParams:
             self.mask_keep_largest_area,
         ]
         datasets = [
-            prefix + 'SofastParams/mask_hist_thresh',
-            prefix + 'SofastParams/mask_filt_width',
-            prefix + 'SofastParams/mask_filt_thresh',
-            prefix + 'SofastParams/mask_thresh_active_pixels',
-            prefix + 'SofastParams/mask_keep_largest_area',
+            prefix + 'ParamsSofastFringe/mask_hist_thresh',
+            prefix + 'ParamsSofastFringe/mask_filt_width',
+            prefix + 'ParamsSofastFringe/mask_filt_thresh',
+            prefix + 'ParamsSofastFringe/mask_thresh_active_pixels',
+            prefix + 'ParamsSofastFringe/mask_keep_largest_area',
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
-        self.geometry_params.save_to_hdf(file, prefix + 'SofastParams/')
+        self.geometry_params.save_to_hdf(file, prefix + 'ParamsSofastFringe/')
