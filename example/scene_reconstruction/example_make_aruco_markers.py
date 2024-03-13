@@ -10,10 +10,10 @@ import numpy as np
 import opencsp.common.lib.tool.file_tools as ft
 
 
-def example_make_aruco_images(save_path: str,
-                              number: str,
-                              size: int = 500,
-                              padding: int = 50):
+def make_aruco_images(save_path: str,
+                      number: str,
+                      size: int = 500,
+                      padding: int = 50):
     """Generates aruco marker images and saves images as PNG files
 
     Parameters
@@ -61,11 +61,18 @@ def example_make_aruco_images(save_path: str,
         imageio.imwrite(join(f'{save_path:s}', f'{id_:03d}.png'), img)
 
 
-if __name__ == '__main__':
+def example_make_aruco_images():
+    """Example script that makes aruco markers images and saves as PNG files.
+    These can be printed to make physical aruco markers.
+    """
     # Create save path
     path = join(dirname(__file__), 'data/output/aruco_markers')
     ft.create_directories_if_necessary(path)
     # Define number of markers
     num_markers = 10
 
-    example_make_aruco_images(path, num_markers)
+    make_aruco_images(path, num_markers)
+
+
+if __name__ == '__main__':
+    example_make_aruco_images()
