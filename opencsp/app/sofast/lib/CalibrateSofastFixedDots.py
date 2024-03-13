@@ -13,7 +13,7 @@ from tqdm import tqdm
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.BlobIndex import BlobIndex
-import opencsp.common.lib.deflectometry.image_processing as ip
+import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.photogrammetry.photogrammetry as ph

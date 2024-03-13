@@ -11,7 +11,7 @@ from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScali
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
-import opencsp.common.lib.deflectometry.image_processing as ip
+import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir

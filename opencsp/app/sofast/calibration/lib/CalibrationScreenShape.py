@@ -16,7 +16,7 @@ from tqdm import tqdm
 import opencsp.app.sofast.calibration.lib.screen_distortion_calculations as sd
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
-import opencsp.common.lib.deflectometry.image_processing as ip
+import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.common.lib.deflectometry.ImageProjection import CalParams
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
