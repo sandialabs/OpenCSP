@@ -38,7 +38,7 @@ def downsample_dataset_1(base_dir):
     file_display_2 = abspath(join(base_dir, 'calibration_files/display_distorted_3d.h5'))
     file_display_3 = abspath(join(base_dir, 'calibration_files/display_rectangular.h5'))
 
-    dir_dataset_out = abspath(join(opencsp_code_dir(), 'test/data/sofast_measurements'))
+    dir_dataset_out = abspath(join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe'))
 
     if not exists(dir_dataset_out):
         raise FileNotFoundError(f'Output directory {dir_dataset_out} does not exist.')
