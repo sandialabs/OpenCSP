@@ -5,7 +5,7 @@ from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet

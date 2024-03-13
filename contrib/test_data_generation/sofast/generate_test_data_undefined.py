@@ -8,7 +8,7 @@ import numpy as np
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
-from opencsp.common.lib.deflectometry.Display import Display
+from opencsp.app.sofast.lib.Display import Display
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
