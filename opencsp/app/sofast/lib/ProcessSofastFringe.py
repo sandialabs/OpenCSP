@@ -12,7 +12,7 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
-import opencsp.common.lib.deflectometry.calculation_data_classes as cdc
+import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
 from opencsp.common.lib.deflectometry.FacetData import FacetData

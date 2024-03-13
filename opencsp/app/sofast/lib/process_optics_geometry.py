@@ -8,10 +8,10 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
-from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
-from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
-from opencsp.app.sofast.lib.ParamsOpticGeometry import (
-    ParamsOpticGeometry,
+from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
+from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
+    GeometryProcessingParams,
 )
 from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
 import opencsp.app.sofast.lib.image_processing as ip
