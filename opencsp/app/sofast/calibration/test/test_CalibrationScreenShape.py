@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.sofast.calibration.lib.CalibrateDisplayShape import (
+from opencsp.app.sofast.lib.CalibrateDisplayShape import (
     CalibrateDisplayShape,
     DataInput,
 )
