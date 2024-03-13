@@ -7,7 +7,7 @@ from numpy import ndarray
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.camera.Camera import Camera
-import opencsp.common.lib.deflectometry.calculation_data_classes as cdc
+import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
