@@ -1,13 +1,11 @@
 import numpy as np
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import (
-    FixedPatternScreenProjection,
-)
+from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 
 
 def test_FixedPatternDisplay():
     # Instantiate
-    pattern = FixedPatternScreenProjection(100, 100, 10, 10)
+    pattern = SystemSofastFixed(100, 100, 10, 10)
 
     # Test screen fractions
     np.testing.assert_allclose(
