@@ -63,7 +63,7 @@ def test_from_Display():
     # Load display
     file_disp = os.path.join(
         opencsp_code_dir(),
-        'test/data/sofast_measurements/display_distorted_3d.h5',
+        'test/data/measurements_sofast_fringe/display_distorted_3d.h5',
     )
     display = Display.load_from_hdf(file_disp)
     fp_proj = SystemSofastFixed(30, 30, 5, 5)

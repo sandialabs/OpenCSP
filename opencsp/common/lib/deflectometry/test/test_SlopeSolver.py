@@ -21,7 +21,7 @@ class TestSlopeSolver(unittest.TestCase):
     def setUpClass(cls):
         # Get test data location
         base_dir = os.path.join(
-            opencsp_code_dir(), 'test/data/sofast_measurements'
+            opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
         )
 
         # Define test data files for single facet processing
