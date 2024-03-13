@@ -3,6 +3,7 @@
 import json
 
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool import hdf5_tools
 
 
 class FacetData:
@@ -69,6 +70,46 @@ class FacetData:
         # Save data in JSON
         with open(file, 'w', encoding='utf-8') as f:
             json.dump(data_dict, f, indent=3)
+
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+        """Saves data to given HDF5 file. Data is stored in PREFIX + FacetDefinition/...
+
+        Parameters
+        ----------
+        file : str
+            HDF filename
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        data = [
+            self.v_facet_corners.data,
+            self.v_facet_centroid.data,
+        ]
+        datasets = [
+            prefix + 'FacetDefinition/v_facet_corners',
+            prefix + 'FacetDefinition/v_facet_centroid',
+        ]
+        hdf5_tools.save_hdf5_datasets(data, datasets, file)
+
+    @classmethod
+    def load_from_hdf(cls, file: str, prefix: str) -> 'FacetData':
+        """Loads FacetData object from given file.  Data is stored in PREFIX + FacetDefinition/...
+
+        Parameters
+        ----------
+        file : str
+            HDF filename
+        prefix : str
+            Prefix appended to folder path within HDF file (folders must be separated by "/")
+        """
+        datasets = [
+            prefix + 'FacetDefinition/v_facet_corners',
+            prefix + 'FacetDefinition/v_facet_centroid',
+        ]
+        data = hdf5_tools.load_hdf5_datasets(datasets, file)
+        v_facet_corners = Vxyz(data['v_facet_corners'])
+        v_facet_centroid = Vxyz(data['v_facet_centroid'])
+        return cls(v_facet_corners, v_facet_centroid)
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:

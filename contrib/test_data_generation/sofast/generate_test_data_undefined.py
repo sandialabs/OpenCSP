@@ -1,15 +1,16 @@
 """Generates test data from measurement file for mirror type 'undefined'.
 """
-import os
+from os.path import join, dirname, exists
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
 def generate_dataset(
@@ -20,6 +21,10 @@ def generate_dataset(
     file_dataset_out: str,
 ):
     """Generates and saves dataset"""
+    # Check output file exists
+    if not exists(dirname(file_dataset_out)):
+        raise FileNotFoundError(f'Output directory {file_dataset_out:s} does not exist.')
+
     # Load components
     camera = Camera.load_from_hdf(file_camera)
     display = Display.load_from_hdf(file_display)
@@ -30,10 +35,10 @@ def generate_dataset(
     measurement.calibrate_fringe_images(calibration)
 
     # Creates sofast object
-    S = Sofast(measurement, camera, display)
+    sofast = Sofast(measurement, camera, display)
 
     # Update mask calculation options
-    S.params.mask_keep_largest_area = True
+    sofast.params.mask_keep_largest_area = True
 
     # Define surface data
     surface_data = dict(
@@ -44,42 +49,34 @@ def generate_dataset(
     )
 
     # Process optic data
-    S.process_optic_undefined(surface_data)
-
-    # Check output file exists
-    if not os.path.exists(os.path.dirname(file_dataset_out)):
-        os.mkdir(os.path.dirname(file_dataset_out))
+    sofast.process_optic_undefined(surface_data)
 
     # Save testing data
-    S.save_data_to_hdf(file_dataset_out)
+    sofast.save_to_hdf(file_dataset_out)
     display.save_to_hdf(file_dataset_out)
     camera.save_to_hdf(file_dataset_out)
     calibration.save_to_hdf(file_dataset_out)
     print(f'All data saved to: {file_dataset_out:s}')
 
     # Show slope map
-    mask = S.data_image_processing_facet[0]['mask_processed']
-    slopes_xy = S.data_characterization_facet[0]['slopes_facet_xy']
+    mask = sofast.data_image_processing_facet[0].mask_processed
+    slopes_xy = sofast.data_characterization_facet[0].slopes_facet_xy
     slopes = np.sqrt(np.sum(slopes_xy**2, 0))
     image = np.zeros(mask.shape) * np.nan
     image[mask] = slopes
-
     plt.imshow(image, cmap='jet')
     plt.title('Slope Magnitude')
-
     plt.show()
 
 
 if __name__ == '__main__':
     # Generate measurement set 1 data
-    base_dir = os.path.join(os.path.dirname(__file__), 'data')
+    base_dir = join(opencsp_code_dir(), 'test/data/sofast_measurements')
 
     generate_dataset(
-        file_measurement=os.path.join(base_dir, 'measurement_facet.h5'),
-        file_camera=os.path.join(base_dir, 'camera.h5'),
-        file_display=os.path.join(base_dir, 'display_distorted_2d.h5'),
-        file_calibration=os.path.join(base_dir, 'calibration.h5'),
-        file_dataset_out=os.path.join(
-            base_dir, 'calculations_undefined_mirror/data.h5'
-        ),
+        file_measurement=join(base_dir, 'measurement_facet.h5'),
+        file_camera=join(base_dir, 'camera.h5'),
+        file_display=join(base_dir, 'display_distorted_2d.h5'),
+        file_calibration=join(base_dir, 'calibration.h5'),
+        file_dataset_out=join(base_dir, 'calculations_undefined_mirror/data.h5'),
     )

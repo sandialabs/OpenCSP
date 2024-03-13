@@ -1,11 +1,10 @@
 """Controls the processing of Sofast measurement data
 to calculate surface slopes.
 """
-from typing import Literal, Any
+from typing import Literal
 import warnings
 
 import numpy as np
-from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.app.sofast.lib.SofastParams import SofastParams
@@ -22,7 +21,6 @@ import opencsp.common.lib.deflectometry.process_optics_geometry as po
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
-from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
@@ -35,22 +33,21 @@ class Sofast:
     """Class that processes measurement data captured by a SOFAST
     system. Computes optic surface slope and saves data to HDF5 format.
 
-    Debug Modes
-    -----------
-    - 0 - No outputs.
-    - 1 - Just Sofast image processing plots
-    - 2 - Just slope solving plots
-    - 3 - All plots
-
     Processing types
     ----------------
     Sofast can process three optic types:
-        - Undefined optic - Sofast.process_optic_undefined(surface_data)
-        - Single facet optic - Sofast.process_optic_singlefacet(facet_data, surface_data)
-        - Multi-facet ensemble - Sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
+    - Undefined optic - Sofast.process_optic_undefined(surface_data)
+    - Single facet optic - Sofast.process_optic_singlefacet(facet_data, surface_data)
+    - Multi-facet ensemble - Sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
 
-    - surface_data : defines surface fitting parameters. See SlopeSolver
-        documentation for more information.
+    Data classes
+    ------------
+    - surface_data : dict
+        Defines surface fitting parameters. See SlopeSolver documentation for more information.
+    - params : SofastParams
+        Parameters specific to Sofast calculations (facet mask calculation, etc.)
+    - params.geometry_params : GeometryProcessingParams
+        Parameters specific to finding boundaries of optics, etc.
 
     Internal Data Storage
     ---------------------
@@ -58,7 +55,7 @@ class Sofast:
         - data_ensemble_def - copy of ensemble definition user input
         - data_facet_def - copy of facet definition user input
         - data_surface_params - copy of surface definition user input
-        - params - internal sofast parameters
+        - params - SofastParams class, internal sofast parameters
         - data_geometry_general - general optic geometric calculations
         - data_geometry_facet - facet specific geometric calculations
         - data_error - errors between optic/sceario definitions and internal calculations
@@ -74,85 +71,89 @@ class Sofast:
 
     - DataSofastInput
         - optic_definintion
-            - ensemble
+            - EnsembleDefinition
                 - v_centroid_ensemble
                 - v_facet_locations
                 - ensemble_perimeter
                 - r_facet_ensemble
             - facet_000
-                - v_centroid_facet
-                - v_facet_corners
-        - sofast_params
-            - facet_corns_refine.fraction_keep
-            - facet_corns_refine.perpendicular_search_dist
-            - facet_corns_refine.step_length
-            - mask.filter_thresh
-            - mask.filter_width
-            - mask.hist_thresh
-            - mask.keep_largest_area
-            - mask.thresh_active_pixels
-            - perimeter_refine.axial_search_dist
-            - perimeter_refine.perpendicular_search_dist
-        - surface_params
-            - facet_000
-                - downsample
-                - initial_focal_lengths_xy
-                - robust_least_squares
-                - surface_type
+                - FacetDefinition
+                    - v_centroid_facet
+                    - v_facet_corners
+                - surface_definition
+                    - downsample
+                    - initial_focal_lengths_xy
+                    - robust_least_squares
+                    - surface_type
+        - SofastParams
+            - mask_filt_thresh
+            - mask_filt_width
+            - mask_hist_thresh
+            - mask_keep_largest_area
+            - mask_thresh_active_pixels
+            - GeometryProcessingParams
+                - facet_corns_refine_frac_keep
+                - facet_corns_refine_perpendicular_search_dist
+                - facet_corns_refine_step_length
+                - perimeter_refine_axial_search_dist
+                - perimeter_refine_perpendicular_search_dist
     - DataSofastCalculation
-        - geometry
-            - optic_general
-                - r_optic_cam
+        - facet
+            - facet_000
+                - CalculationDataGeometryFacet
+                    - SpatialOrientation
+                        - r_cam_optic
+                        - r_cam_screen
+                        - v_cam_optic_cam
+                        - v_cam_screen_cam
+                    - u_cam_measure_point_facet
+                    - measure_point_screen_distance
+                    - u_pixel_pointing_facet
+                    - v_align_point_facet
+                    - v_screen_points_facet
+                    - v_screen_points_screen
+                    - v_screen_points_fractional_screens
+                - CalculationEnsemble
+                    - trans_facet_ensemble
+                    - slopes_ensemble_xy
+                    - v_surf_points_ensemble
+                    - v_facet_pointing_ensemble
+                - CalculationImageProcessingFacet
+                    - loop_facet_image_refine
+                    - mask_fitted
+                    - mask_bad_pixels
+                    - mask_processed
+                    - v_facet_centroid_image_exp
+                    - v_facet_corners_image_exp
+                - SlopeSolverData
+                    - slope_coefs_facet
+                    - slopes_facet_xy
+                    - surf_coefs_facet
+                    - trans_alignment
+                    - v_surf_points_facet
+        - general
+            - CalculationDataGeometryGeneral
                 - r_optic_cam_exp
                 - r_optic_cam_refine_1
                 - r_optic_cam_refine_2
-                - v_cam_optic_cam
                 - v_cam_optic_cam_exp
                 - v_cam_optic_cam_refine_1
                 - v_cam_optic_cam_refine_2
                 - v_cam_optic_cam_refine_3
                 - v_cam_optic_centroid_cam_exp
-            - facet_000
-                - u_cam_measure_point_facet
-                - measure_point_screen_distance
-                - u_pixel_pointing_facet
-                - v_align_point_facet
-                - v_screen_points_facet
-                - v_screen_points_screen
-                - v_screen_points_fractional_screens
-        - error
-            - error_optic_screen_dist_1
-            - error_optic_screen_dist_2
-            - error_optic_screen_dist_3
-            - error_reprojection_1
-            - error_reprojection_2
-            - error_reprojection_3
-        - image_processing
-            - optic_general
-                - v_facet_centroid_image_exp
-                - v_facet_corners_image_exp
-                - v_mask_centroid_image
-                - mask_raw
+            - CalculationError
+                - error_optic_screen_dist_1
+                - error_optic_screen_dist_2
+                - error_optic_screen_dist_3
+                - error_reprojection_1
+                - error_reprojection_2
+                - error_reprojection_3
+            - CalculationImageProcessingGeneral
                 - loop_optic_image_exp
                 - loop_optic_image_refine
+                - mask_raw
                 - v_edges_image
-            - facet_000
-                - loop_facet_image_refine
-                - mask_fitted
-                - mask_processed
-        - facet
-            - facet_000
-                - v_surf_points_facet
-                - slope_coefs_facet
-                - slopes_facet_xy
-                - surf_coefs_facet
-                - trans_alignment
-        - ensemble
-            - facet_000
-                - trans_facet_ensemble
-                - slopes_ensemble_xy
-                - v_surf_points_ensemble
-                - v_facet_pointing_ensemble
+                - v_mask_centroid_image
     """
 
     def __init__(
@@ -184,20 +185,20 @@ class Sofast:
 
         # Instantiate data containers
         self.num_facets: int = 0
-        self.optic_type: Literal['undefined', 'single', 'multi']
-        self.data_facet_def: list[FacetData]
-        self.data_ensemble_def: EnsembleData
+        self.optic_type: Literal['undefined', 'single', 'multi'] = None
+        self.data_facet_def: list[FacetData] = None
+        self.data_ensemble_def: EnsembleData = None
 
-        self.data_surface_params: list[dict]
+        self.data_surface_params: list[dict] = None
 
-        self.data_geometry_general: cdc.CalculationDataGeometryGeneral
-        self.data_image_processing_general: cdc.CalculationsImageProcessingGeneral
-        self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet]
-        self.data_image_processing_facet: list[cdc.CalculationsImageProcessingFacet]
-        self.data_error: cdc.CalculationError
+        self.data_geometry_general: cdc.CalculationDataGeometryGeneral = None
+        self.data_image_processing_general: cdc.CalculationImageProcessingGeneral = None
+        self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet] = None
+        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet] = None
+        self.data_error: cdc.CalculationError = None
 
-        self.data_characterization_facet: list[SlopeSolverData]
-        self.data_characterization_ensemble: list[dict]
+        self.data_characterization_facet: list[SlopeSolverData] = None
+        self.data_characterization_ensemble: list[cdc.CalculationFacetEnsemble] = None
 
     def help(self) -> None:
         """Prints Sofast doc string"""
@@ -648,8 +649,8 @@ class Sofast:
                 f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.'
             )
 
-        # Instantiate data dictionary
-        self.data_characterization_ensemble = [{} for idx in range(self.num_facets)]
+        # Instantiate data list
+        self.data_characterization_ensemble = []
 
         trans_facet_ensemble_list = []
         v_pointing_matrix = np.zeros((3, self.num_facets))
@@ -714,14 +715,13 @@ class Sofast:
                 trans_facet_ensemble_list[idx].R
             )
 
-            self.data_characterization_ensemble[idx].update(
-                {
-                    'trans_facet_ensemble': trans_facet_ensemble_list[idx],
-                    'slopes_ensemble_xy': slopes_ensemble_xy,
-                    'v_surf_points_ensemble': v_surf_points_ensemble,
-                    'v_facet_pointing_ensemble': v_facet_pointing_ensemble,
-                }
+            data = cdc.CalculationFacetEnsemble(
+                trans_facet_ensemble_list[idx],
+                slopes_ensemble_xy,
+                v_surf_points_ensemble,
+                v_facet_pointing_ensemble,
             )
+            self.data_characterization_ensemble.append(data)
 
     def get_optic(
         self, interp_type: Literal['bilinear', 'clough_tocher', 'nearest'] = 'nearest'
@@ -769,9 +769,7 @@ class Sofast:
             facet = Facet(mirror)
             # Locate facet
             if self.optic_type == 'multi':
-                trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror][
-                    'trans_facet_ensemble'
-                ]
+                trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror].trans_facet_ensemble
                 facet.set_position_in_space(trans.V, trans.R)
             # Save facets
             facets.append(facet)
@@ -782,119 +780,57 @@ class Sofast:
         else:
             return facets[0]
 
-    def save_data_to_hdf(self, file: str) -> None:
+    def save_to_hdf(self, file: str) -> None:
         """
-        Saves all processed data to HDF file. This includes the following.
+        Saves all processed data to HDF file. See class docstring
+        for more information on data output format.
 
         Parameters
         ----------
         file : str
             HDF file name.
-
         """
-        values = []
-        names = []
+        # One per measurement
+        if self.data_error is not None:
+            self.data_error.save_to_hdf(file, 'DataSofastCalculation/general/')
+        self.data_geometry_general.save_to_hdf(file, 'DataSofastCalculation/general/')
+        self.data_image_processing_general.save_to_hdf(file, 'DataSofastCalculation/general/')
 
-        def save_dict_data(d: dict, prefix: str) -> None:
-            if d is not None:
-                for v, n in zip(d.values(), d.keys()):
-                    values.append(v)
-                    names.append(f'{prefix}/{n}')
+        # Sofast parameters
+        self.params.save_to_hdf(file, 'DataSofastInput/')
 
-        def save_list_data(l: list[dict], prefix: str) -> None:
-            if l is not None:
-                for idx, d in enumerate(l):
-                    for v, n in zip(d.values(), d.keys()):
-                        values.append(v)
-                        names.append(f'{prefix}/facet_{idx:03d}/{n}')
-
-        # Save facet definitions in dictionary
+        # Facet definition
         if self.data_facet_def is not None:
-            data_facet_def_dict = []
-            for data in self.data_facet_def:
-                data_facet_def_dict.append(
-                    {
-                        'v_facet_corners': data.v_facet_corners,
-                        'v_centroid_facet': data.v_facet_centroid,
-                    }
-                )
-        else:
-            data_facet_def_dict = None
+            for idx_facet, facet_data in enumerate(self.data_facet_def):
+                facet_data.save_to_hdf(
+                    file, f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
 
-        # Save ensemble definitions in dictionary
+        # Ensemble definition
         if self.data_ensemble_def is not None:
-            data_ensemble_def_dict = {
-                'ensemble_perimeter': self.data_ensemble_def.ensemble_perimeter,
-                'r_facet_ensemble': np.array(
-                    [r.as_rotvec() for r in self.data_ensemble_def.r_facet_ensemble]
-                ),
-                'v_centroid_ensemble': self.data_ensemble_def.v_centroid_ensemble,
-                'v_facet_locations': self.data_ensemble_def.v_facet_locations,
-            }
-        else:
-            data_ensemble_def_dict = None
+            self.data_ensemble_def.save_to_hdf(file, 'DataSofastInput/optic_definition/')
 
-        # Save sofast params in dictionary
-        data_params_dict = self.params.__dict__
-        data_params_dict.pop('debug')
+        # Surface definition
+        # TODO: make surface_params a data class
+        for idx_facet, surface_params in enumerate(self.data_surface_params):
+            data = list(surface_params.values())
+            datasets = list(surface_params.keys())
+            datasets = [
+                f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/surface_definition/' + d for d in datasets]
+            save_hdf5_datasets(data, datasets, file)
 
-        # Collect all data
-        save_dict_data(
-            data_ensemble_def_dict, 'DataSofastInput/optic_definition/ensemble'
-        )
-        save_list_data(data_facet_def_dict, 'DataSofastInput/optic_definition')
-        save_dict_data(data_params_dict, 'DataSofastInput/sofast_params')
-        save_list_data(self.data_surface_params, 'DataSofastInput/surface_params')
-        save_dict_data(
-            self.data_geometry_general, 'DataSofastCalculation/geometry/general'
-        )
-        save_list_data(self.data_geometry_facet, 'DataSofastCalculation/geometry')
-        save_dict_data(self.data_error, 'DataSofastCalculation/error')
-        save_dict_data(
-            self.data_image_processing_general,
-            'DataSofastCalculation/image_processing/general',
-        )
-        save_list_data(
-            self.data_image_processing_facet, 'DataSofastCalculation/image_processing'
-        )
-        save_list_data(self.data_characterization_facet, 'DataSofastCalculation/facet')
-        save_list_data(
-            self.data_characterization_ensemble, 'DataSofastCalculation/ensemble'
-        )
+        # Calculations, one per facet
+        for idx_facet in range(self.num_facets):
+            # Save facet slope data
+            self.data_characterization_facet[idx_facet].save_to_hdf(
+                file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/')
+            # Save facet geometry data
+            self.data_geometry_facet[idx_facet].save_to_hdf(
+                file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/')
+            # Save facet image processing data
+            self.data_image_processing_facet[idx_facet].save_to_hdf(
+                file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/')
 
-        # Format data
-        values_formatted = []
-        names_formatted = []
-        for _ in range(len(values)):
-            name = names.pop(0)
-            value = values.pop(0)
-
-            if not isinstance(value, SpatialOrientation):
-                values_formatted.append(self._format_for_hdf(value))
-                names_formatted.append(name)
-
-        # Save all data to HDF file
-        save_hdf5_datasets(values_formatted, names_formatted, file)
-
-    @staticmethod
-    def _format_for_hdf(data: Any) -> Any:
-        if isinstance(data, LoopXY):
-            value = data.vertices.data
-        elif isinstance(data, Vxy):
-            value = data.data.squeeze()
-        elif isinstance(data, Vxyz):
-            value = data.data.squeeze()
-        elif isinstance(data, Rotation):
-            value = data.as_rotvec()
-        elif isinstance(data, TransformXYZ):
-            value = data.matrix
-        elif isinstance(data, bool):
-            value = int(data)
-        elif isinstance(data, np.ndarray) and data.dtype is bool:
-            value = data.astype(int)
-        elif isinstance(data, list):
-            value = list(map(Sofast._format_for_hdf, data))
-        else:
-            value = data
-
-        return value
+            if self.data_characterization_ensemble:
+                # Save ensemle data
+                self.data_characterization_ensemble[idx_facet].save_to_hdf(
+                    file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/')

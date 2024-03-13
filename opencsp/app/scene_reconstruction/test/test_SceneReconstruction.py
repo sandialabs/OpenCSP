@@ -1,4 +1,8 @@
 """Tests the photogrammetric reconstruction of xyz marker positions.
+
+Run this file to drive the test manually.
+To create new test data, uncomment/comment the lines below.
+
 """
 import os
 from os.path import join
@@ -76,19 +80,31 @@ class TestSceneReconstruction(unittest.TestCase):
         scene_recon.align_points(marker_ids, alignment_values, verbose=verbose)
 
         # Test results
-        cls.pts_exp = np.loadtxt(
-            join(dir_output, 'point_locations.csv'), delimiter=',', skiprows=1
-        )
         cls.pts_meas = scene_recon.get_data()
+        cls.scene_recon = scene_recon
+        cls.dir_output = dir_output
 
     def test_calibrated_corner_locations(self):
         """Tests relative corner locations"""
-        np.testing.assert_allclose(self.pts_meas, self.pts_exp, atol=1e-5, rtol=0)
+        pts_exp = np.loadtxt(
+            join(self.dir_output, 'point_locations.csv'), delimiter=',', skiprows=1
+        )
+        np.testing.assert_allclose(self.pts_meas, pts_exp, atol=1e-5, rtol=0)
         print('Corner locations tested successfully.')
+
+    def save_csv(self):
+        """Saves CSV file of points to data location"""
+        base_dir = os.path.dirname(__file__)
+        file = join(base_dir, 'data/data_expected/point_locations.csv')
+        self.scene_recon.save_data_as_csv(file)
 
 
 if __name__ == '__main__':
     test = TestSceneReconstruction()
     test.setUpClass()
 
+    # Perform test
     test.test_calibrated_corner_locations()
+
+    # Generate new test data
+    # test.save_csv()

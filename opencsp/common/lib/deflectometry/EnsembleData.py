@@ -7,6 +7,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool import hdf5_tools
 
 
 class EnsembleData:
@@ -48,6 +49,9 @@ class EnsembleData:
             )
 
         self.num_facets = len(r_facet_ensemble)
+
+    def __copy__(self):
+        return self.copy()
 
     def copy(self) -> 'EnsembleData':
         """Returns copy of ensemble data"""
@@ -115,6 +119,54 @@ class EnsembleData:
         # Save data in JSON
         with open(file, 'w', encoding='utf-8') as f:
             json.dump(data_dict, f, indent=3)
+
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+        """Saves data to given HDF5 file. Data is stored in PREFIX + EnsembleDefinition/...
+
+        Parameters
+        ----------
+        file : str
+            HDF filename
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        data = [
+            self.v_facet_locations.data,
+            np.array([r.as_rotvec() for r in self.r_facet_ensemble]),  # Nx3 vector
+            self.ensemble_perimeter,
+            self.v_centroid_ensemble.data,
+        ]
+        datasets = [
+            prefix + 'EnsembleDefinition/v_facet_locations',
+            prefix + 'EnsembleDefinition/r_facet_ensemble',
+            prefix + 'EnsembleDefinition/ensemble_perimeter',
+            prefix + 'EnsembleDefinition/v_centroid_ensemble',
+        ]
+        hdf5_tools.save_hdf5_datasets(data, datasets, file)
+
+    @classmethod
+    def load_from_hdf(cls, file: str, prefix: str) -> 'EnsembleData':
+        """Loads EnsembleData object from given file.  Data is stored in PREFIX + EnsembleDefinition/...
+
+        Parameters
+        ----------
+        file : str
+            HDF filename
+        prefix : str
+            Prefix appended to folder path within HDF file (folders must be separated by "/")
+        """
+        datasets = [
+            prefix + 'EnsembleDefinition/v_facet_locations',
+            prefix + 'EnsembleDefinition/r_facet_ensemble',
+            prefix + 'EnsembleDefinition/ensemble_perimeter',
+            prefix + 'EnsembleDefinition/v_centroid_ensemble',
+        ]
+        data = hdf5_tools.load_hdf5_datasets(datasets, file)
+        v_facet_locations = Vxyz(data['v_facet_locations'])
+        r_facet_ensemble = [Rotation.from_rotvec(r) for r in data['r_facet_ensemble']]
+        ensemble_perimeter = data['ensemble_perimeter']
+        v_centroid_ensemble = Vxyz(data['v_centroid_ensemble'])
+        return cls(v_facet_locations, r_facet_ensemble, ensemble_perimeter, v_centroid_ensemble)
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:

@@ -1,8 +1,13 @@
 """Contains functions to save downsampled sofast measurement file
 """
+import os
+import sys
 
 from opencsp.app.sofast.lib.Measurement import Measurement
-from opencsp.common.lib.test.downsample_data import downsample_images
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+
+sys.path.append(os.path.join(opencsp_code_dir(), '..'))
+import contrib.test_data_generation.downsample_data_general as ddg  # nopep8
 
 
 def downsample_measurement(file: str, n: int) -> Measurement:
@@ -23,8 +28,8 @@ def downsample_measurement(file: str, n: int) -> Measurement:
     measurement_orig = Measurement.load_from_hdf(file)
 
     # Downsample measurement
-    mask_images = downsample_images(measurement_orig.mask_images, n)
-    fringe_images = downsample_images(measurement_orig.fringe_images, n)
+    mask_images = ddg.downsample_images(measurement_orig.mask_images, n)
+    fringe_images = ddg.downsample_images(measurement_orig.fringe_images, n)
     return Measurement(
         mask_images=mask_images,
         fringe_images=fringe_images,

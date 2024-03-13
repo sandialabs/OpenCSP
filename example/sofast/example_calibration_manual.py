@@ -1,15 +1,8 @@
-"""Example script that runs full Sofast manual calibration routine
-
-1. Screen position calibration
-2. Camera position calibration
-3. Saves Display object
-
-"""
-from datetime import datetime as dt
 from glob import glob
 import os
 from os.path import join
 
+import matplotlib
 import numpy as np
 from numpy import ndarray
 
@@ -27,6 +20,7 @@ from opencsp.app.sofast.lib.Measurement import Measurement
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
 
 
@@ -99,20 +93,28 @@ def run_camera_position_cal(
     return cal
 
 
-if __name__ == '__main__':
-    base_dir = os.path.dirname(__file__)
+def example_driver():
+    """Example script that runs full Sofast calibration routine using manually
+    measured Aruco marker positions. This is an alternative to the
+    "photogrammetric_calibration" method that uses photogrammetry to measure
+    Aruco marker positions.
 
-    # Define input file directories (high-res sample data)
+    1. Screen position calibration
+    2. Camera position calibration
+    3. Saves Display object
+    """
+    # Define input file directories
     base_dir_sofast = join(
-        base_dir, '../../../sample_data/sofast/data_manual_calibration/data_measurement'
-    )
+        opencsp_code_dir(),
+        'common/lib/deflectometry/test/data/data_measurement',
+    )  # low-res test data
 
+    # Define save path
     save_dir = join(
-        base_dir,
-        f'../../../sample_data/sofast/data_manual_calibration/{dt.now().strftime(r"%Y_%m_%d-%H.%M.%S"):s}_data',
+        os.path.dirname(__file__), 'data/output/manual_calibration'
     )
     if not os.path.exists(save_dir):
-        os.mkdir(save_dir)
+        os.makedirs(save_dir)
 
     VERBOSITY = 2  # 0=no output, 1=only print outputs, 2=print outputs and show plots, 3=plots only with no printing
 
@@ -141,3 +143,7 @@ if __name__ == '__main__':
     screen_distortion_data = cal_screen_shape.get_data()
     rvec, tvec = cal_camera_pose.get_data()
     save_physical_setup_file(screen_distortion_data, NAME, rvec, tvec, file_save)
+
+
+if __name__ == '__main__':
+    example_driver()
