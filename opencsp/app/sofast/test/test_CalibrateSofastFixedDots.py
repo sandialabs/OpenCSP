@@ -28,7 +28,7 @@ def test_FixedPatternSetupCalibrate():
         opencsp_code_dir(),
         'test',
         'data',
-        'fixed_pattern_deflectometry',
+        'measurements_sofast_fixed',
         'dot_location_calibration',
     )
     files = [
