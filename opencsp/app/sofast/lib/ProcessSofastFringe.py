@@ -16,7 +16,7 @@ import opencsp.common.lib.deflectometry.calculation_data_classes as cdc
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
 from opencsp.common.lib.deflectometry.FacetData import FacetData
-import opencsp.common.lib.deflectometry.image_processing as ip
+import opencsp.app.sofast.lib.image_processing as ip
 import opencsp.app.sofast.lib.process_optics_geometry as po
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData

@@ -7,7 +7,7 @@ import cv2 as cv
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
-from opencsp.common.lib.deflectometry.image_processing import detect_blobs_annotate
+from opencsp.app.sofast.lib.image_processing import detect_blobs_annotate
 
 
 def example_find_blobs_in_image():
