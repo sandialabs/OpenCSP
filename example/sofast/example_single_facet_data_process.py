@@ -5,7 +5,7 @@ import matplotlib
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet

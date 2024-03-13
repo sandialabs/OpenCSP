@@ -15,7 +15,7 @@ from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.FacetData import FacetData
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.System import System
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
