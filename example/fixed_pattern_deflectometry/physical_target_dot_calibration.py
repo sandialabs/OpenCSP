@@ -6,8 +6,7 @@ from os.path import join, dirname, exists
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternSetupCalibrate import \
-    FixedPatternSetupCalibrate
+from opencsp.app.sofast.lib.CalibrateSofastFixedDots import CalibrateSofastFixedDots
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import \
     CalibrationCameraPosition
@@ -59,7 +58,7 @@ def example_perform_calibration():
     camera_system = Camera.load_from_hdf(file_camera_system)
 
     # Perform dot location calibration
-    cal_dot_locs = FixedPatternSetupCalibrate(
+    cal_dot_locs = CalibrateSofastFixedDots(
         files_cal_images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
     cal_dot_locs.plot = True
