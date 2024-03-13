@@ -1,16 +1,18 @@
-"""Unit test suite to test Display class
+"""Unit test suite to test DisplayShape class
 """
+import unittest
+
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.Display import Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-class TestDisplay:
+class TestDisplay(unittest.TestCase):
     @classmethod
-    def setup_class(cls):
+    def setUpClass(cls):
         # Define screen X and Y extent
         LX = 5.0  # meters
         LY = 5.0  # meters
@@ -30,8 +32,8 @@ class TestDisplay:
 
         # Define 2D input data
         cls.grid_data_2D = {
-            'Pxy_screen_fraction': Vxy(([0, 1, 0, 1], [0, 0, 1, 1])),
-            'Pxy_screen_coords': Vxy(
+            'xy_screen_fraction': Vxy(([0, 1, 0, 1], [0, 0, 1, 1])),
+            'xy_screen_coords': Vxy(
                 ([-LX / 2, LX / 2, -LX / 2, LX / 2], [-LY / 2, -LY / 2, LY / 2, LY / 2])
             ),
             'screen_model': 'distorted2D',
@@ -39,8 +41,8 @@ class TestDisplay:
 
         # Define 3D input data
         cls.grid_data_3D = {
-            'Pxy_screen_fraction': Vxy(([0, 1, 0, 1], [0, 0, 1, 1])),
-            'Pxyz_screen_coords': Vxyz(
+            'xy_screen_fraction': Vxy(([0, 1, 0, 1], [0, 0, 1, 1])),
+            'xyz_screen_coords': Vxyz(
                 (
                     [-LX / 2, LX / 2, -LX / 2, LX / 2],
                     [-LY / 2, -LY / 2, LY / 2, LY / 2],
@@ -70,10 +72,10 @@ class TestDisplay:
 
     def test_rectangular2D(self):
         # Instantiate display object
-        V_cam_screen_screen = Vxyz((0, 0, 1))
-        R_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
-        name = 'Test Display'
-        disp = Display(V_cam_screen_screen, R_screen_cam, self.grid_data_rect2D, name)
+        v_cam_screen_screen = Vxyz((0, 0, 1))
+        r_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
+        name = 'Test DisplayShape'
+        disp = DisplayShape(v_cam_screen_screen, r_screen_cam, self.grid_data_rect2D, name)
 
         # Perform calculation
         calc = disp.interp_func(self.test_Vxy_pts)
@@ -85,10 +87,10 @@ class TestDisplay:
 
     def test_distorted2D(self):
         # Instantiate display object
-        V_cam_screen_screen = Vxyz((0, 0, 1))
-        R_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
-        name = 'Test Display'
-        disp = Display(V_cam_screen_screen, R_screen_cam, self.grid_data_2D, name)
+        v_cam_screen_screen = Vxyz((0, 0, 1))
+        r_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
+        name = 'Test DisplayShape'
+        disp = DisplayShape(v_cam_screen_screen, r_screen_cam, self.grid_data_2D, name)
 
         # Perform calculation
         calc = disp.interp_func(self.test_Vxy_pts)
@@ -100,10 +102,10 @@ class TestDisplay:
 
     def test_distorted3D(self):
         # Instantiate display object
-        V_cam_screen_screen = Vxyz((0, 0, 1))
-        R_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
-        name = 'Test Display'
-        disp = Display(V_cam_screen_screen, R_screen_cam, self.grid_data_3D, name)
+        v_cam_screen_screen = Vxyz((0, 0, 1))
+        r_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
+        name = 'Test DisplayShape'
+        disp = DisplayShape(v_cam_screen_screen, r_screen_cam, self.grid_data_3D, name)
 
         # Perform calculation
         calc = disp.interp_func(self.test_Vxy_pts)
@@ -112,3 +114,7 @@ class TestDisplay:
         np.testing.assert_allclose(
             calc.data, self.exp_Vxyz_disp_pts.data, rtol=0, atol=1e-7
         )
+
+
+if __name__ == '__main__':
+    unittest.main()

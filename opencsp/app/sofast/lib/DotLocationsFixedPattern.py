@@ -2,7 +2,7 @@ import numpy as np
 from numpy import ndarray
 
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
-from opencsp.app.sofast.lib.Display import Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
