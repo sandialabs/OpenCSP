@@ -9,7 +9,7 @@ from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPat
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 

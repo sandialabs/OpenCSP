@@ -13,10 +13,10 @@ from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ParamsOpticGeometry import (
     ParamsOpticGeometry,
 )
-from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
-import opencsp.app.sofast.lib.image_processing as ip
+from opencsp.common.lib.deflectometry.GeometryDataDebug import GeometryDataDebug
+import opencsp.common.lib.deflectometry.image_processing as ip
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
-import opencsp.app.sofast.lib.spatial_processing as sp
+import opencsp.common.lib.deflectometry.spatial_processing as sp
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
