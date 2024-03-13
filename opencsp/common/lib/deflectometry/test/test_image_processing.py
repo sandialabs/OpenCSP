@@ -9,7 +9,7 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.SofastParams import SofastParams
+from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.common.lib.deflectometry.image_processing as ip
 from opencsp.common.lib.geometry.LoopXY import LoopXY
@@ -112,7 +112,7 @@ class TestImageProcessing(unittest.TestCase):
         ]
 
         # Get default parameters from Sofast class
-        params = SofastParams()
+        params = ParamsSofastFringe()
         args = [
             params.geometry_params.perimeter_refine_axial_search_dist,
             params.geometry_params.perimeter_refine_perpendicular_search_dist,
