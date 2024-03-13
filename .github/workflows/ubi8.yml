@@ -46,6 +46,9 @@ jobs:
     needs: ubi8-image
     name: ubi8-ci
     runs-on: [ubuntu-latest]
+    permissions:
+      packages: read
+      contents: read
     container: 
       image: ghcr.io/e10harvey/opencsp:container-ubi8
       credentials:
