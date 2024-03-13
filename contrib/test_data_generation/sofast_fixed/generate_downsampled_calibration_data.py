@@ -29,7 +29,7 @@ def generate_data():
     file_image_def = join(dir_sample_data, 'image_deflectometry_camera.png')
 
     dir_save = join(opencsp_code_dir(),
-                    'test/data/measurements_sofast_fixed/dot_location_calibration/measurements')
+                    'test/data/fixed_pattern_deflectometry/dot_location_calibration/measurements')
 
     # Downsample marker/dot images
     n_downsample = 4
