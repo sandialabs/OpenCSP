@@ -3,8 +3,8 @@
 from dataclasses import dataclass, field
 
 
-from opencsp.app.sofast.lib.GeometryProcessingParams import (
-    GeometryProcessingParams,
+from opencsp.app.sofast.lib.ParamsOpticGeometry import (
+    ParamsOpticGeometry,
 )
 from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
@@ -20,8 +20,8 @@ class ParamsSofastFringe:
     mask_filt_thresh: int = 4
     mask_thresh_active_pixels: float = 0.05
     mask_keep_largest_area: bool = False
-    geometry_params: GeometryProcessingParams = field(
-        default_factory=GeometryProcessingParams
+    geometry_params: ParamsOpticGeometry = field(
+        default_factory=ParamsOpticGeometry
     )
 
     # Debug objects
