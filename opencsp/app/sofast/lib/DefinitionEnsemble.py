@@ -10,7 +10,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool import hdf5_tools
 
 
-class EnsembleData:
+class DefinitionEnsemble:
     """Facet Ensemble definition for Sofast"""
 
     def __init__(
@@ -19,7 +19,7 @@ class EnsembleData:
         r_facet_ensemble: list[Rotation],
         ensemble_perimeter: np.ndarray,
         v_centroid_ensemble: Vxyz,
-    ) -> 'EnsembleData':
+    ) -> 'DefinitionEnsemble':
         """Creates Facet Ensemble object from data
 
         Optic Data Definitions
@@ -53,9 +53,9 @@ class EnsembleData:
     def __copy__(self):
         return self.copy()
 
-    def copy(self) -> 'EnsembleData':
+    def copy(self) -> 'DefinitionEnsemble':
         """Returns copy of ensemble data"""
-        return EnsembleData(
+        return DefinitionEnsemble(
             self.v_facet_locations.copy(),
             [deepcopy(rot) for rot in self.r_facet_ensemble],
             self.ensemble_perimeter.copy(),
@@ -63,7 +63,7 @@ class EnsembleData:
         )
 
     @classmethod
-    def load_from_json(cls, file: str) -> 'EnsembleData':
+    def load_from_json(cls, file: str) -> 'DefinitionEnsemble':
         """
         Loads facet ensemble definition data from JSON file.
 
@@ -121,7 +121,7 @@ class EnsembleData:
             json.dump(data_dict, f, indent=3)
 
     def save_to_hdf(self, file: str, prefix: str = '') -> None:
-        """Saves data to given HDF5 file. Data is stored in PREFIX + EnsembleDefinition/...
+        """Saves data to given HDF5 file. Data is stored in PREFIX + DefinitionEnsemble/...
 
         Parameters
         ----------
@@ -137,16 +137,16 @@ class EnsembleData:
             self.v_centroid_ensemble.data,
         ]
         datasets = [
-            prefix + 'EnsembleDefinition/v_facet_locations',
-            prefix + 'EnsembleDefinition/r_facet_ensemble',
-            prefix + 'EnsembleDefinition/ensemble_perimeter',
-            prefix + 'EnsembleDefinition/v_centroid_ensemble',
+            prefix + 'DefinitionEnsemble/v_facet_locations',
+            prefix + 'DefinitionEnsemble/r_facet_ensemble',
+            prefix + 'DefinitionEnsemble/ensemble_perimeter',
+            prefix + 'DefinitionEnsemble/v_centroid_ensemble',
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str) -> 'EnsembleData':
-        """Loads EnsembleData object from given file.  Data is stored in PREFIX + EnsembleDefinition/...
+    def load_from_hdf(cls, file: str, prefix: str) -> 'DefinitionEnsemble':
+        """Loads DefinitionEnsemble object from given file.  Data is stored in PREFIX + DefinitionEnsemble/...
 
         Parameters
         ----------
@@ -156,10 +156,10 @@ class EnsembleData:
             Prefix appended to folder path within HDF file (folders must be separated by "/")
         """
         datasets = [
-            prefix + 'EnsembleDefinition/v_facet_locations',
-            prefix + 'EnsembleDefinition/r_facet_ensemble',
-            prefix + 'EnsembleDefinition/ensemble_perimeter',
-            prefix + 'EnsembleDefinition/v_centroid_ensemble',
+            prefix + 'DefinitionEnsemble/v_facet_locations',
+            prefix + 'DefinitionEnsemble/r_facet_ensemble',
+            prefix + 'DefinitionEnsemble/ensemble_perimeter',
+            prefix + 'DefinitionEnsemble/v_centroid_ensemble',
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         v_facet_locations = Vxyz(data['v_facet_locations'])
