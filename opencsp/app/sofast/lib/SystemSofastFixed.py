@@ -5,15 +5,15 @@ from numpy import ndarray
 from scipy.signal import convolve2d
 
 
-class FixedPatternScreenProjection:
+class SystemSofastFixed:
     """Class that holds parameters for displaying a Fixed Pattern for use
     in fixed pattern deflectometry.
     """
 
     def __init__(
         self, size_x: int, size_y: int, width_pattern: int, spacing_pattern: int
-    ):
-        """Instantiates FixedPatternScreenProjection class from screen geometry parameters
+    ) -> 'SystemSofastFixed':
+        """Instantiates SystemSofastFixed class from screen geometry parameters
 
         Parameters
         ----------

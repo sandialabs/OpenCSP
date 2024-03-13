@@ -6,8 +6,7 @@ import os
 from os.path import join, dirname, exists
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternScreenProjection import \
-    FixedPatternScreenProjection
+from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
@@ -40,7 +39,7 @@ def example_calculate_dot_locs_from_display():
     im_proj_params = ImageProjection.load_from_hdf(file_image_projection)
 
     # Calculate fixed pattern display parameters
-    projection = FixedPatternScreenProjection(
+    projection = SystemSofastFixed(
         im_proj_params['size_x'], im_proj_params['size_y'], width_dot, spacing_dot
     )
     fixed_pattern_dot_locs = DotLocationsFixedPattern.from_projection_and_display(
