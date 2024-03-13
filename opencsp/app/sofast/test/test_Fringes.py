@@ -3,7 +3,7 @@
 from opencsp.app.sofast.lib.Fringes import Fringes
 
 
-def test_load_from_csv():
+def test_fringe():
     # Create fringe object
     fringe = Fringes([2.0], [2.0])
 
