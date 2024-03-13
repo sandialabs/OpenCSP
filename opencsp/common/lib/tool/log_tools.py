@@ -24,7 +24,7 @@ def logger(log_dir_body_ext: str = None,
     """Initialize logging for single-process programs.
 
     Creates a fresh log file, deleting the existing log file if it exists as indicated by delete_existing_log_file.
-    Once this method is called, then the info(), warn(), error(), and critical() methods will use the logger created here.
+    Once this method is called, then the debug(), info(), warn(), error(), and critical() methods will use the logger created here.
 
     Example usage::
 
