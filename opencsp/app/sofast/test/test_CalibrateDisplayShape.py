@@ -19,7 +19,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
-class TestCalibrationScreenShape(unittest.TestCase):
+class TestCalibrateDisplayShape(unittest.TestCase):
     @classmethod
     def setUpClass(cls, dir_input: str = None, dir_output: str = None):
         """Tests the CalibrateDisplayShape process. If directories are None,
@@ -124,7 +124,4 @@ class TestCalibrationScreenShape(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    test = TestCalibrationScreenShape()
-    test.setUpClass()
-
-    test.test_screen_distortion_data()
+    unittest.main()
