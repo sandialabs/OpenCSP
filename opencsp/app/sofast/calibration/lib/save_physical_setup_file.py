@@ -3,7 +3,7 @@
 from numpy import ndarray
 from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
@@ -15,14 +15,14 @@ def save_physical_setup_file(
     tvec: ndarray,
     file_save: str,
 ) -> None:
-    """Constructs and saves Display file
+    """Constructs and saves DisplayShape file
 
     Parameters
     ----------
     screen_distortion_data : dict
         Dict with following fields: 1) pts_xy_screen_fraction: Vxy, 2) pts_xyz_screen_coords: Vxyz
     name : str
-        Display name
+        DisplayShape name
     rvec : ndarray
         Screen to camera rotation vector
     tvec : ndarray
@@ -46,7 +46,7 @@ def save_physical_setup_file(
     )
 
     # Create display object
-    display = Display(v_cam_screen_screen, rot_screen_cam, grid_data, name)
+    display = DisplayShape(v_cam_screen_screen, rot_screen_cam, grid_data, name)
 
     # Save to HDF file
     display.save_to_hdf(file_save)
