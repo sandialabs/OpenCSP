@@ -46,7 +46,7 @@ jobs:
     needs: ubi8-image
     name: ubi8-ci
     runs-on: [ubuntu-latest]
-    container: ${{ env.UBI8_IMAGE }}
+    container: ghcr.io/e10harvey/opencsp:container-ubi8
 
     steps:
       - name: checkout
