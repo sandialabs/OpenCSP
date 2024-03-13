@@ -1,24 +1,21 @@
-"""
-Finds all aruco markes and annotates image with labeled IDs and aruco marker corners.
-Saves all images to destination folder.
-"""
 from glob import glob
-import os
+from os.path import join, exists, basename, dirname
 
-import argparse
 import cv2 as cv
 import imageio
 import numpy as np
 
 import opencsp.common.lib.photogrammetry.photogrammetry as pg
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+import opencsp.common.lib.tool.file_tools as ft
 
 
-def main(
+def annotate_aruco_markers(
     source_pattern: str,
     save_dir: str,
     line_width: int = 1,
     font_thickness: int = 2,
-    font_scale: float = 1.25,
+    font_scale: float = 2,
 ):
     """Finds aruco markers, annotates edges, labels, and saves into destination folder
 
@@ -41,15 +38,13 @@ def main(
     # Check number of found files
     num_ims = len(files)
     if num_ims == 0:
-        print('No files match given pattern')
-        return
+        raise ValueError('No files match given pattern')
     else:
         print(f'{num_ims:d} images found.')
 
     # Check save dir
-    if not os.path.exists(save_dir):
-        print(f'Save directory, {save_dir:s} does not exist:')
-        return
+    if not exists(save_dir):
+        raise FileNotFoundError(f'Save directory, {save_dir:s} does not exist:')
 
     # Define text parameters
     font_type = cv.FONT_HERSHEY_SIMPLEX
@@ -85,56 +80,25 @@ def main(
             )
 
         # Save image
-        save_name = os.path.basename(file)
+        save_name = basename(file)
         print(save_name)
-        imageio.imwrite(os.path.join(save_dir, save_name), img_rgb)
+        imageio.imwrite(join(save_dir, save_name), img_rgb)
+
+
+def example_annotate_aruco_markers():
+    """Example script that annotates aruco markers found in imput images matching
+    the given source_pattern. Markers are outlined in red and labeled in blue text.
+    """
+    source_pattern = join(opencsp_code_dir(),
+                          'app/scene_reconstruction/test/data',
+                          'data_measurement/aruco_marker_images/DSC0365*.JPG')
+    save_dir = join(dirname(__file__), 'data/output/annotated_aruco_markers')
+
+    ft.create_directories_if_necessary(save_dir)
+
+    # Annotate images
+    annotate_aruco_markers(source_pattern, save_dir)
 
 
 if __name__ == "__main__":
-    # Parse arguments
-    parser = argparse.ArgumentParser(
-        description='Finds all aruco markers in files matching the given source file pattern. Saves annotated images to destination folder.'
-    )
-    parser.add_argument(
-        'source_pattern', metavar='src', type=str, help='Source file pattern.'
-    )
-    parser.add_argument(
-        'save_dir',
-        metavar='dst',
-        type=str,
-        help='Destination folder to save annotated images.',
-    )
-    parser.add_argument(
-        '-w',
-        '--line-width',
-        metavar='width',
-        type=int,
-        default=1,
-        help='Width of annotation lines in pixels (default=1)',
-    )
-    parser.add_argument(
-        '-t',
-        '--font-thickness',
-        metavar='thickness',
-        type=int,
-        default=6,
-        help='Thickness of font in pixels (default=6)',
-    )
-    parser.add_argument(
-        '-s',
-        '--font-scale',
-        metavar='scale',
-        type=float,
-        default=5,
-        help='Font size scale value (default=5)',
-    )
-    args = parser.parse_args()
-
-    # Annotate images
-    main(
-        args.source_pattern,
-        args.save_dir,
-        args.line_width,
-        args.font_thickness,
-        args.font_scale,
-    )
+    example_annotate_aruco_markers()
