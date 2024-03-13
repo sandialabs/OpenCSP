@@ -156,12 +156,18 @@ def _add_stream_handlers(logger_: log.Logger,
 
     From https://stackoverflow.com/questions/16061641/python-logging-split-between-stdout-and-stderr
     """
-    # stdout log
+    # stdout: log everything between level and warning
     h1 = log.StreamHandler(sys.stdout)
-    h1.setLevel(log.DEBUG)
-    h1.addFilter(lambda record: record.levelno >= level)
+    h1.setLevel(level)
+    h1.addFilter(lambda record: record.levelno < log.WARNING)
     h1.setFormatter(formatter)
     logger_.addHandler(h1)
+
+    # stderr: log everything warning and greater (warning, error, critical)
+    h2 = log.StreamHandler(sys.stderr)
+    h2.setLevel(log.WARNING)
+    h2.setFormatter(formatter)
+    logger_.addHandler(h2)
 
 
 def debug(*vargs, **kwargs) -> int:
