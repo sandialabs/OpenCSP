@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Assume opencsp is in PYHTONPATH
-from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 
 # TODO: import all user-facing classes here.
 

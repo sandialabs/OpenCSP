@@ -29,7 +29,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets
 
 
-class Sofast:
+class ProcessSofastFringe:
     """Class that processes measurement data captured by a SOFAST
     system. Computes optic surface slope and saves data to HDF5 format.
 
@@ -158,7 +158,7 @@ class Sofast:
 
     def __init__(
         self, measurement: Measurement, camera: Camera, display: Display
-    ) -> 'Sofast':
+    ) -> 'ProcessSofastFringe':
         """
         SOFAST processing class.
 
