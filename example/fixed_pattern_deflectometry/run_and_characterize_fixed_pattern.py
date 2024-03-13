@@ -10,9 +10,7 @@ import os
 
 import matplotlib.pyplot as plt
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
-    FixedPatternDotLocations,
-)
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternMeasurement import (
     FixedPatternMeasurement,
 )
@@ -39,7 +37,7 @@ def calibrate_camera_exposure(image_acquisition: ImageAcquisition) -> None:
 
 
 def process(
-    fixed_pattern_dot_locs: FixedPatternDotLocations,
+    fixed_pattern_dot_locs: DotLocationsFixedPattern,
     orientation: SpatialOrientation,
     camera: Camera,
     facet_data: FacetData,
@@ -106,7 +104,7 @@ def run() -> None:
     # Load other components
     camera = Camera.load_from_hdf(file_camera)
     spatial_orientation = SpatialOrientation.load_from_hdf(file_spatial_orientation)
-    fixed_pattern_dot_locs = FixedPatternDotLocations.load_from_hdf(
+    fixed_pattern_dot_locs = DotLocationsFixedPattern.load_from_hdf(
         file_fixed_pattern_dot
     )
 

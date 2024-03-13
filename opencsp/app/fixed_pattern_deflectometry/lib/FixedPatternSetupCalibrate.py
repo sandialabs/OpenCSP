@@ -10,9 +10,7 @@ from numpy import ndarray
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
-from opencsp.app.fixed_pattern_deflectometry.lib.FixedPatternDotLocations import (
-    FixedPatternDotLocations,
-)
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.BlobIndex import BlobIndex
 import opencsp.common.lib.deflectometry.image_processing as ip
@@ -327,9 +325,9 @@ class FixedPatternSetupCalibrate:
             self._dot_points_xyz_mat,
         )
 
-    def get_dot_location_object(self) -> FixedPatternDotLocations:
-        """Returns FixedPatternDotLocations object with calibrated data"""
-        return FixedPatternDotLocations(
+    def get_dot_location_object(self) -> DotLocationsFixedPattern:
+        """Returns DotLocationsFixedPattern object with calibrated data"""
+        return DotLocationsFixedPattern(
             self._dot_image_points_indices_x,
             self._dot_image_points_indices_y,
             self._dot_points_xyz_mat,
