@@ -16,7 +16,7 @@ from opencsp.app.sofast.lib.CalibrateDisplayShape import (
     DataInput,
 )
 from opencsp.app.sofast.lib.save_DisplayShape_file import (
-    save_physical_setup_file,
+    save_DisplayShape_file,
 )
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
@@ -183,7 +183,7 @@ def example_driver():
 
     # Save display file
     file_save = join(save_dir, 'example_physical_setup_file.h5')
-    save_physical_setup_file(screen_distortion_data, NAME, rvec, tvec, file_save)
+    save_DisplayShape_file(screen_distortion_data, NAME, rvec, tvec, file_save)
 
 
 if __name__ == '__main__':
