@@ -9,7 +9,7 @@ from scipy.spatial.transform import Rotation
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.app.sofast.lib.EnsembleData import EnsembleData
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.GeometryProcessingParams import (
     GeometryProcessingParams,
 )
@@ -24,7 +24,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 def process_singlefacet_geometry(
-    facet_data: FacetData,
+    facet_data: DefinitionFacet,
     mask_raw: ndarray,
     v_measure_point_facet: Vxyz,
     optic_screen_dist: float,
@@ -43,8 +43,8 @@ def process_singlefacet_geometry(
 
     Parameters
     ----------
-    facet_data : FacetData
-        FacetData object
+    facet_data : DefinitionFacet
+        DefinitionFacet object
     mask_raw : ndarray
         Raw calculated mask
     v_measure_point_facet : Vxyz
@@ -394,7 +394,7 @@ def process_undefined_geometry(
 
 
 def process_multifacet_geometry(
-    facet_data: FacetData,
+    facet_data: DefinitionFacet,
     ensemble_data: EnsembleData,
     mask_raw: ndarray,
     v_meas_pt_ensemble: Vxyz,

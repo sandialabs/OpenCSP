@@ -12,7 +12,7 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.app.sofast.lib.Display import Display
 from opencsp.app.sofast.lib.EnsembleData import EnsembleData
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -114,7 +114,7 @@ class TestMulti(unittest.TestCase):
             ]
             data = load_hdf5_datasets(datasets, file_dataset)
             facet_data.append(
-                FacetData(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet']))
+                DefinitionFacet(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet']))
             )
 
         # Load surface data

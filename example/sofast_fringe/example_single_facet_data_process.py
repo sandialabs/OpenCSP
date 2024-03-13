@@ -10,7 +10,7 @@ from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.app.sofast.lib.Display import Display
-from opencsp.app.sofast.lib.FacetData import FacetData
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
@@ -49,7 +49,7 @@ def example_driver():
     display = Display.load_from_hdf(file_display)
     measurement = Measurement.load_from_hdf(file_measurement)
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
-    facet_data = FacetData.load_from_json(file_facet)
+    facet_data = DefinitionFacet.load_from_json(file_facet)
 
     # Define surface definition (parabolic surface)
     surface_data = dict(
