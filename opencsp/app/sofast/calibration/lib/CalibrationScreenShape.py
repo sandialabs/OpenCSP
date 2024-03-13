@@ -14,7 +14,7 @@ from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
 import opencsp.app.sofast.calibration.lib.screen_distortion_calculations as sd
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.common.lib.deflectometry.image_processing as ip
 from opencsp.common.lib.deflectometry.ImageProjection import CalParams
