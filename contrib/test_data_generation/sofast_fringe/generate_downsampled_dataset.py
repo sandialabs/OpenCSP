@@ -5,10 +5,13 @@ files to this test data suite.
 import os
 from os.path import join
 import shutil
+import sys
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-import opencsp.common.lib.test.downsample_data as dd
-import opencsp.test.data.sofast_measurements.downsample_sofast_data as ds
+
+sys.path.append(join(opencsp_code_dir(), '..'))
+import contrib.test_data_generation.downsample_data_general as ddg  # nopep8
+import contrib.test_data_generation.sofast_fringe.downsample_data as dds  # nopep8
 
 
 def downsample_dataset(dir_input: str, dir_output: str) -> None:
@@ -49,14 +52,14 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
     ]
     for file_meas in files_meas:
         print(f'Downsampling sofast measurement: {os.path.basename(file_meas):s}...')
-        meas_ds = ds.downsample_measurement(file_meas, n_sofast)
+        meas_ds = dds.downsample_measurement(file_meas, n_sofast)
         meas_ds.save_to_hdf(
             join(dir_output_screen_measurements, os.path.basename(file_meas))
         )
 
     # Downsample screen distortion camera
     print('Downsampling sofast camera...')
-    camera_sofast_ds = dd.downsample_camera(
+    camera_sofast_ds = ddg.downsample_camera(
         join(dir_input, 'camera_screen_shape.h5'), n_sofast
     )
     camera_sofast_ds.save_to_hdf(join(dir_output, 'camera_screen_shape.h5'))
@@ -68,5 +71,5 @@ if __name__ == '__main__':
             opencsp_code_dir(),
             '../../sample_data/sofast/data_photogrammetric_calibration/data_measurement',
         ),
-        dir_output=join(os.path.dirname(__file__), 'data/data_measurement'),
+        dir_output=join(opencsp_code_dir, 'test/data/sofast_measurements'),
     )

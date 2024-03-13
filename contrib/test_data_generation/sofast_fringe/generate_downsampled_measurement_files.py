@@ -14,7 +14,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 sys.path.append(join(opencsp_code_dir(), '..'))
 import contrib.test_data_generation.downsample_data_general as ddg  # nopep8
-import contrib.test_data_generation.sofast.downsample_data as dds  # nopep8
+import contrib.test_data_generation.sofast_fringe.downsample_data as dds  # nopep8
 
 
 def downsample_dataset_1(base_dir):
