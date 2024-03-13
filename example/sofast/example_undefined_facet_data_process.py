@@ -3,7 +3,7 @@ from os.path import join
 
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.Measurement import Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.Sofast import Sofast
 from opencsp.common.lib.deflectometry.Display import Display
 from opencsp.common.lib.deflectometry.SpatialOrientation import SpatialOrientation
