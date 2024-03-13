@@ -11,7 +11,7 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
     CalibrationCameraPosition,
 )
-from opencsp.app.sofast.lib.CalibrateDisplayShape import (
+from opencsp.app.sofast.calibration.lib.CalibrateDisplayShape import (
     CalibrateDisplayShape,
     DataInput,
 )
