@@ -16,7 +16,7 @@ from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
-from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.app.sofast.lib.FacetData import FacetData
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxy import Vxy

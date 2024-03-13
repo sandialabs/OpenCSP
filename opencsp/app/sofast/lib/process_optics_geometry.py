@@ -8,8 +8,8 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
-from opencsp.common.lib.deflectometry.EnsembleData import EnsembleData
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.EnsembleData import EnsembleData
+from opencsp.app.sofast.lib.FacetData import FacetData
 from opencsp.common.lib.deflectometry.GeometryProcessingParams import (
     GeometryProcessingParams,
 )

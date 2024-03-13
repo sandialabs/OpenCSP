@@ -6,7 +6,7 @@ from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPat
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.FacetData import FacetData
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
