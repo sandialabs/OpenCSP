@@ -1,0 +1,64 @@
+name: github-UBI8
+
+on:
+  pull_request:
+    paths-ignore:
+    - '**/*.rst'
+    - '**/*.md'
+    - 'doc/**'
+    types: [ opened, reopened, synchronize ]
+
+permissions:
+  contents: none
+
+# Cancels any in progress 'workflow' associated with this PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UBI8_IMAGE: "ghcr.io/sandialabs/opencsp:latest-ubi8"
+  
+jobs:
+  ubi8-image:
+    runs-on: ubuntu-latest
+    permissions: write-all
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build image
+        run: echo UBI8_IMAGE=$UBI8_IMAGE && docker build . --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
+
+      - name: Log in to registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
+
+      - name: Push image
+        run: |
+          echo UBI8_IMAGE=$UBI8_IMAGE
+          docker push $UBI8_IMAGE
+
+  ubi8-ci:
+    needs: ubi8-image
+    name: ubi8-ci
+    runs-on: [ubuntu-latest]
+    permissions:
+      packages: read
+      contents: read
+    container: 
+      image: ghcr.io/sandialabs/opencsp:latest-ubi8
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          path: OpenCSP
+
+      - name: pytest-cov
+        working-directory: OpenCSP/opencsp
+        run: |
+          python3 -m pip install -r ../requirements.txt
+          export PYTHONPATH=$PWD/../
+          pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
