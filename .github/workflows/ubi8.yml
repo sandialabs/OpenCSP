@@ -15,27 +15,30 @@ permissions:
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
-
-env:
-  UBI8_IMAGE: "ghcr.io/sandialabs/opencsp:latest-ubi8"
   
 jobs:
   ubi8-image:
     runs-on: ubuntu-latest
-    permissions: write-all
+    permissions:
+      packages: write
+      contents: read
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Build image
-        run: echo UBI8_IMAGE=$UBI8_IMAGE && docker build . --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
-
-      - name: Log in to registry
-        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
-
-      - name: Push image
-        run: |
-          echo UBI8_IMAGE=$UBI8_IMAGE
-          docker push $UBI8_IMAGE
+      - name: Check out the repo
+        uses: actions/checkout@v3
+      - name: Log in to GitHub Docker Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Build container image
+        uses: docker/build-push-action@v3
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: |
+            ghcr.io/sandialabs/opencsp:latest-ubi8
 
   ubi8-ci:
     needs: ubi8-image
