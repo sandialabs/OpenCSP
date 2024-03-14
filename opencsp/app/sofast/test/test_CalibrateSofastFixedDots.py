@@ -19,7 +19,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.log_tools as lt
 
 
-@pytest.mark.no_xvfb
+@pytest.mark.skip("No unit test data (yet)")
 def test_FixedPatternSetupCalibrate():
     """Tests dot-location calibration
     """
