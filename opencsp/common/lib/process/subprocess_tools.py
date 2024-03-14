@@ -3,9 +3,45 @@ import os
 import subprocess
 import time
 
+import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.process.lib.ProcessOutputLine as pol
 import opencsp.common.lib.process.lib.CalledProcessError as cpe
+
+
+def get_executable_path(executable_name: str, dont_match: str = None) -> str:
+    """ Returns the first "path/name.ext" for the given executable. If
+    dont_match is specified, then paths containing that string are excluded from
+    the returned results.
+
+    Parameters
+    ----------
+    executable_name : str
+        The name of the executable to search for. On windows, either the plain
+        name or the .exe name may be searched for equally.
+    dont_match : str, optional
+        If specified, then don't include results that contain this string. By
+        default None.
+
+    Returns
+    -------
+    executable_path_name_ext: str
+        The "path/name.exe" of the found executable.
+    """
+    dont_match = dont_match.lower()
+    search_cmd = "which"
+    if (os.name == "nt"):
+        search_cmd = "where"
+        if executable_name.endswith(".exe"):
+            executable_name = executable_name[:-4]
+
+    lines = run(f"{search_cmd} {executable_name}", stdout="collect", stderr="collect")
+    lines = filter_lines(lines, keep_stderr=False)
+    for line in lines:
+        if (dont_match == None) or (dont_match not in line.val.lower()):
+            return line.val.strip()
+
+    return executable_name
 
 
 def filter_lines(

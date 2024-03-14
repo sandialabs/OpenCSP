@@ -1,12 +1,16 @@
 import dataclasses
 import datetime
 import os
+import sys
 
-import AbstractFileFingerprint as aff
 import opencsp.common.lib.file.CsvInterface as ci
+import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.time_date_tools as tdt
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
+
+sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+import contrib.scripts.AbstractFileFingerprint as aff  # nopep8
 
 
 @dataclasses.dataclass()
