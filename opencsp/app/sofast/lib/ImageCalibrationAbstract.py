@@ -178,15 +178,15 @@ class ImageCalibrationAbstract(ABC):
 
         """
         # Check calibration type
-        datasets = ['Calibration/calibration_type']
+        datasets = ['ImageCalibration/calibration_type']
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         calibration_name = cls.get_calibration_name()
 
         if data['calibration_type'] != calibration_name:
-            raise ValueError(f'Calibration file is not of type {calibration_name:s}')
+            raise ValueError(f'ImageCalibration file is not of type {calibration_name:s}')
 
         # Load grid data
-        datasets = ['Calibration/camera_values', 'Calibration/display_values']
+        datasets = ['ImageCalibration/camera_values', 'ImageCalibration/display_values']
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
 
         return cls(**kwargs)
@@ -202,9 +202,9 @@ class ImageCalibrationAbstract(ABC):
 
         """
         datasets = [
-            'Calibration/camera_values',
-            'Calibration/display_values',
-            'Calibration/calibration_type',
+            'ImageCalibration/camera_values',
+            'ImageCalibration/display_values',
+            'ImageCalibration/calibration_type',
         ]
         data = [self.camera_values, self.display_values, self.get_calibration_name()]
 
