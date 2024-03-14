@@ -2,11 +2,12 @@ ARG BASE_IMAGE_ARG=registry.access.redhat.com/ubi8:latest
 FROM ${BASE_IMAGE_ARG}
 
 RUN yum -y install python3.11 \
+    python3.11-devel \
     python3.11-pip \
     mesa-libGL \
     python3.11-tkinter \
-    python3-xvfbwrapper \
-    xz
+    xz \
+    gcc
 
 # Installing ffmpeg via relies on the rpmfusion repo and SDL2
 # The SDL2 yum package is not currently available in ubi8
@@ -22,3 +23,4 @@ ENV PYTHONPATH=/code
 
 COPY requirements.txt /code/
 RUN python3 -m pip install -r requirements.txt
+ENV PATH=$HOME/.local/bin:$PATH
