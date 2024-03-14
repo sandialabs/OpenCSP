@@ -33,7 +33,7 @@ def example_driver():
     file_measurement = join(sample_data_dir, 'measurement_facet.h5')
     file_camera = join(sample_data_dir, 'camera.h5')
     file_display = join(sample_data_dir, 'display_distorted_2d.h5')
-    file_calibration = join(sample_data_dir, 'calibration.h5')
+    file_calibration = join(sample_data_dir, 'image_calibration.h5')
 
     # Save directory
     dir_save = join(os.path.dirname(__file__), 'data/output/undefined_facet')

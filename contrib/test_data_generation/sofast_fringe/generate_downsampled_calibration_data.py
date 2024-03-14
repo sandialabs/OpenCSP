@@ -32,7 +32,7 @@ def downsample_dataset_1(base_dir):
     # Define location of sample data
     file_measurement_facet = abspath(join(base_dir, 'sofast/measurement_facet.h5'))
     file_measurement_ensemble = abspath(join(base_dir, 'sofast/measurement_facet_ensemble.h5'))
-    file_calibration = abspath(join(base_dir, 'sofast/calibration.h5'))
+    file_calibration = abspath(join(base_dir, 'sofast/image_calibration.h5'))
     file_camera = abspath(join(base_dir, 'calibration_files/camera.h5'))
     file_display_1 = abspath(join(base_dir, 'calibration_files/display_distorted_2d.h5'))
     file_display_2 = abspath(join(base_dir, 'calibration_files/display_distorted_3d.h5'))
