@@ -1,10 +1,6 @@
 ARG BASE_IMAGE_ARG=registry.access.redhat.com/ubi8:latest
 FROM ${BASE_IMAGE_ARG}
 
-ADD docker/centos8.repo /etc/yum.repos/d/centos8.repo
-
-RUN rpm --import https://www.centos.org/keys/RPM-GPG-KEY-CentOS-Official && yum search xvfb
-
 RUN yum -y install python3.11 \
     python3.11-devel \
     python3.11-pip \
