@@ -21,51 +21,29 @@ from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 class TestCalibrateDisplayShape(unittest.TestCase):
     @classmethod
-    def setUpClass(cls, dir_input: str = None, dir_output: str = None):
+    def setUpClass(cls):
         """Tests the CalibrateDisplayShape process. If directories are None,
         uses default test data directory. All input files listed below must be
         on the dir_input path.
-
-        Input Files (in dir_input):
-        ---------------------------
-            - screen_calibration_point_pairs.csv
-            - point_locations.csv
-            - camera_screen_shape.h5
-            - image_projection.h5
-            - screen_shape_sofast_measurements/pose_*.h5
-
-        Expected Files (in dir_output):
-        ------------------------------
-            - screen_distortion_data_100_100.h5
-
-        Parameters
-        ----------
-        dir_input : str
-            Input/measurement file directory, by default, None
-        dir_output : str
-            Expected output file directory, by default None
-
         """
-        if (dir_input is None) or (dir_output is None):
-            # Define default data directories
-            base_dir = join(
-                opencsp_code_dir(), 'common/lib/deflectometry/test'
-            )
-            dir_input = join(base_dir, 'data/data_measurement')
-            dir_output = join(base_dir, 'data/data_expected')
+        # Define default data directories
+        dir_input_sofast = join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement')
+        dir_input_def = join(opencsp_code_dir(),
+                             'common/lib/deflectometry/test/data/data_measurement')
+        dir_output = join(opencsp_code_dir(), 'app/sofast/test/data/data_expected')
 
         verbose = 1  # 0=no output, 1=only print outputs, 2=print outputs and show plots, 3=plots only with no printing
 
         # Define input files
         resolution_xy = [100, 100]  # sample density of screen
         file_screen_cal_point_pairs = join(
-            dir_input, 'screen_calibration_point_pairs.csv'
+            dir_input_sofast, 'screen_calibration_point_pairs.csv'
         )
-        file_point_locations = join(dir_input, 'point_locations.csv')
-        file_camera_distortion = join(dir_input, 'camera_screen_shape.h5')
-        file_image_projection = join(dir_input, 'image_projection.h5')
+        file_point_locations = join(dir_input_def, 'point_locations.csv')
+        file_camera_distortion = join(dir_input_sofast, 'camera_screen_shape.h5')
+        file_image_projection = join(dir_input_sofast, 'image_projection.h5')
         files_screen_shape_measurement = glob(
-            join(dir_input, 'screen_shape_sofast_measurements/pose_*.h5')
+            join(dir_input_sofast, 'screen_shape_sofast_measurements/pose_*.h5')
         )
 
         # Load input data

@@ -19,7 +19,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.log_tools as lt
 
 
-@pytest.mark.no_xvfb
+@pytest.mark.skip("No unit test data (yet)")
 def test_FixedPatternSetupCalibrate():
     """Tests dot-location calibration
     """
@@ -41,7 +41,7 @@ def test_FixedPatternSetupCalibrate():
     origins = Vxy(origins.astype(int))
 
     # Define other files
-    file_camera_marker = join(base_dir, 'measurements/camera_calibration.h5')
+    file_camera_marker = join(base_dir, 'measurements/camera_image_calibration.h5')
     file_xyz_points = join(base_dir, 'measurements/point_locations.csv')
     file_fpd_dot_locs_exp = join(base_dir, 'calculations/fixed_pattern_dot_locations.h5')
     dir_save = join(dirname(__file__), 'data/output/dot_location_calibration')

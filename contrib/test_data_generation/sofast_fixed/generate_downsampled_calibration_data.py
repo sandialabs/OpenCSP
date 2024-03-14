@@ -23,7 +23,7 @@ def generate_data():
         opencsp_code_dir(), '../../sample_data/deflectometry/calibration_dot_locations/data_measurement')
 
     files_images = glob(join(dir_sample_data, 'images/*.JPG'))
-    file_camera_cal = join(dir_sample_data, 'camera_calibration.h5')
+    file_camera_cal = join(dir_sample_data, 'camera_image_calibration.h5')
     file_point_locs = join(dir_sample_data, 'point_locations.csv')
     file_camera_def = join(dir_sample_data, 'camera_deflectometry.h5')
     file_image_def = join(dir_sample_data, 'image_deflectometry_camera.png')

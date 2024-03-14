@@ -68,3 +68,7 @@ class TestSpatialOrientation(unittest.TestCase):
         I_exp = np.eye(3)
         I_calc = self.so.r_cam_screen * self.so.r_optic_cam * self.so.r_screen_optic
         np.testing.assert_allclose(I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
+
+
+if __name__ == '__main__':
+    unittest.main()

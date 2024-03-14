@@ -34,7 +34,7 @@ def example_perform_calibration():
 
     # Define other files
     file_camera_position = join(base_dir, 'image_deflectometry_camera.png')
-    file_camera_marker = join(base_dir, 'camera_calibration.h5')
+    file_camera_marker = join(base_dir, 'camera_image_calibration.h5')
     file_camera_system = join(base_dir, 'camera_deflectometry.h5')
     file_xyz_points = join(base_dir, 'point_locations.csv')
     dir_save = join(dirname(__file__), 'data/output/dot_location_calibration')

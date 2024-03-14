@@ -6,10 +6,6 @@ Top-level application code, organized in directories.
 
 Graphical User Interface which aides in the calibration of machine vision cameras.
 
-## fp_deflectometry
-
-Fixed pattern deflectrometry system. Provides a coarse slope map of an optic using a single image and a fixed dot pattern.
-
 ## scene_reconstruction
 
 Reconstructs a 3d scene of Aruco markers using a calibrated camera.
