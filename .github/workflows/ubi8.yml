@@ -21,7 +21,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       packages: write
-      contents: read
+      contents: write
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -38,7 +38,7 @@ jobs:
           file: Dockerfile
           push: true
           tags: |
-            ghcr.io/sandialabs/opencsp:latest-ubi8
+            ghcr.io/sandialabs/opencsp:latest
 
   ubi8-ci:
     needs: ubi8-image
@@ -48,7 +48,7 @@ jobs:
       packages: read
       contents: read
     container: 
-      image: ghcr.io/sandialabs/opencsp:latest-ubi8
+      image: ghcr.io/sandialabs/opencsp:latest
       credentials:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
