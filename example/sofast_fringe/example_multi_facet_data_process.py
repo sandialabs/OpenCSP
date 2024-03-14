@@ -39,7 +39,7 @@ def example_driver():
     file_measurement = join(sample_data_dir, 'measurement_ensemble.h5')
     file_camera = join(sample_data_dir, 'camera.h5')
     file_display = join(sample_data_dir, 'display_distorted_2d.h5')
-    file_calibration = join(sample_data_dir, 'calibration.h5')
+    file_calibration = join(sample_data_dir, 'image_calibration.h5')
     file_facet = join(sample_data_dir, 'Facet_lab_6x4.json')
     file_ensemble = join(sample_data_dir, 'Ensemble_lab_6x4.json')
 

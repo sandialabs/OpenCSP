@@ -37,7 +37,7 @@ class TestImageProcessing(unittest.TestCase):
         cls.data_file_camera = join(base_dir, 'camera.h5')
         cls.data_file_measurement_facet = join(base_dir, 'measurement_facet.h5')
         cls.data_file_measurement_ensemble = join(base_dir, 'measurement_ensemble.h5')
-        cls.data_file_calibration = join(base_dir, 'calibration.h5')
+        cls.data_file_calibration = join(base_dir, 'image_calibration.h5')
 
     def test_calc_mask_raw(self):
         """Tests image_processing.calc_mask_raw()"""

@@ -77,6 +77,6 @@ if __name__ == '__main__':
         file_measurement=join(base_dir, 'measurement_facet.h5'),
         file_camera=join(base_dir, 'camera.h5'),
         file_display=join(base_dir, 'display_distorted_2d.h5'),
-        file_calibration=join(base_dir, 'calibration.h5'),
+        file_calibration=join(base_dir, 'image_calibration.h5'),
         file_dataset_out=join(base_dir, 'calculations_undefined_mirror/data.h5'),
     )
