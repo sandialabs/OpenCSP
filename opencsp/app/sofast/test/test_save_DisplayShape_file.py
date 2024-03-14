@@ -17,16 +17,16 @@ class test_save_physical_setup_file(unittest.TestCase):
     def test_save_physical_setup_file(self):
         """Loads data and saves test Display file"""
         # Define input file directory
-        base_dir = join(opencsp_code_dir(), 'common/lib/deflectometry/test')
-        dir_input = join(base_dir, 'data', 'data_expected')
-        dir_output = join(base_dir, 'data', 'output')
+        dir_input_sofast = join(opencsp_code_dir(), 'app/sofast/test/data/data_expected')
+        dir_input_def = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_expected')
+        dir_output = join(opencsp_code_dir(), 'app/sofast/test/data/output')
         file_save = join(dir_output, 'test_physical_setup_file.h5')
 
         ft.create_directories_if_necessary(dir_output)
 
         # Define data files
-        file_screen_distortion_data = join(dir_input, 'screen_distortion_data_100_100.h5')
-        file_cam = join(dir_input, 'camera_rvec_tvec.csv')
+        file_screen_distortion_data = join(dir_input_sofast, 'screen_distortion_data_100_100.h5')
+        file_cam = join(dir_input_def, 'camera_rvec_tvec.csv')
 
         # Load data
         name = 'Test Physical Setup File'
