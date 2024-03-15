@@ -57,6 +57,36 @@ def reset_figure_management():
     fig_record_list = []
 
 
+def _mpl_pyplot_figure(*vargs, **kwargs):
+    """ Initializes and returns a matplotlib.pyplot.figure() instance.
+
+    If creating the figure fails, try again (up to two more times).
+
+    Sometimes initializing a matplotlib figure fails. But if you try to
+    initialize the figure() class again, it seems to always succeed. The
+    measured failure rate for first time initialization is between 7% and 15%.
+    When it fails, it is often with an error about not being able to find a
+    file. Something like::
+
+        _tkinter.TclError: Can't find a usable init.tcl in the following directories
+    """
+    try:
+        # try to create a figure
+        return plt.figure(*vargs, **kwargs)
+    except Exception:
+        try:
+            lt.warn("Failed to create a matplotlib.pyplot.figure instance. Trying again (2nd attempt).")
+            # first attempt failed, try again
+            return plt.figure(*vargs, **kwargs)
+        except Exception:
+            # second attempt failed, give the system a second to stabalize and
+            # try a third time
+            lt.warn("Failed to create a matplotlib.pyplot.figure instance. Trying again (3rd attempt).")
+            import time
+            time.sleep(1)
+            return plt.figure(*vargs, **kwargs)
+
+
 def tile_figure(
     name=None,  # Handle and title of figure window.
     tile_array: tuple[int, int] = (3, 2),  # (n_y, n_x) ~ (columns, rows)
@@ -104,8 +134,8 @@ def tile_figure(
     ul_y = size_y_pixels * y_idx
 
     # Create figure.
-    # fig = plt.figure(constrained_layout=True).subplots(5, 5)
-    fig = plt.figure(name, figsize=(size_x, plot_size_y))
+    # fig = figure(constrained_layout=True).subplots(5, 5)
+    fig = _mpl_pyplot_figure(name, figsize=(size_x, plot_size_y))
     # Turn off the axis around the plot drawing area.  This leads to confusing duplicate, mismatched,
     # axis information.  Why this suddenly appeared is beyond me. - RCB
     # The command below does not suppress the actual plot axes.
@@ -177,7 +207,8 @@ def _setup_figure(
     comments: list[
         str
     ] = None,  # List of strings including comments to associate with the figure.
-    code_tag: str = None,  # String of form "code_file.function_name()" showing where to look in code for call that generated this figure.
+    # String of form "code_file.function_name()" showing where to look in code for call that generated this figure.
+    code_tag: str = None,
 ) -> RenderControlFigureRecord:
     """Common figure setup for 2D and 3D data."""
     # defaults
@@ -211,7 +242,7 @@ def _setup_figure(
             tile_square=figure_control.tile_square,
         )
     else:
-        fig = plt.figure(name, figsize=figure_control.figsize)
+        fig = _mpl_pyplot_figure(name, figsize=figure_control.figsize)
         if figure_control.upper_left_xy:
             upper_left_xy = figure_control.upper_left_xy
             x = upper_left_xy[0]
@@ -465,7 +496,7 @@ def display_plot(
     if tile:
         fig = tile_figure(name, tile_array=tile_array)
     else:
-        fig = plt.figure(name, figsize=figsize)
+        fig = _mpl_pyplot_figure(name, figsize=figsize)
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
@@ -498,7 +529,7 @@ def display_bar(
     if tile:
         fig = tile_figure(name, tile_array=tile_array)
     else:
-        fig = plt.figure(name, figsize=figsize)
+        fig = _mpl_pyplot_figure(name, figsize=figsize)
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
