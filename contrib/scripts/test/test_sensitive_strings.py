@@ -61,7 +61,7 @@ class test_sensitive_strings(unittest.TestCase):
         sensitive_strings_csv = os.path.join(self.ss_dir, "test_all_matches.csv")
         searcher = ss.SensitiveStringsSearcher(self.root_search_dir,
                                                sensitive_strings_csv,
-                                               self.all_binaries)
+                                               self.no_binaries)
         searcher.git_files_only = False
         # 6 matches:
         #   files:   a.txt, b/b.txt, c/d/e.txt
