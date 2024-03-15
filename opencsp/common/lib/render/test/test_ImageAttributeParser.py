@@ -16,11 +16,19 @@ class test_ImageAttributeParser(unittest.TestCase):
         self.img_file = os.path.join(
             self.out_dir, f"nonexistant_image_{self._testMethodName}.png"
         )
-        self.attr_file = os.path.join(
+        attr_file_src = os.path.join(
             self.data_dir, f"nonexistant_image_{self._testMethodName}.txt"
+        )
+        self.attr_file = os.path.join(
+            self.out_dir, f"nonexistant_image_{self._testMethodName}.txt"
         )
 
         ft.create_directories_if_necessary(self.out_dir)
+
+        # Some tests have attribute files that need to be copied to self.out_dir.
+        # Copy the attribute files, if they exist.
+        if not ft.file_exists(self.attr_file) and ft.file_exists(attr_file_src):
+            ft.copy_file(attr_file_src, self.out_dir)
 
     def test_no_attrfile(self):
         """Contructor succeeds even without attributes file"""
