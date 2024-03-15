@@ -9,30 +9,30 @@
 # Note, please leave the hashtags (eg #tag) in place. These are here for processing this file for parallel execution.
 
 # packages that can be installed with conda on solo #condapkgs
-h5py >= 3.7.0
-imageio >= 2.19.3
-matplotlib >= 3.6.2
-numpy >= 1.23.5
-pandas >= 1.5.2
-pillow >= 9.3.0
-pyproj >= 3.4.1
-pytz >= 2022.7
-scipy >= 1.10.0
-sympy >= 1.11.1
+h5py >= 3.10.0
+imageio >= 2.34.0
+matplotlib >= 3.8.3
+numpy >= 1.26.4
+pandas >= 2.2.1
+pillow >= 10.2.0
+pyproj >= 3.6.1
+pytz >= 2024.1
+scipy >= 1.12.0
+sympy >= 1.12
 
 # packages that can't be installed with conda but can be installed with pip on solo #pippkgs
-ipykernel >= 6.22.0
+ipykernel >= 6.29.3
 opencv-contrib-python == 4.5.5.64
-pytest >= 7.2.0
-python-pptx >= 0.6.21
-rawpy >= 0.18.1
+pytest >= 8.1.1
+python-pptx >= 0.6.23
+rawpy >= 0.19.1
 openpyxl >= 3.1.2
 
 # these are packages that have errors with both conda and pip on solo #errpkgs
-pypylon >= 1.9.0
+pypylon >= 3.0.1
 
 pysolar >= 0.11
-tqdm >= 4.66.1
+tqdm >= 4.66.2
 
-pytest-xvfb
-pytest-cov
+pytest-xvfb >= 3.0.0
+pytest-cov >= 4.1.0
