@@ -3,6 +3,7 @@
 *.pyc
 .pytest_cache/
 .spyproject
+**/__pycache__/
 
 # Virtual environment
 env/
