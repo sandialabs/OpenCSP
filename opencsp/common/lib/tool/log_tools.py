@@ -215,7 +215,11 @@ def info(*vargs, **kwargs) -> int:
     return 0
 
 
-def warn(*vargs, **kwargs) -> int:
+def warn(*vargs, **kwargs):
+    warning(*vargs, **kwargs)
+
+
+def warning(*vargs, **kwargs):
     """Warning message, both to console and log file.
 
     Use this level as an indication that something unexpected happened, or
