@@ -47,8 +47,8 @@ class test_opencsp_root_path(unittest.TestCase):
     def test_opencsp_code_dir(self):
         opencsp_path = self.get_opencsp_path()
 
-        expected = os.path.normpath(opencsp_path)
-        actual = os.path.normpath(orp.opencsp_code_dir())
+        expected = os.path.normpath(opencsp_path).lower()
+        actual = os.path.normpath(orp.opencsp_code_dir()).lower()
         self.assertEqual(expected, actual)
 
     def test_opencsp_doc_dir(self):
