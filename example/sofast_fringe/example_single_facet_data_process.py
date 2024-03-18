@@ -19,6 +19,8 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
+import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.file_tools as ft
 
 
 def example_driver():
@@ -42,8 +44,10 @@ def example_driver():
 
     # Define save dir
     dir_save = join(os.path.dirname(__file__), 'data/output/single_facet')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    ft.create_directories_if_necessary(dir_save)
+
+    # Set up logger
+    lt.logger(join(dir_save, 'log.txt'))
 
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -69,12 +73,10 @@ def example_driver():
     sofast.process_optic_singlefacet(facet_data, surface)
 
     # Calculate focal length from parabolic fit
-    if surface is Surface2DParabolic:
-        surf_coefs = sofast.data_characterization_facet[0].surf_coefs_facet
-        focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
-        print('Parabolic fit focal lengths:')
-        print(f'  X {focal_lengths_xy[0]:.3f} m')
-        print(f'  Y {focal_lengths_xy[1]:.3f} m')
+    surf_coefs = sofast.data_characterization_facet[0].surf_coefs_facet
+    focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
+    lt.info(f'Facet xy focal lengths (meters): '
+            f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
 
     # Get optic representation
     facet: Facet = sofast.get_optic()
