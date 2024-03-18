@@ -15,9 +15,7 @@ env:
 jobs:
   ubi8-image:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
+    permissions: write-all
     steps:
       - uses: actions/checkout@v4
 
