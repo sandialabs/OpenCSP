@@ -19,9 +19,7 @@ concurrency:
 jobs:
   ubi8-image:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: write
+    permissions: write-all
     steps:
       - name: Check out the repo
         uses: actions/checkout@v3
@@ -32,7 +30,7 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
       - name: Build container image
-        uses: docker/build-push-action@v3
+        uses: docker/build-push-action@v4
         with:
           context: .
           file: Dockerfile
