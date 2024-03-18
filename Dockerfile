@@ -7,7 +7,12 @@ RUN yum -y install python3.11 \
     mesa-libGL \
     python3.11-tkinter \
     xz \
-    gcc
+    gcc \
+    libXScrnSaver \
+    mesa-libgbm \
+    nss \
+    at-spi2-atk \
+    libX11-xcb
 
 # Installing ffmpeg via relies on the rpmfusion repo and SDL2
 # The SDL2 yum package is not currently available in ubi8
