@@ -13,6 +13,7 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import (
 )
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -55,19 +56,11 @@ class TestSlopeSolver(unittest.TestCase):
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         # Perform calculations
-        if data['surface_type'] == 'parabolic':
-            surface_data = dict(
-                surface_type=data['surface_type'],
-                initial_focal_lengths_xy=data['initial_focal_lengths_xy'],
-                robust_least_squares=bool(data['robust_least_squares']),
-                downsample=data['downsample'],
-            )
-        elif data['surface_type'] == 'plano':
-            surface_data = dict(
-                surface_type=data['surface_type'],
-                robust_least_squares=bool(data['robust_least_squares']),
-                downsample=data['downsample'],
-            )
+        surface = Surface2DParabolic(
+            initial_focal_lengths_xy=data['initial_focal_lengths_xy'],
+            robust_least_squares=bool(data['robust_least_squares']),
+            downsample=data['downsample'],
+        )
         kwargs = {
             'v_optic_cam_optic': ori.v_optic_cam_optic,
             'u_active_pixel_pointing_optic': Uxyz(data['u_pixel_pointing_facet']),
@@ -76,7 +69,7 @@ class TestSlopeSolver(unittest.TestCase):
             'v_optic_screen_optic': ori.v_optic_screen_optic,
             'v_align_point_optic': measurement.measure_point,
             'dist_optic_screen': measurement.optic_screen_dist,
-            'surface_data': surface_data,
+            'surface': surface,
         }
 
         # Solve slopes
@@ -118,3 +111,7 @@ class TestSlopeSolver(unittest.TestCase):
         np.testing.assert_allclose(
             data['slopes_facet_xy'], self.data_slope.slopes_facet_xy, atol=1e-8, rtol=0
         )
+
+
+if __name__ == '__main__':
+    unittest.main()
