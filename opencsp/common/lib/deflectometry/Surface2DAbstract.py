@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABC
+from abc import abstractmethod
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -6,9 +6,10 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import HDF5_IO_Abstract
 
 
-class Surface2DAbstract(ABC):
+class Surface2DAbstract(HDF5_IO_Abstract):
     """Representation of 2d surface for SOFAST processing"""
 
     def __init__(self):
