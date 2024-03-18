@@ -3,7 +3,6 @@ to calculate surface slopes.
 """
 
 from typing import Literal
-import warnings
 
 import numpy as np
 
@@ -28,9 +27,11 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
+import opencsp.common.lib.tool.log_tools as lt
 
 
-class ProcessSofastFringe:
+class ProcessSofastFringe(HDF5_SaveAbstract):
     """Class that processes measurement data captured by a SOFAST
     system. Computes optic surface slope and saves data to HDF5 format.
 
@@ -207,20 +208,16 @@ class ProcessSofastFringe:
         """Prints Sofast doc string"""
         print(self.__doc__)
 
-    def process_optic_undefined(self, surface_data: dict) -> None:
+    def process_optic_undefined(self, surface: Surface2DAbstract) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
         for slops for undefined optical surface.
 
         Parameters
         ----------
-        surface_data : dict
-            See Sofast documentation or Sofast.help() for more details.
-
+        surface_data : Surface2DAbstract
+            Surface type definition
         """
-        # Check input data
-        self._check_surface_data(surface_data)
-
         # Process optic/setup geometry
         self._process_optic_undefined_geometry()
 
@@ -228,11 +225,11 @@ class ProcessSofastFringe:
         self._process_display()
 
         # Solve slopes
-        self._solve_slopes([surface_data])
+        self._solve_slopes([surface])
 
-    def process_optic_singlefacet(
-        self, facet_data: DefinitionFacet, surface: Surface2DAbstract
-    ) -> None:
+    def process_optic_singlefacet(self,
+                                  facet_data: DefinitionFacet,
+                                  surface: Surface2DAbstract) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
         for slops for single facet optic.
@@ -253,12 +250,10 @@ class ProcessSofastFringe:
         # Solve slopes
         self._solve_slopes([surface])
 
-    def process_optic_multifacet(
-        self,
-        facet_data: list[DefinitionFacet],
-        ensemble_data: DefinitionEnsemble,
-        surface_data: list[dict],
-    ) -> None:
+    def process_optic_multifacet(self,
+                                 facet_data: list[DefinitionFacet],
+                                 ensemble_data: DefinitionEnsemble,
+                                 surfaces: list[Surface2DAbstract]) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
         for slops for multi-facet optic.
@@ -274,11 +269,11 @@ class ProcessSofastFringe:
 
         """
         # Check inputs
-        if len(facet_data) != len(surface_data):
+        if len(facet_data) != len(surfaces):
             raise ValueError(
-                f'Length of facet_data does not equal length of surface data; facet_data={len(facet_data)}, surface_data={len(surface_data)}'
+                'Length of facet_data does not equal length of surfaces'
+                f'facet_data={len(facet_data)}, surface_data={len(surfaces)}'
             )
-        list(map(self._check_surface_data, surface_data))
 
         # Process optic/setup geometry
         self._process_optic_multifacet_geometry(facet_data, ensemble_data)
@@ -287,7 +282,7 @@ class ProcessSofastFringe:
         self._process_display()
 
         # Solve slopes
-        self._solve_slopes(surface_data)
+        self._solve_slopes(surfaces)
 
         # Calculate facet pointing
         self._calculate_facet_pointing()
@@ -345,9 +340,9 @@ class ProcessSofastFringe:
         self.optic_type = 'single'
 
         if self.params.geometry_data_debug.debug_active:
-            print('Sofast image processing debug on.')
+            lt.info('Sofast image processing debug on.')
         if self.params.slope_solver_data_debug.debug_active:
-            print('SlopeSolver debug on.')
+            lt.info('SlopeSolver debug on.')
 
         # Calculate raw mask
         params = [
@@ -387,8 +382,7 @@ class ProcessSofastFringe:
     def _process_optic_multifacet_geometry(
         self, facet_data: list[DefinitionFacet], ensemble_data: DefinitionEnsemble
     ) -> None:
-        """
-        Processes optic geometry for an ensemble of facets.
+        """Processes optic geometry for an ensemble of facets.
 
         Parameters
         ----------
@@ -396,7 +390,6 @@ class ProcessSofastFringe:
             List of DefinitionFacet objects.
         ensemble_data : DefinitionEnsemble
             Ensemble data object.
-
         """
         # Get number of facets
         self.num_facets = ensemble_data.num_facets
@@ -405,7 +398,8 @@ class ProcessSofastFringe:
         # Check inputs
         if len(facet_data) != self.num_facets:
             raise ValueError(
-                f'Given length of facet data is {len(facet_data):d} but ensemble_data expects {ensemble_data.num_facets:d} facets.'
+                f'Given length of facet data is {len(facet_data):d}'
+                f'but ensemble_data expects {ensemble_data.num_facets:d} facets.'
             )
 
         # Calculate mask
@@ -418,9 +412,9 @@ class ProcessSofastFringe:
         mask_raw = ip.calc_mask_raw(self.measurement.mask_images, *params)
 
         if self.params.mask_keep_largest_area:
-            warnings.warn(
-                '"keep_largest_area" mask processing option cannot be used for multifacet ensembles. This will be turned off.',
-                stacklevel=2,
+            lt.warn(
+                '"keep_largest_area" mask processing option cannot be used '
+                'for multifacet ensembles. This will be turned off.',
             )
             self.params.mask_keep_largest_area = False
 
@@ -485,9 +479,9 @@ class ProcessSofastFringe:
             nan_mask = np.isnan(v_screen_points_screen.data).sum(0).astype(bool)
             mask_bad_pixels = np.zeros(mask_processed.shape, dtype=bool)
             if np.any(nan_mask):
-                warnings.warn(
-                    f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated screen points for facet {idx_facet:d}. These data points will be removed.',
-                    stacklevel=2,
+                lt.warn(
+                    f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated '
+                    'screen points for facet {idx_facet:d}. These data points will be removed.',
                 )
                 # Make mask of NANs
                 mask_bad_pixels[mask_processed] = nan_mask
@@ -745,63 +739,49 @@ class ProcessSofastFringe:
         else:
             return facets[0]
 
-    def save_to_hdf(self, file: str) -> None:
-        """
-        Saves all processed data to HDF file. See class docstring
-        for more information on data output format.
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        # Log
+        lt.info(f'Saving SofastFringe data to: {file:s}, in HDF5 folder: "{prefix:s}"')
 
-        Parameters
-        ----------
-        file : str
-            HDF file name.
-        """
         # One per measurement
         if self.data_error is not None:
-            self.data_error.save_to_hdf(file, 'DataSofastCalculation/general/')
-        self.data_geometry_general.save_to_hdf(file, 'DataSofastCalculation/general/')
+            self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
+        self.data_geometry_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
         self.data_image_processing_general.save_to_hdf(
-            file, 'DataSofastCalculation/general/'
-        )
+            file, f'{prefix:s}DataSofastCalculation/general/')
 
         # Sofast parameters
-        self.params.save_to_hdf(file, 'DataSofastInput/')
+        self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
 
         # Facet definition
         if self.data_facet_def is not None:
             for idx_facet, facet_data in enumerate(self.data_facet_def):
                 facet_data.save_to_hdf(
-                    file, f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/'
-                )
+                    file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
 
         # Ensemble definition
         if self.data_ensemble_def is not None:
-            self.data_ensemble_def.save_to_hdf(
-                file, 'DataSofastInput/optic_definition/'
-            )
+            self.data_ensemble_def.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/')
 
         # Surface definition
         for idx_facet, surface in enumerate(self.data_surfaces):
             surface.save_to_hdf(
                 file,
-                f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
+                f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
 
         # Calculations, one per facet
         for idx_facet in range(self.num_facets):
             # Save facet slope data
             self.data_characterization_facet[idx_facet].save_to_hdf(
-                file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
             # Save facet geometry data
             self.data_geometry_facet[idx_facet].save_to_hdf(
-                file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
             # Save facet image processing data
             self.data_image_processing_facet[idx_facet].save_to_hdf(
-                file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
 
             if self.data_characterization_ensemble:
                 # Save ensemle data
                 self.data_characterization_ensemble[idx_facet].save_to_hdf(
-                    file, f'DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-                )
+                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
