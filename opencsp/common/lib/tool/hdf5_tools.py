@@ -1,6 +1,8 @@
+from abc import abstractmethod, ABC
+import os
+
 import h5py
 import numpy as np
-import os
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
@@ -205,8 +207,7 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
                 aspect_ratio = max(shape[0], shape[1]) / min(shape[0], shape[1])
                 if (shape[0] >= 10 and shape[1] >= 10) and (aspect_ratio < 10.001):
                     dataset_path_name_ext = _create_dataset_path(
-                        hdf5_dir, possible_images[i][0], ".png"
-                    )
+                        hdf5_dir, possible_images[i][0], ".png")
                     # assumed grayscale or RGB
                     if (len(shape) == 2) or (shape[2] in [1, 3]):
                         img = it.numpy_to_image(np_image)
@@ -252,3 +253,36 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
             np.savetxt(dataset_path_name + ".csv", squeezed, delimiter=",")
 
     return hdf5_dir
+
+
+class HDF5_SaveAbstract(ABC):
+    """Abstract class for saving to HDF5 format"""
+
+    @abstractmethod
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+
+
+class HDF5_IO_Abstract(HDF5_SaveAbstract):
+    """Abstract class for loading from HDF5 format"""
+
+    @classmethod
+    @abstractmethod
+    def load_from_hdf(cls, file: str, prefix: str = ''):
+        """Loads data from given file. Assumes data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
