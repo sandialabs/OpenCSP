@@ -27,6 +27,7 @@ How to install OpenCSP's dependencies
 With python version 3.10 or greater, run the following:
 
 ::  
+    
     $ cd /path/to/OpenCSP/../
     $ python -m venv ./venv_opencsp
     # On Linux:
@@ -42,6 +43,7 @@ Running OpenCSP's test suite
 Within venv_opencsp, you can now run:
 
 ::
+
     $ (venv_opencsp) cd /path/to/OpenCSP
     $ (venv_opencsp) export PYTHONPATH=$PWD
     $ (venv_opencsp) cd opencsp
@@ -56,6 +58,7 @@ environment settings.
 You can use this container as follows. Note: to authenticate to ghcr.io, you must create a classic access token with read permissions. See https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry for more information.
 
 ::
+
     $ cd /path/to/OpenCSP
     $ docker login ghcr.io -u <GITHUB_USERNAME>
     $ docker pull ghcr.io/sandialabs/opencsp:latest-ubi8
