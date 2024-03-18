@@ -28,7 +28,6 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets
 
 
 class ProcessSofastFringe:
@@ -782,9 +781,9 @@ class ProcessSofastFringe:
 
         # Surface definition
         for idx_facet, surface in enumerate(self.data_surfaces):
-            prefix = [
-                f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/']
-            surface.save_as_hdf5(file)
+            surface.save_to_hdf(
+                file,
+                f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
 
         # Calculations, one per facet
         for idx_facet in range(self.num_facets):
