@@ -164,10 +164,10 @@ class test_VideoHandler(unittest.TestCase):
     def test_transform_powerpoint(self):
         src_video_dir_name_ext = os.path.join(self.dir_in, "1s.mp4")
         dst_dir = os.path.join(self.dir_out, "test_transform_powerpoint")
+        ft.create_directories_if_necessary(dst_dir)
         dst_video_dir_name_ext = vh.VideoHandler.transform_powerpoint(
             src_video_dir_name_ext, dst_dir, overwrite=True
         )
-        ft.create_directories_if_necessary(dst_dir)
 
         # verify the width and height
         handler = vh.VideoHandler.VideoInspector(dst_video_dir_name_ext)

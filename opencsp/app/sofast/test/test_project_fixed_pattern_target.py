@@ -14,7 +14,7 @@ def test_project_fixed_pattern_target():
     # Set pattern parameters
     file_image_projection = os.path.join(
         opencsp_code_dir(),
-        "test/data/measurements_sofast_fringe/general/Image_Projection_test.h5",
+        "test/data/measurements_sofast_fringe/general/image_projection_test.h5",
     )
 
     # Load ImageProjection
