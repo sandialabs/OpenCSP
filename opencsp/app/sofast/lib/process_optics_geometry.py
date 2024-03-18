@@ -305,7 +305,7 @@ def process_undefined_geometry(
     list[cdc.CalculationImageProcessingFacet],
     cdc.CalculationError,
 ]:
-    """Processes optic geometry for undefined deflectrometry measurement
+    """Processes optic geometry for undefined deflectometry measurement
 
     Parameters
     ----------
@@ -409,6 +409,37 @@ def process_multifacet_geometry(
     list[cdc.CalculationImageProcessingFacet],
     cdc.CalculationError,
 ]:
+    """Processes optic geometry for multifacet deflectometry measurement
+
+    Parameters
+    ----------
+    facet_data : DefinitionFacet
+        Facet definition object
+    ensemble_data : DefinitionEnsemble
+        Ensemble definition object
+    mask_raw : ndarray
+        Raw calculated mask
+    v_meas_pt_ensemble : Vxyz
+        Measure point lcoation on ensemble, meters
+    orientation : SpatialOrientation
+        SpatialOrientation object
+    camera : Camera
+        Camera object
+    optic_screen_dist : float
+        Optic to screen distance, meters
+    params : ParamsOpticGeometry, optional
+        ParamsOpticGeometry object, by default ParamsOpticGeometry()
+    debug : DebugOpticsGeometry, optional
+        DebugOpticsGeometry object, by default DebugOpticsGeometry()
+
+    Returns
+    -------
+    calculation_data_classes.CalculationDataGeometryGeneral
+    calculation_data_classes.CalculationImageProcessingGeneral
+    list[calculation_data_classes.CalculationDataGeometryFacet]
+    list[calculation_data_classes.CalculationImageProcessingFacet]
+    calculation_data_classes.CalculationError]
+    """
     if debug.debug_active:
         print(
             'Image processing debug on, but is not yet supported for undefined mirrors.'

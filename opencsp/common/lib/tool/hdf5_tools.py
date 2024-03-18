@@ -259,7 +259,7 @@ class HDF5_SaveAbstract(ABC):
     """Abstract class for saving to HDF5 format"""
 
     @abstractmethod
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
         """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
