@@ -1,5 +1,4 @@
-import os
-from os.path import join
+from os.path import join, dirname
 
 import matplotlib
 
@@ -43,7 +42,7 @@ def example_driver():
     file_facet = join(sample_data_dir, 'Facet_NSTTF.json')
 
     # Define save dir
-    dir_save = join(os.path.dirname(__file__), 'data/output/single_facet')
+    dir_save = join(dirname(__file__), 'data/output/single_facet')
     ft.create_directories_if_necessary(dir_save)
 
     # Set up logger
