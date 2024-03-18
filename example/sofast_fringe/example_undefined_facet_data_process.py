@@ -1,5 +1,6 @@
-import os
-from os.path import join
+from os.path import join, dirname
+
+import matplotlib
 
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
@@ -39,7 +40,7 @@ def example_driver():
     file_calibration = join(sample_data_dir, 'image_calibration.h5')
 
     # Save directory
-    dir_save = join(os.path.dirname(__file__), 'data/output/undefined_facet')
+    dir_save = join(dirname(__file__), 'data/output/undefined_facet')
     ft.create_directories_if_necessary(dir_save)
 
     # Set up logger
