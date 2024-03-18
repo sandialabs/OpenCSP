@@ -39,7 +39,8 @@ jobs:
             ghcr.io/sandialabs/opencsp:latest
       - name: Push image
         run: |
-          docker push --user "${{ github.actor }}:${{ secrets.GITHUB_TOKEN }}" ghcr.io/sandialabs/opencsp:latest
+          docker login -u ${{ github.actor }} -p ${{ secrets.GITHUB_TOKEN }} ghcr.io
+          docker push ghcr.io/sandialabs/opencsp:latest
 
   ubi8-ci:
     needs: ubi8-image
