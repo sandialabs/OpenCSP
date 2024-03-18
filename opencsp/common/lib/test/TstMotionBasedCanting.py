@@ -14,48 +14,47 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys as sys
 
-import opencsp_code.wip.mhhwang.binary_search as bin_s
-import opencsp_code.wip.mhhwang.intersection as intersection
-import opencsp_code.common.lib.csp.Heliostat as Heliostat
-import opencsp_code.common.lib.csp.HeliostatConfiguration as hc
-import opencsp_code.common.lib.csp.RayTrace as rt
-import opencsp_code.common.lib.csp.SolarField as sf
-import opencsp_code.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
-import opencsp_code.common.lib.geo.lon_lat_nsttf as lln
-import opencsp_code.common.lib.opencsp_path.data_path_for_test as dpft
-import opencsp_code.common.lib.opencsp_path.opencsp_root_path as orp
-import opencsp_code.common.lib.render.figure_management as fm
-import opencsp_code.common.lib.render.view_spec as vs
-import opencsp_code.common.lib.render_control.RenderControlAxis as rca
-import opencsp_code.common.lib.render_control.RenderControlEnsemble as rce
-import opencsp_code.common.lib.render_control.RenderControlFacet as rcf
-import opencsp_code.common.lib.render_control.RenderControlFigure as rcfg
-import opencsp_code.common.lib.render_control.RenderControlHeliostat as rch
-import opencsp_code.common.lib.render_control.RenderControlPointSeq as rcps
-import opencsp_code.common.lib.render_control.RenderControlSolarField as rcsf
-import opencsp_code.common.lib.render_control.RenderControlTower as rct
-import opencsp_code.common.lib.test.support_test as stest
-import opencsp_code.common.lib.test.TestOutput as to
-import opencsp_code.common.lib.tool.file_tools as ft
-import opencsp_code.common.lib.tool.log_tools as lt
-from opencsp_code.common.lib.csp.Heliostat import Heliostat
-from opencsp_code.common.lib.csp.LightPath import LightPath
-from opencsp_code.common.lib.csp.LightSourcePoint import LightSourcePoint
-from opencsp_code.common.lib.csp.Scene import Scene
-from opencsp_code.common.lib.csp.SolarField import SolarField
-from opencsp_code.common.lib.csp.Tower import Tower
-from opencsp_code.common.lib.geometry.Pxyz import Pxyz
-from opencsp_code.common.lib.geometry.Uxyz import Uxyz
-from opencsp_code.common.lib.geometry.Vxyz import Vxyz
-from opencsp_code.common.lib.render_control.RenderControlAxis import \
+import opencsp.common.lib.geometry.IntersectionBinarySearch as intersection
+import opencsp.common.lib.csp.ufacet.Heliostat as Heliostat
+import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
+import opencsp.common.lib.csp.RayTrace as rt
+import opencsp.common.lib.csp.SolarField as sf
+import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
+import opencsp.common.lib.geo.lon_lat_nsttf as lln
+import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
+import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
+import opencsp.common.lib.render.figure_management as fm
+import opencsp.common.lib.render.view_spec as vs
+import opencsp.common.lib.render_control.RenderControlAxis as rca
+import opencsp.common.lib.render_control.RenderControlEnsemble as rce
+import opencsp.common.lib.render_control.RenderControlFacet as rcf
+import opencsp.common.lib.render_control.RenderControlFigure as rcfg
+import opencsp.common.lib.render_control.RenderControlHeliostat as rch
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
+import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
+import opencsp.common.lib.render_control.RenderControlTower as rct
+import opencsp.common.lib.test.support_test as stest
+import opencsp.common.lib.test.TestOutput as to
+import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
+from opencsp.common.lib.csp.ufacet.Heliostat import Heliostat
+from opencsp.common.lib.csp.LightPath import LightPath
+from opencsp.common.lib.csp.LightSourcePoint import LightSourcePoint
+from opencsp.common.lib.csp.Scene import Scene
+from opencsp.common.lib.csp.SolarField import SolarField
+from opencsp.common.lib.csp.Tower import Tower
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.render_control.RenderControlAxis import \
     RenderControlAxis
-from opencsp_code.common.lib.render_control.RenderControlFigure import \
+from opencsp.common.lib.render_control.RenderControlFigure import \
     RenderControlFigure
-from opencsp_code.common.lib.render_control.RenderControlFigureRecord import \
+from opencsp.common.lib.render_control.RenderControlFigureRecord import \
     RenderControlFigureRecord
-from opencsp_code.common.lib.render_control.RenderControlLightPath import \
+from opencsp.common.lib.render_control.RenderControlLightPath import \
     RenderControlLightPath
-from opencsp_code.common.lib.render_control.RenderControlRayTrace import \
+from opencsp.common.lib.render_control.RenderControlRayTrace import \
     RenderControlRayTrace
 
 
@@ -117,8 +116,10 @@ class TestMotionBasedCanting(to.TestOutput):
         """
 
         if Vxyz.dot(facet_normal, target_plane_normal) < 0:
+            print("In check_heliostat_intersection_point_on_plane:        In plane")
             return True
         else:
+            print("In check_heliostat_intersection_point_on_plane:        Not in plane")
             return False            
 
     def exit_program(self):
@@ -140,7 +141,7 @@ class TestMotionBasedCanting(to.TestOutput):
         """
 
         if is_intersect:
-            pass
+            return az, el
         else:
             print("The given heliostat azimuth and elevation values do produce facet surface normals that intersect the plane of the target.")
             while True: 
@@ -218,7 +219,7 @@ class TestMotionBasedCanting(to.TestOutput):
 
         offset_x = intersection_point.x- target_loc.x
         offset_z = intersection_point.z- target_loc.z
-        # print("In TestMotionBasedCanting.projected_facet_normal_intersection_point_offset: x offset from target to intersection=", offset_x, "    z offset from target to intersection=", offset_z) #TODO mhh
+        print("In TestMotionBasedCanting.projected_facet_normal_intersection_point_offset: x offset from target to intersection=", offset_x, "    z offset from target to intersection=", offset_z) #TODO mhh
 
         return is_intersect, offset_x, offset_z, intersection_point
 
@@ -247,57 +248,69 @@ class TestMotionBasedCanting(to.TestOutput):
         # Find azimuth value that corresponds to a negative offset.
         if offset_x < 0:
             # Then current azimuth corresponds to negative offset.
-            low_az = az
+            low_azimuth = az
             low_offset_x = offset_x
             # Now search for an azimuth value corresponding to a positive offset.
-            search_az = az
+            search_azimuth = az
             while offset_x < 0:
-                search_az -= .05
-                is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, search_az, el)
-                search_az, count = self.doesnt_hit_plane_when_moving_intersect_point(search_az, is_intersect, count)
+                search_azimuth -= .05
+                is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, search_azimuth, el)
+                search_azimuth, count = self.doesnt_hit_plane_when_moving_intersect_point(search_azimuth, is_intersect, count)
                 count += 1     
+                print("In TestMotionBasedCanting.azimuth_binary_search(): offset_x = ", offset_x, "   search_azimuth= ", search_azimuth) #TODO MHH delete!
                 if offset_x > 0:
-                    high_az = search_az
+                    high_azimuth = search_azimuth
                     high_offset_x = offset_x
+                    print("In TestMotionBasedCanting.azimuth_binary_search(): offset_x = ", offset_x, "   low_azimuth = ", low_azimuth, "   high_azimuth = ", high_azimuth) #TODO MHH
                     break
+            print("In TestMotionBasedCanting.azimuth_binary_search(): low_offset_x = ", low_offset_x, "   high_offset_x = ", high_offset_x)
+
 
         elif offset_x > 0:
             # Else we need to find an azimuth that corresponds to negative offset.
-            high_az = az
+            high_azimuth = az
             high_offset_x = offset_x
             # Now search for an azimuth value corresponding to a positive offset.
-            search_az = az
+            search_azimuth = az
             while offset_x > 0:
-                search_az += .05
-                is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, search_az, el)
-                search_az, count = self.doesnt_hit_plane_when_moving_intersect_point(search_az, is_intersect, count)
+                search_azimuth += .05
+                is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, search_azimuth, el)
+                search_azimuth, count = self.doesnt_hit_plane_when_moving_intersect_point(search_azimuth, is_intersect, count)
                 count += 1
+                print("In TestMotionBasedCanting.azimuth_binary_search(): offset_x = ", offset_x, "   search_azimuth= ", search_azimuth) #TODO MHH delete!
                 if offset_x < 0:
-                    low_az = search_az
+                    low_azimuth = search_azimuth
                     low_offset_x = offset_x
+                    print("In TestMotionBasedCanting.azimuth_binary_search(): offset_x = ", offset_x, "   low_azimuth = ", low_azimuth, "   high_azimuth = ", high_azimuth) #TODO MHH
                     break
+            print("In TestMotionBasedCanting.azimuth_binary_search(): low_offset_x = ", low_offset_x, "   high_offset_x = ", high_offset_x)
+
 
         else:
-            middle_az = az
+            middle_azimuth = az
             offset_x_points = offset_x
             # If the current azimuth value corresponds with an offset_x of 0.
+            print("\nIn TestMotionBasedCanting.azimuth_binary_search(): offset_x = 0,    az = ", az)
 
 
         offset_x_points = []
 
         while low_offset_x <= high_offset_x:
-            middle_az = low_az + (high_az - low_az) / 2
-            is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, middle_az, el)
+            middle_azimuth = low_azimuth + (high_azimuth - low_azimuth) / 2
+            is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, middle_azimuth, el)
+            print ("In TestMotionBasedCanting.azimuth_binary_search(): offset=", offset_x, "    azimuth=", middle_azimuth)
             offset_x_points.append(offset_x)
             #ignore left half
             if offset_x < -(tolerance/np.sqrt(2)):
-                low_az = middle_az
+                low_azimuth = middle_azimuth
+                print("In TestMotionBasedCanting.azimuth_binary_search: new low_azimuth = ", low_azimuth)
             # ignore right half
             elif offset_x > tolerance/np.sqrt(2):
-                high_az = middle_az
-            # middle_az value hits target
+                high_azimuth = middle_azimuth
+                print("In TestMotionBasedCanting.azimuth_binary_search: new high_azimuth = ", high_azimuth)
+            # middle_azimuth value hits target
             else:
-                return middle_az, offset_x_points
+                return middle_azimuth, offset_x_points
 
 
         # couldn't find the target az-values
@@ -336,10 +349,13 @@ class TestMotionBasedCanting(to.TestOutput):
                 is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, az, search_el)
                 search_el, count = self.doesnt_hit_plane_when_moving_intersect_point(search_el, is_intersect, count)
                 count += 1
+                print("In TestMotionBasedCanting.elevation_binary_search(): offset_z = ", offset_z, "   search_el= ", search_el) #TODO MHH delete!
                 if offset_z > 0:
                     high_el = search_el
                     high_offset_z = offset_z
+                    print("In TestMotionBasedCanting.elevation_binary_search(): offset_z = ", offset_z, "   low_el = ", low_el, "   high_el = ", high_el) #TODO MHH
                     break
+            print("In TestMotionBasedCanting.elevation_binary_search(): low_offset_z = ", low_offset_z, "   high_offset_z = ", high_offset_z)
 
         elif offset_z > 0:
             # Else we need to find an elevation that corresponds to negative offset.
@@ -352,13 +368,18 @@ class TestMotionBasedCanting(to.TestOutput):
                 is_intersect, offset_z, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, az, search_el)
                 search_el, count = self.doesnt_hit_plane_when_moving_intersect_point(search_el, is_intersect, count)
                 count += 1
+                print("In TestMotionBasedCanting.elevation_binary_search(): offset_z = ", offset_z, "   search_el= ", search_el) #TODO MHH delete!
                 if offset_z < 0:
                     low_el = search_el
                     low_offset_z = offset_z
+                    print("In TestMotionBasedCanting.elevation_binary_search(): offset_z = ", offset_z, "   low_el = ", low_el, "   high_el = ", high_el) #TODO MHH
                     break
+            print("In TestMotionBasedCanting.elevation_binary_search(): low_offset_z = ", low_offset_z, "   high_offset_z = ", high_offset_z)
+
 
         else:
             # If the current elevation value corresponds with an offset_x of 0.
+            print("\nIn TestMotionBasedCanting.elevation_binary_search(): offset_z = 0,    el = ", el)
             middle_el = el
             offset_z_points = offset_z
 
@@ -368,13 +389,16 @@ class TestMotionBasedCanting(to.TestOutput):
         while low_offset_z <= high_offset_z:
             middle_el = low_el + (high_el - low_el) / 2
             is_intersect, offset_x, offset_z, intersection = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, az, middle_el)
+            print ("In TestMotionBasedCanting.elevation_binary_search(): offset=", offset_z, "    elevation=", middle_el)
             offset_z_points.append(offset_z)
             #ignore left half
             if offset_z < -(tolerance/np.sqrt(2)):
                 low_el = middle_el
+                print("In TestMotionBasedCanting.elevation_binary_search: new low_el = ", low_el)
             # ignore right half
             elif offset_z > tolerance/np.sqrt(2):
                 high_el = middle_el
+                print("In TestMotionBasedCanting.elevation_binary_search: new high_el = ", high_el)
             # middle_el value hits target
             else:
                 return middle_el, offset_z_points
@@ -387,7 +411,7 @@ class TestMotionBasedCanting(to.TestOutput):
 
 
 
-    def find_single_facet_az_el_value(self, target_loc:'Pxyz', target_plane_normal:'Uxyz', heliostat_name:str, f_index:int, az:float, el:float, tolerance:float):
+    def find_single_facet_azimuth_el_value(self, target_loc:'Pxyz', target_plane_normal:'Uxyz', heliostat_name:str, f_index:int, az:float, el:float, tolerance:float):
         """
         Returns azimuth and elevation values for single facet.
 
@@ -406,23 +430,26 @@ class TestMotionBasedCanting(to.TestOutput):
         is_intersect, offset_x, offset_z, intersection_point = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, az, el)
 
         # iterates through finding az el values, by first finding az value, then el value given az, etc. until within tolerance
-        for i in range(1, 11): 
+        for i in range(1, 21): 
             if Pxyz.distance(intersection_point, target_loc) > tolerance:
                 az, offset_x_points = self.azimuth_binary_search(target_loc, target_plane_normal, heliostat_name, f_index, az, el, tolerance)
                 el, offset_z_points = self.elevation_binary_search(target_loc, target_plane_normal, heliostat_name, f_index, az, el, tolerance)
                 is_intersect, offset_x, offset_z, intersection_point = self.projected_facet_normal_intersection_point_offset(target_loc, target_plane_normal, heliostat_name, f_index, az, el)
-                if i <= 11:
+                print("In TestMotionBasedCanting.find_single_facet_azimuth_el_value:  azimuth = ",  az, "     elevation = ",el) #TODO MHH            
+                if i <= 21:
+                    print("In TestMotionBasedCanting.find_single_facet_azimuth_el_value: In tolerance = ", tolerance, "distance = ", Pxyz.distance(intersection_point, target_loc), "azimuth = ",  az, "     elevation = ",el) #TODO MHH 
+
                     break
 
             # else: #Pxyz.distance(intersection_point, target_loc) <= tolerance: 
-            #     print("In TestMotionBasedCanting.find_single_facet_az_el_value: Values already in tolerance = ", tolerance, "distance = ", Pxyz.distance(intersection_point, target_loc), "azimuth = ",  az, "     elevation = ",el) #TODO MHH            
+            #     print("In TestMotionBasedCanting.find_single_facet_azimuth_el_value: Values already in tolerance = ", tolerance, "distance = ", Pxyz.distance(intersection_point, target_loc), "azimuth = ",  az, "     elevation = ",el) #TODO MHH            
 
 
         return az, el, intersection_point
 
 
 
-    def find_all_az_el_test_values(self, target_loc:Pxyz, target_plane_normal:Uxyz, heliostat_name:str, az:float, el:float, tolerance:float):
+    def find_all_azimuth_el_test_values(self, target_loc:Pxyz, target_plane_normal:Uxyz, heliostat_name:str, az:float, el:float, tolerance:float):
         """
         Returns all azimuth and elevation values for every facet if within tolerance.
 
@@ -456,9 +483,10 @@ class TestMotionBasedCanting(to.TestOutput):
 
         #iterates through every facet to find the azmimuth and elevation values that correspond with a surface normal that intersects with the target.
         for f_index, f_index in enumerate(heliostat.facet_dict):
-            facet_az, facet_el, intersection = self.find_single_facet_az_el_value(target_loc, target_plane_normal, heliostat_name, f_index, az, el, tolerance)
-            az_el_values_found = {'facet_number': f_index, 'canting data': {'center_normal_to_target_azimith': facet_az, 'center_normal_to_target_elevation': facet_el}}
-            all_facets.append(az_el_values_found)
+            print("\nIn TestMotionBasedCanting.find_all_facet_azimuth_el_values:    facet=", f_index)
+            facet_azimuth, facet_el, intersection = self.find_single_facet_azimuth_el_value(target_loc, target_plane_normal, heliostat_name, f_index, az, el, tolerance)
+            azimuth_el_values_found = {'facet_number': f_index, 'canting data': {'center_normal_to_target_azimuth': facet_azimuth, 'center_normal_to_target_elevation': facet_el}}
+            all_facets.append(azimuth_el_values_found)
 
 
         for facet in all_facets:
@@ -487,19 +515,19 @@ class TestMotionBasedCanting(to.TestOutput):
         comments = []
 
         # # Define test heliostat orientation
-        test_az = np.deg2rad(177.5)
-        test_el = np.deg2rad(43.2)
+        test_azimuth = np.deg2rad(45)
+        test_el = np.deg2rad(0)
         # # Define upward-facing heliostat orientation.
-        up_az = np.deg2rad(180)
+        up_azimuth = np.deg2rad(180)
         up_el = np.deg2rad(90)
 
 
         # Configuration setup
         solar_field = self.solar_field
         # solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
-        test_configuration = hc.HeliostatConfiguration(az=test_az, el=test_el)
+        test_configuration = hc.HeliostatConfiguration(az=test_azimuth, el=test_el)
         solar_field.set_heliostats_configuration(test_heliostat, test_configuration)
-        up_configuration = hc.HeliostatConfiguration(az=up_az, el=up_el)
+        up_configuration = hc.HeliostatConfiguration(az=up_azimuth, el=up_el)
         solar_field.set_heliostats_configuration(up_heliostats, up_configuration)
         tower= Tower(name='Sandia NSTTF', origin=np.array([0,0,0]), parts = ["whole tower", "target"])
 
@@ -551,7 +579,7 @@ class TestMotionBasedCanting(to.TestOutput):
 
 
 
-    def test_az_binary_search(self) -> None:
+    def test_azimuth_binary_search(self) -> None:
         """
         Draws azimuth binary search algorithm with the target.
         """
@@ -568,19 +596,19 @@ class TestMotionBasedCanting(to.TestOutput):
         comments = []
 
         #choose initial position of azimuth and elevation
-        test_az = np.deg2rad(177.5)
+        test_azimuth = np.deg2rad(177.5)
         test_el = np.deg2rad(43.2)
 
         # Configuration setup
-        test_configuration = hc.HeliostatConfiguration(az=test_az, el=test_el)
+        test_configuration = hc.HeliostatConfiguration(az=test_azimuth, el=test_el)
         tower= Tower(name='Sandia NSTTF', origin=np.array([0,0,0]), parts = ["whole tower", "target"])
         target_loc_1 = tower.target_loc
         target_plane_normal_1 = Uxyz([0,1,0])
         test_tolerance = .001
         
-        is_intersect, offset_x, offset_z, intersection = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=az_1, el=el_1)
+        is_intersect, offset_x, offset_z, intersection = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=azimuth_1, el=el_1)
 
-        middle_az, offset_x_points = self.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_az, el=test_el, tolerance=test_tolerance)
+        middle_azimuth, offset_x_points = self.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_azimuth, el=test_el, tolerance=test_tolerance)
 
         z = [(offset_z+target_loc_1.z) for x in enumerate(offset_x_points)]
         y = [target_loc_1.y for x in enumerate(offset_x_points)]
@@ -640,19 +668,19 @@ class TestMotionBasedCanting(to.TestOutput):
         comments = []
 
         #choose initial position of azimuth and elevation
-        test_az = np.deg2rad(177.5)
+        test_azimuth = np.deg2rad(177.5)
         test_el = np.deg2rad(43.2)
 
         # Configuration setup
-        test_configuration = hc.HeliostatConfiguration(az=test_az, el=test_el)
+        test_configuration = hc.HeliostatConfiguration(az=test_azimuth, el=test_el)
         tower= Tower(name='Sandia NSTTF', origin=np.array([0,0,0]), parts = ["whole tower", "target"])
         target_loc_1 = tower.target_loc
         target_plane_normal_1 = Uxyz([0,1,0])
         test_tolerance = .001
         
-        is_intersec, offset_x, offset_z, intersection = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=az_1, el=el_1)
+        is_intersec, offset_x, offset_z, intersection = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=azimuth_1, el=el_1)
 
-        middle_el, offset_z_points = self.elevation_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_az, el=test_el, tolerance=test_tolerance)
+        middle_el, offset_z_points = self.elevation_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_azimuth, el=test_el, tolerance=test_tolerance)
         offset_z_points = np.array(offset_z_points)+ target_loc_1.z
 
         x = [offset_x for x in enumerate(offset_z_points)]
@@ -713,12 +741,12 @@ class TestMotionBasedCanting(to.TestOutput):
         comments = []
 
         #choose initial position of azimuth and elevation
-        test_az = np.deg2rad(177.5)
+        test_azimuth = np.deg2rad(177.5)
         test_el = np.deg2rad(43.2)
 
         # Configuration setup
         solar_field = self.solar_field
-        test_configuration = hc.HeliostatConfiguration(az=test_az, el=test_el)
+        test_configuration = hc.HeliostatConfiguration(az=test_azimuth, el=test_el)
         solar_field.set_heliostats_configuration(test_heliostat, test_configuration)
         tower= Tower(name='Sandia NSTTF', origin=np.array([0,0,0]), parts = ["whole tower", "target"])
         target_loc_1 = tower.target_loc
@@ -732,7 +760,7 @@ class TestMotionBasedCanting(to.TestOutput):
         solar_field_style.heliostat_styles.add_special_names(test_heliostat, surface_normal_facet_style)
         tower_control = rct.normal_tower()
         
-        az, el, intersection = self.find_single_facet_az_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_az, el=test_el, tolerance=test_tolerance)
+        az, el, intersection = self.find_single_facet_azimuth_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_azimuth, el=test_el, tolerance=test_tolerance)
 
         # Style setup
         surface_normal_facet_style = rch.facet_outlines_normals(color='b')
@@ -789,14 +817,14 @@ class TestMotionBasedCanting(to.TestOutput):
         self.start_test()
 
         #choose initial position of azimuth and elevation
-        test_az = np.deg2rad(177.5)
+        test_azimuth = np.deg2rad(177.5)
         test_el = np.deg2rad(43.2)
 
         # Configuration setup
         heliostat_name=("9W1")
         test_heliostat = [heliostat_name]
         solar_field = self.solar_field
-        test_configuration = hc.HeliostatConfiguration(az=test_az, el=test_el)
+        test_configuration = hc.HeliostatConfiguration(az=test_azimuth, el=test_el)
         solar_field.set_heliostats_configuration(test_heliostat, test_configuration)
         tower= Tower(name='Sandia NSTTF', origin=np.array([0,0,0]), parts = ["whole tower", "target"])
         target_loc_1 = tower.target_loc
@@ -823,7 +851,7 @@ class TestMotionBasedCanting(to.TestOutput):
             tower_control = rct.normal_tower()
 
 
-            az, el, intersection = self.find_single_facet_az_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_az, el=test_el, tolerance=test_tolerance)
+            az, el, intersection = self.find_single_facet_azimuth_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, f_index=f_index, az=test_azimuth, el=test_el, tolerance=test_tolerance)
             
             # Comment
             comments.append("The tower with a target in red and intersection point in blue from the surface normal of the facet: ")
@@ -882,13 +910,13 @@ class TestMotionBasedCanting(to.TestOutput):
         comments = []
 
         #choose initial position of azimuth and elevation
-        test_az = np.deg2rad(0)
+        test_azimuth = np.deg2rad(0)
         test_el = np.deg2rad(90)
 
         # Configuration setup
         test_heliostat = [heliostat_name]
         solar_field = self.solar_field
-        test_configuration = hc.HeliostatConfiguration(az=test_az, el=test_el)
+        test_configuration = hc.HeliostatConfiguration(az=test_azimuth, el=test_el)
         solar_field.set_heliostats_configuration(test_heliostat, test_configuration)
         tower= Tower(name='Sandia NSTTF', origin=np.array([0,0,0]), parts = ["whole tower", "target"])
         target_loc_1 = tower.target_loc
@@ -902,7 +930,7 @@ class TestMotionBasedCanting(to.TestOutput):
             # Comment
         comments.append("The tower with a target in red and intersection point in blue from the surface normal of the facet: ")
 
-        result = test_object.find_all_az_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, az=test_az, el=test_el, tolerance=test_tolerance)
+        result = test_object.find_all_azimuth_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name, az=test_azimuth, el=test_el, tolerance=test_tolerance)
         
 
         return
@@ -918,24 +946,24 @@ class TestMotionBasedCanting(to.TestOutput):
     # f_index_1 = 13
 
     # #close to where the target is for facet 1
-    # az_1 = np.deg2rad(177.5)
+    # azimuth_1 = np.deg2rad(177.5)
     # el_1 = np.deg2rad(43.2)
 
     # #facing plane
-    # az_1 = np.deg2rad(180) #or 0
+    # azimuth_1 = np.deg2rad(180) #or 0
     # el_1 = np.deg2rad(0) #or 180
 
     # #Doesn't hit plane
-    # az_1 = np.deg2rad(0)
+    # azimuth_1 = np.deg2rad(0)
     # el_1 = np.deg2rad(0) or 90
 
     # test_tolerance =.001
 
-    # result = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1)
-    # result = test_object.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1, tolerance=test_tolerance)
-    # result = test_object.find_single_facet_az_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1, tolerance=test_tolerance)
-    # result = test_object.elevation_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1, tolerance=test_tolerance)
-    # result = test_object.find_all_az_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, az=az_1, el=el_1, tolerance=test_tolerance)
+    # result = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1)
+    # result = test_object.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    # result = test_object.find_single_facet_azimuth_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    # result = test_object.elevation_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    # result = test_object.find_all_azimuth_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
     
 
 #     # Save figures.
@@ -976,26 +1004,26 @@ if __name__ == "__main__":
     target_loc_1 = tower.target_loc
     target_plane_normal_1 = Uxyz([0,1,0])
     heliostat_name_1=("9W1")
-    f_index_1 = 1
-    az_1 = np.deg2rad(0)
-    el_1 = np.deg2rad(0)
+    f_index_1 = 13
+    azimuth_1 = np.deg2rad(177)
+    el_1 = np.deg2rad(43)
     test_tolerance =.001
 
-    result = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1)
-    print("next test")
-    result = test_object.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1, tolerance=test_tolerance)
-    print("next test")
-    result = test_object.elevation_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1, tolerance=test_tolerance)
-    print("next test")
-    result = test_object.find_single_facet_az_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=az_1, el=el_1, tolerance=test_tolerance)    
-    print("next test")
-    result = test_object.find_all_az_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, az=az_1, el=el_1, tolerance=test_tolerance)
-    print("next test")
+    # result = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1)
+    # print("next test")
+    # result = test_object.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    # print("next test")
+    result = test_object.elevation_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    # print("next test")
+    # result = test_object.find_single_facet_azimuth_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)    
+    # print("next test")
+    # result = test_object.find_all_azimuth_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    # print("next test")
     
     
     
     # test_object.test_9W1_heliostat()
-    # test_object.test_az_binary_search()
+    # test_object.test_azimuth_binary_search()
     # test_object.test_el_binary_search()
     # test_object.test_single_facet()
     # test_object.test_all_facets()

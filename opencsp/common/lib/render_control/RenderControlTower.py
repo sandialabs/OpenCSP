@@ -1,6 +1,8 @@
-import opencsp_code.common.lib.render_control.RenderControlPointSeq as rcps
-import opencsp_code.common.lib.render_control.RenderControlText as rctxt
-from opencsp_code.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
+
+
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
+import opencsp.common.lib.render_control.RenderControlText as rctxt
+from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
 
 
 class RenderControlTower():
@@ -24,7 +26,7 @@ class RenderControlTower():
         self.wire_frame = wire_frame
         self.target = target
 
-
+ 
     def style(self, any):
         """ "style" is a method commonly used by RenderControlEnsemble.
         We add this method here so that RenderControlHeliostat can be used similarly to RenderControlEnsemble. """

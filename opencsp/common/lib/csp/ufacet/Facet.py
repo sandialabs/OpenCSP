@@ -59,9 +59,9 @@ class Facet(RayTraceable):
         # if additional information (backside structure, bolt locations, etc) is needed
         # Fill in here
 
-    def set_position_in_space(self, translation: np.ndarray, rotation: Rotation) -> None:
+    def set_position_in_space(self, heliostat_origin: np.ndarray, rotation: Rotation) -> None:  #TODO np.ndarray needs to be changed to a Pxyz
         # Sets facet's position given heliostat configuration.
-        self.origin: np.ndarray = np.array(translation) + rotation.apply(
+        self.origin: np.ndarray = np.array(heliostat_origin) + rotation.apply(
             np.array(self.centroid_offset)
         )  # R_aiming * T_pivot * T_offset * R_canting * M_origin
         self.composite_rotation: Rotation = rotation * self.canting  # TODO tjlarki: is this right?

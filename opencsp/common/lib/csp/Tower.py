@@ -14,22 +14,22 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 from sympy import Symbol, diff
 
-import   opencsp_code.common.lib.csp.Heliostat as Heliostat
-import opencsp_code.common.lib.csp.HeliostatConfiguration as hc
-import opencsp_code.common.lib.csp.sun_track as st
-import opencsp_code.common.lib.geometry.transform_3d as t3d
-from opencsp_code.common.lib.geometry.Pxyz import Pxyz
-from opencsp_code.common.lib.geometry.Vxyz import Vxyz
-import opencsp_code.common.lib.render_control.RenderControlTower as rct
-import opencsp_code.common.lib.tool.math_tools as mt
-from opencsp_code.common.lib.csp.Facet import Facet
-from opencsp_code.common.lib.csp.geometric_aliases import Pxyz as OldPxyz
-from opencsp_code.common.lib.csp.geometric_aliases import Vxyz as OldVxyz
-from opencsp_code.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
-from opencsp_code.common.lib.csp.RayTraceable import RayTraceable
-from opencsp_code.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
-from opencsp_code.common.lib.render_control.RenderControlTower import RenderControlTower
-from opencsp_code.common.lib.render.View3d import View3d
+import   opencsp.common.lib.csp.ufacet.Heliostat as Heliostat
+import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
+import opencsp.common.lib.csp.sun_track as st
+import opencsp.common.lib.geometry.transform_3d as t3d
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.render_control.RenderControlTower as rct
+import opencsp.common.lib.tool.math_tools as mt
+from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.geometry import Pxyz as OldPxyz
+from opencsp.common.lib.geometry import Vxyz as OldVxyz
+from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
+from opencsp.common.lib.csp.RayTraceable import RayTraceable
+from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
+from opencsp.common.lib.render_control.RenderControlTower import RenderControlTower
+from opencsp.common.lib.render.View3d import View3d
 
 class Tower(RayTraceable):
     """
@@ -97,7 +97,7 @@ class Tower(RayTraceable):
 
         # Facets
         # self.facets = facets
-        # self.parts_dict = {f.name: f_i for f_i, f in enumerate(parts)} #TODO tjlarki: check with RCB that this is what we want
+        # self.parts_dict = {f.name: f_i for f_i, f in enumerate(parts)} # TODO tjlarki: check that this is what we want
 
         # # Tower Edge
         # self.top_left_facet:Facet     = self.facets[self.facet_dict[str(1)]]

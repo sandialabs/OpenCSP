@@ -9,22 +9,22 @@ import numpy as np
 import psutil
 from scipy.spatial.transform import Rotation
 
-from opencsp_code.common.lib.csp import LightPath as lp
-from opencsp_code.common.lib.csp.LightPath import LightPath
-from opencsp_code.common.lib.csp.LightPathEnsemble import LightPathEnsemble
-from opencsp_code.common.lib.csp.LightSource import LightSource
-from opencsp_code.common.lib.csp.RayTrace import RayTrace
-from opencsp_code.common.lib.csp.RayTraceable import RayTraceable
-from opencsp_code.common.lib.csp.Scene import Scene
-from opencsp_code.common.lib.geometry.FunctionXYGrid import FunctionXYGrid
-from opencsp_code.common.lib.geometry.Pxy import Pxy
-from opencsp_code.common.lib.geometry.Pxyz import Pxyz
-from opencsp_code.common.lib.geometry.Uxyz import Uxyz
-from opencsp_code.common.lib.geometry.Vxyz import Vxyz
-from opencsp_code.common.lib.render.View3d import View3d
-from opencsp_code.common.lib.render_control.RenderControlPointSeq import \
+from opencsp.common.lib.csp import LightPath as lp
+from opencsp.common.lib.csp.LightPath import LightPath
+from opencsp.common.lib.csp.LightPathEnsemble import LightPathEnsemble
+from opencsp.common.lib.csp.LightSource import LightSource
+from opencsp.common.lib.csp.RayTrace import RayTrace
+from opencsp.common.lib.csp.RayTraceable import RayTraceable
+from opencsp.common.lib.csp.Scene import Scene
+from opencsp.common.lib.geometry.FunctionXYGrid import FunctionXYGrid
+from opencsp.common.lib.geometry.Pxy import Pxy
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.render.View3d import View3d
+from opencsp.common.lib.render_control.RenderControlPointSeq import \
     RenderControlPointSeq
-from opencsp_code.common.lib.render_control.RenderControlRayTrace import \
+from opencsp.common.lib.render_control.RenderControlRayTrace import \
     RenderControlRayTrace
 
 
@@ -50,7 +50,7 @@ def plane_intersec_vec_maddie(
     points, directions = lines
 
     # finds where the light intersects the plane
-    # algorithm explained at \opencsp_code\doc\IntersectionWithPlaneAlgorithm.pdf
+    # algorithm explained at \opencsp\doc\IntersectionWithPlaneAlgorithm.pdf
     # TODO tjlarki: upload explicitly vectorized algorithm proof
 
     plane_normal_vector = plane_normal_vector.normalize()
