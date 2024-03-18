@@ -7,15 +7,16 @@ import unittest
 from scipy.spatial.transform import Rotation
 import numpy as np
 
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.MeasurementSofastFringe import (
     MeasurementSofastFringe as Measurement,
 )
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
-from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -41,7 +42,6 @@ class TestMulti(unittest.TestCase):
         # Directory Setup
         file_dataset = os.path.join(base_dir, 'calculations_facet_ensemble/data.h5')
         file_measurement = os.path.join(base_dir, 'measurement_ensemble.h5')
-        print(f'Using dataset: {os.path.abspath(file_dataset)}')
 
         # Load data
         camera = Camera.load_from_hdf(file_dataset)
@@ -123,20 +123,19 @@ class TestMulti(unittest.TestCase):
             )
 
         # Load surface data
-        surface_data = []
+        surfaces = []
         for idx in range(len(facet_data)):
             datasets = [
                 f'DataSofastInput/surface_params/facet_{idx:03d}/downsample',
                 f'DataSofastInput/surface_params/facet_{idx:03d}/initial_focal_lengths_xy',
                 f'DataSofastInput/surface_params/facet_{idx:03d}/robust_least_squares',
-                f'DataSofastInput/surface_params/facet_{idx:03d}/surface_type',
             ]
             data = load_hdf5_datasets(datasets, file_dataset)
             data['robust_least_squares'] = bool(data['robust_least_squares'])
-            surface_data.append(data)
+            surfaces.append(Surface2DParabolic(**data))
 
         # Run SOFAST
-        sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
+        sofast.process_optic_multifacet(facet_data, ensemble_data, surfaces)
 
         # Store data
         cls.data_test = {'slopes_facet_xy': [], 'surf_coefs_facet': []}
@@ -188,9 +187,4 @@ class TestMulti(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    Test = TestMulti()
-    Test.setUpClass()
-
-    Test.test_slope()
-    Test.test_surf_coefs()
-    print('All tests run')
+    unittest.main()
