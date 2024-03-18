@@ -740,6 +740,15 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             return facets[0]
 
     def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
         # Log
         lt.info(f'Saving SofastFringe data to: {file:s}, in HDF5 folder: "{prefix:s}"')
 
