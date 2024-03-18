@@ -7,14 +7,16 @@ from scipy.optimize import minimize
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 import opencsp.common.lib.deflectometry.slope_fitting_2d as sf2
-from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
-from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
+from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
 
 class SlopeSolver:
+    """Class that solves for the surface slopes of optics in deflectometry
+    systems."""
+
     def __init__(
         self,
         v_optic_cam_optic: Vxyz,
@@ -24,9 +26,9 @@ class SlopeSolver:
         v_optic_screen_optic: Vxyz,
         v_align_point_optic: Vxyz,
         dist_optic_screen: float,
-        surface_data: dict,
+        surface: Surface2DAbstract,
         debug: SlopeSolverDataDebug = SlopeSolverDataDebug(),
-    ):
+    ) -> 'SlopeSolver':
         """
         Initializes the slope solving object.
 
@@ -46,62 +48,13 @@ class SlopeSolver:
             Position of align point in optic coordinates.
         dist_optic_screen : float
             Measured optic to screen distance.
-        surface_data : dict
-            Dictionary containing surface data information to use when
-            solving slopes. The data fields depend on the surface fit being
-            performed. The following options are supported:
-
-            1) Parabolic fit
-                surface_type
-                initial_focal_lengths_xy
-                robust_least_squares
-                downsample
-            2) Plano fit
-                surface_type
-                robust_least_squares
-                downsample
-            3) Spherical fit (will raise NotImplementedError)
-                surface_type
-                radius
-                robust_least_squares
-                downsample
-
-            Data field descriptions
-            -----------------------
-                surface_type : str {'parabolic', 'plano', 'spherical'}
-                    The type of surface being characterized
-                initial_focal_lengths_xy : list[tuple(float, float)]
-                    The focal lengths to use as the starting point for the
-                    fitting algorithm.
-                robust_least_squares : bool
-                    To use robust least squares fitting, or just least squares
-                    fitting.
-                downsample : int
-                    The amount to downsample data for surface fitting
-                radius : float
-                    The initial radius to use as the starting point for the
-                    fitting algorithm.
+        surface : Surface2DAbstract
+            2D surface definition class.
         debug: SlopeSolverDataDebug
             SlopeSolverDataDebug object for debugging.
-
         """
-        # Instantiate surface fit object depending on fit type
-        surface_data_copy = surface_data.copy()
-        self.surface_type = surface_data_copy.pop('surface_type')
-        if self.surface_type == 'parabolic':
-            self.surface = Surface2DParabolic(**surface_data_copy)
-        elif self.surface_type == 'plano':
-            self.surface = Surface2DPlano(**surface_data_copy)
-        elif self.surface_type == 'spherical':
-            raise NotImplementedError(
-                'Currently, "spherical" surface type is not implemented.'
-            )
-        else:
-            raise ValueError(
-                f'Given surface_type "{self.surface_type:s}" not supported.'
-            )
-
         # Store inputs in class
+        self.surface = surface
         self.v_optic_cam_optic = v_optic_cam_optic
         self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic
         self.u_measure_pixel_pointing_optic = u_measure_pixel_pointing_optic
