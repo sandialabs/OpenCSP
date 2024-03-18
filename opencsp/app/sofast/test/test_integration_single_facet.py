@@ -7,14 +7,16 @@ import unittest
 
 import numpy as np
 
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import (
     MeasurementSofastFringe as Measurement,
 )
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
@@ -43,10 +45,6 @@ class TestSingle(unittest.TestCase):
         )
         if len(cls.files_dataset) == 0:
             raise ValueError('No single-facet datsets found.')
-        else:
-            print(f'Testing {len(cls.files_dataset)} single facet datasets')
-            for file in cls.files_dataset:
-                print(f'Using dataset: {os.path.abspath(file)}')
 
         # Define component files
         file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
@@ -89,6 +87,16 @@ class TestSingle(unittest.TestCase):
                         ],
                         file_dataset,
                     )
+                )
+                surface = Surface2DParabolic(
+                    surface_data['initial_focal_lengths_xy'],
+                    surface_data['robust_least_squares'],
+                    surface_data['downsample'],
+                )
+            else:
+                surface = Surface2DPlano(
+                    surface_data['robust_least_squares'],
+                    surface_data['downsample'],
                 )
 
             # Load optic data
@@ -148,7 +156,7 @@ class TestSingle(unittest.TestCase):
             ]
 
             # Run SOFAST
-            sofast.process_optic_singlefacet(facet_data, surface_data)
+            sofast.process_optic_singlefacet(facet_data, surface)
 
             # Store test data
             cls.slopes.append(sofast.data_characterization_facet[0].slopes_facet_xy)
@@ -191,16 +199,4 @@ class TestSingle(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    Test = TestSingle()
-    Test.setUpClass()
-
-    print('test_slopes', flush=True)
-    Test.test_slopes()
-
-    print('test_surf_coefs', flush=True)
-    Test.test_surf_coefs()
-
-    print('test_int_points', flush=True)
-    Test.test_int_points()
-
-    print('All tests run.')
+    unittest.main()
