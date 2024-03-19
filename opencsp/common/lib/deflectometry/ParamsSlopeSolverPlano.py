@@ -1,11 +1,9 @@
 from dataclasses import dataclass
 
-from opencsp.common.lib.deflectometry.ParamsSlopeSolver import ParamsSlopeSolver
+from opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract import ParamsSlopeSolverAbstract
 
 
 @dataclass
-class ParamsSlopeSolverPlano(ParamsSlopeSolver):
+class ParamsSlopeSolverPlano(ParamsSlopeSolverAbstract):
     """SlopeSolver input parameters class for plano (perfectly flat) surface type
     """
-    robust_least_squares: bool
-    downsample: int
