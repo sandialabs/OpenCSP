@@ -4,6 +4,7 @@ import numpy as np
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Vxy import Vxy
+import opencsp.common.lib.render.figure_management as fm
 
 
 class TestRegionXY:
@@ -30,6 +31,6 @@ class TestRegionXY:
         loop = LoopXY.from_vertices(verts)
         region = RegionXY(loop)
 
-        fig = plt.figure()
+        fig = fm._mpl_pyplot_figure()
         region.draw(fig.gca())
         plt.close(fig)
