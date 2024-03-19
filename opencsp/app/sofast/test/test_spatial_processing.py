@@ -1,5 +1,6 @@
 """Unit test suite to test the spatial_processing library
 """
+
 import os
 import unittest
 
@@ -7,7 +8,9 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy

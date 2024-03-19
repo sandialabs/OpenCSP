@@ -1,4 +1,5 @@
 """Data class for holding output of a SlopeSolver calculation"""
+
 from dataclasses import dataclass
 
 from numpy import ndarray

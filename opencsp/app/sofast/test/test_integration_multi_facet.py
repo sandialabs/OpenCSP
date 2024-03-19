@@ -1,5 +1,6 @@
 """Integration test. Testing processing of a 'multi_facet' type optic.
 """
+
 import os
 import unittest
 
@@ -8,7 +9,9 @@ import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
@@ -114,7 +117,9 @@ class TestMulti(unittest.TestCase):
             ]
             data = load_hdf5_datasets(datasets, file_dataset)
             facet_data.append(
-                DefinitionFacet(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet']))
+                DefinitionFacet(
+                    Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet'])
+                )
             )
 
         # Load surface data

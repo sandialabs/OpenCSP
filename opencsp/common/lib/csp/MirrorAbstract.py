@@ -1,5 +1,6 @@
 """Abstract mirror representing a single reflective surface
 """
+
 from abc import ABC, abstractmethod
 
 from matplotlib.tri import Triangulation

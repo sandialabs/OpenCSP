@@ -177,11 +177,12 @@ class KeyFramesGivenManual:
                     heliostat_names = keyinfo[3]
                     frame_id = instance_frame_correspondence_dict[instance_key]
                     # Construct key frame entry.
-                    (
-                        key_frame_id,
-                        list_of_name_polygons,
-                    ) = self.construct_key_frame_entry(
-                        instance_key, keyinfo_dict, instance_frame_correspondence_dict
+                    (key_frame_id, list_of_name_polygons) = (
+                        self.construct_key_frame_entry(
+                            instance_key,
+                            keyinfo_dict,
+                            instance_frame_correspondence_dict,
+                        )
                     )
                     key_frames_fnxl.add_list_of_name_xy_lists(
                         key_frame_id, list_of_name_polygons

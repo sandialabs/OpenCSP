@@ -50,14 +50,12 @@ class RenderControlFigureRecord:
         self.figure = figure
         self.axis_control = axis_control
         """ Axis control instance used in figure_management.setup_figure. Can be None|RenderControlAxis. """
-        self.metadata: list[
-            str
-        ] = (
+        self.metadata: list[str] = (
             []
         )  # A list of standard string fields -- name, figure number, file path, etc.
-        self.comments: list[
-            str
-        ] = []  # A list of caller-defined strings, to be filled in later.
+        self.comments: list[str] = (
+            []
+        )  # A list of caller-defined strings, to be filled in later.
         self.axis: plt.Axes = None  # Matplotlib plot axes object.  Set later.
         self.view: View3d = None  # View3d object.                Set later.
         self.equal = None  # Whether to make axes equal.   Set later.

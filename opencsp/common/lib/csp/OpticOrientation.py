@@ -1,5 +1,6 @@
 """Class to handle relative orientations of heirarchical optics.
 """
+
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
 

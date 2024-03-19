@@ -37,7 +37,9 @@ class SpotAnalysisOperable:
     """ Any fiducials handed to us in the currently processing image. """
     found_fiducials: list[af.AbstractFiducial] = field(default_factory=list)
     """ The identified fiducials in the currently processing image. """
-    camera_intrinsics_characterization: any = None  # TODO figure out how to specify information here, maybe using common/lib/camera/Camera
+    camera_intrinsics_characterization: any = (
+        None  # TODO figure out how to specify information here, maybe using common/lib/camera/Camera
+    )
     """ Distortion, color, bit depth, etc of the camera. Maybe also distortion properties of the lens system. """
     light_sources: list[ls.LightSource] = field(default_factory=list)
     """ The sources that produced the light that landed on the observed

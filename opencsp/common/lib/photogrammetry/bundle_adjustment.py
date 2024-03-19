@@ -3,6 +3,7 @@ Bundle adjustment algorithm based on example at:
 https://scipy-cookbook.readthedocs.io/items/bundle_adjustment.html
 
 """
+
 from typing import Literal
 
 import cv2 as cv

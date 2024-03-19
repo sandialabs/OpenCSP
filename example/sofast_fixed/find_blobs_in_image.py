@@ -1,5 +1,6 @@
 """Example script that finds blobs in image and saves annotated image.
 """
+
 import os
 from os.path import join, dirname, exists
 

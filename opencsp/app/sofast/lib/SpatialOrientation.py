@@ -60,14 +60,12 @@ class SpatialOrientation:
 
     def __copy__(self) -> 'SpatialOrientation':
         """Returns a copy of spatial orientation"""
-        r_cam_screen = Rotation.from_rotvec(
-            self.r_cam_screen.as_rotvec().copy())
+        r_cam_screen = Rotation.from_rotvec(self.r_cam_screen.as_rotvec().copy())
         v_cam_screen_cam = self.v_cam_screen_cam.copy()
         ori = SpatialOrientation(r_cam_screen, v_cam_screen_cam)
 
         if self.optic_oriented:
-            r_cam_optic = Rotation.from_rotve(
-                self.r_cam_optic.as_rotvec().copy())
+            r_cam_optic = Rotation.from_rotve(self.r_cam_optic.as_rotvec().copy())
             v_cam_optic_cam = self.v_cam_optic_cam.copy()
             ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 

@@ -123,9 +123,7 @@ class DisplayShape:
             self.interp_func = lambda Vuv: self._interp_func_3D(Vuv, func_xyz)
 
         else:
-            raise ValueError(
-                f'Unknown screen model: {self.grid_data["screen_model"]}'
-            )
+            raise ValueError(f'Unknown screen model: {self.grid_data["screen_model"]}')
 
     def _interp_func_rectangular2D(self, uv_display_pts: Vxy) -> Vxyz:
         """
@@ -228,9 +226,7 @@ class DisplayShape:
             grid_data['xyz_screen_coords'] = Vxyz(grid_data['xyz_screen_coords'])
 
         else:
-            raise ValueError(
-                f'Model, {grid_data["screen_model"]}, not supported.'
-            )
+            raise ValueError(f'Model, {grid_data["screen_model"]}, not supported.')
 
         # Load display parameters
         datasets = [
@@ -265,9 +261,8 @@ class DisplayShape:
         data = []
         for dataset in self.grid_data.keys():
             datasets.append('DisplayShape/' + dataset)
-            if (
-                isinstance(self.grid_data[dataset], Vxy)
-                or isinstance(self.grid_data[dataset], Vxyz)
+            if isinstance(self.grid_data[dataset], Vxy) or isinstance(
+                self.grid_data[dataset], Vxyz
             ):
                 data.append(self.grid_data[dataset].data)
             else:

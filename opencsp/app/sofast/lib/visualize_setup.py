@@ -1,6 +1,7 @@
 """Library with function used to visualise a given Sofast setup in
 3D given a display and camera file. Useful for debugging calibration errors.
 """
+
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation

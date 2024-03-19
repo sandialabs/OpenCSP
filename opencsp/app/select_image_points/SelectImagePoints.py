@@ -6,6 +6,7 @@ to select image and find key points.
 's' key saves data.
 
 """
+
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 import os

@@ -52,14 +52,16 @@ class AbstractSpotAnalysisImagesProcessor(
 
     def run(
         self,
-        operables: ImagesIterable
-        | ImagesStream
-        | SpotAnalysisImagesStream
-        | Union[
-            'AbstractSpotAnalysisImagesProcessor',
-            list[SpotAnalysisOperable],
-            Iterator[SpotAnalysisOperable],
-        ],
+        operables: (
+            ImagesIterable
+            | ImagesStream
+            | SpotAnalysisImagesStream
+            | Union[
+                'AbstractSpotAnalysisImagesProcessor',
+                list[SpotAnalysisOperable],
+                Iterator[SpotAnalysisOperable],
+            ]
+        ),
     ) -> list[CacheableImage]:
         """Performs image processing on the input images."""
         if isinstance(operables, (ImagesIterable, ImagesStream)):

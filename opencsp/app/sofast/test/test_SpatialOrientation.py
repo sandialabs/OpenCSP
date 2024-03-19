@@ -1,5 +1,6 @@
 """Unit test suite to test the SpatialOrientation class
 """
+
 import os
 import unittest
 

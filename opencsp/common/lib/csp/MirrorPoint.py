@@ -1,6 +1,7 @@
 """Mirror class representing mirrors with scattered surface point
 locations.
 """
+
 from typing import Literal
 from warnings import warn
 

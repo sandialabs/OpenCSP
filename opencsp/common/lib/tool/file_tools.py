@@ -285,8 +285,12 @@ def file_size(input_dir_body_ext, error_if_exists_as_dir=True):
     Returns the size of the given file in bytes.
     """
     if not file_exists(input_dir_body_ext, error_if_exists_as_dir):
-        lt.error_and_raise(FileNotFoundError, 'ERROR: In file_size(), input_dir_body_ext ' +
-                           'was not found.\n\tinput_dir_body_ext =' + input_dir_body_ext)
+        lt.error_and_raise(
+            FileNotFoundError,
+            'ERROR: In file_size(), input_dir_body_ext '
+            + 'was not found.\n\tinput_dir_body_ext ='
+            + input_dir_body_ext,
+        )
     return os.path.getsize(input_dir_body_ext)
 
 
@@ -1086,12 +1090,15 @@ def convert_shortcuts_to_symlinks(dirname: str):
 
 # TEXT FILES
 
-def write_text_file(description: str,
-                    output_dir: str,
-                    output_file_body: str,
-                    output_string_list: list[any],
-                    error_if_dir_not_exist=True) -> str:
-    """ Writes a strings to a ".txt" file, with each string on a new line.
+
+def write_text_file(
+    description: str,
+    output_dir: str,
+    output_file_body: str,
+    output_string_list: list[any],
+    error_if_dir_not_exist=True,
+) -> str:
+    """Writes a strings to a ".txt" file, with each string on a new line.
 
     Parameters
     ----------

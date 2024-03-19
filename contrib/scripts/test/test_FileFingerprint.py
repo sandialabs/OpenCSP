@@ -26,8 +26,12 @@ class test_FileFingerprint(unittest.TestCase):
         f2 = "equal_file"
         contents = "%0.10f" % random.Random().random()
 
-        ft.write_text_file(f1, f"{self.out_dir}/{d1}", f1, [contents], error_if_dir_not_exist=False)
-        ft.write_text_file(f2, f"{self.out_dir}/{d2}", f2, [contents], error_if_dir_not_exist=False)
+        ft.write_text_file(
+            f1, f"{self.out_dir}/{d1}", f1, [contents], error_if_dir_not_exist=False
+        )
+        ft.write_text_file(
+            f2, f"{self.out_dir}/{d2}", f2, [contents], error_if_dir_not_exist=False
+        )
         ff1 = ff.FileFingerprint.for_file(f"{self.out_dir}/{d1}", "", f1 + ".txt")
         ff2 = ff.FileFingerprint.for_file(f"{self.out_dir}/{d2}", "", f2 + ".txt")
 
@@ -40,8 +44,12 @@ class test_FileFingerprint(unittest.TestCase):
         f2 = "equal_file"
         contents = "%0.10f" % random.Random().random()
 
-        ft.write_text_file(f1, f"{self.out_dir}/{d1}", f1, [contents], error_if_dir_not_exist=False)
-        ft.write_text_file(f2, f"{self.out_dir}/{d2}", f2, [contents], error_if_dir_not_exist=False)
+        ft.write_text_file(
+            f1, f"{self.out_dir}/{d1}", f1, [contents], error_if_dir_not_exist=False
+        )
+        ft.write_text_file(
+            f2, f"{self.out_dir}/{d2}", f2, [contents], error_if_dir_not_exist=False
+        )
         ff1 = ff.FileFingerprint.for_file(self.out_dir, d1, f1 + ".txt")
         ff2 = ff.FileFingerprint.for_file(self.out_dir, d2, f2 + ".txt")
 
@@ -54,8 +62,12 @@ class test_FileFingerprint(unittest.TestCase):
         f2 = "equal_file2"
         contents = "%0.10f" % random.Random().random()
 
-        ft.write_text_file(f1, f"{self.out_dir}/{d1}", f1, [contents], error_if_dir_not_exist=False)
-        ft.write_text_file(f2, f"{self.out_dir}/{d2}", f2, [contents], error_if_dir_not_exist=False)
+        ft.write_text_file(
+            f1, f"{self.out_dir}/{d1}", f1, [contents], error_if_dir_not_exist=False
+        )
+        ft.write_text_file(
+            f2, f"{self.out_dir}/{d2}", f2, [contents], error_if_dir_not_exist=False
+        )
         ff1 = ff.FileFingerprint.for_file(f"{self.out_dir}/{d1}", "", f1 + ".txt")
         ff2 = ff.FileFingerprint.for_file(f"{self.out_dir}/{d2}", "", f2 + ".txt")
 
@@ -70,8 +82,12 @@ class test_FileFingerprint(unittest.TestCase):
         contents1 = contents + " "
         contents2 = " " + contents
 
-        ft.write_text_file(f1, f"{self.out_dir}/{d1}", f1, [contents1], error_if_dir_not_exist=False)
-        ft.write_text_file(f2, f"{self.out_dir}/{d2}", f2, [contents2], error_if_dir_not_exist=False)
+        ft.write_text_file(
+            f1, f"{self.out_dir}/{d1}", f1, [contents1], error_if_dir_not_exist=False
+        )
+        ft.write_text_file(
+            f2, f"{self.out_dir}/{d2}", f2, [contents2], error_if_dir_not_exist=False
+        )
         ff1 = ff.FileFingerprint.for_file(f"{self.out_dir}/{d1}", "", f1 + ".txt")
         ff2 = ff.FileFingerprint.for_file(f"{self.out_dir}/{d2}", "", f2 + ".txt")
 

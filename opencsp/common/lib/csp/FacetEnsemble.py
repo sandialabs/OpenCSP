@@ -1,4 +1,5 @@
 """Rigid ensemble of facets"""
+
 from typing import Callable
 import numpy as np
 from scipy.spatial.transform import Rotation

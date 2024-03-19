@@ -1,5 +1,6 @@
 """Unit test suite to test the System class
 """
+
 import os
 
 import pytest
@@ -14,9 +15,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 @pytest.mark.no_xvfb
 def test_SystemSofastFringe():
     # Get test data location
-    base_dir = os.path.join(
-        opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
-    )
+    base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
 
     # Create fringe object
     periods_x = [0.9, 3.9]

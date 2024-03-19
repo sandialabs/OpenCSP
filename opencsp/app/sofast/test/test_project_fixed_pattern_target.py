@@ -1,5 +1,6 @@
 """Tests projecting a test dot pattern onto a screen
 """
+
 import os
 
 import pytest

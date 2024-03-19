@@ -2,6 +2,7 @@
 
 NOTE: This example requires a computer screen
 """
+
 from os.path import join
 
 import pytest

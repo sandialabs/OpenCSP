@@ -1,6 +1,7 @@
 """Library of functions used to calibation a machine vision camera.
 Functions are based off OpenCV library.
 """
+
 from typing import Iterable
 
 import cv2 as cv

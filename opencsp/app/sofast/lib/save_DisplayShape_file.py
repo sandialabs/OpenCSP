@@ -1,5 +1,6 @@
 """Script that saves a Sofast physical setup file from previously processed data
 """
+
 from numpy import ndarray
 from scipy.spatial.transform import Rotation
 

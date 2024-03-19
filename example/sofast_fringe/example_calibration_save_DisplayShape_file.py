@@ -11,8 +11,7 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 def example_save_display_shape_file():
-    """Example script that saves a DisplayShape file from its components
-    """
+    """Example script that saves a DisplayShape file from its components"""
     # Define save directory
     save_dir = join(dirname(__file__), 'data/output/save_DisplayShape_file')
     ft.create_directories_if_necessary(save_dir)
@@ -21,7 +20,7 @@ def example_save_display_shape_file():
     file_screen_distortion_data = join(
         opencsp_code_dir(),
         'app/sofast/test/data/data_expected',
-        'screen_distortion_data_100_100.h5'
+        'screen_distortion_data_100_100.h5',
     )
     datasets = ['pts_xy_screen_fraction', 'pts_xyz_screen_coords']
     data = load_hdf5_datasets(datasets, file_screen_distortion_data)
@@ -34,7 +33,7 @@ def example_save_display_shape_file():
     file_rvec_tvec = join(
         opencsp_code_dir(),
         'common/lib/deflectometry/test/data/data_expected',
-        'camera_rvec_tvec.csv'
+        'camera_rvec_tvec.csv',
     )
     pose_data = np.loadtxt(file_rvec_tvec, delimiter=',')
     rvec = pose_data[0]

@@ -1,4 +1,5 @@
 """Representation of a notional camera for image acquisition"""
+
 import numpy as np
 
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract

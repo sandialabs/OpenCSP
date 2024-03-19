@@ -51,28 +51,28 @@ import opencsp.common.lib.render.view_spec as vs
 def construct_ufacet_scan_pass(solar_field, lead_in, run_past):
     # Control parameters.
     scan_parameters = {}
-    scan_parameters[
-        'locale'
-    ] = 'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters['locale'] = (
+        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    )
     scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
     scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters[
-        'section_plane_tolerance'
-    ] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters[
-        'p_margin'
-    ] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters[
-        'altitude_margin'
-    ] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters[
-        'maximum_safe_altitude'
-    ] = 90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
-    scan_parameters[
-        'maximum_target_lookback'
-    ] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters['section_plane_tolerance'] = (
+        3  # m.  Lateral distance to include heliostats in section.
+    )
+    scan_parameters['p_margin'] = (
+        0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    )
+    scan_parameters['altitude_margin'] = (
+        2.5  # m.  Clearance of highest possible heliostat point.
+    )
+    scan_parameters['maximum_safe_altitude'] = (
+        90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
+    )
+    scan_parameters['maximum_target_lookback'] = (
+        3  # Number of heliostats to look back for reflection targets.
+    )
     scan_parameters['gaze_tolerance'] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
@@ -131,28 +131,28 @@ def construct_ufacet_scan_pass(solar_field, lead_in, run_past):
 def construct_ufacet_scan_passes(solar_field, lead_in, run_past):
     # Control parameters.
     scan_parameters = {}
-    scan_parameters[
-        'locale'
-    ] = 'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters['locale'] = (
+        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    )
     scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
     scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters[
-        'section_plane_tolerance'
-    ] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters[
-        'p_margin'
-    ] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters[
-        'altitude_margin'
-    ] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters[
-        'maximum_safe_altitude'
-    ] = 90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
-    scan_parameters[
-        'maximum_target_lookback'
-    ] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters['section_plane_tolerance'] = (
+        3  # m.  Lateral distance to include heliostats in section.
+    )
+    scan_parameters['p_margin'] = (
+        0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    )
+    scan_parameters['altitude_margin'] = (
+        2.5  # m.  Clearance of highest possible heliostat point.
+    )
+    scan_parameters['maximum_safe_altitude'] = (
+        90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
+    )
+    scan_parameters['maximum_target_lookback'] = (
+        3  # Number of heliostats to look back for reflection targets.
+    )
     scan_parameters['gaze_tolerance'] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
@@ -211,28 +211,28 @@ def construct_ufacet_scan_passes(solar_field, lead_in, run_past):
 def construct_ufacet_scan(solar_field, lead_in, run_past):
     # Control parameters.
     scan_parameters = {}
-    scan_parameters[
-        'locale'
-    ] = 'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters['locale'] = (
+        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    )
     scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
     scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters[
-        'section_plane_tolerance'
-    ] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters[
-        'p_margin'
-    ] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters[
-        'altitude_margin'
-    ] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters[
-        'maximum_safe_altitude'
-    ] = 90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
-    scan_parameters[
-        'maximum_target_lookback'
-    ] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters['section_plane_tolerance'] = (
+        3  # m.  Lateral distance to include heliostats in section.
+    )
+    scan_parameters['p_margin'] = (
+        0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    )
+    scan_parameters['altitude_margin'] = (
+        2.5  # m.  Clearance of highest possible heliostat point.
+    )
+    scan_parameters['maximum_safe_altitude'] = (
+        90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
+    )
+    scan_parameters['maximum_target_lookback'] = (
+        3  # Number of heliostats to look back for reflection targets.
+    )
     scan_parameters['gaze_tolerance'] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.

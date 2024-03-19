@@ -1,6 +1,7 @@
 """
 Script that generates Aruco marker PNG files of given size and number
 """
+
 from os.path import dirname, join
 
 import cv2 as cv
@@ -10,10 +11,7 @@ import numpy as np
 import opencsp.common.lib.tool.file_tools as ft
 
 
-def make_aruco_images(save_path: str,
-                      number: str,
-                      size: int = 500,
-                      padding: int = 50):
+def make_aruco_images(save_path: str, number: str, size: int = 500, padding: int = 50):
     """Generates aruco marker images and saves images as PNG files
 
     Parameters

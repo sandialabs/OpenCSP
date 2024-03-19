@@ -4,6 +4,7 @@ files to this test data suite.
 
 To update the expected data, run the corresponding example file.
 """
+
 from glob import glob
 import os
 from os.path import join
@@ -58,8 +59,7 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
 
     # Downsample aruco marker camera
     print('Downsampling camera...')
-    camera_aruco_ds = dd.downsample_camera(
-        join(dir_input, 'camera.h5'), n_aruco)
+    camera_aruco_ds = dd.downsample_camera(join(dir_input, 'camera.h5'), n_aruco)
     camera_aruco_ds.save_to_hdf(join(dir_output, 'camera.h5'))
 
 

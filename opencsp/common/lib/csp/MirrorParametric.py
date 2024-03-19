@@ -1,6 +1,7 @@
 """Parametric mirror representing a single reflective surface defined
 by an algebraic function.
 """
+
 import inspect
 from typing import Callable
 

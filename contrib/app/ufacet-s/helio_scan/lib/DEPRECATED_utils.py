@@ -368,7 +368,7 @@ def extract_frames_nopipe(
         str(ending_frame_id / fps),
         '-vf',
         str(fps),
-        str(saving_path)
+        str(saving_path),
         # '-c:v', 'ffv1',
         # #'-vf', 'select=eq(n\,' + str(frame_id) + ')',
         # #'-vsync', '0',

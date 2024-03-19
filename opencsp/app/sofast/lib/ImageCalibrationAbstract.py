@@ -183,7 +183,9 @@ class ImageCalibrationAbstract(ABC):
         calibration_name = cls.get_calibration_name()
 
         if data['calibration_type'] != calibration_name:
-            raise ValueError(f'ImageCalibration file is not of type {calibration_name:s}')
+            raise ValueError(
+                f'ImageCalibration file is not of type {calibration_name:s}'
+            )
 
         # Load grid data
         datasets = ['ImageCalibration/camera_values', 'ImageCalibration/display_values']

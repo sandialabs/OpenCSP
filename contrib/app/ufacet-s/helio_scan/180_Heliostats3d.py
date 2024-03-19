@@ -150,18 +150,16 @@ class Heliostats3d:
             )
         )
         # Nearest.
-        (
-            self.nearest_smooth_dir_body_ext,
-            self.nearest_design_dir_body_ext,
-        ) = self.construct_save_and_analyze_key_heliostats(
-            self.specifications.heliostat_design_name, 'Nearest'
+        (self.nearest_smooth_dir_body_ext, self.nearest_design_dir_body_ext) = (
+            self.construct_save_and_analyze_key_heliostats(
+                self.specifications.heliostat_design_name, 'Nearest'
+            )
         )
         # Farthest.
-        (
-            self.farthest_smooth_dir_body_ext,
-            self.farthest_design_dir_body_ext,
-        ) = self.construct_save_and_analyze_key_heliostats(
-            self.specifications.heliostat_design_name, 'Farthest'
+        (self.farthest_smooth_dir_body_ext, self.farthest_design_dir_body_ext) = (
+            self.construct_save_and_analyze_key_heliostats(
+                self.specifications.heliostat_design_name, 'Farthest'
+            )
         )
         # Demonstration heliostat.
         self.demonstration_dir_body_ext = (
@@ -483,9 +481,9 @@ class Heliostats3d:
             infer_dict['projected_or_confirmed_str'] = projected_or_confirmed_str
             infer_dict['distorted_or_undistorted_str'] = distorted_or_undistorted_str
             # infer_dict['output_corner_2d_trajectories_dir'] = output_corner_2d_trajectories_dir
-            infer_dict[
-                'output_construct_corners_3d_dir'
-            ] = output_construct_corners_3d_dir
+            infer_dict['output_construct_corners_3d_dir'] = (
+                output_construct_corners_3d_dir
+            )
             infer_dict['render_control'] = render_control
             list_of_infer_dicts.append(infer_dict)
 
