@@ -40,5 +40,7 @@ RUN tar -xf ffmpeg-*-amd64-static.tar.xz && \
 ENV PYTHONPATH=/code
 
 COPY requirements.txt /code/
-RUN python3 -m pip install -r requirements.txt
+RUN python3 -m pip install -r requirements.txt && \
+    python3 -m pip install pip-licenses && \
+    pip-licenses
 ENV PATH=$HOME/.local/bin:$PATH
