@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.tool import log_tools as lt
 
 
 class BlobIndex:
@@ -22,8 +23,6 @@ class BlobIndex:
         search for points.
     apply_filter : bool
         To filter bad points (experimental)
-    verbose : bool
-        Deprecated
     """
 
     def __init__(
@@ -55,7 +54,6 @@ class BlobIndex:
         self.search_thresh = 5.0  # pixels
         self.search_perp_axis_ratio = 3.0
         self.apply_filter = False
-        self.verbose = True
 
         self._offset_x = -x_min  # index
         self._offset_y = -y_min  # index
@@ -164,8 +162,7 @@ class BlobIndex:
         ].data.squeeze()
         self._point_indices_mat[idx_y + self._offset_y, idx_x + self._offset_x] = idx_pt
 
-        if self.verbose:
-            print(f'Blob number {idx_pt:d} was assigned ({idx_x:d}, {idx_y:d})')
+        lt.debug(f'Blob number {idx_pt:d} was assigned ({idx_x:d}, {idx_y:d})')
 
     def _unassign(self, idx_pt: int) -> None:
         """Unassigns a point index
@@ -192,8 +189,7 @@ class BlobIndex:
         self._idx_y[idx_pt] = np.nan
         self._is_assigned[idx_pt] = False
 
-        if self.verbose:
-            print(f'Blob number {idx_pt:d} was unassigned')
+        lt.debug(f'Blob number {idx_pt:d} was unassigned')
 
     def _assign_center(self, pt_origin: Vxy) -> None:
         """Assigns the center point to (0, 0)
@@ -338,9 +334,8 @@ class BlobIndex:
             idxs_a = self._idx_x
             idxs_b = self._idx_y
         else:
-            raise ValueError(
-                f'Given "direction" must be either "x" or "y", not {direction}'
-            )
+            lt.error_and_raise(
+                ValueError, f'Given "direction" must be either "x" or "y", not {direction}')
 
         # Step through direction
         # TODO Can speed up with matrix data storage
@@ -464,8 +459,7 @@ class BlobIndex:
             # Check if no progress has been made
             cur_num_unassigned = self._num_unassigned()
             if prev_num_unassigned == cur_num_unassigned:
-                if self.verbose:
-                    print(f'All possible points found in {idx + 1:d} iterations.')
+                lt.debug(f'All possible points found in {idx + 1:d} iterations.')
                 break
             else:
                 prev_num_unassigned = cur_num_unassigned
