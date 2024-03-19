@@ -7,21 +7,22 @@ import cv2 as cv
 import numpy as np
 from numpy import ndarray
 
-from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
-from opencsp.app.sofast.lib.ParamsSofastFixed import ParamsSofastFixed
-from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.app.sofast.lib.BlobIndex import BlobIndex
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 import opencsp.app.sofast.lib.image_processing as ip
+from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
+from opencsp.app.sofast.lib.ParamsSofastFixed import ParamsSofastFixed
 import opencsp.app.sofast.lib.process_optics_geometry as pr
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
-from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.tool import log_tools as lt
 
 
 class ProcessSofastFixed:
@@ -82,7 +83,6 @@ class ProcessSofastFixed:
 
         # Index blobs
         blob_index = BlobIndex(pts_blob, *self.fixed_pattern_dot_locs.dot_extent)
-        blob_index.verbose = False
         blob_index.search_thresh = self.params.blob_search_thresh
         blob_index.search_perp_axis_ratio = self.params.search_perp_axis_ratio
         blob_index.run(self.measurement.origin)
@@ -231,7 +231,7 @@ class ProcessSofastFixed:
         slope_solver.solve_slopes()
         self.data_slope_solver = slope_solver.get_data()
 
-    def save_to_hdf(self, file: str):
+    def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
 
         Parameters
@@ -252,6 +252,8 @@ class ProcessSofastFixed:
         )
         self.data_error.save_to_hdf(file, 'CalculationsFixedPattern/')
 
+        lt.info(f'SofastFixed data saved to: {file:s} with prefix: {prefix:s}')
+
     def get_mirror(
         self,
         interpolation_type: Literal[
@@ -261,7 +263,8 @@ class ProcessSofastFixed:
         """Returns mirror object with slope data"""
         v_surf_pts = self.data_slope_solver.v_surf_points_facet
         v_normals_data = np.ones((3, len(v_surf_pts)))
-        v_normals_data[:2, :] = -self.data_slope_solver.slopes_facet_xy
+        v_normals_data[:2, :] = self.data_slope_solver.slopes_facet_xy
+        v_normals_data[:2, :] *= -1
         v_normals = Uxyz(v_normals_data)
         shape = RegionXY.from_vertices(self.facet_data.v_facet_corners.projXY())
         return MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
