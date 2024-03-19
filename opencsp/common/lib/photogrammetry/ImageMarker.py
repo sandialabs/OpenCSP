@@ -6,6 +6,7 @@ the model loads an image using the one point model. In the one point model, the
 point ID is the aruco marker ID. In the four point model, the point ID is the
 Aruco marker ID * 4 plus the corner index (ranging from 0 to 4).
 """
+
 from warnings import warn
 
 import cv2 as cv

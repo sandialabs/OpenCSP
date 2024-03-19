@@ -416,12 +416,12 @@ class KeyTracks:
         # Assemble result dictionary.
         result_dict = {}
         result_dict['key_frame_id'] = key_frame_id
-        result_dict[
-            'key_frame_projected_track_fnxl'
-        ] = search_result.key_frame_projected_track_fnxl
-        result_dict[
-            'key_frame_confirmed_track_fnxl'
-        ] = search_result.key_frame_confirmed_track_fnxl
+        result_dict['key_frame_projected_track_fnxl'] = (
+            search_result.key_frame_projected_track_fnxl
+        )
+        result_dict['key_frame_confirmed_track_fnxl'] = (
+            search_result.key_frame_confirmed_track_fnxl
+        )
         return result_dict
 
     # WRITE RESULT
@@ -488,9 +488,9 @@ class KeyTracks:
             key_frame_projected_track_fnxl = result_dict[
                 'key_frame_projected_track_fnxl'
             ]
-            tracked_frames_per_key_frame_dict[
-                key_frame_id
-            ] = key_frame_projected_track_fnxl.number_of_frames()
+            tracked_frames_per_key_frame_dict[key_frame_id] = (
+                key_frame_projected_track_fnxl.number_of_frames()
+            )
         print(
             'In KeyTracks.save_data(), writing tracked_frames per key frame:',
             os.path.join(self.output_data_dir, self.tfpkf_body_ext),

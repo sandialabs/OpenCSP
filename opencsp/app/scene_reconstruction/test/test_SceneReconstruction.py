@@ -4,6 +4,7 @@ Run this file to drive the test manually.
 To create new test data, uncomment/comment the lines below.
 
 """
+
 import os
 from os.path import join
 import unittest

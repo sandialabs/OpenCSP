@@ -19,27 +19,27 @@ def construct_ufacet_scan_parameters(
     # NSTTF
     if ufacet_scan_parameter_file == 'NSTTF':
         # Scan section construction.
-        scan_parameters[
-            'candidate_margin_w'
-        ] = 10.00  # m.  Margin on either side of section plane to bring in heliostats.
+        scan_parameters['candidate_margin_w'] = (
+            10.00  # m.  Margin on either side of section plane to bring in heliostats.
+        )
         #     Should be larger than side-to-side heliostat distance.
-        scan_parameters[
-            'discard_threshold_p'
-        ] = 9.00  # m.  Threshold to discard heliostats that are close together on a section, presumably abreast.
+        scan_parameters['discard_threshold_p'] = (
+            9.00  # m.  Threshold to discard heliostats that are close together on a section, presumably abreast.
+        )
         #     Should be smaller than minimum heliostat row spacing.
         # Section analysis.
-        scan_parameters[
-            'p_margin'
-        ] = 0  # 2    # m.  Lateral distance to add to constraints to allow UAS postiion error.
-        scan_parameters[
-            'altitude_margin'
-        ] = 2.5  # m.   Clearance above highest possible heliostat point.
-        scan_parameters[
-            'maximum_safe_altitude'
-        ] = 90.0  # meters.  Driven by safey considerations.  Control limit may be tighter.
-        scan_parameters[
-            'maximum_target_lookback'
-        ] = 3  # Number of heliostats to look back for reflection targets.
+        scan_parameters['p_margin'] = (
+            0  # 2    # m.  Lateral distance to add to constraints to allow UAS postiion error.
+        )
+        scan_parameters['altitude_margin'] = (
+            2.5  # m.   Clearance above highest possible heliostat point.
+        )
+        scan_parameters['maximum_safe_altitude'] = (
+            90.0  # meters.  Driven by safey considerations.  Control limit may be tighter.
+        )
+        scan_parameters['maximum_target_lookback'] = (
+            3  # Number of heliostats to look back for reflection targets.
+        )
         scan_parameters['gaze_tolerance'] = np.deg2rad(
             1
         )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.

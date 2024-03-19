@@ -71,9 +71,11 @@ class _VideoToFramesIterable(_IndexableIterable):
 class ImagesIterable(Iterable[CacheableImage]):
     def __init__(
         self,
-        stream: Callable[[int], CacheableImage]
-        | list[str | CacheableImage]
-        | vh.VideoHandler,
+        stream: (
+            Callable[[int], CacheableImage]
+            | list[str | CacheableImage]
+            | vh.VideoHandler
+        ),
     ):
         """A restartable iterable that returns one image at a time, for as long as images are still available.
 

@@ -378,13 +378,12 @@ class KeyCorners:
             # Construct a new fnxl that combines both key frame search results.
             # Take care to ensure that both have the same set of heliostat names.
             # This can return None if there are no xy_lists with a common name.
-            (
-                pair_projected_fnxl_or_None,
-                mismatched,
-            ) = self.construct_merged_fnxl_synchronizing_heliostat_names(
-                local_logger,
-                search_result_1.projected_fnxl(),
-                search_result_2.projected_fnxl(),
+            (pair_projected_fnxl_or_None, mismatched) = (
+                self.construct_merged_fnxl_synchronizing_heliostat_names(
+                    local_logger,
+                    search_result_1.projected_fnxl(),
+                    search_result_2.projected_fnxl(),
+                )
             )
 
         # Determine whether any found heliostats were lost from one frame to the next.
@@ -562,9 +561,9 @@ class KeyCorners:
     def save_data(self, all_key_frames_corners_fnxl, mismatched_key_frame_ids):
         # Statistics.
         summary_dict = {}
-        summary_dict[
-            'n_key_frames_with_corners'
-        ] = all_key_frames_corners_fnxl.number_of_frames()
+        summary_dict['n_key_frames_with_corners'] = (
+            all_key_frames_corners_fnxl.number_of_frames()
+        )
         print('In KeyCorners.save_data(), writing key frame summary statistics...')
         ft.write_dict_file(
             'key frame corners summary statistics',

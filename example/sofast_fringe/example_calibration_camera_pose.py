@@ -2,7 +2,9 @@ from os.path import join, dirname
 
 import numpy as np
 
-from opencsp.common.lib.deflectometry.CalibrationCameraPosition import CalibrationCameraPosition
+from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
+    CalibrationCameraPosition,
+)
 
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -22,8 +24,7 @@ def example_run_camera_position_calibration():
 
     # Define directory where screen shape calibration data is saved
     base_dir_sofast_cal = join(
-        opencsp_code_dir(),
-        'common/lib/deflectometry/test/data/data_measurement',
+        opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement'
     )
 
     # Define inputs

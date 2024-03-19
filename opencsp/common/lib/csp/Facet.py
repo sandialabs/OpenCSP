@@ -1,4 +1,5 @@
 """Facet class inherited by all facet classes"""
+
 from typing import Callable
 
 import numpy as np

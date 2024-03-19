@@ -21,7 +21,7 @@ class test_FileCache(unittest.TestCase):
         ft.create_directories_if_necessary(self.out_dir)
 
     def _delay_1_second(self):
-        """ sleeps up to 1 second so that the file modification time looks different """
+        """sleeps up to 1 second so that the file modification time looks different"""
         ts1 = tdt.current_time_string_forfile()
         while ts1 == tdt.current_time_string_forfile():
             time.sleep(0.05)

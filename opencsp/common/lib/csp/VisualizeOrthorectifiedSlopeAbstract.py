@@ -1,6 +1,7 @@
 """Abstract class used for visualizing orthorectified slope looking
 down from +z axis
 """
+
 from abc import abstractmethod
 from typing import Literal
 

@@ -225,9 +225,11 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
     def set_input_operables(
         self,
-        input_operables: SpotAnalysisOperablesStream
-        | list[SpotAnalysisOperable]
-        | Iterator[SpotAnalysisOperable],
+        input_operables: (
+            SpotAnalysisOperablesStream
+            | list[SpotAnalysisOperable]
+            | Iterator[SpotAnalysisOperable]
+        ),
     ):
         """Assigns primary and supporting images, and other necessary data, in preparation for process_next().
 

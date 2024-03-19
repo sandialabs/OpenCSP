@@ -1,6 +1,7 @@
 """Class containing all screen distortion calibration routines.
 Saves distortion data and calibrated markers for camera position calibration.
 """
+
 from dataclasses import dataclass
 import os
 from warnings import warn
@@ -15,7 +16,9 @@ from scipy.signal import medfilt
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.common.lib.deflectometry.ImageProjection import CalParams
@@ -548,10 +551,9 @@ class CalibrateDisplayShape:
             self.visualize_xyz_screen_maps()
 
 
-def interp_xy_screen_positions(im_x: np.ndarray,
-                               im_y: np.ndarray,
-                               x_sc: np.ndarray,
-                               y_sc: np.ndarray) -> Vxy:
+def interp_xy_screen_positions(
+    im_x: np.ndarray, im_y: np.ndarray, x_sc: np.ndarray, y_sc: np.ndarray
+) -> Vxy:
     """
     Calculates the interpolated XY screen positions given X/Y fractional
     screen maps and X/Y interpolation vectors.

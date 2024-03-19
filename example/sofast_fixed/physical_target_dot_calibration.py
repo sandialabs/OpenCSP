@@ -1,5 +1,6 @@
 """Example script that performs dot location calibration using photogrammetry.
 """
+
 import os
 from os.path import join, dirname, exists
 
@@ -8,8 +9,9 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.CalibrateSofastFixedDots import CalibrateSofastFixedDots
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.CalibrationCameraPosition import \
-    CalibrationCameraPosition
+from opencsp.common.lib.deflectometry.CalibrationCameraPosition import (
+    CalibrationCameraPosition,
+)
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -21,15 +23,19 @@ import opencsp.common.lib.tool.log_tools as lt
 def example_perform_calibration():
     """Performs a dot-location calibration using photogrammetry"""
     # Define dot location images and origins
-    base_dir = join(opencsp_code_dir(),
-                    'test/data/measurements_sofast_fixed/dot_location_calibration/measurements')
+    base_dir = join(
+        opencsp_code_dir(),
+        'test/data/measurements_sofast_fixed/dot_location_calibration/measurements',
+    )
     files_cal_images = [
         join(base_dir, 'images/DSC03965.JPG'),
         join(base_dir, 'images/DSC03967.JPG'),
         join(base_dir, 'images/DSC03970.JPG'),
         join(base_dir, 'images/DSC03972.JPG'),
     ]
-    origins = np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
+    origins = (
+        np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
+    )
     origins = Vxy(origins.astype(int))
 
     # Define other files
@@ -59,12 +65,20 @@ def example_perform_calibration():
 
     # Perform dot location calibration
     cal_dot_locs = CalibrateSofastFixedDots(
-        files_cal_images, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
+        files_cal_images,
+        origins,
+        camera_marker,
+        pts_xyz_corners,
+        ids_corners,
+        -32,
+        31,
+        -31,
+        32,
     )
     cal_dot_locs.plot = True
-    cal_dot_locs.blob_search_threshold = 3.
-    cal_dot_locs.blob_detector.minArea = 3.
-    cal_dot_locs.blob_detector.maxArea = 30.
+    cal_dot_locs.blob_search_threshold = 3.0
+    cal_dot_locs.blob_detector.minArea = 3.0
+    cal_dot_locs.blob_detector.maxArea = 30.0
     cal_dot_locs.run()
 
     # Perform camera position calibration

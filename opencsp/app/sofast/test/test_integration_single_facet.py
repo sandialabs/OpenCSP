@@ -1,5 +1,6 @@
 """Integration test. Testing processing of a 'single_facet' type optic.
 """
+
 import glob
 import os
 import unittest
@@ -7,7 +8,9 @@ import unittest
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display

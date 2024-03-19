@@ -43,12 +43,12 @@ def define_scan_NSTTF_half_and_half(solar_field_short_name):
         lln.LON_NSTTF_ORIGIN,
         lln.LAT_NSTTF_ORIGIN,
     )
-    solar_field_spec[
-        'field_heliostat_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
-    solar_field_spec[
-        'field_facet_centroids_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
+    solar_field_spec['field_heliostat_file'] = (
+        '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
+    )
+    solar_field_spec['field_facet_centroids_file'] = (
+        '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
+    )
 
     # Define UFACET control flags.
     ufacet_control_parameters = {}
@@ -62,9 +62,9 @@ def define_scan_NSTTF_half_and_half(solar_field_short_name):
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
     # Half-and-Half
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 18.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = (
+        18.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    )
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(
@@ -351,12 +351,12 @@ def define_scan_NSTTF_demo(solar_field_short_name):
         lln.LON_NSTTF_ORIGIN,
         lln.LAT_NSTTF_ORIGIN,
     )
-    solar_field_spec[
-        'field_heliostat_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
-    solar_field_spec[
-        'field_facet_centroids_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
+    solar_field_spec['field_heliostat_file'] = (
+        '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
+    )
+    solar_field_spec['field_facet_centroids_file'] = (
+        '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
+    )
 
     # Define UFACET control flags.
     ufacet_control_parameters = {}
@@ -369,9 +369,9 @@ def define_scan_NSTTF_demo(solar_field_short_name):
     ]
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = (
+        25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    )
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(
@@ -454,9 +454,9 @@ def define_scan_NSTTF_full_field(solar_field_short_name):
     ]
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = (
+        25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    )
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(

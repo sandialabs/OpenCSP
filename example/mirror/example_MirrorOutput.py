@@ -477,9 +477,7 @@ class ExampleMirrorOutput(to.TestOutput):
 
         # Construct heliostat objects and solar field object.
         def fn_5W01(x, y):
-            return (x**2) / (4 * focal_length_5W01) + (y**2) / (
-                4 * focal_length_5W01
-            )
+            return (x**2) / (4 * focal_length_5W01) + (y**2) / (4 * focal_length_5W01)
 
         h_5W01 = helio.h_from_facet_centroids(
             name_5W01,
@@ -497,9 +495,7 @@ class ExampleMirrorOutput(to.TestOutput):
         h_5W01.set_canting_from_equation(fn_5W01)
 
         def fn_14W01(x, y):
-            return (x**2) / (4 * focal_length_14W01) + (y**2) / (
-                4 * focal_length_14W01
-            )
+            return (x**2) / (4 * focal_length_14W01) + (y**2) / (4 * focal_length_14W01)
 
         h_14W01 = helio.h_from_facet_centroids(
             "NSTTF Heliostat 14W01",

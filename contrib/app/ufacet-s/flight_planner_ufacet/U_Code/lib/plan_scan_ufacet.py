@@ -59,9 +59,9 @@ def construct_ufacet_scan(
         'curve_key_xy_list'
     ]
     ufacet_scan_construction['list_of_ideal_xy_lists'] = list_of_ideal_xy_lists
-    ufacet_scan_construction[
-        'list_of_best_fit_segment_xys'
-    ] = list_of_best_fit_segment_xys
+    ufacet_scan_construction['list_of_best_fit_segment_xys'] = (
+        list_of_best_fit_segment_xys
+    )
     ufacet_scan_construction['section_list'] = section_list
     ufacet_scan_construction['scan_pass_list'] = scan_pass_list
 

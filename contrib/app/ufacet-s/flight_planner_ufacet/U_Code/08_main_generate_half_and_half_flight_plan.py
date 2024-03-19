@@ -204,9 +204,9 @@ if __name__ == "__main__":
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
     # ufacet_control_parameters['maximum_altitude'] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 18.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = (
+        18.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    )
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(

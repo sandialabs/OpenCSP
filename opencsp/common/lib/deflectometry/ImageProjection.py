@@ -1,5 +1,6 @@
 """Class handling the projection of images on a monitor/projector
 """
+
 import tkinter
 
 import cv2 as cv

@@ -62,7 +62,9 @@ class BlobIndex:
         idx_x_vec = np.arange(x_min, x_max + 1)  # index
         idx_y_vec = np.arange(y_min, y_max + 1)  # index
         self._idx_x_mat, self._idx_y_mat = np.meshgrid(idx_x_vec, idx_y_vec)  # index
-        self._points_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan  # pixels
+        self._points_mat = (
+            np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan
+        )  # pixels
         self._point_indices_mat = (
             np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan  # index
         )
@@ -122,8 +124,7 @@ class BlobIndex:
         dists_perp = np.abs(v_perp.dot(points_rel))  # Distance of points from line
         # Make mask of valid points
         mask = np.logical_and(
-            dists_axis > 0,
-            dists_perp / dists_axis <= self.search_perp_axis_ratio
+            dists_axis > 0, dists_perp / dists_axis <= self.search_perp_axis_ratio
         )
         # Check there are points to find
         if mask.sum() == 0:
@@ -359,19 +360,20 @@ class BlobIndex:
                                 pt_cur = pts[is_b == i_b]
                                 pt_prev = pts[is_b == idx_b_prev]
                                 if (len(pt_cur) > 1) or (len(pt_prev) > 1):
-                                    raise ValueError(f'Point index {idx_a:.0f}, {i_b:.0f} '
-                                                     'was assigned more than once. '
-                                                     'Try tightening dot search settings.')
+                                    raise ValueError(
+                                        f'Point index {idx_a:.0f}, {i_b:.0f} '
+                                        'was assigned more than once. '
+                                        'Try tightening dot search settings.'
+                                    )
                             else:  # Next iterations, use new points
                                 pt_prev = pt_cur
                                 pt_cur = self._points[idx_new]
                             # Calculate deltas
                             pt_exp = self._exp_pt_from_pt_pair(pt_cur, pt_prev)
-                            success, (
-                                idx_new,
-                                dist,
-                            ) = self._nearest_unassigned_idx_from_xy_point_direction(
-                                pt_cur, pt_exp
+                            success, (idx_new, dist) = (
+                                self._nearest_unassigned_idx_from_xy_point_direction(
+                                    pt_cur, pt_exp
+                                )
                             )
                             if not success:
                                 break

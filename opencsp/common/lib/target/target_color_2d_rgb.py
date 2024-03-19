@@ -2,6 +2,7 @@
 Creates a 2D color target
 
 """
+
 import imageio.v3 as imageio
 import matplotlib.pyplot as plt
 import numpy as np

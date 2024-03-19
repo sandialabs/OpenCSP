@@ -10,7 +10,7 @@ import opencsp.common.lib.process.lib.CalledProcessError as cpe
 
 
 def get_executable_path(executable_name: str, dont_match: str = None) -> str:
-    """ Returns the first "path/name.ext" for the given executable. If
+    """Returns the first "path/name.ext" for the given executable. If
     dont_match is specified, then paths containing that string are excluded from
     the returned results.
 
@@ -30,7 +30,7 @@ def get_executable_path(executable_name: str, dont_match: str = None) -> str:
     """
     dont_match = dont_match.lower()
     search_cmd = "which"
-    if (os.name == "nt"):
+    if os.name == "nt":
         search_cmd = "where"
         if executable_name.endswith(".exe"):
             executable_name = executable_name[:-4]

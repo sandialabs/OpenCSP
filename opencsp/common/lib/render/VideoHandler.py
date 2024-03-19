@@ -336,9 +336,9 @@ class VideoHandler:
             non_duplicate_frame_files = [
                 ft.file_size_pair_name(previous_frame_file_size_pair)
             ]
-            duplicate_frame_files: list[
-                str
-            ] = []  # First frame is never a duplicate of preceding.
+            duplicate_frame_files: list[str] = (
+                []
+            )  # First frame is never a duplicate of preceding.
             for this_frame_file_size_pair in input_frame_file_size_pair_list[1:]:
                 if self._this_frame_is_a_duplicate_of_previous(
                     previous_frame_file_size_pair,

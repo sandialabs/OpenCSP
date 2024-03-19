@@ -1,5 +1,6 @@
 """Unit test for ImageColor class
 """
+
 import numpy as np
 
 from opencsp.app.target.target_color.lib.ImageColor import ImageColor

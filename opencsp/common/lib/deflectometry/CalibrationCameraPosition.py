@@ -96,7 +96,7 @@ class CalibrationCameraPosition:
             # Extract calibrated corner locations (4 corners per marker)
             self.pts_xyz_active_corner_locations = (
                 self.pts_xyz_active_corner_locations.concatenate(
-                    self.pts_xyz_corners[index:index + 4]
+                    self.pts_xyz_corners[index : index + 4]
                 )
             )
 

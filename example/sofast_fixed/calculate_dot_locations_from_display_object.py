@@ -2,6 +2,7 @@
 file using a previously created Display object. This is only when displaying a fixed dot pattern
 on a screen.
 """
+
 import os
 from os.path import join, dirname, exists
 

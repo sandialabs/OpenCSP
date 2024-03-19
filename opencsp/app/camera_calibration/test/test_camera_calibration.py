@@ -2,6 +2,7 @@
 
 Change the boolean below to True and run to regenerate all test data
 """
+
 from glob import glob
 import os
 
@@ -62,12 +63,9 @@ class TestCameraCalibration:
         img_size = images[0].shape
 
         # Calibrate camera
-        (
-            camera,
-            r_cam_object,
-            v_cam_object_cam,
-            calibration_error,
-        ) = cc.calibrate_camera(p_object, p_image, img_size, cam_name)
+        (camera, r_cam_object, v_cam_object_cam, calibration_error) = (
+            cc.calibrate_camera(p_object, p_image, img_size, cam_name)
+        )
 
         # Calculate reprojection errors
         errors = []

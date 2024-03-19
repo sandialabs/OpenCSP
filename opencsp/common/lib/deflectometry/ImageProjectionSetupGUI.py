@@ -3,6 +3,7 @@ of a computer display (ImageProjection class). To run GUI, use the following:
 ```python ImageProjectionGUI.py```
 
 """
+
 import tkinter
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename

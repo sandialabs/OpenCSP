@@ -1,5 +1,6 @@
 """Data class to store facet ensemble optic definition for sofast
 """
+
 from copy import deepcopy
 import json
 
@@ -166,7 +167,9 @@ class DefinitionEnsemble:
         r_facet_ensemble = [Rotation.from_rotvec(r) for r in data['r_facet_ensemble']]
         ensemble_perimeter = data['ensemble_perimeter']
         v_centroid_ensemble = Vxyz(data['v_centroid_ensemble'])
-        return cls(v_facet_locations, r_facet_ensemble, ensemble_perimeter, v_centroid_ensemble)
+        return cls(
+            v_facet_locations, r_facet_ensemble, ensemble_perimeter, v_centroid_ensemble
+        )
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:

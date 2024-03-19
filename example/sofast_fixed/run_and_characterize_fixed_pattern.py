@@ -6,6 +6,7 @@ displayed.
 NOTE: The user must have a complete deflectometry setup in place. This includes a camera,
 dot grid, and system calibration files.
 """
+
 import os
 
 import matplotlib.pyplot as plt
