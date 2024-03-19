@@ -2,7 +2,9 @@
 
 ## Install requirements in virtual environment
 ```bash
-(venv) $ cd /path/to/OpenCSP/doc
+(venv) $ cd /path/to/OpenCSP
+(venv) $ pip install -r requirements.txt
+(venv) $ cd doc
 (venv) $ pip install -r requirements.txt
 ```
 
