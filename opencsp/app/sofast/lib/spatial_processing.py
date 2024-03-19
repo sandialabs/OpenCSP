@@ -6,6 +6,7 @@ from scipy.spatial.transform import Rotation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def t_from_distance(
@@ -158,7 +159,7 @@ def calc_rt_from_img_pts(
     )
 
     if not ret:
-        raise ValueError('Could not find position of optic relative to camera.')
+        lt.error_and_raise(ValueError, 'Could not find position of optic relative to camera.')
 
     return Rotation.from_rotvec(rvec.squeeze()), Vxyz(tvec.squeeze())
 

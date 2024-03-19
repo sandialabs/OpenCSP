@@ -270,7 +270,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         """
         # Check inputs
         if len(facet_data) != len(surfaces):
-            raise ValueError(
+            lt.error_and_raise(
+                ValueError,
                 'Length of facet_data does not equal length of surfaces'
                 f'facet_data={len(facet_data)}, surface_data={len(surfaces)}'
             )
@@ -397,7 +398,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
 
         # Check inputs
         if len(facet_data) != self.num_facets:
-            raise ValueError(
+            lt.error_and_raise(
+                ValueError,
                 f'Given length of facet data is {len(facet_data):d}'
                 f'but ensemble_data expects {ensemble_data.num_facets:d} facets.'
             )
@@ -530,7 +532,10 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         """
         # Check inputs
         if self.data_geometry_facet is None:
-            raise ValueError('Not all facets geometrically processed.')
+            lt.error_and_raise(
+                ValueError,
+                'Not all facets geometrically processed; cannot solve slopes.'
+            )
 
         # Loop through all input facets and solve slopes
         self.data_characterization_facet = []
@@ -595,14 +600,14 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             If 'average', the pointing reference is the average of all
             facet pointing directions. If, int, that facet index is assumed
             to have perfect pointing.
-
         """
         if self.data_characterization_facet is None:
-            raise ValueError('Slopes must be solved first by running "solve_slopes".')
+            lt.error_and_raise(ValueError, 'Slopes must be solved first by running "solve_slopes".')
         if reference != 'average' and not isinstance(reference, int):
-            raise ValueError('Given reference must be int or "average".')
+            lt.error_and_raise(ValueError, 'Given reference must be int or "average".')
         if isinstance(reference, int) and reference >= self.num_facets:
-            raise ValueError(
+            lt.error_and_raise(
+                ValueError,
                 f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.'
             )
 
