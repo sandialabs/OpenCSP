@@ -61,11 +61,18 @@ def process_singlefacet_geometry(
 
     Returns
     -------
-    calculation_data_classes.CalculationDataGeometryGeneral
-    calculation_data_classes.CalculationImageProcessingGeneral
-    list[calculation_data_classes.CalculationDataGeometryFacet]
-    list[calculation_data_classes.CalculationImageProcessingFacet]
-    calculation_data_classes.CalculationError]
+    data_geometry_general: calculation_data_classes.CalculationDataGeometryGeneral
+        Positional optic geometry calculations general to entire measurement; not facet specific.
+    data_image_processing_general: calculation_data_classes.CalculationImageProcessingGeneral
+        Image processing calculations general to entire measurement; not facet specific.
+    data_geometry_facet: list[calculation_data_classes.CalculationDataGeometryFacet]
+        List of positional optic geometry calculations specific to each facet. Order is
+        same as input facet definitions.
+    data_image_processing_facet: list[calculation_data_classes.CalculationImageProcessingFacet]
+        List of image processing calcualtions specific to each facet. Order is same as input facet
+        definitions.
+    data_error: calculation_data_classes.CalculationError
+        Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
         print('Image processing debug on.')
@@ -324,11 +331,18 @@ def process_undefined_geometry(
 
     Returns
     -------
-    calculation_data_classes.CalculationDataGeometryGeneral
-    calculation_data_classes.CalculationImageProcessingGeneral
-    list[calculation_data_classes.CalculationDataGeometryFacet]
-    list[calculation_data_classes.CalculationImageProcessingFacet]
-    calculation_data_classes.CalculationError]
+    data_geometry_general: calculation_data_classes.CalculationDataGeometryGeneral
+        Positional optic geometry calculations general to entire measurement; not facet specific.
+    data_image_processing_general: calculation_data_classes.CalculationImageProcessingGeneral
+        Image processing calculations general to entire measurement; not facet specific.
+    data_geometry_facet: list[calculation_data_classes.CalculationDataGeometryFacet]
+        List of positional optic geometry calculations specific to each facet. Order is
+        same as input facet definitions.
+    data_image_processing_facet: list[calculation_data_classes.CalculationImageProcessingFacet]
+        List of image processing calcualtions specific to each facet. Order is same as input facet
+        definitions.
+    data_error: calculation_data_classes.CalculationError
+        Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
         print(
@@ -418,7 +432,7 @@ def process_multifacet_geometry(
     ensemble_data : DefinitionEnsemble
         Ensemble definition object
     mask_raw : ndarray
-        Raw calculated mask
+        Raw calculated mask, shape (m, n) array of booleans
     v_meas_pt_ensemble : Vxyz
         Measure point lcoation on ensemble, meters
     orientation : SpatialOrientation
@@ -434,11 +448,18 @@ def process_multifacet_geometry(
 
     Returns
     -------
-    calculation_data_classes.CalculationDataGeometryGeneral
-    calculation_data_classes.CalculationImageProcessingGeneral
-    list[calculation_data_classes.CalculationDataGeometryFacet]
-    list[calculation_data_classes.CalculationImageProcessingFacet]
-    calculation_data_classes.CalculationError]
+    data_geometry_general: calculation_data_classes.CalculationDataGeometryGeneral
+        Positional optic geometry calculations general to entire measurement; not facet specific.
+    data_image_processing_general: calculation_data_classes.CalculationImageProcessingGeneral
+        Image processing calculations general to entire measurement; not facet specific.
+    data_geometry_facet: list[calculation_data_classes.CalculationDataGeometryFacet]
+        List of positional optic geometry calculations specific to each facet. Order is
+        same as input facet definitions.
+    data_image_processing_facet: list[calculation_data_classes.CalculationImageProcessingFacet]
+        List of image processing calcualtions specific to each facet. Order is same as input facet
+        definitions.
+    data_error: calculation_data_classes.CalculationError
+        Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
         print(
