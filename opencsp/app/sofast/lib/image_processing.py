@@ -1,5 +1,3 @@
-from warnings import warn
-
 import cv2 as cv
 import numpy as np
 from scipy.signal import find_peaks
@@ -9,6 +7,7 @@ from opencsp.common.lib.geometry.LineXY import LineXY
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Uxyz import Uxyz
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def calc_mask_raw(
@@ -71,7 +70,7 @@ def calc_mask_raw(
             )
 
         # Calculate minimum between two peaks
-        idx_hist_min = np.argmin(hist[peaks[0] : peaks[1]]) + peaks[0]
+        idx_hist_min = np.argmin(hist[peaks[0]: peaks[1]]) + peaks[0]
 
         # Find index of histogram that is "hist_thresh" the way between the min and max
         thresh_hist_min = edges[idx_hist_min + 1]
@@ -93,10 +92,8 @@ def calc_mask_raw(
     # Check for enough active pixels
     thresh_active_pixels = int(mask_raw.size * thresh_active_pixels)
     if mask_raw.sum() < thresh_active_pixels:
-        warn(
-            'Mask contains less than {:d} active pixels.'.format(thresh_active_pixels),
-            stacklevel=2,
-        )
+        lt.error_and_raise(
+            ValueError, f'Mask contains less than {thresh_active_pixels:d} active pixels.')
 
     # Return raw, unprocessed mask
     return mask_raw
