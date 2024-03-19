@@ -20,6 +20,7 @@ from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def process_singlefacet_geometry(
@@ -75,7 +76,9 @@ def process_singlefacet_geometry(
         Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
-        print('Image processing debug on.')
+        lt.debug('process_optics_geometry debug on.')
+    else:
+        lt.debug('process_optics_geometry debug off.')
 
     # Create data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
@@ -345,8 +348,8 @@ def process_undefined_geometry(
         Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
-        print(
-            'Image processing debug on, but is not yet supported for undefined mirrors.'
+        lt.debug(
+            'process_optics_geometry debug on, but is not yet supported for undefined mirrors.'
         )
 
     # Define data classes
@@ -462,9 +465,7 @@ def process_multifacet_geometry(
         Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
-        print(
-            'Image processing debug on, but is not yet supported for undefined mirrors.'
-        )
+        lt.debug('process_optics_geometry debug on.')
 
     # Get facet data
     v_facet_corners_facet: list = [
