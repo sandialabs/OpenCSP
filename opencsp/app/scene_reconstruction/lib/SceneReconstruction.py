@@ -488,7 +488,7 @@ class SceneReconstruction:
             num_unlocated_pts = self.unlocated_marker_ids.size
 
         # Check that all markers have been found
-        if (self.unlocated_marker_ids.size != 0):
+        if self.unlocated_marker_ids.size != 0:
             lt.warn(
                 'Not all markers have been found, '
                 f'{self.unlocated_marker_ids.size:d} remain. '
