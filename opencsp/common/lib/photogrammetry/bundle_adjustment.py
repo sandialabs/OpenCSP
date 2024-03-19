@@ -24,7 +24,7 @@ def bundle_adjust(
     intrinsic_mat: np.ndarray,
     dist_coefs: np.ndarray,
     opt_type: Literal['camera', 'points', 'both'],
-    verbose: bool,
+    verbose: int,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Perform bundel adjustment algorithm on object points and camera poses.
@@ -52,6 +52,8 @@ def bundle_adjust(
         (n,) distortion coefficients array.
     opt_type : str
         What to optimize: {'camera', 'points', 'both'}
+    verbose : int
+        Level of verbosity of least squares solver [0, 1, 2]
 
     Returns
     -------
@@ -87,7 +89,7 @@ def bundle_adjust(
         fun,
         x0,
         jac_sparsity=jac_sparsity,
-        verbose=int(verbose),
+        verbose=verbose,
         x_scale='jac',
         ftol=1e-4,
         method='trf',

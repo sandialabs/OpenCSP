@@ -15,6 +15,7 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def load_image_grayscale(file: str) -> ndarray:
@@ -90,7 +91,6 @@ def valid_camera_pose(
     pts_image: ndarray,
     pts_object: ndarray,
     reproj_thresh: float = 100.0,
-    verbose: bool = False,
 ) -> bool:
     """
     Returns image IDs that have points behind the camera or have high
@@ -129,12 +129,10 @@ def valid_camera_pose(
     # Check if z < 0 or reprojection error is large
     valid = True
     if pts_cam_z.min() < 0:
-        if verbose:
-            print('Points located behind camera.')
+        lt.debug('Object points located behind camera during camera pose calculation.')
         valid = False
     if error.max() > reproj_thresh:
-        if verbose:
-            print(f'Reprojection error above {reproj_thresh:.2f}')
+        lt.debug(f'Reprojection error above {reproj_thresh:.2f} during camera pose calculation')
         valid = False
     return valid
 
