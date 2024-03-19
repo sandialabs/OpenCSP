@@ -1,0 +1,52 @@
+name: github-WINDOWS2022
+
+on:
+  push
+  #pull_request:
+  #  paths-ignore:
+  #  - '**/*.rst'
+  #  - '**/*.md'
+  #  - 'doc/**'
+  #  types: [ opened, reopened, synchronize ]
+
+permissions:
+  contents: none
+
+# Cancels any in progress 'workflow' associated with this PR
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  windows2022-ci:
+    name: windows2022-ci
+    runs-on: [windows-2022]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          path: OpenCSP
+
+      - name: Setup headless display
+        uses: pyvista/setup-headless-display-action@v2
+        with:
+          qt: true
+          pyvista: false
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Deps
+        run: |
+          python3 -m pip install -r ./OpenCSP/requirements.txt
+          choco install ffmpeg
+
+      - name: pytest-cov
+        working-directory: OpenCSP/opencsp
+        run: |
+          set PYTHONPATH="$PWD\.."
+          echo "$PYTHONPATH"
+          $env:PYTHONPATH="$PWD\.."
+          pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
