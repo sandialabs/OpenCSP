@@ -6,6 +6,67 @@ OpenCSP uses a fork-based development process. To contribute, please create a fo
 OpenCSP. When you are ready to propose these changes, please open a pull request (PR)
 into the develop branch.
 
+Getting Started
+---------------
+
+Setting up your development environment
++++++++++++++++++++++++++++++++++++++++
+
+1. Install Git. Please see: https://git-scm.com/downloads.
+2. Install Python 3.10+ and add it to your PATH. Please see: https://www.python.org/downloads/ and https://docs.python.org/3/using/windows.html#installation-steps.
+3. Install visual studio code. Please see: https://code.visualstudio.com/.
+4. Install ffmpeg. Please see:  https://www.ffmpeg.org/download.html.
+5. Add ffmpeg to your path. Please see: https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)#to-add-a-path-to-the-path-environment-variable.
+6. Clone the repository. For help on cloning, please see https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository.
+7. Setup a python virtual environment to manage OpenCSP's dependencies. For information about python's virtual environments, please see https://docs.python.org/3/library/venv.html.
+8. Add OpenCSP to your pythonpath. Please see https://learn.microsoft.com/en-us/windows/python/faqs#what-is-pythonpath-.
+
+How to install OpenCSP's dependencies
++++++++++++++++++++++++++++++++++++++
+
+With python version 3.10 or greater, run the following:
+
+::  
+    
+    $ cd /path/to/OpenCSP/../
+    $ python -m venv ./venv_opencsp
+    # On Linux:
+    $ . ./venv_opencsp/bin/activate
+    # Or, on Windows:
+    $ . ./venv_opencsp/Scripts/activate
+    $ (venv_opencsp) cd OpenCSP
+    $ (venv_opencsp) pip install -r requirements.txt
+
+Running OpenCSP's test suite
+++++++++++++++++++++++++++++
+
+Within venv_opencsp, you can now run:
+
+::
+
+    $ (venv_opencsp) cd /path/to/OpenCSP
+    $ (venv_opencsp) export PYTHONPATH=$PWD
+    $ (venv_opencsp) cd opencsp
+    $ (venv_opencsp) pytest
+
+Optional: Using the OpenCSP container
++++++++++++++++++++++++++++++++++++++
+
+If you prefer developing in a container, OpenCSP provides a container image which provides all the dependencies and
+environment settings.
+
+You can use this container as follows. Note: to authenticate to ghcr.io, you must create a classic access token with read permissions. See https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry for more information.
+
+::
+
+    $ cd /path/to/OpenCSP
+    $ docker login ghcr.io -u <GITHUB_USERNAME>
+    $ docker pull ghcr.io/sandialabs/opencsp:latest-ubi8
+    $ docker run -it -v$PWD:/code ghcr.io/sandialabs/opencsp:latest-ubi8
+    $ cd opencsp
+    $ pytest
+
+
 Contribution Requirements
 -------------------------
 

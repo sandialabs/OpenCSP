@@ -3,8 +3,7 @@ name: github-DOCKER
 on:
   push:
     branches:
-      - main
-      
+      - main      
 
 permissions:
   contents: none
