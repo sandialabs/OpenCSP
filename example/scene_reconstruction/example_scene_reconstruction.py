@@ -54,6 +54,7 @@ if __name__ == '__main__':
     save_path = join(dirname(__file__), 'data/output/scene_reconstruction')
     ft.create_directories_if_necessary(save_path)
 
+    # Set up logger
     lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
 
     example_scene_reconstruction(save_path)
