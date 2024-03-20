@@ -13,14 +13,12 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_run_screen_shape_calibration():
-    """Runs screen shape calibration. Saves data to ./data/output/screen_shape"""
-    # Define save directory
-    save_dir = join(dirname(__file__), 'data/output/screen_shape')
-    ft.create_directories_if_necessary(save_dir)
-
+def example_run_screen_shape_calibration(save_dir):
+    """Runs screen shape calibration. Saves data to ./data/output/screen_shape
+    """
     # Load output data from Scene Reconstruction (Aruco marker xyz points)
     file_pts_data = join(
         opencsp_code_dir(),
@@ -72,7 +70,8 @@ def example_run_screen_shape_calibration():
 
     # Perform screen shape calibration
     cal = CalibrateDisplayShape(data_input)
-    cal.run_calibration(2)
+    cal.make_figures = True
+    cal.run_calibration()
 
     # Save screen shape data as HDF5 file
     cal.save_data_as_hdf(join(save_dir, 'screen_distortion_data.h5'))
@@ -83,4 +82,9 @@ def example_run_screen_shape_calibration():
 
 
 if __name__ == '__main__':
-    example_run_screen_shape_calibration()
+    # Define save directory
+    save_path = join(dirname(__file__), 'data/output/screen_shape')
+    ft.create_directories_if_necessary(save_path)
+    lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
+
+    example_run_screen_shape_calibration(save_path)
