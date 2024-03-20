@@ -3,12 +3,10 @@ from scipy.interpolate import LinearNDInterpolator
 
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
-
-# TODO: add HDF5 IO interface
+import opencsp.common.lib.tool.hdf5_tools as ht
 
 
-class DisplayShape:
+class DisplayShape(ht.HDF5_IO_Abstract):
     """Representation of a screen/projector for deflectometry."""
 
     def __init__(self, grid_data: dict, name: str = '') -> 'DisplayShape':
@@ -168,35 +166,45 @@ class DisplayShape:
         return Vxyz(xyz)  # meters, display coordinates
 
     @classmethod
-    def load_from_hdf(cls, file: str):
-        """
-        Loads from HDF file
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'DisplayShape':
+        """Loads data from given file. Assumes data is stored as: PREFIX + DisplayShape/Field_1
 
         Parameters
         ----------
-        file : string
-            HDF5 file to load
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
         # Load grid data
-        datasets = ['DisplayShape/screen_model', 'DisplayShape/name']
-        data = hdf5_tools.load_hdf5_datasets(datasets, file)
+        datasets = [
+            prefix + 'DisplayShape/screen_model',
+            prefix + 'DisplayShape/name',
+        ]
+        data = ht.load_hdf5_datasets(datasets, file)
 
         # Rectangular
         if data['screen_model'] == 'rectangular2D':
             datasets = ['DisplayShape/screen_x', 'DisplayShape/screen_y']
-            grid_data = hdf5_tools.load_hdf5_datasets(datasets, file)
+            grid_data = ht.load_hdf5_datasets(datasets, file)
 
         # Distorted 2D
         elif data['screen_model'] == 'distorted2D':
-            datasets = ['DisplayShape/xy_screen_fraction', 'DisplayShape/xy_screen_coords']
-            grid_data = hdf5_tools.load_hdf5_datasets(datasets, file)
+            datasets = [
+                'DisplayShape/xy_screen_fraction',
+                'DisplayShape/xy_screen_coords',
+            ]
+            grid_data = ht.load_hdf5_datasets(datasets, file)
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xy_screen_coords'] = Vxy(grid_data['xy_screen_coords'])
 
         # Distorted 3D
         elif data['screen_model'] == 'distorted3D':
-            datasets = ['DisplayShape/xy_screen_fraction', 'DisplayShape/xyz_screen_coords']
-            grid_data = hdf5_tools.load_hdf5_datasets(datasets, file)
+            datasets = [
+                'DisplayShape/xy_screen_fraction',
+                'DisplayShape/xyz_screen_coords',
+            ]
+            grid_data = ht.load_hdf5_datasets(datasets, file)
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xyz_screen_coords'] = Vxyz(grid_data['xyz_screen_coords'])
 
@@ -211,26 +219,25 @@ class DisplayShape:
         }
         return cls(**kwargs)
 
-    def save_to_hdf(self, file: str):
-        """
-        Saves to HDF file
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+        """Saves data to given file. Data is stored as: PREFIX + DisplayShape/Field_1
 
         Parameters
         ----------
-        file : string
-            HDF5 file to save
-
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
-
         # Get "grid data" datset names and data
         datasets = []
         data = []
         for dataset in self.grid_data.keys():
-            datasets.append('DisplayShape/' + dataset)
-            if isinstance(self.grid_data[dataset], Vxy) or isinstance(self.grid_data[dataset], Vxyz):
+            datasets.append(prefix + 'DisplayShape/' + dataset)
+            if isinstance(self.grid_data[dataset], (Vxy, Vxyz)):
                 data.append(self.grid_data[dataset].data)
             else:
                 data.append(self.grid_data[dataset])
 
         # Save data
-        hdf5_tools.save_hdf5_datasets(data, datasets, file)
+        ht.save_hdf5_datasets(data, datasets, file)

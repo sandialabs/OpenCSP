@@ -4,7 +4,6 @@
 import unittest
 
 import numpy as np
-from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.common.lib.geometry.Vxy import Vxy
@@ -61,10 +60,8 @@ class TestDisplay(unittest.TestCase):
 
     def test_rectangular2D(self):
         # Instantiate display object
-        v_cam_screen_screen = Vxyz((0, 0, 1))
-        r_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
         name = 'Test DisplayShape'
-        disp = DisplayShape(v_cam_screen_screen, r_screen_cam, self.grid_data_rect2D, name)
+        disp = DisplayShape(self.grid_data_rect2D, name)
 
         # Perform calculation
         calc = disp.interp_func(self.test_Vxy_pts)
@@ -74,10 +71,8 @@ class TestDisplay(unittest.TestCase):
 
     def test_distorted2D(self):
         # Instantiate display object
-        v_cam_screen_screen = Vxyz((0, 0, 1))
-        r_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
         name = 'Test DisplayShape'
-        disp = DisplayShape(v_cam_screen_screen, r_screen_cam, self.grid_data_2D, name)
+        disp = DisplayShape(self.grid_data_2D, name)
 
         # Perform calculation
         calc = disp.interp_func(self.test_Vxy_pts)
@@ -87,10 +82,8 @@ class TestDisplay(unittest.TestCase):
 
     def test_distorted3D(self):
         # Instantiate display object
-        v_cam_screen_screen = Vxyz((0, 0, 1))
-        r_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
         name = 'Test DisplayShape'
-        disp = DisplayShape(v_cam_screen_screen, r_screen_cam, self.grid_data_3D, name)
+        disp = DisplayShape(self.grid_data_3D, name)
 
         # Perform calculation
         calc = disp.interp_func(self.test_Vxy_pts)
