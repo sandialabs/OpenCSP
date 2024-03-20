@@ -134,7 +134,7 @@ class CalibrateDisplayShape:
         pts_uv_pixel_ori: list[Vxy] = []
         pts_uv_pixel_full: list[Vxy] = []
         for idx, meas in enumerate(self.data_input.measurements_screen):
-            lt.info(f'Processing measurement: {idx:d}')
+            lt.debug(f'Processing measurement: {idx:d}')
 
             # Calculate mask
             mask1 = ip.calc_mask_raw(meas.mask_images, hist_thresh=0.2)
@@ -391,13 +391,9 @@ class CalibrateDisplayShape:
 
         # Save distortion data
         with h5py.File(file, 'w') as f:
-            f.create_dataset(
-                'pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data
-            )
-            f.create_dataset(
-                'pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data
-            )
-        print(f'Saved distortion data to: {os.path.abspath(file):s}')
+            f.create_dataset('pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data)
+            f.create_dataset('pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data)
+        lt.info(f'Saved distortion data to: {os.path.abspath(file):s}')
 
     def visualize_located_cameras(self) -> None:
         """Plots cameras and alignment points"""

@@ -78,7 +78,9 @@ def example_run_screen_shape_calibration(save_dir):
 
     # Save calibration figures
     for fig in cal.figures:
-        fig.savefig(join(save_dir, fig.get_label() + '.png'))
+        file = join(save_dir, fig.get_label() + '.png')
+        lt.info(f'Saving figure to: {file:s}')
+        fig.savefig(file)
 
 
 if __name__ == '__main__':
