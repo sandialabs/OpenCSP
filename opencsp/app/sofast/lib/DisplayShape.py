@@ -203,6 +203,7 @@ class DisplayShape:
         else:
             raise ValueError(f'Model, {data["screen_model"]}, not supported.')
 
+        grid_data.update({'screen_model': data['screen_model']})
         # Return display object
         kwargs = {
             'name': data['name'],
