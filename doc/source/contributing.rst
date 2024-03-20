@@ -91,8 +91,23 @@ Continuous integration (CI) testing will fail if the changes are not pep8 compli
 
     # Apply correct formatting in CI
     pip install black
-    black /path/to/opencsp
+    black /path/to/opencsp -C -S
 
+
+NOTE, the following pre-commit hook can be added to automatically apply black to your
+commits:
+
+::
+   $ cat .git/hooks/pre-commit
+   for FILE in $(git diff --cached --name-only | egrep '.*\.py$')
+   do
+     if [ -e $FILE ]; then
+       black $FILE -C -S
+       git add $FILE
+     fi
+   done
+   
+   
 Online OpenCSP documentation is generated using Sphinx. For API documentation, we use
 NumPy-style docstrings with bulleted lists. We require NumPy compliant docstrings for 
 Models, Public Classes, and Public Functions. For more internal and development-facing 
