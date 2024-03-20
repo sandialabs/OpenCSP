@@ -87,6 +87,8 @@ if __name__ == '__main__':
     # Define save directory
     save_path = join(dirname(__file__), 'data/output/screen_shape')
     ft.create_directories_if_necessary(save_path)
+
+    # Set up logger
     lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
 
     example_run_screen_shape_calibration(save_path)

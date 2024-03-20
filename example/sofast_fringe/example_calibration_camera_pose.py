@@ -56,6 +56,8 @@ if __name__ == '__main__':
     # Define save dir
     save_path = join(dirname(__file__), 'data/output/camera_pose')
     ft.create_directories_if_necessary(save_path)
+
+    # Set up logger
     lt.logger(join(save_path, 'log.txt'))
 
     example_run_camera_position_calibration(save_path)
