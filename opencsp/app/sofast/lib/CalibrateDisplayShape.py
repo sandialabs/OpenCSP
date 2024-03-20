@@ -92,7 +92,7 @@ class CalibrateDisplayShape:
     ----------
     data_input: : DataInput
         DataInput class with input data
-    to_plot : bool
+    make_figures : bool
         Set to True to output plots
     data_calculation : DataCalculation
         DataCalculation class for storing calculated data
@@ -109,7 +109,7 @@ class CalibrateDisplayShape:
             A DataInput class with all fields defined
         """
         self.data_input = data_input
-        self.to_plot = False
+        self.make_figures = False
 
         # Load cal params
         cal_pattern_params = CalParams(
@@ -539,7 +539,7 @@ class CalibrateDisplayShape:
         self.assemble_xyz_data_into_images()
 
         # Plot figures
-        if self.to_plot:
+        if self.make_figures:
             self.visualize_located_cameras()
             self.visualize_annotated_camera_images()
             self.plot_ray_intersection_errors()

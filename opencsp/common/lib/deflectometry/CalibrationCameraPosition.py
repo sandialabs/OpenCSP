@@ -67,7 +67,7 @@ class CalibrationCameraPosition:
         self.pts_xy_marker_corners_reprojected: Vxy
 
         # Save figures
-        self.make_figures: bool = False
+        self.make_figures = False
         self.figures: list[plt.Figure] = []
 
     def find_markers(self) -> None:
