@@ -20,20 +20,20 @@ import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
-import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_driver():
+def example_driver(dir_save: str):
     """Example SOFAST script
 
     Performs processing of previously collected Sofast data of multi facet mirror ensemble.
         1. Loads saved "multi-facet" SOFAST collection data
         2. Processes data with SOFAST (without using facet file)
-        3. Prints best-fit parabolic focal lengths
+        3. Logs best-fit parabolic focal lengths
         4. Plots slope magnitude, physical setup
-
     """
+
     # Define sample data directory
     sample_data_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe/')
 
@@ -44,13 +44,6 @@ def example_driver():
     file_calibration = join(sample_data_dir, 'image_calibration.h5')
     file_facet = join(sample_data_dir, 'Facet_lab_6x4.json')
     file_ensemble = join(sample_data_dir, 'Ensemble_lab_6x4.json')
-
-    # Define save dir
-    dir_save = join(dirname(__file__), 'data/output/facet_ensemble')
-    ft.create_directories_if_necessary(dir_save)
-
-    # Set up logger
-    lt.logger(join(dir_save, 'log.txt'))
 
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -91,8 +84,7 @@ def example_driver():
     for idx in range(sofast.num_facets):
         surf_coefs = sofast.data_characterization_facet[idx].surf_coefs_facet
         focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
-        lt.info(f'Facet {idx:d} xy focal lengths (meters): '
-                f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
+        lt.info(f'Facet {idx:d} xy focal lengths (meters): {focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
 
     # Get optic representation
     ensemble: FacetEnsemble = sofast.get_optic()
@@ -134,4 +126,11 @@ def example_driver():
 
 
 if __name__ == '__main__':
-    example_driver()
+    # Define save dir
+    save_path = join(dirname(__file__), 'data/output/facet_ensemble')
+    ft.create_directories_if_necessary(save_path)
+
+    # Set up logger
+    lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
+
+    example_driver(save_path)
