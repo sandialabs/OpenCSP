@@ -335,7 +335,20 @@ class CalibrateDisplayShape:
             self.data_calculation.pts_xyz_screen_aligned.data[:, self.data_calculation.intersection_points_mask]
         )
 
-        return {'pts_xy_screen_fraction': pts_xy_screen_fraction, 'pts_xyz_screen_coords': pts_xyz_screen}
+        return {'xy_screen_fraction': pts_xy_screen_fraction, 'xyz_screen_coords': pts_xyz_screen}
+
+    def to_DisplayShape_file(self, file: str, name: str) -> None:
+        """Saves data to DisplayShape hdf file using the distorted_3d model
+
+        Parameters
+        ----------
+        file : str
+            Save file name.
+        name : str
+            Name of DisplayShape.
+        """
+        grid_data = self.get_data()
+        return
 
     def save_data_as_hdf(self, file: str) -> None:
         """Saves distortion data to given HDF file"""
@@ -344,9 +357,9 @@ class CalibrateDisplayShape:
 
         # Save distortion data
         with h5py.File(file, 'w') as f:
-            f.create_dataset('pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data)
-            f.create_dataset('pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data)
-        lt.info(f'Saved distortion data to: {os.path.abspath(file):s}')
+            f.create_dataset('xy_screen_fraction', data=data['xy_screen_fraction'].data)
+            f.create_dataset('xyz_screen_coords', data=data['xyz_screen_coords'].data)
+        print(f'Saved distortion data to: {os.path.abspath(file):s}')
 
     def visualize_located_cameras(self) -> None:
         """Plots cameras and alignment points"""
