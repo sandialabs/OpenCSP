@@ -353,9 +353,9 @@ class TargetColor(TargetAbstract):
 
                 # Set pixel color
                 # ?? SCAFFOLDING RCB -- FIXUP ALL THIS CONFUSION REGARDING WHETHER COLORS ARE OVER [0,1] OR [0,255].
-                self.image[
-                    row, col, 0
-                ] = this_red  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]?
+                self.image[row, col, 0] = (
+                    this_red  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]?
+                )
                 self.image[row, col, 1] = this_green  # /255.0
                 self.image[row, col, 2] = this_blue  # /255.0
 

@@ -103,9 +103,9 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 def tracking_surface_normal_xyz(
     heliostat_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Heliostat origin.
     aimpoint_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Reflection aim point.
-    location_lon_lat: list
-    | np.ndarray
-    | tuple,  # (lon,lat) in rad. Solar field origin.
+    location_lon_lat: (
+        list | np.ndarray | tuple
+    ),  # (lon,lat) in rad. Solar field origin.
     when_ymdhmsz: list | np.ndarray | tuple,
 ):  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6)

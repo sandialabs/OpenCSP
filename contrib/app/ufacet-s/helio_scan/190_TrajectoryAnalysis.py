@@ -319,10 +319,9 @@ class TrajectoryAnalysis:
             'In TrajectoryAnalysis.__init__(), initializing GPS-frame synchronization constants...'
         )
         self.synchronization_pair_list = self.initialize_synchronization_pair_list()
-        (
-            self.synchronization_slope,
-            self.synchronization_intercept,
-        ) = self.initialize_synchronization_constants()
+        (self.synchronization_slope, self.synchronization_intercept) = (
+            self.initialize_synchronization_constants()
+        )
         self.print_synchronization_pair_list()
         self.synchronization_constants_dir_body_ext = (
             self.save_synchronization_constants()
@@ -579,16 +578,16 @@ class TrajectoryAnalysis:
                 self.flight_log_df.loc[idx, 'speed_average(m/sec)'] = average_s
                 self.flight_log_df.loc[idx, 'delta_speed(m/sec)'] = delta_speed
                 self.flight_log_df.loc[idx, 'abs_delta_speed(m/sec)'] = abs_delta_speed
-                self.flight_log_df.loc[
-                    idx, 'velocity_angle_xy(rad)'
-                ] = velocity_angle_xy
+                self.flight_log_df.loc[idx, 'velocity_angle_xy(rad)'] = (
+                    velocity_angle_xy
+                )
                 self.flight_log_df.loc[idx, 'velocity_angle_z(rad)'] = velocity_angle_z
-                self.flight_log_df.loc[
-                    idx, 'delta_velocity_angle_xy(rad)'
-                ] = delta_velocity_angle_xy
-                self.flight_log_df.loc[
-                    idx, 'delta_velocity_angle_z(rad)'
-                ] = delta_velocity_angle_z
+                self.flight_log_df.loc[idx, 'delta_velocity_angle_xy(rad)'] = (
+                    delta_velocity_angle_xy
+                )
+                self.flight_log_df.loc[idx, 'delta_velocity_angle_z(rad)'] = (
+                    delta_velocity_angle_z
+                )
 
     def velocity_angle_xy(self, velocity_x, velocity_y):
         """
@@ -1750,9 +1749,9 @@ class TrajectoryAnalysis:
                 )
                 pass
             else:
-                hel_gps_camera_analysis_dict[
-                    hel_name
-                ] = list_of_gps_camera_analysis_dicts
+                hel_gps_camera_analysis_dict[hel_name] = (
+                    list_of_gps_camera_analysis_dicts
+                )
         # Return.
         return hel_gps_camera_analysis_dict
 
@@ -1824,12 +1823,10 @@ class TrajectoryAnalysis:
             hel_name, time_begin, time_mid, time_end
         )
         # Compute heliostat (azimuth, elevation) that will bring camera pass into parallel alignment with GPS pass.
-        (
-            azimuth_from_alignment,
-            elevation_from_alignment,
-            alignment_angle_error,
-        ) = self.compute_alignment_azimuth_elevation(
-            gps_pass, camera_pass, azimuth_from_model_mid, elevation_from_model_mid
+        (azimuth_from_alignment, elevation_from_alignment, alignment_angle_error) = (
+            self.compute_alignment_azimuth_elevation(
+                gps_pass, camera_pass, azimuth_from_model_mid, elevation_from_model_mid
+            )
         )
         # # Compute heliostat (azimuth, elevation) from log.
         # azimuth_from_log_begin,          \
@@ -1904,9 +1901,9 @@ class TrajectoryAnalysis:
         gps_camera_analysis_dict['time_mid'] = time_mid
         # (azimuth, elevation) from aim point and time.
         gps_camera_analysis_dict['azimuth_from_model_begin'] = azimuth_from_model_begin
-        gps_camera_analysis_dict[
-            'elevation_from_model_begin'
-        ] = elevation_from_model_begin
+        gps_camera_analysis_dict['elevation_from_model_begin'] = (
+            elevation_from_model_begin
+        )
         gps_camera_analysis_dict['azimuth_from_model_mid'] = azimuth_from_model_mid
         gps_camera_analysis_dict['elevation_from_model_mid'] = elevation_from_model_mid
         gps_camera_analysis_dict['azimuth_from_model_end'] = azimuth_from_model_end
@@ -1929,22 +1926,21 @@ class TrajectoryAnalysis:
         # gps_camera_analysis_dict['azimuth_target_from_log_end']     = azimuth_target_from_log_end
         # gps_camera_analysis_dict['elevation_target_from_log_end']   = elevation_target_from_log_end
         # Corresponding point analysis.
-        gps_camera_analysis_dict[
-            'per_heliostat_transformed_camera_pass'
-        ] = per_heliostat_transformed_camera_pass
-        gps_camera_analysis_dict[
-            'camera_gps_point_pair_list'
-        ] = camera_gps_point_pair_list
+        gps_camera_analysis_dict['per_heliostat_transformed_camera_pass'] = (
+            per_heliostat_transformed_camera_pass
+        )
+        gps_camera_analysis_dict['camera_gps_point_pair_list'] = (
+            camera_gps_point_pair_list
+        )
         gps_camera_analysis_dict['camera_gps_distance_list'] = camera_gps_distance_list
         gps_camera_analysis_dict['rms_distance'] = rms_distance
         # Return.
         return gps_camera_analysis_dict
 
     def compute_model_azimuth_elevation(self, hel_name, time_begin, time_mid, time_end):
-        (
-            azimuth_begin,
-            elevation_begin,
-        ) = self.compute_model_azimuth_elevation_given_time(hel_name, time_begin)
+        (azimuth_begin, elevation_begin) = (
+            self.compute_model_azimuth_elevation_given_time(hel_name, time_begin)
+        )
         azimuth_mid, elevation_mid = self.compute_model_azimuth_elevation_given_time(
             hel_name, time_mid
         )
@@ -2051,18 +2047,12 @@ class TrajectoryAnalysis:
             azimuth_target_begin,
             elevation_target_begin,
         ) = self.compute_log_azimuth_elevation_given_time(hel_name, time_begin)
-        (
-            azimuth_mid,
-            elevation_mid,
-            azimuth_target_mid,
-            elevation_target_mid,
-        ) = self.compute_log_azimuth_elevation_given_time(hel_name, time_mid)
-        (
-            azimuth_end,
-            elevation_end,
-            azimuth_target_end,
-            elevation_target_end,
-        ) = self.compute_log_azimuth_elevation_given_time(hel_name, time_end)
+        (azimuth_mid, elevation_mid, azimuth_target_mid, elevation_target_mid) = (
+            self.compute_log_azimuth_elevation_given_time(hel_name, time_mid)
+        )
+        (azimuth_end, elevation_end, azimuth_target_end, elevation_target_end) = (
+            self.compute_log_azimuth_elevation_given_time(hel_name, time_end)
+        )
         # Return.
         return (
             azimuth_begin,
@@ -2124,9 +2114,9 @@ class TrajectoryAnalysis:
                 )
                 transformed_camera_pass_list.append(transformed_camera_pass)
             # Add to result.
-            self.hel_transformed_camera_passes_dict[
-                hel_name
-            ] = transformed_camera_pass_list
+            self.hel_transformed_camera_passes_dict[hel_name] = (
+                transformed_camera_pass_list
+            )
 
     def set_per_heliosat_configurations_from_gps_camera_alignment(self):
         """
@@ -2849,9 +2839,9 @@ class TrajectoryAnalysis:
         draw_control_dict['draw_GPS_log'] = True
         draw_control_dict['draw_gps_scan_passes'] = False
         draw_control_dict['draw_trajectory_fragments'] = True
-        draw_control_dict[
-            'trajectory_fragment_selected_heliostats'
-        ] = self.synchronization_heliostat_name_list()
+        draw_control_dict['trajectory_fragment_selected_heliostats'] = (
+            self.synchronization_heliostat_name_list()
+        )
         draw_control_dict['connect_trajectory_fragments'] = True
         draw_control_dict['draw_synchronization_points'] = True
         draw_control_dict['include_points_with_missing_corners'] = True
@@ -3282,9 +3272,9 @@ class TrajectoryAnalysis:
         draw_control_dict['include_points_with_missing_corners'] = False
         draw_control_dict['include_non_refined_points'] = False
         draw_control_dict['draw_camera_passes'] = True
-        draw_control_dict[
-            'draw_gps_transformed_camera_pass_connections'
-        ] = True  # False #True
+        draw_control_dict['draw_gps_transformed_camera_pass_connections'] = (
+            True  # False #True
+        )
         self.solar_field_style = rcsf.heliostat_outlines(color='grey')
         self.heliostat_up_style = rch.outline(
             color='lightblue'
@@ -4467,11 +4457,9 @@ class TrajectoryAnalysis:
     def save_enhanced_flight_log(self):
         if not (os.path.exists(self.output_data_dir)):
             os.makedirs(self.output_data_dir)
-            (
-                input_flight_log_dir,
-                input_flight_log_body,
-                input_flight_log_ext,
-            ) = ft.path_components(self.input_flight_log_dir_body_ext)
+            (input_flight_log_dir, input_flight_log_body, input_flight_log_ext) = (
+                ft.path_components(self.input_flight_log_dir_body_ext)
+            )
             output_flight_log_plus_body_ext = (
                 input_flight_log_body + '_plus' + input_flight_log_ext
             )

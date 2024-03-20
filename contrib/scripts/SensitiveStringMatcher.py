@@ -118,7 +118,7 @@ class SensitiveStringMatcher:
             matching: dict[re.Pattern | str, list[int]] = {}
             for pattern in possible_matching:
                 span = possible_matching[pattern]
-                line_part = iline[span[0]: span[1]]
+                line_part = iline[span[0] : span[1]]
                 if len(self._search_patterns(line_part, self.neg_patterns)) == 0:
                     matching[pattern] = span
 
@@ -130,9 +130,9 @@ class SensitiveStringMatcher:
                 line_part = line[start:end]
                 line_context = f"`{line_part}`"
                 if start > 0:
-                    line_context = line[max(start - 5, 0): start] + line_context
+                    line_context = line[max(start - 5, 0) : start] + line_context
                 if end < len(line):
-                    line_context = line_context + line[end: min(end + 5, len(line))]
+                    line_context = line_context + line[end : min(end + 5, len(line))]
 
                 match = Match(lineno + 1, start, end, line, line_part, self)
                 self.set_match_msg(match, pattern, line_context)

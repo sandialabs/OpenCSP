@@ -1,6 +1,7 @@
 """
 GUI used to view annotated checkerboard corners.
 """
+
 import tkinter
 
 from numpy import ndarray

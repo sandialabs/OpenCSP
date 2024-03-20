@@ -3,6 +3,7 @@ Example program that captures images from a 12 bit color Basler
 camera and saves the images in TIFF format.
  
 """
+
 import argparse
 import imageio.v3 as imageio
 

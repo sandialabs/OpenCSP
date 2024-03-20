@@ -89,9 +89,11 @@ def example_annotate_aruco_markers():
     """Example script that annotates aruco markers found in imput images matching
     the given source_pattern. Markers are outlined in red and labeled in blue text.
     """
-    source_pattern = join(opencsp_code_dir(),
-                          'app/scene_reconstruction/test/data',
-                          'data_measurement/aruco_marker_images/DSC0365*.JPG')
+    source_pattern = join(
+        opencsp_code_dir(),
+        'app/scene_reconstruction/test/data',
+        'data_measurement/aruco_marker_images/DSC0365*.JPG',
+    )
     save_dir = join(dirname(__file__), 'data/output/annotated_aruco_markers')
 
     ft.create_directories_if_necessary(save_dir)

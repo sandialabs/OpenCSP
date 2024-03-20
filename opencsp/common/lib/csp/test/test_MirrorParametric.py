@@ -1,4 +1,5 @@
 """Unit test to test MirrorParametric class"""
+
 import numpy as np
 
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric

@@ -3,7 +3,9 @@ from os.path import join
 
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
@@ -25,9 +27,7 @@ def example_driver():
     4. Plots slope magnitude, physical setup
     """
     # Define sample data directory
-    sample_data_dir = join(
-        opencsp_code_dir(), 'test/data/measurements_sofast_fringe/'
-    )
+    sample_data_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe/')
 
     # Directory Setup
     file_measurement = join(sample_data_dir, 'measurement_facet.h5')

@@ -35,7 +35,9 @@ class TestFileTools(unittest.TestCase):
         self.assertListEqual(expected, files_name_ext)
 
     def test_files_in_directory_recursive_files_only(self):
-        files_name_ext = ft.files_in_directory(self.data_dir, recursive=True, files_only=True)
+        files_name_ext = ft.files_in_directory(
+            self.data_dir, recursive=True, files_only=True
+        )
         files_name_ext = [f.replace("\\", "/") for f in files_name_ext]
         expected = [".dotfile", "a.a", "b.b", "d/c.c", "d/e/f.f"]
         self.assertListEqual(expected, files_name_ext)

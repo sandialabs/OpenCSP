@@ -1,5 +1,6 @@
 """Class that handles the processing of fixed pattern deflectometry data.
 """
+
 from typing import Literal
 
 import cv2 as cv

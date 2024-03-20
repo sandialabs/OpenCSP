@@ -1,6 +1,7 @@
 """Generates test data from measurement file for mirror type 'single_facet'.
 Multiple combinations of display and surface types are iterated over.
 """
+
 from os.path import join, dirname, exists
 from typing import Literal
 
@@ -8,7 +9,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
@@ -29,7 +32,9 @@ def generate_dataset(
     """Generates and saves dataset"""
     # Check output file exists
     if not exists(dirname(file_dataset_out)):
-        raise FileNotFoundError(f'Output directory {file_dataset_out:s} does not exist.')
+        raise FileNotFoundError(
+            f'Output directory {file_dataset_out:s} does not exist.'
+        )
 
     # Load components
     camera = Camera.load_from_hdf(file_camera)

@@ -1,5 +1,6 @@
 """Unit test suite to test SlopeSolver class
 """
+
 import os
 import unittest
 
@@ -7,7 +8,9 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.geometry.Uxyz import Uxyz

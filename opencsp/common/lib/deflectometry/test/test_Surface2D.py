@@ -1,5 +1,6 @@
 """Unit test suite to test Surface2D type classes
 """
+
 import unittest
 
 import numpy as np

@@ -257,22 +257,22 @@ def construct_line_3d_given_two_points(
     line_3d['xyz_1'] = xyz_1  # First example point.
     line_3d['xyz_2'] = xyz_2  # Second example point.
     line_3d['length'] = length  # Euclidean distance between example points.
-    line_3d[
-        'length_xy'
-    ] = length_xy  # Euclidean distance between example points, projected onto the xy plane.
+    line_3d['length_xy'] = (
+        length_xy  # Euclidean distance between example points, projected onto the xy plane.
+    )
     line_3d['mid_xyz'] = mid_xyz  # Point midway between the two example points.
-    line_3d[
-        'vxyz'
-    ] = vxyz  # Vector pointing from first example point to second example point.
-    line_3d[
-        'uxyz'
-    ] = uxyz  # Unit vector pointing from first example point to second example point.
-    line_3d[
-        'theta'
-    ] = theta  # Angle the line points, after projecting onto the xy plane, measured ccw about the z axis.
-    line_3d[
-        'eta'
-    ] = eta  # Angle the line points above the xy plane (negative values indicate below the xy plane).
+    line_3d['vxyz'] = (
+        vxyz  # Vector pointing from first example point to second example point.
+    )
+    line_3d['uxyz'] = (
+        uxyz  # Unit vector pointing from first example point to second example point.
+    )
+    line_3d['theta'] = (
+        theta  # Angle the line points, after projecting onto the xy plane, measured ccw about the z axis.
+    )
+    line_3d['eta'] = (
+        eta  # Angle the line points above the xy plane (negative values indicate below the xy plane).
+    )
     # Return.
     return line_3d
 
