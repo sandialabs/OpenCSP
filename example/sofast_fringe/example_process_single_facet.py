@@ -18,11 +18,11 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_driver():
+def example_driver(dir_save: str):
     """Example SOFAST script
 
     Performs processing of previously collected Sofast data of single facet mirror.
@@ -40,13 +40,6 @@ def example_driver():
     file_display = join(sample_data_dir, 'display_distorted_2d.h5')
     file_calibration = join(sample_data_dir, 'image_calibration.h5')
     file_facet = join(sample_data_dir, 'Facet_NSTTF.json')
-
-    # Define save dir
-    dir_save = join(dirname(__file__), 'data/output/single_facet')
-    ft.create_directories_if_necessary(dir_save)
-
-    # Set up logger
-    lt.logger(join(dir_save, 'log.txt'))
 
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -106,4 +99,11 @@ def example_driver():
 
 
 if __name__ == '__main__':
-    example_driver()
+    # Define save dir
+    save_path = join(dirname(__file__), 'data/output/single_facet')
+    ft.create_directories_if_necessary(save_path)
+
+    # Set up logger
+    lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
+
+    example_driver(save_path)
