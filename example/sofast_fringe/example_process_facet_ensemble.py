@@ -1,25 +1,27 @@
-import os
-from os.path import join
+from os.path import join, dirname
 
 import matplotlib
 
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import (
     MeasurementSofastFringe as Measurement,
 )
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
-from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
-from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
+import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.file_tools as ft
 
 
 def example_driver():
@@ -44,9 +46,11 @@ def example_driver():
     file_ensemble = join(sample_data_dir, 'Ensemble_lab_6x4.json')
 
     # Define save dir
-    dir_save = join(os.path.dirname(__file__), 'data/output/facet_ensemble')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    dir_save = join(dirname(__file__), 'data/output/facet_ensemble')
+    ft.create_directories_if_necessary(dir_save)
+
+    # Set up logger
+    lt.logger(join(dir_save, 'log.txt'))
 
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -58,12 +62,9 @@ def example_driver():
     # Define facet data
     facet_data = [DefinitionFacet.load_from_json(file_facet)] * ensemble_data.num_facets
 
-    # Define surface data (plano)
-    # surface_data = [dict(surface_type='plano', robust_least_squares=False, downsample=20)] * ensemble_data.num_facets
-    # Define surface data (parabolic)
+    # Define surface data
     surface_data = [
-        dict(
-            surface_type='parabolic',
+        Surface2DParabolic(
             initial_focal_lengths_xy=(100.0, 100.0),
             robust_least_squares=False,
             downsample=20,
@@ -88,12 +89,10 @@ def example_driver():
 
     # Calculate focal length from parabolic fit
     for idx in range(sofast.num_facets):
-        if surface_data[idx]['surface_type'] == 'parabolic':
-            surf_coefs = sofast.data_characterization_facet[idx].surf_coefs_facet
-            focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
-            print('Parabolic fit focal lengths:')
-            print(f'  X {focal_lengths_xy[0]:.3f} m')
-            print(f'  Y {focal_lengths_xy[1]:.3f} m')
+        surf_coefs = sofast.data_characterization_facet[idx].surf_coefs_facet
+        focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
+        lt.info(f'Facet {idx:d} xy focal lengths (meters): '
+                f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
 
     # Get optic representation
     ensemble: FacetEnsemble = sofast.get_optic()

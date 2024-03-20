@@ -1,6 +1,6 @@
 """Unit test suite to test Surface2D type classes
 """
-
+from os.path import dirname, join
 import unittest
 
 import numpy as np
@@ -10,12 +10,17 @@ from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabol
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.file_tools as ft
 
 
 class Test2DSurface(unittest.TestCase):
     @classmethod
-    def setup_class(cls):
+    def setUpClass(cls):
+        # Generate test data
         cls.data_test = [generate_2DParabolic(), generate_2DPlano()]
+        # Save location
+        cls.dir_save = join(dirname(__file__), 'data/output')
+        ft.create_directories_if_necessary(cls.dir_save)
 
     def test_intersect(self):
         """Tests the intersection of rays with fit surface."""
@@ -92,6 +97,17 @@ class Test2DSurface(unittest.TestCase):
 
                 # Test
                 np.testing.assert_allclose(n_design.data, data_exp.data)
+
+    def test_io(self):
+        """Test saving to HDF5"""
+        prefix = 'test_folder/'
+        for idx, surf in enumerate(self.data_test):
+            surf_cur: Surface2DAbstract = surf[0]
+            file = join(self.dir_save, f'test_surface_{idx:d}.h5')
+            # Test saving
+            surf_cur.save_to_hdf(file, prefix)
+            # Test loading
+            surf_cur.load_from_hdf(file, prefix)
 
 
 def generate_2DParabolic() -> (
@@ -246,12 +262,4 @@ def generate_2DPlano() -> (
 
 
 if __name__ == '__main__':
-    Test = Test2DSurface()
-    Test.setup_class()
-
-    Test.test_intersect()
-    Test.test_calculate_slopes()
-    Test.test_fit_slopes()
-    Test.test_fit_surf()
-    Test.test_design_normal()
-    Test.test_fit_normal()
+    unittest.main()

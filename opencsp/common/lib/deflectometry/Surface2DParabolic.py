@@ -5,6 +5,7 @@ import opencsp.common.lib.deflectometry.slope_fitting_2d as sf2
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets, load_hdf5_datasets
 
 
 class Surface2DParabolic(Surface2DAbstract):
@@ -327,3 +328,35 @@ class Surface2DParabolic(Surface2DAbstract):
         self.v_optic_cam_optic += v_align_optic_step
         self.v_screen_points_optic += v_align_optic_step
         self.v_optic_screen_optic += v_align_optic_step
+
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        data = [
+            self.initial_focal_lengths_xy,
+            self.robust_least_squares,
+            self.downsample,
+            'parabolic'
+        ]
+        datasets = [
+            prefix + 'ParamsSurface/initial_focal_lengths_xy',
+            prefix + 'ParamsSurface/robust_least_squares',
+            prefix + 'ParamsSurface/downsample',
+            prefix + 'ParamsSurface/surface_type',
+        ]
+        save_hdf5_datasets(data, datasets, file)
+
+    @classmethod
+    def load_from_hdf(cls, file: str, prefix: str = ''):
+        # Check surface type
+        data = load_hdf5_datasets([prefix + 'ParamsSurface/surface_type'], file)
+        if data['surface_type'] != 'parabolic':
+            raise ValueError(
+                f'Surface2DParabolic cannot load surface type, {data["surface_type"]:s}')
+
+        # Load
+        datasets = [
+            prefix + 'ParamsSurface/initial_focal_lengths_xy',
+            prefix + 'ParamsSurface/robust_least_squares',
+            prefix + 'ParamsSurface/downsample',
+        ]
+        data = load_hdf5_datasets(datasets, file)
+        return cls(**data)

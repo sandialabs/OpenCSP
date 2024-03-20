@@ -1,5 +1,6 @@
-import os
-from os.path import join
+from os.path import join, dirname
+
+import matplotlib
 
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
@@ -11,10 +12,13 @@ from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
+import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.file_tools as ft
 
 
 def example_driver():
@@ -36,9 +40,11 @@ def example_driver():
     file_calibration = join(sample_data_dir, 'image_calibration.h5')
 
     # Save directory
-    dir_save = join(os.path.dirname(__file__), 'data/output/undefined_facet')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
+    dir_save = join(dirname(__file__), 'data/output/undefined_facet')
+    ft.create_directories_if_necessary(dir_save)
+
+    # Set up logger
+    lt.logger(join(dir_save, 'log.txt'))
 
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -47,9 +53,8 @@ def example_driver():
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
 
     # Define surface definition (parabolic surface)
-    surface_data = dict(
-        surface_type='parabolic',
-        initial_focal_lengths_xy=(300.0, 300),
+    surface = Surface2DParabolic(
+        initial_focal_lengths_xy=(300., 300.),
         robust_least_squares=True,
         downsample=10,
     )
@@ -62,15 +67,13 @@ def example_driver():
     sofast.params.mask_keep_largest_area = True
 
     # Process
-    sofast.process_optic_undefined(surface_data)
+    sofast.process_optic_undefined(surface)
 
     # Calculate focal length from parabolic fit
-    if surface_data['surface_type'] == 'parabolic':
-        surf_coefs = sofast.data_characterization_facet[0].surf_coefs_facet
-        focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
-        print('Parabolic fit focal lengths:')
-        print(f'  X {focal_lengths_xy[0]:.3f} m')
-        print(f'  Y {focal_lengths_xy[1]:.3f} m')
+    surf_coefs = sofast.data_characterization_facet[0].surf_coefs_facet
+    focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
+    lt.info(f'Facet xy focal lengths (meters): '
+            f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
 
     # Get optic representation
     facet: Facet = sofast.get_optic()
