@@ -4,6 +4,8 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool import hdf5_tools
 
+# TODO: Add HDF5 abstract class inheritance
+
 
 class SpatialOrientation:
     """Holds relative orientations of camera, screen, and optic for deflectometry systems"""
