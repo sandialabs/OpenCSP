@@ -10,6 +10,7 @@ from opencsp.common.lib.photogrammetry.photogrammetry import find_aruco_marker
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class CalibrationCameraPosition:
@@ -19,15 +20,13 @@ class CalibrationCameraPosition:
 
     Calculates
     ----------
-        - rvec : rotation vector, screen to camera rotation vector
-        - tvec : translation vector, camera to screen (in screen coordinates) translation vector
+    - rvec : rotation vector, screen to camera rotation vector
+    - tvec : translation vector, camera to screen (in screen coordinates) translation vector
 
-    Verbose Settings (self.verbose)
-    -------------------------------
-        - 0 no output
-        - 1 print only output
-        - 2 print and plot output
-        - 3 plot only output
+    Attributes
+    ----------
+    make_figures : bool
+        To create output summary figures
     """
 
     def __init__(
@@ -68,18 +67,8 @@ class CalibrationCameraPosition:
         self.pts_xy_marker_corners_reprojected: Vxy
 
         # Save figures
-        self.verbose: int = 0
+        self.make_figures: bool = False
         self.figures: list[plt.Figure] = []
-
-    @property
-    def _to_print(self) -> bool:
-        """If verbose printing is turned on"""
-        return self.verbose in [1, 2]
-
-    @property
-    def _to_plot(self) -> bool:
-        """If verbose plotting is turned on"""
-        return self.verbose in [2, 3]
 
     def find_markers(self) -> None:
         """Finds marker corner locations in image"""
@@ -124,10 +113,9 @@ class CalibrationCameraPosition:
             self.rot_screen_cam.inv()
         )
 
-        if self._to_print:
-            print('Camera pose calculated:')
-            print(f'   rvec: {self.rot_screen_cam.as_rotvec()}')
-            print(f'   tvec: {self.v_cam_screen_screen.data.squeeze()}')
+        lt.info('Camera pose calculated:')
+        lt.info(f'rvec: {self.rot_screen_cam.as_rotvec()}')
+        lt.info(f'tvec: {self.v_cam_screen_screen.data.squeeze()}')
 
     def get_data(self) -> tuple[ndarray, ndarray]:
         """Returns rvec and tvec orienting camera to screen coordinates
@@ -149,7 +137,7 @@ class CalibrationCameraPosition:
         data = np.vstack((rvec, tvec))
         np.savetxt(file, data, delimiter=',', fmt='%.8f')
 
-        print(f'Saved camera rvec and tvec to: {os.path.abspath(file):s}')
+        lt.info(f'Saved camera rvec and tvec to: {os.path.abspath(file):s}')
 
     def calculate_reprojection_error(self) -> None:
         """Calculates reprojection error"""
@@ -165,15 +153,10 @@ class CalibrationCameraPosition:
             np.vstack(self.pts_xy_marker_corners_list).T
         )
 
-        if self._to_print:
-            errors_mag: ndarray = np.sqrt(
-                (self.errors_reprojection_xy.data.T**2).sum(axis=1)
-            )
-            print('Camera pose reprojection error:')
-            print(f'   Mean error: {errors_mag.mean():.3f} pixels')
-            print(
-                f'   STDEV of errors (N={errors_mag.size}): {errors_mag.std():.4f} pixels'
-            )
+        errors_mag: ndarray = np.sqrt((self.errors_reprojection_xy.data.T**2).sum(axis=1))
+        lt.info('Camera pose reprojection errors:')
+        lt.info(f'Mean error: {errors_mag.mean():.3f} pixels')
+        lt.info(f'STDEV of errors (N={errors_mag.size}): {errors_mag.std():.4f} pixels')
 
     def plot_found_corners(self) -> None:
         """Plots camera image and found corners"""
@@ -226,6 +209,6 @@ class CalibrationCameraPosition:
         self.calculate_reprojection_error()
 
         # Plot figures
-        if self._to_plot:
+        if self.make_figures:
             self.plot_found_corners()
             self.plot_reprojection_error()

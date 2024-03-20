@@ -11,17 +11,14 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.photogrammetry.photogrammetry import load_image_grayscale
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_run_camera_position_calibration():
+def example_run_camera_position_calibration(save_dir: str):
     """Calibrates the position of the Sofast camera. Saves the rvec/tvec that
     define the relative pose of the camera/screen to a CSV file located
     at ./data/output/camera_rvec_tvec.csv
     """
-    # Define save dir
-    save_dir = join(dirname(__file__), 'data/output/camera_pose')
-    ft.create_directories_if_necessary(save_dir)
-
     # Define directory where screen shape calibration data is saved
     base_dir_sofast_cal = join(
         opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement'
@@ -43,15 +40,22 @@ def example_run_camera_position_calibration():
 
     # Perform camera position calibraiton
     cal = CalibrationCameraPosition(camera, pts_xyz_marker, corner_ids, image)
-    cal.verbose = 2
+    cal.make_figures = True
     cal.run_calibration()
 
     for fig in cal.figures:
-        fig.savefig(join(save_dir, fig.get_label() + '.png'))
+        file = join(save_dir, fig.get_label() + '.png')
+        lt.info(f'Saving figure to: {file:s}')
+        fig.savefig(file)
 
     # Save data
     cal.save_data_as_csv(join(save_dir, 'camera_rvec_tvec.csv'))
 
 
 if __name__ == '__main__':
-    example_run_camera_position_calibration()
+    # Define save dir
+    save_path = join(dirname(__file__), 'data/output/camera_pose')
+    ft.create_directories_if_necessary(save_path)
+    lt.logger(join(save_path, 'log.txt'))
+
+    example_run_camera_position_calibration(save_path)
