@@ -56,8 +56,8 @@ def run_screen_shape_calibration(save_dir):
     cal.make_figures = True
     cal.run_calibration()
 
-    # Save screen shape data as HDF5 file
-    cal.save_data_as_hdf(join(save_dir, 'screen_distortion_data.h5'))
+    # Get screen shape data
+    grid_data = cal.get_data()
 
     # Save calibration figures
     for fig in cal.figures:
