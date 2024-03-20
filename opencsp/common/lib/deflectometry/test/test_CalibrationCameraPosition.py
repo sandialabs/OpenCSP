@@ -1,5 +1,6 @@
 """Tests the calculation of the Sofast camera position from known points
 """
+
 import os
 from os.path import join
 import unittest

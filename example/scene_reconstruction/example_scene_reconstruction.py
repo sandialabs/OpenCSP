@@ -13,8 +13,7 @@ def example_scene_reconstruction():
     """Example script that reconstructs the XYZ locations of Aruco markers in a scene."""
     # Define input directory
     dir_input = join(
-        opencsp_code_dir(),
-        'app/scene_reconstruction/test/data/data_measurement',
+        opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement'
     )
 
     # Define output directory

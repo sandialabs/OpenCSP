@@ -1,5 +1,6 @@
 """Measurement class for SofastFringe
 """
+
 import datetime as dt
 
 import numpy as np
@@ -92,7 +93,7 @@ class MeasurementSofastFringe:
     @property
     def fringe_images_x(self) -> np.ndarray:
         """Returns raw x-only fringes"""
-        return self.fringe_images[..., self.num_y_ims:]
+        return self.fringe_images[..., self.num_y_ims :]
 
     @property
     def fringe_images_calibrated(self) -> np.ndarray:
@@ -110,7 +111,7 @@ class MeasurementSofastFringe:
     @property
     def fringe_images_x_calibrated(self) -> np.ndarray:
         """Returns calibrated x-only fringes"""
-        return self.fringe_images_calibrated[..., self.num_y_ims:]
+        return self.fringe_images_calibrated[..., self.num_y_ims :]
 
     def calibrate_fringe_images(
         self, calibration: ImageCalibrationAbstract, **kwargs

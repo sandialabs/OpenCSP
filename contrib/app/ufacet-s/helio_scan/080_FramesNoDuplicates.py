@@ -111,14 +111,13 @@ class FramesNoDuplicates:
             )
 
             # Identify duplicate frames.
-            (
-                non_duplicate_frame_files,
-                duplicate_frame_files,
-            ) = vm.identify_duplicate_frames(
-                self.input_frame_dir,
-                self.output_frame_dir,
-                self.tolerance_image_size,
-                self.tolerance_image_pixel,
+            (non_duplicate_frame_files, duplicate_frame_files) = (
+                vm.identify_duplicate_frames(
+                    self.input_frame_dir,
+                    self.output_frame_dir,
+                    self.tolerance_image_size,
+                    self.tolerance_image_pixel,
+                )
             )
 
             # Copy non-duplicate frames to frame output directory.

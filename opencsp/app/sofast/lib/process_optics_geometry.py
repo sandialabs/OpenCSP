@@ -1,4 +1,5 @@
 """Library of functions used to process the geometry of a deflectometry setup."""
+
 from copy import copy
 
 import matplotlib.pyplot as plt
@@ -10,9 +11,7 @@ from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
-from opencsp.app.sofast.lib.ParamsOpticGeometry import (
-    ParamsOpticGeometry,
-)
+from opencsp.app.sofast.lib.ParamsOpticGeometry import ParamsOpticGeometry
 from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
@@ -565,12 +564,12 @@ def process_multifacet_geometry(
         v_facet_locs_ensemble, r_ensemble_cam_refine_1, v_cam_ensemble_cam_refine_1
     )
     for idx in range(num_facets):
-        data_image_processing_facet[
-            idx
-        ].v_facet_corners_image_exp = v_facet_corners_image_exp[idx]
-        data_image_processing_facet[
-            idx
-        ].v_facet_centroid_image_exp = v_uv_facet_cent_exp[idx]
+        data_image_processing_facet[idx].v_facet_corners_image_exp = (
+            v_facet_corners_image_exp[idx]
+        )
+        data_image_processing_facet[idx].v_facet_centroid_image_exp = (
+            v_uv_facet_cent_exp[idx]
+        )
 
     # Refine facet corners
     args = [

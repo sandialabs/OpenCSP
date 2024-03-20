@@ -3,6 +3,7 @@ Example script that connects to and shows a live view from an
 8 bit Basler monochrome camera.
 
 """
+
 import argparse
 
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import (

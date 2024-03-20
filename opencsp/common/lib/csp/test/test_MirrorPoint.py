@@ -1,4 +1,5 @@
 """Unit test to test the MirrorPoint class"""
+
 import numpy as np
 
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint

@@ -1,5 +1,6 @@
 """Photogrammetric reconstruction class based on images of Aruco markers
 """
+
 from glob import glob
 from os.path import join
 from typing import Iterable

@@ -1,4 +1,5 @@
 """Class that holds information for debugging a SlopeSolver calculation."""
+
 from typing import Any
 
 

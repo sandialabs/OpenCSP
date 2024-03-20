@@ -94,13 +94,17 @@ class SensitiveStringsSearcher:
         )
 
     def _is_file_in_cleared_cache(self, file_path: str, file_name_ext: str):
-        cache_entry = fc.FileCache.for_file(self.root_search_dir, file_path, file_name_ext)
+        cache_entry = fc.FileCache.for_file(
+            self.root_search_dir, file_path, file_name_ext
+        )
         if cache_entry in self.cached_cleared_files:
             return True
         return False
 
     def _register_file_in_cleared_cache(self, file_path: str, file_name_ext: str):
-        cache_entry = fc.FileCache.for_file(self.root_search_dir, file_path, file_name_ext)
+        cache_entry = fc.FileCache.for_file(
+            self.root_search_dir, file_path, file_name_ext
+        )
         self.new_cached_cleared_files.append(cache_entry)
 
     def _is_binary_file(self, file_path: str, file_name_ext: str):
@@ -112,8 +116,9 @@ class SensitiveStringsSearcher:
         if self._is_img_ext(ext):
             if ext in self._text_file_extensions:
                 is_binary_file = False
-            elif (f"{file_path}/{file_name_ext}" in self._text_file_path_name_exts) or \
-                    (file_name_ext in self._text_file_path_name_exts):
+            elif (f"{file_path}/{file_name_ext}" in self._text_file_path_name_exts) or (
+                file_name_ext in self._text_file_path_name_exts
+            ):
                 is_binary_file = False
             else:
                 is_binary_file = True
@@ -127,7 +132,9 @@ class SensitiveStringsSearcher:
 
         return is_binary_file
 
-    def _enqueue_binary_file_for_later_processing(self, file_path: str, file_name_ext: str):
+    def _enqueue_binary_file_for_later_processing(
+        self, file_path: str, file_name_ext: str
+    ):
         file_ff = ff.FileFingerprint.for_file(
             self.root_search_dir, file_path, file_name_ext
         )
@@ -440,13 +447,26 @@ class SensitiveStringsSearcher:
             git = st.get_executable_path("git", "mobaxterm")
             git_committed = st.run(
                 f"\"{git}\" ls-tree --full-tree --name-only -r HEAD",
-                cwd=self.root_search_dir, stdout="collect", stderr="print")
+                cwd=self.root_search_dir,
+                stdout="collect",
+                stderr="print",
+            )
             git_added = st.run(
                 f"\"{git}\" diff --name-only --cached --diff-filter=A",
-                cwd=self.root_search_dir, stdout="collect", stderr="print")
+                cwd=self.root_search_dir,
+                stdout="collect",
+                stderr="print",
+            )
             files = [line.val for line in git_committed + git_added]
             # don't include "git rm"'d files
-            files = list(filter(lambda file: ft.file_exists(os.path.join(self.root_search_dir, file)), files))
+            files = list(
+                filter(
+                    lambda file: ft.file_exists(
+                        os.path.join(self.root_search_dir, file)
+                    ),
+                    files,
+                )
+            )
             lt.info(f"Searching for sensitive strings in {len(files)} tracked files")
         else:
             files = ft.files_in_directory(
@@ -467,7 +487,9 @@ class SensitiveStringsSearcher:
                 # need to check this file
                 if self._is_binary_file(file_path, file_name_ext):
                     # deal with non-parseable binary files as a group, below
-                    self._enqueue_binary_file_for_later_processing(file_path, file_name_ext)
+                    self._enqueue_binary_file_for_later_processing(
+                        file_path, file_name_ext
+                    )
                 else:
                     # check text files for sensitive strings
                     file_matches = self.search_file(file_path, file_name_ext)
@@ -498,9 +520,7 @@ class SensitiveStringsSearcher:
                 lt.info("")
                 lt.error(os.path.join(file_ff.relative_path, file_ff.name_ext))
         if len(self.unknown_binary_files) > 0:
-            lt.warn(
-                f"Found {len(self.unknown_binary_files)} unexpected binary files:"
-            )
+            lt.warn(f"Found {len(self.unknown_binary_files)} unexpected binary files:")
 
         # Deal with unknown binary files
         if len(self.unknown_binary_files) > 0:
@@ -543,10 +563,14 @@ class SensitiveStringsSearcher:
                 if num_signed_binary_files > 0:
                     path, name, ext = ft.path_components(self.allowed_binary_files_csv)
                     abfc_stamped_name_ext = f"{name}_{self.date_time_str}{ext}"
-                    abfc_stamped_path_name_ext = os.path.join(path, abfc_stamped_name_ext)
+                    abfc_stamped_path_name_ext = os.path.join(
+                        path, abfc_stamped_name_ext
+                    )
                     if ft.file_exists(abfc_stamped_path_name_ext):
                         ft.delete_file(abfc_stamped_path_name_ext)
-                    ft.copy_file(self.allowed_binary_files_csv, path, abfc_stamped_name_ext)
+                    ft.copy_file(
+                        self.allowed_binary_files_csv, path, abfc_stamped_name_ext
+                    )
             # for file_ff in unknowns_copy
         # if len(self.unknown_binary_files) > 0:
 
@@ -554,9 +578,12 @@ class SensitiveStringsSearcher:
         for file_ff in self.allowed_binary_files + self.unfound_allowed_binary_files:
             for file_cf in self.new_cached_cleared_files:
                 if file_ff.eq_aff(file_cf):
-                    lt.error_and_raise(RuntimeError, "Programmer error in sensitive_strings.search_files(): " +
-                                       "No binary files should be in the cache, but at least 1 such file was found: " +
-                                       f"\"{file_cf.relative_path}/{file_cf.name_ext}\"")
+                    lt.error_and_raise(
+                        RuntimeError,
+                        "Programmer error in sensitive_strings.search_files(): "
+                        + "No binary files should be in the cache, but at least 1 such file was found: "
+                        + f"\"{file_cf.relative_path}/{file_cf.name_ext}\"",
+                    )
 
         # Save the cleared files cache
         for file_ff in self.unknown_binary_files:
@@ -584,9 +611,13 @@ class SensitiveStringsSearcher:
         info_or_warn("<<<PASS>>>" if ret == 0 else "<<<FAIL>>>")
         info_or_warn(f"Found {len(matches)} sensitive string matches")
         if len(self.unfound_allowed_binary_files) > 0:
-            info_or_warn(f"Did not find {len(self.unfound_allowed_binary_files)} expected binary files")
+            info_or_warn(
+                f"Did not find {len(self.unfound_allowed_binary_files)} expected binary files"
+            )
         else:
-            info_or_warn(f"Found {len(self.allowed_binary_files)} expected binary files")
+            info_or_warn(
+                f"Found {len(self.allowed_binary_files)} expected binary files"
+            )
         info_or_warn(f"Found {len(self.unknown_binary_files)} unexpected binary files")
 
         # Add a 'match' for any unfound or unknown binary files

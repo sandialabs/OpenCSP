@@ -1,5 +1,6 @@
 """Data class to store single facet optic definition
 """
+
 import json
 
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -27,7 +28,9 @@ class DefinitionFacet:
 
     def copy(self) -> 'DefinitionFacet':
         """Returns copy of class"""
-        return DefinitionFacet(self.v_facet_corners.copy(), self.v_facet_centroid.copy())
+        return DefinitionFacet(
+            self.v_facet_corners.copy(), self.v_facet_centroid.copy()
+        )
 
     @classmethod
     def load_from_json(cls, file: str) -> 'DefinitionFacet':
@@ -81,10 +84,7 @@ class DefinitionFacet:
         prefix : str
             Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
-        data = [
-            self.v_facet_corners.data,
-            self.v_facet_centroid.data,
-        ]
+        data = [self.v_facet_corners.data, self.v_facet_centroid.data]
         datasets = [
             prefix + 'DefinitionFacet/v_facet_corners',
             prefix + 'DefinitionFacet/v_facet_centroid',

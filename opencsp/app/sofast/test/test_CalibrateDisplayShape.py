@@ -1,5 +1,6 @@
 """Tests Sofast screen distortion calibration
 """
+
 from os.path import join
 import unittest
 
@@ -12,7 +13,9 @@ from opencsp.app.sofast.lib.CalibrateDisplayShape import (
     CalibrateDisplayShape,
     DataInput,
 )
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -27,9 +30,12 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         on the dir_input path.
         """
         # Define default data directories
-        dir_input_sofast = join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement')
-        dir_input_def = join(opencsp_code_dir(),
-                             'common/lib/deflectometry/test/data/data_measurement')
+        dir_input_sofast = join(
+            opencsp_code_dir(), 'app/sofast/test/data/data_measurement'
+        )
+        dir_input_def = join(
+            opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement'
+        )
         dir_output = join(opencsp_code_dir(), 'app/sofast/test/data/data_expected')
 
         verbose = 1  # 0=no output, 1=only print outputs, 2=print outputs and show plots, 3=plots only with no printing

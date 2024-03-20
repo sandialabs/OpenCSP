@@ -1,5 +1,6 @@
 """Fixed pattern dot location calibration.
 """
+
 import os
 
 import cv2 as cv
@@ -188,7 +189,8 @@ class CalibrateSofastFixedDots:
             ret = self._images[cam_idx].attempt_calculate_pose(True)
             if ret == -1:
                 lt.critical_and_raise(
-                    ValueError, f'Camera pose {cam_idx:d} not calculated successfully')
+                    ValueError, f'Camera pose {cam_idx:d} not calculated successfully'
+                )
 
             self._rots_cams.append(Rotation.from_rotvec(self._images[cam_idx].rvec))
             self._vecs_cams.append(Vxyz(self._images[cam_idx].tvec))
@@ -196,11 +198,18 @@ class CalibrateSofastFixedDots:
             # Calculate reproj error
             errors = self._images[cam_idx].calc_reprojection_errors()
             # Log errors
-            lt.info(f'Camera {cam_idx:d} mean corner reprojection error: {errors.mean():.2f} pixels')
-            lt.info(f'Camera {cam_idx:d} min corner reprojection error: {errors.min():.2f} pixels')
-            lt.info(f'Camera {cam_idx:d} max corner reprojection error: {errors.mean():.2f} pixels')
             lt.info(
-                f'Camera {cam_idx:d} STDEV corner reprojection error: {errors.mean():.2f} pixels')
+                f'Camera {cam_idx:d} mean corner reprojection error: {errors.mean():.2f} pixels'
+            )
+            lt.info(
+                f'Camera {cam_idx:d} min corner reprojection error: {errors.min():.2f} pixels'
+            )
+            lt.info(
+                f'Camera {cam_idx:d} max corner reprojection error: {errors.mean():.2f} pixels'
+            )
+            lt.info(
+                f'Camera {cam_idx:d} STDEV corner reprojection error: {errors.mean():.2f} pixels'
+            )
 
     def _intersect_rays(self) -> None:
         """Intersects camera rays to find dot xyz locations"""
@@ -224,21 +233,31 @@ class CalibrateSofastFixedDots:
                 self._dot_points_xyz_mat[idx_y, idx_x, :] = point.data.squeeze()
 
         self._dot_intersection_dists = np.array(int_dists)
-        lt.info('Dot ray intersections mean intersection error: '
-                f'{self._dot_intersection_dists.mean() * 1000:.1f} mm')
-        lt.info('Dot ray intersections min intersection error: '
-                f'{self._dot_intersection_dists.min() * 1000:.1f} mm')
-        lt.info('Dot ray intersections max intersection error: '
-                f'{self._dot_intersection_dists.max() * 1000:.1f} mm')
-        lt.info('Dot ray intersections STDEV of intersection error: '
-                f'{self._dot_intersection_dists.std() * 1000:.1f} mm')
+        lt.info(
+            'Dot ray intersections mean intersection error: '
+            f'{self._dot_intersection_dists.mean() * 1000:.1f} mm'
+        )
+        lt.info(
+            'Dot ray intersections min intersection error: '
+            f'{self._dot_intersection_dists.min() * 1000:.1f} mm'
+        )
+        lt.info(
+            'Dot ray intersections max intersection error: '
+            f'{self._dot_intersection_dists.max() * 1000:.1f} mm'
+        )
+        lt.info(
+            'Dot ray intersections STDEV of intersection error: '
+            f'{self._dot_intersection_dists.std() * 1000:.1f} mm'
+        )
 
     def _plot_common_dots(self) -> None:
         """Plots common dots on images"""
         for idx_image in range(self._num_images):
             fig = plt.figure(f'image_{idx_image:d}_annotated_dots')
             plt.imshow(self._images[idx_image].image, cmap='gray')
-            plt.scatter(*self._dot_image_points_xy[idx_image].data, marker='.', color='red')
+            plt.scatter(
+                *self._dot_image_points_xy[idx_image].data, marker='.', color='red'
+            )
             self.figures.append(fig)
 
     def _plot_marker_corners(self) -> None:

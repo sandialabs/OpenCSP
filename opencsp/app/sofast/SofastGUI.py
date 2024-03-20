@@ -1,6 +1,7 @@
 """GUI to control SOFAST image projection, image acquisition,
 and data capture. Can capture datasets and save to HDF format.
 """
+
 import datetime as dt
 import tkinter
 from tkinter import messagebox, simpledialog
@@ -586,7 +587,9 @@ class SofastGUI:
 
         """
         if self.image_acquisition is not None and self.image_projection is not None:
-            self.system = SystemSofastFringe(self.image_projection, self.image_acquisition)
+            self.system = SystemSofastFringe(
+                self.image_projection, self.image_acquisition
+            )
 
     def _save_measurement_data(self, file: str) -> None:
         """Saves last measurement to HDF file"""

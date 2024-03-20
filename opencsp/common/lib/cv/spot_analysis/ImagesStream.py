@@ -20,10 +20,12 @@ class _StrToCacheableImagesIterator(Iterator[CacheableImage]):
 class ImagesStream(Iterator[CacheableImage]):
     def __init__(
         self,
-        images: Callable[[int], CacheableImage]
-        | list[str | CacheableImage]
-        | vh.VideoHandler
-        | Iterator[str | CacheableImage],
+        images: (
+            Callable[[int], CacheableImage]
+            | list[str | CacheableImage]
+            | vh.VideoHandler
+            | Iterator[str | CacheableImage]
+        ),
     ):
         """A one-time iterator over a list of images.
 

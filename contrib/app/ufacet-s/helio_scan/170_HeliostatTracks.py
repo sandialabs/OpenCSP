@@ -327,9 +327,9 @@ class HeliostatTracks:
             raise ValueError(msg)
         # Statistics.
         summary_dict = {}
-        summary_dict[
-            'n_heliostat_track_frames'
-        ] = heliostat_tracks_nfxl.number_of_frames()
+        summary_dict['n_heliostat_track_frames'] = (
+            heliostat_tracks_nfxl.number_of_frames()
+        )
         print(
             'In HeliostatTracks.save_data(), writing key frame '
             + projected_or_confirmed_str

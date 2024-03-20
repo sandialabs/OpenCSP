@@ -7,6 +7,7 @@
 NOTE: must be run with a computer connected to a working SOFAST system. This includes a camera,
 mirror, screen, and system layout calibration files.
 """
+
 import os
 
 import numpy as np

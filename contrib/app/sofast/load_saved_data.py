@@ -1,6 +1,7 @@
 """Library of functions that load saved Sofast HDF5 files
 and return OpenCSP optics classes.
 """
+
 import numpy as np
 from scipy.spatial.transform import Rotation
 

@@ -1,5 +1,6 @@
 """Example script that runs fixed pattern deflectometry analysis on saved data
 """
+
 from os.path import join, dirname
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
@@ -64,9 +65,7 @@ def example_process_fixed_pattern_printed_target():
     """Example function that processes a fixed pattern data collect using a physical,
     printed dot target.
     """
-    dir_base = join(
-        opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab'
-    )
+    dir_base = join(opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab')
 
     file_camera = join(dir_base, "calibration_files/camera.h5")
     file_facet = join(dir_base, "calibration_files/Facet_NSTTF.json")
@@ -95,9 +94,7 @@ def example_process_fixed_pattern_printed_target():
 
 def example_process_fixed_pattern_screen_target():
     """Loads data and calls processing function"""
-    dir_base = join(
-        opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab'
-    )
+    dir_base = join(opencsp_code_dir(), '../../sample_data/deflectometry/sandia_lab')
 
     # Define files
     file_camera = join(dir_base, "calibration_files/camera.h5")

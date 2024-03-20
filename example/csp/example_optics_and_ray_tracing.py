@@ -6,6 +6,7 @@
 4) Plots ensquared energy plot
 
 """
+
 import datetime
 import os
 

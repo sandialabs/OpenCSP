@@ -3,6 +3,7 @@
 To create new test data, copy the results from the output folder into the
 "calculations" folder.
 """
+
 import os
 from os.path import join, dirname, exists
 
@@ -21,8 +22,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 @pytest.mark.skip("No unit test data (yet)")
 def test_FixedPatternSetupCalibrate():
-    """Tests dot-location calibration
-    """
+    """Tests dot-location calibration"""
     # Define dot location images and origins
     base_dir = join(
         opencsp_code_dir(),
@@ -37,13 +37,17 @@ def test_FixedPatternSetupCalibrate():
         join(base_dir, 'measurements/images/DSC03970.JPG'),
         join(base_dir, 'measurements/images/DSC03972.JPG'),
     ]
-    origins = np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
+    origins = (
+        np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
+    )
     origins = Vxy(origins.astype(int))
 
     # Define other files
     file_camera_marker = join(base_dir, 'measurements/camera_image_calibration.h5')
     file_xyz_points = join(base_dir, 'measurements/point_locations.csv')
-    file_fpd_dot_locs_exp = join(base_dir, 'calculations/fixed_pattern_dot_locations.h5')
+    file_fpd_dot_locs_exp = join(
+        base_dir, 'calculations/fixed_pattern_dot_locations.h5'
+    )
     dir_save = join(dirname(__file__), 'data/output/dot_location_calibration')
 
     if not exists(dir_save):
@@ -68,9 +72,9 @@ def test_FixedPatternSetupCalibrate():
         files, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
     )
     cal_dot_locs.plot = True
-    cal_dot_locs.blob_search_threshold = 3.
-    cal_dot_locs.blob_detector.minArea = 3.
-    cal_dot_locs.blob_detector.maxArea = 30.
+    cal_dot_locs.blob_search_threshold = 3.0
+    cal_dot_locs.blob_detector.minArea = 3.0
+    cal_dot_locs.blob_detector.maxArea = 30.0
     cal_dot_locs.run()
 
     # Save data

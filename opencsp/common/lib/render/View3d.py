@@ -2,6 +2,7 @@
 
 
 """
+
 import numpy as np
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -306,8 +307,8 @@ class View3d:
         top of other plots (example on top of 3D data) use draw_image instead."""
         if self.view_spec['type'] == 'image':
             # load the image, as necessary
-            load_as_necessary = (
-                lambda img: img if not isinstance(img, str) else Image.open(img)
+            load_as_necessary = lambda img: (
+                img if not isinstance(img, str) else Image.open(img)
             )
             if 'X' in kwargs:
                 img = kwargs['X']

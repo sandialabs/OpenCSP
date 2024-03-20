@@ -2,7 +2,9 @@ from numpy import ndarray
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import (
+    MeasurementSofastFringe as Measurement,
+)
 
 
 class ImageCalibrationScaling(ImageCalibrationAbstract):

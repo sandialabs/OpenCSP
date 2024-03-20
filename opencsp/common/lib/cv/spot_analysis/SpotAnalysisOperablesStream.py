@@ -16,10 +16,12 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
 class SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
     def __init__(
         self,
-        images: ImagesIterable
-        | ImagesStream
-        | SpotAnalysisImagesStream
-        | Iterator[SpotAnalysisOperable],
+        images: (
+            ImagesIterable
+            | ImagesStream
+            | SpotAnalysisImagesStream
+            | Iterator[SpotAnalysisOperable]
+        ),
     ):
         self.images = images
         self.images_iter = None
