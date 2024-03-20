@@ -1,13 +1,12 @@
 name: github-WINDOWS2022
 
 on:
-  push
-  #pull_request:
-  #  paths-ignore:
-  #  - '**/*.rst'
-  #  - '**/*.md'
-  #  - 'doc/**'
-  #  types: [ opened, reopened, synchronize ]
+  pull_request:
+    paths-ignore:
+    - '**/*.rst'
+    - '**/*.md'
+    - 'doc/**'
+    types: [ opened, reopened, synchronize ]
 
 permissions:
   contents: none
