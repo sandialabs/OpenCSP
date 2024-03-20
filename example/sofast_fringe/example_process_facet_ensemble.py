@@ -6,9 +6,7 @@ from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
@@ -48,7 +46,7 @@ def example_driver(dir_save: str):
     # Load data
     camera = Camera.load_from_hdf(file_camera)
     display = Display.load_from_hdf(file_display)
-    measurement = Measurement.load_from_hdf(file_measurement)
+    measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
     ensemble_data = DefinitionEnsemble.load_from_json(file_ensemble)
 
@@ -91,9 +89,7 @@ def example_driver(dir_save: str):
 
     # Generate plots
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
-    mirror_control = rcm.RenderControlMirror(
-        centroid=True, surface_normals=True, norm_res=1
-    )
+    mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
     axis_control_m = rca.meters()
 
     # Visualize setup
@@ -109,9 +105,7 @@ def example_driver(dir_save: str):
     fig_record.save(dir_save, 'physical_setup_layout', 'png')
 
     # Plot scenario
-    fig_record = fm.setup_figure_for_3d_data(
-        figure_control, axis_control_m, title='Facet Ensemble'
-    )
+    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='Facet Ensemble')
     ensemble.draw(fig_record.view, mirror_control)
     fig_record.axis.axis('equal')
     fig_record.save(dir_save, 'facet_ensemble', 'png')

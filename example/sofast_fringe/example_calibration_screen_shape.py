@@ -4,10 +4,7 @@ from os.path import join, dirname
 import numpy as np
 
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
-from opencsp.app.sofast.lib.CalibrateDisplayShape import (
-    CalibrateDisplayShape,
-    DataInput,
-)
+from opencsp.app.sofast.lib.CalibrateDisplayShape import CalibrateDisplayShape, DataInput
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -33,26 +30,18 @@ def example_run_screen_shape_calibration(save_dir):
     resolution_xy = [100, 100]
 
     # Define directory where screen shape calibration data is saved
-    base_dir_sofast_cal = join(
-        opencsp_code_dir(), 'app/sofast/test/data/data_measurement'
-    )
+    base_dir_sofast_cal = join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement')
 
     # Define input files
-    file_screen_cal_point_pairs = join(
-        base_dir_sofast_cal, 'screen_calibration_point_pairs.csv'
-    )
+    file_screen_cal_point_pairs = join(base_dir_sofast_cal, 'screen_calibration_point_pairs.csv')
     file_camera_distortion = join(base_dir_sofast_cal, 'camera_screen_shape.h5')
     file_image_projection = join(base_dir_sofast_cal, 'image_projection.h5')
-    files_screen_shape_measurement = glob(
-        join(base_dir_sofast_cal, 'screen_shape_sofast_measurements/pose_*.h5')
-    )
+    files_screen_shape_measurement = glob(join(base_dir_sofast_cal, 'screen_shape_sofast_measurements/pose_*.h5'))
 
     # Load input data
     camera = Camera.load_from_hdf(file_camera_distortion)
     image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
-    screen_cal_point_pairs = np.loadtxt(
-        file_screen_cal_point_pairs, delimiter=',', skiprows=1, dtype=int
-    )
+    screen_cal_point_pairs = np.loadtxt(file_screen_cal_point_pairs, delimiter=',', skiprows=1, dtype=int)
 
     # Store input data in data class
     data_input = DataInput(
@@ -62,10 +51,7 @@ def example_run_screen_shape_calibration(save_dir):
         pts_xyz_marker,
         camera,
         image_projection_data,
-        [
-            MeasurementSofastFringe.load_from_hdf(f)
-            for f in files_screen_shape_measurement
-        ],
+        [MeasurementSofastFringe.load_from_hdf(f) for f in files_screen_shape_measurement],
     )
 
     # Perform screen shape calibration

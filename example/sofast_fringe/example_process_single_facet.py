@@ -5,9 +5,7 @@ import matplotlib
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.visualize_setup import visualize_setup
@@ -44,7 +42,7 @@ def example_driver(dir_save: str):
     # Load data
     camera = Camera.load_from_hdf(file_camera)
     display = Display.load_from_hdf(file_display)
-    measurement = Measurement.load_from_hdf(file_measurement)
+    measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
     facet_data = DefinitionFacet.load_from_json(file_facet)
 
