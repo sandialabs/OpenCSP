@@ -103,7 +103,7 @@ def bundle_adjust(
             dist_coefs,
         ),
     )
-    lt.info('Bundle adjustment finished: ' + res.message)
+    lt.debug('Bundle adjustment finished: ' + res.message)
 
     # Return data
     data = res.x[: n_cameras * 6].reshape((n_cameras, 6))

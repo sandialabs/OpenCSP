@@ -125,7 +125,7 @@ class SceneReconstruction:
         pt : np.ndarray
             Shape (3,) ndarray xyz point location
         """
-        lt.debug(f'Point ID {id_:d} located.')
+        lt.debug(f'Point ID {id_:.0f} located.')
         # Update master array
         mask = self.unique_point_ids == id_
         self.points_xyz[mask] = pt
@@ -320,6 +320,7 @@ class SceneReconstruction:
             Vxyz(self.points_xyz.T), self.unique_point_ids, point_pairs * 4, distances
         )
 
+        lt.info('Point cloud scaling summary:')
         lt.info(f'Calculated average point cloud scale: {scales.mean():.4f}.')
         lt.info(f'STDEV of point cloud scales (N={scales.size}): {scales.std():.4f}')
 
@@ -362,7 +363,7 @@ class SceneReconstruction:
         self.points_xyz = trans.apply(Vxyz(self.points_xyz.T) * scale).data.T
 
         # Log summary output
-        lt.info('Point cloud alignment complete.')
+        lt.info('Point cloud alignment summary:')
         lt.info(f'Scale factor: {scale:.4f}')
         lt.info(f'Rotation: {trans.R.magnitude():.4f} radians')
         lt.info(f'Translation: {trans.V.magnitude()[0]:.4f} meters')
@@ -372,6 +373,7 @@ class SceneReconstruction:
     def log_reprojection_error_summary(self) -> None:
         """Logs reprojection error summary"""
         errors = self.calculate_mean_reproj_errors()
+        lt.info('Reprojection error summary:')
         lt.info(f'Average per-camera reprojection error: {np.nanmean(errors):.2f} pixels')
         lt.info(f'Min per-camera reprojection error: {np.nanmin(errors):.2f} pixels')
         lt.info(f'Max per-camera reprojection error: {np.nanmax(errors):.2f} pixels')
@@ -382,13 +384,13 @@ class SceneReconstruction:
 
     def log_located_points_cameras(self) -> None:
         """Logs currently located cameras and markers"""
-        lt.info('Located camera indices:', self.located_camera_idxs)
-        lt.info('Located point IDs', self.located_point_ids)
+        lt.debug(f'Located camera indices: {self.located_camera_idxs}')
+        lt.debug(f'Located point IDs: {self.located_point_ids}')
 
     def log_point_location_summary(self) -> None:
         """Logs short summary of current progress"""
-        lt.info('Number of located cameras:', len(self.located_camera_idxs))
-        lt.info('Number of located points:', len(self.located_point_ids))
+        lt.debug(f'Number of located cameras: {len(self.located_camera_idxs):d}')
+        lt.debug(f'Number of located points: {len(self.located_point_ids):d}')
 
     def plot_point_camera_summary(self) -> None:
         """Plots situational summary: Camera poses and point locations"""
@@ -465,7 +467,7 @@ class SceneReconstruction:
         num_unlocated_pts = self.unlocated_marker_ids.size
 
         # Update status
-        lt.info('SceneReconstruction initial state')
+        lt.debug('SceneReconstruction initial state')
         self.log_point_location_summary()
 
         for idx_attempt in range(100):
@@ -476,7 +478,7 @@ class SceneReconstruction:
             self.attempt_all_points_triangulation(intersect_thresh)
 
             # Update status
-            lt.info(f'SceneReconstruction entering iteration {idx_attempt:d}')
+            lt.debug(f'SceneReconstruction entering iteration {idx_attempt:d}')
             self.log_point_location_summary()
 
             # Bundle adjust
@@ -490,13 +492,12 @@ class SceneReconstruction:
         # Check that all markers have been found
         if self.unlocated_marker_ids.size != 0:
             lt.warn(
-                'Not all markers have been found, '
-                f'{self.unlocated_marker_ids.size:d} remain. '
+                f'{self.unlocated_marker_ids.size:d} markers remain unlocated. '
                 'More camera images may be needed.'
             )
 
         # Convert to 4-corner model
-        lt.info('SceneReconstruction entering final 4 point refinement phase')
+        lt.debug('SceneReconstruction entering final 4 point refinement phase')
         self.convert_to_four_corners()
 
         # Intersect rays
