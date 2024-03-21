@@ -7,9 +7,9 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 import opencsp.app.sofast.lib.spatial_processing as sp
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -27,7 +27,7 @@ class TestSpatialProcessing(unittest.TestCase):
         cls.data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
         cls.data_file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
 
-        cls.display = Display.load_from_hdf(cls.data_file_facet)
+        cls.orientation = SpatialOrientation.load_from_hdf(cls.data_file_facet)
         cls.camera = Camera.load_from_hdf(cls.data_file_facet)
 
     def test_t_from_distance(self):
@@ -38,14 +38,14 @@ class TestSpatialProcessing(unittest.TestCase):
 
         # Load test data
         data = load_hdf5_datasets(datasets, self.data_file_facet)
-        measurement = Measurement.load_from_hdf(self.data_file_measurement)
+        measurement = MeasurementSofastFringe.load_from_hdf(self.data_file_measurement)
 
         # Perform calculation
         v_cam_optic_cam_exp = sp.t_from_distance(
             Vxy(data['v_mask_centroid_image']),
             measurement.optic_screen_dist,
             self.camera,
-            self.display.v_cam_screen_cam,
+            self.orientation.v_cam_screen_cam,
         ).data.squeeze()
 
         # Test
@@ -62,7 +62,7 @@ class TestSpatialProcessing(unittest.TestCase):
 
         # Perform calculation
         r_optic_cam_exp = (
-            sp.r_from_position(Vxyz(data['v_cam_optic_cam_exp']), self.display.v_cam_screen_cam).inv().as_rotvec()
+            sp.r_from_position(Vxyz(data['v_cam_optic_cam_exp']), self.orientation.v_cam_screen_cam).inv().as_rotvec()
         )
 
         # Test
@@ -100,11 +100,11 @@ class TestSpatialProcessing(unittest.TestCase):
 
         # Load test data
         data = load_hdf5_datasets(datasets, self.data_file_facet)
-        measurement = Measurement.load_from_hdf(self.data_file_measurement)
+        measurement = MeasurementSofastFringe.load_from_hdf(self.data_file_measurement)
 
         # Perform calculation
         error_optic_screen_dist_2 = sp.distance_error(
-            self.display.v_cam_screen_cam, Vxyz(data['v_cam_optic_cam_refine_2']), measurement.optic_screen_dist
+            self.orientation.v_cam_screen_cam, Vxyz(data['v_cam_optic_cam_refine_2']), measurement.optic_screen_dist
         )
 
         # Test
@@ -143,7 +143,7 @@ class TestSpatialProcessing(unittest.TestCase):
 
         # Load test data
         data = load_hdf5_datasets(datasets, self.data_file_facet)
-        measurement = Measurement.load_from_hdf(self.data_file_measurement)
+        measurement = MeasurementSofastFringe.load_from_hdf(self.data_file_measurement)
 
         # Perform calculation
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1'])
@@ -151,7 +151,7 @@ class TestSpatialProcessing(unittest.TestCase):
         v_cam_optic_cam_refine_2 = sp.refine_v_distance(
             Vxyz(data['v_cam_optic_cam_refine_1']),
             measurement.optic_screen_dist,
-            self.display.v_cam_screen_cam,
+            self.orientation.v_cam_screen_cam,
             v_meas_pt_optic_cam,
         ).data.squeeze()
 
