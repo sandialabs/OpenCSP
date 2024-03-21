@@ -54,6 +54,7 @@ class SceneReconstruction:
         self.camera = camera
         self.known_point_locations = known_point_locations
         self.image_paths = glob(image_filter_path)
+        self.image_paths.sort()
 
         # Declare attributes
         self.images: list[ImageMarker]  # Loaded image marker objects
