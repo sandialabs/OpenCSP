@@ -39,11 +39,6 @@ def example_run_camera_position_calibration(save_dir: str):
     cal.make_figures = True
     cal.run_calibration()
 
-    for fig in cal.figures:
-        file = join(save_dir, fig.get_label() + '.png')
-        lt.info(f'Saving figure to: {file:s}')
-        fig.savefig(file)
-
     # Get orientation
     r_screen_cam, v_cam_screen_screen = cal.get_data()
     r_screen_cam = Rotation.from_rotvec(r_screen_cam)
@@ -57,6 +52,12 @@ def example_run_camera_position_calibration(save_dir: str):
 
     # Save data
     orientation.save_to_hdf(join(save_dir, 'spatial_orientation.h5'))
+
+    # Save figures
+    for fig in cal.figures:
+        file = join(save_dir, fig.get_label() + '.png')
+        lt.info(f'Saving figure to: {file:s}')
+        fig.savefig(file)
 
 
 if __name__ == '__main__':
