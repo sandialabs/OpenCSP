@@ -281,7 +281,10 @@ def align_points(
         return np.sqrt(np.mean(e**2))
 
     # Optimize points
-    vec = np.array([0, 0, 0, 0, 0, 0, 1], dtype=float)
+    if scale:
+        vec = np.array([0, 0, 0, 0, 0, 0, 1], dtype=float)
+    else:
+        vec = np.array([0, 0, 0, 0, 0, 0], dtype=float)
     x = minimize(align_merit_fcn, vec, method='Powell')
 
     # Calculate final alignment error
@@ -290,7 +293,8 @@ def align_points(
     # Return transform and scale
     rot_out = Rotation.from_rotvec(x.x[:3])
     trans_out = Vxyz(x.x[3:6])
-    return TransformXYZ.from_R_V(rot_out, trans_out), x.x[6], e_final
+    scale_out = 1.0 if not scale else x.x[6]
+    return TransformXYZ.from_R_V(rot_out, trans_out), scale_out, e_final
 
 
 def _ref_coord_error(pts_obj: Vxyz, pts_exp: Vxyz) -> np.ndarray:

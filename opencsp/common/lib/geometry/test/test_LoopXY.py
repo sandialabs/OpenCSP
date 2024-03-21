@@ -6,6 +6,7 @@ from opencsp.common.lib.geometry.EdgeXY import EdgeXY
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.LineXY import LineXY
 from opencsp.common.lib.geometry.Vxy import Vxy
+import opencsp.common.lib.render.figure_management as fm
 
 
 class TestLoopXY(unittest.TestCase):
@@ -124,7 +125,7 @@ class TestLoopXY(unittest.TestCase):
         verts = Vxy(([1, 0, 0, 1], [1, 1, 0, 0]))
         loop = LoopXY.from_vertices(verts)
 
-        fig = plt.figure()
+        fig = fm._mpl_pyplot_figure()
         loop.draw(fig.gca())
         plt.close(fig)
 

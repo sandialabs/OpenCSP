@@ -3,6 +3,7 @@ from pypylon import pylon
 
 from opencsp.common.lib.camera.image_processing import encode_RG_to_RGB
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as MonoIA
 
 
 class ImageAcquisition(ImageAcquisitionAbstract):
@@ -23,6 +24,8 @@ class ImageAcquisition(ImageAcquisitionAbstract):
                 - Other RGB based formats as defined by Basler
 
         """
+        MonoIA._check_pypylon_version()
+
         # Find all instances of DCAM cameras
         tlFactory = pylon.TlFactory.GetInstance()
         devices = tlFactory.EnumerateDevices()
