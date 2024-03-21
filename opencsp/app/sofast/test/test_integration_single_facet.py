@@ -7,11 +7,11 @@ import unittest
 
 import numpy as np
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
@@ -45,7 +45,7 @@ class TestSingle(unittest.TestCase):
         file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
 
         # Load components
-        measurement = Measurement.load_from_hdf(file_measurement)
+        measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
 
         # Initialize data containers
         cls.slopes = []
@@ -58,7 +58,7 @@ class TestSingle(unittest.TestCase):
             camera = Camera.load_from_hdf(file_dataset)
             orientation = SpatialOrientation.load_from_hdf(file_dataset)
             calibration = ImageCalibrationScaling.load_from_hdf(file_dataset)
-            display = Display.load_from_hdf(file_dataset)
+            display = DisplayShape.load_from_hdf(file_dataset)
 
             # Calibrate measurement
             measurement.calibrate_fringe_images(calibration)
@@ -113,7 +113,7 @@ class TestSingle(unittest.TestCase):
             params = load_hdf5_datasets(datasets, file_dataset)
 
             # Instantiate sofast object
-            sofast = Sofast(measurement, orientation, camera, display)
+            sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
             # Update parameters
             sofast.params.mask_hist_thresh = params['mask_hist_thresh']
