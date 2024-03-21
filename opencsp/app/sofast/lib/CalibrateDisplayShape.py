@@ -15,8 +15,9 @@ from scipy.signal import medfilt
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 import opencsp.app.sofast.lib.image_processing as ip
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import CalParams
 from opencsp.common.lib.geometry.Vxy import Vxy
@@ -44,7 +45,7 @@ class DataInput:
         Camera object used to capture screen distortion data
     image_projection_data : dict
         Image projection parameters
-    measurements_screen : list[Measurement]
+    measurements_screen : list[MeasurementSofastFringe]
         Screen shape Sofast measurement objects
     assume_located_points : bool
         To assume that points are located accuratly, does not optimize point location, by default True.
@@ -58,7 +59,7 @@ class DataInput:
     pts_xyz_marker: Vxyz
     camera: Camera
     image_projection_data: dict
-    measurements_screen: list[Measurement]
+    measurements_screen: list[MeasurementSofastFringe]
     assume_located_points: bool = True
     ray_intersection_threshold: float = 0.001
 
@@ -337,18 +338,18 @@ class CalibrateDisplayShape:
 
         return {'xy_screen_fraction': pts_xy_screen_fraction, 'xyz_screen_coords': pts_xyz_screen}
 
-    def to_DisplayShape_file(self, file: str, name: str) -> None:
-        """Saves data to DisplayShape hdf file using the distorted_3d model
+    def as_DisplayShape(self, name: str) -> DisplayShape:
+        """Saves data to DisplayShape hdf file using the distorted3d model, see
+        DisplayShape documentation for more information.
 
         Parameters
         ----------
-        file : str
-            Save file name.
         name : str
             Name of DisplayShape.
         """
         grid_data = self.get_data()
-        return
+        grid_data.update({'screen_model': 'distorted3D'})
+        return DisplayShape(grid_data, name)
 
     def save_data_as_hdf(self, file: str) -> None:
         """Saves distortion data to given HDF file"""
