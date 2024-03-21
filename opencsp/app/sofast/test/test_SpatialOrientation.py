@@ -1,6 +1,6 @@
 """Unit test suite to test the SpatialOrientation class"""
 
-import os
+from os.path import join, dirname
 import unittest
 
 import numpy as np
@@ -16,10 +16,10 @@ class TestSpatialOrientation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+        base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
 
         # Define test data files for single facet processing
-        data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
+        data_file_facet = join(base_dir, 'calculations_facet/data.h5')
 
         # Load data
         datasets = [
@@ -65,6 +65,28 @@ class TestSpatialOrientation(unittest.TestCase):
         I_exp = np.eye(3)
         I_calc = self.so.r_cam_screen * self.so.r_optic_cam * self.so.r_screen_optic
         np.testing.assert_allclose(I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
+
+    def test_io_oriented_optic(self):
+        file = join(dirname(__file__), 'data/output/test_spatial_orientation_oriented_optic.h5')
+        # Save
+        self.so.save_to_hdf(file)
+        # Load
+        ori = SpatialOrientation.load_from_hdf(file)
+        # Check optic is oriented
+        np.testing.assert_equal(ori.optic_oriented, True)
+
+    def test_io_unoriented_optic(self):
+        file = join(dirname(__file__), 'data/output/test_spatial_orientation_unoriented_optic.h5')
+        # Save
+        r_cam_screen = self.so.r_cam_screen
+        v_cam_screen_cam = self.so.v_cam_screen_cam
+        ori_1 = SpatialOrientation(r_cam_screen, v_cam_screen_cam)
+        ori_1.save_to_hdf(file)
+        # Load
+        ori_2 = SpatialOrientation.load_from_hdf(file)
+        # Check optic not oriented
+        np.testing.assert_equal(ori_1.optic_oriented, False)
+        np.testing.assert_equal(ori_2.optic_oriented, False)
 
 
 if __name__ == '__main__':
