@@ -40,4 +40,4 @@ jobs:
         run: |
           python3 -m pip install -r ../requirements.txt
           export PYTHONPATH=$PWD/../
-          pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc -s -k test_image_points
+          pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
