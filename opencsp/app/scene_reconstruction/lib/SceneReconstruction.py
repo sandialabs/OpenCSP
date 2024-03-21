@@ -28,6 +28,9 @@ class SceneReconstruction:
     ----------
     make_figures : bool
         To make output figures, by default, False.
+    intersect_threshold : float
+        Maximum point to ray distance to be considered an intersection during
+        triangulation, by default 0.02 meters.
     """
 
     def __init__(
@@ -47,6 +50,8 @@ class SceneReconstruction:
             Glob-like file path search string to locations of images with Aruco markers
 
         """
+        self.intersect_threshold = 0.02  # meters
+
         # Save data
         self.camera = camera
         self.known_point_locations = known_point_locations
@@ -507,20 +512,13 @@ class SceneReconstruction:
         # Bundle adjust
         self.refine_located_poses_and_points()
 
-    def run_calibration(self, intersect_thresh: float = 0.02) -> ndarray:
+    def run_calibration(self) -> None:
         """Runs the calibration sequence
-
-        Parameters
-        ----------
-        intersect_thresh : bool
-            Maximum point to ray distance to be considered an intersection during
-            triangulation, by default 0.02 meters.
-
         """
         # Run calibration
         self.load_images()
         self.save_ids_known()
-        self.optimize(intersect_thresh)
+        self.optimize(self.intersect_threshold)
         self.calculate_mean_reproj_errors()
 
         # Log reprojection errors
