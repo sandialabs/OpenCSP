@@ -11,7 +11,7 @@ import pytest
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.CalibrateDisplayShape import CalibrateDisplayShape, DataInput
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -21,12 +21,10 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class TestCalibrateDisplayShape(unittest.TestCase):
+    """Tests CalibrateDisplayShape"""
+
     @classmethod
     def setUpClass(cls):
-        """Tests the CalibrateDisplayShape process. If directories are None,
-        uses default test data directory. All input files listed below must be
-        on the dir_input path.
-        """
         # Define default data directories
         dir_input_sofast = join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement')
         dir_input_def = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement')
@@ -56,7 +54,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
             pts_xyz_marker,
             camera,
             image_projection_data,
-            [Measurement.load_from_hdf(f) for f in files_screen_shape_measurement],
+            [MeasurementSofastFringe.load_from_hdf(f) for f in files_screen_shape_measurement],
         )
 
         # Perform screen position calibration
@@ -73,18 +71,26 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         cls.data_meas = dist_data
 
     @pytest.mark.skipif(os.name != 'nt', reason='Does not pass in Linux environment for unkonwn reason.')
-    def test_screen_distortion_data(self):
-        """Tests screen calibration data"""
+    def test_xy_screen_fraction(self):
+        """Tests xy points"""
         np.testing.assert_allclose(
-            self.data_meas['pts_xy_screen_fraction'].data, self.data_exp['pts_xy_screen_fraction'], rtol=0, atol=1e-6
+            self.data_meas['xy_screen_fraction'].data, self.data_exp['pts_xy_screen_fraction'], rtol=0, atol=1e-6
         )
+
+    @pytest.mark.skipif(os.name != 'nt', reason='Does not pass in Linux environment for unkonwn reason.')
+    def test_xyz_screen_coords(self):
+        """Tests xyz points"""
         np.testing.assert_allclose(
-            self.data_meas['pts_xyz_screen_coords'].data, self.data_exp['pts_xyz_screen_coords'], rtol=0, atol=1e-6
+            self.data_meas['xyz_screen_coords'].data, self.data_exp['pts_xyz_screen_coords'], rtol=0, atol=1e-6
         )
 
 
 if __name__ == '__main__':
+    # Set up save dir
     save_dir = join(dirname(__file__), 'data/output')
     ft.create_directories_if_necessary(save_dir)
+
+    # Set up logger
     lt.logger(join(save_dir, 'log_display_shape.txt'), lt.log.WARN)
+
     unittest.main()
