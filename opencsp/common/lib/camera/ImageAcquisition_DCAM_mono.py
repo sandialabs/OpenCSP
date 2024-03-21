@@ -1,10 +1,15 @@
+from importlib.metadata import version
 import numpy as np
+
 from pypylon import pylon
 
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class ImageAcquisition(ImageAcquisitionAbstract):
+    _has_checked_pypylon_version = False
+
     def __init__(self, instance: int = 0, pixel_format: str = 'Mono8'):
         """
         Class to control a Basler DCAM monochromatic camera. Grabs one frame
@@ -22,6 +27,8 @@ class ImageAcquisition(ImageAcquisitionAbstract):
                 - Others as defined by Basler
 
         """
+        ImageAcquisition._check_pypylon_version()
+
         # Find all instances of DCAM cameras
         tlFactory = pylon.TlFactory.GetInstance()
         devices = tlFactory.EnumerateDevices()
@@ -63,6 +70,20 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         self._shutter_cal_values = np.linspace(
             shutter_min, shutter_max, 2**13
         ).astype(int)
+
+    @classmethod
+    def _check_pypylon_version(cls):
+        if not cls._has_checked_pypylon_version:
+            pypylon_version = version('pypylon')
+            suggested_pypylon_version = "3.0"  # latest release as of 2024/03/21
+
+            if pypylon_version < suggested_pypylon_version:
+                lt.warn("Warning in ImageAcquisition_DCAM_mono.py: " +
+                        f"pypylon version {pypylon_version} is behind the suggested version {suggested_pypylon_version}. " +
+                        "If you have trouble grabbing frames with the basler camera, try upgrading your version of pypylon " +
+                        "with \"python -m pip install --upgrade pypylon\".")
+
+            cls._has_checked_pypylon_version = True
 
     def get_frame(self) -> np.ndarray:
         # Start frame capture
