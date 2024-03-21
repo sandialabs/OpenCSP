@@ -98,6 +98,7 @@ NOTE, the following pre-commit hook can be added to automatically apply black to
 commits:
 
 ::
+
    $ cat .git/hooks/pre-commit
    for FILE in $(git diff --cached --name-only | egrep '.*\.py$')
    do
