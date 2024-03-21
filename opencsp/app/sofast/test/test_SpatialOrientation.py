@@ -1,6 +1,6 @@
 """Unit test suite to test the SpatialOrientation class"""
 
-from os.path import join, dirname
+from os.path import join
 import unittest
 
 import numpy as np
@@ -40,7 +40,7 @@ class TestSpatialOrientation(unittest.TestCase):
         cls.so = ori
 
         # Set up save path
-        cls.save_dir = join(dirname(__file__), 'data/output')
+        cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output')
         ft.create_directories_if_necessary(cls.save_dir)
 
     def test_translation_ring_1(self):
