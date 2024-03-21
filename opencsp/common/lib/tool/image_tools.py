@@ -11,59 +11,11 @@ from PIL import Image
 import opencsp.common.lib.tool.log_tools as lt
 
 # from https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
-pil_image_formats_rw = [
-    "blp",
-    "bmp",
-    "dds",
-    "dib",
-    "eps",
-    "gif",
-    "icns",
-    "ico",
-    "im",
-    "jpg",
-    "jpeg",
-    "msp",
-    "pcx",
-    "png",
-    "apng",
-    "pbm",
-    "pgm",
-    "ppm",
-    "pnm",
-    "sgi",
-    "spider",
-    "tga",
-    "tiff",
-    "webp",
-    "xbm",
-]
+pil_image_formats_rw = ["blp", "bmp", "dds", "dib", "eps", "gif", "icns", "ico", "im", "jpg", "jpeg",
+                        "msp", "pcx", "png", "apng", "pbm", "pgm", "ppm", "pnm", "sgi", "spider", "tga", "tiff", "webp", "xbm"]
 """ A list of all image image formats that can be read and written by the Python Imaging Library (PIL) """
-pil_image_formats_readable = pil_image_formats_rw + [
-    "cur",
-    "dcx",
-    "fits",
-    "fli",
-    "flc",
-    "fpx",
-    "ftex",
-    "gbr",
-    "gd",
-    "imt",
-    "iptc",
-    "naa",
-    "mcidas",
-    "mic",
-    "mpo",
-    "pcd",
-    "pixar",
-    "psd",
-    "sun",
-    "wal",
-    "wmf",
-    "emf",
-    "xpm",
-]
+pil_image_formats_readable = pil_image_formats_rw + ["cur", "dcx", "fits", "fli", "flc", "fpx", "ftex", "gbr",
+                                                     "gd", "imt", "iptc", "naa", "mcidas", "mic", "mpo", "pcd", "pixar", "psd", "sun", "wal", "wmf", "emf", "xpm"]
 """ A list of all image image formats that can be read by the Python Imaging Library (PIL). Note that not all of these formats can be written by PIL. """
 pil_image_formats_writable = pil_image_formats_rw + ["palm", "pdf", "xv"]
 """ A list of all image image formats that can be written by the Python Imaging Library (PIL). Note that not all of these formats can be ready by PIL. """
