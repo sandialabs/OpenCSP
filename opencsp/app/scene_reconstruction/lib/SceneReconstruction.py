@@ -235,7 +235,8 @@ class SceneReconstruction:
             pt_int, dists = ph.triangulate(cameras, rots, tvecs, pts_img)
             if dists.max() < intersect_thres:
                 self.set_id_known(id_, pt_int.data.squeeze())
-            lt.debug(f'Too high of intersecion error to locate marker ID {id_:d}')
+            else:
+                lt.debug(f'Too high of intersecion error to locate marker ID {id_:d}')
 
     def refine_located_poses_and_points(self) -> None:
         """Performs bundle adjustment on located points and poses"""
