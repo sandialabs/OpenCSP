@@ -58,27 +58,32 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         # Perform screen position calibration
         cal_screen_position = CalibrateDisplayShape(data_input)
         cal_screen_position.run_calibration()
-
-        # Get distortion data
-        dist_data = cal_screen_position.get_data()
+        cls.cal = cal_screen_position
 
         # Test screen distortion information
         cls.data_exp = load_hdf5_datasets(
             ['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], join(dir_output, 'screen_distortion_data_100_100.h5')
         )
-        cls.data_meas = dist_data
 
     def test_xy_screen_fraction(self):
         """Tests xy points"""
+        data_meas = self.cal.get_data()
         np.testing.assert_allclose(
-            self.data_meas['xy_screen_fraction'].data, self.data_exp['pts_xy_screen_fraction'], rtol=0, atol=1e-6
+            data_meas['xy_screen_fraction'].data, self.data_exp['pts_xy_screen_fraction'], rtol=0, atol=1e-6
         )
 
     def test_xyz_screen_coords(self):
         """Tests xyz points"""
+        data_meas = self.cal.get_data()
         np.testing.assert_allclose(
-            self.data_meas['xyz_screen_coords'].data, self.data_exp['pts_xyz_screen_coords'], rtol=0, atol=1e-6
+            data_meas['xyz_screen_coords'].data, self.data_exp['pts_xyz_screen_coords'], rtol=0, atol=1e-6
         )
+
+    def test_save_display_object(self):
+        """Tests saving DisplayShape object"""
+        display_shape = self.cal.as_DisplayShape('Test display')
+        file = join(dirname(__file__), 'data/output/test_calibration_display.h5')
+        display_shape.save_to_hdf(file)
 
 
 if __name__ == '__main__':
