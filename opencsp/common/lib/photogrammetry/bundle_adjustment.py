@@ -11,6 +11,8 @@ import numpy as np
 from scipy.sparse import lil_matrix
 from scipy.optimize import least_squares
 
+import opencsp.common.lib.tool.log_tools as lt
+
 
 def bundle_adjust(
     rvecs: np.ndarray,
@@ -22,7 +24,7 @@ def bundle_adjust(
     intrinsic_mat: np.ndarray,
     dist_coefs: np.ndarray,
     opt_type: Literal['camera', 'points', 'both'],
-    verbose: bool,
+    verbose: int,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Perform bundel adjustment algorithm on object points and camera poses.
@@ -50,6 +52,8 @@ def bundle_adjust(
         (n,) distortion coefficients array.
     opt_type : str
         What to optimize: {'camera', 'points', 'both'}
+    verbose : int
+        Level of verbosity of least squares solver [0, 1, 2]
 
     Returns
     -------
@@ -76,7 +80,7 @@ def bundle_adjust(
     x0 = np.hstack((params.ravel(), pts_obj.ravel()))
 
     # Create Jacobian sparsity structure
-    A = bundle_adjustment_sparsity(
+    jac_sparsity = bundle_adjustment_sparsity(
         n_cameras, n_points, camera_indices, point_indices, opt_type
     )
 
@@ -84,8 +88,8 @@ def bundle_adjust(
     res = least_squares(
         fun,
         x0,
-        jac_sparsity=A,
-        verbose=int(verbose),
+        jac_sparsity=jac_sparsity,
+        verbose=verbose,
         x_scale='jac',
         ftol=1e-4,
         method='trf',
@@ -99,12 +103,13 @@ def bundle_adjust(
             dist_coefs,
         ),
     )
+    lt.debug('Bundle adjustment finished: ' + res.message)
 
     # Return data
     data = res.x[: n_cameras * 6].reshape((n_cameras, 6))
     rvecs_opt = data[:, :3]
     tvecs_opt = data[:, 3:]
-    pts_obj_opt = res.x[n_cameras * 6 :].reshape((n_points, 3))
+    pts_obj_opt = res.x[n_cameras * 6:].reshape((n_points, 3))
 
     return rvecs_opt, tvecs_opt, pts_obj_opt
 
@@ -167,7 +172,7 @@ def fun(
 
     """
     camera_params = params[: n_cameras * 6].reshape((n_cameras, 6))
-    points_3d = params[n_cameras * 6 :].reshape((n_points, 3))
+    points_3d = params[n_cameras * 6:].reshape((n_points, 3))
     points_proj = project(
         points_3d[point_indices],
         camera_params[camera_indices],
@@ -190,19 +195,19 @@ def bundle_adjustment_sparsity(
     """
     m = camera_indices.size * 2  # num observed points (x and y)
     n = n_cameras * 6 + n_points * 3  # Nvars
-    A = lil_matrix((m, n), dtype=int)  # Num xy points x num vars
+    jac_sparsity = lil_matrix((m, n), dtype=int)  # Num xy points x num vars
 
     i = np.arange(camera_indices.size)
 
     # Fill in diagonals of Jacobian sparsity matrix
     if opt_type in ['camera', 'both']:
         for s in range(6):
-            A[2 * i, camera_indices * 6 + s] = 1  # rotation
-            A[2 * i + 1, camera_indices * 6 + s] = 1  # translation
+            jac_sparsity[2 * i, camera_indices * 6 + s] = 1  # rotation
+            jac_sparsity[2 * i + 1, camera_indices * 6 + s] = 1  # translation
 
     if opt_type in ['points', 'both']:
         for s in range(3):
-            A[2 * i, n_cameras * 6 + point_indices * 3 + s] = 1
-            A[2 * i + 1, n_cameras * 6 + point_indices * 3 + s] = 1
+            jac_sparsity[2 * i, n_cameras * 6 + point_indices * 3 + s] = 1
+            jac_sparsity[2 * i + 1, n_cameras * 6 + point_indices * 3 + s] = 1
 
-    return A
+    return jac_sparsity

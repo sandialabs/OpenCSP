@@ -17,6 +17,7 @@ from numpy import ndarray
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
 from opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class ImageMarker:
@@ -157,7 +158,7 @@ class ImageMarker:
         mask = np.array([1, np.nan, np.nan, np.nan] * num_markers)
         self.pts_obj_xyz = np.repeat(self.pts_obj_xyz, 4, axis=0) * mask[:, None]
 
-    def attempt_calculate_pose(self, verbose=False) -> int:
+    def attempt_calculate_pose(self) -> int:
         """Calculates pose of camera if enough points in image are located
 
         Returns
@@ -171,8 +172,7 @@ class ImageMarker:
 
         # Check if too few points to calculate pose
         if self.located_markers_mask.sum() <= 5:
-            if verbose:
-                print(f'Camera pose {self.img_id:d} has too few points to solve')
+            lt.debug(f'Camera pose {self.img_id:d} has too few points to solve')
             return -1
 
         # Get object and image points
@@ -188,26 +188,20 @@ class ImageMarker:
 
         # Check if CV succeeded
         if not ret:
-            if verbose:
-                print(
-                    f'Camera pose {self.img_id:d} did not solve properly', stacklevel=2
-                )
+            lt.debug('Camera pose {self.img_id:d} did not solve properly')
             return -1
-        if verbose:
-            print(f'Camera pose {self.img_id:d} solved')
+        lt.debug(f'Camera pose {self.img_id:d} solved')
 
         # Check if pose is valid
         valid = ph.valid_camera_pose(
-            self.camera, rvec, tvec, pts_img, pts_obj, verbose=verbose
-        )
+            self.camera, rvec, tvec, pts_img, pts_obj)
         if not valid:
-            if verbose:
-                print(f'Camera pose {self.img_id:d} not valid')
+            lt.debug(f'Camera pose {self.img_id:d} not valid')
             return -1
 
         # Pose is valid
         self.pose_known = True
-        self.set_pose(rvec, tvec, verbose)
+        self.set_pose(rvec, tvec)
         return 1
 
     def set_point_id_located(self, id_: int, pt: ndarray) -> None:
@@ -222,7 +216,7 @@ class ImageMarker:
         self.located_markers_mask[mask] = False
         self.pts_obj_xyz[mask] = np.zeros(3) * np.nan
 
-    def set_pose(self, rvec: ndarray, tvec: ndarray, verbose: bool = False) -> None:
+    def set_pose(self, rvec: ndarray, tvec: ndarray) -> None:
         """Sets the pose of the camera known
 
         Parameters
@@ -231,17 +225,15 @@ class ImageMarker:
             Shape (3,) rotation vector
         tvec : ndarray
             Shape (3,) translation vector
-        verbose : bool, optional
-            To print update, by default False
         """
-        if verbose:
-            print(f'Camera pose {self.img_id:d} set')
+        lt.debug(f'Camera pose {self.img_id:d} set')
         self.pose_known = True
         self.rvec = rvec
         self.tvec = tvec
 
     def unset_pose(self) -> None:
         """Removes the pose of the camera"""
+        lt.debug(f'Camera pose {self.img_id:d} unset')
         self.pose_known = False
         self.rvec = np.zeros(3) * np.nan
         self.tvec = np.zeros(3) * np.nan

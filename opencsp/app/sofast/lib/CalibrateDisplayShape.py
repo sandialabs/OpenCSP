@@ -4,7 +4,6 @@ Saves distortion data and calibrated markers for camera position calibration.
 
 from dataclasses import dataclass
 import os
-from warnings import warn
 
 import cv2 as cv
 import h5py
@@ -16,16 +15,15 @@ from scipy.signal import medfilt
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
-from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.image_processing as ip
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import CalParams
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
 import opencsp.common.lib.photogrammetry.bundle_adjustment as ba
+import opencsp.common.lib.tool.log_tools as lt
 
 
 @dataclass
@@ -88,7 +86,19 @@ class DataCalculation:
 
 
 class CalibrateDisplayShape:
-    """Class containing methods to calibrate screen distortion/position"""
+    """Class containing methods to calibrate screen distortion/position
+
+    Attributes
+    ----------
+    data_input: : DataInput
+        DataInput class with input data
+    make_figures : bool
+        Set to True to output plots
+    data_calculation : DataCalculation
+        DataCalculation class for storing calculated data
+    figures : list[plt.Figure]
+        List containing generated figures, if not figures generated, empty list.
+    """
 
     def __init__(self, data_input: DataInput) -> 'CalibrateDisplayShape':
         """Instantiates CalibrateDisplayShape object
@@ -97,9 +107,9 @@ class CalibrateDisplayShape:
         ----------
         data_input : DataInput
             A DataInput class with all fields defined
-
         """
         self.data_input = data_input
+        self.make_figures = False
 
         # Load cal params
         cal_pattern_params = CalParams(
@@ -117,15 +127,14 @@ class CalibrateDisplayShape:
         # Save figures
         self.figures: list[plt.Figure] = []
 
-    def interpolate_camera_pixel_positions(self, verbose: bool = False) -> None:
+    def interpolate_camera_pixel_positions(self) -> None:
         """Interpolates the XY position of each camera pixel position for
         regular grids of screen fractions"""
         # Create interpolation objects for each camera pose
         pts_uv_pixel_ori: list[Vxy] = []
         pts_uv_pixel_full: list[Vxy] = []
         for idx, meas in enumerate(self.data_input.measurements_screen):
-            if verbose:
-                print(f'Processing measurement: {idx:d}')
+            lt.debug(f'Processing measurement: {idx:d}')
 
             # Calculate mask
             mask1 = ip.calc_mask_raw(meas.mask_images, hist_thresh=0.2)
@@ -180,7 +189,7 @@ class CalibrateDisplayShape:
         )
         self.data_calculation.num_poses = len(pts_uv_pixel_ori)
 
-    def locate_camera_positions(self, verbose: bool = False) -> None:
+    def locate_camera_positions(self) -> None:
         """Finds location of cameras in space using orientation points"""
         # Define initial guess of object points (Nx3 array)
         pts_obj_ori_0 = []
@@ -202,7 +211,7 @@ class CalibrateDisplayShape:
                 self.data_input.camera.distortion_coef,
             )
             if not ret:
-                warn('Camera position did not solve correctly.')
+                lt.error_and_raise(ValueError, 'Camera position did not solve correctly.')
             rvecs_0.append(rvec.squeeze())
             tvecs_0.append(tvec.squeeze())
         rvecs_0 = np.array(rvecs_0)
@@ -233,8 +242,7 @@ class CalibrateDisplayShape:
             points_2d,
         )
         error_0 = np.sqrt(np.mean(errors_0**2))
-        if verbose:
-            print(f'Reprojection error stage 1 rough alignment: {error_0:.2f} pixels')
+        lt.info(f'Reprojection error stage 1 rough alignment: {error_0:.2f} pixels')
 
         # Bundle adjustment optimizing points and camera poses
         if self.data_input.assume_located_points:
@@ -251,7 +259,7 @@ class CalibrateDisplayShape:
             self.data_input.camera.intrinsic_mat,
             self.data_input.camera.distortion_coef,
             type_,
-            verbose,
+            True,
         )
 
         # Calculate error
@@ -265,8 +273,7 @@ class CalibrateDisplayShape:
             points_2d,
         )
         error_1 = np.sqrt(np.mean(errors_1**2))
-        if verbose:
-            print(f'Reprojection error stage 2 bundle adjustment: {error_1:.2f} pixels')
+        lt.info(f'Reprojection error stage 2 bundle adjustment: {error_1:.2f} pixels')
 
         # Save data in class
         self.data_calculation.rvecs = [Rotation.from_rotvec(v).inv() for v in rvecs_1]
@@ -384,13 +391,9 @@ class CalibrateDisplayShape:
 
         # Save distortion data
         with h5py.File(file, 'w') as f:
-            f.create_dataset(
-                'pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data
-            )
-            f.create_dataset(
-                'pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data
-            )
-        print(f'Saved distortion data to: {os.path.abspath(file):s}')
+            f.create_dataset('pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data)
+            f.create_dataset('pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data)
+        lt.info(f'Saved distortion data to: {os.path.abspath(file):s}')
 
     def visualize_located_cameras(self) -> None:
         """Plots cameras and alignment points"""
@@ -522,28 +525,17 @@ class CalibrateDisplayShape:
         im.set_clim(-z_clim, z_clim)
         ax.set_title('Z (mm)')
 
-    def run_calibration(self, verbose: int = 0) -> None:
+    def run_calibration(self) -> None:
         """Runs a complete calibration
-
-        Parameters
-        ----------
-        verbose : int, optional
-            - 0=no output
-            - 1=only print outputs
-            - 2=print outputs and show plots
-            - 3=plots only with no printing
         """
-        to_print = verbose in [1, 2]
-        to_plot = verbose in [2, 3]
-
         # Run calibration
-        self.interpolate_camera_pixel_positions(to_print)
-        self.locate_camera_positions(to_print)
+        self.interpolate_camera_pixel_positions()
+        self.locate_camera_positions()
         self.calculate_3d_screen_points()
         self.assemble_xyz_data_into_images()
 
         # Plot figures
-        if to_plot:
+        if self.make_figures:
             self.visualize_located_cameras()
             self.visualize_annotated_camera_images()
             self.plot_ray_intersection_errors()
@@ -575,7 +567,6 @@ def interp_xy_screen_positions(
     -------
     Vxy
         Length (M * N) image coordinates corresponding to input interpolation axes (pixels).
-
     """
     # Set up interpolation parameters
     x_px = np.arange(im_x.shape[1]) + 0.5  # image pixels

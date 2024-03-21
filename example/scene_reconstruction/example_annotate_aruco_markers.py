@@ -8,6 +8,7 @@ import numpy as np
 import opencsp.common.lib.photogrammetry.photogrammetry as pg
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def annotate_aruco_markers(
@@ -40,7 +41,7 @@ def annotate_aruco_markers(
     if num_ims == 0:
         raise ValueError('No files match given pattern')
     else:
-        print(f'{num_ims:d} images found.')
+        lt.debug(f'{num_ims:d} images containing Aruco markers to be annotated.')
 
     # Check save dir
     if not exists(save_dir):
@@ -81,7 +82,7 @@ def annotate_aruco_markers(
 
         # Save image
         save_name = basename(file)
-        print(save_name)
+        lt.debug(f'Currently saving annotated Aruco markers to: {save_name:s}')
         imageio.imwrite(join(save_dir, save_name), img_rgb)
 
 
@@ -97,6 +98,7 @@ def example_annotate_aruco_markers():
     save_dir = join(dirname(__file__), 'data/output/annotated_aruco_markers')
 
     ft.create_directories_if_necessary(save_dir)
+    lt.logger(join(save_dir, 'log.txt'), lt.log.DEBUG)
 
     # Annotate images
     annotate_aruco_markers(source_pattern, save_dir)

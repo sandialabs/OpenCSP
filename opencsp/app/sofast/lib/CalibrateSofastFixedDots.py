@@ -149,7 +149,6 @@ class CalibrateSofastFixedDots:
                 pts, -self._x_max, -self._x_min, self._y_min, self._y_max
             )
             blob_index.search_thresh = self.blob_search_threshold
-            blob_index.verbose = False
             blob_index.run(origin_pt)
             points, indices = blob_index.get_data_mat()
 
