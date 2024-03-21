@@ -2,12 +2,10 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool import hdf5_tools
-
-# TODO: Add HDF5 abstract class inheritance
+import opencsp.common.lib.tool.hdf5_tools as ht
 
 
-class SpatialOrientation:
+class SpatialOrientation(ht.HDF5_IO_Abstract):
     """Holds relative orientations of camera, screen, and optic for deflectometry systems"""
 
     def __init__(self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz) -> 'SpatialOrientation':
@@ -141,13 +139,12 @@ class SpatialOrientation:
             HDF file to save to
         prefix : str
             Prefix to append to folder path within HDF file (folders must be separated by "/")
-
         """
         datasets = [prefix + 'SpatialOrientation/r_cam_screen', prefix + 'SpatialOrientation/v_cam_screen_cam']
 
         data = [self.r_cam_screen.as_rotvec(), self.v_cam_screen_cam.data]
 
-        hdf5_tools.save_hdf5_datasets(data, datasets, file)
+        ht.save_hdf5_datasets(data, datasets, file)
 
     def save_all_to_hdf(self, file: str, prefix: str = '') -> None:
         """Saves all data to HDF file. Data is stored as prefix + SpatialOrientation/...
@@ -174,27 +171,46 @@ class SpatialOrientation:
             self.v_cam_optic_cam.data,
         ]
 
-        hdf5_tools.save_hdf5_datasets(data, datasets, file)
+        ht.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str) -> 'SpatialOrientation':
-        """Loads camera-screen orientation data from HDF file"""
-        datasets = ['SpatialOrientation/r_cam_screen', 'SpatialOrientation/v_cam_screen_cam']
-        data = hdf5_tools.load_hdf5_datasets(datasets, file)
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'SpatialOrientation':
+        """Loads data from given file. Assumes data is stored as: PREFIX + SpatialOrientation/...
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        datasets = [
+            prefix + 'SpatialOrientation/r_cam_screen',
+            prefix + 'SpatialOrientation/v_cam_screen_cam',
+        ]
+        data = ht.load_hdf5_datasets(datasets, file)
         r_cam_screen = Rotation.from_rotvec(data['r_cam_screen'])
         v_cam_screen_cam = Vxyz(data['v_cam_screen_cam'])
         return cls(r_cam_screen, v_cam_screen_cam)
 
     @classmethod
-    def load_all_from_hdf(cls, file: str) -> 'SpatialOrientation':
-        """Loads all data from HDF file"""
+    def load_all_from_hdf(cls, file: str, prefix: str = '') -> 'SpatialOrientation':
+        """Loads data from given file. Assumes data is stored as: PREFIX + SpatialOrientation/...
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
         datasets = [
-            'SpatialOrientation/r_cam_screen',
-            'SpatialOrientation/v_cam_screen_cam',
-            'SpatialOrientation/r_cam_optic',
-            'SpatialOrientation/v_cam_optic_cam',
+            prefix + 'SpatialOrientation/r_cam_screen',
+            prefix + 'SpatialOrientation/v_cam_screen_cam',
+            prefix + 'SpatialOrientation/r_cam_optic',
+            prefix + 'SpatialOrientation/v_cam_optic_cam',
         ]
-        data = hdf5_tools.load_hdf5_datasets(datasets, file)
+        data = ht.load_hdf5_datasets(datasets, file)
 
         r_cam_screen = Rotation.from_rotvec(data['r_cam_screen'])
         v_cam_screen_cam = Vxyz(data['v_cam_screen_cam'])
