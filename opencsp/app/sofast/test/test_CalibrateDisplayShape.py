@@ -6,6 +6,7 @@ import unittest
 
 from glob import glob
 import numpy as np
+import pytest
 
 from opencsp.app.sofast.lib.CalibrateDisplayShape import CalibrateDisplayShape, DataInput
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
@@ -69,6 +70,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         cls.save_dir_local = join(opencsp_code_dir(), 'app/sofast/test/data/output')
         ft.create_directories_if_necessary(cls.save_dir_local)
 
+    @pytest.mark.no_xvfb
     def test_xy_screen_fraction(self):
         """Tests xy points"""
         data_meas = self.cal.get_data()
@@ -76,6 +78,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
             data_meas['xy_screen_fraction'].data, self.data_exp['pts_xy_screen_fraction'], rtol=0, atol=1e-6
         )
 
+    @pytest.mark.no_xvfb
     def test_xyz_screen_coords(self):
         """Tests xyz points"""
         data_meas = self.cal.get_data()
