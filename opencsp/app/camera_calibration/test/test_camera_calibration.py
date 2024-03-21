@@ -40,6 +40,7 @@ class TestCameraCalibration:
 
         # Find all files
         files = glob(image_pattern)
+        files.sort()
 
         # Load images and find corners
         images = []
