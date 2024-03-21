@@ -38,6 +38,7 @@ class TestSingle(unittest.TestCase):
 
         # Find all test files
         cls.files_dataset = glob.glob(os.path.join(base_dir, 'calculations_facet/data*.h5'))
+        cls.files_dataset.sort()
         if len(cls.files_dataset) == 0:
             raise ValueError('No single-facet datsets found.')
 
