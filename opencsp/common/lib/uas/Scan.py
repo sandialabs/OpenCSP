@@ -81,11 +81,7 @@ def construct_scan_given_segments_of_interest(list_of_xyz_segments, scan_paramet
             fly_backward = False
         else:
             fly_backward = True
-        passes.append(
-            sp.construct_scan_pass_given_segment_of_interest(
-                segment_xyz, fly_backward, scan_parameters
-            )
-        )
+        passes.append(sp.construct_scan_pass_given_segment_of_interest(segment_xyz, fly_backward, scan_parameters))
         idx += 1
     # Construct scan.
     scan = Scan(passes)
@@ -114,11 +110,7 @@ def construct_scan_given_UFACET_scan_passes(ufacet_scan_pass_list, scan_paramete
             fly_backward = False
         else:
             fly_backward = True
-        passes.append(
-            sp.construct_scan_pass_given_UFACET_scan_pass(
-                ufacet_scan_pass, fly_backward, scan_parameters
-            )
-        )
+        passes.append(sp.construct_scan_pass_given_UFACET_scan_pass(ufacet_scan_pass, fly_backward, scan_parameters))
         idx += 1
     # Construct scan.
     scan = Scan(passes)

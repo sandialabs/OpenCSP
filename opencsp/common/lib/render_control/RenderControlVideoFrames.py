@@ -58,9 +58,7 @@ class RenderControlVideoFrames:
         self.outframe_format = outframe_format
         self.outframe_dpi = outframe_dpi
         self.example_name = example_name if example_name != None else outframe_name
-        self.example_format = (
-            example_format if example_format != None else outframe_format
-        )
+        self.example_format = example_format if example_format != None else outframe_format
         self.example_dpi = example_dpi if example_dpi != None else outframe_dpi
         self.example_freq = example_freq
         self.draw_example_frames = draw_example_frames
@@ -95,17 +93,13 @@ class RenderControlVideoFrames:
             if self.draw_example_frames and self.example_format != self.outframe_format:
                 extensions.append(self.example_format)
 
-            files_name_ext_dict = ft.files_in_directory_by_extension(
-                dir, sort=False, extensions=extensions
-            )
+            files_name_ext_dict = ft.files_in_directory_by_extension(dir, sort=False, extensions=extensions)
             for extension in files_name_ext_dict.keys():
                 files_name_ext = files_name_ext_dict[extension]
                 for fn in files_name_ext:
                     ft.delete_file(os.path.join(dir, fn), error_on_not_exists=False)
 
-    def get_outframe_name(
-        self, source_video_dir_body_ext: str = None, is_example_frames=False
-    ):
+    def get_outframe_name(self, source_video_dir_body_ext: str = None, is_example_frames=False):
         """Returns the format string for generating frame names (name+ext only)"""
         # get the name and extension
         name, ext = self.outframe_name, self.outframe_format
@@ -123,19 +117,13 @@ class RenderControlVideoFrames:
         return name_ext
 
     def get_outframe_path_name_ext(
-        self,
-        destination_dir: str,
-        source_video_dir_body_ext: str = None,
-        is_example_frames=False,
+        self, destination_dir: str, source_video_dir_body_ext: str = None, is_example_frames=False
     ):
         name_ext = self.get_outframe_name(source_video_dir_body_ext, is_example_frames)
         return os.path.join(destination_dir, name_ext)
 
     def get_ffmpeg_args(
-        self,
-        destination_dir: str,
-        source_video_dir_body_ext: str = None,
-        is_example_frames=False,
+        self, destination_dir: str, source_video_dir_body_ext: str = None, is_example_frames=False
     ) -> tuple[str, dict[str, str]]:
         """Get the ffmpeg arguments for extracting either extracted or example frames.
 

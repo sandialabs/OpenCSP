@@ -55,11 +55,7 @@ def example_driver(dir_save: str):
 
     # Define surface data
     surface_data = [
-        Surface2DParabolic(
-            initial_focal_lengths_xy=(100.0, 100.0),
-            robust_least_squares=False,
-            downsample=20,
-        )
+        Surface2DParabolic(initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=False, downsample=20)
     ] * ensemble_data.num_facets
 
     # Calibrate fringes
@@ -95,13 +91,7 @@ def example_driver(dir_save: str):
     # Visualize setup
     fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
     spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
-    visualize_setup(
-        display,
-        camera,
-        spatial_ori.v_screen_optic_screen,
-        spatial_ori.r_optic_screen,
-        ax=fig_record.axis,
-    )
+    visualize_setup(display, camera, spatial_ori.v_screen_optic_screen, spatial_ori.r_optic_screen, ax=fig_record.axis)
     fig_record.save(dir_save, 'physical_setup_layout', 'png')
 
     # Plot scenario

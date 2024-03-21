@@ -14,9 +14,7 @@ class HeliostatConfiguration:
 
     def __init__(
         self,
-        az: float = np.deg2rad(
-            180
-        ),  # (az,el) = (180,90) degrees corresponde to pointing straight up,
+        az: float = np.deg2rad(180),  # (az,el) = (180,90) degrees corresponde to pointing straight up,
         el: float = np.deg2rad(90),
     ) -> None:  # as if transitioned by tilting up from face south orientation.
         super(HeliostatConfiguration, self).__init__()

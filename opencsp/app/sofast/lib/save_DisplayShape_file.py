@@ -10,11 +10,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 def save_DisplayShape_file(
-    screen_distortion_data: dict,
-    name: str,
-    rvec: ndarray,
-    tvec: ndarray,
-    file_save: str,
+    screen_distortion_data: dict, name: str, rvec: ndarray, tvec: ndarray, file_save: str
 ) -> None:
     """Constructs and saves DisplayShape file
 
@@ -41,9 +37,7 @@ def save_DisplayShape_file(
 
     # Gather display grid data
     grid_data = dict(
-        screen_model='distorted3D',
-        xy_screen_fraction=pts_xy_screen_fraction,
-        xyz_screen_coords=pts_xyz_screen_coords,
+        screen_model='distorted3D', xy_screen_fraction=pts_xy_screen_fraction, xyz_screen_coords=pts_xyz_screen_coords
     )
 
     # Create display object

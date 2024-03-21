@@ -27,13 +27,9 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-from opencsp.common.lib.render_control.RenderControlLightPath import (
-    RenderControlLightPath,
-)
+from opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
-from opencsp.common.lib.render_control.RenderControlRayTrace import (
-    RenderControlRayTrace,
-)
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
 
 
 def visualize_mirror() -> None:
@@ -49,9 +45,7 @@ def visualize_mirror() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate mirror pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(
-        Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True)
-    )
+    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
@@ -89,9 +83,7 @@ def visualize_facet() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate facet pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(
-        Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True)
-    )
+    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
@@ -132,9 +124,7 @@ def visualize_mirror_array() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate mirror_array pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(
-        Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True)
-    )
+    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
@@ -164,9 +154,7 @@ def visualize_mirror_array() -> None:
 
 def define_mirror(focal_length: float) -> MirrorParametric:
     """Creates parametric mirror with given focal length"""
-    region_mirror = RegionXY.from_vertices(
-        Vxy(([-0.6, -0.6, 0.6, 0.6], [-0.6, 0.6, 0.6, -0.6]))
-    )
+    region_mirror = RegionXY.from_vertices(Vxy(([-0.6, -0.6, 0.6, 0.6], [-0.6, 0.6, 0.6, -0.6])))
     return MirrorParametric.generate_symmetric_paraboloid(focal_length, region_mirror)
 
 
@@ -228,31 +216,21 @@ def ray_trace_obj(
     return image, trace
 
 
-def plot_ray_trace(
-    scene: Scene,
-    image: np.ndarray,
-    trace: rt.RayTrace,
-    title: str,
-    plot_rays: bool = False,
-) -> None:
+def plot_ray_trace(scene: Scene, image: np.ndarray, trace: rt.RayTrace, title: str, plot_rays: bool = False) -> None:
     """Plots and saves images"""
     # Define save directory
     save_dir = os.path.join(os.path.dirname(__file__), 'data/output')
 
     # Define visualization controls
     figure_control = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
-    mirror_control = rcm.RenderControlMirror(
-        centroid=True, surface_normals=True, norm_res=1
-    )
+    mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
     axis_control_m = rca.meters()
     if plot_rays:
         light_path_control = RenderControlLightPath(current_length=10)
         ray_trace_control = RenderControlRayTrace(light_path_control=light_path_control)
 
     # Plot scenario
-    fig_record = fm.setup_figure_for_3d_data(
-        figure_control, axis_control_m, title=title + ': Ray Trace'
-    )
+    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title=title + ': Ray Trace')
     if plot_rays:
         trace.draw(fig_record.view, ray_trace_control)
     scene.objects[0].draw(fig_record.view, mirror_control)
@@ -260,9 +238,7 @@ def plot_ray_trace(
     fig_record.save(save_dir, 'ray_trace_' + title, 'png')
 
     # Plot image
-    fig_record = fm.setup_figure(
-        figure_control, axis_control_m, title=title + ': Sun Image'
-    )
+    fig_record = fm.setup_figure(figure_control, axis_control_m, title=title + ': Sun Image')
     fig_record.axis.imshow(image, cmap='jet')
     fig_record.save(save_dir, 'sun_image_' + title, 'png')
 

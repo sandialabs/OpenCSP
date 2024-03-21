@@ -31,9 +31,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         if np.ndim(frame) == 3:
             frame = frame.mean(axis=2)
         elif np.ndim(frame) != 2:
-            raise ValueError(
-                f'Output frame must have 2 or 3 dimensions, not {np.ndim(frame):d}.'
-            )
+            raise ValueError(f'Output frame must have 2 or 3 dimensions, not {np.ndim(frame):d}.')
 
         return frame
 
@@ -78,9 +76,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
     @property
     def shutter_cal_values(self) -> np.ndarray:
-        raise ValueError(
-            'exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.'
-        )
+        raise ValueError('exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.')
 
     def close(self):
         self.cap.release()

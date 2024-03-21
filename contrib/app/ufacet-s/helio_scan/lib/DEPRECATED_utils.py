@@ -56,12 +56,8 @@ CX = 3840 / 2  # W / 2  # ?? SCAFFOLDING RCB -- USED TO BE SONY ABOVE (NOT [FRAM
 CY = 2160 / 2  # H / 2   # ?? SCAFFOLDING RCB -- USED TO BE SONY ABOVE (NOT [FRAME])
 # ?? SCAFFOLDING RCB -- USED TO BE SONY ABOVE (NOT [FRAME])
 # ?? SCAFFOLDING RCB -- "DistCoefs"  MISSPELLED -- SHOULD BE "DistCoeffs", OR EVEN BETTER, "DISTORTION_COEFFICIENTS"
-DistCoefs = np.array(
-    [[K1, K2, P1, P2]]
-)  # ?? SCAFFOLDING RCB -- USED TO BE SONY ABOVE (NOT [FRAME])
-ZeroDistCoefs = np.array(
-    [[1.0e-9, 0.0, 0.0, 0.0]]
-)  # ?? SCAFFOLDING RCB -- SET FLOAT TYPE PROPERLY
+DistCoefs = np.array([[K1, K2, P1, P2]])  # ?? SCAFFOLDING RCB -- USED TO BE SONY ABOVE (NOT [FRAME])
+ZeroDistCoefs = np.array([[1.0e-9, 0.0, 0.0, 0.0]])  # ?? SCAFFOLDING RCB -- SET FLOAT TYPE PROPERLY
 CameraMatrix = np.array(
     [
         [FX, 0, CX],  # ?? SCAFFOLDING RCB -- USED TO BE SONY ABOVE (NOT [FRAME])
@@ -100,12 +96,8 @@ PLT_BOTTOM_LEFT_COLOR = 'y'
 PLT_CENTER_COLOR = 'c'
 
 ## MAGIC NUMBERS
-INTER_POINT_DISTANCE = (
-    20  # for the corners  # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
-)
-SIDE_FACET_DISTANCE = (
-    800  # for the facets  # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
-)
+INTER_POINT_DISTANCE = 20  # for the corners  # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
+SIDE_FACET_DISTANCE = 800  # for the facets  # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
 COMPONENT_THRESHOLD = 35  # 50 # 100 # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
 CLUSTERED_CORNERS_DISTANCE = 100  # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
 # INTER_POINT_DISTANCE        = 20    # for the corners  # ?? SCAFFOLDING RCB - ORIGINAL CODE
@@ -114,9 +106,7 @@ CLUSTERED_CORNERS_DISTANCE = 100  # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
 # CLUSTERED_CORNERS_DISTANCE  = 100  # ?? SCAFFOLDING RCB - ORIGINAL CODE
 
 ## Tracking
-MINIMUM_FRACTION_OF_CONFIRMED_CORNERS = (
-    0.7  # This is a measure of quality of match.  For whatever corners are expected
-)
+MINIMUM_FRACTION_OF_CONFIRMED_CORNERS = 0.7  # This is a measure of quality of match.  For whatever corners are expected
 # to be seen inside the frame, this fraction must match via image confirmation.
 
 MINIMUM_CORNERS_REQUIRED_INSIDE_FRAME = (
@@ -180,26 +170,20 @@ TOL_STEP = 0.1
 
 
 def save_image(img, imgname, path):
-    print(
-        'In save_image(), saving:', os.path.join(path, imgname)
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print('In save_image(), saving:', os.path.join(path, imgname))  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is None:  # ?? SCAFFOLDING RCB -- TEMPORARY
         print(
-            'WARNING: In save_image(), img==None encountered for output:',
-            os.path.join(path, imgname),
+            'WARNING: In save_image(), img==None encountered for output:', os.path.join(path, imgname)
         )  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is not None:
         cv.imwrite(os.path.join(path, imgname), img)
 
 
 def save_fig(img=None, imgname=None, path=None, dpi=500, rgb=False):
-    print(
-        'In save_fig(),   saving:', os.path.join(path, imgname)
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print('In save_fig(),   saving:', os.path.join(path, imgname))  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is None:  # ?? SCAFFOLDING RCB -- TEMPORARY
         print(
-            'WARNING: In save_fig(), img==None encountered for output:',
-            os.path.join(path, imgname),
+            'WARNING: In save_fig(), img==None encountered for output:', os.path.join(path, imgname)
         )  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is not None:
         plt.figure()
@@ -249,31 +233,14 @@ def CannyImg(img=None, canny_type='normal', lower=None, upper=None):
     return cv.Canny(img, threshold1=lower, threshold2=upper)
 
 
-def extract_all_frames_from_video(
-    vidoe_path=None, video_name=None, saving_path=None, fps=30
-):
+def extract_all_frames_from_video(vidoe_path=None, video_name=None, saving_path=None, fps=30):
     cmd = 'ffmpeg'
-    cmd += (
-        ' -i '
-        + vidoe_path
-        + video_name
-        + ' -vf fps='
-        + str(fps)
-        + ' '
-        + saving_path
-        + 'img%d.png'
-    )
+    cmd += ' -i ' + vidoe_path + video_name + ' -vf fps=' + str(fps) + ' ' + saving_path + 'img%d.png'
     subprocess.call(cmd.split())
 
 
 def extract_frames_from_video(
-    video_path=None,
-    video_name=None,
-    saving_path=None,
-    fps=30,
-    starting_time=None,
-    duration=None,
-    backward=False,
+    video_path=None, video_name=None, saving_path=None, fps=30, starting_time=None, duration=None, backward=False
 ):
     cmd = 'ffmpeg'
     if starting_time is not None and starting_time != '':
@@ -379,9 +346,7 @@ def extract_frames_nopipe(
     subprocess.call(command)
 
 
-def extract_frames_opencv(
-    video=None, start=None, end=None, saving_path=None, every=1, plot=False, store=False
-):
+def extract_frames_opencv(video=None, start=None, end=None, saving_path=None, every=1, plot=False, store=False):
     vid = cv.VideoCapture(video)
     vid.set(cv.CAP_PROP_POS_FRAMES, start - 1)
     frame = start
@@ -415,13 +380,7 @@ def extract_frames_opencv(
 
 
 def extract_specific_frames_pipe(
-    video_path=None,
-    video_name=None,
-    starting_frame_id=None,
-    ending_frame_id=None,
-    fps=30,
-    height=2160,
-    width=3840,
+    video_path=None, video_name=None, starting_frame_id=None, ending_frame_id=None, fps=30, height=2160, width=3840
 ):
     command = [
         'ffmpeg',
@@ -491,9 +450,7 @@ def extract_specific_frames_pipe(
     return image_list
 
 
-def set_proper_hom_coef_sign(
-    point_on_line, btype, A, B, C
-) -> tuple[float, float, float]:
+def set_proper_hom_coef_sign(point_on_line, btype, A, B, C) -> tuple[float, float, float]:
     """Ensures negative sign distance for points on the mirror side of the line.
 
     For a given x and y in "Ax + Bx + C", ensure that the sum is positive/negative
@@ -585,9 +542,7 @@ def fit_line_component(component=None, type_fit='regression', plot_fit=False):
         component['original_line_points'] = [x1, y1, x2, y2]  # col, row, col, row
         if plot_fit:
             plot_line(
-                pixels=pixels,
-                points=component['original_line_points'],
-                hom_coef=component['original_line_hom_coef'],
+                pixels=pixels, points=component['original_line_points'], hom_coef=component['original_line_hom_coef']
             )
 
     return component
@@ -615,9 +570,7 @@ def fit_line_pixels(pixels):
     return A, B, C
 
 
-def fit_line_inliers_pixels(
-    pixels, coeff, min_tolerance=0.5, max_tolerance=5, tol_step=0.1
-):
+def fit_line_inliers_pixels(pixels, coeff, min_tolerance=0.5, max_tolerance=5, tol_step=0.1):
     A, B, C = coeff
     required_inliers = int(round(0.7 * len(pixels)))
     tolerance = min_tolerance
@@ -727,32 +680,20 @@ def solvePNP(points3d, points2d, h, w, pnptype='pnp', cam_matrix=None, dist_coef
     # Check input.
     if len(points3d) != len(points2d):
         msg = (
-            'In solvePNP(), len(points3d)='
-            + str(len(points3d))
-            + ' does not equal len(points3d)='
-            + str(len(points3d))
+            'In solvePNP(), len(points3d)=' + str(len(points3d)) + ' does not equal len(points3d)=' + str(len(points3d))
         )
         print('ERROR: ' + msg)
         raise ValueError(msg)
     if len(points3d) < 4:
-        msg = (
-            'In solvePNP(), len(points3d)=' + str(len(points3d)) + ' is not at least 4.'
-        )
+        msg = 'In solvePNP(), len(points3d)=' + str(len(points3d)) + ' is not at least 4.'
         print('ERROR: ' + msg)
         raise ValueError(msg)
     points3d_plane = points3d.copy()
     points3d_plane[:, 2] = 0
     if pnptype == 'calib':
-        _, mtx, dist, _, _ = cv.calibrateCamera(
-            [points3d_plane], [points2d], (w, h), None, None
-        )
+        _, mtx, dist, _, _ = cv.calibrateCamera([points3d_plane], [points2d], (w, h), None, None)
         _, mtx, dist, rvecs, tvecs = cv.calibrateCamera(
-            [points3d],
-            [points2d],
-            (w, h),
-            mtx,
-            dist,
-            flags=cv.CALIB_USE_INTRINSIC_GUESS,
+            [points3d], [points2d], (w, h), mtx, dist, flags=cv.CALIB_USE_INTRINSIC_GUESS
         )
         rvec, tvec = rvecs[0], tvecs[0]
     else:
@@ -784,9 +725,7 @@ def uncouple_points(corners):
 
 
 def setup_loger(name, log_file, level=log.INFO):
-    formatter = log.Formatter(
-        '%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s'
-    )
+    formatter = log.Formatter('%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s')
     handler = log.FileHandler(log_file)
     handler.setFormatter(formatter)
 
@@ -800,9 +739,7 @@ def setup_loger(name, log_file, level=log.INFO):
 def multiprocessing_loger(log_file, level=log.INFO):
     logger = mp.get_logger()
     logger.setLevel(level)
-    formatter = log.Formatter(
-        '[%(asctime)s| %(levelname)s| %(processName)s] %(message)s'
-    )
+    formatter = log.Formatter('[%(asctime)s| %(levelname)s| %(processName)s] %(message)s')
     handler = log.FileHandler(log_file)
     handler.setFormatter(formatter)
 

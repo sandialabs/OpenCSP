@@ -47,9 +47,7 @@ class ImageAcquisitionAbstract(ABC):
         self.exposure_time = exposure_values[0]
         im = self.get_frame()
         if _check_saturated(im):
-            raise ValueError(
-                'Minimum exposure value is too high; image still saturated.'
-            )
+            raise ValueError('Minimum exposure value is too high; image still saturated.')
 
         # Checks that the maximum value is over-exposed
         self.exposure_time = exposure_values[-1]

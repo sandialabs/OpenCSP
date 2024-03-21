@@ -91,175 +91,69 @@ class RenderControlScanSectionAnalysis:
         self.draw_single_heliostat_analysis = draw_single_heliostat_analysis
         self.draw_single_heliostat_analysis_list = draw_single_heliostat_analysis_list
         self.draw_single_heliostat_constraints = draw_single_heliostat_constraints
-        self.draw_single_heliostat_constraints_heliostats = (
-            draw_single_heliostat_constraints_heliostats
-        )
-        self.draw_single_heliostat_constraints_mnsa_ray = (
-            draw_single_heliostat_constraints_mnsa_ray
-        )
-        self.draw_single_heliostat_constraints_mxsa_ray = (
-            draw_single_heliostat_constraints_mxsa_ray
-        )
-        self.draw_single_heliostat_constraints_key_points = (
-            draw_single_heliostat_constraints_key_points
-        )
-        self.draw_single_heliostat_constraints_assessed_normals = (
-            draw_single_heliostat_constraints_assessed_normals
-        )
-        self.draw_single_heliostat_constraints_detail = (
-            draw_single_heliostat_constraints_detail
-        )
-        self.draw_single_heliostat_constraints_all_targets = (
-            draw_single_heliostat_constraints_all_targets
-        )
-        self.draw_single_heliostat_constraints_summary = (
-            draw_single_heliostat_constraints_summary
-        )
-        self.draw_single_heliostat_constraints_gaze_example = (
-            draw_single_heliostat_constraints_gaze_example
-        )
-        self.draw_single_heliostat_constraints_gaze_example_C = (
-            draw_single_heliostat_constraints_gaze_example_C
-        )
-        self.draw_single_heliostat_constraints_legend = (
-            draw_single_heliostat_constraints_legend
-        )
+        self.draw_single_heliostat_constraints_heliostats = draw_single_heliostat_constraints_heliostats
+        self.draw_single_heliostat_constraints_mnsa_ray = draw_single_heliostat_constraints_mnsa_ray
+        self.draw_single_heliostat_constraints_mxsa_ray = draw_single_heliostat_constraints_mxsa_ray
+        self.draw_single_heliostat_constraints_key_points = draw_single_heliostat_constraints_key_points
+        self.draw_single_heliostat_constraints_assessed_normals = draw_single_heliostat_constraints_assessed_normals
+        self.draw_single_heliostat_constraints_detail = draw_single_heliostat_constraints_detail
+        self.draw_single_heliostat_constraints_all_targets = draw_single_heliostat_constraints_all_targets
+        self.draw_single_heliostat_constraints_summary = draw_single_heliostat_constraints_summary
+        self.draw_single_heliostat_constraints_gaze_example = draw_single_heliostat_constraints_gaze_example
+        self.draw_single_heliostat_constraints_gaze_example_C = draw_single_heliostat_constraints_gaze_example_C
+        self.draw_single_heliostat_constraints_legend = draw_single_heliostat_constraints_legend
         self.draw_single_heliostat_gaze_angle = draw_single_heliostat_gaze_angle
-        self.draw_single_heliostat_gaze_angle_mnsa = (
-            draw_single_heliostat_gaze_angle_mnsa
-        )
-        self.draw_single_heliostat_gaze_angle_mxsa = (
-            draw_single_heliostat_gaze_angle_mxsa
-        )
-        self.draw_single_heliostat_gaze_angle_critical = (
-            draw_single_heliostat_gaze_angle_critical
-        )
-        self.draw_single_heliostat_gaze_angle_example = (
-            draw_single_heliostat_gaze_angle_example
-        )
-        self.draw_single_heliostat_gaze_angle_fill = (
-            draw_single_heliostat_gaze_angle_fill
-        )
-        self.draw_single_heliostat_gaze_angle_legend = (
-            draw_single_heliostat_gaze_angle_legend
-        )
+        self.draw_single_heliostat_gaze_angle_mnsa = draw_single_heliostat_gaze_angle_mnsa
+        self.draw_single_heliostat_gaze_angle_mxsa = draw_single_heliostat_gaze_angle_mxsa
+        self.draw_single_heliostat_gaze_angle_critical = draw_single_heliostat_gaze_angle_critical
+        self.draw_single_heliostat_gaze_angle_example = draw_single_heliostat_gaze_angle_example
+        self.draw_single_heliostat_gaze_angle_fill = draw_single_heliostat_gaze_angle_fill
+        self.draw_single_heliostat_gaze_angle_legend = draw_single_heliostat_gaze_angle_legend
         self.draw_single_heliostat_select_gaze = draw_single_heliostat_select_gaze
-        self.draw_single_heliostat_select_gaze_shifted = (
-            draw_single_heliostat_select_gaze_shifted
-        )
-        self.draw_single_heliostat_select_gaze_envelope = (
-            draw_single_heliostat_select_gaze_envelope
-        )
-        self.draw_single_heliostat_select_gaze_shrunk = (
-            draw_single_heliostat_select_gaze_shrunk
-        )
-        self.draw_single_heliostat_select_gaze_clipped = (
-            draw_single_heliostat_select_gaze_clipped
-        )
-        self.draw_single_heliostat_select_gaze_selected = (
-            draw_single_heliostat_select_gaze_selected
-        )
-        self.draw_single_heliostat_select_gaze_mnsa = (
-            draw_single_heliostat_select_gaze_mnsa
-        )
-        self.draw_single_heliostat_select_gaze_mxsa = (
-            draw_single_heliostat_select_gaze_mxsa
-        )
-        self.draw_single_heliostat_select_gaze_critical = (
-            draw_single_heliostat_select_gaze_critical
-        )
-        self.draw_single_heliostat_select_gaze_fill = (
-            draw_single_heliostat_select_gaze_fill
-        )
-        self.draw_single_heliostat_select_gaze_legend = (
-            draw_single_heliostat_select_gaze_legend
-        )
+        self.draw_single_heliostat_select_gaze_shifted = draw_single_heliostat_select_gaze_shifted
+        self.draw_single_heliostat_select_gaze_envelope = draw_single_heliostat_select_gaze_envelope
+        self.draw_single_heliostat_select_gaze_shrunk = draw_single_heliostat_select_gaze_shrunk
+        self.draw_single_heliostat_select_gaze_clipped = draw_single_heliostat_select_gaze_clipped
+        self.draw_single_heliostat_select_gaze_selected = draw_single_heliostat_select_gaze_selected
+        self.draw_single_heliostat_select_gaze_mnsa = draw_single_heliostat_select_gaze_mnsa
+        self.draw_single_heliostat_select_gaze_mxsa = draw_single_heliostat_select_gaze_mxsa
+        self.draw_single_heliostat_select_gaze_critical = draw_single_heliostat_select_gaze_critical
+        self.draw_single_heliostat_select_gaze_fill = draw_single_heliostat_select_gaze_fill
+        self.draw_single_heliostat_select_gaze_legend = draw_single_heliostat_select_gaze_legend
         self.draw_multi_heliostat_gaze_angle = draw_multi_heliostat_gaze_angle
-        self.draw_multi_heliostat_gaze_angle_per_heliostat = (
-            draw_multi_heliostat_gaze_angle_per_heliostat
-        )
-        self.draw_multi_heliostat_gaze_angle_envelope = (
-            draw_multi_heliostat_gaze_angle_envelope
-        )
+        self.draw_multi_heliostat_gaze_angle_per_heliostat = draw_multi_heliostat_gaze_angle_per_heliostat
+        self.draw_multi_heliostat_gaze_angle_envelope = draw_multi_heliostat_gaze_angle_envelope
         self.draw_multi_heliostat_gaze_angle_mnsa = draw_multi_heliostat_gaze_angle_mnsa
         self.draw_multi_heliostat_gaze_angle_mxsa = draw_multi_heliostat_gaze_angle_mxsa
-        self.draw_multi_heliostat_gaze_angle_critical = (
-            draw_multi_heliostat_gaze_angle_critical
-        )
-        self.draw_multi_heliostat_gaze_angle_example = (
-            draw_multi_heliostat_gaze_angle_example
-        )
+        self.draw_multi_heliostat_gaze_angle_critical = draw_multi_heliostat_gaze_angle_critical
+        self.draw_multi_heliostat_gaze_angle_example = draw_multi_heliostat_gaze_angle_example
         self.draw_multi_heliostat_gaze_angle_fill = draw_multi_heliostat_gaze_angle_fill
-        self.draw_multi_heliostat_gaze_angle_legend = (
-            draw_multi_heliostat_gaze_angle_legend
-        )
-        self.draw_multi_heliostat_vertical_fov_required = (
-            draw_multi_heliostat_vertical_fov_required
-        )
-        self.draw_multi_heliostat_vertical_fov_required_mnsa = (
-            draw_multi_heliostat_vertical_fov_required_mnsa
-        )
-        self.draw_multi_heliostat_vertical_fov_required_mxsa = (
-            draw_multi_heliostat_vertical_fov_required_mxsa
-        )
-        self.draw_multi_heliostat_vertical_fov_required_critical = (
-            draw_multi_heliostat_vertical_fov_required_critical
-        )
-        self.draw_multi_heliostat_vertical_fov_required_camera = (
-            draw_multi_heliostat_vertical_fov_required_camera
-        )
-        self.draw_multi_heliostat_vertical_fov_required_legend = (
-            draw_multi_heliostat_vertical_fov_required_legend
-        )
+        self.draw_multi_heliostat_gaze_angle_legend = draw_multi_heliostat_gaze_angle_legend
+        self.draw_multi_heliostat_vertical_fov_required = draw_multi_heliostat_vertical_fov_required
+        self.draw_multi_heliostat_vertical_fov_required_mnsa = draw_multi_heliostat_vertical_fov_required_mnsa
+        self.draw_multi_heliostat_vertical_fov_required_mxsa = draw_multi_heliostat_vertical_fov_required_mxsa
+        self.draw_multi_heliostat_vertical_fov_required_critical = draw_multi_heliostat_vertical_fov_required_critical
+        self.draw_multi_heliostat_vertical_fov_required_camera = draw_multi_heliostat_vertical_fov_required_camera
+        self.draw_multi_heliostat_vertical_fov_required_legend = draw_multi_heliostat_vertical_fov_required_legend
         self.draw_multi_heliostat_select_gaze = draw_multi_heliostat_select_gaze
-        self.draw_multi_heliostat_select_gaze_shifted = (
-            draw_multi_heliostat_select_gaze_shifted
-        )
-        self.draw_multi_heliostat_select_gaze_envelope = (
-            draw_multi_heliostat_select_gaze_envelope
-        )
-        self.draw_multi_heliostat_select_gaze_shrunk = (
-            draw_multi_heliostat_select_gaze_shrunk
-        )
-        self.draw_multi_heliostat_select_gaze_clipped = (
-            draw_multi_heliostat_select_gaze_clipped
-        )
-        self.draw_multi_heliostat_select_gaze_selected = (
-            draw_multi_heliostat_select_gaze_selected
-        )
-        self.draw_multi_heliostat_select_gaze_mnsa = (
-            draw_multi_heliostat_select_gaze_mnsa
-        )
-        self.draw_multi_heliostat_select_gaze_mxsa = (
-            draw_multi_heliostat_select_gaze_mxsa
-        )
-        self.draw_multi_heliostat_select_gaze_critical = (
-            draw_multi_heliostat_select_gaze_critical
-        )
-        self.draw_multi_heliostat_select_gaze_fill = (
-            draw_multi_heliostat_select_gaze_fill
-        )
-        self.draw_multi_heliostat_select_gaze_legend = (
-            draw_multi_heliostat_select_gaze_legend
-        )
+        self.draw_multi_heliostat_select_gaze_shifted = draw_multi_heliostat_select_gaze_shifted
+        self.draw_multi_heliostat_select_gaze_envelope = draw_multi_heliostat_select_gaze_envelope
+        self.draw_multi_heliostat_select_gaze_shrunk = draw_multi_heliostat_select_gaze_shrunk
+        self.draw_multi_heliostat_select_gaze_clipped = draw_multi_heliostat_select_gaze_clipped
+        self.draw_multi_heliostat_select_gaze_selected = draw_multi_heliostat_select_gaze_selected
+        self.draw_multi_heliostat_select_gaze_mnsa = draw_multi_heliostat_select_gaze_mnsa
+        self.draw_multi_heliostat_select_gaze_mxsa = draw_multi_heliostat_select_gaze_mxsa
+        self.draw_multi_heliostat_select_gaze_critical = draw_multi_heliostat_select_gaze_critical
+        self.draw_multi_heliostat_select_gaze_fill = draw_multi_heliostat_select_gaze_fill
+        self.draw_multi_heliostat_select_gaze_legend = draw_multi_heliostat_select_gaze_legend
         self.draw_multi_heliostat_result = draw_multi_heliostat_result
-        self.draw_multi_heliostat_result_heliostats = (
-            draw_multi_heliostat_result_heliostats
-        )
+        self.draw_multi_heliostat_result_heliostats = draw_multi_heliostat_result_heliostats
         self.draw_multi_heliostat_result_mnsa_ray = draw_multi_heliostat_result_mnsa_ray
         self.draw_multi_heliostat_result_mxsa_ray = draw_multi_heliostat_result_mxsa_ray
-        self.draw_multi_heliostat_result_selected_cacg_line = (
-            draw_multi_heliostat_result_selected_cacg_line
-        )
-        self.draw_multi_heliostat_result_length_margin = (
-            draw_multi_heliostat_result_length_margin
-        )
-        self.draw_multi_heliostat_result_selected_cacg_segment = (
-            draw_multi_heliostat_result_selected_cacg_segment
-        )
-        self.draw_multi_heliostat_result_start_end_loci = (
-            draw_multi_heliostat_result_start_end_loci
-        )
+        self.draw_multi_heliostat_result_selected_cacg_line = draw_multi_heliostat_result_selected_cacg_line
+        self.draw_multi_heliostat_result_length_margin = draw_multi_heliostat_result_length_margin
+        self.draw_multi_heliostat_result_selected_cacg_segment = draw_multi_heliostat_result_selected_cacg_segment
+        self.draw_multi_heliostat_result_start_end_loci = draw_multi_heliostat_result_start_end_loci
         self.draw_multi_heliostat_result_legend = draw_multi_heliostat_result_legend
         self.draw_single_heliostat_etaC_dict = draw_single_heliostat_etaC_dict
 

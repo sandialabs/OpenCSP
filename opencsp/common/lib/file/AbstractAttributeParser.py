@@ -58,9 +58,7 @@ class AbstractAttributeParser(ABC):
         pass
 
     @abstractmethod
-    def parse_my_contents(
-        self, file_path_name_ext: str, raw_contents: str, my_contents: any
-    ):
+    def parse_my_contents(self, file_path_name_ext: str, raw_contents: str, my_contents: any):
         """Parse this attribute parser's specific contents.
 
         Parameters
@@ -172,9 +170,7 @@ class AbstractAttributeParser(ABC):
         attr = am.AttributesManager(self)
         attr.load(attributes_file_path_name_ext)
 
-    def append_contents_for_writing(
-        self, file_path_name_ext: str, contents: dict[str, any]
-    ) -> dict[str, any]:
+    def append_contents_for_writing(self, file_path_name_ext: str, contents: dict[str, any]) -> dict[str, any]:
         """Add the contents from this parser to be written to an attributes file.
         If has_contents() == False, then this parser will be skipped.
 

@@ -33,14 +33,10 @@ class TestSingle(unittest.TestCase):
         """
         # Get test data location
         if base_dir is None:
-            base_dir = os.path.join(
-                opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
-            )
+            base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
 
         # Find all test files
-        cls.files_dataset = glob.glob(
-            os.path.join(base_dir, 'calculations_facet/data*.h5')
-        )
+        cls.files_dataset = glob.glob(os.path.join(base_dir, 'calculations_facet/data*.h5'))
         if len(cls.files_dataset) == 0:
             raise ValueError('No single-facet datsets found.')
 
@@ -74,16 +70,11 @@ class TestSingle(unittest.TestCase):
                 ],
                 file_dataset,
             )
-            surface_data['robust_least_squares'] = bool(
-                surface_data['robust_least_squares']
-            )
+            surface_data['robust_least_squares'] = bool(surface_data['robust_least_squares'])
             if surface_data['surface_type'] == 'parabolic':
                 surface_data.update(
                     load_hdf5_datasets(
-                        [
-                            'DataSofastInput/surface_params/facet_000/initial_focal_lengths_xy'
-                        ],
-                        file_dataset,
+                        ['DataSofastInput/surface_params/facet_000/initial_focal_lengths_xy'], file_dataset
                     )
                 )
                 surface = Surface2DParabolic(
@@ -92,10 +83,7 @@ class TestSingle(unittest.TestCase):
                     surface_data['downsample'],
                 )
             else:
-                surface = Surface2DPlano(
-                    surface_data['robust_least_squares'],
-                    surface_data['downsample'],
-                )
+                surface = Surface2DPlano(surface_data['robust_least_squares'], surface_data['downsample'])
 
             # Load optic data
             facet_data = load_hdf5_datasets(
@@ -105,10 +93,7 @@ class TestSingle(unittest.TestCase):
                 ],
                 file_dataset,
             )
-            facet_data = DefinitionFacet(
-                Vxyz(facet_data['v_facet_corners']),
-                Vxyz(facet_data['v_centroid_facet']),
-            )
+            facet_data = DefinitionFacet(Vxyz(facet_data['v_facet_corners']), Vxyz(facet_data['v_centroid_facet']))
 
             # Load sofast params
             datasets = [
@@ -132,56 +117,42 @@ class TestSingle(unittest.TestCase):
             sofast.params.mask_hist_thresh = params['mask_hist_thresh']
             sofast.params.mask_filt_width = params['mask_filt_width']
             sofast.params.mask_filt_thresh = params['mask_filt_thresh']
-            sofast.params.mask_thresh_active_pixels = params[
-                'mask_thresh_active_pixels'
-            ]
+            sofast.params.mask_thresh_active_pixels = params['mask_thresh_active_pixels']
             sofast.params.mask_keep_largest_area = params['mask_keep_largest_area']
 
             sofast.params.geometry_params.perimeter_refine_axial_search_dist = params[
                 'perimeter_refine_axial_search_dist'
             ]
-            sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = (
-                params['perimeter_refine_perpendicular_search_dist']
-            )
-            sofast.params.geometry_params.facet_corns_refine_step_length = params[
-                'facet_corns_refine_step_length'
+            sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = params[
+                'perimeter_refine_perpendicular_search_dist'
             ]
+            sofast.params.geometry_params.facet_corns_refine_step_length = params['facet_corns_refine_step_length']
             sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = params[
                 'facet_corns_refine_perpendicular_search_dist'
             ]
-            sofast.params.geometry_params.facet_corns_refine_frac_keep = params[
-                'facet_corns_refine_frac_keep'
-            ]
+            sofast.params.geometry_params.facet_corns_refine_frac_keep = params['facet_corns_refine_frac_keep']
 
             # Run SOFAST
             sofast.process_optic_singlefacet(facet_data, surface)
 
             # Store test data
             cls.slopes.append(sofast.data_characterization_facet[0].slopes_facet_xy)
-            cls.surf_coefs.append(
-                sofast.data_characterization_facet[0].surf_coefs_facet
-            )
-            cls.v_surf_points_facet.append(
-                sofast.data_characterization_facet[0].v_surf_points_facet.data
-            )
+            cls.surf_coefs.append(sofast.data_characterization_facet[0].surf_coefs_facet)
+            cls.v_surf_points_facet.append(sofast.data_characterization_facet[0].v_surf_points_facet.data)
 
     def test_slopes(self):
         datasets = ['DataSofastCalculation/facet/facet_000/slopes_facet_xy']
         for idx, file in enumerate(self.files_dataset):
             with self.subTest(i=idx):
                 data = load_hdf5_datasets(datasets, file)
-                np.testing.assert_allclose(
-                    data['slopes_facet_xy'], self.slopes[idx], atol=1e-7, rtol=0
-                )
+                np.testing.assert_allclose(data['slopes_facet_xy'], self.slopes[idx], atol=1e-7, rtol=0)
 
     def test_surf_coefs(self):
         datasets = ['DataSofastCalculation/facet/facet_000/surf_coefs_facet']
         for idx, file in enumerate(self.files_dataset):
             with self.subTest(i=idx):
                 data = load_hdf5_datasets(datasets, file)
-                np.testing.assert_allclose(
-                    data['surf_coefs_facet'], self.surf_coefs[idx], atol=1e-8, rtol=0
-                )
+                np.testing.assert_allclose(data['surf_coefs_facet'], self.surf_coefs[idx], atol=1e-8, rtol=0)
 
     def test_int_points(self):
         datasets = ['DataSofastCalculation/facet/facet_000/v_surf_points_facet']
@@ -189,10 +160,7 @@ class TestSingle(unittest.TestCase):
             with self.subTest(i=idx):
                 data = load_hdf5_datasets(datasets, file)
                 np.testing.assert_allclose(
-                    data['v_surf_points_facet'],
-                    self.v_surf_points_facet[idx],
-                    atol=1e-8,
-                    rtol=0,
+                    data['v_surf_points_facet'], self.v_surf_points_facet[idx], atol=1e-8, rtol=0
                 )
 
 

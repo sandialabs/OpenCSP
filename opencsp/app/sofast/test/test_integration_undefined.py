@@ -8,9 +8,7 @@ import numpy as np
 
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
@@ -70,21 +68,15 @@ class test_IntegrationUndefined(unittest.TestCase):
         sofast.params.mask_filt_thresh = params['mask_filt_thresh']
         sofast.params.mask_thresh_active_pixels = params['mask_thresh_active_pixels']
         sofast.params.mask_keep_largest_area = params['mask_keep_largest_area']
-        sofast.params.geometry_params.perimeter_refine_axial_search_dist = params[
-            'perimeter_refine_axial_search_dist'
-        ]
+        sofast.params.geometry_params.perimeter_refine_axial_search_dist = params['perimeter_refine_axial_search_dist']
         sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = params[
             'perimeter_refine_perpendicular_search_dist'
         ]
-        sofast.params.geometry_params.facet_corns_refine_step_length = params[
-            'facet_corns_refine_step_length'
-        ]
+        sofast.params.geometry_params.facet_corns_refine_step_length = params['facet_corns_refine_step_length']
         sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = params[
             'facet_corns_refine_perpendicular_search_dist'
         ]
-        sofast.params.geometry_params.facet_corns_refine_frac_keep = params[
-            'facet_corns_refine_frac_keep'
-        ]
+        sofast.params.geometry_params.facet_corns_refine_frac_keep = params['facet_corns_refine_frac_keep']
 
         # Define surface data
         surface = Surface2DParabolic(
@@ -101,9 +93,7 @@ class test_IntegrationUndefined(unittest.TestCase):
         slope_coefs = sofast.data_characterization_facet[0].slope_coefs_facet
 
         np.testing.assert_allclose(data['slopes_facet_xy'], slopes, atol=1e-7, rtol=0)
-        np.testing.assert_allclose(
-            data['slope_coefs_facet'], slope_coefs, atol=1e-8, rtol=0
-        )
+        np.testing.assert_allclose(data['slope_coefs_facet'], slope_coefs, atol=1e-8, rtol=0)
 
 
 if __name__ == '__main__':

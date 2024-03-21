@@ -9,11 +9,7 @@ import opencsp.common.lib.tool.time_date_tools as tdt
 
 
 class RenderControlPowerpointPresentation:
-    def __init__(
-        self,
-        new_slides: list[pps.PowerpointSlide] = None,
-        existing_presentation_path_name_ext: str = None,
-    ):
+    def __init__(self, new_slides: list[pps.PowerpointSlide] = None, existing_presentation_path_name_ext: str = None):
         """Create a new presentation instance to which to add slides.
 
         Example::
@@ -83,19 +79,13 @@ class RenderControlPowerpointPresentation:
 
         # setup
         tmp_dir = os.path.join(
-            orp.opencsp_temporary_dir(),
-            "powerpoint_presentations",
-            tdt.current_date_time_string_forfile(),
+            orp.opencsp_temporary_dir(), "powerpoint_presentations", tdt.current_date_time_string_forfile()
         )
 
         # render all the slides
         for slide_list_idx, pps_slide in enumerate(self.new_slides):
             control = pps_slide.slide_control
-            layout = (
-                self.get_title_layout()
-                if control.is_title_slide
-                else self.get_content_layout()
-            )
+            layout = self.get_title_layout() if control.is_title_slide else self.get_content_layout()
 
             if control.slide_index < 0 or control.slide_index == slide_list_idx:
                 pass
@@ -106,10 +96,7 @@ class RenderControlPowerpointPresentation:
 
             tmp_render_path = os.path.join(tmp_dir, f"slide_{slide_list_idx}")
             if ft.directory_exists(tmp_render_path):
-                lt.error_and_raise(
-                    FileExistsError,
-                    f"Temporary rendering directory {tmp_render_path} already exists!",
-                )
+                lt.error_and_raise(FileExistsError, f"Temporary rendering directory {tmp_render_path} already exists!")
             slide = pps_slide.render(self, layout, tmp_render_path)
 
         # check if the file already exists
@@ -117,8 +104,7 @@ class RenderControlPowerpointPresentation:
             # check again, just to be safe
             if not overwrite:
                 lt.error_and_raise(
-                    RuntimeError,
-                    f"Reached unreachable code!!! (file {dest_path_name_ext} already exists)",
+                    RuntimeError, f"Reached unreachable code!!! (file {dest_path_name_ext} already exists)"
                 )
 
             # save to a temporary file

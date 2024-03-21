@@ -78,9 +78,7 @@ class TestSceneReconstruction(unittest.TestCase):
 
     def test_calibrated_corner_locations(self):
         """Tests relative corner locations"""
-        pts_exp = np.loadtxt(
-            join(self.dir_output, 'point_locations.csv'), delimiter=',', skiprows=1
-        )
+        pts_exp = np.loadtxt(join(self.dir_output, 'point_locations.csv'), delimiter=',', skiprows=1)
         np.testing.assert_allclose(self.pts_meas, pts_exp, atol=1e-5, rtol=0)
         print('Corner locations tested successfully.')
 

@@ -43,10 +43,7 @@ def default():
 def outline(color='k'):
     # Overall field outline only.
     return RenderControlSolarField(
-        draw_outline=True,
-        outline_style=rcps.outline(color=color),
-        draw_heliostats=False,
-        draw_name=False,
+        draw_outline=True, outline_style=rcps.outline(color=color), draw_heliostats=False, draw_name=False
     )
 
 
@@ -115,18 +112,14 @@ def heliostat_outlines_names(color='k'):
 
 
 def heliostat_centroids_outlines_names(
-    color='k',
-    horizontalalignment='center',  # center, right, left
-    verticalalignment='center',
+    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
 ):  # center, top, bottom, baseline, center_baseline
     return RenderControlSolarField(
         draw_outline=False,
         draw_heliostats=True,
         heliostat_styles=rce.RenderControlEnsemble(
             rch.centroid_name_outline(
-                color=color,
-                horizontalalignment=horizontalalignment,
-                verticalalignment=verticalalignment,
+                color=color, horizontalalignment=horizontalalignment, verticalalignment=verticalalignment
             )
         ),
         draw_name=False,
@@ -138,9 +131,7 @@ def heliostat_vector_field(color='k', vector_length=9):
         draw_outline=False,
         outline_style=rcps.outline(color=color),
         draw_heliostats=True,
-        heliostat_styles=rce.RenderControlEnsemble(
-            rch.normal(color=color, surface_normal_length=vector_length)
-        ),
+        heliostat_styles=rce.RenderControlEnsemble(rch.normal(color=color, surface_normal_length=vector_length)),
         draw_name=False,
     )
 

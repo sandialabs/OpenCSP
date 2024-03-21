@@ -1,5 +1,6 @@
 """Unit test suite to test Surface2D type classes
 """
+
 from os.path import dirname, join
 import unittest
 
@@ -30,9 +31,7 @@ class Test2DSurface(unittest.TestCase):
                 surface: Surface2DAbstract = test[0]
                 data_exp: Vxyz = test[1]
 
-                np.testing.assert_allclose(
-                    surface.v_surf_int_pts_optic.data, data_exp.data
-                )
+                np.testing.assert_allclose(surface.v_surf_int_pts_optic.data, data_exp.data)
 
     def test_calculate_slopes(self):
         """Tests slope calculations."""
@@ -110,9 +109,7 @@ class Test2DSurface(unittest.TestCase):
             surf_cur.load_from_hdf(file, prefix)
 
 
-def generate_2DParabolic() -> (
-    tuple[Surface2DParabolic, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]
-):
+def generate_2DParabolic() -> tuple[Surface2DParabolic, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]:
     """
     Generates data for 2DParabolic case
     """
@@ -120,20 +117,14 @@ def generate_2DParabolic() -> (
     initial_focal_lengths_xy = (1.0, 1.0)
     robust_least_squares = False
     downsample = 1
-    surface = Surface2DParabolic(
-        initial_focal_lengths_xy, robust_least_squares, downsample
-    )
+    surface = Surface2DParabolic(initial_focal_lengths_xy, robust_least_squares, downsample)
 
     # Define reflection geometry
     x_int = 2 * (np.sqrt(2) - 1)
     z_int = 0.25 * x_int**2
 
-    u_active_pixel_pointing_optic = Uxyz(
-        ([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1])
-    )
-    v_screen_points_optic = Vxyz(
-        ([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [1, 1, 1, 1, 1])
-    )
+    u_active_pixel_pointing_optic = Uxyz(([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1]))
+    v_screen_points_optic = Vxyz(([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [1, 1, 1, 1, 1]))
     v_optic_cam_optic = Vxyz((0, 0, 1))
     u_measure_pixel_pointing_optic = Uxyz((0, 0, -1))
     v_align_point_optic = Vxyz((0, 0, 0))
@@ -150,16 +141,8 @@ def generate_2DParabolic() -> (
     )
 
     # Define expected data
-    v_surf_int_pts_exp = Vxyz(
-        (
-            [-x_int, x_int, 0, 0, 0],
-            [0, 0, -x_int, x_int, 0],
-            [z_int, z_int, z_int, z_int, 0],
-        )
-    )
-    slopes_exp = np.array(
-        ([-x_int / 2, x_int / 2, 0, 0, 0], [0, 0, -x_int / 2, x_int / 2, 0])
-    )
+    v_surf_int_pts_exp = Vxyz(([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [z_int, z_int, z_int, z_int, 0]))
+    slopes_exp = np.array(([-x_int / 2, x_int / 2, 0, 0, 0], [0, 0, -x_int / 2, x_int / 2, 0]))
     slope_coefs_exp = np.array(([0, 0.5, 0], [0, 0, 0.5]))
     surf_coefs_exp = np.array([0, 0, 0.25, 0, 0, 0.25])
     u_design_exp = Uxyz((0.0, 0.0, 1.0))
@@ -175,20 +158,10 @@ def generate_2DParabolic() -> (
     surface.fit_slopes()
 
     # Pack data
-    return (
-        surface,
-        v_surf_int_pts_exp,
-        slopes_exp,
-        slope_coefs_exp,
-        surf_coefs_exp,
-        u_design_exp,
-        u_fit_exp,
-    )
+    return (surface, v_surf_int_pts_exp, slopes_exp, slope_coefs_exp, surf_coefs_exp, u_design_exp, u_fit_exp)
 
 
-def generate_2DPlano() -> (
-    tuple[Surface2DPlano, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]
-):
+def generate_2DPlano() -> tuple[Surface2DPlano, Vxyz, np.ndarray, np.ndarray, np.ndarray, Uxyz, Uxyz]:
     """
     Generates data for 2DPlano case
     """
@@ -201,16 +174,8 @@ def generate_2DPlano() -> (
     x_int = 1
     z_int = 0
 
-    u_active_pixel_pointing_optic = Uxyz(
-        ([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1])
-    )
-    v_screen_points_optic = Vxyz(
-        (
-            [-2 * x_int, 2 * x_int, 0, 0, 0],
-            [0, 0, -2 * x_int, 2 * x_int, 0],
-            [1, 1, 1, 1, 1],
-        )
-    )
+    u_active_pixel_pointing_optic = Uxyz(([-1, 1, 0, 0, 0], [0, 0, -1, 1, 0], [-1, -1, -1, -1, -1]))
+    v_screen_points_optic = Vxyz(([-2 * x_int, 2 * x_int, 0, 0, 0], [0, 0, -2 * x_int, 2 * x_int, 0], [1, 1, 1, 1, 1]))
     v_optic_cam_optic = Vxyz((0, 0, 1))
     u_measure_pixel_pointing_optic = Uxyz((0, 0, -1))
     v_align_point_optic = Vxyz((0, 0, 0))
@@ -227,13 +192,7 @@ def generate_2DPlano() -> (
     )
 
     # Define expected data
-    v_surf_int_pts_exp = Vxyz(
-        (
-            [-x_int, x_int, 0, 0, 0],
-            [0, 0, -x_int, x_int, 0],
-            [z_int, z_int, z_int, z_int, 0],
-        )
-    )
+    v_surf_int_pts_exp = Vxyz(([-x_int, x_int, 0, 0, 0], [0, 0, -x_int, x_int, 0], [z_int, z_int, z_int, z_int, 0]))
     slopes_exp = np.array(([0, 0, 0, 0, 0], [0, 0, 0, 0, 0]), dtype=float)
     slope_coefs_exp = np.array(([0, 0]), dtype=float)
     surf_coefs_exp = np.array([0, 0, 0], dtype=float)
@@ -250,15 +209,7 @@ def generate_2DPlano() -> (
     surface.fit_slopes()
 
     # Pack data
-    return (
-        surface,
-        v_surf_int_pts_exp,
-        slopes_exp,
-        slope_coefs_exp,
-        surf_coefs_exp,
-        u_design_exp,
-        u_fit_exp,
-    )
+    return (surface, v_surf_int_pts_exp, slopes_exp, slope_coefs_exp, surf_coefs_exp, u_design_exp, u_fit_exp)
 
 
 if __name__ == '__main__':

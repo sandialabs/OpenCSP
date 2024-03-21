@@ -32,9 +32,7 @@ class RenderControlVideoTracks:
         self.video_tracks_points_marker = video_tracks_points_marker
         self.video_tracks_points_markersize = video_tracks_points_markersize
         self.video_tracks_points_color = video_tracks_points_color
-        self.video_tracks_label_horizontalalignment = (
-            video_tracks_label_horizontalalignment
-        )
+        self.video_tracks_label_horizontalalignment = video_tracks_label_horizontalalignment
         self.video_tracks_label_verticalalignment = video_tracks_label_verticalalignment
         self.video_tracks_label_fontsize = video_tracks_label_fontsize
         self.video_tracks_label_fontstyle = video_tracks_label_fontstyle
@@ -48,9 +46,7 @@ class RenderControlVideoTracks:
 
 
 def default(color='m'):
-    return RenderControlVideoTracks(
-        video_tracks_points_color=color, video_tracks_label_color=color
-    )
+    return RenderControlVideoTracks(video_tracks_points_color=color, video_tracks_label_color=color)
 
 
 def fast():

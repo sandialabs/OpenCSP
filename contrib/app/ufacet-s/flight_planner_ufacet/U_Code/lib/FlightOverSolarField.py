@@ -12,9 +12,7 @@ class FlightOverSolarField:
     Represents a flight over a solar field, for rendering and analysis.
     """
 
-    def __init__(
-        self, solar_field, flight_plan  # SolarField class object.
-    ):  # FlightPlan class object.
+    def __init__(self, solar_field, flight_plan):  # SolarField class object.  # FlightPlan class object.
         super(FlightOverSolarField, self).__init__()
 
         self.solar_field = solar_field
@@ -34,18 +32,14 @@ class FlightOverSolarField:
 #
 
 
-def draw_flight_over_solar_field(
-    figure_control, flight_over_solar_field, flight_over_solar_field_style, view_spec
-):
+def draw_flight_over_solar_field(figure_control, flight_over_solar_field, flight_over_solar_field_style, view_spec):
     # Assumes that solar field and flight plan are already set up with heliosat configurations, waypoints, etc.
 
     # Construct title.
     title = flight_over_solar_field.flight_plan.name
     name = flight_over_solar_field.flight_plan.short_name
     # Setup figure.
-    fig_record = fm.setup_figure_for_3d_data(
-        figure_control, rca.meters(), view_spec, title=title, name=name
-    )
+    fig_record = fm.setup_figure_for_3d_data(figure_control, rca.meters(), view_spec, title=title, name=name)
     view = fig_record.view
     # Comment.
     fig_record.comment.append(title)

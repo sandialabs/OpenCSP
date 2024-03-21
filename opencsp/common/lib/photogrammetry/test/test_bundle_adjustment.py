@@ -33,16 +33,7 @@ def test_bundle_adjust_points():
     tvecs_in = tvecs.copy()
 
     rvecs_out, tvecs_out, pts_obj_out = ba.bundle_adjust(
-        rvecs_in,
-        tvecs_in,
-        pts_obj,
-        cam_indices,
-        point_indices,
-        pts_img,
-        int_mat,
-        dist_coefs,
-        'points',
-        verbose=True,
+        rvecs_in, tvecs_in, pts_obj, cam_indices, point_indices, pts_img, int_mat, dist_coefs, 'points', verbose=True
     )
 
     np.testing.assert_allclose(rvecs_out, rvecs, atol=1e-6, rtol=0)
@@ -72,16 +63,7 @@ def test_bundle_adjust_camera():
     tvecs_in = tvecs.copy() + np.random.randn(*tvecs.shape) * 0.01
 
     rvecs_out, tvecs_out, pts_obj_out = ba.bundle_adjust(
-        rvecs_in,
-        tvecs_in,
-        pts_obj,
-        cam_indices,
-        point_indices,
-        pts_img,
-        int_mat,
-        dist_coefs,
-        'camera',
-        verbose=True,
+        rvecs_in, tvecs_in, pts_obj, cam_indices, point_indices, pts_img, int_mat, dist_coefs, 'camera', verbose=True
     )
 
     np.testing.assert_allclose(rvecs_out, rvecs, atol=1e-3, rtol=0)

@@ -47,9 +47,7 @@ class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
             )
             del other_iterators[ImageType.PRIMARY]
 
-        self.current_iterators: dict[ImageType, ImagesIterable | ImagesStream] = {
-            ImageType.PRIMARY: None
-        }
+        self.current_iterators: dict[ImageType, ImagesIterable | ImagesStream] = {ImageType.PRIMARY: None}
 
     def __iter__(self):
         self.current_iterators = {}

@@ -87,8 +87,7 @@ def binary_search(
     if len(sorted_list) == 0:
         if err_if_not_equal:
             lt.error_and_raise(
-                RuntimeError,
-                f"Error: in list_tools.binary_search: empty list, can't find search value {search_val}",
+                RuntimeError, f"Error: in list_tools.binary_search: empty list, can't find search value {search_val}"
             )
         return -1, None
 
@@ -112,9 +111,7 @@ def binary_search(
 
     # if split between two values, choose the closer one
     else:
-        if isinstance(sorted_list[left], (int, float, complex)) and not isinstance(
-            sorted_list[left], bool
-        ):
+        if isinstance(sorted_list[left], (int, float, complex)) and not isinstance(sorted_list[left], bool):
             # list instances are numbers, so we can evaluate which is closer
             lv = sorted_list[left]
             rv = sorted_list[right]
@@ -143,10 +140,7 @@ def binary_search(
 
 
 def get_range(
-    data_keys: list[float],
-    data_values: list[_T],
-    key_subset_range: tuple[float, float],
-    exclude_outside_range=False,
+    data_keys: list[float], data_values: list[_T], key_subset_range: tuple[float, float], exclude_outside_range=False
 ) -> tuple[list[float], list[_T]]:
     """Select a subset of the data_keys[] and data_values[], limited to the given key_subset_range.
     Chooses the keys closest to the given range start and end points, inclusively.
@@ -179,9 +173,7 @@ def get_range(
 
     # inclusive only?
     if exclude_outside_range:
-        while (start_idx < len(data_keys)) and (
-            data_keys[start_idx] < key_subset_range[0]
-        ):
+        while (start_idx < len(data_keys)) and (data_keys[start_idx] < key_subset_range[0]):
             start_idx += 1
         while (stop_idx > 0) and (data_keys[stop_idx - 1] > key_subset_range[1]):
             stop_idx -= 1

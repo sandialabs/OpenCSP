@@ -147,27 +147,19 @@ class test_list_tools(unittest.TestCase):
         self.assertEqual(closest_vals_back[0], [4])
         self.assertEqual(closest_vals_back[1], ['e'])
 
-        middle_vals_exclusive = listt.get_range(
-            lvals, tvals, [1.2, 2.8], exclude_outside_range=True
-        )
+        middle_vals_exclusive = listt.get_range(lvals, tvals, [1.2, 2.8], exclude_outside_range=True)
         self.assertEqual(middle_vals_exclusive[0], [2])
         self.assertEqual(middle_vals_exclusive[1], ['c'])
 
-        empty_vals_front = listt.get_range(
-            lvals, tvals, [-100, -1], exclude_outside_range=True
-        )
+        empty_vals_front = listt.get_range(lvals, tvals, [-100, -1], exclude_outside_range=True)
         self.assertEqual(len(empty_vals_front[0]), 0)
         self.assertEqual(len(empty_vals_front[1]), 0)
 
-        empty_vals_middle = listt.get_range(
-            lvals, tvals, [0.1, 0.9], exclude_outside_range=True
-        )
+        empty_vals_middle = listt.get_range(lvals, tvals, [0.1, 0.9], exclude_outside_range=True)
         self.assertEqual(len(empty_vals_middle[0]), 0)
         self.assertEqual(len(empty_vals_middle[1]), 0)
 
-        empty_vals_back = listt.get_range(
-            lvals, tvals, [6, 100], exclude_outside_range=True
-        )
+        empty_vals_back = listt.get_range(lvals, tvals, [6, 100], exclude_outside_range=True)
         self.assertEqual(len(empty_vals_back[0]), 0)
         self.assertEqual(len(empty_vals_back[1]), 0)
 
@@ -184,26 +176,8 @@ class test_list_tools(unittest.TestCase):
         self.assertEqual(actual, expected)
 
     def test_natural_sort_strs_nums(self):
-        lvals = [
-            "c_4_c",
-            "c_3_c",
-            "c_3_a",
-            "b_05_b",
-            "b_4_b",
-            "b_0_c",
-            "1_a_2",
-            "1_a_1",
-        ]
-        expected = [
-            "1_a_1",
-            "1_a_2",
-            "b_0_c",
-            "b_4_b",
-            "b_05_b",
-            "c_3_a",
-            "c_3_c",
-            "c_4_c",
-        ]
+        lvals = ["c_4_c", "c_3_c", "c_3_a", "b_05_b", "b_4_b", "b_0_c", "1_a_2", "1_a_1"]
+        expected = ["1_a_1", "1_a_2", "b_0_c", "b_4_b", "b_05_b", "c_3_a", "c_3_c", "c_4_c"]
         actual = listt.natural_sort(lvals)
         self.assertEqual(actual, expected)
 

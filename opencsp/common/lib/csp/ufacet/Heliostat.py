@@ -21,20 +21,14 @@ import opencsp.common.lib.geometry.transform_3d as t3d
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.tool.math_tools as mt
 from opencsp.common.lib.csp.ufacet.Facet import Facet
-from opencsp.common.lib.csp.MirrorParametricRectangular import (
-    MirrorParametricRectangular,
-)
+from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlEnsemble import (
-    RenderControlEnsemble,
-)
-from opencsp.common.lib.render_control.RenderControlHeliostat import (
-    RenderControlHeliostat,
-)
+from opencsp.common.lib.render_control.RenderControlEnsemble import RenderControlEnsemble
+from opencsp.common.lib.render_control.RenderControlHeliostat import RenderControlHeliostat
 from opencsp.common.lib.tool.typing_tools import strict_types
 
 
@@ -114,51 +108,29 @@ class Heliostat(RayTraceable):
         self.top_left_facet: Facet = self.facets[self.facet_dict[str(1)]]
         self.top_right_facet: Facet = self.facets[self.facet_dict[str(num_cols)]]
         self.bottom_right_facet: Facet = self.facets[self.facet_dict[str(num_facets)]]
-        self.bottom_left_facet: Facet = self.facets[
-            self.facet_dict[str(num_facets - num_cols + 1)]
-        ]
+        self.bottom_left_facet: Facet = self.facets[self.facet_dict[str(num_facets - num_cols + 1)]]
 
         # Heliostat Corners [offsets in terms of heliostat's centroid]
         self.top_left_corner_offset = [
-            x + y
-            for x, y in zip(
-                self.top_left_facet.centroid_offset,
-                self.top_left_facet.top_left_corner_offset,
-            )
+            x + y for x, y in zip(self.top_left_facet.centroid_offset, self.top_left_facet.top_left_corner_offset)
         ]
         self.top_right_corner_offset = [
-            x + y
-            for x, y in zip(
-                self.top_right_facet.centroid_offset,
-                self.top_right_facet.top_right_corner_offset,
-            )
+            x + y for x, y in zip(self.top_right_facet.centroid_offset, self.top_right_facet.top_right_corner_offset)
         ]
         self.bottom_right_corner_offset = [
             x + y
-            for x, y in zip(
-                self.bottom_right_facet.centroid_offset,
-                self.bottom_right_facet.bottom_right_corner_offset,
-            )
+            for x, y in zip(self.bottom_right_facet.centroid_offset, self.bottom_right_facet.bottom_right_corner_offset)
         ]
         self.bottom_left_corner_offset = [
             x + y
-            for x, y in zip(
-                self.bottom_left_facet.centroid_offset,
-                self.bottom_left_facet.bottom_left_corner_offset,
-            )
+            for x, y in zip(self.bottom_left_facet.centroid_offset, self.bottom_left_facet.bottom_left_corner_offset)
         ]
 
         # Centroid
-        self.origin = np.array(
-            [origin[0], origin[1], origin[2]]
-        )  # Origin is at torque tube center.
+        self.origin = np.array([origin[0], origin[1], origin[2]])  # Origin is at torque tube center.
 
-        self.az = np.deg2rad(
-            180
-        )  # (az,el) = (180,90) degrees corresponds to pointing straight up,
-        self.el = np.deg2rad(
-            90
-        )  # as if transitioned by tilting up from face south orientation.
+        self.az = np.deg2rad(180)  # (az,el) = (180,90) degrees corresponds to pointing straight up,
+        self.el = np.deg2rad(90)  # as if transitioned by tilting up from face south orientation.
         self.surface_normal = [0, 0, 1]  #
         self.rx_rotation = np.identity(3)
         self.rz_rotation = np.identity(3)
@@ -166,8 +138,12 @@ class Heliostat(RayTraceable):
         # self._set_corner_positions_in_space()
 
         # Tracking
-        self._aimpoint_xyz = None  # (x,y,y) in m. Do not access this member externally; use aimpoint_xyz() function instead.
-        self._when_ymdhmsz = None  # (y,m,d,h,m,s,z). Do not access this member externally; use when_ymdhmsz() function instead.
+        self._aimpoint_xyz = (
+            None  # (x,y,y) in m. Do not access this member externally; use aimpoint_xyz() function instead.
+        )
+        self._when_ymdhmsz = (
+            None  # (y,m,d,h,m,s,z). Do not access this member externally; use when_ymdhmsz() function instead.
+        )
 
         # SET POSITION IN SPACE
         self.set_position_in_space(self.origin, self.rotation)
@@ -177,18 +153,14 @@ class Heliostat(RayTraceable):
     @property
     def aimpoint_xyz(self):
         if self._aimpoint_xyz == None:
-            print(
-                'ERROR: In Heliostat.aimpoint_xyz(), attempt to fetch unset _aimpoint_xyz.'
-            )
+            print('ERROR: In Heliostat.aimpoint_xyz(), attempt to fetch unset _aimpoint_xyz.')
             assert False
         return self._aimpoint_xyz
 
     @property
     def when_ymdhmsz(self):
         if self._when_ymdhmsz == None:
-            print(
-                'ERROR: In Heliostat.when_ymdhmsz(), attempt to fetch unset _when_ymdhmsz.'
-            )
+            print('ERROR: In Heliostat.when_ymdhmsz(), attempt to fetch unset _when_ymdhmsz.')
             assert False
         return self._when_ymdhmsz
 
@@ -205,16 +177,11 @@ class Heliostat(RayTraceable):
         return ray
 
     def compute_tracking_configuration(
-        self,
-        aimpoint_xyz: list | np.ndarray,
-        location_lon_lat: tuple | list,
-        when_ymdhmsz: tuple,
+        self, aimpoint_xyz: list | np.ndarray, location_lon_lat: tuple | list, when_ymdhmsz: tuple
     ):
         if self.use_center_facet_for_aiming:
             if self.center_facet == None:
-                raise AttributeError(
-                    f"Helisotat (Name: {self.name}) does not have a center facet defined"
-                )
+                raise AttributeError(f"Helisotat (Name: {self.name}) does not have a center facet defined")
 
             # TODO tjlarki: centroid_offset needs to become a Pxyz eventually
             d: float = self.center_facet.centroid_offset[2]
@@ -225,28 +192,19 @@ class Heliostat(RayTraceable):
             h = Pxyz(h_tube)  # Later, add correction for center facet offset.
 
             # Compute heliostat surface normal which tracks the sun to the aimpoint.
-            n = Vxyz(
-                st.tracking_surface_normal_xyz(
-                    h_tube, aimpoint_xyz, location_lon_lat, when_ymdhmsz
-                )
-            ).normalize()
+            n = Vxyz(st.tracking_surface_normal_xyz(h_tube, aimpoint_xyz, location_lon_lat, when_ymdhmsz)).normalize()
 
             # iteratively find the normal vectors that actually
             # take into account the offset to the center facet
             for _ in range(10):
                 n = Vxyz(
                     st.tracking_surface_normal_xyz(
-                        (h + n * d).data.T.flatten(),
-                        aimpoint_xyz,
-                        location_lon_lat,
-                        when_ymdhmsz,
+                        (h + n * d).data.T.flatten(), aimpoint_xyz, location_lon_lat, when_ymdhmsz
                     )
                 ).normalize()
 
             # Compute heliostat configuration.
-            return hc.heliostat_configuration_given_surface_normal_xyz(
-                n.data.T.flatten()
-            )
+            return hc.heliostat_configuration_given_surface_normal_xyz(n.data.T.flatten())
         else:
             # Heliostat centroid coordinates.
             # Coordinates are (x,z) center, z=0 is at torque tube height.
@@ -254,9 +212,7 @@ class Heliostat(RayTraceable):
             h = h_tube  # Later, add correction for center facet offset.
 
             # Compute heliostat surface normal which tracks the sun to the aimpoint.
-            n_xyz = st.tracking_surface_normal_xyz(
-                h, aimpoint_xyz, location_lon_lat, when_ymdhmsz
-            )
+            n_xyz = st.tracking_surface_normal_xyz(h, aimpoint_xyz, location_lon_lat, when_ymdhmsz)
 
             # Compute heliostat configuration.
             return hc.heliostat_configuration_given_surface_normal_xyz(n_xyz)
@@ -276,9 +232,7 @@ class Heliostat(RayTraceable):
             The vector from the center of the sun.
         """
         if self.center_facet == None:
-            raise AttributeError(
-                f"Helisotat (Name: {self.name}) does not have a center facet defined"
-            )
+            raise AttributeError(f"Helisotat (Name: {self.name}) does not have a center facet defined")
 
         # TODO tjlarki: centroid_offset needs to become a Pxyz eventually
         d: float = self.center_facet.centroid_offset[2]
@@ -289,19 +243,13 @@ class Heliostat(RayTraceable):
         h = Pxyz(h_tube)  # Later, add correction for center facet offset.
 
         # Compute heliostat surface normal which tracks the sun to the aimpoint.
-        n = Vxyz(
-            st.tracking_surface_normal_xyz_given_sun_vector(
-                h_tube, aimpoint_xyz, sun_vector
-            )
-        ).normalize()
+        n = Vxyz(st.tracking_surface_normal_xyz_given_sun_vector(h_tube, aimpoint_xyz, sun_vector)).normalize()
 
         # iteratively find the normal vectors that actually
         # take into account the offset to the center facet
         for _ in range(10):
             n = Vxyz(
-                st.tracking_surface_normal_xyz_given_sun_vector(
-                    (h + n * d).data.T.flatten(), aimpoint_xyz, sun_vector
-                )
+                st.tracking_surface_normal_xyz_given_sun_vector((h + n * d).data.T.flatten(), aimpoint_xyz, sun_vector)
             ).normalize()
 
         # Compute heliostat configuration.
@@ -311,12 +259,8 @@ class Heliostat(RayTraceable):
         # ?? TODO RCB -- MAKE THIS SENSITIVE TO INPUT DEFINITION.
         NSTTF = True
         if NSTTF:
-            azimuth = np.deg2rad(
-                270.0
-            )  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
-            elevation = np.deg2rad(
-                -85.0
-            )  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
+            azimuth = np.deg2rad(270.0)  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
+            elevation = np.deg2rad(-85.0)  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
         else:
             # ?? TODO RCB -- FOR NOW, ASSUME RADIAL STOW.  MAKE CONTROLLABLE.
             origin_x = self.origin[0]
@@ -333,12 +277,8 @@ class Heliostat(RayTraceable):
         # ?? TODO RCB -- MAKE THIS SENSITIVE TO INPUT DEFINITION.
         NSTTF = True
         if NSTTF:
-            azimuth = np.deg2rad(
-                180.0
-            )  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
-            elevation = np.deg2rad(
-                90.0
-            )  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
+            azimuth = np.deg2rad(180.0)  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
+            elevation = np.deg2rad(90.0)  # ?? SCAFFOLDING RCB -- FIND OUT THE CORRECT NUMBER FOR THIS.
         else:
             # ?? TODO RCB -- FOR NOW, ASSUME RADIAL STOW.  MAKE CONTROLLABLE.
             origin_x = self.origin[0]
@@ -355,12 +295,7 @@ class Heliostat(RayTraceable):
         """Returns the list of corners in ul,ur,lr,ll order."""
         # Assumes that heliostat coordinates have been set, and the corners have been set.
         # Later we can add a more meaningful check for this.
-        return [
-            self.top_left_corner,
-            self.top_right_corner,
-            self.bottom_right_corner,
-            self.bottom_left_corner,
-        ]
+        return [self.top_left_corner, self.top_right_corner, self.bottom_right_corner, self.bottom_left_corner]
 
     def get_configuration(self):
         return hc.HeliostatConfiguration(self.az, self.el)
@@ -368,9 +303,7 @@ class Heliostat(RayTraceable):
     # CANTING MODIFICATION
 
     # TODO tjlarki: clean up surface normal code
-    def set_canting_from_equation(
-        self, func: Callable[[float, float], float], move_centriods: bool = False
-    ) -> None:
+    def set_canting_from_equation(self, func: Callable[[float, float], float], move_centriods: bool = False) -> None:
         """
         Uses an equation to set the canting of the facets on the heliostat.
 
@@ -465,9 +398,7 @@ class Heliostat(RayTraceable):
         # self.set_configuration(current_configuration)
         # self.update_position_in_space()
 
-    def set_off_axis_canting(
-        self, long_lat: tuple, aimpoint: Pxyz, time_ymdhmsz: tuple
-    ):
+    def set_off_axis_canting(self, long_lat: tuple, aimpoint: Pxyz, time_ymdhmsz: tuple):
         # we need the Rotation R1 (canting rotation)
         # we will call the heliostat roation R2
         # R2 * R1 = R (total rotation)
@@ -493,18 +424,14 @@ class Heliostat(RayTraceable):
         for facet in self.facets:
             # facet_aiming_direction = up_vector.rotate(facet.composite_rotation)
             vector_the_normal_should_be = Vxyz(
-                st.tracking_surface_normal_xyz(
-                    facet.origin, aimpoint_xyz, long_lat, time_ymdhmsz
-                )
+                st.tracking_surface_normal_xyz(facet.origin, aimpoint_xyz, long_lat, time_ymdhmsz)
             )
             R1_prime = heliostat_aiming_direction.align_to(vector_the_normal_should_be)
             facet.canting = copy.deepcopy(R2_inv * R1_prime * R2)
         self.set_configuration(current_configuration)
         self.update_position_in_space()
 
-    def rodrigues_vector_from_partial_derivatives(
-        self, dfdx_n: float, dfdy_n: float
-    ) -> np.ndarray:
+    def rodrigues_vector_from_partial_derivatives(self, dfdx_n: float, dfdy_n: float) -> np.ndarray:
         """
         Constructs a Rodrigues vector from partial derivatives of a surface normal that is
         pointing nearly straight up.
@@ -521,9 +448,7 @@ class Heliostat(RayTraceable):
         if (dfdx_n == 0) and (dfdy_n == 0):
             # Then the surface normal is vertical, and there is no rotation.
             # TODO:  THIS SHOULD RETURN AN ACTUAL Vxyz.
-            return np.array(
-                [0.0, 0.0, 0.0]
-            )  # Zero magnitude implies zero rotation; direction doesn't matter.
+            return np.array([0.0, 0.0, 0.0])  # Zero magnitude implies zero rotation; direction doesn't matter.
 
         else:
             # There is a rotation.
@@ -535,9 +460,7 @@ class Heliostat(RayTraceable):
             v_norm = np.linalg.norm(v)
             if v_norm == 0.0:
                 # TODO RCB: REPLACE THIS WITH LOG/EXCEPTION THROW.
-                print(
-                    'ERROR: In Heliostat.set_canting_from_equation(), encountered unexpected zero v_norm.'
-                )
+                print('ERROR: In Heliostat.set_canting_from_equation(), encountered unexpected zero v_norm.')
                 print('         x_vec = ', x_vec)
                 print('         y_vec = ', y_vec)
                 assert False
@@ -549,18 +472,14 @@ class Heliostat(RayTraceable):
             v_rot_norm = np.linalg.norm(v_rot)
             if v_rot_norm == 0.0:
                 # TODO RCB: REPLACE THIS WITH LOG/EXCEPTION THROW.
-                print(
-                    'ERROR: In Heliostat.set_canting_from_equation(), encountered unexpected zero v_rot_norm.'
-                )
+                print('ERROR: In Heliostat.set_canting_from_equation(), encountered unexpected zero v_rot_norm.')
                 print('         u = ', u)
                 print('         v_rot = ', v_rot)
                 assert False
 
             u_rot = v_rot / v_rot_norm  # axis of rotation normalized
 
-            theta_rot = -mt.robust_arccos(
-                np.dot(u, np.array([0.0, 0.0, 1.0]))
-            )  # angle of rotation
+            theta_rot = -mt.robust_arccos(np.dot(u, np.array([0.0, 0.0, 1.0])))  # angle of rotation
 
             # TODO:  THIS SHOULD RETURN AN ACTUAL Vxyz.
             return theta_rot * u_rot
@@ -596,16 +515,12 @@ class Heliostat(RayTraceable):
     def set_tracking(self, aimpoint_xyz, location_lon_lat, when_ymdhmsz):
         # checks
         if len(location_lon_lat) != 2:
-            raise ValueError(
-                f'{location_lon_lat} must be of length 2. (Lattitude, Longitude)'
-            )
+            raise ValueError(f'{location_lon_lat} must be of length 2. (Lattitude, Longitude)')
         # Save tracking command.
         self._aimpoint_xyz = aimpoint_xyz
         self._when_ymdhmsz = when_ymdhmsz
         # Set tracking configuration.
-        h_config = self.compute_tracking_configuration(
-            aimpoint_xyz, location_lon_lat, when_ymdhmsz
-        )
+        h_config = self.compute_tracking_configuration(aimpoint_xyz, location_lon_lat, when_ymdhmsz)
         self.set_configuration(h_config, clear_tracking=False)
 
     @strict_types
@@ -614,9 +529,7 @@ class Heliostat(RayTraceable):
         # Save tracking command.
         self._aimpoint_xyz = aimpoint_xyz
         # Set tracking configuration.
-        h_config = self.compute_tracking_configuration_from_sun_vector(
-            aimpoint_xyz, sun_vector
-        )
+        h_config = self.compute_tracking_configuration_from_sun_vector(aimpoint_xyz, sun_vector)
         self.set_configuration(h_config, clear_tracking=False)
 
     def set_stow(self):
@@ -627,9 +540,7 @@ class Heliostat(RayTraceable):
         h_config = self.compute_face_up_configuration()
         self.set_configuration(h_config, clear_tracking=True)
 
-    def set_configuration(
-        self, h_config: hc.HeliostatConfiguration, clear_tracking=True
-    ):
+    def set_configuration(self, h_config: hc.HeliostatConfiguration, clear_tracking=True):
         # TODO is this function safe to call multiple times? For example to update with small sun tracking changes.
         # Clear tracking command.
         if clear_tracking:
@@ -663,13 +574,9 @@ class Heliostat(RayTraceable):
         vector_offset = hel_rotation.apply(vector)
 
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO tjlarki: Line below is confusing to me
-        origin = (
-            np.array(self.origin) + vector_offset
-        )  # Origin is at torque tube center.
+        origin = np.array(self.origin) + vector_offset  # Origin is at torque tube center.
 
-        self.surface_normal = hel_rotation.apply(
-            [0, 0, 1]
-        )  # Before rotation, heliostat is face up.
+        self.surface_normal = hel_rotation.apply([0, 0, 1])  # Before rotation, heliostat is face up.
 
         self.el = el
         self.az = az
@@ -711,9 +618,7 @@ class Heliostat(RayTraceable):
         after any function decorated with it."""
         ...
 
-    def update_position_in_space(
-        self,
-    ):  # TODO tjlarki: should this be in the RayTraceable object?
+    def update_position_in_space(self):  # TODO tjlarki: should this be in the RayTraceable object?
         """updates the heliostat position in space, and all RayTracables
         contained in self"""
         self.set_position_in_space(self.origin, self.rotation)
@@ -727,16 +632,10 @@ class Heliostat(RayTraceable):
 
     # RENDERING
 
-    def draw(
-        self,
-        view: View3d,
-        heliostat_styles: RenderControlHeliostat | RenderControlEnsemble = None,
-    ):
+    def draw(self, view: View3d, heliostat_styles: RenderControlHeliostat | RenderControlEnsemble = None):
         # Assumes that heliostat configuration has already been set.
         if heliostat_styles == None:
-            heliostat_styles = RenderControlEnsemble(
-                default_style=rch.mirror_surfaces()
-            )
+            heliostat_styles = RenderControlEnsemble(default_style=rch.mirror_surfaces())
 
         # Fetch draw style control.
         heliostat_style = heliostat_styles.style(self.name)
@@ -747,12 +646,7 @@ class Heliostat(RayTraceable):
 
         # Outline.
         if heliostat_style.draw_outline:
-            corners = [
-                self.top_left_corner,
-                self.top_right_corner,
-                self.bottom_right_corner,
-                self.bottom_left_corner,
-            ]
+            corners = [self.top_left_corner, self.top_right_corner, self.bottom_right_corner, self.bottom_left_corner]
             view.draw_xyz_list(corners, close=True, style=heliostat_style.outline_style)
 
         # Facets.
@@ -763,31 +657,19 @@ class Heliostat(RayTraceable):
         # Surface normal.
         if heliostat_style.draw_surface_normal:
             # Construct ray.
-            surface_normal_ray = self.surface_normal_ray(
-                self.origin, heliostat_style.surface_normal_length
-            )
+            surface_normal_ray = self.surface_normal_ray(self.origin, heliostat_style.surface_normal_length)
             # Draw ray and its base.
             view.draw_xyz(self.origin, style=heliostat_style.surface_normal_base_style)
-            view.draw_xyz_list(
-                surface_normal_ray, style=heliostat_style.surface_normal_style
-            )
+            view.draw_xyz_list(surface_normal_ray, style=heliostat_style.surface_normal_style)
 
         # Surface normal drawn at corners.
         # (Not the surface normal at the corner.  Facet curvature is not shown.)
         if heliostat_style.draw_surface_normal_at_corners:
             # Construct rays.
-            top_left_ray = self.surface_normal_ray(
-                self.top_left_corner, heliostat_style.corner_normal_length
-            )
-            top_right_ray = self.surface_normal_ray(
-                self.top_right_corner, heliostat_style.corner_normal_length
-            )
-            bottom_left_ray = self.surface_normal_ray(
-                self.bottom_left_corner, heliostat_style.corner_normal_length
-            )
-            bottom_right_ray = self.surface_normal_ray(
-                self.bottom_right_corner, heliostat_style.corner_normal_length
-            )
+            top_left_ray = self.surface_normal_ray(self.top_left_corner, heliostat_style.corner_normal_length)
+            top_right_ray = self.surface_normal_ray(self.top_right_corner, heliostat_style.corner_normal_length)
+            bottom_left_ray = self.surface_normal_ray(self.bottom_left_corner, heliostat_style.corner_normal_length)
+            bottom_right_ray = self.surface_normal_ray(self.bottom_right_corner, heliostat_style.corner_normal_length)
             rays = [top_left_ray, top_right_ray, bottom_left_ray, bottom_right_ray]
             # Draw each ray and its base.
             for base, ray in zip(corners, rays):
@@ -798,9 +680,7 @@ class Heliostat(RayTraceable):
         if heliostat_style.draw_name:
             view.draw_xyz_text(self.origin, self.name, style=heliostat_style.name_style)
 
-    def survey_of_points(
-        self, resolution, random_dist: bool = False
-    ) -> tuple[Pxyz, Vxyz]:
+    def survey_of_points(self, resolution, random_dist: bool = False) -> tuple[Pxyz, Vxyz]:
         """
         Returns a grid of equispaced points and the normal vectors at those points.
 
@@ -817,9 +697,7 @@ class Heliostat(RayTraceable):
         points = Pxyz.empty()
         normals = Vxyz.empty()
         for facet in self.facets:
-            additional_points, additional_normals = facet.survey_of_points(
-                resolution, random_dist
-            )
+            additional_points, additional_normals = facet.survey_of_points(resolution, random_dist)
             points = points.concatenate(additional_points)
             normals = normals.concatenate(additional_normals)
 
@@ -862,13 +740,9 @@ def h_from_facet_centroids(
     default_mirror_shape: Callable[[float, float], float] = lambda x, y: x * 0,
 ) -> 'Heliostat':
     # Facets
-    facets, _ = facets_read_file(
-        file_centroids_offsets, facet_height, facet_width, default_mirror_shape
-    )
+    facets, _ = facets_read_file(file_centroids_offsets, facet_height, facet_width, default_mirror_shape)
 
-    return Heliostat(
-        name, origin, num_facets, num_rows, num_cols, facets, pivot_height, pivot_offset
-    )
+    return Heliostat(name, origin, num_facets, num_rows, num_cols, facets, pivot_height, pivot_offset)
 
 
 # TODO tjlarki: update this to be a class method

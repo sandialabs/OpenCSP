@@ -41,9 +41,7 @@ class KeyFrameTrackSearch:
         specifications: any,  # heliostat design specifications
         input_frame_dir: str,  # directory containing input frame images
         input_frame_id_format: str,  # How to turn frame id numbers into strings. Ex: "06d"
-        all_frame_body_ext_list: list[
-            str
-        ],  # Full path of all the frames to be processed
+        all_frame_body_ext_list: list[str],  # Full path of all the frames to be processed
         output_construction_dir: str,  # Output directory to store results into
         # Render control.
         draw_track_images: bool,  # Also output the human-consumable images
@@ -67,51 +65,37 @@ class KeyFrameTrackSearch:
         self.draw_track_images = draw_track_images
 
         # Tracking exit control.
-        self.minimum_fraction_of_confirmed_corners = (
-            MINIMUM_FRACTION_OF_CONFIRMED_CORNERS
-        )
+        self.minimum_fraction_of_confirmed_corners = MINIMUM_FRACTION_OF_CONFIRMED_CORNERS
         self.minimum_corners_required_inside_frame = math.ceil(
-            MINIMUM_CORNERS_REQUIRED_INSIDE_FRAME
-            * self.specifications.corners_per_heliostat
+            MINIMUM_CORNERS_REQUIRED_INSIDE_FRAME * self.specifications.corners_per_heliostat
         )
 
         # Heliostat shape.
         self.corners3d = self.specifications.facets_corners
 
         # Extact key frame information.
-        self.sorted_key_frame_ids = (
-            key_frame_projected_corners_fnxl.sorted_frame_id_list()
-        )
+        self.sorted_key_frame_ids = key_frame_projected_corners_fnxl.sorted_frame_id_list()
         self.key_frame_id_1 = self.sorted_key_frame_ids[0]
         self.key_frame_id_2 = self.sorted_key_frame_ids[1]
-        self.key_frame_id_str_1 = upf.frame_id_str_given_frame_id(
-            self.key_frame_id_1, self.input_frame_id_format
+        self.key_frame_id_str_1 = upf.frame_id_str_given_frame_id(self.key_frame_id_1, self.input_frame_id_format)
+        self.key_frame_id_str_2 = upf.frame_id_str_given_frame_id(self.key_frame_id_2, self.input_frame_id_format)
+        self.key_frame_1_projected_list_of_name_xy_lists = key_frame_projected_corners_fnxl.list_of_name_xy_lists(
+            self.key_frame_id_1
         )
-        self.key_frame_id_str_2 = upf.frame_id_str_given_frame_id(
-            self.key_frame_id_2, self.input_frame_id_format
+        self.key_frame_2_projected_list_of_name_xy_lists = key_frame_projected_corners_fnxl.list_of_name_xy_lists(
+            self.key_frame_id_2
         )
-        self.key_frame_1_projected_list_of_name_xy_lists = (
-            key_frame_projected_corners_fnxl.list_of_name_xy_lists(self.key_frame_id_1)
+        self.key_frame_1_confirmed_list_of_name_xy_lists = key_frame_confirmed_corners_fnxl.list_of_name_xy_lists(
+            self.key_frame_id_1
         )
-        self.key_frame_2_projected_list_of_name_xy_lists = (
-            key_frame_projected_corners_fnxl.list_of_name_xy_lists(self.key_frame_id_2)
+        self.key_frame_2_confirmed_list_of_name_xy_lists = key_frame_confirmed_corners_fnxl.list_of_name_xy_lists(
+            self.key_frame_id_2
         )
-        self.key_frame_1_confirmed_list_of_name_xy_lists = (
-            key_frame_confirmed_corners_fnxl.list_of_name_xy_lists(self.key_frame_id_1)
-        )
-        self.key_frame_2_confirmed_list_of_name_xy_lists = (
-            key_frame_confirmed_corners_fnxl.list_of_name_xy_lists(self.key_frame_id_2)
-        )
-        self.heliostat_names = [
-            name_xy_list[0]
-            for name_xy_list in self.key_frame_1_projected_list_of_name_xy_lists
-        ]
+        self.heliostat_names = [name_xy_list[0] for name_xy_list in self.key_frame_1_projected_list_of_name_xy_lists]
 
         # Create output directory for frame figures.
         # Projected.
-        self.output_projected_corners_dir = os.path.join(
-            self.output_construction_dir, 'projected'
-        )
+        self.output_projected_corners_dir = os.path.join(self.output_construction_dir, 'projected')
         self.output_frame_projected_corners_dir = os.path.join(
             self.output_projected_corners_dir, self.key_frame_id_str_1
         )
@@ -122,9 +106,7 @@ class KeyFrameTrackSearch:
         if self.draw_track_images:
             ft.create_directories_if_necessary(self.output_frame_projected_corners_dir)
         # Confirmed.
-        self.output_confirmed_corners_dir = os.path.join(
-            self.output_construction_dir, 'confirmed'
-        )
+        self.output_confirmed_corners_dir = os.path.join(self.output_construction_dir, 'confirmed')
         self.output_frame_confirmed_corners_dir = os.path.join(
             self.output_confirmed_corners_dir, self.key_frame_id_str_1
         )
@@ -144,43 +126,30 @@ class KeyFrameTrackSearch:
         self.PredictConfirm(tracking_direction='backward')
 
     def PredictConfirm(self, tracking_direction):
-        print(
-            'In KeyFrameTrackSearch.PredictConfirm(tracking_direction="'
-            + tracking_direction
-            + '")...'
-        )
+        print('In KeyFrameTrackSearch.PredictConfirm(tracking_direction="' + tracking_direction + '")...')
 
         # Build image name list from image file list.
         all_frame_id_str_list = [
-            upf.frame_id_str_given_frame_file_body_ext(body_ext)
-            for body_ext in self.all_frame_body_ext_list
+            upf.frame_id_str_given_frame_file_body_ext(body_ext) for body_ext in self.all_frame_body_ext_list
         ]
         if tracking_direction == 'forward':
             # Velocity is from 1 --> 2.
             velocity, latest_projected_corners = self.velocity_and_initial_corners(
-                self.key_frame_1_projected_list_of_name_xy_lists,
-                self.key_frame_2_projected_list_of_name_xy_lists,
+                self.key_frame_1_projected_list_of_name_xy_lists, self.key_frame_2_projected_list_of_name_xy_lists
             )
             # The image name list proceeds forward from key_frame 1.
-            key_frame_id_str_1_idx = all_frame_id_str_list.index(
-                self.key_frame_id_str_1
-            )
+            key_frame_id_str_1_idx = all_frame_id_str_list.index(self.key_frame_id_str_1)
             frame_id_str_sequence = all_frame_id_str_list[key_frame_id_str_1_idx:]
         elif tracking_direction == 'backward':
             # Velocity is from 2 --> 1.
             velocity, latest_projected_corners = self.velocity_and_initial_corners(
-                self.key_frame_2_projected_list_of_name_xy_lists,
-                self.key_frame_1_projected_list_of_name_xy_lists,
+                self.key_frame_2_projected_list_of_name_xy_lists, self.key_frame_1_projected_list_of_name_xy_lists
             )
             # The image name list proceeds backward from key_frame 2.
             all_frame_id_str_list_reverse = copy.copy(all_frame_id_str_list)
             all_frame_id_str_list_reverse.reverse()
-            key_frame_id_str_2_idx = all_frame_id_str_list_reverse.index(
-                self.key_frame_id_str_2
-            )
-            frame_id_str_sequence = all_frame_id_str_list_reverse[
-                key_frame_id_str_2_idx:
-            ]
+            key_frame_id_str_2_idx = all_frame_id_str_list_reverse.index(self.key_frame_id_str_2)
+            frame_id_str_sequence = all_frame_id_str_list_reverse[key_frame_id_str_2_idx:]
         else:
             raise ValueError(
                 'ERROR: In KeyFrameTrackSearch.PredictConfirm(), unexpected tracking_direction="'
@@ -203,16 +172,10 @@ class KeyFrameTrackSearch:
                 self.key_frame_id_1, self.key_frame_1_confirmed_list_of_name_xy_lists
             )
             self.draw_frame_with_points_if_desired(
-                self.key_frame_id_str_1,
-                self.key_frame_1_projected_list_of_name_xy_lists,
-                'Projected',
-                point_color='g',
+                self.key_frame_id_str_1, self.key_frame_1_projected_list_of_name_xy_lists, 'Projected', point_color='g'
             )
             self.draw_frame_with_points_if_desired(
-                self.key_frame_id_str_1,
-                self.key_frame_1_confirmed_list_of_name_xy_lists,
-                'Confirmed',
-                point_color='b',
+                self.key_frame_id_str_1, self.key_frame_1_confirmed_list_of_name_xy_lists, 'Confirmed', point_color='b'
             )
             # Key frame 2.
             self.key_frame_projected_track_fnxl.add_list_of_name_xy_lists(
@@ -238,9 +201,7 @@ class KeyFrameTrackSearch:
         for frame_id_str in frame_id_str_sequence[2:]:
             # print('In KeyFrameTrackSearch.PredictConfirm(), for key_frame_id='+self.key_frame_id_str_1+', '+str(tracking_direction)+' tracking corners into image: '+frame_id_str)
             img = None
-            frame_body_ext = upf.frame_file_body_ext_given_frame_id_str(
-                self.input_video_body, frame_id_str
-            )
+            frame_body_ext = upf.frame_file_body_ext_given_frame_id_str(self.input_video_body, frame_id_str)
             frame_dir_body_ext = os.path.join(self.input_frame_dir, frame_body_ext)
             if os.path.exists(frame_dir_body_ext):
                 img = cv.imread(frame_dir_body_ext)
@@ -248,7 +209,9 @@ class KeyFrameTrackSearch:
                 print(
                     'In KeyFrameTrackSearch.PredictConfirm(), Unexpected null image encountered.'
                 )  # ?? SCAFFOLDING RCB -- WE DON'T KNOW WHY THIS IS HERE.  CAN THIS HAPPEN?  WHY IS IT ALLOWED?
-                assert False  # ?? SCAFFOLDING RCB -- WE DON'T KNOW WHY THIS IS HERE.  CAN THIS HAPPEN?  WHY IS IT ALLOWED?
+                assert (
+                    False  # ?? SCAFFOLDING RCB -- WE DON'T KNOW WHY THIS IS HERE.  CAN THIS HAPPEN?  WHY IS IT ALLOWED?
+                )
                 skip_flag.append(True)
                 continue
             else:
@@ -262,43 +225,28 @@ class KeyFrameTrackSearch:
                             break
                     for hel_indx in range(0, num_hel):
                         for vel_indx in range(0, len(velocity[hel_indx])):
-                            new_vel = [
-                                velocity[hel_indx][vel_indx][0] * cnt,
-                                velocity[hel_indx][vel_indx][1] * cnt,
-                            ]
+                            new_vel = [velocity[hel_indx][vel_indx][0] * cnt, velocity[hel_indx][vel_indx][1] * cnt]
                             velocity[hel_indx][vel_indx] = new_vel
 
             """Edge Detection based on Image"""
             img = cv.GaussianBlur(img, (5, 5), 0)
             cnt = 0
 
-            projected_list_of_name_xy_lists = (
-                []
-            )  # For adding to the FrameNameXyList object.
-            confirmed_list_of_name_xy_lists = (
-                []
-            )  # For adding to the FrameNameXyList object.
+            projected_list_of_name_xy_lists = []  # For adding to the FrameNameXyList object.
+            confirmed_list_of_name_xy_lists = []  # For adding to the FrameNameXyList object.
             for hel_indx in range(0, num_hel):
                 if stop_track_flags[hel_indx]:
                     continue
                 """Predict Corners"""
-                predicted_corners = self.predict_corners(
-                    velocity, latest_projected_corners, hel_indx
-                )
-                n_inside = self.number_of_predicted_corners_inside_frame(
-                    img, predicted_corners
-                )
+                predicted_corners = self.predict_corners(velocity, latest_projected_corners, hel_indx)
+                n_inside = self.number_of_predicted_corners_inside_frame(img, predicted_corners)
                 # print('In KeyFrameTrackSearch.PredictConfirm(), n_inside =', n_inside, ';  self.minimum_corners_required_inside_frame =', self.minimum_corners_required_inside_frame)
                 if n_inside < self.minimum_corners_required_inside_frame:
                     """ending criterion"""
                     stop_track_flags[hel_indx] = True
                     continue
                 """Confirm Corners"""
-                (
-                    projected_corners,
-                    confirmed_corners,
-                    num_non_None_confirmed_corners,
-                ) = self.confirm_corners(
+                (projected_corners, confirmed_corners, num_non_None_confirmed_corners) = self.confirm_corners(
                     img,
                     predicted_corners,
                     iterations=self.iterations,
@@ -332,32 +280,20 @@ class KeyFrameTrackSearch:
 
             # Add to FrameNameXyList objects.
             self.key_frame_projected_track_fnxl.add_list_of_name_xy_lists(
-                upf.frame_id_given_frame_id_str(frame_id_str),
-                projected_list_of_name_xy_lists,
+                upf.frame_id_given_frame_id_str(frame_id_str), projected_list_of_name_xy_lists
             )
             self.key_frame_confirmed_track_fnxl.add_list_of_name_xy_lists(
-                upf.frame_id_given_frame_id_str(frame_id_str),
-                confirmed_list_of_name_xy_lists,
+                upf.frame_id_given_frame_id_str(frame_id_str), confirmed_list_of_name_xy_lists
             )
             # Draw.
             self.draw_frame_with_points_if_desired_aux(
-                img,
-                frame_id_str,
-                projected_list_of_name_xy_lists,
-                'Projected',
-                point_color='m',
+                img, frame_id_str, projected_list_of_name_xy_lists, 'Projected', point_color='m'
             )
             self.draw_frame_with_points_if_desired_aux(
-                img,
-                frame_id_str,
-                confirmed_list_of_name_xy_lists,
-                'Confirmed',
-                point_color='c',
+                img, frame_id_str, confirmed_list_of_name_xy_lists, 'Confirmed', point_color='c'
             )
 
-    def velocity_and_initial_corners(
-        self, key_frame_A_list_of_name_xy_lists, key_frame_B_list_of_name_xy_lists
-    ):
+    def velocity_and_initial_corners(self, key_frame_A_list_of_name_xy_lists, key_frame_B_list_of_name_xy_lists):
         """
         Motion is from A --> B.
         Reurns point-by-point velocity vector in image coordinates, and also the set of points
@@ -365,9 +301,7 @@ class KeyFrameTrackSearch:
         """
         velocity = []
         latest_projected_corners = []
-        for name_xy_list_A, name_xy_list_B in zip(
-            key_frame_A_list_of_name_xy_lists, key_frame_B_list_of_name_xy_lists
-        ):
+        for name_xy_list_A, name_xy_list_B in zip(key_frame_A_list_of_name_xy_lists, key_frame_B_list_of_name_xy_lists):
             name_A = name_xy_list_A[0]
             xy_list_A = name_xy_list_A[1]
             name_B = name_xy_list_B[0]
@@ -392,32 +326,17 @@ class KeyFrameTrackSearch:
         return velocity, latest_projected_corners
 
     def draw_frame_with_points_if_desired(
-        self,
-        frame_id_str,
-        list_of_name_xy_lists,
-        Confirmed_or_Projected_str,
-        point_color,
+        self, frame_id_str, list_of_name_xy_lists, Confirmed_or_Projected_str, point_color
     ):
         if self.draw_track_images:
-            frame_body_ext = upf.frame_file_body_ext_given_frame_id_str(
-                self.input_video_body, frame_id_str
-            )
+            frame_body_ext = upf.frame_file_body_ext_given_frame_id_str(self.input_video_body, frame_id_str)
             img = cv.imread(os.path.join(self.input_frame_dir, frame_body_ext))
             self.draw_frame_with_points_if_desired_aux(
-                img,
-                frame_id_str,
-                list_of_name_xy_lists,
-                Confirmed_or_Projected_str,
-                point_color,
+                img, frame_id_str, list_of_name_xy_lists, Confirmed_or_Projected_str, point_color
             )
 
     def draw_frame_with_points_if_desired_aux(
-        self,
-        img,
-        frame_id_str,
-        list_of_name_xy_lists,
-        Confirmed_or_Projected_str,
-        point_color,
+        self, img, frame_id_str, list_of_name_xy_lists, Confirmed_or_Projected_str, point_color
     ):
         if self.draw_track_images:
             plt.figure()
@@ -434,12 +353,7 @@ class KeyFrameTrackSearch:
                 + frame_id_str
             )
             fig_file_body_ext = (
-                self.input_video_body
-                + '_'
-                + frame_id_str
-                + '_'
-                + Confirmed_or_Projected_str.lower()
-                + '.png'
+                self.input_video_body + '_' + frame_id_str + '_' + Confirmed_or_Projected_str.lower() + '.png'
             )
             if Confirmed_or_Projected_str == 'Projected':
                 figure_output_dir = self.output_frame_projected_corners_dir
@@ -462,18 +376,12 @@ class KeyFrameTrackSearch:
         velocity = velocity[hel_indx]
         latest_projected_corners = latest_projected_corners[hel_indx]
         for corner_indx in range(0, len(latest_projected_corners)):
-            pred_col = (
-                latest_projected_corners[corner_indx][0] + velocity[corner_indx][0]
-            )
-            pred_row = (
-                latest_projected_corners[corner_indx][1] + velocity[corner_indx][1]
-            )
+            pred_col = latest_projected_corners[corner_indx][0] + velocity[corner_indx][0]
+            pred_row = latest_projected_corners[corner_indx][1] + velocity[corner_indx][1]
             predicted_corners.append([pred_col, pred_row])
         return predicted_corners
 
-    def update_velocity(
-        self, velocity, predicted_corners, confirmed_corners, hel_indx, skip_flag
-    ):
+    def update_velocity(self, velocity, predicted_corners, confirmed_corners, hel_indx, skip_flag):
         previous_velocity = velocity[hel_indx]
         deltas_adjust = []
         for conf_corner, pred_corner in zip(confirmed_corners, predicted_corners):
@@ -498,10 +406,7 @@ class KeyFrameTrackSearch:
                 else:
                     break
             for vel_indx in range(0, len(new_velocity)):
-                new_velocity[vel_indx] = [
-                    new_velocity[vel_indx][0] / cnt,
-                    new_velocity[vel_indx][1] / cnt,
-                ]
+                new_velocity[vel_indx] = [new_velocity[vel_indx][0] / cnt, new_velocity[vel_indx][1] / cnt]
 
         return new_velocity
 
@@ -516,37 +421,18 @@ class KeyFrameTrackSearch:
         return cnt
 
     def confirm_corners(
-        self,
-        img,
-        predicted_corners,
-        canny_levels,
-        iterations,
-        confirm_type='',
-        tolerance=3,
-        pixels=100,
+        self, img, predicted_corners, canny_levels, iterations, confirm_type='', tolerance=3, pixels=100
     ):
         def confirm_facets(expected_corners, edges, tolerance, pixels):
             confirmed_facets = {}
-            for indx in range(
-                0, len(expected_corners), self.specifications.corners_per_facet
-            ):
+            for indx in range(0, len(expected_corners), self.specifications.corners_per_facet):
                 facet_id = indx // self.specifications.corners_per_facet
-                corners = [
-                    expected_corners[indx + i]
-                    for i in range(0, self.specifications.corners_per_facet)
-                ]
+                corners = [expected_corners[indx + i] for i in range(0, self.specifications.corners_per_facet)]
                 for corner_indx in range(0, len(corners)):
                     corner = corners[corner_indx]
-                    if (
-                        corner[0] >= max_col
-                        or corner[0] < 0
-                        or corner[1] >= max_row
-                        or corner[1] < 0
-                    ):
+                    if corner[0] >= max_col or corner[0] < 0 or corner[1] >= max_row or corner[1] < 0:
                         corners[corner_indx] = None
-                confirmed_facets[facet_id] = {
-                    'edges': confirm_facet_edges(corners, edges, tolerance, pixels)
-                }
+                confirmed_facets[facet_id] = {'edges': confirm_facet_edges(corners, edges, tolerance, pixels)}
             return confirmed_facets
 
         def confirm_facet_edges(corners, edges, tolerance, pixels):
@@ -562,9 +448,7 @@ class KeyFrameTrackSearch:
                 A, B, C = find_hom_line_2points(corner1, corner2)
                 if A is None:
                     continue
-                min_col, max_col, min_row, max_row = min_max_col_row(
-                    edges, corner1, corner2
-                )
+                min_col, max_col, min_row, max_row = min_max_col_row(edges, corner1, corner2)
                 edge_pixels = []
                 # confirming
                 if indx % 2 == 0:
@@ -590,9 +474,7 @@ class KeyFrameTrackSearch:
             return confirmed_edges
 
         def find_corners(confirmed_facets):
-            hel_corners = [
-                None for _ in range(0, self.specifications.corners_per_heliostat)
-            ]
+            hel_corners = [None for _ in range(0, self.specifications.corners_per_heliostat)]
             for facet_indx, facet in confirmed_facets.items():
                 corners = []
                 edges = facet['edges']
@@ -661,9 +543,7 @@ class KeyFrameTrackSearch:
                         img, canny_type=canny_types[i]
                     )  # ?? SCAFFOLDING RCB -- CHANGE THIS VARIABLE NAME TO "edge_image"
 
-                confirmed_facets = confirm_facets(
-                    expected_corners, edges, tolerance, pixels
-                )
+                confirmed_facets = confirm_facets(expected_corners, edges, tolerance, pixels)
                 confirmed_corners = find_corners(confirmed_facets)
                 flag_break = True
                 flag_less_than_6 = False
@@ -696,9 +576,7 @@ class KeyFrameTrackSearch:
                     dist_coeff=self.dist_coeff,
                 )
 
-                expected_corners, _ = cv.projectPoints(
-                    np.array(corners3d).astype('float32'), rvec, tvec, mtx, dist
-                )
+                expected_corners, _ = cv.projectPoints(np.array(corners3d).astype('float32'), rvec, tvec, mtx, dist)
                 expected_corners = expected_corners.reshape(-1, 2)
                 expected_corners = expected_corners.tolist()
                 previous_expected_corners = expected_corners.copy()

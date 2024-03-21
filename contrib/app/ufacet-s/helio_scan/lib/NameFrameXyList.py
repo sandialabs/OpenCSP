@@ -162,9 +162,7 @@ class NameFrameXyList:
             self.dictionary[hel_name] = copy.deepcopy(input_list_of_frame_xy_lists)
         else:
             existing_list_of_frame_xy_lists = self.dictionary[hel_name]
-            existing_frame_list = [
-                frame_xy_list[0] for frame_xy_list in existing_list_of_frame_xy_lists
-            ]
+            existing_frame_list = [frame_xy_list[0] for frame_xy_list in existing_list_of_frame_xy_lists]
             for input_frame_xy_list in input_list_of_frame_xy_lists:
                 input_frame_xy_list_copy = copy.deepcopy(input_frame_xy_list)
                 input_frame_copy = input_frame_xy_list_copy[0]
@@ -229,9 +227,7 @@ class NameFrameXyList:
             self.dictionary[hel_name] = [copy.deepcopy(input_frame_xy_list)]
         else:
             existing_list_of_frame_xy_lists = self.dictionary[hel_name]
-            existing_frame_list = [
-                frame_xy_list[0] for frame_xy_list in existing_list_of_frame_xy_lists
-            ]
+            existing_frame_list = [frame_xy_list[0] for frame_xy_list in existing_list_of_frame_xy_lists]
             input_frame_xy_list_copy = copy.deepcopy(input_frame_xy_list)
             input_frame_copy = input_frame_xy_list_copy[0]
             input_xy_list_copy = input_frame_xy_list_copy[1]
@@ -277,11 +273,7 @@ class NameFrameXyList:
                             existing_xy_list += input_xy_list_copy
 
     def add_FrameNameXyList(
-        self,
-        input_fnxl,
-        warn_if_common_frame=False,
-        skip_if_common_frame=False,
-        error_if_common_frame=True,
+        self, input_fnxl, warn_if_common_frame=False, skip_if_common_frame=False, error_if_common_frame=True
     ):
         # Walk the input FranemNameXyList, adding data to the current NameFrameXyList.
         for frame_id in input_fnxl.sorted_frame_id_list():
@@ -291,11 +283,7 @@ class NameFrameXyList:
                 xy_list = name_xy_list[1]
                 new_frame_xy_list = [frame_id, xy_list]
                 self.merge_frame_xy_list(
-                    hel_name,
-                    new_frame_xy_list,
-                    warn_if_common_frame,
-                    skip_if_common_frame,
-                    error_if_common_frame,
+                    hel_name, new_frame_xy_list, warn_if_common_frame, skip_if_common_frame, error_if_common_frame
                 )
 
     # READ
@@ -321,10 +309,7 @@ class NameFrameXyList:
         # print('In NameFrameXyList.load(), loading input file: ', input_dir_body_ext)
         # Check if the input file exists.
         if not ft.file_exists(input_dir_body_ext):
-            raise OSError(
-                'In NameFrameXyList.load(), file does not exist: '
-                + str(input_dir_body_ext)
-            )
+            raise OSError('In NameFrameXyList.load(), file does not exist: ' + str(input_dir_body_ext))
         # Open and read the file.
         with open(input_dir_body_ext, newline='') as input_stream:
             reader = csv.reader(input_stream, delimiter=',')
@@ -342,13 +327,9 @@ class NameFrameXyList:
         if n_frames == 0:
             return []
         else:
-            return self.parse_row_list_of_frame_xylists_aux(
-                input_row_remainder[1:], n_frames
-            )
+            return self.parse_row_list_of_frame_xylists_aux(input_row_remainder[1:], n_frames)
 
-    def parse_row_list_of_frame_xylists_aux(
-        self, input_row_list_of_frame_xylists, n_frames
-    ):
+    def parse_row_list_of_frame_xylists_aux(self, input_row_list_of_frame_xylists, n_frames):
         # Fetch this frame_xylist's frame_id and the number of points in its xylist.
         frame_id = int(input_row_list_of_frame_xylists[0])
         n_points = int(input_row_list_of_frame_xylists[1])
@@ -357,10 +338,7 @@ class NameFrameXyList:
         for idx in range(0, n_points):
             idx_x = 2 + (2 * idx)
             idx_y = idx_x + 1
-            vertex_str = [
-                input_row_list_of_frame_xylists[idx_x],
-                input_row_list_of_frame_xylists[idx_y],
-            ]
+            vertex_str = [input_row_list_of_frame_xylists[idx_x], input_row_list_of_frame_xylists[idx_y]]
             x_str = vertex_str[0]
             y_str = vertex_str[1]
             x = float(x_str)
@@ -419,12 +397,7 @@ class NameFrameXyList:
         indent=None,
     ):  # Number of blankss to print at the beginning of each line.
         # Print.
-        dt.print_dict(
-            self.dictionary,
-            max_keys=max_keys,
-            max_value_length=max_value_length,
-            indent=indent,
-        )
+        dt.print_dict(self.dictionary, max_keys=max_keys, max_value_length=max_value_length, indent=indent)
 
 
 # HELPER FUNCTIONS

@@ -39,21 +39,11 @@ def make_aruco_images(save_path: str, number: str, size: int = 500, padding: int
         cv.aruco.drawMarker(dictionary, id_, side_pixels, img[-side_pixels:, :])
 
         # Add padding
-        img = np.pad(
-            img, ((pad_width, pad_width), (pad_width, pad_width)), constant_values=255
-        )
+        img = np.pad(img, ((pad_width, pad_width), (pad_width, pad_width)), constant_values=255)
 
         # Add text
         id_string = f'ID: {id_:d}'
-        cv.putText(
-            img,
-            id_string,
-            (20, side_pixels + 2 * pad_width - 4),
-            0,
-            1,
-            0,
-            font_thickness,
-        )
+        cv.putText(img, id_string, (20, side_pixels + 2 * pad_width - 4), 0, 1, 0, font_thickness)
 
         # Save image
         imageio.imwrite(join(f'{save_path:s}', f'{id_:03d}.png'), img)

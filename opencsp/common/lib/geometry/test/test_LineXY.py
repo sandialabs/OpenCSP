@@ -19,27 +19,7 @@ class TestLineXY(unittest.TestCase):
 
     def test_from_points(self):
         pts = Vxy(
-            [
-                np.arange(16),
-                [
-                    1.1,
-                    2.4,
-                    3.1,
-                    4.6,
-                    5.2,
-                    6.8,
-                    7.3,
-                    8.7,
-                    9.9,
-                    10.3,
-                    11.5,
-                    12.1,
-                    13.8,
-                    14.4,
-                    15.0,
-                    16.5,
-                ],
-            ]
+            [np.arange(16), [1.1, 2.4, 3.1, 4.6, 5.2, 6.8, 7.3, 8.7, 9.9, 10.3, 11.5, 12.1, 13.8, 14.4, 15.0, 16.5]]
         )
 
         with np.testing.assert_raises(ValueError):

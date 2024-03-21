@@ -18,11 +18,7 @@ global_singleprocessing_logger: log.Logger = None
 global_multiprocessing_logger: log.Logger = None
 
 
-def logger(
-    log_dir_body_ext: str = None,
-    level: int = log.INFO,
-    delete_existing_log: bool = True,
-) -> log.Logger:
+def logger(log_dir_body_ext: str = None, level: int = log.INFO, delete_existing_log: bool = True) -> log.Logger:
     """Initialize logging for single-process programs.
 
     Creates a fresh log file, deleting the existing log file if it exists as indicated by delete_existing_log_file.
@@ -129,9 +125,7 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO) -> log.Logger:
         process_name = hn_match.groups()[0] + ":" + process_name
 
     # Set formatter.
-    formatter = log.Formatter(
-        f"[%(asctime)s| %(levelname)s| {process_name}] %(message)s"
-    )
+    formatter = log.Formatter(f"[%(asctime)s| %(levelname)s| {process_name}] %(message)s")
     if log_dir_body_ext is not None:
         handler = log.FileHandler(log_dir_body_ext)
         handler.setFormatter(formatter)
@@ -151,9 +145,7 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO) -> log.Logger:
     return global_multiprocessing_logger
 
 
-def _add_stream_handlers(
-    logger_: log.Logger, level: int, formatter: log.Formatter = None
-) -> None:
+def _add_stream_handlers(logger_: log.Logger, level: int, formatter: log.Formatter = None) -> None:
     """Adds streams to the given logger. Prints
 
     From https://stackoverflow.com/questions/16061641/python-logging-split-between-stdout-and-stderr

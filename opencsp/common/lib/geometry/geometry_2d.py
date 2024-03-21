@@ -18,11 +18,7 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 
 def homogeneous_line(xy1, xy2):
-    warn(
-        'geometry_2d.homogeneous_line is deprecated. Use LineXY instead.',
-        DeprecationWarning,
-        stacklevel=2,
-    )
+    warn('geometry_2d.homogeneous_line is deprecated. Use LineXY instead.', DeprecationWarning, stacklevel=2)
     # Returns homogeneous line coeffcients, in normalized form.
     x1 = xy1[0]
     y1 = xy1[1]
@@ -33,11 +29,7 @@ def homogeneous_line(xy1, xy2):
     C = (x2 * y1) - (x1 * y2)
     n = np.sqrt((A * A) + (B * B))
     if n == 0:
-        print(
-            '\nERROR: In homogeneous_line, degenerate case encountered.',
-            DeprecationWarning,
-            stacklevel=2,
-        )
+        print('\nERROR: In homogeneous_line, degenerate case encountered.', DeprecationWarning, stacklevel=2)
         print('   xy1 =', xy1)
         print('   xy2 =', xy2)
         print('\n')
@@ -50,9 +42,7 @@ def homogeneous_line(xy1, xy2):
 
 def flip_homogeneous_line(line):
     warn(
-        'geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.',
-        DeprecationWarning,
-        stacklevel=2,
+        'geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.', DeprecationWarning, stacklevel=2
     )
     # Reverse the sense of the homogeneous line.
     return [-x for x in line]
@@ -132,11 +122,7 @@ def intersect_lines(line1, line2):
 
 
 def shift_x(ray, dx):
-    warn(
-        'geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.',
-        DeprecationWarning,
-        stacklevel=2,
-    )
+    warn('geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.', DeprecationWarning, stacklevel=2)
     x0 = ray[0][0]
     y0 = ray[0][1]
     x1 = ray[1][0]
@@ -173,9 +159,7 @@ def draw_clip_xy_box(view, clip_xy_box):
     p_max = xy_max[0]
     y_max = xy_max[1]
     xy_list = [[p_min, y_min], [p_max, y_min], [p_max, y_max], [p_min, y_max]]
-    view.draw_pq_list(
-        xy_list, close=True, style=rcps.outline(color='r'), label='Clip Box'
-    )
+    view.draw_pq_list(xy_list, close=True, style=rcps.outline(color='r'), label='Clip Box')
 
 
 def clip_line_to_xy_box(line, clip_xy_box):
@@ -214,9 +198,7 @@ def clip_line_to_xy_box(line, clip_xy_box):
     # Check result.
     if len(clip_points) != 2:
         print(
-            'WARNING: In clip_line_to_xy_box(), unexpected result with ',
-            len(clip_points),
-            ' clip points encountered.',
+            'WARNING: In clip_line_to_xy_box(), unexpected result with ', len(clip_points), ' clip points encountered.'
         )
         print('          line        = ', line)
         print('          clip_xy_box = ', clip_xy_box)
@@ -226,9 +208,7 @@ def clip_line_to_xy_box(line, clip_xy_box):
 
 def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
     warn(
-        'geometry_2d.extend_ray is deprecated. Should be migrated to another library.',
-        DeprecationWarning,
-        stacklevel=2,
+        'geometry_2d.extend_ray is deprecated. Should be migrated to another library.', DeprecationWarning, stacklevel=2
     )
     xy0 = ray[0]
     xy1 = ray[1]
@@ -328,12 +308,7 @@ def best_fit_line_segment_A(xy_seq):
         assert False
     if dx > dy:
         pfit, stats = np.polynomial.Polynomial.fit(
-            x_seq,
-            y_seq,
-            degree,  # linear
-            full=True,
-            window=(x_min, x_max),
-            domain=(x_min, x_max),
+            x_seq, y_seq, degree, full=True, window=(x_min, x_max), domain=(x_min, x_max)  # linear
         )
         b, m = pfit
         x0 = x_min
@@ -399,11 +374,7 @@ def rotate_about_origin(xy, theta):
 
 
 def rotate_about_center(xy, theta, center_xy):
-    warn(
-        'geometry_2d.rotate_about_center is deprecated. Use TransformXY instead.',
-        DeprecationWarning,
-        stacklevel=2,
-    )
+    warn('geometry_2d.rotate_about_center is deprecated. Use TransformXY instead.', DeprecationWarning, stacklevel=2)
     x = xy[0]
     y = xy[1]
     cx = center_xy[0]

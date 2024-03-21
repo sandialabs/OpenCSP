@@ -64,24 +64,17 @@ def draw_demonstration_figures(
         heliostat_name = '5E10'
         # View setup
         fig_record = fm.setup_figure_for_3d_data(
-            figure_control,
-            axis_control_m,
-            view_spec,
-            title=('Heliostat ' + heliostat_name),
+            figure_control, axis_control_m, view_spec, title=('Heliostat ' + heliostat_name)
         )
         view = fig_record.view
         # Configuration setup
         heliostat = solar_field.lookup_heliostat(heliostat_name)
         heliostat.set_configuration(hc.face_south())
         # Style setup
-        heliostat_styles = rce.RenderControlEnsemble(
-            rch.normal_facet_outlines_names(color='b')
-        )
+        heliostat_styles = rce.RenderControlEnsemble(rch.normal_facet_outlines_names(color='b'))
         # Comment
         fig_record.comment.append("Demonstration of heliostat drawing.")
-        fig_record.comment.append(
-            "Facet outlines shown, with facet names and overall heliostat surface normal."
-        )
+        fig_record.comment.append("Facet outlines shown, with facet names and overall heliostat surface normal.")
         # Draw
         heliostat.draw(view, heliostat_styles)
         view.show()
@@ -92,10 +85,7 @@ def draw_demonstration_figures(
         heliostat_name = '5E10'
         # View setup
         fig_record = fm.setup_figure_for_3d_data(
-            figure_control,
-            axis_control_m,
-            view_spec,
-            title=('Heliostat ' + heliostat_name + ', with Highlighting'),
+            figure_control, axis_control_m, view_spec, title=('Heliostat ' + heliostat_name + ', with Highlighting')
         )
         view = fig_record.view
         # Tracking setup
@@ -103,20 +93,14 @@ def draw_demonstration_figures(
         heliostat.set_tracking(aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz)
         # Style setup
         default_heliostat_style = rch.normal_facet_outlines()
-        default_heliostat_style.facet_styles.add_special_name(
-            16, rcf.corner_normals_outline_name(color='c')
-        )
-        default_heliostat_style.facet_styles.add_special_names(
-            [1, 4, 7, 24, 25], rcf.normal_outline(color='r')
-        )
+        default_heliostat_style.facet_styles.add_special_name(16, rcf.corner_normals_outline_name(color='c'))
+        default_heliostat_style.facet_styles.add_special_names([1, 4, 7, 24, 25], rcf.normal_outline(color='r'))
         heliostat_styles = rce.RenderControlEnsemble(default_heliostat_style)
         # Comment
         fig_record.comment.append("Demonstration of example heliostat annotations.")
         fig_record.comment.append("Black:   Facet outlines.")
         fig_record.comment.append("Black:   Overall heliostat surface normal.")
-        fig_record.comment.append(
-            "Red:     Highlighted facets and their surface normals."
-        )
+        fig_record.comment.append("Red:     Highlighted facets and their surface normals.")
         fig_record.comment.append(
             "Cyan:    Highlighted facet with facet name and facet surface normal drawn at corners."
         )
@@ -156,44 +140,30 @@ def draw_demonstration_figures(
             # Draw
             heliostat.draw(view, heliostat_styles)
         # Comment
-        fig_record.comment.append(
-            "Demonstration of various example heliostat drawing modes."
-        )
+        fig_record.comment.append("Demonstration of various example heliostat drawing modes.")
         fig_record.comment.append("Black:   Name only.")
         fig_record.comment.append("Red:     Centroid only.")
         fig_record.comment.append("Green:   Centroid and name.")
         fig_record.comment.append("Blue:    Facet outlines.")
-        fig_record.comment.append(
-            "Cyan:    Overall outline and overall surface normal."
-        )
-        fig_record.comment.append(
-            "Magneta: Overall outline and overall surface normal, drawn at corners."
-        )
+        fig_record.comment.append("Cyan:    Overall outline and overall surface normal.")
+        fig_record.comment.append("Magneta: Overall outline and overall surface normal, drawn at corners.")
         fig_record.comment.append("Green:   Facet outlines and overall surface normal.")
         fig_record.comment.append("Cyan:    Facet outlines and facet surface normals.")
-        fig_record.comment.append(
-            "Black:   Facet outlines and facet surface normals drawn at facet corners."
-        )
+        fig_record.comment.append("Black:   Facet outlines and facet surface normals drawn at facet corners.")
         view.show()
 
     # Solar field heliostat names.
     if draw_solar_field_h_names:
         # View setup
-        fig_record = fm.setup_figure_for_3d_data(
-            figure_control, axis_control_m, view_spec, title='Heliostat Names'
-        )
+        fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, view_spec, title='Heliostat Names')
         view = fig_record.view
         # Tracking setup
         # Not required since we're not drawing heliostat shape.
         # Style setup
         solar_field_style = rcsf.heliostat_names(color='m')
         # Comment
-        fig_record.comment.append(
-            "Heliostat names, drawn at each heliostat's centroid."
-        )
-        fig_record.comment.append(
-            "At NSTTF, centroids appear to be at the midpoint of the torque tube."
-        )
+        fig_record.comment.append("Heliostat names, drawn at each heliostat's centroid.")
+        fig_record.comment.append("At NSTTF, centroids appear to be at the midpoint of the torque tube.")
         # Draw
         solar_field.draw(view, solar_field_style)
         view.show()
@@ -201,9 +171,7 @@ def draw_demonstration_figures(
     # Solar field heliostat centroids.
     if draw_solar_field_h_centroids:
         # View setup
-        fig_record = fm.setup_figure_for_3d_data(
-            figure_control, axis_control_m, view_spec, title='Heliostat Centroids'
-        )
+        fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, view_spec, title='Heliostat Centroids')
         view = fig_record.view
         # Tracking setup
         # Not required since we're not drawing heliostat shape.
@@ -221,10 +189,7 @@ def draw_demonstration_figures(
     if draw_solar_field_h_centroids_names:
         # View setup
         fig_record = fm.setup_figure_for_3d_data(
-            figure_control,
-            axis_control_m,
-            view_spec,
-            title='Heliostat Labelled Centroids',
+            figure_control, axis_control_m, view_spec, title='Heliostat Labelled Centroids'
         )
         view = fig_record.view
         # Tracking setup
@@ -241,23 +206,17 @@ def draw_demonstration_figures(
     # (Plus aim point and legend.)
     if draw_solar_field_h_outlines:
         # View setup
-        fig_record = fm.setup_figure_for_3d_data(
-            figure_control, axis_control_m, view_spec, title='Heliostat Outlines'
-        )
+        fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, view_spec, title='Heliostat Outlines')
         view = fig_record.view
         # Tracking setup
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
         # Style setup
         solar_field_style = rcsf.heliostat_outlines(color='b')
         # Comment
         fig_record.comment.append("A simple way of rendering a solar field.")
         # Draw
         solar_field.draw(view, solar_field_style)
-        view.draw_xyz(
-            aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz'
-        )
+        view.draw_xyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
         view.show()
 
     # Annotated solar field.
@@ -293,31 +252,19 @@ def draw_demonstration_figures(
         )
         view = fig_record.view
         # Configuration setup
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
         solar_field.set_heliostats_configuration(stowed_heliostats, hc.NSTTF_stow())
         synch_configuration = hc.HeliostatConfiguration(az=synch_az, el=synch_el)
-        solar_field.set_heliostats_configuration(
-            synched_heliostats, synch_configuration
-        )
+        solar_field.set_heliostats_configuration(synched_heliostats, synch_configuration)
         up_configuration = hc.HeliostatConfiguration(az=up_az, el=up_el)
         solar_field.set_heliostats_configuration(up_heliostats, up_configuration)
         # Style setup
         solar_field_style = rcsf.heliostat_outlines(color='b')
-        solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, rch.normal_outline(color='c')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            stowed_heliostats, rch.normal_outline(color='r')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            synched_heliostats, rch.normal_outline(color='g')
-        )
+        solar_field_style.heliostat_styles.add_special_names(up_heliostats, rch.normal_outline(color='c'))
+        solar_field_style.heliostat_styles.add_special_names(stowed_heliostats, rch.normal_outline(color='r'))
+        solar_field_style.heliostat_styles.add_special_names(synched_heliostats, rch.normal_outline(color='g'))
         # Comment
-        fig_record.comment.append(
-            "A solar field situation with heliostats in varying status."
-        )
+        fig_record.comment.append("A solar field situation with heliostats in varying status.")
         fig_record.comment.append("Blue heliostats are tracking.")
         fig_record.comment.append("Cyan heliostats are face up.")
         fig_record.comment.append("Red heliostats are in stow (out of service).")
@@ -356,54 +303,25 @@ def draw_demonstration_figures(
             '7E6',
             '7E7',
         ]
-        tracking_heliostats = [
-            '8E1',
-            '8E2',
-            '8E4',
-            '8E6',
-            '8E7',
-            '9E1',
-            '9E2',
-            '9E3',
-            '9E4',
-            '9E5',
-            '9E6',
-            '9E7',
-        ]
+        tracking_heliostats = ['8E1', '8E2', '8E4', '8E6', '8E7', '9E1', '9E2', '9E3', '9E4', '9E5', '9E6', '9E7']
         # View setup
-        fig_record = fm.setup_figure_for_3d_data(
-            figure_control, axis_control_m, view_spec, title='Selected Heliostats'
-        )
+        fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, view_spec, title='Selected Heliostats')
         view = fig_record.view
         # Configuration setup
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
         solar_field.set_heliostats_configuration(stowed_heliostats, hc.NSTTF_stow())
         synch_configuration = hc.HeliostatConfiguration(az=synch_az, el=synch_el)
-        solar_field.set_heliostats_configuration(
-            synched_heliostats, synch_configuration
-        )
+        solar_field.set_heliostats_configuration(synched_heliostats, synch_configuration)
         up_configuration = hc.HeliostatConfiguration(az=up_az, el=up_el)
         solar_field.set_heliostats_configuration(up_heliostats, up_configuration)
         # Style setup
         solar_field_style = rcsf.heliostat_blanks()
-        solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, rch.normal_outline(color='c')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            stowed_heliostats, rch.normal_outline(color='r')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            synched_heliostats, rch.normal_outline(color='g')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            tracking_heliostats, rch.normal_outline(color='b')
-        )
+        solar_field_style.heliostat_styles.add_special_names(up_heliostats, rch.normal_outline(color='c'))
+        solar_field_style.heliostat_styles.add_special_names(stowed_heliostats, rch.normal_outline(color='r'))
+        solar_field_style.heliostat_styles.add_special_names(synched_heliostats, rch.normal_outline(color='g'))
+        solar_field_style.heliostat_styles.add_special_names(tracking_heliostats, rch.normal_outline(color='b'))
         # Comment
-        fig_record.comment.append(
-            "A subset of heliostats selected, so that plot is effectively zoomed in."
-        )
+        fig_record.comment.append("A subset of heliostats selected, so that plot is effectively zoomed in.")
         fig_record.comment.append("Blue heliostats are tracking.")
         fig_record.comment.append("Cyan heliostats are face up.")
         fig_record.comment.append("Red heliostats are in stow (out of service).")
@@ -424,59 +342,39 @@ def draw_demonstration_figures(
         )
         view = fig_record.view
         # Tracking setup
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
         # Style setup
         solar_field_style = rcsf.heliostat_vector_field(color='b')
         # Comment
-        fig_record.comment.append(
-            "Each heliostat's surface normal, which can be viewed as a vector field."
-        )
+        fig_record.comment.append("Each heliostat's surface normal, which can be viewed as a vector field.")
         # Draw
         solar_field.draw(view, solar_field_style)
-        view.draw_xyz(
-            aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz'
-        )
+        view.draw_xyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
         view.show()
 
     # Dense vector field.
     if draw_dense_vector_field:
         # View setup (xy only)
         fig_record = fm.setup_figure_for_3d_data(
-            figure_control,
-            axis_control_m,
-            vs.view_spec_xy(),
-            title='Dense Tracking Vector Field',
+            figure_control, axis_control_m, vs.view_spec_xy(), title='Dense Tracking Vector Field'
         )
         view_xy = fig_record.view
         # Tracking setup
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
         # Style setup
         solar_field_style = rcsf.heliostat_vector_field_outlines(color='grey')
         # Comment
         fig_record.comment.append("Dense vector field of tracking surface normals.")
         # Draw solar field and aim point.
         solar_field.draw(view_xy, solar_field_style)
-        view_xy.draw_xyz(
-            aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz'
-        )
+        view_xy.draw_xyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
         # Draw dense vector field.
         grid_xy = solar_field.heliostat_field_regular_grid_xy(40, 20)
         grid_xydxy = [
-            [
-                p,
-                sun_track.tracking_surface_normal_xy(
-                    p + [0], aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz
-                ),
-            ]
+            [p, sun_track.tracking_surface_normal_xy(p + [0], aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz)]
             for p in grid_xy
         ]
-        view_xy.draw_pqdpq_list(
-            grid_xydxy, style=rcps.vector_field(color='b', vector_scale=5.0)
-        )
+        view_xy.draw_pqdpq_list(grid_xydxy, style=rcps.vector_field(color='b', vector_scale=5.0))
         # Finish.
         view.show()
 
@@ -551,9 +449,7 @@ if __name__ == "__main__":
     if save_figures:
         print('\n\nSaving figures...')
         # Output directory.
-        output_path = os.path.join(
-            '..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M'))
-        )
+        output_path = os.path.join('..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M')))
         if not (os.path.exists(output_path)):
             os.makedirs(output_path)
         fm.save_all_figures(output_path)

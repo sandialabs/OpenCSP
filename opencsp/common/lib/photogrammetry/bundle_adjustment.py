@@ -67,9 +67,7 @@ def bundle_adjust(
     """
     # Check inputs
     if opt_type not in ['camera', 'points', 'both']:
-        raise ValueError(
-            f'Given opt_type must be one of ("camera", "points", "both"), not "{opt_type:s}"'
-        )
+        raise ValueError(f'Given opt_type must be one of ("camera", "points", "both"), not "{opt_type:s}"')
 
     # Calculate number of cameras and points
     n_cameras = rvecs.shape[0]
@@ -80,9 +78,7 @@ def bundle_adjust(
     x0 = np.hstack((params.ravel(), pts_obj.ravel()))
 
     # Create Jacobian sparsity structure
-    jac_sparsity = bundle_adjustment_sparsity(
-        n_cameras, n_points, camera_indices, point_indices, opt_type
-    )
+    jac_sparsity = bundle_adjustment_sparsity(n_cameras, n_points, camera_indices, point_indices, opt_type)
 
     # Optimize
     res = least_squares(
@@ -93,15 +89,7 @@ def bundle_adjust(
         x_scale='jac',
         ftol=1e-4,
         method='trf',
-        args=(
-            n_cameras,
-            n_points,
-            camera_indices,
-            point_indices,
-            pts_img,
-            intrinsic_mat,
-            dist_coefs,
-        ),
+        args=(n_cameras, n_points, camera_indices, point_indices, pts_img, intrinsic_mat, dist_coefs),
     )
     lt.debug('Bundle adjustment finished: ' + res.message)
 
@@ -109,7 +97,7 @@ def bundle_adjust(
     data = res.x[: n_cameras * 6].reshape((n_cameras, 6))
     rvecs_opt = data[:, :3]
     tvecs_opt = data[:, 3:]
-    pts_obj_opt = res.x[n_cameras * 6:].reshape((n_points, 3))
+    pts_obj_opt = res.x[n_cameras * 6 :].reshape((n_points, 3))
 
     return rvecs_opt, tvecs_opt, pts_obj_opt
 
@@ -127,17 +115,10 @@ def rotate(points: np.ndarray, rot_vecs: np.ndarray):
     cos_theta = np.cos(theta)
     sin_theta = np.sin(theta)
 
-    return (
-        cos_theta * points + sin_theta * np.cross(v, points) + dot * (1 - cos_theta) * v
-    )
+    return cos_theta * points + sin_theta * np.cross(v, points) + dot * (1 - cos_theta) * v
 
 
-def project(
-    points: np.ndarray,
-    camera_params: np.ndarray,
-    intrinsic_mat: np.ndarray,
-    dist_coefs: np.ndarray,
-):
+def project(points: np.ndarray, camera_params: np.ndarray, intrinsic_mat: np.ndarray, dist_coefs: np.ndarray):
     """
     Convert 3-D points to 2-D by projecting onto camera sensor. A ray with
     normal incidence has a (0, 0) coordinate.
@@ -150,9 +131,7 @@ def project(
     # Project
     rvec = np.array([0.0, 0.0, 0.0])
     tvec = np.array([0.0, 0.0, 0.0])
-    points_proj = cv.projectPoints(points_cam, rvec, tvec, intrinsic_mat, dist_coefs)[
-        0
-    ][:, 0, :]
+    points_proj = cv.projectPoints(points_cam, rvec, tvec, intrinsic_mat, dist_coefs)[0][:, 0, :]
 
     return points_proj
 
@@ -172,22 +151,13 @@ def fun(
 
     """
     camera_params = params[: n_cameras * 6].reshape((n_cameras, 6))
-    points_3d = params[n_cameras * 6:].reshape((n_points, 3))
-    points_proj = project(
-        points_3d[point_indices],
-        camera_params[camera_indices],
-        intrinsic_mat,
-        dist_coefs,
-    )
+    points_3d = params[n_cameras * 6 :].reshape((n_points, 3))
+    points_proj = project(points_3d[point_indices], camera_params[camera_indices], intrinsic_mat, dist_coefs)
     return (points_proj - points_2d).ravel()
 
 
 def bundle_adjustment_sparsity(
-    n_cameras: int,
-    n_points: int,
-    camera_indices: np.ndarray,
-    point_indices: np.ndarray,
-    opt_type: str,
+    n_cameras: int, n_points: int, camera_indices: np.ndarray, point_indices: np.ndarray, opt_type: str
 ):
     """
     Returns Jacobian sparsity structure.

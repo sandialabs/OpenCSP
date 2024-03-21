@@ -33,9 +33,7 @@ def process(
     measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
 
     # Instantiate class
-    fixed_pattern = ProcessSofastFixed(
-        orientation, camera, fixed_pattern_dot_locs, facet_data
-    )
+    fixed_pattern = ProcessSofastFixed(orientation, camera, fixed_pattern_dot_locs, facet_data)
     fixed_pattern.load_measurement_data(measurement)
 
     # Process
@@ -75,21 +73,10 @@ def example_process_fixed_pattern_printed_target():
     dir_output = join(dirname(__file__), 'data/output/printed_target')
 
     surface_data = dict(
-        surface_type='parabolic',
-        initial_focal_lengths_xy=(150.0, 150),
-        robust_least_squares=False,
-        downsample=1,
+        surface_type='parabolic', initial_focal_lengths_xy=(150.0, 150), robust_least_squares=False, downsample=1
     )
 
-    process(
-        file_camera,
-        file_facet,
-        file_dot_locs,
-        file_ori,
-        file_meas,
-        dir_output,
-        surface_data,
-    )
+    process(file_camera, file_facet, file_dot_locs, file_ori, file_meas, dir_output, surface_data)
 
 
 def example_process_fixed_pattern_screen_target():
@@ -100,30 +87,15 @@ def example_process_fixed_pattern_screen_target():
     file_camera = join(dir_base, "calibration_files/camera.h5")
     file_facet = join(dir_base, "calibration_files/Facet_NSTTF.json")
     file_ori = join(dir_base, 'fixed_pattern/spatial_orientation.h5')
-    file_dot_locs = join(
-        dir_base, 'fixed_pattern/dot_locations_screen_square_width3_space6.h5'
-    )
-    file_meas = join(
-        dir_base, 'fixed_pattern/measurement_screen_square_width3_space6.h5'
-    )
+    file_dot_locs = join(dir_base, 'fixed_pattern/dot_locations_screen_square_width3_space6.h5')
+    file_meas = join(dir_base, 'fixed_pattern/measurement_screen_square_width3_space6.h5')
     dir_output = join(dirname(__file__), 'data/output/screen_target')
 
     surface_data = dict(
-        surface_type='parabolic',
-        initial_focal_lengths_xy=(150.0, 150),
-        robust_least_squares=False,
-        downsample=1,
+        surface_type='parabolic', initial_focal_lengths_xy=(150.0, 150), robust_least_squares=False, downsample=1
     )
 
-    process(
-        file_camera,
-        file_facet,
-        file_dot_locs,
-        file_ori,
-        file_meas,
-        dir_output,
-        surface_data,
-    )
+    process(file_camera, file_facet, file_dot_locs, file_ori, file_meas, dir_output, surface_data)
 
 
 if __name__ == '__main__':

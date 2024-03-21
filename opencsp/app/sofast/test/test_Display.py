@@ -20,23 +20,15 @@ class TestDisplay(unittest.TestCase):
         LZ = 3.0  # meters
 
         # Define test points
-        cls.test_Vxy_pts = Vxy(
-            ([0, 0.5, 1, 0, 0.5, 1, 0, 0.5, 1], [0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1])
-        )
+        cls.test_Vxy_pts = Vxy(([0, 0.5, 1, 0, 0.5, 1, 0, 0.5, 1], [0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1]))
 
         # Define rectangular input data
-        cls.grid_data_rect2D = {
-            'screen_x': LX,
-            'screen_y': LY,
-            'screen_model': 'rectangular2D',
-        }
+        cls.grid_data_rect2D = {'screen_x': LX, 'screen_y': LY, 'screen_model': 'rectangular2D'}
 
         # Define 2D input data
         cls.grid_data_2D = {
             'xy_screen_fraction': Vxy(([0, 1, 0, 1], [0, 0, 1, 1])),
-            'xy_screen_coords': Vxy(
-                ([-LX / 2, LX / 2, -LX / 2, LX / 2], [-LY / 2, -LY / 2, LY / 2, LY / 2])
-            ),
+            'xy_screen_coords': Vxy(([-LX / 2, LX / 2, -LX / 2, LX / 2], [-LY / 2, -LY / 2, LY / 2, LY / 2])),
             'screen_model': 'distorted2D',
         }
 
@@ -44,11 +36,7 @@ class TestDisplay(unittest.TestCase):
         cls.grid_data_3D = {
             'xy_screen_fraction': Vxy(([0, 1, 0, 1], [0, 0, 1, 1])),
             'xyz_screen_coords': Vxyz(
-                (
-                    [-LX / 2, LX / 2, -LX / 2, LX / 2],
-                    [-LY / 2, -LY / 2, LY / 2, LY / 2],
-                    [LZ, LZ, 0, 0],
-                )
+                ([-LX / 2, LX / 2, -LX / 2, LX / 2], [-LY / 2, -LY / 2, LY / 2, LY / 2], [LZ, LZ, 0, 0])
             ),
             'screen_model': 'distorted3D',
         }
@@ -76,17 +64,13 @@ class TestDisplay(unittest.TestCase):
         v_cam_screen_screen = Vxyz((0, 0, 1))
         r_screen_cam = Rotation.from_rotvec(np.array([0.0, 0.0, 0.0]))
         name = 'Test DisplayShape'
-        disp = DisplayShape(
-            v_cam_screen_screen, r_screen_cam, self.grid_data_rect2D, name
-        )
+        disp = DisplayShape(v_cam_screen_screen, r_screen_cam, self.grid_data_rect2D, name)
 
         # Perform calculation
         calc = disp.interp_func(self.test_Vxy_pts)
 
         # Test
-        np.testing.assert_allclose(
-            calc.data, self.exp_Vxy_disp_pts.data, rtol=0, atol=0
-        )
+        np.testing.assert_allclose(calc.data, self.exp_Vxy_disp_pts.data, rtol=0, atol=0)
 
     def test_distorted2D(self):
         # Instantiate display object
@@ -99,9 +83,7 @@ class TestDisplay(unittest.TestCase):
         calc = disp.interp_func(self.test_Vxy_pts)
 
         # Test
-        np.testing.assert_allclose(
-            calc.data, self.exp_Vxy_disp_pts.data, rtol=0, atol=1e-7
-        )
+        np.testing.assert_allclose(calc.data, self.exp_Vxy_disp_pts.data, rtol=0, atol=1e-7)
 
     def test_distorted3D(self):
         # Instantiate display object
@@ -114,9 +96,7 @@ class TestDisplay(unittest.TestCase):
         calc = disp.interp_func(self.test_Vxy_pts)
 
         # Test
-        np.testing.assert_allclose(
-            calc.data, self.exp_Vxyz_disp_pts.data, rtol=0, atol=1e-7
-        )
+        np.testing.assert_allclose(calc.data, self.exp_Vxyz_disp_pts.data, rtol=0, atol=1e-7)
 
 
 if __name__ == '__main__':

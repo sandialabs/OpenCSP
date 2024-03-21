@@ -42,9 +42,7 @@ class CameraTransform:
         # That is, this is the tranform that moves the cameras for it position and view direction back to face up at (0,0,0).
         self.transform = self.construct_transform()
         self.rotation_matrix = self.construct_rotation_matrix()
-        self.rvec = (
-            self.construct_rvec()
-        )  # These are the transforms required by OpenCV.
+        self.rvec = self.construct_rvec()  # These are the transforms required by OpenCV.
         self.tvec = self.construct_tvec()  #
         # View direction and origin plane.
         self.view_dir = self.construct_view_direction()
@@ -58,9 +56,7 @@ class CameraTransform:
         # Component rotations.
         rot_z_to_y = t3d.axisrotation(x_axis, np.deg2rad(-90.0))
         rot_y_to_el = t3d.axisrotation(x_axis, el)
-        rot_az_about_z = t3d.axisrotation(
-            z_axis, -az
-        )  # Azimuth is a compass heading, measured clockwise from north.
+        rot_az_about_z = t3d.axisrotation(z_axis, -az)  # Azimuth is a compass heading, measured clockwise from north.
         # Combined rotation.
         rot_z_to_el = rot_y_to_el.dot(rot_z_to_y)
         rot_z_to_azel = rot_az_about_z.dot(rot_z_to_el)
@@ -94,11 +90,7 @@ class CameraTransform:
         # This rotation moves the camera from its pointing direction to on its back.
         xf = self.transform
         return np.array(
-            [
-                [xf[0][0], xf[0][1], xf[0][2]],
-                [xf[1][0], xf[1][1], xf[1][2]],
-                [xf[2][0], xf[2][1], xf[2][2]],
-            ]
+            [[xf[0][0], xf[0][1], xf[0][2]], [xf[1][0], xf[1][1], xf[1][2]], [xf[2][0], xf[2][1], xf[2][2]]]
         )
 
     def construct_rvec(self):
@@ -127,9 +119,7 @@ class CameraTransform:
         A = normal[0]
         B = normal[1]
         C = normal[2]
-        D = (
-            -distance_origin_to_plane
-        )  # Negate so that points on +z side of plane have positive distance values.
+        D = -distance_origin_to_plane  # Negate so that points on +z side of plane have positive distance values.
         # Return.
         return [A, B, C, D]
 
@@ -145,9 +135,7 @@ class CameraTransform:
         A = normal[0]
         B = normal[1]
         C = normal[2]
-        D = (
-            -distance_origin_to_plane
-        )  # Negate so that points on +z side of plane have positive distance values.
+        D = -distance_origin_to_plane  # Negate so that points on +z side of plane have positive distance values.
         # Return.
         return [A, B, C, D]
 
@@ -170,11 +158,7 @@ class CameraTransform:
                 [xyz]
             )  # float 64 required by OpenCV.  Can also "obj_points = obj_points.astype('float64')"
             open_cv_img_points, jacobian_project = cv.projectPoints(
-                obj_points,
-                self.rvec,
-                self.tvec,
-                camera.camera_matrix,
-                camera.distortion_coeffs,
+                obj_points, self.rvec, self.tvec, camera.camera_matrix, camera.distortion_coeffs
             )
             # The OpenCV function returns a nested list of points.  We want just a list of points.
             if len(open_cv_img_points) != 1:
@@ -194,11 +178,7 @@ class CameraTransform:
                 assert False
             img_pt = nested_img_pt[0]
             if len(img_pt) != 2:
-                print(
-                    'ERROR: In CameraTransform.pq_or_none(), img_pt = "'
-                    + str(img_pt)
-                    + '" was not of length 2.'
-                )
+                print('ERROR: In CameraTransform.pq_or_none(), img_pt = "' + str(img_pt) + '" was not of length 2.')
                 assert False
             # Set (p,q) coordinates.
             p = img_pt[0]

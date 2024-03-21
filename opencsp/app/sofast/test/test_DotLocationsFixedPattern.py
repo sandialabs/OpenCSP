@@ -14,14 +14,7 @@ def test_DotLocationsFixedPattern():
     xv = np.array([-2, -1, 0, 1, 2])
     yv = np.array([-3, -2, -1, 0, 1, 2])
     x = np.array(
-        [
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-            [1, 2, 3, 4, 5],
-        ],
+        [[1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5], [1, 2, 3, 4, 5]],
         dtype=float,
     )
     y = np.array(
@@ -61,10 +54,7 @@ def test_DotLocationsFixedPattern():
 
 def test_from_Display():
     # Load display
-    file_disp = os.path.join(
-        opencsp_code_dir(),
-        'test/data/measurements_sofast_fringe/display_distorted_3d.h5',
-    )
+    file_disp = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe/display_distorted_3d.h5')
     display = Display.load_from_hdf(file_disp)
     fp_proj = SystemSofastFixed(30, 30, 5, 5)
 
@@ -86,9 +76,7 @@ def test_from_Display():
         ]
     )
     z_exp = np.array([[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]])
-    xyz_exp = np.concatenate(
-        (x_exp[..., None], y_exp[..., None], z_exp[..., None]), axis=2
-    )
+    xyz_exp = np.concatenate((x_exp[..., None], y_exp[..., None], z_exp[..., None]), axis=2)
     np.testing.assert_allclose(fp.xyz_dot_loc, xyz_exp, atol=1e-6, rtol=0)
 
 

@@ -7,9 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
@@ -30,9 +28,7 @@ def generate_dataset(
     """Generates and saves test data"""
     # Check output file exists
     if not exists(dirname(file_dataset_out)):
-        raise FileNotFoundError(
-            f'Output directory {file_dataset_out:s} does not exist.'
-        )
+        raise FileNotFoundError(f'Output directory {file_dataset_out:s} does not exist.')
 
     # Load components
     camera = Camera.load_from_hdf(file_camera)
@@ -58,10 +54,7 @@ def generate_dataset(
     # Define surface data
     surface_data = [
         dict(
-            surface_type='parabolic',
-            initial_focal_lengths_xy=(100.0, 100.0),
-            robust_least_squares=False,
-            downsample=10,
+            surface_type='parabolic', initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=False, downsample=10
         )
     ] * ensemble_data.num_facets
 

@@ -12,11 +12,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def annotate_aruco_markers(
-    source_pattern: str,
-    save_dir: str,
-    line_width: int = 1,
-    font_thickness: int = 2,
-    font_scale: float = 2,
+    source_pattern: str, save_dir: str, line_width: int = 1, font_thickness: int = 2, font_scale: float = 2
 ):
     """Finds aruco markers, annotates edges, labels, and saves into destination folder
 
@@ -70,15 +66,7 @@ def annotate_aruco_markers(
 
             # Add text
             orig = (int(pt_img[:, 0].min()), int(pt_img[:, 1].min() - 5))
-            cv.putText(
-                img_rgb,
-                str(id_),
-                orig,
-                font_type,
-                font_scale,
-                (0, 0, 255),
-                font_thickness,
-            )
+            cv.putText(img_rgb, str(id_), orig, font_type, font_scale, (0, 0, 255), font_thickness)
 
         # Save image
         save_name = basename(file)
@@ -91,9 +79,7 @@ def example_annotate_aruco_markers():
     the given source_pattern. Markers are outlined in red and labeled in blue text.
     """
     source_pattern = join(
-        opencsp_code_dir(),
-        'app/scene_reconstruction/test/data',
-        'data_measurement/aruco_marker_images/DSC0365*.JPG',
+        opencsp_code_dir(), 'app/scene_reconstruction/test/data', 'data_measurement/aruco_marker_images/DSC0365*.JPG'
     )
     save_dir = join(dirname(__file__), 'data/output/annotated_aruco_markers')
 

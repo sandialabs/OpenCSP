@@ -10,9 +10,7 @@ import numpy as np
 
 # COORDINATE SYSTEM ORIGIN
 
-LON_NSTTF_ORIGIN_DEG = (
-    -106.509606
-)  # Six decimal places correspond to about 11 cm resolution.
+LON_NSTTF_ORIGIN_DEG = -106.509606  # Six decimal places correspond to about 11 cm resolution.
 LAT_NSTTF_ORIGIN_DEG = 34.962276  #
 
 LON_NSTTF_ORIGIN: float = np.deg2rad(LON_NSTTF_ORIGIN_DEG)

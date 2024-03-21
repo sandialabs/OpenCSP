@@ -46,13 +46,9 @@ class TestTypingTools(unittest.TestCase):
         self.assertEqual("a", tt.default(self.raises_runtime_error, "a"))
         with self.assertRaises(RuntimeError):
             tt.default(self.raises_runtime_error, self.raises_value_error)
-        self.assertEqual(
-            None, tt.default(self.raises_runtime_error, self.raises_value_error, None)
-        )
+        self.assertEqual(None, tt.default(self.raises_runtime_error, self.raises_value_error, None))
         self.assertEqual("a", tt.default("a", self.raises_value_error))
-        self.assertEqual(
-            "a", tt.default(None, lambda: lval[4], dval[3], lambda: dval[4], "a")
-        )
+        self.assertEqual("a", tt.default(None, lambda: lval[4], dval[3], lambda: dval[4], "a"))
 
         with self.assertRaises(ValueError):
             self.assertEqual("a", tt.default("a"))

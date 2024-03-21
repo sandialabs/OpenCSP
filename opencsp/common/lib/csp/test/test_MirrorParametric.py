@@ -14,9 +14,7 @@ class TestMirrorParametric:
 
     def get_region_test_mirror(self) -> RegionXY:
         """Returns a test mirror region"""
-        return RegionXY.from_vertices(
-            Vxy(([0.5, -0.5, -0.5, 0.5], [-0.5, -0.5, 0.5, 0.5]))
-        )
+        return RegionXY.from_vertices(Vxy(([0.5, -0.5, -0.5, 0.5], [-0.5, -0.5, 0.5, 0.5])))
 
     def get_test_flat_mirror(self, height: float) -> MirrorParametric:
         """Returns a flat mirror with defined height"""

@@ -61,14 +61,10 @@ class Specifications:
         self.bottom_left_facet_indx = bottom_left_facet_indx
         self.facets_centroids_file = facets_centroids_file
         self.facets_centroids = sr.read_centers3d(facets_centroids_file)
-        self.facets_corners = sr.centers3d_to_corners3d(
-            self.facets_centroids, self.facet_width, self.facet_height
-        )
+        self.facets_corners = sr.centers3d_to_corners3d(self.facets_centroids, self.facet_width, self.facet_height)
         self.flat_corner_xyz_list = self.facets_corners
         self.heliostat_locations_file = heliostat_locations_file
-        self.heliostat_locations_dict = self.read_heliostat_locations_dict(
-            self.heliostat_locations_file
-        )
+        self.heliostat_locations_dict = self.read_heliostat_locations_dict(self.heliostat_locations_file)
         # Design aim point.
         self.design_aim_point_x = design_aim_point_x
         self.design_aim_point_y = design_aim_point_y
@@ -159,14 +155,10 @@ class Specifications:
         return self.ideal_focal_length(hel_xyz)
 
     def smooth_heliostat_corner_xyz_list_given_focal_length(self, focal_length):
-        return heliostat_corner_xyz_list_given_focal_length_smooth(
-            self.flat_corner_xyz_list, focal_length
-        )
+        return heliostat_corner_xyz_list_given_focal_length_smooth(self.flat_corner_xyz_list, focal_length)
 
     def faceted_heliostat_corner_xyz_list_given_focal_length(self, focal_length):
-        return heliostat_corner_xyz_list_given_focal_length_faceted(
-            self.flat_corner_xyz_list, focal_length
-        )
+        return heliostat_corner_xyz_list_given_focal_length_faceted(self.flat_corner_xyz_list, focal_length)
 
     def design_heliostat_corner_xyz_list(self, hel_xyz):
         """
@@ -185,9 +177,7 @@ class Specifications:
         Future implementations are envisioned to support a more realistic suite of design decisions.
         """
         focal_length = self.design_focal_length(hel_xyz)
-        return heliostat_corner_xyz_list_given_focal_length_faceted(
-            input_flat_corner_xyz_list, focal_length
-        )
+        return heliostat_corner_xyz_list_given_focal_length_faceted(input_flat_corner_xyz_list, focal_length)
 
     def heliostat_xyz(self, hel_name):
         """
@@ -315,9 +305,7 @@ class Specifications:
         This routine returns a heliostat_spec, for the nominal design of a heliostat located in the given position.
         As noted above, the issues determining the design vary depending on solar field design and manufacturing decisions.
         """
-        return self.construct_focal_length_heliostat_spec(
-            self.design_focal_length(hel_xyz)
-        )
+        return self.construct_focal_length_heliostat_spec(self.design_focal_length(hel_xyz))
 
 
 # HELPER FUNCTIONS
@@ -331,26 +319,16 @@ def smooth_z(x, y, focal_length):
     return k * (r * r)
 
 
-def heliostat_corner_xyz_list_given_focal_length_smooth(
-    flat_corner_xyz_list, focal_length
-):
-    return [
-        [xyz[0], xyz[1], xyz[2] + smooth_z(xyz[0], xyz[1], focal_length)]
-        for xyz in flat_corner_xyz_list
-    ]
+def heliostat_corner_xyz_list_given_focal_length_smooth(flat_corner_xyz_list, focal_length):
+    return [[xyz[0], xyz[1], xyz[2] + smooth_z(xyz[0], xyz[1], focal_length)] for xyz in flat_corner_xyz_list]
 
 
-def heliostat_corner_xyz_list_given_focal_length_faceted(
-    flat_corner_xyz_list, focal_length
-):
+def heliostat_corner_xyz_list_given_focal_length_faceted(flat_corner_xyz_list, focal_length):
     # Construct initial smooth design.
     smooth_xyz_list = [
-        [xyz[0], xyz[1], xyz[2] + smooth_z(xyz[0], xyz[1], focal_length)]
-        for xyz in flat_corner_xyz_list
+        [xyz[0], xyz[1], xyz[2] + smooth_z(xyz[0], xyz[1], focal_length)] for xyz in flat_corner_xyz_list
     ]
-    return vertically_move_facets_to_flat_z_heights(
-        flat_corner_xyz_list, smooth_xyz_list
-    )
+    return vertically_move_facets_to_flat_z_heights(flat_corner_xyz_list, smooth_xyz_list)
 
 
 def vertically_move_facets_to_flat_z_heights(flat_corner_xyz_list, smooth_xyz_list):
@@ -369,17 +347,13 @@ def vertically_move_facets_to_flat_z_heights(flat_corner_xyz_list, smooth_xyz_li
         flat_xyz_B = flat_corner_xyz_list_2.pop(0)
         flat_xyz_C = flat_corner_xyz_list_2.pop(0)
         flat_xyz_D = flat_corner_xyz_list_2.pop(0)
-        flat_z_mean = (
-            flat_xyz_A[2] + flat_xyz_B[2] + flat_xyz_C[2] + flat_xyz_D[2]
-        ) / 4
+        flat_z_mean = (flat_xyz_A[2] + flat_xyz_B[2] + flat_xyz_C[2] + flat_xyz_D[2]) / 4
         # Smooth facet.
         smooth_xyz_A = smooth_xyz_list_2.pop(0)
         smooth_xyz_B = smooth_xyz_list_2.pop(0)
         smooth_xyz_C = smooth_xyz_list_2.pop(0)
         smooth_xyz_D = smooth_xyz_list_2.pop(0)
-        smooth_z_mean = (
-            smooth_xyz_A[2] + smooth_xyz_B[2] + smooth_xyz_C[2] + smooth_xyz_D[2]
-        ) / 4
+        smooth_z_mean = (smooth_xyz_A[2] + smooth_xyz_B[2] + smooth_xyz_C[2] + smooth_xyz_D[2]) / 4
         # Shift.
         dz = flat_z_mean - smooth_z_mean
         shifted_xyz_list.append(shift_xyz(smooth_xyz_A, dz))

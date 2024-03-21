@@ -13,9 +13,7 @@ import opencsp.common.lib.tool.log_tools as lt
 def example_scene_reconstruction(save_dir: str):
     """Example script that reconstructs the XYZ locations of Aruco markers in a scene."""
     # Define input directory
-    dir_input = join(
-        opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement'
-    )
+    dir_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
 
     # Load components
     camera = Camera.load_from_hdf(join(dir_input, 'camera.h5'))
@@ -25,9 +23,7 @@ def example_scene_reconstruction(save_dir: str):
     alignment_points = np.loadtxt(join(dir_input, 'alignment_points.csv'), delimiter=',', skiprows=1)
 
     # Perform marker position calibration
-    cal_scene_recon = SceneReconstruction(
-        camera, known_point_locations, image_filter_path
-    )
+    cal_scene_recon = SceneReconstruction(camera, known_point_locations, image_filter_path)
     cal_scene_recon.make_figures = True
     cal_scene_recon.run_calibration()
 

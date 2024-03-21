@@ -79,12 +79,8 @@ class LoopXY:
         for idx1 in range(self.num_edges):
             idx2 = np.mod(idx1 + 1, self.num_edges)
             # Calcualte edge vectors
-            V_1 = (
-                self._edges[idx1]._vertices[1] - self._edges[idx1]._vertices[0]
-            ).normalize()
-            V_2 = (
-                self._edges[idx2]._vertices[1] - self._edges[idx2]._vertices[0]
-            ).normalize()
+            V_1 = (self._edges[idx1]._vertices[1] - self._edges[idx1]._vertices[0]).normalize()
+            V_2 = (self._edges[idx2]._vertices[1] - self._edges[idx2]._vertices[0]).normalize()
             # Calculate cross product
             cross_prod_data[idx2] = V_1.cross(V_2)[0]
 
@@ -127,13 +123,7 @@ class LoopXY:
         edges = []
         for idx1 in range(len(vertices)):
             idx2 = np.mod(idx1 + 1, len(vertices))
-            edges.append(
-                EdgeXY(
-                    vertices=vertices[[idx1, idx2]],
-                    curve_data={'type': 'line'},
-                    closed=False,
-                )
-            )
+            edges.append(EdgeXY(vertices=vertices[[idx1, idx2]], curve_data={'type': 'line'}, closed=False))
 
         return cls(edges=edges)
 
@@ -161,20 +151,12 @@ class LoopXY:
         edges = []
         for idx1 in range(len(vertices)):
             idx2 = np.mod(idx1 + 1, len(vertices))
-            edges.append(
-                EdgeXY(
-                    vertices=vertices[[idx1, idx2]],
-                    curve_data={'type': 'line'},
-                    closed=False,
-                )
-            )
+            edges.append(EdgeXY(vertices=vertices[[idx1, idx2]], curve_data={'type': 'line'}, closed=False))
 
         return cls(edges=edges)
 
     @classmethod
-    def from_rectangle(
-        cls, x: float, y: float, width: float, height: float
-    ) -> 'LoopXY':
+    def from_rectangle(cls, x: float, y: float, width: float, height: float) -> 'LoopXY':
         """Returns rectangular loop
 
         Parameters
@@ -451,15 +433,11 @@ class LoopXY:
                     intersect_xs.append(intersect_point.x[0])
                     intersect_ys.append(intersect_point.y[0])
             else:
-                raise NotImplementedError(
-                    "Intersections of non-line edges not yet supported in this method"
-                )
+                raise NotImplementedError("Intersections of non-line edges not yet supported in this method")
         intersect_points = Vxy((intersect_xs, intersect_ys))
 
         # Limit to internal (or border) intersections
-        intersect_points = intersect_points[
-            self.is_inside_or_on_border(intersect_points)
-        ]
+        intersect_points = intersect_points[self.is_inside_or_on_border(intersect_points)]
 
         # De-duplicate intersections
         keep_xs: list[float] = []

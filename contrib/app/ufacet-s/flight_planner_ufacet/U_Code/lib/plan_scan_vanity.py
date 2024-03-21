@@ -9,12 +9,7 @@ import opencsp.app.ufacets.flight_planner_ufacet.U_Code.lib.plan_scan_vanity_par
 import opencsp.common.lib.csp.SolarField as sf
 
 
-def construct_vanity_scan(
-    solar_field,
-    vanity_scan_parameter_file,
-    vanity_heliostat_name,
-    vanity_heliostat_azimuth,
-):
+def construct_vanity_scan(solar_field, vanity_scan_parameter_file, vanity_heliostat_name, vanity_heliostat_azimuth):
     # Notify progress.
     print('Constructing vanity scan...')
 

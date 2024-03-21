@@ -40,9 +40,7 @@ class MemoryMonitor:
             - print_on_new_min (bool): If true, then for each second, if the memory available has reached a new minimum print out the usage for that second. Defaults to True.
             - always_print (bool): If True, then print out the usage every second. Defaults to False.
         """
-        partitioner = ppart.ParallelPartitioner(
-            server_index + 1, server_index, cpu_index + 1, cpu_index
-        )
+        partitioner = ppart.ParallelPartitioner(server_index + 1, server_index, cpu_index + 1, cpu_index)
         self.identifier = partitioner.identifier()
         """ String used to uniquely identify this server/processor core. """
         self._proc: multiprocessing.Process = None
@@ -71,9 +69,7 @@ class MemoryMonitor:
             return False
 
         # start the process
-        executor = concurrent.futures.ThreadPoolExecutor(
-            1, "mem_monitor_" + self.identifier
-        )
+        executor = concurrent.futures.ThreadPoolExecutor(1, "mem_monitor_" + self.identifier)
         self._future = executor.submit(self._run)
         while self._start_datetime == None:
             time.sleep(0.1)

@@ -44,27 +44,17 @@ class OpticOrientation:
         if self.no_child:
             out += 'Child to Base: None\n'
         else:
-            out += (
-                'Child to Base: '
-                + str(self.transform_child_to_base.R.as_rotvec().round(3))
-                + '\n'
-            )
+            out += 'Child to Base: ' + str(self.transform_child_to_base.R.as_rotvec().round(3)) + '\n'
         # Base to parent
         if self.no_parent:
             out += 'Base to parent: None\n'
         else:
-            out += (
-                'Base to parent: '
-                + str(self.transform_base_to_parent.R.as_rotvec().round(3))
-                + '\n'
-            )
+            out += 'Base to parent: ' + str(self.transform_base_to_parent.R.as_rotvec().round(3)) + '\n'
         # Child to parent
         if self.no_child or self.no_parent:
             out += 'Child to parent: None'
         else:
-            out += 'Child to parent: ' + str(
-                self.transform_child_to_base.R.as_rotvec().round(3)
-            )
+            out += 'Child to parent: ' + str(self.transform_child_to_base.R.as_rotvec().round(3))
         return out
 
     @property
@@ -79,9 +69,7 @@ class OpticOrientation:
         if self.no_child:
             raise ValueError('Optic does not have child mount.')
         if not isinstance(transform, TransformXYZ):
-            raise TypeError(
-                f'Input transform must be type {TransformXYZ} but is type {type(transform)}'
-            )
+            raise TypeError(f'Input transform must be type {TransformXYZ} but is type {type(transform)}')
         self._transform_child_to_base = transform.copy()
 
     @property
@@ -96,9 +84,7 @@ class OpticOrientation:
         if self.no_parent:
             raise ValueError('Optic does not have parent mount.')
         if not isinstance(transform, TransformXYZ):
-            raise TypeError(
-                f'Input transform must be type {TransformXYZ} but is type {type(transform)}'
-            )
+            raise TypeError(f'Input transform must be type {TransformXYZ} but is type {type(transform)}')
         self._transform_base_to_parent = transform.copy()
 
     @property

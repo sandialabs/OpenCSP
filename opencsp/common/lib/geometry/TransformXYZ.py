@@ -28,9 +28,7 @@ class TransformXYZ:
     def __mul__(self, T):
         # Check input type
         if not isinstance(T, TransformXYZ):
-            raise TypeError(
-                f'Type, {type(self)}, cannot be multipled by type, {type(T)}.'
-            )
+            raise TypeError(f'Type, {type(self)}, cannot be multipled by type, {type(T)}.')
 
         return TransformXYZ(self._matrix @ T._matrix)
 
