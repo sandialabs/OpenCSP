@@ -133,6 +133,16 @@ class TestCameraCalibration:
             cls.calibration_error_exp = data['calibration_error']
             cls.reprojection_errors_exp = data['reprojection_errors']
 
+            print([a.data[:, :2] for a in p_image[:2]])
+            print('\n')
+            print(np.array([a.data[:, :2] for a in p_image[:2]]))
+            print('\n')
+            print(cls.p_image_points[:2, :2, :2])
+            # pts_test = cls.p_image_points[:2, :2, :2]
+            # pts_test_exp = cls.p_image_points_exp[:2, :2, :2]
+            # print(pts_test_exp)
+            # print(pts_test)
+
     def test_image_points(self):
         np.testing.assert_allclose(self.p_image_points, self.p_image_points_exp)
 
