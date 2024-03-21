@@ -29,6 +29,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         dir_input_sofast = join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement')
         dir_input_def = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement')
         dir_output = join(opencsp_code_dir(), 'app/sofast/test/data/data_expected')
+        ft.create_directories_if_necessary(dir_output)
 
         # Define input files
         resolution_xy = [100, 100]  # sample density of screen

@@ -9,6 +9,7 @@ import numpy as np
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.file_tools as ft
 
 
 class TestDisplayShape(unittest.TestCase):
@@ -59,6 +60,10 @@ class TestDisplayShape(unittest.TestCase):
             )
         )
 
+        # Set up save path
+        cls.save_dir = join(dirname(__file__), 'data/output')
+        ft.create_directories_if_necessary(cls.save_dir)
+
     def test_rectangular2D(self):
         # Instantiate display object
         name = 'Test DisplayShape'
@@ -96,7 +101,7 @@ class TestDisplayShape(unittest.TestCase):
         # Instantiate display object
         name = 'Test DisplayShape'
         disp = DisplayShape(self.grid_data_3D, name)
-        file = join(dirname(__file__), 'data/output/test_display_shape_dist_3d.h5')
+        file = join(self.save_dir, 'test_display_shape_dist_3d.h5')
 
         # Save
         disp.save_to_hdf(file)
@@ -108,7 +113,7 @@ class TestDisplayShape(unittest.TestCase):
         # Instantiate display object
         name = 'Test DisplayShape'
         disp = DisplayShape(self.grid_data_2D, name)
-        file = join(dirname(__file__), 'data/output/test_display_shape_dist_2d.h5')
+        file = join(self.save_dir, 'test_display_shape_dist_2d.h5')
 
         # Save
         disp.save_to_hdf(file)
@@ -120,7 +125,7 @@ class TestDisplayShape(unittest.TestCase):
         # Instantiate display object
         name = 'Test DisplayShape'
         disp = DisplayShape(self.grid_data_rect2D, name)
-        file = join(dirname(__file__), 'data/output/test_display_shape_rect.h5')
+        file = join(self.save_dir, 'test_display_shape_rect.h5')
 
         # Save
         disp.save_to_hdf(file)
