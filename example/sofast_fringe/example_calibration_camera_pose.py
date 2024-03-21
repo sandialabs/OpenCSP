@@ -14,9 +14,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_run_camera_position_calibration(save_dir: str):
-    """Calibrates the position of the Sofast camera. Saves the rvec/tvec that
-    define the relative pose of the camera/screen in a SpatialOrientation file
-    at ./data/output/spatial_orientation.h5
+    """Calibrates the relative position of the Sofast camera and display. 
+    Saves the rvec/tvec in a SpatialOrientation file at ./data/output/spatial_orientation.h5
     """
     # Define directory where screen shape calibration data is saved
     base_dir_sofast_cal = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement')
