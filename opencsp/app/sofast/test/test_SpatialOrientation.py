@@ -1,5 +1,4 @@
-"""Unit test suite to test the SpatialOrientation class
-"""
+"""Unit test suite to test the SpatialOrientation class"""
 
 import os
 import unittest
@@ -7,7 +6,6 @@ import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -23,18 +21,18 @@ class TestSpatialOrientation(unittest.TestCase):
         # Define test data files for single facet processing
         data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
 
-        # Create spatial orientation objects
+        # Load data
         datasets = [
             'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
             'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
         ]
-        # Load data
-        data = load_hdf5_datasets(datasets, data_file_facet)
-        display = Display.load_from_hdf(data_file_facet)
 
+        ori = SpatialOrientation.load_from_hdf(data_file_facet)
+
+        data = load_hdf5_datasets(datasets, data_file_facet)
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1']).inv()
         v_cam_optic_cam = Vxyz(data['v_cam_optic_cam_refine_2'])
-        ori = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
+
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         # Save spatial orientation
