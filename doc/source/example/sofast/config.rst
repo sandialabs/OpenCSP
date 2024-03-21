@@ -1,18 +1,9 @@
-Multi Facet Data Process
-========================
-
-.. currentmodule:: example.sofast_fringe.example_multi_facet_data_process
-
-.. automodule:: example.sofast_fringe.example_multi_facet_data_process
-   :members:
-   :show-inheritance:
-
 Single Facet Data Process
 =========================
 
-.. currentmodule:: example.sofast_fringe.example_single_facet_data_process
+.. currentmodule:: example.sofast_fringe.example_process_single_facet
 
-.. automodule:: example.sofast_fringe.example_single_facet_data_process
+.. automodule:: example.sofast_fringe.example_process_single_facet
    :members:
    :show-inheritance:
 
@@ -20,17 +11,17 @@ Single Facet Data Process
 Undefined Facet Data Process
 ============================
 
-.. currentmodule:: example.sofast_fringe.example_undefined_facet_data_process
+.. currentmodule:: example.sofast_fringe.example_process_facet_ensemble
 
-.. automodule:: example.sofast_fringe.example_undefined_facet_data_process
+.. automodule:: example.sofast_fringe.example_process_facet_ensemble
    :members:
    :show-inheritance:
 
 View Camera Distortion
 ======================
 
-.. currentmodule:: example.sofast_fringe.example_view_camera_distortion
+.. currentmodule:: example.sofast_fringe.example_calibration_camera_pose
 
-.. automodule:: example.sofast_fringe.example_view_camera_distortion
+.. automodule:: example.sofast_fringe.example_calibration_camera_pose
    :members:
    :show-inheritance:
