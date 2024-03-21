@@ -2,6 +2,7 @@
 """
 
 import unittest
+from os.path import dirname, join
 
 import numpy as np
 
@@ -10,7 +11,7 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-class TestDisplay(unittest.TestCase):
+class TestDisplayShape(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Define screen X and Y extent
@@ -90,6 +91,42 @@ class TestDisplay(unittest.TestCase):
 
         # Test
         np.testing.assert_allclose(calc.data, self.exp_Vxyz_disp_pts.data, rtol=0, atol=1e-7)
+
+    def test_save_load_hdf_dist_3d(self):
+        # Instantiate display object
+        name = 'Test DisplayShape'
+        disp = DisplayShape(self.grid_data_3D, name)
+        file = join(dirname(__file__), 'data/output/test_display_shape_dist_3d.h5')
+
+        # Save
+        disp.save_to_hdf(file)
+
+        # Load
+        DisplayShape.load_from_hdf(file)
+
+    def test_save_load_hdf_dist_2d(self):
+        # Instantiate display object
+        name = 'Test DisplayShape'
+        disp = DisplayShape(self.grid_data_2D, name)
+        file = join(dirname(__file__), 'data/output/test_display_shape_dist_2d.h5')
+
+        # Save
+        disp.save_to_hdf(file)
+
+        # Load
+        DisplayShape.load_from_hdf(file)
+
+    def test_save_load_hdf_rectangular(self):
+        # Instantiate display object
+        name = 'Test DisplayShape'
+        disp = DisplayShape(self.grid_data_rect2D, name)
+        file = join(dirname(__file__), 'data/output/test_display_shape_rect.h5')
+
+        # Save
+        disp.save_to_hdf(file)
+
+        # Load
+        DisplayShape.load_from_hdf(file)
 
 
 if __name__ == '__main__':

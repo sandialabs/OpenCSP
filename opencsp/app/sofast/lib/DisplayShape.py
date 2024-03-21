@@ -239,5 +239,9 @@ class DisplayShape(ht.HDF5_IO_Abstract):
             else:
                 data.append(self.grid_data[dataset])
 
+        # Add name
+        datasets.append(prefix + 'DisplayShape/name')
+        data.append(self.name)
+
         # Save data
         ht.save_hdf5_datasets(data, datasets, file)
