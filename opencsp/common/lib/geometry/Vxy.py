@@ -22,9 +22,7 @@ class Vxy:
             if np.ndim(data) not in [1, 2]:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
             elif np.ndim(data) == 2 and data.shape[0] != 2:
-                raise ValueError(
-                    'First dimension of 2-dimensional data must be length 2 if ndarray.'
-                )
+                raise ValueError('First dimension of 2-dimensional data must be length 2 if ndarray.')
         elif len(data) != 2:
             raise ValueError('Input data must have length 2.')
 
@@ -85,9 +83,7 @@ class Vxy:
         elif type(data_in) is np.ndarray:
             return self._from_data(self._data * data_in)
         else:
-            raise TypeError(
-                'Vxy cannot be multipled by type, {}.'.format(type(data_in))
-            )
+            raise TypeError('Vxy cannot be multipled by type, {}.'.format(type(data_in)))
 
     def __getitem__(self, key):
         # Check that only one dimension is being indexed
@@ -212,9 +208,7 @@ class Vxy:
         if type(R) is not np.ndarray:
             raise TypeError('Rotation must be type ndarray, not {}'.format(type(R)))
         if R.shape != (2, 2):
-            raise ValueError(
-                'Rotation matrix must be shape (2, 2), not {}'.format(R.shape)
-            )
+            raise ValueError('Rotation matrix must be shape (2, 2), not {}'.format(R.shape))
 
         self._data = R @ self._data
 

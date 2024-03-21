@@ -5,5 +5,4 @@ from opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract import ParamsSlo
 
 @dataclass
 class ParamsSlopeSolverPlano(ParamsSlopeSolverAbstract):
-    """SlopeSolver input parameters class for plano (perfectly flat) surface type
-    """
+    """SlopeSolver input parameters class for plano (perfectly flat) surface type"""

@@ -25,9 +25,7 @@ import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
 from opencsp.common.lib.csp.ufacet.Facet import Facet
 from opencsp.common.lib.csp.ufacet.Heliostat import Heliostat
-from opencsp.common.lib.csp.MirrorParametricRectangular import (
-    MirrorParametricRectangular,
-)
+from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 from opencsp.common.lib.csp.SolarField import SolarField
 
@@ -58,16 +56,8 @@ class TestMirrorOutput(to.TestOutput):
         self.m1_len_y = 3.0  # m
         self.m1_rectangle_xy = (self.m1_len_x, self.m1_len_y)
         self.m1 = MirrorParametricRectangular(self.m1_fxn, self.m1_rectangle_xy)
-        self.m1_shape_description = (
-            'rectangle ' + str(self.m1_len_x) + 'm x ' + str(self.m1_len_y) + 'm'
-        )
-        self.m1_title = (
-            'Mirror ('
-            + self.m1_shape_description
-            + ', f='
-            + str(self.m1_focal_length)
-            + 'm), Face Up'
-        )
+        self.m1_shape_description = 'rectangle ' + str(self.m1_len_x) + 'm x ' + str(self.m1_len_y) + 'm'
+        self.m1_title = 'Mirror (' + self.m1_shape_description + ', f=' + str(self.m1_focal_length) + 'm), Face Up'
         self.m1_caption = (
             'A single mirror of shape ('
             + self.m1_shape_description
@@ -107,26 +97,16 @@ class TestMirrorOutput(to.TestOutput):
         # Set canting angles.
         cos5 = np.cos(np.deg2rad(8))
         sin5 = np.sin(np.deg2rad(8))
-        tilt_up = Rotation.from_matrix(
-            np.asarray([[1, 0, 0], [0, cos5, -sin5], [0, sin5, cos5]])
-        )
-        tilt_down = Rotation.from_matrix(
-            np.asarray([[1, 0, 0], [0, cos5, sin5], [0, -sin5, cos5]])
-        )
-        tilt_left = Rotation.from_matrix(
-            np.asarray([[cos5, 0, sin5], [0, 1, 0], [-sin5, 0, cos5]])
-        )
-        tilt_right = Rotation.from_matrix(
-            np.asarray([[cos5, 0, -sin5], [0, 1, 0], [sin5, 0, cos5]])
-        )
+        tilt_up = Rotation.from_matrix(np.asarray([[1, 0, 0], [0, cos5, -sin5], [0, sin5, cos5]]))
+        tilt_down = Rotation.from_matrix(np.asarray([[1, 0, 0], [0, cos5, sin5], [0, -sin5, cos5]]))
+        tilt_left = Rotation.from_matrix(np.asarray([[cos5, 0, sin5], [0, 1, 0], [-sin5, 0, cos5]]))
+        tilt_right = Rotation.from_matrix(np.asarray([[cos5, 0, -sin5], [0, 1, 0], [sin5, 0, cos5]]))
         self.h2x2_f1.canting = tilt_left * tilt_up
         self.h2x2_f2.canting = tilt_right * tilt_up
         self.h2x2_f3.canting = tilt_left * tilt_down
         self.h2x2_f4.canting = tilt_right * tilt_down
         self.h2x2_facets = [self.h2x2_f1, self.h2x2_f2, self.h2x2_f3, self.h2x2_f4]
-        self.h2x2 = Heliostat(
-            'Simple 2x2 Heliostat', [0, 0, 0], 4, 2, 2, self.h2x2_facets, 0, 0
-        )
+        self.h2x2 = Heliostat('Simple 2x2 Heliostat', [0, 0, 0], 4, 2, 2, self.h2x2_facets, 0, 0)
         self.h2x2_title = 'Heliostat with Parametrically Defined Facets'
         self.h2x2_caption = (
             'Heliostat with four facets ('
@@ -138,37 +118,15 @@ class TestMirrorOutput(to.TestOutput):
         self.h2x2_comments = []
 
         # Simple solar field, with two simple heliostats.
-        self.sf2x2_h1 = Heliostat(
-            'Heliostat 1',
-            [0, 0, 0],
-            4,
-            2,
-            2,
-            copy.deepcopy(self.h2x2_facets),
-            4.02,
-            0.1778,
-        )
-        self.sf2x2_h2 = Heliostat(
-            'Heliostat 2',
-            [0, 10, 0],
-            4,
-            2,
-            2,
-            copy.deepcopy(self.h2x2_facets),
-            4.02,
-            0.1778,
-        )
+        self.sf2x2_h1 = Heliostat('Heliostat 1', [0, 0, 0], 4, 2, 2, copy.deepcopy(self.h2x2_facets), 4.02, 0.1778)
+        self.sf2x2_h2 = Heliostat('Heliostat 2', [0, 10, 0], 4, 2, 2, copy.deepcopy(self.h2x2_facets), 4.02, 0.1778)
         self.sf2x2_heliostats = [self.sf2x2_h1, self.sf2x2_h2]
-        self.sf2x2 = SolarField(
-            'Test Field', 'test', [-106.509606, 34.962276], self.sf2x2_heliostats
-        )
+        self.sf2x2 = SolarField('Test Field', 'test', [-106.509606, 34.962276], self.sf2x2_heliostats)
         self.sf2x2_title = 'Two Heliostats'
         self.sf2x2_caption = 'Two 4-facet heliostats, tracking.'
         self.sf2x2_comments = []
 
-    def lambda_symmetric_paraboloid(
-        self, focal_length: float
-    ) -> Callable[[float, float], float]:
+    def lambda_symmetric_paraboloid(self, focal_length: float) -> Callable[[float, float], float]:
         """Returns a callable for a symmetric paraboloid surface
 
         Parameters
@@ -244,9 +202,7 @@ class TestMirrorOutput(to.TestOutput):
             draw_surface_normal=False,
             draw_surface_normal_at_corners=True,
         )
-        local_comments.append(
-            'Render mirror surface with normals, facet outline with corner normals.'
-        )
+        local_comments.append('Render mirror surface with normals, facet outline with corner normals.')
 
         # Draw.
         fig_record = fm.setup_figure_for_3d_data(
@@ -276,25 +232,16 @@ class TestMirrorOutput(to.TestOutput):
 
         # Set configurations.
         self.sf2x2_h1.set_configuration(hc.face_west())
-        local_comments.append(
-            'Heliostat 1 oriented initially face west.'
-        )  # Overriden by tracking below.
+        local_comments.append('Heliostat 1 oriented initially face west.')  # Overriden by tracking below.
         self.sf2x2_h2.set_configuration(hc.face_south())
-        local_comments.append(
-            'Heliostat 2 oriented initially face south.'
-        )  # Overriden by tracking below.
+        local_comments.append('Heliostat 2 oriented initially face south.')  # Overriden by tracking below.
 
         # Define tracking time.
         aimpoint_xyz = [60.0, 8.8, 28.9]
         #               year, month, day, hour, minute, second, zone]
         when_ymdhmsz = [2021, 5, 13, 13, 2, 0, -6]
         self.sf2x2.set_full_field_tracking(aimpoint_xyz, when_ymdhmsz)
-        local_comments.append(
-            'Heliostats set to track to '
-            + str(aimpoint_xyz)
-            + ' at ymdhmsz ='
-            + str(when_ymdhmsz)
-        )
+        local_comments.append('Heliostats set to track to ' + str(aimpoint_xyz) + ' at ymdhmsz =' + str(when_ymdhmsz))
 
         # Setup render control.
         mirror_control = rcm.RenderControlMirror(surface_normals=False)
@@ -317,9 +264,7 @@ class TestMirrorOutput(to.TestOutput):
         solar_field_control = rcsf.RenderControlSolarField(
             heliostat_styles=rce.RenderControlEnsemble(heliostat_control)
         )
-        local_comments.append(
-            'Render mirror surfaces, facet centroids, and heliostat outline and surface normal.'
-        )
+        local_comments.append('Render mirror surfaces, facet centroids, and heliostat outline and surface normal.')
 
         # Draw.
         fig_record = fm.setup_figure_for_3d_data(
@@ -358,11 +303,7 @@ class TestMirrorOutput(to.TestOutput):
         focal_length_5W01 = 55  # meters
         name_5W01 = '5W01'
         title_5W01 = 'NSTTF Heliostat ' + name_5W01
-        caption_5W01 = (
-            '5W01 modeled as a symmetric paraboloid with focal length f='
-            + str(focal_length_5W01)
-            + 'm.'
-        )
+        caption_5W01 = '5W01 modeled as a symmetric paraboloid with focal length f=' + str(focal_length_5W01) + 'm.'
         # 14W01.
         x_14W01 = -4.88  # meters  # TODO RCB: FETCH FROM DEFINITION FILE
         y_14W01 = 194.71  # meters  # TODO RCB: FETCH FROM DEFINITION FILE
@@ -370,11 +311,7 @@ class TestMirrorOutput(to.TestOutput):
         focal_length_14W01 = 186.8  # meters
         name_14W01 = '14W01'
         title_14W01 = 'NSTTF Heliostat ' + name_14W01
-        caption_14W01 = (
-            '14W01 modeled as a symmetric paraboloid with focal length f='
-            + str(focal_length_14W01)
-            + 'm.'
-        )
+        caption_14W01 = '14W01 modeled as a symmetric paraboloid with focal length f=' + str(focal_length_14W01) + 'm.'
         # Solar field.
         short_name_sf = 'Mini NSTTF'
         name_sf = 'Mini NSTTF with ' + name_5W01 + ' and ' + name_14W01
@@ -431,23 +368,15 @@ class TestMirrorOutput(to.TestOutput):
 
         sf = SolarField(name_sf, short_name_sf, [-106.509606, 34.962276], heliostats)
 
-        comments_long = (
-            comments.copy()
-        )  # We'll add a different comment for the plots with long normals.
-        comments_very_long = (
-            comments.copy()
-        )  # We'll add a different comment for the plots with very long normals.
+        comments_long = comments.copy()  # We'll add a different comment for the plots with long normals.
+        comments_very_long = comments.copy()  # We'll add a different comment for the plots with very long normals.
         comments_exaggerated_z = (
             comments.copy()
         )  # We'll add a different comment for the plots with an exaggerated z axis.
-        comments.append(
-            'Render mirror surfaces and normals, facet outlines, and heliostat centroid.'
-        )
+        comments.append('Render mirror surfaces and normals, facet outlines, and heliostat centroid.')
 
         # Setup render control (long normals).
-        mirror_control_long = rcm.RenderControlMirror(
-            surface_normals=True, norm_len=12, norm_res=3, resolution=3
-        )
+        mirror_control_long = rcm.RenderControlMirror(surface_normals=True, norm_len=12, norm_res=3, resolution=3)
         facet_control_long = rcf.RenderControlFacet(
             draw_mirror_curvature=True,
             mirror_styles=mirror_control_long,
@@ -466,9 +395,7 @@ class TestMirrorOutput(to.TestOutput):
             draw_facets=True,
         )
 
-        comments_long.append(
-            'Render mirror surfaces and long normals, facet outlines, and heliostat centroid.'
-        )
+        comments_long.append('Render mirror surfaces and long normals, facet outlines, and heliostat centroid.')
 
         # Draw and output 5W01 figure (long normals, xy view).
         fig_record = fm.setup_figure_for_3d_data(
@@ -505,9 +432,7 @@ class TestMirrorOutput(to.TestOutput):
         # Setup render control (very long normals).
         mirror_control_very_long = rcm.RenderControlMirror(
             surface_normals=True,
-            norm_len=(
-                2 * focal_length_14W01
-            ),  # Twice the focal length is the center of curvature.
+            norm_len=(2 * focal_length_14W01),  # Twice the focal length is the center of curvature.
             norm_res=2,
             resolution=3,
         )
@@ -555,31 +480,13 @@ class TestMirrorOutput(to.TestOutput):
         z_exaggerated_margin = 0.35  # meters, plus or minus reference height.
         decimal_factor = 100.0
         # Different z limits for each heliostat, because they are at different elevations on the sloped field.
-        z_min_5W01 = (
-            np.floor(
-                decimal_factor * ((z_5W01 + nsttf_pivot_offset) - z_exaggerated_margin)
-            )
-            / decimal_factor
-        )
-        z_max_5W01 = (
-            np.ceil(
-                decimal_factor * ((z_5W01 + nsttf_pivot_offset) + z_exaggerated_margin)
-            )
-            / decimal_factor
-        )
+        z_min_5W01 = np.floor(decimal_factor * ((z_5W01 + nsttf_pivot_offset) - z_exaggerated_margin)) / decimal_factor
+        z_max_5W01 = np.ceil(decimal_factor * ((z_5W01 + nsttf_pivot_offset) + z_exaggerated_margin)) / decimal_factor
         exaggerated_z_limits_5W01 = [z_min_5W01, z_max_5W01]
         z_min_14W01 = (
-            np.floor(
-                decimal_factor * ((z_14W01 + nsttf_pivot_offset) - z_exaggerated_margin)
-            )
-            / decimal_factor
+            np.floor(decimal_factor * ((z_14W01 + nsttf_pivot_offset) - z_exaggerated_margin)) / decimal_factor
         )
-        z_max_14W01 = (
-            np.ceil(
-                decimal_factor * ((z_14W01 + nsttf_pivot_offset) + z_exaggerated_margin)
-            )
-            / decimal_factor
-        )
+        z_max_14W01 = np.ceil(decimal_factor * ((z_14W01 + nsttf_pivot_offset) + z_exaggerated_margin)) / decimal_factor
         exaggerated_z_limits_14W01 = [z_min_14W01, z_max_14W01]
         mirror_control_exaggerated_z = rcm.RenderControlMirror(surface_normals=False)
         facet_control_exaggerated_z = rcf.RenderControlFacet(
@@ -632,7 +539,9 @@ class TestMirrorOutput(to.TestOutput):
             code_tag=self.code_tag,
         )
         fig_record.equal = False  # Asserting equal axis scales contradicts exaggerated z limits in 2-d plots.
-        fig_record.z_limits = exaggerated_z_limits_14W01  # Limits are on z values, even though the plot is 2-d.  View3d.py handles this.
+        fig_record.z_limits = (
+            exaggerated_z_limits_14W01  # Limits are on z values, even though the plot is 2-d.  View3d.py handles this.
+        )
         h_14W01.draw(fig_record.view, heliostat_control_exaggerated_z)
         self.show_save_and_check_figure(fig_record, dpi=150)
 
@@ -689,9 +598,7 @@ class TestMirrorOutput(to.TestOutput):
         when_ymdhmsz = [2021, 5, 13, 13, 2, 0, -6]
 
         # Setup render control.
-        mirror_control = rcm.RenderControlMirror(
-            surface_normals=True, norm_len=4, norm_res=2, resolution=3
-        )
+        mirror_control = rcm.RenderControlMirror(surface_normals=True, norm_len=4, norm_res=2, resolution=3)
         facet_control = rcf.RenderControlFacet(
             draw_mirror_curvature=True,
             mirror_styles=mirror_control,
@@ -737,12 +644,7 @@ class TestMirrorOutput(to.TestOutput):
         # Tracking heliostat.
 
         sf.set_full_field_tracking(aimpoint_xyz, when_ymdhmsz)
-        comments.append(
-            'Heliostats set to track to '
-            + str(aimpoint_xyz)
-            + ' at ymdhmsz ='
-            + str(when_ymdhmsz)
-        )
+        comments.append('Heliostats set to track to ' + str(aimpoint_xyz) + ' at ymdhmsz =' + str(when_ymdhmsz))
         fig_record = fm.setup_figure_for_3d_data(
             self.figure_control,
             self.axis_control_m,

@@ -37,14 +37,7 @@ class LineXY:
         self.C = C / mag
 
     def __repr__(self):
-        return (
-            '2D Line: '
-            + self.A.__repr__()
-            + ', '
-            + self.B.__repr__()
-            + ', '
-            + self.C.__repr__()
-        )
+        return '2D Line: ' + self.A.__repr__() + ', ' + self.B.__repr__() + ', ' + self.C.__repr__()
 
     @property
     def n_vec(self) -> Vxy:
@@ -105,9 +98,7 @@ class LineXY:
         n = len(Pxy)
         thresh = int(0.99 * n)
         if n <= 15:
-            raise ValueError(
-                f'To fit line from points, must have > 15 points, but {n:d} were given.'
-            )
+            raise ValueError(f'To fit line from points, must have > 15 points, but {n:d} were given.')
 
         # Fit from random combinations of points, keeping the best
         best_active = 0
@@ -115,10 +106,7 @@ class LineXY:
             # Find two separate points
             i1 = np.floor(rs.rand() * n).astype(int)
             i2 = np.floor(rs.rand() * n).astype(int)
-            while (
-                Pxy.data[0, i1] == Pxy.data[0, i2]
-                and Pxy.data[1, i1] == Pxy.data[1, i2]
-            ):
+            while Pxy.data[0, i1] == Pxy.data[0, i2] and Pxy.data[1, i1] == Pxy.data[1, i2]:
                 i2 = np.floor(rs.rand() * n).astype(int)
 
             # Fit line to two poins

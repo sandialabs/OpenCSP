@@ -158,9 +158,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
                 - v_mask_centroid_image
     """
 
-    def __init__(
-        self, measurement: Measurement, camera: Camera, display: Display
-    ) -> 'ProcessSofastFringe':
+    def __init__(self, measurement: Measurement, camera: Camera, display: Display) -> 'ProcessSofastFringe':
         """
         SOFAST processing class.
 
@@ -178,9 +176,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         self.measurement = measurement
         self.display = display
         self.camera = camera
-        self.orientation = SpatialOrientation(
-            display.r_cam_screen, display.v_cam_screen_cam
-        )
+        self.orientation = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
 
         # Define default calculation parameters
         self.params = ParamsSofastFringe()
@@ -196,9 +192,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         self.data_geometry_general: cdc.CalculationDataGeometryGeneral = None
         self.data_image_processing_general: cdc.CalculationImageProcessingGeneral = None
         self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet] = None
-        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet] = (
-            None
-        )
+        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet] = None
         self.data_error: cdc.CalculationError = None
 
         self.data_characterization_facet: list[SlopeSolverData] = None
@@ -227,9 +221,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         # Solve slopes
         self._solve_slopes([surface])
 
-    def process_optic_singlefacet(self,
-                                  facet_data: DefinitionFacet,
-                                  surface: Surface2DAbstract) -> None:
+    def process_optic_singlefacet(self, facet_data: DefinitionFacet, surface: Surface2DAbstract) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
         for slops for single facet optic.
@@ -250,10 +242,9 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         # Solve slopes
         self._solve_slopes([surface])
 
-    def process_optic_multifacet(self,
-                                 facet_data: list[DefinitionFacet],
-                                 ensemble_data: DefinitionEnsemble,
-                                 surfaces: list[Surface2DAbstract]) -> None:
+    def process_optic_multifacet(
+        self, facet_data: list[DefinitionFacet], ensemble_data: DefinitionEnsemble, surfaces: list[Surface2DAbstract]
+    ) -> None:
         """
         Processes optic geometry, screen intersection points, and solves
         for slops for multi-facet optic.
@@ -273,7 +264,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             lt.error_and_raise(
                 ValueError,
                 'Length of facet_data does not equal length of surfaces'
-                f'facet_data={len(facet_data)}, surface_data={len(surfaces)}'
+                f'facet_data={len(facet_data)}, surface_data={len(surfaces)}',
             )
 
         # Process optic/setup geometry
@@ -401,7 +392,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             lt.error_and_raise(
                 ValueError,
                 f'Given length of facet data is {len(facet_data):d}'
-                f'but ensemble_data expects {ensemble_data.num_facets:d} facets.'
+                f'but ensemble_data expects {ensemble_data.num_facets:d} facets.',
             )
 
         # Calculate mask
@@ -416,7 +407,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         if self.params.mask_keep_largest_area:
             lt.warn(
                 '"keep_largest_area" mask processing option cannot be used '
-                'for multifacet ensembles. This will be turned off.',
+                'for multifacet ensembles. This will be turned off.'
             )
             self.params.mask_keep_largest_area = False
 
@@ -465,17 +456,13 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             screen_ys = 1.0 - screen_ys
             # Store screen points in Vxy
             v_screen_points_fractional_screens = Vxy((screen_xs, screen_ys))
-            self.data_geometry_facet[idx_facet].v_screen_points_fractional_screens = (
-                v_screen_points_fractional_screens
-            )
+            self.data_geometry_facet[idx_facet].v_screen_points_fractional_screens = v_screen_points_fractional_screens
 
             # Undistort screen points (display coordinates)
             v_screen_points_screen = self.display.interp_func(
                 v_screen_points_fractional_screens
             )  # meters, display coordinates
-            self.data_geometry_facet[idx_facet].v_screen_points_screen = (
-                v_screen_points_screen
-            )
+            self.data_geometry_facet[idx_facet].v_screen_points_screen = v_screen_points_screen
 
             # Check for nans returning from screen point calculation
             nan_mask = np.isnan(v_screen_points_screen.data).sum(0).astype(bool)
@@ -483,43 +470,33 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             if np.any(nan_mask):
                 lt.warn(
                     f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated '
-                    'screen points for facet {idx_facet:d}. These data points will be removed.',
+                    'screen points for facet {idx_facet:d}. These data points will be removed.'
                 )
                 # Make mask of NANs
                 mask_bad_pixels[mask_processed] = nan_mask
                 # Update processed mask
                 mask_processed[mask_bad_pixels] = False
                 # Remove nan data points from screen points
-                self.data_geometry_facet[
-                    idx_facet
-                ].v_screen_points_fractional_screens = v_screen_points_fractional_screens[
+                self.data_geometry_facet[idx_facet].v_screen_points_fractional_screens = (
+                    v_screen_points_fractional_screens[np.logical_not(nan_mask)]
+                )
+                self.data_geometry_facet[idx_facet].v_screen_points_screen = v_screen_points_screen[
                     np.logical_not(nan_mask)
                 ]
-                self.data_geometry_facet[idx_facet].v_screen_points_screen = (
-                    v_screen_points_screen[np.logical_not(nan_mask)]
-                )
             # Save bad pixel mask
-            self.data_image_processing_facet[idx_facet].mask_bad_pixels = (
-                mask_bad_pixels
-            )
+            self.data_image_processing_facet[idx_facet].mask_bad_pixels = mask_bad_pixels
 
             # Calculate pixel pointing directions (camera coordinates)
-            u_pixel_pointing_cam = ip.calculate_active_pixels_vectors(
-                mask_processed, self.camera
-            )
+            u_pixel_pointing_cam = ip.calculate_active_pixels_vectors(mask_processed, self.camera)
             # Convert to optic coordinates
             u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(ori.r_cam_optic)
-            self.data_geometry_facet[idx_facet].u_pixel_pointing_facet = (
-                u_pixel_pointing_facet
-            )
+            self.data_geometry_facet[idx_facet].u_pixel_pointing_facet = u_pixel_pointing_facet
 
             # Convert to optic coordinates
             v_screen_points_facet = ori.trans_screen_optic.apply(
                 self.data_geometry_facet[idx_facet].v_screen_points_screen
             )
-            self.data_geometry_facet[idx_facet].v_screen_points_facet = (
-                v_screen_points_facet
-            )
+            self.data_geometry_facet[idx_facet].v_screen_points_facet = v_screen_points_facet
 
     def _solve_slopes(self, surfaces: list[Surface2DAbstract]) -> None:
         """
@@ -532,43 +509,24 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         """
         # Check inputs
         if self.data_geometry_facet is None:
-            lt.error_and_raise(
-                ValueError,
-                'Not all facets geometrically processed; cannot solve slopes.'
-            )
+            lt.error_and_raise(ValueError, 'Not all facets geometrically processed; cannot solve slopes.')
 
         # Loop through all input facets and solve slopes
         self.data_characterization_facet = []
         for facet_idx in range(self.num_facets):
             # Check debug status
             if self.params.slope_solver_data_debug.debug_active:
-                self.params.slope_solver_data_debug.optic_data = self.data_facet_def[
-                    facet_idx
-                ]
+                self.params.slope_solver_data_debug.optic_data = self.data_facet_def[facet_idx]
 
             # Instantiate slope solver object
             kwargs = {
-                'v_optic_cam_optic': self.data_geometry_facet[
-                    facet_idx
-                ].spatial_orientation.v_optic_cam_optic,
-                'u_active_pixel_pointing_optic': self.data_geometry_facet[
-                    facet_idx
-                ].u_pixel_pointing_facet,
-                'u_measure_pixel_pointing_optic': self.data_geometry_facet[
-                    facet_idx
-                ].u_cam_measure_point_facet,
-                'v_screen_points_facet': self.data_geometry_facet[
-                    facet_idx
-                ].v_screen_points_facet,
-                'v_optic_screen_optic': self.data_geometry_facet[
-                    facet_idx
-                ].spatial_orientation.v_optic_screen_optic,
-                'v_align_point_optic': self.data_geometry_facet[
-                    facet_idx
-                ].v_align_point_facet,
-                'dist_optic_screen': self.data_geometry_facet[
-                    facet_idx
-                ].measure_point_screen_distance,
+                'v_optic_cam_optic': self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_cam_optic,
+                'u_active_pixel_pointing_optic': self.data_geometry_facet[facet_idx].u_pixel_pointing_facet,
+                'u_measure_pixel_pointing_optic': self.data_geometry_facet[facet_idx].u_cam_measure_point_facet,
+                'v_screen_points_facet': self.data_geometry_facet[facet_idx].v_screen_points_facet,
+                'v_optic_screen_optic': self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_screen_optic,
+                'v_align_point_optic': self.data_geometry_facet[facet_idx].v_align_point_facet,
+                'dist_optic_screen': self.data_geometry_facet[facet_idx].measure_point_screen_distance,
                 'surface': surfaces[facet_idx],
                 'debug': self.params.slope_solver_data_debug,
             }
@@ -588,9 +546,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         # Save input surface parameters data
         self.data_surfaces = surfaces
 
-    def _calculate_facet_pointing(
-        self, reference: Literal['average'] | int = 'average'
-    ) -> None:
+    def _calculate_facet_pointing(self, reference: Literal['average'] | int = 'average') -> None:
         """
         Calculates facet pointing relative to the given reference.
 
@@ -607,8 +563,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             lt.error_and_raise(ValueError, 'Given reference must be int or "average".')
         if isinstance(reference, int) and reference >= self.num_facets:
             lt.error_and_raise(
-                ValueError,
-                f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.'
+                ValueError, f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.'
             )
 
         # Instantiate data list
@@ -619,14 +574,11 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         for idx in range(self.num_facets):
             # Get transformation from user-input and slope solving
             trans_1 = TransformXYZ.from_R_V(
-                self.data_ensemble_def.r_facet_ensemble[idx],
-                self.data_ensemble_def.v_facet_locations[idx],
+                self.data_ensemble_def.r_facet_ensemble[idx], self.data_ensemble_def.v_facet_locations[idx]
             )
             trans_2 = self.data_characterization_facet[idx].trans_alignment
             # Calculate inverse of slope solving transform
-            trans_2 = TransformXYZ.from_V(-trans_2.V) * TransformXYZ.from_R(
-                trans_2.R.inv()
-            )
+            trans_2 = TransformXYZ.from_V(-trans_2.V) * TransformXYZ.from_R(trans_2.R.inv())
             # Create local to global transformation
             trans_facet_ensemble_list.append(trans_2 * trans_1)
 
@@ -644,16 +596,12 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         trans_align_pointing = TransformXYZ.from_R(r_align_pointing)
 
         # Apply alignment rotation to total transformation
-        trans_facet_ensemble_list = [
-            trans_align_pointing * t for t in trans_facet_ensemble_list
-        ]
+        trans_facet_ensemble_list = [trans_align_pointing * t for t in trans_facet_ensemble_list]
 
         # Calculate global slope and surface points
         for idx in range(self.num_facets):
             # Get slope data
-            slopes = self.data_characterization_facet[
-                idx
-            ].slopes_facet_xy  # facet coordinats
+            slopes = self.data_characterization_facet[idx].slopes_facet_xy  # facet coordinats
 
             # Calculate surface normals in local (facet) coordinates
             u_surf_norms = np.ones((3, slopes.shape[1]))
@@ -663,9 +611,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             # Apply rotation to normal vectors
             u_surf_norms_global = u_surf_norms.rotate(trans_facet_ensemble_list[idx].R)
             # Convert normal vectors to global (ensemble) slopes
-            slopes_ensemble_xy = (
-                -u_surf_norms_global.data[:2] / u_surf_norms_global.data[2:]
-            )
+            slopes_ensemble_xy = -u_surf_norms_global.data[:2] / u_surf_norms_global.data[2:]
 
             # Convert surface points to global (ensemble) coordinates
             v_surf_points_ensemble = trans_facet_ensemble_list[idx].apply(
@@ -673,15 +619,10 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             )
 
             # Calculate pointing vectors in ensemble coordinates
-            v_facet_pointing_ensemble = Vxyz((0, 0, 1)).rotate(
-                trans_facet_ensemble_list[idx].R
-            )
+            v_facet_pointing_ensemble = Vxyz((0, 0, 1)).rotate(trans_facet_ensemble_list[idx].R)
 
             data = cdc.CalculationFacetEnsemble(
-                trans_facet_ensemble_list[idx],
-                slopes_ensemble_xy,
-                v_surf_points_ensemble,
-                v_facet_pointing_ensemble,
+                trans_facet_ensemble_list[idx], slopes_ensemble_xy, v_surf_points_ensemble, v_facet_pointing_ensemble
             )
             self.data_characterization_ensemble.append(data)
 
@@ -731,9 +672,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             facet = Facet(mirror)
             # Locate facet
             if self.optic_type == 'multi':
-                trans: TransformXYZ = self.data_characterization_ensemble[
-                    idx_mirror
-                ].trans_facet_ensemble
+                trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror].trans_facet_ensemble
                 facet.set_position_in_space(trans.V, trans.R)
             # Save facets
             facets.append(facet)
@@ -761,8 +700,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         if self.data_error is not None:
             self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
         self.data_geometry_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-        self.data_image_processing_general.save_to_hdf(
-            file, f'{prefix:s}DataSofastCalculation/general/')
+        self.data_image_processing_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
 
         # Sofast parameters
         self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
@@ -770,8 +708,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         # Facet definition
         if self.data_facet_def is not None:
             for idx_facet, facet_data in enumerate(self.data_facet_def):
-                facet_data.save_to_hdf(
-                    file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
+                facet_data.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
 
         # Ensemble definition
         if self.data_ensemble_def is not None:
@@ -779,23 +716,25 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
 
         # Surface definition
         for idx_facet, surface in enumerate(self.data_surfaces):
-            surface.save_to_hdf(
-                file,
-                f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
+            surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
 
         # Calculations, one per facet
         for idx_facet in range(self.num_facets):
             # Save facet slope data
             self.data_characterization_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+            )
             # Save facet geometry data
             self.data_geometry_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+            )
             # Save facet image processing data
             self.data_image_processing_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+            )
 
             if self.data_characterization_ensemble:
                 # Save ensemle data
                 self.data_characterization_ensemble[idx_facet].save_to_hdf(
-                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/')
+                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                )

@@ -11,11 +11,7 @@ class DisplayShape:
     """Representation of a screen/projector for deflectometry."""
 
     def __init__(
-        self,
-        v_cam_screen_screen: Vxyz,
-        r_screen_cam: Rotation,
-        grid_data: dict,
-        name: str = '',
+        self, v_cam_screen_screen: Vxyz, r_screen_cam: Rotation, grid_data: dict, name: str = ''
     ) -> 'DisplayShape':
         """
         Instantiates deflectometry display representation.
@@ -207,20 +203,14 @@ class DisplayShape:
 
         # Distorted 2D
         elif grid_data['screen_model'] == 'distorted2D':
-            datasets = [
-                'DisplayShape/xy_screen_fraction',
-                'DisplayShape/xy_screen_coords',
-            ]
+            datasets = ['DisplayShape/xy_screen_fraction', 'DisplayShape/xy_screen_coords']
             grid_data.update(hdf5_tools.load_hdf5_datasets(datasets, file))
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xy_screen_coords'] = Vxy(grid_data['xy_screen_coords'])
 
         # Distorted 3D
         elif grid_data['screen_model'] == 'distorted3D':
-            datasets = [
-                'DisplayShape/xy_screen_fraction',
-                'DisplayShape/xyz_screen_coords',
-            ]
+            datasets = ['DisplayShape/xy_screen_fraction', 'DisplayShape/xyz_screen_coords']
             grid_data.update(hdf5_tools.load_hdf5_datasets(datasets, file))
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xyz_screen_coords'] = Vxyz(grid_data['xyz_screen_coords'])
@@ -229,11 +219,7 @@ class DisplayShape:
             raise ValueError(f'Model, {grid_data["screen_model"]}, not supported.')
 
         # Load display parameters
-        datasets = [
-            'DisplayShape/rvec_screen_cam',
-            'DisplayShape/tvec_cam_screen_screen',
-            'DisplayShape/name',
-        ]
+        datasets = ['DisplayShape/rvec_screen_cam', 'DisplayShape/tvec_cam_screen_screen', 'DisplayShape/name']
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
 
         # Return display object
@@ -261,24 +247,14 @@ class DisplayShape:
         data = []
         for dataset in self.grid_data.keys():
             datasets.append('DisplayShape/' + dataset)
-            if isinstance(self.grid_data[dataset], Vxy) or isinstance(
-                self.grid_data[dataset], Vxyz
-            ):
+            if isinstance(self.grid_data[dataset], Vxy) or isinstance(self.grid_data[dataset], Vxyz):
                 data.append(self.grid_data[dataset].data)
             else:
                 data.append(self.grid_data[dataset])
 
         # Screen data
-        datasets += [
-            'DisplayShape/rvec_screen_cam',
-            'DisplayShape/tvec_cam_screen_screen',
-            'DisplayShape/name',
-        ]
-        data += [
-            self.r_screen_cam.as_rotvec(),
-            self.v_cam_screen_screen.data,
-            self.name,
-        ]
+        datasets += ['DisplayShape/rvec_screen_cam', 'DisplayShape/tvec_cam_screen_screen', 'DisplayShape/name']
+        data += [self.r_screen_cam.as_rotvec(), self.v_cam_screen_screen.data, self.name]
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)

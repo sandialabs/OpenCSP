@@ -17,7 +17,4 @@ class AbstractFileFingerprint(ABC):
     def eq_aff(self, other: 'AbstractFileFingerprint'):
         if not isinstance(other, AbstractFileFingerprint):
             return False
-        return (
-            self.relative_path == other.relative_path
-            and self.name_ext == other.name_ext
-        )
+        return self.relative_path == other.relative_path and self.name_ext == other.name_ext

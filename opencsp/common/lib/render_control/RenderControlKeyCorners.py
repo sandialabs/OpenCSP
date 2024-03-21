@@ -32,9 +32,7 @@ class RenderControlKeyCorners:
         self.key_corners_points_marker = key_corners_points_marker
         self.key_corners_points_markersize = key_corners_points_markersize
         self.key_corners_points_color = key_corners_points_color
-        self.key_corners_label_horizontalalignment = (
-            key_corners_label_horizontalalignment
-        )
+        self.key_corners_label_horizontalalignment = key_corners_label_horizontalalignment
         self.key_corners_label_verticalalignment = key_corners_label_verticalalignment
         self.key_corners_label_fontsize = key_corners_label_fontsize
         self.key_corners_label_fontstyle = key_corners_label_fontstyle

@@ -74,9 +74,7 @@ class SensitiveStringMatcher:
                         p: re.Pattern = pattern
                         patterns[i] = re.compile(p.pattern.lower())
 
-    def _search_pattern(
-        self, ihaystack: str, pattern: re.Pattern | str
-    ) -> None | list[int]:
+    def _search_pattern(self, ihaystack: str, pattern: re.Pattern | str) -> None | list[int]:
         if isinstance(pattern, str):
             # Check for occurances of string literals
             if pattern in ihaystack:
@@ -93,9 +91,7 @@ class SensitiveStringMatcher:
 
         return None
 
-    def _search_patterns(
-        self, ihaystack: str, patterns: list[re.Pattern | str]
-    ) -> dict[re.Pattern | str, list[int]]:
+    def _search_patterns(self, ihaystack: str, patterns: list[re.Pattern | str]) -> dict[re.Pattern | str, list[int]]:
         ret: dict[re.Pattern | str, list[int]] = {}
 
         for pattern in patterns:

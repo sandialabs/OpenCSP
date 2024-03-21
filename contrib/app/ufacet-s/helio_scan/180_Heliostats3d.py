@@ -66,22 +66,14 @@ class Heliostats3d:
     ):  # Flags to control rendering on this run, for the confirmed, undistorted data.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError(
-                'In Heliostats3d.__init__(), null input_video_dir_body_ext encountered.'
-            )
+            raise ValueError('In Heliostats3d.__init__(), null input_video_dir_body_ext encountered.')
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError(
-                'In Heliostats3d.__init__(), null output_data_dir encountered.'
-            )
+            raise ValueError('In Heliostats3d.__init__(), null output_data_dir encountered.')
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError(
-                'In Heliostats3d.__init__(), null output_render_dir encountered.'
-            )
+            raise ValueError('In Heliostats3d.__init__(), null output_render_dir encountered.')
 
         # Parse input video path components.
-        input_video_dir, input_video_body, input_video_ext = ft.path_components(
-            input_video_dir_body_ext
-        )
+        input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
 
         # Store input.
         # Execution control.
@@ -89,21 +81,13 @@ class Heliostats3d:
         self.specific_frame_ids = specific_frame_ids
         self.single_processor = single_processor
         self.log_dir_body_ext = log_dir_body_ext
-        self.camera_matrix = (
-            utils.CameraMatrix
-        )  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
-        self.distortion_coefficients = (
-            utils.DistCoefs
-        )  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
-        self.zero_distortion_coefficients = (
-            utils.ZeroDistCoefs
-        )  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
+        self.camera_matrix = utils.CameraMatrix  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
+        self.distortion_coefficients = utils.DistCoefs  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
+        self.zero_distortion_coefficients = utils.ZeroDistCoefs  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
         # self.reconstruct_executable_path                   = '<home_dir>/Code/ufacet_code/Reconstruct/bin/reconstruct_main.out'  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS.  PASS IN?
         # Input/output sources.
         self.specifications = specifications
-        self.theoretical_flat_heliostat_dir_body_ext = (
-            theoretical_flat_heliostat_dir_body_ext
-        )
+        self.theoretical_flat_heliostat_dir_body_ext = theoretical_flat_heliostat_dir_body_ext
         self.theoretical_flat_heliostat_dict = uh3a.read_txt_file_to_heliostat(
             self.theoretical_flat_heliostat_dir_body_ext, self.specifications
         )
@@ -116,12 +100,8 @@ class Heliostats3d:
         self.input_video_ext = input_video_ext
         self.input_frame_dir = input_frame_dir
         self.input_frame_id_format = input_frame_id_format
-        self.input_heliostat_projected_tracks_dir_body_ext = (
-            input_heliostat_projected_tracks_dir_body_ext
-        )
-        self.input_heliostat_confirmed_tracks_dir_body_ext = (
-            input_heliostat_confirmed_tracks_dir_body_ext
-        )
+        self.input_heliostat_projected_tracks_dir_body_ext = input_heliostat_projected_tracks_dir_body_ext
+        self.input_heliostat_confirmed_tracks_dir_body_ext = input_heliostat_confirmed_tracks_dir_body_ext
         self.output_data_dir = output_data_dir
         self.output_render_dir = output_render_dir
         self.output_construction_dir = output_construction_dir
@@ -140,31 +120,21 @@ class Heliostats3d:
         # self.output_heliostat_confirmed_undistorted_corner_2d_trajectories_dir = os.path.join(self.output_data_dir, 'confirmed_undistorted_corner_2d_trajectories')
 
         # Output ideal heliostat models and their analysis plots.
-        self.output_ideal_model_dir = os.path.join(
-            self.output_data_dir, 'IdealSiteWide'
-        )
+        self.output_ideal_model_dir = os.path.join(self.output_data_dir, 'IdealSiteWide')
         # Flat.
-        self.theoretical_flat_heliostat_dir_body_ext = (
-            self.save_and_analyze_flat_heliostat(
-                self.specifications.heliostat_design_name
-            )
+        self.theoretical_flat_heliostat_dir_body_ext = self.save_and_analyze_flat_heliostat(
+            self.specifications.heliostat_design_name
         )
         # Nearest.
         (self.nearest_smooth_dir_body_ext, self.nearest_design_dir_body_ext) = (
-            self.construct_save_and_analyze_key_heliostats(
-                self.specifications.heliostat_design_name, 'Nearest'
-            )
+            self.construct_save_and_analyze_key_heliostats(self.specifications.heliostat_design_name, 'Nearest')
         )
         # Farthest.
         (self.farthest_smooth_dir_body_ext, self.farthest_design_dir_body_ext) = (
-            self.construct_save_and_analyze_key_heliostats(
-                self.specifications.heliostat_design_name, 'Farthest'
-            )
+            self.construct_save_and_analyze_key_heliostats(self.specifications.heliostat_design_name, 'Farthest')
         )
         # Demonstration heliostat.
-        self.demonstration_dir_body_ext = (
-            self.construct_save_and_analyze_demonstration_heliostat_corner_xyz_list()
-        )
+        self.demonstration_dir_body_ext = self.construct_save_and_analyze_demonstration_heliostat_corner_xyz_list()
 
         # Output heliostat 3-d corner directories.
         # Projected.
@@ -184,26 +154,18 @@ class Heliostats3d:
 
         # Output heliostat 3-d cnstruction directories.
         # Projected.
-        self.output_heliostat_projected_distorted_construct_corners_3d_dir = (
-            os.path.join(
-                self.output_construction_dir, 'projected_distorted_corners_3dc'
-            )
+        self.output_heliostat_projected_distorted_construct_corners_3d_dir = os.path.join(
+            self.output_construction_dir, 'projected_distorted_corners_3dc'
         )
-        self.output_heliostat_projected_undistorted_construct_corners_3d_dir = (
-            os.path.join(
-                self.output_construction_dir, 'projected_undistorted_corners_3dc'
-            )
+        self.output_heliostat_projected_undistorted_construct_corners_3d_dir = os.path.join(
+            self.output_construction_dir, 'projected_undistorted_corners_3dc'
         )
         # Confirmed.
-        self.output_heliostat_confirmed_distorted_construct_corners_3d_dir = (
-            os.path.join(
-                self.output_construction_dir, 'confirmed_distorted_corners_3dc'
-            )
+        self.output_heliostat_confirmed_distorted_construct_corners_3d_dir = os.path.join(
+            self.output_construction_dir, 'confirmed_distorted_corners_3dc'
         )
-        self.output_heliostat_confirmed_undistorted_construct_corners_3d_dir = (
-            os.path.join(
-                self.output_construction_dir, 'confirmed_undistorted_corners_3dc'
-            )
+        self.output_heliostat_confirmed_undistorted_construct_corners_3d_dir = os.path.join(
+            self.output_construction_dir, 'confirmed_undistorted_corners_3dc'
         )
 
         # Load video tracks files.
@@ -220,14 +182,10 @@ class Heliostats3d:
             self.input_heliostat_confirmed_tracks_dir_body_ext,
         )
         self.heliostat_confirmed_tracks_nfxl = nfxl.NameFrameXyList()
-        self.heliostat_confirmed_tracks_nfxl.load(
-            self.input_heliostat_confirmed_tracks_dir_body_ext
-        )
+        self.heliostat_confirmed_tracks_nfxl.load(self.input_heliostat_confirmed_tracks_dir_body_ext)
         # Confirm what was read.
         print('In Heliostats3d.__init__(), heliostat confirmed tracks read:')
-        self.heliostat_confirmed_tracks_nfxl.print(
-            max_keys=12, max_value_length=200, indent=4
-        )
+        self.heliostat_confirmed_tracks_nfxl.print(max_keys=12, max_value_length=200, indent=4)
 
         # For each NameFrameXyList object, produce a 3-d heliostat shape estimate.
         self.construct_and_save_heliostat_corners_3d()
@@ -242,9 +200,7 @@ class Heliostats3d:
         # Save.
         flat_name = heliostat_design_name + 'Flat'
         flat_output_dir = os.path.join(self.output_ideal_model_dir, flat_name)
-        flat_dir_body_ext = uh3a.save_heliostat_3d(
-            flat_name, self.theoretical_flat_heliostat_xyz_list, flat_output_dir
-        )
+        flat_dir_body_ext = uh3a.save_heliostat_3d(flat_name, self.theoretical_flat_heliostat_xyz_list, flat_output_dir)
         # Analyze.
         # Viewpoint for projection analysis plots for ideal heliostats.
         #
@@ -278,20 +234,14 @@ class Heliostats3d:
         # Return.
         return flat_dir_body_ext
 
-    def construct_save_and_analyze_key_heliostats(
-        self, heliostat_design_name, key_name
-    ):
+    def construct_save_and_analyze_key_heliostats(self, heliostat_design_name, key_name):
         # Smooth.
         # Facets are at z positions corresponding to an uninterrupted smooth paraboloid.
         # Construct.
         if key_name == 'Nearest':
-            focal_length = self.specifications.design_focal_length(
-                self.specifications.nearest_heliostat_xyz()
-            )
+            focal_length = self.specifications.design_focal_length(self.specifications.nearest_heliostat_xyz())
         elif key_name == 'Farthest':
-            focal_length = self.specifications.design_focal_length(
-                self.specifications.farthest_heliostat_xyz()
-            )
+            focal_length = self.specifications.design_focal_length(self.specifications.farthest_heliostat_xyz())
         else:
             print(
                 'ERROR: In Heliostats3d.construct_save_and_analyze_key_heliostats(), unexpected key_name="'
@@ -299,17 +249,11 @@ class Heliostats3d:
                 + '" encountered (1).'
             )
             assert False
-        smooth_xyz_list = (
-            self.specifications.smooth_heliostat_corner_xyz_list_given_focal_length(
-                focal_length
-            )
-        )
+        smooth_xyz_list = self.specifications.smooth_heliostat_corner_xyz_list_given_focal_length(focal_length)
         # Save.
         smooth_name = heliostat_design_name + key_name + 'Smooth'
         smooth_output_dir = os.path.join(self.output_ideal_model_dir, smooth_name)
-        smooth_dir_body_ext = uh3a.save_heliostat_3d(
-            smooth_name, smooth_xyz_list, smooth_output_dir
-        )
+        smooth_dir_body_ext = uh3a.save_heliostat_3d(smooth_name, smooth_xyz_list, smooth_output_dir)
         # Analyze.
         camera_rvec = np.array([-2.68359887, -0.2037837, 0.215282]).reshape(
             3, 1
@@ -346,9 +290,7 @@ class Heliostats3d:
         # Save.
         design_name = heliostat_design_name + key_name + 'Design'
         design_output_dir = os.path.join(self.output_ideal_model_dir, design_name)
-        design_dir_body_ext = uh3a.save_heliostat_3d(
-            design_name, design_xyz_list, design_output_dir
-        )
+        design_dir_body_ext = uh3a.save_heliostat_3d(design_name, design_xyz_list, design_output_dir)
         # Analyze.
         camera_rvec = np.array([-2.68359887, -0.2037837, 0.215282]).reshape(
             3, 1
@@ -383,10 +325,8 @@ class Heliostats3d:
         demonstration_heliostat_spec[4]['center_x'] += 0.25  # m
         demonstration_heliostat_spec[4]['center_y'] += 0.25  # m
         demonstration_heliostat_spec[22]['center_z'] += -0.0508  # m
-        demonstration_heliostat_corner_xyz_list = (
-            self.specifications.heliostat_corner_xyz_list_given_heliostat_spec(
-                demonstration_heliostat_spec
-            )
+        demonstration_heliostat_corner_xyz_list = self.specifications.heliostat_corner_xyz_list_given_heliostat_spec(
+            demonstration_heliostat_spec
         )
         # Save.
         output_hel_name = 'Demonstration'
@@ -481,9 +421,7 @@ class Heliostats3d:
             infer_dict['projected_or_confirmed_str'] = projected_or_confirmed_str
             infer_dict['distorted_or_undistorted_str'] = distorted_or_undistorted_str
             # infer_dict['output_corner_2d_trajectories_dir'] = output_corner_2d_trajectories_dir
-            infer_dict['output_construct_corners_3d_dir'] = (
-                output_construct_corners_3d_dir
-            )
+            infer_dict['output_construct_corners_3d_dir'] = output_construct_corners_3d_dir
             infer_dict['render_control'] = render_control
             list_of_infer_dicts.append(infer_dict)
 
@@ -494,33 +432,21 @@ class Heliostats3d:
             )
             list_of_result_hi3ds = []
             for infer_dict in list_of_infer_dicts:
-                list_of_result_hi3ds.append(
-                    self.execute_heliostat_3d_inference(infer_dict)
-                )
+                list_of_result_hi3ds.append(self.execute_heliostat_3d_inference(infer_dict))
         else:
             print(
                 'In Heliostats3d.construct_and_save_heliostat_corners_3d_aux(), starting heliostat 3-d inference (multi-processor)...'
             )
-            logger = logt.multiprocessing_logger(
-                self.log_dir_body_ext, level=logging.INFO
-            )
-            logger.info(
-                '================================= Execution ================================='
-            )
+            logger = logt.multiprocessing_logger(self.log_dir_body_ext, level=logging.INFO)
+            logger.info('================================= Execution =================================')
             with Pool(25) as pool:
-                list_of_result_hi3ds = pool.map(
-                    self.execute_heliostat_3d_inference, list_of_infer_dicts
-                )
+                list_of_result_hi3ds = pool.map(self.execute_heliostat_3d_inference, list_of_infer_dicts)
 
-        print(
-            'In Heliostats3d.construct_and_save_heliostat_corners_3d_aux(), heliostat 3-d inference done.'
-        )
+        print('In Heliostats3d.construct_and_save_heliostat_corners_3d_aux(), heliostat 3-d inference done.')
 
         # Save the result.
         for hi3d in list_of_result_hi3ds:
-            if (
-                hi3d is not None
-            ):  # We might have skipped some heliostats, for example for debuggging.
+            if hi3d is not None:  # We might have skipped some heliostats, for example for debuggging.
                 # Output file name.
                 output_corners_3d_dir_body_ext = uh3a.corners_3d_dir_body_ext(
                     self.input_video_body,
@@ -568,9 +494,7 @@ class Heliostats3d:
         # dt.print_dict(corner_trajectory_dict, indent=4)  # ?? SCAFFOLDING RCB -- TEMPORARY
 
         # Fetch the list of [frame xy_list] pairs for this heliostat.
-        list_of_frame_id_xy_lists = heliostat_tracks_nfxl.list_of_frame_xy_lists(
-            hel_name
-        )
+        list_of_frame_id_xy_lists = heliostat_tracks_nfxl.list_of_frame_xy_lists(hel_name)
         # Remove lens distortion, if desired.
         if distorted_or_undistorted_str == 'distorted':
             list_of_frame_id_xy_lists_to_process = list_of_frame_id_xy_lists
@@ -695,11 +619,7 @@ class Heliostats3d:
         camera_matrix_2 = self.camera_matrix.copy()
         xy_array = np.array(input_xy_list).reshape(-1, 2)
         undistorted_xy_array = cv.undistortPoints(
-            xy_array,
-            self.camera_matrix,
-            self.distortion_coefficients,
-            None,
-            camera_matrix_2,
+            xy_array, self.camera_matrix, self.distortion_coefficients, None, camera_matrix_2
         )
         undistorted_xy_list = undistorted_xy_array.reshape(-1, 2).tolist()
         # Points with coordinates [1,-1] are flags for "None" and are expected by OpenCV.  Reset these to their original values.
@@ -912,16 +832,13 @@ if __name__ == "__main__":
         + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Corners.csv'
     )
     input_video_dir_body_ext = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
     )
     input_frame_dir = (
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/'
     )
-    input_frame_id_format = (
-        '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
-    )
+    input_frame_id_format = '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
     input_video_projected_tracks_dir_body_ext = (
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/170_HeliostatTracks/mavic_zoom/data/DJI_427t_428_429_heliostat_projected_tracks_nfxl.csv'
@@ -931,38 +848,25 @@ if __name__ == "__main__":
         + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/170_HeliostatTracks/mavic_zoom/data/DJI_427t_428_429_heliostat_confirmed_tracks_nfxl.csv'
     )
     output_data_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/180_Heliostats3d/mavic_zoom/data/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/180_Heliostats3d/mavic_zoom/data/'
     )
     output_render_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/180_Heliostats3d/mavic_zoom/render/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/180_Heliostats3d/mavic_zoom/render/'
     )
     output_construction_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/180c_Heliostats3d/mavic_zoom/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/180c_Heliostats3d/mavic_zoom/'
     )
 
     # Render control.
-    render_control_projected_distorted = rchr.default(
-        color='m'
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
-    render_control_projected_undistorted = rchr.default(
-        color='r'
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
-    render_control_confirmed_distorted = rchr.default(
-        color='c'
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
-    render_control_confirmed_undistorted = rchr.default(
-        color='b'
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
+    render_control_projected_distorted = rchr.default(color='m')  # ?? SCAFFOLDING RCB -- TEMPORARY
+    render_control_projected_undistorted = rchr.default(color='r')  # ?? SCAFFOLDING RCB -- TEMPORARY
+    render_control_confirmed_distorted = rchr.default(color='c')  # ?? SCAFFOLDING RCB -- TEMPORARY
+    render_control_confirmed_undistorted = rchr.default(color='b')  # ?? SCAFFOLDING RCB -- TEMPORARY
     # render_control_projected_distorted        = rchr.fast()  # Don't draw frames.  # ?? SCAFFOLDING RCB -- TEMPORARY
     # render_control_projected_undistorted      = rchr.fast()  # Don't draw frames.  # ?? SCAFFOLDING RCB -- TEMPORARY
     # render_control_confirmed_distorted        = rchr.fast()  # Don't draw frames.  # ?? SCAFFOLDING RCB -- TEMPORARY
     # render_control_confirmed_undistorted      = rchr.fast()  # Don't draw frames.  # ?? SCAFFOLDING RCB -- TEMPORARY
-    render_control_confirmed_undistorted = (
-        rckfgm.default()
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
+    render_control_confirmed_undistorted = rckfgm.default()  # ?? SCAFFOLDING RCB -- TEMPORARY
 
     key_frames_object = Heliostats3d(  # Execution control.
         force_construction,

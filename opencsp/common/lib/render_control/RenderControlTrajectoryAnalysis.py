@@ -32,12 +32,8 @@ class RenderControlTrajectoryAnalysis:
         self.heliostats_3d_points_marker = heliostats_3d_points_marker
         self.heliostats_3d_points_markersize = heliostats_3d_points_markersize
         self.heliostats_3d_points_color = heliostats_3d_points_color
-        self.heliostats_3d_label_horizontalalignment = (
-            heliostats_3d_label_horizontalalignment
-        )
-        self.heliostats_3d_label_verticalalignment = (
-            heliostats_3d_label_verticalalignment
-        )
+        self.heliostats_3d_label_horizontalalignment = heliostats_3d_label_horizontalalignment
+        self.heliostats_3d_label_verticalalignment = heliostats_3d_label_verticalalignment
         self.heliostats_3d_label_fontsize = heliostats_3d_label_fontsize
         self.heliostats_3d_label_fontstyle = heliostats_3d_label_fontstyle
         self.heliostats_3d_label_fontweight = heliostats_3d_label_fontweight
@@ -50,9 +46,7 @@ class RenderControlTrajectoryAnalysis:
 
 
 def default(color='m'):
-    return RenderControlTrajectoryAnalysis(
-        heliostats_3d_points_color=color, heliostats_3d_label_color=color
-    )
+    return RenderControlTrajectoryAnalysis(heliostats_3d_points_color=color, heliostats_3d_label_color=color)
 
 
 def fast():

@@ -25,9 +25,7 @@ class BlobIndex:
         To filter bad points (experimental)
     """
 
-    def __init__(
-        self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int
-    ) -> 'BlobIndex':
+    def __init__(self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int) -> 'BlobIndex':
         """Instantiates BlobIndex class
 
         Parameters
@@ -47,9 +45,7 @@ class BlobIndex:
         self._idx_x = np.zeros(self._num_pts) * np.nan
         self._idx_y = np.zeros(self._num_pts) * np.nan
         self._is_assigned = np.zeros(self._num_pts, dtype=bool)
-        self._neighbor_dists = (
-            np.zeros((self._num_pts, 4)) * np.nan
-        )  # left, right, up, down
+        self._neighbor_dists = np.zeros((self._num_pts, 4)) * np.nan  # left, right, up, down
 
         self.search_thresh = 5.0  # pixels
         self.search_perp_axis_ratio = 3.0
@@ -60,12 +56,8 @@ class BlobIndex:
         idx_x_vec = np.arange(x_min, x_max + 1)  # index
         idx_y_vec = np.arange(y_min, y_max + 1)  # index
         self._idx_x_mat, self._idx_y_mat = np.meshgrid(idx_x_vec, idx_y_vec)  # index
-        self._points_mat = (
-            np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan
-        )  # pixels
-        self._point_indices_mat = (
-            np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan  # index
-        )
+        self._points_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan  # pixels
+        self._point_indices_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan  # index
 
     def _get_assigned_point_indices(self) -> np.ndarray[int]:
         """Returns found point indices"""
@@ -115,15 +107,11 @@ class BlobIndex:
         # Calculate xy deltas for expected/current point
         points_rel = points - pt_cur  # Vectors, current point to all points
         v_search = pt_exp - pt_cur  # Vector, from current point to expected point
-        v_perp = v_search.rotate(
-            np.array([[0, -1], [1, 0]])
-        )  # Vector, perpendicular to search axis
+        v_perp = v_search.rotate(np.array([[0, -1], [1, 0]]))  # Vector, perpendicular to search axis
         dists_axis = v_search.dot(points_rel)  # Distance of points along search axis
         dists_perp = np.abs(v_perp.dot(points_rel))  # Distance of points from line
         # Make mask of valid points
-        mask = np.logical_and(
-            dists_axis > 0, dists_perp / dists_axis <= self.search_perp_axis_ratio
-        )
+        mask = np.logical_and(dists_axis > 0, dists_perp / dists_axis <= self.search_perp_axis_ratio)
         # Check there are points to find
         if mask.sum() == 0:
             return False, (None, None)
@@ -157,9 +145,7 @@ class BlobIndex:
         self._idx_y[idx_pt] = idx_y
         self._is_assigned[idx_pt] = True
         # Assign matrices
-        self._points_mat[idx_y + self._offset_y, idx_x + self._offset_x] = self._points[
-            idx_pt
-        ].data.squeeze()
+        self._points_mat[idx_y + self._offset_y, idx_x + self._offset_x] = self._points[idx_pt].data.squeeze()
         self._point_indices_mat[idx_y + self._offset_y, idx_x + self._offset_x] = idx_pt
 
         lt.debug(f'Blob number {idx_pt:d} was assigned ({idx_x:d}, {idx_y:d})')
@@ -179,9 +165,7 @@ class BlobIndex:
         if np.isnan(idx_mat_x) or np.isnan(idx_mat_y):
             return
 
-        self._points_mat[int(idx_mat_y), int(idx_mat_x)] = self._points[
-            idx_pt
-        ].data.squeeze()
+        self._points_mat[int(idx_mat_y), int(idx_mat_x)] = self._points[idx_pt].data.squeeze()
         self._point_indices_mat[int(idx_mat_y), int(idx_mat_x)] = idx_pt
 
         # Unassign vectors
@@ -201,9 +185,7 @@ class BlobIndex:
         """
         idx, dist = self._nearest_unassigned_idx_from_xy_point(pt_origin)
         if dist > self.search_thresh:
-            warn(
-                f'Assigning point {idx:d} to index (0, 0) resulted in {dist:.2f} pixels error.'
-            )
+            warn(f'Assigning point {idx:d} to index (0, 0) resulted in {dist:.2f} pixels error.')
         self._assign(idx, 0, 0)
 
     def _find_nearest_in_direction(
@@ -236,32 +218,20 @@ class BlobIndex:
         idx_y = self._idx_y[idx_pt]
 
         if direction == 'right':
-            mask = np.logical_and(
-                unassigned_deltas.x > 0,
-                unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)),
-            )
+            mask = np.logical_and(unassigned_deltas.x > 0, unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)))
             idx_x_out = idx_x + 1
             idx_y_out = idx_y
         elif direction == 'left':
-            mask = np.logical_and(
-                unassigned_deltas.x < 0,
-                -unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)),
-            )
+            mask = np.logical_and(unassigned_deltas.x < 0, -unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)))
             idx_x_out = idx_x - 1
             idx_y_out = idx_y
         elif direction == 'up':
-            mask = np.logical_and(
-                unassigned_deltas.y > 0,
-                unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)),
-            )
+            mask = np.logical_and(unassigned_deltas.y > 0, unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
             idx_x_out = idx_x
             idx_y_out = idx_y + 1
         # Down
         elif direction == 'down':
-            mask = np.logical_and(
-                unassigned_deltas.y < 0,
-                -unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)),
-            )
+            mask = np.logical_and(unassigned_deltas.y < 0, -unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
             idx_x_out = idx_x
             idx_y_out = idx_y - 1
 
@@ -334,8 +304,7 @@ class BlobIndex:
             idxs_a = self._idx_x
             idxs_b = self._idx_y
         else:
-            lt.error_and_raise(
-                ValueError, f'Given "direction" must be either "x" or "y", not {direction}')
+            lt.error_and_raise(ValueError, f'Given "direction" must be either "x" or "y", not {direction}')
 
         # Step through direction
         # TODO Can speed up with matrix data storage
@@ -365,10 +334,8 @@ class BlobIndex:
                                 pt_cur = self._points[idx_new]
                             # Calculate deltas
                             pt_exp = self._exp_pt_from_pt_pair(pt_cur, pt_prev)
-                            success, (idx_new, dist) = (
-                                self._nearest_unassigned_idx_from_xy_point_direction(
-                                    pt_cur, pt_exp
-                                )
+                            success, (idx_new, dist) = self._nearest_unassigned_idx_from_xy_point_direction(
+                                pt_cur, pt_exp
                             )
                             if not success:
                                 break
@@ -417,12 +384,8 @@ class BlobIndex:
         mask_bad_pixels_y = np.abs(del_2_y) > thresh
 
         # Calculate mask of bad pixels using x and y derivatives
-        mask_bad_pixels_x = np.concatenate(
-            (np.zeros((ny, 2, 2), dtype=bool), mask_bad_pixels_x), axis=1
-        )
-        mask_bad_pixels_y = np.concatenate(
-            (np.zeros((2, nx, 2), dtype=bool), mask_bad_pixels_y), axis=0
-        )
+        mask_bad_pixels_x = np.concatenate((np.zeros((ny, 2, 2), dtype=bool), mask_bad_pixels_x), axis=1)
+        mask_bad_pixels_y = np.concatenate((np.zeros((2, nx, 2), dtype=bool), mask_bad_pixels_y), axis=0)
 
         # Combine into one mask
         mask_bad_pixels = (mask_bad_pixels_x + mask_bad_pixels_y).max(2)
@@ -475,9 +438,7 @@ class BlobIndex:
         plt.scatter(*self._points[self._is_assigned].data, color='blue')
         if labels:
             for x, y, pt in zip(
-                self._idx_x[self._is_assigned],
-                self._idx_y[self._is_assigned],
-                self._points[self._is_assigned],
+                self._idx_x[self._is_assigned], self._idx_y[self._is_assigned], self._points[self._is_assigned]
             ):
                 plt.text(*pt.data, f'({x:.0f}, {y:.0f})')
 

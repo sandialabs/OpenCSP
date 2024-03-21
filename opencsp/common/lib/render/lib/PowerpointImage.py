@@ -11,9 +11,7 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 class PowerpointImage(pps.PowerpointShape):
-    _tmp_save_path = os.path.join(
-        orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp"
-    )
+    _tmp_save_path = os.path.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
 
     def __init__(
         self,
@@ -62,15 +60,11 @@ class PowerpointImage(pps.PowerpointShape):
     def has_val(self):
         return self._val is not None
 
-    def get_val(
-        self,
-    ) -> None | str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord:
+    def get_val(self) -> None | str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord:
         """Get the image assigned to this instance. What you probably actually want is get_saved_path()."""
         return self._val
 
-    def set_val(
-        self, image: str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord
-    ):
+    def set_val(self, image: str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord):
         self._val = image
         self.width = -1
         self.height = -1
@@ -89,9 +83,7 @@ class PowerpointImage(pps.PowerpointShape):
 
     def _test_saved_path(self):
         """Verification check that I (BGB) haven't goofed up how images are saved to temporary files."""
-        if ft.path_to_cmd_line(self.get_saved_path()) == ft.path_to_cmd_line(
-            str(self._val)
-        ):
+        if ft.path_to_cmd_line(self.get_saved_path()) == ft.path_to_cmd_line(str(self._val)):
             if "tmp" in str(self._val):
                 pass  # lt.info(f"Image val and save path are the same:\nval: {self._val}\nsave path: {self.get_saved_path()}")
             else:
@@ -149,10 +141,7 @@ class PowerpointImage(pps.PowerpointShape):
 
     @staticmethod
     def _image_dims_relative_to_cell(
-        cell_dims: tuple[float, float, float, float],
-        image_width: int,
-        image_height: int,
-        stretch=False,
+        cell_dims: tuple[float, float, float, float], image_width: int, image_height: int, stretch=False
     ):
         """Returns the x, y, width, and height of an image fitted to the dimensions of the given cell."""
         cell_x, cell_y, cell_width, cell_height = cell_dims
@@ -183,16 +172,12 @@ class PowerpointImage(pps.PowerpointShape):
     def fit_to_cell_dimensions(self, cell_dims: tuple[float, float, float, float]):
         width, height = self.get_size()
         self.cell_dims = cell_dims
-        self.dims = self._image_dims_relative_to_cell(
-            self.cell_dims, width, height, self.stretch
-        )
+        self.dims = self._image_dims_relative_to_cell(self.cell_dims, width, height, self.stretch)
 
     def stretch_to_cell_dimensions(self, cell_dims: tuple[float, float, float, float]):
         width, height = self.get_size()
         self.cell_dims = cell_dims
-        self.dims = self._image_dims_relative_to_cell(
-            self.cell_dims, width, height, stretch=True
-        )
+        self.dims = self._image_dims_relative_to_cell(self.cell_dims, width, height, stretch=True)
 
     def reduce_size(self, reduced_image_size_scale: float = -1):
         """If the given image is significantly bigger than its rendered size,
@@ -220,9 +205,7 @@ class PowerpointImage(pps.PowerpointShape):
 
         # image is larger than is reasonable, shrink it
         pil_image: Image.Image = Image.open(self.get_saved_path())
-        lt.debug(
-            f"Resizing from ({image_width,image_height}) to ({expected_width_pixels,expected_height_pixels})"
-        )
+        lt.debug(f"Resizing from ({image_width,image_height}) to ({expected_width_pixels,expected_height_pixels})")
         pil_image = pil_image.resize((expected_width_pixels, expected_height_pixels))
         pil_image.save(self.get_saved_path())
 
@@ -356,9 +339,7 @@ class PowerpointImage(pps.PowerpointShape):
         image_path_name_ext = None if not has_val else os.path.join(path, slines[3])
         caption = None if caption_is_none else caption
 
-        return cls(
-            image_path_name_ext, dims, cell_dims, caption_is_above, caption, stretch
-        )
+        return cls(image_path_name_ext, dims, cell_dims, caption_is_above, caption, stretch)
 
     @classmethod
     def _get_save_dir_name_ext_pattern(cls, slide_idx: int = None, for_glob=False):
@@ -471,12 +452,8 @@ class PowerpointImage(pps.PowerpointShape):
     def clear_tmp_save_all(cls):
         """Remove all temporarily saved files from PowerpointImage.save()"""
         if ft.directory_exists(cls._tmp_save_path, error_if_exists_as_file=False):
-            ft.delete_files_in_directory(
-                cls._tmp_save_path, "*.png", error_on_dir_not_exists=False
-            )
-            ft.delete_files_in_directory(
-                cls._tmp_save_path, "*.png.txt", error_on_dir_not_exists=False
-            )
+            ft.delete_files_in_directory(cls._tmp_save_path, "*.png", error_on_dir_not_exists=False)
+            ft.delete_files_in_directory(cls._tmp_save_path, "*.png.txt", error_on_dir_not_exists=False)
 
     @classmethod
     def append_tmp_path_all(cls, append_dir: str):

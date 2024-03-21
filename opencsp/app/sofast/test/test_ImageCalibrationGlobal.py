@@ -6,9 +6,7 @@ import datetime as dt
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
@@ -16,9 +14,7 @@ class TestImageCalibrationGlobal:
     @classmethod
     def setup_class(cls):
         # Create data
-        cls.camera_values = np.concatenate(([0.0, 0.0], np.linspace(1, 255, 8))).astype(
-            'uint8'
-        )
+        cls.camera_values = np.concatenate(([0.0, 0.0], np.linspace(1, 255, 8))).astype('uint8')
         cls.display_values = np.linspace(0, 255, 10).astype('uint8')
 
         # Create frames
@@ -41,35 +37,24 @@ class TestImageCalibrationGlobal:
         mask_images = mask_images.astype('uint8')
 
         # Create fringe images
-        fringe_images = np.ones((100, 200, 8)) * self.camera_values[2:].reshape(
-            (1, 1, -1)
-        )
+        fringe_images = np.ones((100, 200, 8)) * self.camera_values[2:].reshape((1, 1, -1))
         fringe_images = fringe_images.astype('uint8')
 
         # Expected fringe images are same as display values
-        fringe_images_calibrated_exp = np.ones((100, 200, 8)) * self.display_values[
-            2:
-        ].astype(float).reshape((1, 1, -1))
+        fringe_images_calibrated_exp = np.ones((100, 200, 8)) * self.display_values[2:].astype(float).reshape(
+            (1, 1, -1)
+        )
 
         # Create measurement object
         measurement = Measurement(
-            mask_images,
-            fringe_images,
-            np.array([0.0]),
-            np.array([0.0]),
-            Vxyz((0, 0, 0)),
-            10,
-            dt.datetime.now(),
-            'Test',
+            mask_images, fringe_images, np.array([0.0]), np.array([0.0]), Vxyz((0, 0, 0)), 10, dt.datetime.now(), 'Test'
         )
 
         # Calibrate
         fringe_images_calibrated = self.calibration.apply_to_images(measurement)
 
         # Test
-        np.testing.assert_allclose(
-            fringe_images_calibrated_exp, fringe_images_calibrated
-        )
+        np.testing.assert_allclose(fringe_images_calibrated_exp, fringe_images_calibrated)
 
 
 if __name__ == '__main__':

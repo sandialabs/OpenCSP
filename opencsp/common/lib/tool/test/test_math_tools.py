@@ -39,13 +39,9 @@ class TestMathTools(unittest.TestCase):
         # average of all ones should be all ones
         in10 = np.ones((10))
         out10 = mt.rolling_average(in10, 5)
-        self.assertAlmostEqual(
-            np.sum(in10 - out10), 0, msg=f"A: out10 is not all 1's: {out10}"
-        )
+        self.assertAlmostEqual(np.sum(in10 - out10), 0, msg=f"A: out10 is not all 1's: {out10}")
         out10 = mt.rolling_average(in10, 6)
-        self.assertAlmostEqual(
-            np.sum(in10 - out10), 0, msg=f"B: out10 is not all 1's: {out10}"
-        )
+        self.assertAlmostEqual(np.sum(in10 - out10), 0, msg=f"B: out10 is not all 1's: {out10}")
 
     def test_rolling_average_full(self):
         # average of all ones should be all ones

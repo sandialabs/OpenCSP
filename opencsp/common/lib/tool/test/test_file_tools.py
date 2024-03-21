@@ -35,9 +35,7 @@ class TestFileTools(unittest.TestCase):
         self.assertListEqual(expected, files_name_ext)
 
     def test_files_in_directory_recursive_files_only(self):
-        files_name_ext = ft.files_in_directory(
-            self.data_dir, recursive=True, files_only=True
-        )
+        files_name_ext = ft.files_in_directory(self.data_dir, recursive=True, files_only=True)
         files_name_ext = [f.replace("\\", "/") for f in files_name_ext]
         expected = [".dotfile", "a.a", "b.b", "d/c.c", "d/e/f.f"]
         self.assertListEqual(expected, files_name_ext)
@@ -48,9 +46,7 @@ class TestFileTools(unittest.TestCase):
         self.assertDictEqual(expected, files_name_ext)
 
     def test_files_in_directory_by_extension_case_sensity(self):
-        files_name_ext = ft.files_in_directory_by_extension(
-            self.data_dir, [".a", ".B"], case_sensitive=True
-        )
+        files_name_ext = ft.files_in_directory_by_extension(self.data_dir, [".a", ".B"], case_sensitive=True)
         expected = {".a": ["a.a"], ".B": []}
         self.assertDictEqual(expected, files_name_ext)
 
@@ -101,24 +97,18 @@ class TestFileTools(unittest.TestCase):
         ft.delete_files_in_directory(test_dir, "*.tmp")
 
         ft.create_file(test_dir + "/copy_and_delete_a.tmp")
-        ft.copy_and_delete_file(
-            test_dir + "/copy_and_delete_a.tmp", test_dir + "/copy_and_delete_b.tmp"
-        )
+        ft.copy_and_delete_file(test_dir + "/copy_and_delete_a.tmp", test_dir + "/copy_and_delete_b.tmp")
         self.assertFalse(ft.file_exists(test_dir + "/copy_and_delete_a.tmp"))
         self.assertTrue(ft.file_exists(test_dir + "/copy_and_delete_b.tmp"))
 
         ft.create_file(test_dir + "/copy_and_delete_c.tmp")
-        ft.copy_and_delete_file(
-            test_dir + "/copy_and_delete_c.tmp", test_dir + "/copy_and_delete_d.tmp"
-        )
+        ft.copy_and_delete_file(test_dir + "/copy_and_delete_c.tmp", test_dir + "/copy_and_delete_d.tmp")
         self.assertFalse(ft.file_exists(test_dir + "/copy_and_delete_c.tmp"))
         self.assertTrue(ft.file_exists(test_dir + "/copy_and_delete_d.tmp"))
 
         # don't delete the source file if the source and destination are the same file
         ft.create_file(test_dir + "/copy_and_delete_e.tmp")
-        ft.copy_and_delete_file(
-            test_dir + "/copy_and_delete_e.tmp", test_dir + "/copy_and_delete_e.tmp"
-        )
+        ft.copy_and_delete_file(test_dir + "/copy_and_delete_e.tmp", test_dir + "/copy_and_delete_e.tmp")
         self.assertTrue(ft.file_exists(test_dir + "/copy_and_delete_e.tmp"))
 
 

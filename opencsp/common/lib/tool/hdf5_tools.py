@@ -118,9 +118,7 @@ def get_groups_and_datasets(hdf5_path_name_ext: str | h5py.File):
     return group_names, file_names_and_shapes
 
 
-def _create_dataset_path(
-    base_dir: str, h5_dataset_path_name: str, dataset_ext: str = ".txt"
-):
+def _create_dataset_path(base_dir: str, h5_dataset_path_name: str, dataset_ext: str = ".txt"):
     dataset_location, dataset_name, _ = ft.path_components(h5_dataset_path_name)
     dataset_path = ft.norm_path(os.path.join(base_dir, dataset_location))
     ft.create_directories_if_necessary(dataset_path)
@@ -158,10 +156,7 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
 
     # Create the HDF5 output directory
     if ft.directory_exists(hdf5_dir):
-        lt.error_and_raise(
-            FileExistsError,
-            f"Error in hdf5_tools.unzip(): output directory {hdf5_dir} already exists!",
-        )
+        lt.error_and_raise(FileExistsError, f"Error in hdf5_tools.unzip(): output directory {hdf5_dir} already exists!")
     ft.create_directories_if_necessary(hdf5_dir)
 
     # Get all of what may be strings or images from the h5 file
@@ -177,16 +172,10 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
     for i, possible_string_name in enumerate(possible_strings_names):
         dataset_name = possible_string_name.split("/")[-1]
         h5_val = load_hdf5_datasets([possible_string_name], norm_path)[dataset_name]
-        if (
-            isinstance(h5_val, np.ndarray)
-            and h5_val.ndim <= 1
-            and isinstance(h5_val.tolist()[0], str)
-        ):
+        if isinstance(h5_val, np.ndarray) and h5_val.ndim <= 1 and isinstance(h5_val.tolist()[0], str):
             h5_val = h5_val.tolist()[0]
         if isinstance(h5_val, str):
-            dataset_path_name_ext = _create_dataset_path(
-                hdf5_dir, possible_strings[i][0], ".txt"
-            )
+            dataset_path_name_ext = _create_dataset_path(hdf5_dir, possible_strings[i][0], ".txt")
             with open(dataset_path_name_ext, "w") as fout:
                 fout.write(h5_val)
         else:
@@ -206,8 +195,7 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
                 # we assume shapes are at least 10x10 pixels and have an aspect ratio of at least 10:1
                 aspect_ratio = max(shape[0], shape[1]) / min(shape[0], shape[1])
                 if (shape[0] >= 10 and shape[1] >= 10) and (aspect_ratio < 10.001):
-                    dataset_path_name_ext = _create_dataset_path(
-                        hdf5_dir, possible_images[i][0], ".png")
+                    dataset_path_name_ext = _create_dataset_path(hdf5_dir, possible_images[i][0], ".png")
                     # assumed grayscale or RGB
                     if (len(shape) == 2) or (shape[2] in [1, 3]):
                         img = it.numpy_to_image(np_image)

@@ -54,19 +54,12 @@ class ImageCalibrationAbstract(ABC):
 
         # Create interpolation function
         self.response_function = interpolate.interp1d(
-            camera_values_clip,
-            display_values_clip,
-            bounds_error=False,
-            fill_value=(display_min, display_max),
+            camera_values_clip, display_values_clip, bounds_error=False, fill_value=(display_min, display_max)
         )
 
     @classmethod
     def from_data(
-        cls,
-        images_cal: ndarray,
-        display_values: ndarray,
-        mask: ndarray | None = None,
-        num_samps: int = 1000,
+        cls, images_cal: ndarray, display_values: ndarray, mask: ndarray | None = None, num_samps: int = 1000
     ) -> 'ImageCalibrationAbstract':
         """
         Calculates camera values from calibration images. Returns
@@ -104,10 +97,7 @@ class ImageCalibrationAbstract(ABC):
         idx_0 = idx_1 - num_samps
         if idx_0 < 0:
             idx_0 = 0
-            warn(
-                f'Number of samples smaller than n_samps. Using {idx_1:d} samples instead.',
-                stacklevel=2,
-            )
+            warn(f'Number of samples smaller than n_samps. Using {idx_1:d} samples instead.', stacklevel=2)
 
         # Get brightness values corresponding to indices
         vals_sort = np.sort(im_1.flatten())
@@ -125,9 +115,7 @@ class ImageCalibrationAbstract(ABC):
 
         return cls(camera_values.astype(float), display_values.astype(float))
 
-    def calculate_min_display_camera_values(
-        self, derivative_thresh: float = 0.4
-    ) -> tuple[float, float]:
+    def calculate_min_display_camera_values(self, derivative_thresh: float = 0.4) -> tuple[float, float]:
         """
         Calculates the minimum display and camera brightness values to be used
         in a valid calibration. Values lower than these values are too close to
@@ -146,12 +134,8 @@ class ImageCalibrationAbstract(ABC):
 
         """
         # Calculate normalized differential
-        camera_values_norm = (
-            self.camera_values.astype(float) / self.camera_values.astype(float).max()
-        )
-        display_values_norm = (
-            self.display_values.astype(float) / self.display_values.astype(float).max()
-        )
+        camera_values_norm = self.camera_values.astype(float) / self.camera_values.astype(float).max()
+        display_values_norm = self.display_values.astype(float) / self.display_values.astype(float).max()
         dy_dx = np.diff(camera_values_norm) / np.diff(display_values_norm)
 
         # Calculate data points that are below threshold
@@ -183,9 +167,7 @@ class ImageCalibrationAbstract(ABC):
         calibration_name = cls.get_calibration_name()
 
         if data['calibration_type'] != calibration_name:
-            raise ValueError(
-                f'ImageCalibration file is not of type {calibration_name:s}'
-            )
+            raise ValueError(f'ImageCalibration file is not of type {calibration_name:s}')
 
         # Load grid data
         datasets = ['ImageCalibration/camera_values', 'ImageCalibration/display_values']

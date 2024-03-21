@@ -9,9 +9,7 @@ import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.image_processing as ip
@@ -25,15 +23,11 @@ class TestImageProcessing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(
-            opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
-        )
+        base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
 
         # Define calculation data files
         cls.data_file_facet = join(base_dir, 'calculations_facet/data.h5')
-        cls.data_file_undefined = join(
-            base_dir, 'calculations_undefined_mirror/data.h5'
-        )
+        cls.data_file_undefined = join(base_dir, 'calculations_undefined_mirror/data.h5')
         cls.data_file_multi = join(base_dir, 'calculations_facet_ensemble/data.h5')
 
         # Define component files
@@ -175,12 +169,7 @@ class TestImageProcessing(unittest.TestCase):
             data_exp.append(data['loop_facet_image_refine'])
 
             # Perform calculation
-            reg = ip.refine_facet_corners(
-                v_facet_corners_image_exp,
-                v_facet_centroid_image_exp,
-                v_edges_image,
-                *args,
-            )
+            reg = ip.refine_facet_corners(v_facet_corners_image_exp, v_facet_centroid_image_exp, v_edges_image, *args)
             data_calc.append(reg.vertices.data)
 
         data_exp = np.concatenate(data_exp, axis=1)
@@ -216,9 +205,7 @@ class TestImageProcessing(unittest.TestCase):
         v_display_pts = np.array([screen_xs, screen_ys])
 
         # Test
-        np.testing.assert_allclose(
-            data['v_screen_points_fractional_screens'], v_display_pts, rtol=1e-06
-        )
+        np.testing.assert_allclose(data['v_screen_points_fractional_screens'], v_display_pts, rtol=1e-06)
 
     def test_calculate_active_pixel_pointing_vectors(self):
         """Tests image_processing.calculate_active_pixel_pointing_vectors()"""
@@ -239,9 +226,7 @@ class TestImageProcessing(unittest.TestCase):
         u_pixel_pointing_optic = u_pixel_pointing_cam.rotate(r_cam_optic).data.squeeze()
 
         # Test
-        np.testing.assert_allclose(
-            data['u_pixel_pointing_facet'], u_pixel_pointing_optic
-        )
+        np.testing.assert_allclose(data['u_pixel_pointing_facet'], u_pixel_pointing_optic)
 
 
 if __name__ == '__main__':

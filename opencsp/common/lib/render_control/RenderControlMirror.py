@@ -1,7 +1,5 @@
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
-from opencsp.common.lib.render_control.RenderControlPointSeq import (
-    RenderControlPointSeq,
-)
+from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
 from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
 
 

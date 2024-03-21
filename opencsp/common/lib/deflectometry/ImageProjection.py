@@ -44,12 +44,8 @@ class CalParams:
         y_ax = np.linspace(dy, size_y - dy, ny).astype(int)  # pixels
         self.x_pixel_axis: np.ndarray[int] = x_ax  # pixels
         self.y_pixel_axis: np.ndarray[int] = y_ax  # pixels
-        self.x_screen_axis: np.ndarray[float] = 1 - (
-            self.x_pixel_axis.astype(float) + 0.5
-        ) / float(size_x)
-        self.y_screen_axis: np.ndarray[float] = 1 - (
-            self.y_pixel_axis.astype(float) + 0.5
-        ) / float(size_y)
+        self.x_screen_axis: np.ndarray[float] = 1 - (self.x_pixel_axis.astype(float) + 0.5) / float(size_x)
+        self.y_screen_axis: np.ndarray[float] = 1 - (self.y_pixel_axis.astype(float) + 0.5) / float(size_y)
         # Fiducial x/y locations in image, pixels
         x_mat_pixel, y_mat_pixel = np.meshgrid(self.x_pixel_axis, self.y_pixel_axis)
         self.x_pixel: np.ndarray[int] = x_mat_pixel.flatten()
@@ -97,10 +93,7 @@ class ImageProjection:
 
         # Create black image
         image = self._format_image(
-            np.zeros(
-                (self.win_size_y, self.win_size_x, 3),
-                dtype=self.display_data['projector_data_type'],
-            )
+            np.zeros((self.win_size_y, self.win_size_x, 3), dtype=self.display_data['projector_data_type'])
         )
         self.canvas_image = self.canvas.create_image(0, 0, image=image, anchor='nw')
 
@@ -172,12 +165,7 @@ class ImageProjection:
 
         # Resize window
         self.root.geometry(
-            '{:d}x{:d}+{:d}+{:d}'.format(
-                self.win_size_x,
-                self.win_size_y,
-                self.win_position_x,
-                self.win_position_y,
-            )
+            '{:d}x{:d}+{:d}+{:d}'.format(self.win_size_x, self.win_size_y, self.win_position_x, self.win_position_y)
         )
 
         # Resize canvas size
@@ -189,13 +177,7 @@ class ImageProjection:
 
         """
         # Add white active region
-        array = (
-            np.ones(
-                (self.size_y, self.size_x, 3),
-                dtype=self.display_data['projector_data_type'],
-            )
-            * self.max_int
-        )
+        array = np.ones((self.size_y, self.size_x, 3), dtype=self.display_data['projector_data_type']) * self.max_int
 
         # Add crosshairs vertical
         array[:, self.x_active_mid, :] = 0
@@ -221,13 +203,7 @@ class ImageProjection:
 
         """
         # Add white active region
-        array = (
-            np.ones(
-                (self.size_y, self.size_x, 3),
-                dtype=self.display_data['projector_data_type'],
-            )
-            * self.max_int
-        )
+        array = np.ones((self.size_y, self.size_x, 3), dtype=self.display_data['projector_data_type']) * self.max_int
 
         # Add arrows
         width = int(np.min([self.size_x, self.size_y]) / 4)
@@ -261,13 +237,7 @@ class ImageProjection:
         # Add Y text
         font = cv.FONT_HERSHEY_PLAIN
         array = cv.putText(
-            array,
-            'Y',
-            (self.x_active_mid + 20, self.y_active_mid + width + 20),
-            font,
-            6,
-            (0, int(self.max_int), 0),
-            2,
+            array, 'Y', (self.x_active_mid + 20, self.y_active_mid + width + 20), font, 6, (0, int(self.max_int), 0), 2
         )
 
         # Display image
@@ -284,9 +254,7 @@ class ImageProjection:
         pattern_params = CalParams(self.size_x, self.size_y)
 
         # Add fiducials
-        for x_loc, y_loc, idx in zip(
-            pattern_params.x_pixel, pattern_params.y_pixel, pattern_params.index
-        ):
+        for x_loc, y_loc, idx in zip(pattern_params.x_pixel, pattern_params.y_pixel, pattern_params.index):
             # Place fiducial
             array[y_loc, x_loc, 1] = self.max_int
             # Place label (offset so label is in view)
@@ -301,14 +269,7 @@ class ImageProjection:
             else:
                 dy = -10
             # Draw text
-            cv.putText(
-                array,
-                f'{idx:d}',
-                (x_loc + dx, y_loc + dy),
-                cv.FONT_HERSHEY_PLAIN,
-                1,
-                (0, 255, 0),
-            )
+            cv.putText(array, f'{idx:d}', (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
         # Display with black border
         self.display_image_in_active_area(array)
@@ -326,9 +287,7 @@ class ImageProjection:
         """
         # Check image is RGB
         if np.ndim(array) != 3 or array.shape[2] != 3:
-            raise ValueError(
-                'Input array must have 3 dimensions and dimension 2 must be length 3.'
-            )
+            raise ValueError('Input array must have 3 dimensions and dimension 2 must be length 3.')
 
         # Check array is correct xy shape
         if array.shape[0] != self.win_size_y or array.shape[1] != self.win_size_x:
@@ -359,9 +318,7 @@ class ImageProjection:
         """
         # Check image is RGB
         if np.ndim(array) != 3 or array.shape[2] != 3:
-            raise ValueError(
-                'Input array must have 3 dimensions and dimension 2 must be length 3.'
-            )
+            raise ValueError('Input array must have 3 dimensions and dimension 2 must be length 3.')
 
         # Check array is correct xy shape
         if array.shape[0] != self.size_y or array.shape[1] != self.size_x:
@@ -372,13 +329,8 @@ class ImageProjection:
             )
 
         # Create black image and place array in correct position
-        array_out = np.zeros(
-            (self.win_size_y, self.win_size_x, 3),
-            dtype=self.display_data['projector_data_type'],
-        )
-        array_out[
-            self.y_active_1 : self.y_active_2, self.x_active_1 : self.x_active_2, :
-        ] = array
+        array_out = np.zeros((self.win_size_y, self.win_size_x, 3), dtype=self.display_data['projector_data_type'])
+        array_out[self.y_active_1 : self.y_active_2, self.x_active_1 : self.x_active_2, :] = array
 
         # Display image
         self.display_image(array_out)

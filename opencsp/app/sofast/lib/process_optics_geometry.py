@@ -91,12 +91,8 @@ def process_singlefacet_geometry(
     ori = copy(orientation)
 
     # Get optic data
-    v_facet_corners: Vxyz = (
-        facet_data.v_facet_corners
-    )  # Corners of facet in facet coordinates
-    v_centroid_facet: Vxyz = (
-        facet_data.v_facet_centroid
-    )  # Centroid of facet in facet coordinates
+    v_facet_corners: Vxyz = facet_data.v_facet_corners  # Corners of facet in facet coordinates
+    v_centroid_facet: Vxyz = facet_data.v_facet_centroid  # Centroid of facet in facet coordinates
 
     # Save mask raw
     data_image_processing_general.mask_raw = mask_raw
@@ -136,29 +132,20 @@ def process_singlefacet_geometry(
         debug.figures.append(fig)
         plt.imshow(mask_raw)
         plt.scatter(
-            *camera.project(
-                v_cam_optic_centroid_cam_exp, Rotation.identity(), Vxyz((0, 0, 0))
-            ).data,
-            marker='.'
+            *camera.project(v_cam_optic_centroid_cam_exp, Rotation.identity(), Vxyz((0, 0, 0))).data, marker='.'
         )
         plt.title('Expected Optic Centroid')
 
     # Find expected orientation of optic
-    r_cam_optic_exp = sp.r_from_position(
-        v_cam_optic_centroid_cam_exp, ori.v_cam_screen_cam
-    )
+    r_cam_optic_exp = sp.r_from_position(v_cam_optic_centroid_cam_exp, ori.v_cam_screen_cam)
     data_geometry_general.r_optic_cam_exp = r_cam_optic_exp.inv()
 
     # Find expected position of optic origin
-    v_cam_optic_cam_exp = v_cam_optic_centroid_cam_exp - v_centroid_facet.rotate(
-        r_cam_optic_exp.inv()
-    )
+    v_cam_optic_cam_exp = v_cam_optic_centroid_cam_exp - v_centroid_facet.rotate(r_cam_optic_exp.inv())
     data_geometry_general.v_cam_optic_cam_exp = v_cam_optic_cam_exp
 
     # Find expected optic loop in pixels
-    v_optic_corners_image_exp = camera.project(
-        v_facet_corners, r_cam_optic_exp.inv(), v_cam_optic_cam_exp
-    )
+    v_optic_corners_image_exp = camera.project(v_facet_corners, r_cam_optic_exp.inv(), v_cam_optic_cam_exp)
     loop_optic_image_exp = LoopXY.from_vertices(v_optic_corners_image_exp)
     data_image_processing_general.loop_optic_image_exp = loop_optic_image_exp
 
@@ -171,13 +158,8 @@ def process_singlefacet_geometry(
         plt.title('Expected Optic Corners')
 
     # Refine locations of optic corners with mask
-    prs = [
-        params.perimeter_refine_axial_search_dist,
-        params.perimeter_refine_perpendicular_search_dist,
-    ]
-    loop_facet_image_refine = ip.refine_mask_perimeter(
-        loop_optic_image_exp, v_edges_image, *prs
-    )
+    prs = [params.perimeter_refine_axial_search_dist, params.perimeter_refine_perpendicular_search_dist]
+    loop_facet_image_refine = ip.refine_mask_perimeter(loop_optic_image_exp, v_edges_image, *prs)
     data_image_processing_facet.loop_facet_image_refine = loop_facet_image_refine
 
     # Plot refined optic corners
@@ -211,25 +193,16 @@ def process_singlefacet_geometry(
         fig = plt.figure()
         debug.figures.append(fig)
         plt.imshow(mask_raw)
-        pts_reproj = camera.project(
-            facet_data.v_facet_corners,
-            r_cam_optic_refine_1.inv(),
-            v_cam_optic_cam_refine_1,
-        )
+        pts_reproj = camera.project(facet_data.v_facet_corners, r_cam_optic_refine_1.inv(), v_cam_optic_cam_refine_1)
         _plot_labeled_points(pts_reproj)
         plt.title('Reprojected Points 1')
 
     # Calculate refined measure point vector in optic coordinates
-    v_measure_point_optic_cam_refine_1 = v_measure_point_facet.rotate(
-        r_optic_cam_refine_1
-    )
+    v_measure_point_optic_cam_refine_1 = v_measure_point_facet.rotate(r_optic_cam_refine_1)
 
     # Refine V with measured optic to display distance
     v_cam_optic_cam_refine_2 = sp.refine_v_distance(
-        v_cam_optic_cam_refine_1,
-        optic_screen_dist,
-        ori.v_cam_screen_cam,
-        v_measure_point_optic_cam_refine_1,
+        v_cam_optic_cam_refine_1, optic_screen_dist, ori.v_cam_screen_cam, v_measure_point_optic_cam_refine_1
     )
     data_geometry_general.v_cam_optic_cam_refine_2 = v_cam_optic_cam_refine_2
 
@@ -238,11 +211,7 @@ def process_singlefacet_geometry(
         fig = plt.figure()
         debug.figures.append(fig)
         plt.imshow(mask_raw)
-        pts_reproj = camera.project(
-            facet_data.v_facet_corners,
-            r_cam_optic_refine_1.inv(),
-            v_cam_optic_cam_refine_2,
-        )
+        pts_reproj = camera.project(facet_data.v_facet_corners, r_cam_optic_refine_1.inv(), v_cam_optic_cam_refine_2)
         _plot_labeled_points(pts_reproj)
         plt.title('Reprojected Points 2')
 
@@ -250,40 +219,26 @@ def process_singlefacet_geometry(
     ori.orient_optic_cam(r_cam_optic_refine_1, v_cam_optic_cam_refine_2)
 
     # Calculate measure point pointing direction
-    u_cam_measure_point_facet = Uxyz(
-        (ori.v_cam_optic_optic + v_measure_point_facet).data
-    )
+    u_cam_measure_point_facet = Uxyz((ori.v_cam_optic_optic + v_measure_point_facet).data)
     data_geometry_facet.u_cam_measure_point_facet = u_cam_measure_point_facet
 
     # Calculate errors from using only facet corners
     error_optic_screen_dist_1 = sp.distance_error(
-        ori.v_cam_screen_cam,
-        v_cam_optic_cam_refine_1 + v_measure_point_optic_cam_refine_1,
-        optic_screen_dist,
+        ori.v_cam_screen_cam, v_cam_optic_cam_refine_1 + v_measure_point_optic_cam_refine_1, optic_screen_dist
     )
     data_error.error_optic_screen_dist_1 = error_optic_screen_dist_1
     error_reprojection_1 = sp.reprojection_error(
-        camera,
-        v_facet_corners,
-        loop_facet_image_refine.vertices,
-        r_optic_cam_refine_1,
-        v_cam_optic_cam_refine_1,
+        camera, v_facet_corners, loop_facet_image_refine.vertices, r_optic_cam_refine_1, v_cam_optic_cam_refine_1
     )
     data_error.error_reprojection_1 = error_reprojection_1
 
     # Calculate errors after refining with measured distance
     error_optic_screen_dist_2 = sp.distance_error(
-        ori.v_cam_screen_cam,
-        v_cam_optic_cam_refine_2 + v_measure_point_optic_cam_refine_1,
-        optic_screen_dist,
+        ori.v_cam_screen_cam, v_cam_optic_cam_refine_2 + v_measure_point_optic_cam_refine_1, optic_screen_dist
     )
     data_error.error_optic_screen_dist_2 = error_optic_screen_dist_2
     error_reprojection_2 = sp.reprojection_error(
-        camera,
-        v_facet_corners,
-        loop_facet_image_refine.vertices,
-        r_optic_cam_refine_1,
-        v_cam_optic_cam_refine_2,
+        camera, v_facet_corners, loop_facet_image_refine.vertices, r_optic_cam_refine_1, v_cam_optic_cam_refine_2
     )
     data_error.error_reprojection_2 = error_reprojection_2
 
@@ -348,9 +303,7 @@ def process_undefined_geometry(
         Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
-        lt.debug(
-            'process_optics_geometry debug on, but is not yet supported for undefined mirrors.'
-        )
+        lt.debug('process_optics_geometry debug on, but is not yet supported for undefined mirrors.')
 
     # Define data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
@@ -376,9 +329,7 @@ def process_undefined_geometry(
     data_image_processing_general.v_mask_centroid_image = v_mask_centroid_image
 
     # Find position of optic centroid in space
-    v_cam_optic_cam = sp.t_from_distance(
-        v_mask_centroid_image, optic_screen_dist, camera, orientation.v_cam_screen_cam
-    )
+    v_cam_optic_cam = sp.t_from_distance(v_mask_centroid_image, optic_screen_dist, camera, orientation.v_cam_screen_cam)
     data_geometry_general.v_cam_optic_cam_exp = v_cam_optic_cam
 
     # Find orientation of optic
@@ -386,9 +337,7 @@ def process_undefined_geometry(
     data_geometry_general.r_optic_cam_exp = r_cam_optic.inv()
 
     # Orient optic
-    spatial_orientation = SpatialOrientation(
-        orientation.r_cam_screen, orientation.v_cam_screen_cam
-    )
+    spatial_orientation = SpatialOrientation(orientation.r_cam_screen, orientation.v_cam_screen_cam)
     spatial_orientation.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
     # Calculate measure point pointing direction
@@ -480,12 +429,8 @@ def process_multifacet_geometry(
         ensemble_data.v_facet_locations
     )  # Locations of facet origins relative to ensemble origin in ensemble coordinates
     r_facet_ensemble = ensemble_data.r_facet_ensemble  # Facet to ensemble rotation
-    ensemble_corns_indices = (
-        ensemble_data.ensemble_perimeter
-    )  # [(facet_idx, facet_corner_idx), ...], integers
-    v_centroid_ensemble = (
-        ensemble_data.v_centroid_ensemble
-    )  # Centroid of ensemble in ensemble coordinates
+    ensemble_corns_indices = ensemble_data.ensemble_perimeter  # [(facet_idx, facet_corner_idx), ...], integers
+    v_centroid_ensemble = ensemble_data.v_centroid_ensemble  # Centroid of ensemble in ensemble coordinates
 
     # Get number of facets
     num_facets = len(v_facet_locs_ensemble)
@@ -493,41 +438,30 @@ def process_multifacet_geometry(
     # Define data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
     data_image_processing_general = cdc.CalculationImageProcessingGeneral()
-    data_geometry_facet = [
-        cdc.CalculationDataGeometryFacet() for _ in range(num_facets)
-    ]
-    data_image_processing_facet = [
-        cdc.CalculationImageProcessingFacet() for _ in range(num_facets)
-    ]
+    data_geometry_facet = [cdc.CalculationDataGeometryFacet() for _ in range(num_facets)]
+    data_image_processing_facet = [cdc.CalculationImageProcessingFacet() for _ in range(num_facets)]
     data_error = cdc.CalculationError()
 
     # Convert facet corners to ensemble coordinates
     v_ensemble_facet_corns = []
     for idx in range(num_facets):
         v_ensemble_facet_corns.append(
-            v_facet_locs_ensemble[idx]
-            + v_facet_corners_facet[idx].rotate(r_facet_ensemble[idx])
+            v_facet_locs_ensemble[idx] + v_facet_corners_facet[idx].rotate(r_facet_ensemble[idx])
         )
 
     # Calculate ensemble corners in ensemble coordinates
     v_ensemble_corns_ensemble = []
-    for r_facet_ensemble_cur, (idx_facet, idx_corn) in zip(
-        r_facet_ensemble, ensemble_corns_indices
-    ):
+    for r_facet_ensemble_cur, (idx_facet, idx_corn) in zip(r_facet_ensemble, ensemble_corns_indices):
         v_ensemble_corns_ensemble.append(
             (
                 v_facet_locs_ensemble[idx_facet]
-                + v_facet_corners_facet[idx_facet][idx_corn].rotate(
-                    r_facet_ensemble_cur
-                )
+                + v_facet_corners_facet[idx_facet][idx_corn].rotate(r_facet_ensemble_cur)
             ).data
         )
     v_ensemble_corns_ensemble = Vxyz(np.concatenate(v_ensemble_corns_ensemble, axis=1))
 
     # Concatenate all facet corners
-    v_ensemble_facet_corns_all = Vxyz(
-        np.concatenate([V.data for V in v_ensemble_facet_corns], axis=1)
-    )
+    v_ensemble_facet_corns_all = Vxyz(np.concatenate([V.data for V in v_ensemble_facet_corns], axis=1))
 
     # Calculate raw mask
     data_image_processing_general.mask_raw = mask_raw
@@ -554,15 +488,11 @@ def process_multifacet_geometry(
     data_geometry_general.v_cam_optic_centroid_cam_exp = v_cam_ensemble_cent_cam_exp
 
     # Calculate expected orientation of facet ensemble
-    r_cam_ensemble_exp = sp.r_from_position(
-        v_cam_ensemble_cent_cam_exp, orientation.v_cam_screen_cam
-    )
+    r_cam_ensemble_exp = sp.r_from_position(v_cam_ensemble_cent_cam_exp, orientation.v_cam_screen_cam)
     data_geometry_general.r_optic_cam_exp = r_cam_ensemble_exp.inv()
 
     # Calculate expected position of ensemble origin
-    v_cam_ensemble_cam_exp = v_cam_ensemble_cent_cam_exp - v_centroid_ensemble.rotate(
-        r_cam_ensemble_exp.inv()
-    )
+    v_cam_ensemble_cam_exp = v_cam_ensemble_cent_cam_exp - v_centroid_ensemble.rotate(r_cam_ensemble_exp.inv())
     data_geometry_general.v_cam_optic_cam_exp = v_cam_ensemble_cam_exp
 
     # Project perimeter points
@@ -581,13 +511,8 @@ def process_multifacet_geometry(
         plt.title('Expected Perimeter Points')
 
     # Refine perimeter points
-    args = [
-        params.perimeter_refine_axial_search_dist,
-        params.perimeter_refine_perpendicular_search_dist,
-    ]
-    loop_ensemble_image_refine = ip.refine_mask_perimeter(
-        loop_ensemble_exp, v_edges_image, *args
-    )
+    args = [params.perimeter_refine_axial_search_dist, params.perimeter_refine_perpendicular_search_dist]
+    loop_ensemble_image_refine = ip.refine_mask_perimeter(loop_ensemble_exp, v_edges_image, *args)
     data_image_processing_general.loop_optic_image_refine = loop_ensemble_image_refine
 
     # Plot refined perimeter points
@@ -610,19 +535,12 @@ def process_multifacet_geometry(
 
     # Calculate expected location of all facet corners and centroids
     v_facet_corners_image_exp = [
-        camera.project(P, r_ensemble_cam_refine_1, v_cam_ensemble_cam_refine_1)
-        for P in v_ensemble_facet_corns
+        camera.project(P, r_ensemble_cam_refine_1, v_cam_ensemble_cam_refine_1) for P in v_ensemble_facet_corns
     ]
-    v_uv_facet_cent_exp = camera.project(
-        v_facet_locs_ensemble, r_ensemble_cam_refine_1, v_cam_ensemble_cam_refine_1
-    )
+    v_uv_facet_cent_exp = camera.project(v_facet_locs_ensemble, r_ensemble_cam_refine_1, v_cam_ensemble_cam_refine_1)
     for idx in range(num_facets):
-        data_image_processing_facet[idx].v_facet_corners_image_exp = (
-            v_facet_corners_image_exp[idx]
-        )
-        data_image_processing_facet[idx].v_facet_centroid_image_exp = (
-            v_uv_facet_cent_exp[idx]
-        )
+        data_image_processing_facet[idx].v_facet_corners_image_exp = v_facet_corners_image_exp[idx]
+        data_image_processing_facet[idx].v_facet_centroid_image_exp = v_uv_facet_cent_exp[idx]
 
     # Refine facet corners
     args = [
@@ -632,12 +550,7 @@ def process_multifacet_geometry(
     ]
     loops_facets_refined: list[LoopXY] = []
     for idx in range(num_facets):
-        loop = ip.refine_facet_corners(
-            v_facet_corners_image_exp[idx],
-            v_uv_facet_cent_exp[idx],
-            v_edges_image,
-            *args
-        )
+        loop = ip.refine_facet_corners(v_facet_corners_image_exp[idx], v_uv_facet_cent_exp[idx], v_edges_image, *args)
         loops_facets_refined.append(loop)
         data_image_processing_facet[idx].loop_facet_image_refine = loop
 
@@ -654,9 +567,7 @@ def process_multifacet_geometry(
     v_facet_corners_all_image_refine = []
     for loop in loops_facets_refined:
         v_facet_corners_all_image_refine.append(loop.vertices.data)
-    v_facet_corners_all_image_refine = Vxy(
-        np.concatenate(v_facet_corners_all_image_refine, axis=1)
-    )
+    v_facet_corners_all_image_refine = Vxy(np.concatenate(v_facet_corners_all_image_refine, axis=1))
 
     # Calculate fitted masks
     mask_fitted = np.zeros(mask_raw.shape + (num_facets,), dtype=bool)
@@ -686,18 +597,13 @@ def process_multifacet_geometry(
 
     # Refine T with measured distance
     v_cam_ensemble_cam_refine_3 = sp.refine_v_distance(
-        v_cam_ensemble_cam_refine_2,
-        optic_screen_dist,
-        orientation.v_cam_screen_cam,
-        v_meas_pt_ensemble_cam_refine_2,
+        v_cam_ensemble_cam_refine_2, optic_screen_dist, orientation.v_cam_screen_cam, v_meas_pt_ensemble_cam_refine_2
     )
     data_geometry_general.v_cam_optic_cam_refine_3 = v_cam_ensemble_cam_refine_3
 
     # Calculate error 1 (R/T calculated using only ensemble perimeter points)
     error_optic_screen_dist_1 = sp.distance_error(
-        orientation.v_cam_screen_cam,
-        v_cam_ensemble_cam_refine_1 + v_meas_pt_ensemble_cam_refine_1,
-        optic_screen_dist,
+        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_1 + v_meas_pt_ensemble_cam_refine_1, optic_screen_dist
     )
     data_error.error_optic_screen_dist_1 = error_optic_screen_dist_1
     error_reprojection_1 = sp.reprojection_error(
@@ -711,9 +617,7 @@ def process_multifacet_geometry(
 
     # Calculate error 2 (R/T calculated using all facet corners)
     error_optic_screen_dist_2 = sp.distance_error(
-        orientation.v_cam_screen_cam,
-        v_cam_ensemble_cam_refine_2 + v_meas_pt_ensemble_cam_refine_2,
-        optic_screen_dist,
+        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_2 + v_meas_pt_ensemble_cam_refine_2, optic_screen_dist
     )
     data_error.error_optic_screen_dist_2 = error_optic_screen_dist_2
     error_reprojection_2 = sp.reprojection_error(
@@ -727,9 +631,7 @@ def process_multifacet_geometry(
 
     # Calculate error 3 (T refined using measured distance)
     error_optic_screen_dist_3 = sp.distance_error(
-        orientation.v_cam_screen_cam,
-        v_cam_ensemble_cam_refine_3 + v_meas_pt_ensemble_cam_refine_2,
-        optic_screen_dist,
+        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_3 + v_meas_pt_ensemble_cam_refine_2, optic_screen_dist
     )
     data_error.error_optic_screen_dist_3 = error_optic_screen_dist_3
     error_reprojection_3 = sp.reprojection_error(
@@ -744,14 +646,10 @@ def process_multifacet_geometry(
     # Spatially orient facets and the setup
     for idx in range(num_facets):
         # Calculate ensemble to facet vector in camera coordinates
-        v_ensemble_facet_cam = v_facet_locs_ensemble[idx].rotate(
-            r_ensemble_cam_refine_2
-        )
+        v_ensemble_facet_cam = v_facet_locs_ensemble[idx].rotate(r_ensemble_cam_refine_2)
 
         # Instantiate spatial orientation object
-        facet_ori = SpatialOrientation(
-            orientation.r_cam_screen, orientation.v_cam_screen_cam
-        )
+        facet_ori = SpatialOrientation(orientation.r_cam_screen, orientation.v_cam_screen_cam)
 
         # Orient facet
         r_cam_facet = r_facet_ensemble[idx].inv() * r_cam_ensemble_refine_2
@@ -765,9 +663,7 @@ def process_multifacet_geometry(
         v_cam_screen_optic = facet_ori.v_cam_screen_cam.rotate(facet_ori.r_cam_optic)
         dist = (v_cam_meas_pt_facet - v_cam_screen_optic).magnitude()[0]
 
-        data_geometry_facet[idx].u_cam_measure_point_facet = Uxyz(
-            v_cam_meas_pt_facet.data
-        )
+        data_geometry_facet[idx].u_cam_measure_point_facet = Uxyz(v_cam_meas_pt_facet.data)
         data_geometry_facet[idx].measure_point_screen_distance = dist
         data_geometry_facet[idx].spatial_orientation = facet_ori
         data_geometry_facet[idx].v_align_point_facet = v_facet_centroid_facet[idx]

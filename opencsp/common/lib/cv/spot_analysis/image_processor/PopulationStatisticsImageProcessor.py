@@ -2,12 +2,8 @@ import dataclasses
 import numpy as np
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
-    SpotAnalysisOperable,
-)
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import (
-    SpotAnalysisPopulationStatistics,
-)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImagesProcessor,
 )
@@ -82,9 +78,7 @@ class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
             image = operable.primary_image.nparray
             dims, _ = it.dims_and_nchannels(image)
             sum_per_color = np.sum(image, axis=(0, 1))
-            self._rolling_window_stats.append(
-                _RollingWindowOperableStats(operable, sum_per_color, dims)
-            )
+            self._rolling_window_stats.append(_RollingWindowOperableStats(operable, sum_per_color, dims))
 
         # calculate statistics
         first_stat = self._rolling_window_stats[0]
@@ -100,11 +94,7 @@ class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
 
         return ret
 
-    def _calculate_cummulative(
-        self,
-        curr_stats: SpotAnalysisPopulationStatistics,
-        operable: SpotAnalysisOperable,
-    ):
+    def _calculate_cummulative(self, curr_stats: SpotAnalysisPopulationStatistics, operable: SpotAnalysisOperable):
         """Analyze the given operable and update the cummulative statistics."""
         ret: SpotAnalysisPopulationStatistics = dataclasses.replace(curr_stats)
 
@@ -125,18 +115,14 @@ class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
 
         return ret
 
-    def _execute(
-        self, operable: SpotAnalysisOperable, is_last: bool
-    ) -> list[SpotAnalysisOperable]:
+    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         ret: list[SpotAnalysisOperable] = []
         self.rolling_window_operables.append(operable)
 
         if self.curr_stats == None:
             # We haven't hit the minimum population size yet as of the previous call to _execute().
             # Maybe we'll reach the minimum population size this time?
-            if (len(self.initial_operables) < self.min_pop_size - 1) or (
-                self.min_pop_size == -1
-            ):
+            if (len(self.initial_operables) < self.min_pop_size - 1) or (self.min_pop_size == -1):
                 if not is_last:
                     # We still haven't reached the minimum population size.
                     self.initial_operables.append(operable)
@@ -150,19 +136,11 @@ class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
                 self.curr_stats = self._calculate_rolling_window(
                     self.curr_stats, prior_operable, self.rolling_window_operables
                 )
-                self.curr_stats = self._calculate_cummulative(
-                    self.curr_stats, prior_operable
-                )
-                ret.append(
-                    dataclasses.replace(
-                        prior_operable, population_statistics=self.curr_stats
-                    )
-                )
+                self.curr_stats = self._calculate_cummulative(self.curr_stats, prior_operable)
+                ret.append(dataclasses.replace(prior_operable, population_statistics=self.curr_stats))
 
         # do some calculations
-        self.curr_stats = self._calculate_rolling_window(
-            self.curr_stats, operable, self.rolling_window_operables
-        )
+        self.curr_stats = self._calculate_rolling_window(self.curr_stats, operable, self.rolling_window_operables)
         self.curr_stats = self._calculate_cummulative(self.curr_stats, operable)
         ret.append(dataclasses.replace(operable, population_statistics=self.curr_stats))
 

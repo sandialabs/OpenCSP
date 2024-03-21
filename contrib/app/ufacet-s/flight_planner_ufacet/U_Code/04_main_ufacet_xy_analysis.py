@@ -58,21 +58,13 @@ def construct_ufacet_scan_pass(solar_field, lead_in, run_past):
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
     scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = (
-        3  # m.  Lateral distance to include heliostats in section.
-    )
-    scan_parameters['p_margin'] = (
-        0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    )
-    scan_parameters['altitude_margin'] = (
-        2.5  # m.  Clearance of highest possible heliostat point.
-    )
+    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
     scan_parameters['maximum_safe_altitude'] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = (
-        3  # Number of heliostats to look back for reflection targets.
-    )
+    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
     scan_parameters['gaze_tolerance'] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
@@ -85,26 +77,11 @@ def construct_ufacet_scan_pass(solar_field, lead_in, run_past):
     E06_x = 53.5  # m.
     E07_x = 63.4  # m.
     E08_x = 73.2  # m.
-    segment_xy_E04 = [
-        [E04_x, R05_y],
-        [E04_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E05 = [
-        [E05_x, R05_y],
-        [E05_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E06 = [
-        [E06_x, R05_y],
-        [E06_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E07 = [
-        [E07_x, R05_y],
-        [E07_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E08 = [
-        [E08_x, R05_y],
-        [E08_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E04 = [[E04_x, R05_y], [E04_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E05 = [[E05_x, R05_y], [E05_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E06 = [[E06_x, R05_y], [E06_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E07 = [[E07_x, R05_y], [E07_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E08 = [[E08_x, R05_y], [E08_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
 
     # Construct individual UFACET scan passes.
     # # ufacet_pass_E04 = usp.UfacetScanPass(solar_field, segment_xy_E04, scan_parameters)  # ?? SCAFFOLDING RCB -- CRASHES
@@ -113,17 +90,10 @@ def construct_ufacet_scan_pass(solar_field, lead_in, run_past):
     ufacet_pass_E07 = usp.UfacetScanPass(solar_field, segment_xy_E07, scan_parameters)
     ufacet_pass_E08 = usp.UfacetScanPass(solar_field, segment_xy_E08, scan_parameters)
 
-    ufacet_scan_pass_list = [
-        ufacet_pass_E05,
-        ufacet_pass_E06,
-        ufacet_pass_E07,
-        ufacet_pass_E08,
-    ]
+    ufacet_scan_pass_list = [ufacet_pass_E05, ufacet_pass_E06, ufacet_pass_E07, ufacet_pass_E08]
 
     # Construct the scan.
-    scan = Scan.construct_scan_given_UFACET_scan_passes(
-        ufacet_scan_pass_list, lead_in, run_past
-    )
+    scan = Scan.construct_scan_given_UFACET_scan_passes(ufacet_scan_pass_list, lead_in, run_past)
     # Return.
     return scan
 
@@ -138,21 +108,13 @@ def construct_ufacet_scan_passes(solar_field, lead_in, run_past):
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
     scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = (
-        3  # m.  Lateral distance to include heliostats in section.
-    )
-    scan_parameters['p_margin'] = (
-        0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    )
-    scan_parameters['altitude_margin'] = (
-        2.5  # m.  Clearance of highest possible heliostat point.
-    )
+    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
     scan_parameters['maximum_safe_altitude'] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = (
-        3  # Number of heliostats to look back for reflection targets.
-    )
+    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
     scan_parameters['gaze_tolerance'] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
@@ -165,26 +127,11 @@ def construct_ufacet_scan_passes(solar_field, lead_in, run_past):
     E06_x = 53.5  # m.
     E07_x = 63.4  # m.
     E08_x = 73.2  # m.
-    segment_xy_E04 = [
-        [E04_x, R05_y],
-        [E04_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E05 = [
-        [E05_x, R05_y],
-        [E05_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E06 = [
-        [E06_x, R05_y],
-        [E06_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E07 = [
-        [E07_x, R05_y],
-        [E07_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E08 = [
-        [E08_x, R05_y],
-        [E08_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E04 = [[E04_x, R05_y], [E04_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E05 = [[E05_x, R05_y], [E05_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E06 = [[E06_x, R05_y], [E06_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E07 = [[E07_x, R05_y], [E07_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E08 = [[E08_x, R05_y], [E08_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
 
     # Construct individual UFACET scan passes.
     # # ufacet_pass_E04 = usp.UfacetScanPass(solar_field, segment_xy_E04, scan_parameters)  # ?? SCAFFOLDING RCB -- CRASHES
@@ -193,17 +140,10 @@ def construct_ufacet_scan_passes(solar_field, lead_in, run_past):
     ufacet_pass_E07 = usp.UfacetScanPass(solar_field, segment_xy_E07, scan_parameters)
     ufacet_pass_E08 = usp.UfacetScanPass(solar_field, segment_xy_E08, scan_parameters)
 
-    ufacet_scan_pass_list = [
-        ufacet_pass_E05,
-        ufacet_pass_E06,
-        ufacet_pass_E07,
-        ufacet_pass_E08,
-    ]
+    ufacet_scan_pass_list = [ufacet_pass_E05, ufacet_pass_E06, ufacet_pass_E07, ufacet_pass_E08]
 
     # Construct the scan.
-    scan = Scan.construct_scan_given_UFACET_scan_passes(
-        ufacet_scan_pass_list, lead_in, run_past
-    )
+    scan = Scan.construct_scan_given_UFACET_scan_passes(ufacet_scan_pass_list, lead_in, run_past)
     # Return.
     return scan
 
@@ -218,21 +158,13 @@ def construct_ufacet_scan(solar_field, lead_in, run_past):
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
     scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = (
-        3  # m.  Lateral distance to include heliostats in section.
-    )
-    scan_parameters['p_margin'] = (
-        0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    )
-    scan_parameters['altitude_margin'] = (
-        2.5  # m.  Clearance of highest possible heliostat point.
-    )
+    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
     scan_parameters['maximum_safe_altitude'] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = (
-        3  # Number of heliostats to look back for reflection targets.
-    )
+    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
     scan_parameters['gaze_tolerance'] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
@@ -245,26 +177,11 @@ def construct_ufacet_scan(solar_field, lead_in, run_past):
     E06_x = 53.5  # m.
     E07_x = 63.4  # m.
     E08_x = 73.2  # m.
-    segment_xy_E04 = [
-        [E04_x, R05_y],
-        [E04_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E05 = [
-        [E05_x, R05_y],
-        [E05_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E06 = [
-        [E06_x, R05_y],
-        [E06_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E07 = [
-        [E07_x, R05_y],
-        [E07_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E08 = [
-        [E08_x, R05_y],
-        [E08_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E04 = [[E04_x, R05_y], [E04_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E05 = [[E05_x, R05_y], [E05_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E06 = [[E06_x, R05_y], [E06_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E07 = [[E07_x, R05_y], [E07_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E08 = [[E08_x, R05_y], [E08_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
 
     # Construct individual UFACET scan passes.
     # # ufacet_pass_E04 = usp.UfacetScanPass(solar_field, segment_xy_E04, scan_parameters)  # ?? SCAFFOLDING RCB -- CRASHES
@@ -273,17 +190,10 @@ def construct_ufacet_scan(solar_field, lead_in, run_past):
     ufacet_pass_E07 = usp.UfacetScanPass(solar_field, segment_xy_E07, scan_parameters)
     ufacet_pass_E08 = usp.UfacetScanPass(solar_field, segment_xy_E08, scan_parameters)
 
-    ufacet_scan_pass_list = [
-        ufacet_pass_E05,
-        ufacet_pass_E06,
-        ufacet_pass_E07,
-        ufacet_pass_E08,
-    ]
+    ufacet_scan_pass_list = [ufacet_pass_E05, ufacet_pass_E06, ufacet_pass_E07, ufacet_pass_E08]
 
     # Construct the scan.
-    scan = Scan.construct_scan_given_UFACET_scan_passes(
-        ufacet_scan_pass_list, lead_in, run_past
-    )
+    scan = Scan.construct_scan_given_UFACET_scan_passes(ufacet_scan_pass_list, lead_in, run_past)
     # Return.
     return scan
 
@@ -351,9 +261,7 @@ def setup_render_control_scan_section_analysis():
     analysis_render_control.draw_multi_heliostat_gaze_angle_example = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_fill = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_legend = False
-    analysis_render_control.draw_multi_heliostat_vertical_fov_required = (
-        False  # KEY SUMMARY
-    )
+    analysis_render_control.draw_multi_heliostat_vertical_fov_required = False  # KEY SUMMARY
     analysis_render_control.draw_multi_heliostat_vertical_fov_required_legend = False
     analysis_render_control.draw_multi_heliostat_select_gaze = False  # KEY SUMMARY
     # analysis_render_control.draw_multi_heliostat_select_gaze_per_heliostat = False
@@ -381,9 +289,7 @@ def render_ufacet_scan(figure_control, scan):
 
     # Render the analysis.
     for scan_pass in scan.passes:
-        scan_pass.ufacet_scan_pass().draw_section_analysis(
-            figure_control, analysis_render_control
-        )
+        scan_pass.ufacet_scan_pass().draw_section_analysis(figure_control, analysis_render_control)
 
 
 # -------------------------------------------------------------------------------------------------------
@@ -450,11 +356,11 @@ if __name__ == "__main__":
     n_vertical = 6  # Number of vertical passes.
 
     # UFACET scan parameters
-    candidate_margin_w = (
-        10.00  # m.  Margin on either side of section plane to bring in heliostats.
-    )
+    candidate_margin_w = 10.00  # m.  Margin on either side of section plane to bring in heliostats.
     #     Should be larger than side-to-side heliostat distance.
-    discard_threshold_p = 9.00  # m.  Threshold to discarb heliostats that are close togethre ona section, presumably abreast.
+    discard_threshold_p = (
+        9.00  # m.  Threshold to discarb heliostats that are close togethre ona section, presumably abreast.
+    )
     #     Should be smaller than minimum heliostat row spacing.
 
     # Scan flight parameters (both raster and UFACET).
@@ -467,9 +373,7 @@ if __name__ == "__main__":
     #    curve_keys_x = [-43.9] # ?? SCAFFOLDING RCB -- TEMPORARY
     #    curve_keys_x = [92.7] # ?? SCAFFOLDING RCB -- TEMPORARY
     curve_keys_y = [136.9] * len(curve_keys_x)
-    curve_key_xy_list = [
-        [key_x, key_y] for key_x, key_y in zip(curve_keys_x, curve_keys_y)
-    ]
+    curve_key_xy_list = [[key_x, key_y] for key_x, key_y in zip(curve_keys_x, curve_keys_y)]
 
     # UFACET (x,y) analysis.
     list_of_ideal_xy_lists, list_of_best_fit_segment_xys = pusxya.ufacet_xy_analysis(
@@ -492,34 +396,19 @@ if __name__ == "__main__":
 
     # UFACET section analysis.
     section_list = pussc.construct_ufacet_sections(
-        solar_field,
-        list_of_best_fit_segment_xys,
-        candidate_margin_w,
-        discard_threshold_p,
+        solar_field, list_of_best_fit_segment_xys, candidate_margin_w, discard_threshold_p
     )
 
     # Draw UFACET section analysis.
     render_control_scan_section_setup = setup_render_control_scan_section_setup()
     pusscr.draw_construct_ufacet_sections(
-        figure_control,
-        solar_field,
-        section_list,
-        vs.view_spec_3d(),
-        render_control_scan_section_setup,
+        figure_control, solar_field, section_list, vs.view_spec_3d(), render_control_scan_section_setup
     )
     pusscr.draw_construct_ufacet_sections(
-        figure_control,
-        solar_field,
-        section_list,
-        vs.view_spec_xy(),
-        render_control_scan_section_setup,
+        figure_control, solar_field, section_list, vs.view_spec_xy(), render_control_scan_section_setup
     )
     pusscr.draw_construct_ufacet_sections(
-        figure_control,
-        solar_field,
-        section_list,
-        None,
-        render_control_scan_section_setup,
+        figure_control, solar_field, section_list, None, render_control_scan_section_setup
     )  # Use section view.
 
     #     # Construct the scan.
@@ -581,9 +470,7 @@ if __name__ == "__main__":
     if save_figures:
         print('\n\nSaving figures...')
         # Output directory.
-        output_path = os.path.join(
-            '..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M'))
-        )
+        output_path = os.path.join('..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M')))
         if not (os.path.exists(output_path)):
             os.makedirs(output_path)
         fm.save_all_figures(output_path)

@@ -105,9 +105,7 @@ class CalculationDataGeometryFacet:
             prefix + 'CalculationDataGeometryFacet/u_pixel_pointing_facet',
             prefix + 'CalculationDataGeometryFacet/v_screen_points_facet',
         ]
-        self.spatial_orientation.save_all_to_hdf(
-            file, prefix + 'CalculationDataGeometryFacet/'
-        )
+        self.spatial_orientation.save_all_to_hdf(file, prefix + 'CalculationDataGeometryFacet/')
         _save_data_in_file(data, datasets, file)
 
 
@@ -286,16 +284,10 @@ def _save_data_in_file(data_in: list, datasets_in: list, file: str) -> None:
             elif isinstance(d, float) or isinstance(d, int) or isinstance(d, ndarray):
                 data.append(d)
             else:
-                raise ValueError(
-                    f'Unrecognized data type {type(d)} could not be saved.'
-                )
+                raise ValueError(f'Unrecognized data type {type(d)} could not be saved.')
             datasets.append(ds)
 
     if len(data) > 0:
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
     else:
-        warn(
-            f'Length 0 dataset was not saved to file "{file:s}"',
-            UserWarning,
-            stacklevel=2,
-        )
+        warn(f'Length 0 dataset was not saved to file "{file:s}"', UserWarning, stacklevel=2)

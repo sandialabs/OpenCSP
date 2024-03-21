@@ -28,9 +28,7 @@ class DefinitionFacet:
 
     def copy(self) -> 'DefinitionFacet':
         """Returns copy of class"""
-        return DefinitionFacet(
-            self.v_facet_corners.copy(), self.v_facet_centroid.copy()
-        )
+        return DefinitionFacet(self.v_facet_corners.copy(), self.v_facet_centroid.copy())
 
     @classmethod
     def load_from_json(cls, file: str) -> 'DefinitionFacet':
@@ -85,10 +83,7 @@ class DefinitionFacet:
             Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
         data = [self.v_facet_corners.data, self.v_facet_centroid.data]
-        datasets = [
-            prefix + 'DefinitionFacet/v_facet_corners',
-            prefix + 'DefinitionFacet/v_facet_centroid',
-        ]
+        datasets = [prefix + 'DefinitionFacet/v_facet_corners', prefix + 'DefinitionFacet/v_facet_centroid']
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
@@ -102,10 +97,7 @@ class DefinitionFacet:
         prefix : str
             Prefix appended to folder path within HDF file (folders must be separated by "/")
         """
-        datasets = [
-            prefix + 'DefinitionFacet/v_facet_corners',
-            prefix + 'DefinitionFacet/v_facet_centroid',
-        ]
+        datasets = [prefix + 'DefinitionFacet/v_facet_corners', prefix + 'DefinitionFacet/v_facet_centroid']
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         v_facet_corners = Vxyz(data['v_facet_corners'])
         v_facet_centroid = Vxyz(data['v_facet_centroid'])

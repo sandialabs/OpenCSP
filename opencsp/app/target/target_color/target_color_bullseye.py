@@ -66,13 +66,7 @@ def bullseye_color_bar(
                 row, col, x_max, cx_offset_pix, y_offset_pix, focal_length_meter
             )
             color = color_convert.color_given_value(
-                r_mrad,
-                r_min_mrad,
-                r_max_mrad,
-                color_bar,
-                discrete_or_continuous,
-                color_below_min,
-                color_above_max,
+                r_mrad, r_min_mrad, r_max_mrad, color_bar, discrete_or_continuous, color_below_min, color_above_max
             )
             # Set pixel color
             img[row, col, 0] = color[0] / 255.0
@@ -106,16 +100,10 @@ def bullseye_color_bar(
     if draw_alignment_line:
         cx = (x_max / 2) + cx_offset_pix
         this_hole_center_x = round(cx)  # x position of target center, in this image.
-        other_hole_center_x = round(
-            cx_offset_alignment_pix
-        )  # x position of target center, in other image.
-        alignment_line_start_x = this_hole_center_x - (
-            other_hole_center_x + round(x_max / 2)
-        )
+        other_hole_center_x = round(cx_offset_alignment_pix)  # x position of target center, in other image.
+        alignment_line_start_x = this_hole_center_x - (other_hole_center_x + round(x_max / 2))
         for row in range(0, n_rows):
-            for col in range(
-                alignment_line_start_x, (alignment_line_start_x + frame_width_pix)
-            ):
+            for col in range(alignment_line_start_x, (alignment_line_start_x + frame_width_pix)):
                 # Don't draw within the target.
                 r_mrad = bullseye_error.radius_in_mrad_given_row_col(
                     row, col, x_max, cx_offset_pix, y_offset_pix, focal_length_meter
@@ -151,13 +139,7 @@ def bullseye_color_bar(
     else:
         trim_line_start_x = -999
     # Save.
-    output_file_body = (
-        'matplotlib_'
-        + discrete_or_continuous
-        + '_bullseye_color_bar'
-        + '_cx'
-        + str(cx_offset_pix)
-    )
+    output_file_body = 'matplotlib_' + discrete_or_continuous + '_bullseye_color_bar' + '_cx' + str(cx_offset_pix)
     output_file_dir_body_ext = os.path.join(output_dir, output_file_body + output_ext)
     print('Saving file:', output_file_dir_body_ext)
     plt.imsave(output_file_dir_body_ext, img, dpi=dpi)

@@ -45,9 +45,7 @@ class CsvColumns:
 
         if last_matched_idx < len(data_row) - 1:
             if row_idx > -1:
-                lt.debug(
-                    f"Found {len(data_row)-last_matched_idx-1} extra values in row {row_idx}"
-                )
+                lt.debug(f"Found {len(data_row)-last_matched_idx-1} extra values in row {row_idx}")
             last_column = sorted(self.columns.values(), key=lambda c: c.idx)[-1]
             cnt = 2
             for i in range(last_matched_idx + 1, len(data_row)):
@@ -100,9 +98,7 @@ class CsvColumns:
             if column.idx < 0:
                 dbg_msg += f"    {column.name}: -1\n"
             else:
-                dbg_msg += (
-                    f"    {column.name}: {header_row[column.idx]} ({column.idx})\n"
-                )
+                dbg_msg += f"    {column.name}: {header_row[column.idx]} ({column.idx})\n"
         lt.debug(dbg_msg)
 
         # check that we found all the columns
@@ -122,10 +118,7 @@ class CsvColumns:
                     found = False
                     others = alternatives[column.name]
                     for alternative in others:
-                        if (
-                            alternative in self.columns
-                            and self.columns[alternative] != -1
-                        ):
+                        if alternative in self.columns and self.columns[alternative] != -1:
                             found = True
                             break
                     if found:

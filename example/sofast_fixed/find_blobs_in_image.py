@@ -17,9 +17,7 @@ def example_find_blobs_in_image():
         opencsp_code_dir(),
         '../../sample_data/deflectometry/sandia_lab/fixed_pattern/measurement_screen_square_width3_space6.h5',
     )
-    file_save = join(
-        dirname(__file__), 'data/output/blob_detection/image_with_detected_blobs.png'
-    )
+    file_save = join(dirname(__file__), 'data/output/blob_detection/image_with_detected_blobs.png')
 
     if not exists(dirname(file_save)):
         os.makedirs(dirname(file_save))

@@ -9,13 +9,8 @@ import numpy as np
 import pytest
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.app.sofast.lib.CalibrateDisplayShape import (
-    CalibrateDisplayShape,
-    DataInput,
-)
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.CalibrateDisplayShape import CalibrateDisplayShape, DataInput
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -72,8 +67,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
 
         # Test screen distortion information
         cls.data_exp = load_hdf5_datasets(
-            ['pts_xy_screen_fraction', 'pts_xyz_screen_coords'],
-            join(dir_output, 'screen_distortion_data_100_100.h5'),
+            ['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], join(dir_output, 'screen_distortion_data_100_100.h5')
         )
         cls.data_meas = dist_data
 
@@ -81,16 +75,10 @@ class TestCalibrateDisplayShape(unittest.TestCase):
     def test_screen_distortion_data(self):
         """Tests screen calibration data"""
         np.testing.assert_allclose(
-            self.data_meas['pts_xy_screen_fraction'].data,
-            self.data_exp['pts_xy_screen_fraction'],
-            rtol=0,
-            atol=1e-6,
+            self.data_meas['pts_xy_screen_fraction'].data, self.data_exp['pts_xy_screen_fraction'], rtol=0, atol=1e-6
         )
         np.testing.assert_allclose(
-            self.data_meas['pts_xyz_screen_coords'].data,
-            self.data_exp['pts_xyz_screen_coords'],
-            rtol=0,
-            atol=1e-6,
+            self.data_meas['pts_xyz_screen_coords'].data, self.data_exp['pts_xyz_screen_coords'], rtol=0, atol=1e-6
         )
 
 

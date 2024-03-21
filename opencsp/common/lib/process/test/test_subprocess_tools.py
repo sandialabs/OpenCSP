@@ -13,11 +13,7 @@ class TestSubprocess(unittest.TestCase):
     def test_echo(self):
         output = subt.run(f"echo 'hello, world!'")
         self.assertEqual(len(output), 1, f"Unexpected output:\n\t{output}")
-        self.assertEqual(
-            output[0].val.strip().strip("'"),
-            'hello, world!',
-            f"Unexpected output:\n\t{output}",
-        )
+        self.assertEqual(output[0].val.strip().strip("'"), 'hello, world!', f"Unexpected output:\n\t{output}")
 
     def test_success(self):
         subt.run(f"{sys.executable} {helper.__file__} --retcode=0")
@@ -27,9 +23,7 @@ class TestSubprocess(unittest.TestCase):
         self.assertRaises(subprocess.CalledProcessError, func)
 
     def test_get_stdout(self):
-        output = subt.run(
-            f"{sys.executable} {helper.__file__} --simple_stdout", stdout="collect"
-        )
+        output = subt.run(f"{sys.executable} {helper.__file__} --simple_stdout", stdout="collect")
         self.assertEqual(len(output), 2, f"Unexpected output:\n\t{output}")
         self.assertEqual(output[0].val, "Hello", f"Unexpected output:\n\t{output}")
         self.assertEqual(output[1].val, "world!", f"Unexpected output:\n\t{output}")
@@ -38,9 +32,7 @@ class TestSubprocess(unittest.TestCase):
             self.assertEqual(output[i].lineno, i)
 
     def test_get_stderr(self):
-        output = subt.run(
-            f"{sys.executable} {helper.__file__} --simple_stderr", stderr="collect"
-        )
+        output = subt.run(f"{sys.executable} {helper.__file__} --simple_stderr", stderr="collect")
         self.assertEqual(len(output), 2, f"Unexpected output:\n\t{output}")
         self.assertEqual(output[0].val, "Goodbye", f"Unexpected output:\n\t{output}")
         self.assertEqual(output[1].val, "world!", f"Unexpected output:\n\t{output}")
@@ -53,9 +45,7 @@ class TestSubprocess(unittest.TestCase):
             # can't get mixed output on windows
             return
         output = subt.run(
-            f"{sys.executable} {helper.__file__} --mixed_stdout_stderr",
-            stdout="collect",
-            stderr="collect",
+            f"{sys.executable} {helper.__file__} --mixed_stdout_stderr", stdout="collect", stderr="collect"
         )
         self.assertEqual(len(output), 3, f"Unexpected output:\n\t{output}")
         self.assertEqual(output[0].val, "foo", f"Unexpected output:\n\t{output}")
@@ -78,20 +68,12 @@ class TestSubprocess(unittest.TestCase):
         )
         self.assertLess(time.time() - start_time, 4.9)
         self.assertEqual(len(output), 2, f"Unexpected output:\n\t{output}")
-        self.assertEqual(
-            output[0].val.strip().strip("'"), 'Hello', f"Unexpected output:\n\t{output}"
-        )
-        self.assertEqual(
-            output[1].val.strip().strip("'"),
-            'world!',
-            f"Unexpected output:\n\t{output}",
-        )
+        self.assertEqual(output[0].val.strip().strip("'"), 'Hello', f"Unexpected output:\n\t{output}")
+        self.assertEqual(output[1].val.strip().strip("'"), 'world!', f"Unexpected output:\n\t{output}")
 
     def test_timeout_timesout(self):
         """Test that a program that executes in 0.9 seconds is killed by a 0.4s timeout."""
-        with self.assertRaises(
-            (subprocess.CalledProcessError, subprocess.TimeoutExpired)
-        ):
+        with self.assertRaises((subprocess.CalledProcessError, subprocess.TimeoutExpired)):
             start_time = time.time()
             output = subt.run(
                 f"{sys.executable} {helper.__file__} --simple_stdout --simple_stderr --delay_before=0.5 --delay_after=0.4",

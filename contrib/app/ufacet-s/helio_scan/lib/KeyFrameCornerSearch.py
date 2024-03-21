@@ -17,13 +17,9 @@ import opencsp.common.lib.geometry.geometry_2d as g2d
 from DEPRECATED_utils import *  # ?? SCAFFOLDING RCB -- ELIMINATE THIS
 from DEPRECATED_save_read import *  # ?? SCAFFOLDING RCB -- ELIMINATE THIS
 import FrameNameXyList as fnxl
-from opencsp.common.lib.render_control.RenderControlKeyCorners import (
-    RenderControlKeyCorners,
-)
+from opencsp.common.lib.render_control.RenderControlKeyCorners import RenderControlKeyCorners
 
-Component = NewType(
-    "Component", dict[str, Union[str, list[int], list[float], list[list[int]]]]
-)
+Component = NewType("Component", dict[str, Union[str, list[int], list[float], list[list[int]]]])
 
 
 class KeyFrameCornerSearch:
@@ -39,9 +35,7 @@ class KeyFrameCornerSearch:
         key_frame_id,  # Numerical key frame index.  Uniquely determines the frame within the video.
         key_frame_id_str,  # Not the same as str(key_frame_id), because this includes the proper number of leading zeros, etc.
         key_frame_img: np.ndarray,  # The key frame image, already loaded.
-        list_of_name_polygons: list[
-            tuple[str, list[list[int]]]
-        ],  # List of expected [hel_name, polygon] pairs.
+        list_of_name_polygons: list[tuple[str, list[list[int]]]],  # List of expected [hel_name, polygon] pairs.
         specifications,  # Solar field specifications.  # ?? SCAFFOLDING RCB -- REPLACE THIS WITH MASTER INFORMATION LOADED FROM DISK FILES.
         # Input/output sources.
         output_construction_dir,  # Where to save the detailed image processing step-by-step plots.
@@ -55,9 +49,7 @@ class KeyFrameCornerSearch:
             Retrieve results with projected_fnxl()
         """
 
-        print(
-            'In KeyFrameCornerSearch.__init__()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.__init__()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
 
         # Store input.
         self.key_frame_id = key_frame_id
@@ -89,20 +81,14 @@ class KeyFrameCornerSearch:
         # Facet boundaries
         self.frame['boundaries'], self.frame['boundaries_img'] = self.facet_boundaries()
         # Connected_components
-        (self.frame['components'], self.frame['components_img']) = (
-            self.connected_components()
-        )
+        (self.frame['components'], self.frame['components_img']) = self.connected_components()
         # Filtered connected_components
-        (self.frame['filt_components'], self.frame['filt_components_img']) = (
-            self.filter_connected_components()
-        )
+        (self.frame['filt_components'], self.frame['filt_components_img']) = self.filter_connected_components()
         # TODO BGB make sure none of the components bridge the gap between mirrors
         # Fitted lines connected components
         self.frame['fitted_lines_components'] = self.fitted_lines_connected_components()
         # Line inliers
-        self.frame['fitted_lines_inliers_components'] = (
-            self.fitted_lines_inliers_components()
-        )
+        self.frame['fitted_lines_inliers_components'] = self.fitted_lines_inliers_components()
         # Corners
         self.frame['corners'] = self.find_corners()
         # Facets
@@ -139,16 +125,12 @@ class KeyFrameCornerSearch:
         """
         Returns true if the image processing successfully produced final corners.
         """
-        return ('all_projected_corners' in self.frame) and (
-            len(self.frame['all_projected_corners']) > 0
-        )
+        return ('all_projected_corners' in self.frame) and (len(self.frame['all_projected_corners']) > 0)
 
     # IMAGE PROCESSING
 
     def draw_img_polygons(self):
-        print(
-            'In KeyFrameCornerSearch.draw_img_polygons(), entering routine...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.draw_img_polygons(), entering routine...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         if self.render_control.draw_img_box:
             img = self.frame['key_frame_img']
             plt.figure()
@@ -156,15 +138,9 @@ class KeyFrameCornerSearch:
 
             for (
                 name_polygon
-            ) in (
-                self.list_of_name_polygons
-            ):  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
-                name = name_polygon[
-                    0
-                ]  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
-                polygon = name_polygon[
-                    1
-                ]  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
+            ) in self.list_of_name_polygons:  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
+                name = name_polygon[0]  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
+                polygon = name_polygon[1]  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
                 color = 'g'  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
                 # Draw the polygon.  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
                 closed_xy_list = polygon.copy()
@@ -202,11 +178,7 @@ class KeyFrameCornerSearch:
                     )  # ?? SCAFFOLDING RCB -- MAKE THIS INTEGRATED WITH STANDARD PLOTTING AND RENDER CONTROL ROUTINES.  # ?? SCAFFOLDING RCB -- INTEGRATRE THIS WITH STANDARD FNXL RENDERING.
 
             plt.savefig(
-                os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_00_img_box.png',
-                ),
-                dpi=500,
+                os.path.join(self.frame['output_construction_dir'], self.key_frame_id_str + '_00_img_box.png'), dpi=500
             )
             plt.close()
 
@@ -274,9 +246,7 @@ class KeyFrameCornerSearch:
         # sky_img         = cv.bitwise_and(img_rgb, img_rgb, mask=sky)
         if self.render_control.draw_skyhsv:
             save_image(
-                img=sky,
-                imgname=self.key_frame_id_str + '_02_skyhsv.png',
-                path=self.frame['output_construction_dir'],
+                img=sky, imgname=self.key_frame_id_str + '_02_skyhsv.png', path=self.frame['output_construction_dir']
             )
         if self.render_control.draw_skyhsv_fig:
             save_fig(
@@ -358,16 +328,13 @@ class KeyFrameCornerSearch:
         boundaries: a 0 (not a boundary pixel) or 1 (boundary pixel) ndarray that is the same size as self.frame['key_frame_img']
         boundaries_img: an ndarray with with boundary pixels colored based on whether they are a top/left/right/bottom edge pixel
         """
-        print(
-            'In KeyFrameCornerSearch.facet_boundaries()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.facet_boundaries()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         img = self.frame['key_frame_img']
         edges = self.frame['edges']
 
         row_edges, col_edges = np.nonzero(edges)
         print(
-            'In KeyFrameCornerSearch.facet_boundaries(), number of edge pixels len(row_edges) =',
-            len(row_edges),
+            'In KeyFrameCornerSearch.facet_boundaries(), number of edge pixels len(row_edges) =', len(row_edges)
         )  # ?? SCAFFOLDING RCB -- TEMPORARY
         boundaries_img = 0 * img
         boundaries_rows = []
@@ -433,12 +400,7 @@ class KeyFrameCornerSearch:
         return boundaries, boundaries_img
 
     def is_boundary_pixel(
-        self,
-        row: int,
-        col: int,
-        btype: str,
-        required_sky_width: int = None,
-        ignore_margin: int = None,
+        self, row: int, col: int, btype: str, required_sky_width: int = None, ignore_margin: int = None
     ) -> bool:
         """Checks if the pixel at the given row/col is a mirror edge boundary pixel (it is assumed to be an edge pixel).
 
@@ -503,9 +465,7 @@ class KeyFrameCornerSearch:
             components: the dict['original_pixels'] entries contains the list of component pixels.
             component_img: the image with the components drawn on top of it."""
 
-        def construct_component(
-            row: int, col: int, btype: str, color: list[int], img: np.ndarray
-        ) -> Component:
+        def construct_component(row: int, col: int, btype: str, color: list[int], img: np.ndarray) -> Component:
             """Builds out a list of adjacent pixels that all have the same color (including diagonals).
 
             Parameters
@@ -534,11 +494,7 @@ class KeyFrameCornerSearch:
                     and [r - 1, c - 1] not in horizon
                 ):
                     horizon.append([r - 1, c - 1])
-                if (
-                    ((r - 1) >= 0)
-                    and (img[r - 1, c, :] == color).all(axis=-1)
-                    and [r - 1, c] not in horizon
-                ):
+                if ((r - 1) >= 0) and (img[r - 1, c, :] == color).all(axis=-1) and [r - 1, c] not in horizon:
                     horizon.append([r - 1, c])
                 if (
                     ((r - 1) >= 0)
@@ -547,17 +503,9 @@ class KeyFrameCornerSearch:
                     and [r - 1, c + 1] not in horizon
                 ):
                     horizon.append([r - 1, c + 1])
-                if (
-                    ((c - 1) >= 0)
-                    and (img[r, c - 1, :] == color).all(axis=-1)
-                    and [r, c - 1] not in horizon
-                ):
+                if ((c - 1) >= 0) and (img[r, c - 1, :] == color).all(axis=-1) and [r, c - 1] not in horizon:
                     horizon.append([r, c - 1])
-                if (
-                    ((c + 1) < max_col)
-                    and (img[r, c + 1, :] == color).all(axis=-1)
-                    and [r, c + 1] not in horizon
-                ):
+                if ((c + 1) < max_col) and (img[r, c + 1, :] == color).all(axis=-1) and [r, c + 1] not in horizon:
                     horizon.append([r, c + 1])
                 if (
                     ((r + 1) < max_row)
@@ -566,11 +514,7 @@ class KeyFrameCornerSearch:
                     and [r + 1, c - 1] not in horizon
                 ):
                     horizon.append([r + 1, c - 1])
-                if (
-                    ((r + 1) < max_row)
-                    and (img[r + 1, c, :] == color).all(axis=-1)
-                    and [r + 1, c] not in horizon
-                ):
+                if ((r + 1) < max_row) and (img[r + 1, c, :] == color).all(axis=-1) and [r + 1, c] not in horizon:
                     horizon.append([r + 1, c])
                 if (
                     ((r + 1) < max_row)
@@ -592,9 +536,7 @@ class KeyFrameCornerSearch:
                     components_img[pixel[0], pixel[1], :] = color
             return components_img
 
-        print(
-            'In KeyFrameCornerSearch.connected_components()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.connected_components()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         img = self.frame['key_frame_img']
         boundaries = self.frame['boundaries']
         boundaries_img = self.frame['boundaries_img']
@@ -639,9 +581,7 @@ class KeyFrameCornerSearch:
 
         if self.render_control.write_components:
             save_connected_components(
-                components=components,
-                filename='components.csv',
-                path=self.frame['output_construction_dir'],
+                components=components, filename='components.csv', path=self.frame['output_construction_dir']
             )
 
         return components, components_img
@@ -658,9 +598,7 @@ class KeyFrameCornerSearch:
                     components_img[pixel[0], pixel[1], :] = color
             return components_img
 
-        print(
-            'In KeyFrameCornerSearch.filter_connected_components()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.filter_connected_components()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         img = self.frame['key_frame_img']
         components = self.frame['components']
 
@@ -669,10 +607,7 @@ class KeyFrameCornerSearch:
             if len(component['original_pixels']) >= COMPONENT_THRESHOLD:
                 filtered_components.append(component)
 
-        if (
-            self.render_control.draw_filt_components
-            or self.render_control.draw_filt_components_fig
-        ):
+        if self.render_control.draw_filt_components or self.render_control.draw_filt_components_fig:
             filt_connected_comp_img = construct_component_img(filtered_components, img)
             if self.render_control.draw_filt_components:
                 save_image(
@@ -689,18 +624,14 @@ class KeyFrameCornerSearch:
 
         if self.render_control.write_filt_components:
             save_connected_components(
-                filtered_components,
-                filename='filt_components.csv',
-                path=self.frame['output_construction_dir'],
+                filtered_components, filename='filt_components.csv', path=self.frame['output_construction_dir']
             )
 
         return filtered_components, filt_connected_comp_img
 
     def fitted_lines_connected_components(self, type_fit='regression'):
         """Does an initial line fit on the pixels in the components."""
-        print(
-            'In KeyFrameCornerSearch.fitted_lines_connected_components()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.fitted_lines_connected_components()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         line_components = []
         components = self.frame['filt_components']
         for component in components:
@@ -731,9 +662,7 @@ class KeyFrameCornerSearch:
 
         def find_inliers_component(component: Component):
             A, B, C = component['original_line_hom_coef']  # from Ax + By + C = 0
-            btype: str = component[
-                'boundary_type'
-            ]  # 'left', 'right', 'top', or 'bottom'
+            btype: str = component['boundary_type']  # 'left', 'right', 'top', or 'bottom'
             original_pixels: list[list[int]] = component['original_pixels']
             required_inliers = int(round(INLIERS_THRESHOLD * len(original_pixels)))
 
@@ -762,9 +691,7 @@ class KeyFrameCornerSearch:
                 component['inliers_line_residual'] = component['original_line_residual']
                 component['inliers_line_points'] = component['original_line_points']
             else:
-                row, col = np.array([a[0] for a in inliers]), np.array(
-                    [a[1] for a in inliers]
-                )
+                row, col = np.array([a[0] for a in inliers]), np.array([a[1] for a in inliers])
                 if btype == 'left' or btype == 'right':
                     # expected horizontal line in terms of row
                     x, y = row, col
@@ -791,14 +718,8 @@ class KeyFrameCornerSearch:
                     x1,
                     y1,
                 ]  # point at first x pixel [first y for left/right], with the y [x] adjusted to lie on the fit line
-                A_inl, B_inl, C_inl = set_proper_hom_coef_sign(
-                    start_point, btype, A_inl, B_inl, C_inl
-                )
-                outliers = [
-                    [pixel[0], pixel[1]]
-                    for pixel in original_pixels
-                    if pixel not in inliers
-                ]
+                A_inl, B_inl, C_inl = set_proper_hom_coef_sign(start_point, btype, A_inl, B_inl, C_inl)
+                outliers = [[pixel[0], pixel[1]] for pixel in original_pixels if pixel not in inliers]
                 component['tolerance'] = tolerance
                 component['outliers_pixels'] = outliers
                 component['inliers_pixels'] = inliers
@@ -808,9 +729,7 @@ class KeyFrameCornerSearch:
 
             return component
 
-        print(
-            'In KeyFrameCornerSearch.fitted_lines_inliers_components()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.fitted_lines_inliers_components()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         components = self.frame['fitted_lines_components']
         inliers_components: list[Component] = []
         for component in components:
@@ -837,18 +756,14 @@ class KeyFrameCornerSearch:
         -------
             corners: a list of corner dict lists [[TL],[TR],[BR],[BL]], where each dict contains the xy 'point' for the corner.
         """
-        print(
-            'In KeyFrameCornerSearch.find_corners()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.find_corners()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         top_left_corners: dict[str, Any] = []
         top_right_corners: dict[str, Any] = []
         bottom_right_corners: dict[str, Any] = []
         bottom_left_corners: dict[str, Any] = []
         output_construction_dir = self.frame['output_construction_dir']
         corners_types = (
-            [corners_type]
-            if (corners_type != None)
-            else ['top_left', 'top_right', 'bottom_right', 'bottom_left']
+            [corners_type] if (corners_type != None) else ['top_left', 'top_right', 'bottom_right', 'bottom_left']
         )
 
         max_row = self.frame['key_frame_img'].shape[0]
@@ -916,25 +831,13 @@ class KeyFrameCornerSearch:
                 # keep the component's representative
                 pixels = component['inliers_pixels']
                 if corners_type == 'top_left':  # left edge
-                    representative = sorted(
-                        pixels, key=lambda pix: pix[0], reverse=False
-                    )[
-                        0
-                    ]  # ascending
+                    representative = sorted(pixels, key=lambda pix: pix[0], reverse=False)[0]  # ascending
                 elif corners_type == 'top_right':  # top edge
-                    representative = sorted(
-                        pixels, key=lambda pix: pix[1], reverse=True
-                    )[
-                        0
-                    ]  # descending
+                    representative = sorted(pixels, key=lambda pix: pix[1], reverse=True)[0]  # descending
                 elif corners_type == 'bottom_right':  # right edge
-                    representative = sorted(
-                        pixels, key=lambda pix: pix[0], reverse=True
-                    )[0]
+                    representative = sorted(pixels, key=lambda pix: pix[0], reverse=True)[0]
                 elif corners_type == 'bottom_left':  # bottom edge
-                    representative = sorted(
-                        pixels, key=lambda pix: pix[1], reverse=False
-                    )[0]
+                    representative = sorted(pixels, key=lambda pix: pix[1], reverse=False)[0]
 
                 representative_tomatched = representative
                 #  keep the closest ones
@@ -942,46 +845,28 @@ class KeyFrameCornerSearch:
                 for candidate in components_candidates:
                     pixels = candidate['inliers_pixels']
                     if corners_type == 'top_left':  # top edge
-                        representative = sorted(
-                            pixels, key=lambda pix: pix[1], reverse=False
-                        )[0]
+                        representative = sorted(pixels, key=lambda pix: pix[1], reverse=False)[0]
                     elif corners_type == 'top_right':  # right edge
-                        representative = sorted(
-                            pixels, key=lambda pix: pix[0], reverse=False
-                        )[0]
+                        representative = sorted(pixels, key=lambda pix: pix[0], reverse=False)[0]
                     elif corners_type == 'bottom_right':  # bottom edge
-                        representative = sorted(
-                            pixels, key=lambda pix: pix[1], reverse=True
-                        )[0]
+                        representative = sorted(pixels, key=lambda pix: pix[1], reverse=True)[0]
                     elif corners_type == 'bottom_left':  # left edge
-                        representative = sorted(
-                            pixels, key=lambda pix: pix[0], reverse=True
-                        )[0]
+                        representative = sorted(pixels, key=lambda pix: pix[0], reverse=True)[0]
 
                     representatives_candidates.append(representative)
 
                 distances = [
-                    euclidean_distance(representative_tomatched, candidate)
-                    for candidate in representatives_candidates
+                    euclidean_distance(representative_tomatched, candidate) for candidate in representatives_candidates
                 ]
                 found_candidate_indx = np.argsort(np.array(distances))[0]
                 found_candidate = components_candidates[found_candidate_indx]
 
                 component_points = component['inliers_line_points']
-                component_start_point = [
-                    component_points[0],
-                    component_points[1],
-                ]  # col, row
+                component_start_point = [component_points[0], component_points[1]]  # col, row
                 component_end_point = [component_points[2], component_points[3]]
                 found_candidate_points = found_candidate['inliers_line_points']
-                found_candidate_start_point = [
-                    found_candidate_points[0],
-                    found_candidate_points[1],
-                ]
-                found_candidate_end_point = [
-                    found_candidate_points[2],
-                    found_candidate_points[3],
-                ]
+                found_candidate_start_point = [found_candidate_points[0], found_candidate_points[1]]
+                found_candidate_end_point = [found_candidate_points[2], found_candidate_points[3]]
 
                 corner = intersection_point(
                     component_start_point[0],
@@ -1000,16 +885,12 @@ class KeyFrameCornerSearch:
                 avg_row = sum([p[0] for p in pixels]) / len(pixels)
                 avg_col = sum([p[1] for p in pixels]) / len(pixels)
 
-                distance1 = euclidean_distance(
-                    [corner[1], corner[0]], [avg_row, avg_col]
-                )
+                distance1 = euclidean_distance([corner[1], corner[0]], [avg_row, avg_col])
 
                 pixels = found_candidate['inliers_pixels']
                 avg_row = sum([p[0] for p in pixels]) / len(pixels)
                 avg_col = sum([p[1] for p in pixels]) / len(pixels)
-                distance2 = euclidean_distance(
-                    [corner[1], corner[0]], [avg_row, avg_col]
-                )
+                distance2 = euclidean_distance([corner[1], corner[0]], [avg_row, avg_col])
 
                 distance = max([distance1, distance2])
 
@@ -1022,12 +903,7 @@ class KeyFrameCornerSearch:
                 #     < euclidean_distance(representative_tomatched, [avg_row, avg_col]))):
                 #     continue
 
-                if (
-                    corner[1] >= 0
-                    and corner[1] < max_row
-                    and corner[0] >= 0
-                    and corner[0] < max_col
-                ):
+                if corner[1] >= 0 and corner[1] < max_row and corner[0] >= 0 and corner[0] < max_col:
                     corner_structure = {}
                     key1 = 'edge_coeff'
                     key2 = 'edge_pixels'
@@ -1092,18 +968,10 @@ class KeyFrameCornerSearch:
             plt.figure()
             plt.imshow(self.frame['edges_img'])
             plt.scatter(
-                [x[0] for x in top_left],
-                [x[1] for x in top_left],
-                marker='o',
-                facecolor=PLT_TOP_LEFT_COLOR,
-                s=5,
+                [x[0] for x in top_left], [x[1] for x in top_left], marker='o', facecolor=PLT_TOP_LEFT_COLOR, s=5
             )
             plt.scatter(
-                [x[0] for x in top_right],
-                [x[1] for x in top_right],
-                marker='o',
-                facecolor=PLT_TOP_RIGHT_COLOR,
-                s=5,
+                [x[0] for x in top_right], [x[1] for x in top_right], marker='o', facecolor=PLT_TOP_RIGHT_COLOR, s=5
             )
             plt.scatter(
                 [x[0] for x in bottom_right],
@@ -1120,11 +988,7 @@ class KeyFrameCornerSearch:
                 s=5,
             )
             plt.savefig(
-                os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_08_corners.png',
-                ),
-                dpi=200,
+                os.path.join(self.frame['output_construction_dir'], self.key_frame_id_str + '_08_corners.png'), dpi=200
             )
             plt.close()
 
@@ -1157,21 +1021,11 @@ class KeyFrameCornerSearch:
                 corners_type='bottom_left',
             )
 
-        return [
-            top_left_corners,
-            top_right_corners,
-            bottom_right_corners,
-            bottom_left_corners,
-        ]
+        return [top_left_corners, top_right_corners, bottom_right_corners, bottom_left_corners]
 
     def facets(self):
         print('In KeyFrameCornerSearch.facets()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
-        (
-            top_left_corners,
-            top_right_corners,
-            bottom_right_corners,
-            bottom_left_corners,
-        ) = self.frame['corners']
+        (top_left_corners, top_right_corners, bottom_right_corners, bottom_left_corners) = self.frame['corners']
         already_matched_corners = []
         facets = []
         # For each Top Left corner
@@ -1182,8 +1036,7 @@ class KeyFrameCornerSearch:
             A_left, B_left, C_left = top_left_corner['left_edge_coeff']
             # distances with top right corners
             top_right_distances = [
-                euclidean_distance(top_left_point, top_right_corner['point'])
-                for top_right_corner in top_right_corners
+                euclidean_distance(top_left_point, top_right_corner['point']) for top_right_corner in top_right_corners
             ]
             indices = np.argsort(np.array(top_right_distances))
             flag = True
@@ -1204,20 +1057,13 @@ class KeyFrameCornerSearch:
                 )
 
                 distance = euclidean_distance(top_left_point, interpoint)
-                if (
-                    A_left * top_right_point[0] + B_left * top_right_point[1] + C_left
-                    < 0
-                ) and (  # on the right side
+                if (A_left * top_right_point[0] + B_left * top_right_point[1] + C_left < 0) and (  # on the right side
                     distance <= INTER_POINT_DISTANCE
                 ):  # ?? MAGIC NUMBER
                     flag = False
                     break
 
-            if (
-                flag
-                or top_left_corner in already_matched_corners
-                or top_right_corner in already_matched_corners
-            ):
+            if flag or top_left_corner in already_matched_corners or top_right_corner in already_matched_corners:
                 continue
 
             # Finding Bottom Right corner
@@ -1249,17 +1095,9 @@ class KeyFrameCornerSearch:
 
                 distance = euclidean_distance(top_right_point, interpoint)
                 if (
-                    (
-                        A_top * bottom_right_point[0]
-                        + B_top * bottom_right_point[1]
-                        + C_top
-                        < 0
-                    )  # on the right side
+                    (A_top * bottom_right_point[0] + B_top * bottom_right_point[1] + C_top < 0)  # on the right side
                     and (
-                        A_left * bottom_right_point[0]
-                        + B_left * bottom_right_point[1]
-                        + C_left
-                        < 0
+                        A_left * bottom_right_point[0] + B_left * bottom_right_point[1] + C_left < 0
                     )  # on the right side
                     and (distance <= INTER_POINT_DISTANCE)
                 ):  # ?? MAGIC NUMBER
@@ -1311,18 +1149,8 @@ class KeyFrameCornerSearch:
                 distance = euclidean_distance(bottom_right_point, interpoint)
                 distance_alt = euclidean_distance(interpoint_alt, bottom_left_point)
                 if (
-                    (
-                        A_right * bottom_left_point[0]
-                        + B_right * bottom_left_point[1]
-                        + C_right
-                        < 0
-                    )  # on the right side
-                    and (
-                        A_top * bottom_left_point[0]
-                        + B_top * bottom_left_point[1]
-                        + C_top
-                        < 0
-                    )  # on the below side
+                    (A_right * bottom_left_point[0] + B_right * bottom_left_point[1] + C_right < 0)  # on the right side
+                    and (A_top * bottom_left_point[0] + B_top * bottom_left_point[1] + C_top < 0)  # on the below side
                     and (distance <= INTER_POINT_DISTANCE)  # ?? MAGIC NUMBER
                     and (distance_alt <= INTER_POINT_DISTANCE)
                 ):  # ?? MAGIC NUMBER
@@ -1364,18 +1192,10 @@ class KeyFrameCornerSearch:
 
             required_sky_width = int(REQUIRED_SKY_WIDTH / 4)
             if (
-                self.is_boundary_pixel(
-                    r, c, 'left', required_sky_width=required_sky_width
-                )
-                and self.is_boundary_pixel(
-                    r, c, 'top', required_sky_width=required_sky_width
-                )
-                and self.is_boundary_pixel(
-                    r, c, 'right', required_sky_width=required_sky_width
-                )
-                and self.is_boundary_pixel(
-                    r, c, 'bottom', required_sky_width=required_sky_width
-                )
+                self.is_boundary_pixel(r, c, 'left', required_sky_width=required_sky_width)
+                and self.is_boundary_pixel(r, c, 'top', required_sky_width=required_sky_width)
+                and self.is_boundary_pixel(r, c, 'right', required_sky_width=required_sky_width)
+                and self.is_boundary_pixel(r, c, 'bottom', required_sky_width=required_sky_width)
             ):
                 flag = True
             if not flag:
@@ -1402,53 +1222,23 @@ class KeyFrameCornerSearch:
                 bottom_right_corner = facet['bottom_right']['point']
                 bottom_left_corner = facet['bottom_left']['point']
                 center = facet['center']
-                plt.scatter(
-                    top_left_corner[0],
-                    top_left_corner[1],
-                    facecolor=PLT_TOP_LEFT_COLOR,
-                    s=1,
-                )
-                plt.scatter(
-                    top_right_corner[0],
-                    top_right_corner[1],
-                    facecolor=PLT_TOP_RIGHT_COLOR,
-                    s=1,
-                )
-                plt.scatter(
-                    bottom_right_corner[0],
-                    bottom_right_corner[1],
-                    facecolor=PLT_BOTTOM_RIGHT_COLOR,
-                    s=1,
-                )
-                plt.scatter(
-                    bottom_left_corner[0],
-                    bottom_left_corner[1],
-                    facecolor=PLT_BOTTOM_LEFT_COLOR,
-                    s=1,
-                )
+                plt.scatter(top_left_corner[0], top_left_corner[1], facecolor=PLT_TOP_LEFT_COLOR, s=1)
+                plt.scatter(top_right_corner[0], top_right_corner[1], facecolor=PLT_TOP_RIGHT_COLOR, s=1)
+                plt.scatter(bottom_right_corner[0], bottom_right_corner[1], facecolor=PLT_BOTTOM_RIGHT_COLOR, s=1)
+                plt.scatter(bottom_left_corner[0], bottom_left_corner[1], facecolor=PLT_BOTTOM_LEFT_COLOR, s=1)
                 plt.scatter(center[0], center[1], facecolor=PLT_CENTER_COLOR, s=1)
             plt.savefig(
-                os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_09_facets.png',
-                ),
-                dpi=200,
+                os.path.join(self.frame['output_construction_dir'], self.key_frame_id_str + '_09_facets.png'), dpi=200
             )
             plt.close()
 
         if self.render_control.write_facets:
-            save_corners_facets(
-                facets=facets,
-                filename='facets.csv',
-                path=self.frame['output_construction_dir'],
-            )
+            save_corners_facets(facets=facets, filename='facets.csv', path=self.frame['output_construction_dir'])
 
         return facets
 
     def filter_facets_polygons(self):
-        print(
-            'In KeyFrameCornerSearch.filter_facets_polygons()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.filter_facets_polygons()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         all_facets = self.frame['facets']
 
         # filter the facets
@@ -1465,12 +1255,7 @@ class KeyFrameCornerSearch:
                 x_max = max(x_list)
                 y_min = min(y_list)
                 y_max = max(y_list)
-                if (
-                    (x_min < center[0])
-                    and (center[0] < x_max)
-                    and (y_min < center[1])
-                    and (center[1] < y_max)
-                ):
+                if (x_min < center[0]) and (center[0] < x_max) and (y_min < center[1]) and (center[1] < y_max):
                     in_polygon = True
                     break
             if in_polygon:
@@ -1506,10 +1291,7 @@ class KeyFrameCornerSearch:
             for facet in filtered_facets:
                 center = facet['center']
                 if (center not in assigned_centers) and (
-                    (x_min < center[0])
-                    and (center[0] < x_max)
-                    and (y_min < center[1])
-                    and (center[1] < y_max)
+                    (x_min < center[0]) and (center[0] < x_max) and (y_min < center[1]) and (center[1] < y_max)
                 ):
                     assigned_centers.append(center)
                     heliostat['facets'].append(facet)
@@ -1524,36 +1306,13 @@ class KeyFrameCornerSearch:
                 bottom_right_corner = facet['bottom_right']['point']
                 bottom_left_corner = facet['bottom_left']['point']
                 center = facet['center']
-                plt.scatter(
-                    top_left_corner[0],
-                    top_left_corner[1],
-                    facecolor=PLT_TOP_LEFT_COLOR,
-                    s=1,
-                )
-                plt.scatter(
-                    top_right_corner[0],
-                    top_right_corner[1],
-                    facecolor=PLT_TOP_RIGHT_COLOR,
-                    s=1,
-                )
-                plt.scatter(
-                    bottom_right_corner[0],
-                    bottom_right_corner[1],
-                    facecolor=PLT_BOTTOM_RIGHT_COLOR,
-                    s=1,
-                )
-                plt.scatter(
-                    bottom_left_corner[0],
-                    bottom_left_corner[1],
-                    facecolor=PLT_BOTTOM_LEFT_COLOR,
-                    s=1,
-                )
+                plt.scatter(top_left_corner[0], top_left_corner[1], facecolor=PLT_TOP_LEFT_COLOR, s=1)
+                plt.scatter(top_right_corner[0], top_right_corner[1], facecolor=PLT_TOP_RIGHT_COLOR, s=1)
+                plt.scatter(bottom_right_corner[0], bottom_right_corner[1], facecolor=PLT_BOTTOM_RIGHT_COLOR, s=1)
+                plt.scatter(bottom_left_corner[0], bottom_left_corner[1], facecolor=PLT_BOTTOM_LEFT_COLOR, s=1)
                 plt.scatter(center[0], center[1], facecolor=PLT_CENTER_COLOR, s=1)
             plt.savefig(
-                os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_10_filtered_facets.png',
-                ),
+                os.path.join(self.frame['output_construction_dir'], self.key_frame_id_str + '_10_filtered_facets.png'),
                 dpi=200,
             )
             plt.close()
@@ -1570,8 +1329,7 @@ class KeyFrameCornerSearch:
                     plt.scatter(center[0], center[1], facecolor=color, s=1)
             plt.savefig(
                 os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_11_filtered_heliostats.png',
+                    self.frame['output_construction_dir'], self.key_frame_id_str + '_11_filtered_heliostats.png'
                 ),
                 dpi=200,
             )
@@ -1583,22 +1341,13 @@ class KeyFrameCornerSearch:
         """
         Assumption: We trust first row in terms of correct found centers
         """
-        print(
-            'In KeyFrameCornerSearch.top_row_facets()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.top_row_facets()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         for heliostat in self.frame['heliostats']:
             facets = heliostat['facets']  # this is a list
-            facets = sorted(
-                facets, key=lambda f: f['center'][1]
-            )  # sort in terms of rows
-            top_row_facets = facets[
-                : self.specifications.facets_per_row
-            ]  # top row facets
+            facets = sorted(facets, key=lambda f: f['center'][1])  # sort in terms of rows
+            top_row_facets = facets[: self.specifications.facets_per_row]  # top row facets
             keys = [
-                [
-                    ['bottom_right', 'bottom_edge_coeff'],
-                    ['bottom_left', 'bottom_edge_coeff'],
-                ],
+                [['bottom_right', 'bottom_edge_coeff'], ['bottom_left', 'bottom_edge_coeff']],
                 [['top_left', 'top_edge_coeff'], ['top_right', 'top_edge_coeff']],
             ]
             for type_of_keys in keys:
@@ -1632,14 +1381,9 @@ class KeyFrameCornerSearch:
             for heliostat in self.frame['heliostats']:
                 top_row_facets = heliostat['top_row_facets']
                 for facet in top_row_facets:
-                    plt.scatter(
-                        facet['center'][0], facet['center'][1], s=1, facecolor='m'
-                    )
+                    plt.scatter(facet['center'][0], facet['center'][1], s=1, facecolor='m')
             plt.savefig(
-                os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_14_top_row_facets.png',
-                ),
+                os.path.join(self.frame['output_construction_dir'], self.key_frame_id_str + '_14_top_row_facets.png'),
                 dpi=200,
             )
             plt.close()
@@ -1658,18 +1402,12 @@ class KeyFrameCornerSearch:
                 out.append(inp[0])
                 find_combinations(inp[1:], out[:])
 
-        print(
-            'In KeyFrameCornerSearch.classify_top_row_facets()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyFrameCornerSearch.classify_top_row_facets()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         for heliostat in self.frame['heliostats']:
             top_row_facets = heliostat['top_row_facets']
-            top_row_facets = sorted(
-                top_row_facets, key=lambda f: f['center'][0]
-            )  # sort in terms of column
+            top_row_facets = sorted(top_row_facets, key=lambda f: f['center'][0])  # sort in terms of column
             ids = [i for i in range(0, self.specifications.facets_per_row)]
-            if (
-                len(top_row_facets) == self.specifications.facets_per_row
-            ):  # all facets have been identified
+            if len(top_row_facets) == self.specifications.facets_per_row:  # all facets have been identified
                 for facet_indx in range(0, len(top_row_facets)):
                     facet = top_row_facets[facet_indx]
                     facet['id'] = facet_indx
@@ -1678,9 +1416,7 @@ class KeyFrameCornerSearch:
                 # all diferent combinations, brute-force - Complexity O(self.specifications.facets_per_row!)
                 all_combinations = []
                 find_combinations(ids, [])
-                combinations = [
-                    x for x in all_combinations if len(x) == len(top_row_facets)
-                ]
+                combinations = [x for x in all_combinations if len(x) == len(top_row_facets)]
 
                 # image points
                 img_centers2d = []
@@ -1704,25 +1440,18 @@ class KeyFrameCornerSearch:
                     for i in combination:
                         obj_centers3d.append(centers3d[i])
                         corners_indx = i * self.specifications.corners_per_facet
-                        for indx in range(
-                            corners_indx,
-                            corners_indx + self.specifications.corners_per_facet,
-                        ):
+                        for indx in range(corners_indx, corners_indx + self.specifications.corners_per_facet):
                             obj_corners3d.append(corners3d[indx])
                     ## Projection
                     points3d = np.array(obj_corners3d + obj_centers3d).astype('float32')
                     h, w = self.frame['key_frame_img'].shape[:2]
-                    _, _, _, _, error = solvePNP(
-                        points3d, points2d, h, w, pnptype=self.solvePnPtype
-                    )
+                    _, _, _, _, error = solvePNP(points3d, points2d, h, w, pnptype=self.solvePnPtype)
                     proj_errors.append(error)
 
                 # select based on projected error
                 best_indx = np.argsort(np.array(proj_errors))[0]
                 selected_combination = combinations[best_indx]
-                for facet_indx, i in zip(
-                    range(0, len(top_row_facets)), selected_combination
-                ):
+                for facet_indx, i in zip(range(0, len(top_row_facets)), selected_combination):
                     facet = top_row_facets[facet_indx]
                     facet['id'] = i
                     top_row_facets[facet_indx] = facet
@@ -1737,25 +1466,18 @@ class KeyFrameCornerSearch:
                     center = facet['center']
                     label = facet['id']
                     plt.scatter(center[0], center[1], s=1, facecolor='m')
-                    plt.annotate(
-                        str(label), (center[0], center[1]), color='c', fontsize=5
-                    )
+                    plt.annotate(str(label), (center[0], center[1]), color='c', fontsize=5)
 
             plt.savefig(
                 os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_15_top_row_facets_labels.png',
+                    self.frame['output_construction_dir'], self.key_frame_id_str + '_15_top_row_facets_labels.png'
                 ),
                 dpi=200,
             )
             plt.close()
 
-    def project_and_confirm(
-        self, canny_levels=['tight', 'normal', 'light'], iterations=5
-    ):
-        print(
-            'In KeyFrameCornerSearch.project_and_confirm()...'
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+    def project_and_confirm(self, canny_levels=['tight', 'normal', 'light'], iterations=5):
+        print('In KeyFrameCornerSearch.project_and_confirm()...')  # ?? SCAFFOLDING RCB -- TEMPORARY
         edge_img = self.frame['edges_img']  # demonstration
         h, w = self.frame['key_frame_img'].shape[:2]
         # facet_centoids_csv  = self.facet_centroids_dir_body_ext + 'csv_files/' + 'Facets_Centroids.csv'
@@ -1782,9 +1504,7 @@ class KeyFrameCornerSearch:
             for label in labels:
                 objcenters.append(centers3d[label])
                 corner_indx = label * self.specifications.corners_per_facet
-                for indx in range(
-                    corner_indx, corner_indx + self.specifications.corners_per_facet
-                ):
+                for indx in range(corner_indx, corner_indx + self.specifications.corners_per_facet):
                     objcorners.append(corners3d[indx])
 
             points3d = np.array(objcorners + objcenters).astype('float32')
@@ -1811,21 +1531,14 @@ class KeyFrameCornerSearch:
                 '; len(points2d) =',
                 len(points2d),
             )  # ?? SCAFFOLDING RCB -- TEMPORARY
-            mtx, dist, rvec, tvec, pnp_error = solvePNP(
-                points3d, points2d, h, w, pnptype=self.solvePnPtype
-            )
+            mtx, dist, rvec, tvec, pnp_error = solvePNP(points3d, points2d, h, w, pnptype=self.solvePnPtype)
 
-            proj_corners, _ = cv.projectPoints(
-                np.array(corners3d).astype('float32'), rvec, tvec, mtx, dist
-            )
+            proj_corners, _ = cv.projectPoints(np.array(corners3d).astype('float32'), rvec, tvec, mtx, dist)
             proj_corners = proj_corners.reshape(-1, 2)
             proj_corners = proj_corners.tolist()
 
             confirmed_corners, projected_corners = self.confirm(
-                proj_corners,
-                corners3d,
-                canny_levels=canny_levels,
-                iterations=iterations,
+                proj_corners, corners3d, canny_levels=canny_levels, iterations=iterations
             )
 
             if (
@@ -1855,21 +1568,13 @@ class KeyFrameCornerSearch:
             all_projected_corners += heliostat[
                 'projected_corners'
             ]  # ?? SCAFFOLDING RCB -- AFTER THIS REFACTOR IS COMPLETE, MAYBE THESE ARE NO LONGER NEEDED.
-            list_of_name_confirmed_corners.append(
-                [heliostat['name'], heliostat['confirmed_corners']]
-            )
-            list_of_name_projected_corners.append(
-                [heliostat['name'], heliostat['projected_corners']]
-            )
+            list_of_name_confirmed_corners.append([heliostat['name'], heliostat['confirmed_corners']])
+            list_of_name_projected_corners.append([heliostat['name'], heliostat['projected_corners']])
         # FrameNameXyList objects.
         confirmed_fnxl = fnxl.FrameNameXyList()
         projected_fnxl = fnxl.FrameNameXyList()
-        confirmed_fnxl.add_list_of_name_xy_lists(
-            self.key_frame_id, list_of_name_confirmed_corners
-        )
-        projected_fnxl.add_list_of_name_xy_lists(
-            self.key_frame_id, list_of_name_projected_corners
-        )
+        confirmed_fnxl.add_list_of_name_xy_lists(self.key_frame_id, list_of_name_confirmed_corners)
+        projected_fnxl.add_list_of_name_xy_lists(self.key_frame_id, list_of_name_projected_corners)
         # Store in this class object.
         self.frame['all_confirmed_corners'] = all_confirmed_corners
         self.frame['all_projected_corners'] = all_projected_corners
@@ -1891,17 +1596,13 @@ class KeyFrameCornerSearch:
         if self.render_control.write_confirmed_fnxl:
             confirmed_fnxl.save(
                 os.path.join(
-                    self.frame['output_construction_dir'],
-                    'csv_files',
-                    (self.key_frame_id_str + '_confirmed_fnxl.csv'),
+                    self.frame['output_construction_dir'], 'csv_files', (self.key_frame_id_str + '_confirmed_fnxl.csv')
                 )
             )  # ?? SCAFFOLDING RCB -- INSTEAD OF ADDING "CSV_FILES" HERE, SHOULD BE PASSED IN THAT WAY.  SAVE TO ANSWER DIRECTORY?  -- PROBABLY NOT; INSEAD SAVE FROM CALLER?
         if self.render_control.write_projected_fnxl:
             projected_fnxl.save(
                 os.path.join(
-                    self.frame['output_construction_dir'],
-                    'csv_files',
-                    (self.key_frame_id_str + '_projected_fnxl.csv'),
+                    self.frame['output_construction_dir'], 'csv_files', (self.key_frame_id_str + '_projected_fnxl.csv')
                 )
             )  # ?? SCAFFOLDING RCB -- INSTEAD OF ADDING "CSV_FILES" HERE, SHOULD BE PASSED IN THAT WAY.  SAVE TO ANSWER DIRECTORY?  -- PROBABLY NOT; INSEAD SAVE FROM CALLER?
 
@@ -1911,9 +1612,7 @@ class KeyFrameCornerSearch:
             plt.figure()
             plt.imshow(edge_img)
             for final_heliostat in final_heliostats:
-                found_confirmed_corners = self.filter_not_found_corners(
-                    final_heliostat['confirmed_corners']
-                )
+                found_confirmed_corners = self.filter_not_found_corners(final_heliostat['confirmed_corners'])
                 # Draw the heliostat name.
                 if (
                     len(found_confirmed_corners) > 0
@@ -1945,8 +1644,7 @@ class KeyFrameCornerSearch:
             # Save the figure.
             plt.savefig(
                 os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_16_confirmed_corners.png',
+                    self.frame['output_construction_dir'], self.key_frame_id_str + '_16_confirmed_corners.png'
                 ),
                 dpi=200,
             )
@@ -1993,8 +1691,7 @@ class KeyFrameCornerSearch:
             # Save the figure.
             plt.savefig(
                 os.path.join(
-                    self.frame['output_construction_dir'],
-                    self.key_frame_id_str + '_17_projected_corners.png',
+                    self.frame['output_construction_dir'], self.key_frame_id_str + '_17_projected_corners.png'
                 ),
                 dpi=200,
             )
@@ -2007,9 +1704,7 @@ class KeyFrameCornerSearch:
             plt.imshow(edge_img)
             for final_heliostat in final_heliostats:
                 projected_corners = final_heliostat['projected_corners']
-                found_confirmed_corners = self.filter_not_found_corners(
-                    final_heliostat['confirmed_corners']
-                )
+                found_confirmed_corners = self.filter_not_found_corners(final_heliostat['confirmed_corners'])
                 # Draw the heliostat name.
                 if (
                     len(projected_corners) > 0
@@ -2057,8 +1752,7 @@ class KeyFrameCornerSearch:
 
         # Sort heliostats left to right  # ?? SCAFFOLDING RCB -- MAY NOT DO ANYTHING, IN WHICH CASE WE SHOULD DELETE.  WILL BE INCORRECT IF BOXES ARE NOT SORTED LEFT TO RIGHT?
         final_heliostats = sorted(
-            final_heliostats,
-            key=lambda x: np.mean(np.array(x['projected_corners']), axis=0)[0],
+            final_heliostats, key=lambda x: np.mean(np.array(x['projected_corners']), axis=0)[0]
         )  # ?? SCAFFOLDING RCB -- MAY NOT DO ANYTHING, IN WHICH CASE WE SHOULD DELETE.  WILL BE INCORRECT IF BOXES ARE NOT SORTED LEFT TO RIGHT?
 
     def confirm(
@@ -2076,27 +1770,15 @@ class KeyFrameCornerSearch:
 
         def confirm_facets(expected_corners, edges, tolerance, pixels):
             confirmed_facets = {}
-            for indx in range(
-                0, len(expected_corners), self.specifications.corners_per_facet
-            ):
+            for indx in range(0, len(expected_corners), self.specifications.corners_per_facet):
                 facet_id = indx // self.specifications.corners_per_facet
-                corners = [
-                    expected_corners[indx + i]
-                    for i in range(0, self.specifications.corners_per_facet)
-                ]
+                corners = [expected_corners[indx + i] for i in range(0, self.specifications.corners_per_facet)]
                 for corner_indx in range(0, len(corners)):
                     corner = corners[corner_indx]
-                    if (
-                        corner[0] >= max_col
-                        or corner[0] < 0
-                        or corner[1] >= max_row
-                        or corner[1] < 0
-                    ):
+                    if corner[0] >= max_col or corner[0] < 0 or corner[1] >= max_row or corner[1] < 0:
                         corners[corner_indx] = None
 
-                confirmed_facets[facet_id] = {
-                    'edges': confirm_facet_edges(corners, edges, tolerance, pixels)
-                }
+                confirmed_facets[facet_id] = {'edges': confirm_facet_edges(corners, edges, tolerance, pixels)}
             return confirmed_facets
 
         def confirm_facet_edges(corners, edges, tolerance, pixels):
@@ -2112,9 +1794,7 @@ class KeyFrameCornerSearch:
                 A, B, C = find_hom_line_2points(corner1, corner2)
                 if A is None:
                     continue
-                min_col, max_col, min_row, max_row = min_max_col_row(
-                    edges, corner1, corner2
-                )
+                min_col, max_col, min_row, max_row = min_max_col_row(edges, corner1, corner2)
                 edge_pixels = []
                 # confirming
                 if indx % 2 == 0:
@@ -2143,9 +1823,7 @@ class KeyFrameCornerSearch:
             return confirmed_edges
 
         def find_corners(confirmed_facets):
-            hel_corners = [
-                None for _ in range(0, self.specifications.corners_per_heliostat)
-            ]
+            hel_corners = [None for _ in range(0, self.specifications.corners_per_heliostat)]
             for facet_indx, facet in confirmed_facets.items():
                 corners = []
                 edges = facet['edges']
@@ -2193,9 +1871,7 @@ class KeyFrameCornerSearch:
                     img, canny_type=canny_type
                 )  # ?? SCAFFOLDING RCB -- SEE CANNY() AND CONFIRM() ROUTINES FOR DUPLICATE PLACES WHERE THIS CODE IS PLACED.  MUST KEEP CONSISTENT.  # ?? SCAFFOLDING RCB -- REDUNDANT IMAGE LOAD, BLUR, AND EDGE FINDING.  COMPUTE ONCE, CACHE AND COMMUNICATE.
                 # edges                           = CannyImg(self.frame['sky'], canny_type=canny_type)  # ?? SCAFFOLDING RCB -- ORIGINAL CODE, MULTIPLE FAILURE IMPLICATIONS:  (1) USING SKY, WHEN SKY WAS NOT USERED PREVIOUSLY.  (2) CAUSES OPENCV TO CRASH.  (THANKFULLY; OTHERWISE I WOULDN'T HAVE FOUND THE OTHER BUG.)
-                confirmed_facets = confirm_facets(
-                    expected_corners, edges, tolerance, pixels
-                )
+                confirmed_facets = confirm_facets(expected_corners, edges, tolerance, pixels)
                 confirmed_corners = find_corners(confirmed_facets)
                 flag_break = True
                 for corner in confirmed_corners:
@@ -2217,12 +1893,8 @@ class KeyFrameCornerSearch:
                 if len(points3d) < 4:  # Four points needed for solvePNP().
                     expected_corners = []
                     break
-                mtx, dist, rvec, tvec, pnp_error = solvePNP(
-                    points3d, points2d, h, w, pnptype=self.solvePnPtype
-                )
-                expected_corners, _ = cv.projectPoints(
-                    np.array(corners3d).astype('float32'), rvec, tvec, mtx, dist
-                )
+                mtx, dist, rvec, tvec, pnp_error = solvePNP(points3d, points2d, h, w, pnptype=self.solvePnPtype)
+                expected_corners, _ = cv.projectPoints(np.array(corners3d).astype('float32'), rvec, tvec, mtx, dist)
                 expected_corners = expected_corners.reshape(-1, 2)
                 expected_corners = expected_corners.tolist()
             if flag_break:

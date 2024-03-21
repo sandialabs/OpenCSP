@@ -43,27 +43,20 @@ def load_ideal_facet_ensemble_from_hdf(file: str, focal_length: float) -> FacetE
         file,
     )
     vs_facet_loc = Vxyz(data_ensemble['v_facet_locations'])
-    rs_facet_ensemble = [
-        Rotation.from_rotvec(v) for v in data_ensemble['r_facet_ensemble']
-    ]
+    rs_facet_ensemble = [Rotation.from_rotvec(v) for v in data_ensemble['r_facet_ensemble']]
 
     # Load ensemble definition data
     num_facets = len(vs_facet_loc)
     facets = []
     for idx_facet in range(num_facets):
-        data = load_hdf5_datasets(
-            [f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/v_facet_corners'],
-            file,
-        )
+        data = load_hdf5_datasets([f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/v_facet_corners'], file)
 
         # Create mirror region
         v_facet_corners = Vxy(data['v_facet_corners'][:2])
         region_facet = RegionXY.from_vertices(v_facet_corners)
 
         # Create mirror
-        mirror = MirrorParametric.generate_symmetric_paraboloid(
-            focal_length, region_facet
-        )
+        mirror = MirrorParametric.generate_symmetric_paraboloid(focal_length, region_facet)
 
         # Create facet
         facet = Facet(mirror)
@@ -98,9 +91,7 @@ def load_facet_ensemble_from_hdf(file: str) -> FacetEnsemble:
         "rotation_defined" Ensemble.
     """
     # Get number of facets
-    data_ensemble = load_hdf5_datasets(
-        ['DataSofastInput/optic_definition/ensemble/v_facet_locations'], file
-    )
+    data_ensemble = load_hdf5_datasets(['DataSofastInput/optic_definition/ensemble/v_facet_locations'], file)
     num_facets = data_ensemble['v_facet_locations'].shape[1]
 
     facets = []
@@ -160,9 +151,7 @@ def load_ideal_facet_from_hdf(file: str, focal_length: float) -> Facet:
         Reference facet representation. Defined as "rotation_defined."
     """
     # Load facet corners
-    data = load_hdf5_datasets(
-        ['DataSofastInput/optic_definition/facet_000/v_facet_corners'], file
-    )
+    data = load_hdf5_datasets(['DataSofastInput/optic_definition/facet_000/v_facet_corners'], file)
 
     # Create mirror
     v_facet_corners = Vxy(data['v_facet_corners'][:2])

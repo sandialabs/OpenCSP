@@ -77,19 +77,11 @@ def default(fontsize='medium', color='b'):
     """
     What to draw if no particular preference is expressed.
     """
-    return RenderControlText(
-        fontsize=fontsize,
-        fontstyle='normal',
-        fontweight='normal',
-        zdir=None,
-        color=color,
-    )
+    return RenderControlText(fontsize=fontsize, fontstyle='normal', fontweight='normal', zdir=None, color=color)
 
 
 def bold(fontsize='medium', color='b'):
     """
     What to draw for emphasis.
     """
-    return RenderControlText(
-        fontsize=fontsize, fontstyle='normal', fontweight='bold', zdir=None, color=color
-    )
+    return RenderControlText(fontsize=fontsize, fontstyle='normal', fontweight='bold', zdir=None, color=color)

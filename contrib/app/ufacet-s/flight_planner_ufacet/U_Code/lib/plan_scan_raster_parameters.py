@@ -28,11 +28,7 @@ def check_eta(eta):
             + str(np.rad2deg(eta))
             + 'encountered.'
         )
-        print(
-            '       We reject positive gaze angles exceeding '
-            + str(np.rad2deg(eta_max))
-            + ' degrees.'
-        )
+        print('       We reject positive gaze angles exceeding ' + str(np.rad2deg(eta_max)) + ' degrees.')
         assert False
     eta_min = np.rad2deg(-90.0)
     if eta < eta_min:
@@ -41,11 +37,7 @@ def check_eta(eta):
             + str(np.rad2deg(eta))
             + 'encountered.'
         )
-        print(
-            '       We reject gaze angles less than '
-            + str(np.rad2deg(eta_min))
-            + ' degrees.'
-        )
+        print('       We reject gaze angles less than ' + str(np.rad2deg(eta_min)) + ' degrees.')
         assert False
 
 
@@ -58,9 +50,7 @@ def construct_raster_scan_parameters(raster_scan_parameter_file):
         eta = np.deg2rad(-35.0)  # Arbitrary test value.
         scan_parameters['n_horizontal'] = 10  # Number of horizontal passes.
         scan_parameters['n_vertical'] = 6  # Number of vertical passes.
-        scan_parameters['eta'] = (
-            eta  # rad,  Gaze angle, measured relative to horizontal (positive ==> up).
-        )
+        scan_parameters['eta'] = eta  # rad,  Gaze angle, measured relative to horizontal (positive ==> up).
         scan_parameters['relative_z'] = 20  # m.
         scan_parameters['speed'] = 10  # m/sec.
         # Check result and return.

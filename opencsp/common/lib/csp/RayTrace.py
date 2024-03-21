@@ -23,9 +23,7 @@ from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlRayTrace import (
-    RenderControlRayTrace,
-)
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
 from opencsp.common.lib.tool.typing_tools import strict_types
 
@@ -56,9 +54,7 @@ class RayTrace:
         for obj in self.scene.objects + trace.scene.objects:
             sum_trace.scene.add_object(obj)
 
-        sum_trace.light_paths_ensemble = (
-            self.light_paths_ensemble + trace.light_paths_ensemble
-        )
+        sum_trace.light_paths_ensemble = self.light_paths_ensemble + trace.light_paths_ensemble
 
         return sum_trace
 
@@ -71,9 +67,7 @@ class RayTrace:
         for lp in self.light_paths_ensemble:
             lp.draw(view, trace_style.light_path_control)
 
-    def draw_subset(
-        self, view: View3d, count: int, trace_style: RenderControlRayTrace = None
-    ):
+    def draw_subset(self, view: View3d, count: int, trace_style: RenderControlRayTrace = None):
         for i in np.floor(np.linspace(0, len(self.light_paths_ensemble) - 1, count)):
             lp = self.light_paths_ensemble[int(i)]
             lp.draw(view, trace_style.light_path_control)
@@ -87,26 +81,16 @@ class RayTrace:
         """Creates a RayTrace object from an hdf5 file."""
         trace = RayTrace()
 
-        batch_names: list[str] = list(
-            load_hdf5_datasets([f"RayTrace_{trace_name}/Batches"], filename).values()
-        )[0]
+        batch_names: list[str] = list(load_hdf5_datasets([f"RayTrace_{trace_name}/Batches"], filename).values())[0]
         lpe = LightPathEnsemble([])
         for batch in batch_names:
             prefix = f"RayTrace_{trace_name}/Batches/{batch}/"
-            subgroups = [
-                prefix + 'CurrentDirections',
-                prefix + 'InitialDirections',
-                prefix + 'Points',
-            ]
-            curr_directions, init_directions, points = list(
-                load_hdf5_datasets(subgroups, filename).values()
-            )
+            subgroups = [prefix + 'CurrentDirections', prefix + 'InitialDirections', prefix + 'Points']
+            curr_directions, init_directions, points = list(load_hdf5_datasets(subgroups, filename).values())
             curr_directions = Uxyz(curr_directions)
             init_directions = Uxyz(init_directions)
             points = list(map(Pxyz, points))
-            lpe.concatenate_in_place(
-                LightPathEnsemble.from_parts(init_directions, points, curr_directions)
-            )
+            lpe.concatenate_in_place(LightPathEnsemble.from_parts(init_directions, points, curr_directions))
 
         trace.light_paths_ensemble = lpe
         return trace
@@ -185,9 +169,7 @@ def trace_scene_unvec(
     ray_trace = RayTrace(scene)
     for obj in scene.objects:
         # get the points on the mirror to reflect off of
-        points_and_normals = obj.survey_of_points(
-            obj_resolution, random_dist=random_dist
-        )
+        points_and_normals = obj.survey_of_points(obj_resolution, random_dist=random_dist)
         # from tutorial https://www.geeksforgeeks.org/python-unzip-a-list-of-tuples/
         unzipped_p_and_n = list(zip(*points_and_normals))
         just_points = unzipped_p_and_n[0]
@@ -230,9 +212,7 @@ def trace_scene_unvec(
                     ray = LightPath([], vector_from_path)
                     ray.add_step(p, ref_vec[:, 0])
                     ray_trace.add_light_path(ray)
-            if (
-                verbose and i in checkpoints
-            ):  # TODO tjlarki: make sure this check does not slow down the program
+            if verbose and i in checkpoints:  # TODO tjlarki: make sure this check does not slow down the program
                 print(f"{i/tot:.2%} through tracing.")
 
         # if save_in_file:
@@ -263,13 +243,9 @@ def trace_scene(
             stacklevel=2,
         )
     if save_in_file and save_name == None:
-        raise ValueError(
-            "save_in_file flag was True, but no file was specified to dave in."
-        )
+        raise ValueError("save_in_file flag was True, but no file was specified to dave in.")
     if save_in_file and max_ram_in_use_percent < psutil.virtual_memory().percent:
-        raise MemoryError(
-            "Maximum memory allocated to ray trace was reached before the trace has begun"
-        )
+        raise MemoryError("Maximum memory allocated to ray trace was reached before the trace has begun")
 
     # start
     if verbose:
@@ -302,16 +278,9 @@ def trace_scene(
         # Loop through points and perform trace calculations
         for i, (p, n_v) in enumerate(zip(points, normals)):
             ################# TODO Tjlarki: draft for saving traces ######################
-            if (
-                save_in_file
-                and max_ram_in_use_percent < psutil.virtual_memory().percent
-            ):
+            if save_in_file and max_ram_in_use_percent < psutil.virtual_memory().percent:
                 prefix = f"RayTrace_{trace_name}/Batches/Batch{batch:03}/"
-                datasets = [
-                    prefix + "InitialDirections",
-                    prefix + "Points",
-                    prefix + "CurrentDirections",
-                ]
+                datasets = [prefix + "InitialDirections", prefix + "Points", prefix + "CurrentDirections"]
                 data = [
                     total_lpe.init_directions.data,
                     np.array([points.data for points in total_lpe.points_lists]),
@@ -322,9 +291,7 @@ def trace_scene(
                 save_hdf5_datasets(data, datasets, save_name)
                 total_lpe = LightPathEnsemble([])
                 if verbose:
-                    print(
-                        f"Batch {batch} is over, now we start batch {(batch:=batch+1)}"
-                    )
+                    print(f"Batch {batch} is over, now we start batch {(batch:=batch+1)}")
             ##############################################################################
 
             p: Pxyz
@@ -347,9 +314,7 @@ def trace_scene(
             lpe.add_steps(Pxyz(P), Uxyz(results))
             total_lpe.concatenate_in_place(lpe)
 
-            if (
-                verbose and i in checkpoints
-            ):  # TODO tjlarki: make sure this check does not slow down the program
+            if verbose and i in checkpoints:  # TODO tjlarki: make sure this check does not slow down the program
                 print(
                     f"{i/number_of_rays:.2%} through tracing. Using {psutil.virtual_memory().percent}% of system RAM."
                 )
@@ -366,11 +331,7 @@ def trace_scene(
     # Save Last Batch
     if save_in_file:
         prefix = f"RayTrace/Batches/Batch{batch:08}/"
-        datasets = [
-            prefix + "InitialDirections",
-            prefix + "Points",
-            prefix + "CurrentDirections",
-        ]
+        datasets = [prefix + "InitialDirections", prefix + "Points", prefix + "CurrentDirections"]
         data = [
             total_lpe.init_directions.data,
             np.array([points.data for points in total_lpe.points_lists]),
@@ -574,11 +535,7 @@ def trace_scene_parallel(
         ################################# Save in hdf5 file #################################
         if save_file_name != None:
             prefix = f"RayTrace_{trace_name}/Batches/Batch_{process:03}_{batch:03}/"
-            dataset_names = [
-                prefix + "InitialDirections",
-                prefix + "Points",
-                prefix + "CurrentDirections",
-            ]
+            dataset_names = [prefix + "InitialDirections", prefix + "Points", prefix + "CurrentDirections"]
             ray_trace_data = [
                 process_lpe.init_directions.data,
                 np.array([points.data for points in process_lpe.points_lists]),
@@ -607,11 +564,7 @@ def trace_scene_parallel(
 
 
 def plane_intersect_OLD(
-    ray_trace: RayTrace,
-    v_plane_center: Vxyz,
-    u_plane_norm: Uxyz,
-    epsilon: float = 1e-6,
-    verbose=False,
+    ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm: Uxyz, epsilon: float = 1e-6, verbose=False
 ) -> Vxy:
     """Finds all the intersections that occur at a plane from the light paths
     in the raytrace. Output points are transformed from the global (i.e. solar field)
@@ -728,9 +681,7 @@ def plane_intersect(
     # filter out points that miss the plane
     if verbose:
         print("filtering out missed vectors")
-    filtered_intersec_points = Pxyz.merge(
-        list(filter(lambda vec: not vec.hasnan(), intersection_points))
-    )
+    filtered_intersec_points = Pxyz.merge(list(filter(lambda vec: not vec.hasnan(), intersection_points)))
 
     if verbose:
         print("Rotating.")
@@ -758,9 +709,7 @@ def plane_intersect(
     # TODO tjlarki: create the histogram from this or bin these results
 
 
-def histogram_image(
-    bin_res: float, extent: float, pts: Vxy
-) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+def histogram_image(bin_res: float, extent: float, pts: Vxy) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
     Creates a 2D histogram from scattered points
 
@@ -787,17 +736,13 @@ def histogram_image(
     extent = bin_res * bins
     rng = [[-extent / 2, extent / 2]] * 2
 
-    hist, x, y = np.histogram2d(
-        pts.x, pts.y, range=rng, bins=bins, density=False
-    )  # (y, x)
+    hist, x, y = np.histogram2d(pts.x, pts.y, range=rng, bins=bins, density=False)  # (y, x)
     hist = hist.T  # (x, y)
     hist = np.flip(hist, 0)  # convert from image to array
     return hist, x, y
 
 
-def ensquared_energy(
-    pts: Vxy, semi_width_max: float, res: int = 50
-) -> tuple[np.ndarray, np.ndarray]:
+def ensquared_energy(pts: Vxy, semi_width_max: float, res: int = 50) -> tuple[np.ndarray, np.ndarray]:
     """Calculate ensquared energy as function of square half-width.
 
     Parameters

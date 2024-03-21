@@ -32,12 +32,8 @@ class RenderControlHeliostatTracks:
         self.heliostat_tracks_points_marker = heliostat_tracks_points_marker
         self.heliostat_tracks_points_markersize = heliostat_tracks_points_markersize
         self.heliostat_tracks_points_color = heliostat_tracks_points_color
-        self.heliostat_tracks_label_horizontalalignment = (
-            heliostat_tracks_label_horizontalalignment
-        )
-        self.heliostat_tracks_label_verticalalignment = (
-            heliostat_tracks_label_verticalalignment
-        )
+        self.heliostat_tracks_label_horizontalalignment = heliostat_tracks_label_horizontalalignment
+        self.heliostat_tracks_label_verticalalignment = heliostat_tracks_label_verticalalignment
         self.heliostat_tracks_label_fontsize = heliostat_tracks_label_fontsize
         self.heliostat_tracks_label_fontstyle = heliostat_tracks_label_fontstyle
         self.heliostat_tracks_label_fontweight = heliostat_tracks_label_fontweight
@@ -50,9 +46,7 @@ class RenderControlHeliostatTracks:
 
 
 def default(color='m'):
-    return RenderControlHeliostatTracks(
-        heliostat_tracks_points_color=color, heliostat_tracks_label_color=color
-    )
+    return RenderControlHeliostatTracks(heliostat_tracks_points_color=color, heliostat_tracks_label_color=color)
 
 
 def fast():

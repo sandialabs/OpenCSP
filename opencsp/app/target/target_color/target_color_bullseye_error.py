@@ -29,9 +29,7 @@ def surface_normal_error_magnitude_given_radius_in_meters(r_meter, focal_length_
     return surface_normal_error * 1000.0  # Convert radians to milliradians.
 
 
-def radius_in_mrad_given_row_col(
-    n_rows, row, col, x_max, cx_offset_pix, y_offset_pix, focal_length_meter
-):
+def radius_in_mrad_given_row_col(n_rows, row, col, x_max, cx_offset_pix, y_offset_pix, focal_length_meter):
     x = col
     y = n_rows - row
     cx = (x_max / 2) + cx_offset_pix
@@ -42,7 +40,5 @@ def radius_in_mrad_given_row_col(
     theta = math.atan2(dy, dx)
     # Lookup color bar entry.
     r_meter = meters_given_pixels(r_pixel)
-    r_mrad = surface_normal_error_magnitude_given_radius_in_meters(
-        r_meter, focal_length_meter
-    )
+    r_mrad = surface_normal_error_magnitude_given_radius_in_meters(r_meter, focal_length_meter)
     return r_mrad

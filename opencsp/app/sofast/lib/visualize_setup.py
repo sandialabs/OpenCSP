@@ -56,41 +56,20 @@ def visualize_setup(
     # Calculate camera FOV
     x = camera.image_shape_xy[0]
     y = camera.image_shape_xy[1]
-    v_cam_fov_screen = (
-        camera.vector_from_pixel(Vxy(([0, 0, x, x, 0], [0, y, y, 0, 0]))).as_Vxyz()
-        * length_z_axis_cam
-    )
+    v_cam_fov_screen = camera.vector_from_pixel(Vxy(([0, 0, x, x, 0], [0, y, y, 0, 0]))).as_Vxyz() * length_z_axis_cam
     v_cam_fov_screen.rotate_in_place(display.r_cam_screen)
     v_cam_fov_screen += v_screen_cam_screen
 
     # Calculate camera X/Y axes
-    v_cam_x_screen = (
-        Vxyz(([0, axes_length], [0, 0], [0, 0])).rotate(display.r_cam_screen)
-        + v_screen_cam_screen
-    )
-    v_cam_y_screen = (
-        Vxyz(([0, 0], [0, axes_length], [0, 0])).rotate(display.r_cam_screen)
-        + v_screen_cam_screen
-    )
-    v_cam_z_screen = (
-        Vxyz(([0, 0], [0, 0], [0, length_z_axis_cam])).rotate(display.r_cam_screen)
-        + v_screen_cam_screen
-    )
+    v_cam_x_screen = Vxyz(([0, axes_length], [0, 0], [0, 0])).rotate(display.r_cam_screen) + v_screen_cam_screen
+    v_cam_y_screen = Vxyz(([0, 0], [0, axes_length], [0, 0])).rotate(display.r_cam_screen) + v_screen_cam_screen
+    v_cam_z_screen = Vxyz(([0, 0], [0, 0], [0, length_z_axis_cam])).rotate(display.r_cam_screen) + v_screen_cam_screen
 
     # Calculate object axes
     if v_screen_object_screen is not None:
-        v_obj_x_screen = (
-            Vxyz(([0, axes_length], [0, 0], [0, 0])).rotate(r_object_screen)
-            + v_screen_object_screen
-        )
-        v_obj_y_screen = (
-            Vxyz(([0, 0], [0, axes_length], [0, 0])).rotate(r_object_screen)
-            + v_screen_object_screen
-        )
-        v_obj_z_screen = (
-            Vxyz(([0, 0], [0, 0], [0, axes_length])).rotate(r_object_screen)
-            + v_screen_object_screen
-        )
+        v_obj_x_screen = Vxyz(([0, axes_length], [0, 0], [0, 0])).rotate(r_object_screen) + v_screen_object_screen
+        v_obj_y_screen = Vxyz(([0, 0], [0, axes_length], [0, 0])).rotate(r_object_screen) + v_screen_object_screen
+        v_obj_z_screen = Vxyz(([0, 0], [0, 0], [0, axes_length])).rotate(r_object_screen) + v_screen_object_screen
 
     # Calculate screen outline
     p_screen_outline = display.interp_func(Vxy(([0, 1, 1, 0, 0], [0, 0, 1, 1, 0])))
@@ -108,52 +87,28 @@ def visualize_setup(
         obj_y = v_screen_object_screen.y
         obj_z = v_screen_object_screen.z
     lx1 = max(
-        np.nanmax(
-            np.concatenate(
-                (v_screen_cam_screen.x, v_cam_fov_screen.x, p_screen_outline.x, obj_x)
-            )
-        ),
+        np.nanmax(np.concatenate((v_screen_cam_screen.x, v_cam_fov_screen.x, p_screen_outline.x, obj_x))),
         min_axis_length_screen,
     )
     ly1 = max(
-        np.nanmax(
-            np.concatenate(
-                (v_screen_cam_screen.y, v_cam_fov_screen.y, p_screen_outline.y, obj_y)
-            )
-        ),
+        np.nanmax(np.concatenate((v_screen_cam_screen.y, v_cam_fov_screen.y, p_screen_outline.y, obj_y))),
         min_axis_length_screen,
     )
     lz1 = max(
-        np.nanmax(
-            np.concatenate(
-                (v_screen_cam_screen.z, v_cam_fov_screen.z, p_screen_outline.z, obj_z)
-            )
-        ),
+        np.nanmax(np.concatenate((v_screen_cam_screen.z, v_cam_fov_screen.z, p_screen_outline.z, obj_z))),
         min_axis_length_screen,
     )
     # Define negative xyz screen axes extent
     lx2 = min(
-        np.nanmin(
-            np.concatenate(
-                (v_screen_cam_screen.x, v_cam_fov_screen.x, p_screen_outline.x, obj_x)
-            )
-        ),
+        np.nanmin(np.concatenate((v_screen_cam_screen.x, v_cam_fov_screen.x, p_screen_outline.x, obj_x))),
         -min_axis_length_screen,
     )
     ly2 = min(
-        np.nanmin(
-            np.concatenate(
-                (v_screen_cam_screen.y, v_cam_fov_screen.y, p_screen_outline.y, obj_y)
-            )
-        ),
+        np.nanmin(np.concatenate((v_screen_cam_screen.y, v_cam_fov_screen.y, p_screen_outline.y, obj_y))),
         -min_axis_length_screen,
     )
     lz2 = min(
-        np.nanmin(
-            np.concatenate(
-                (v_screen_cam_screen.z, v_cam_fov_screen.z, p_screen_outline.z, obj_z)
-            )
-        ),
+        np.nanmin(np.concatenate((v_screen_cam_screen.z, v_cam_fov_screen.z, p_screen_outline.z, obj_z))),
         -min_axis_length_screen,
     )
     # Add screen axes

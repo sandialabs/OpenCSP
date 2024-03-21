@@ -50,12 +50,8 @@ class RenderControlFigureRecord:
         self.figure = figure
         self.axis_control = axis_control
         """ Axis control instance used in figure_management.setup_figure. Can be None|RenderControlAxis. """
-        self.metadata: list[str] = (
-            []
-        )  # A list of standard string fields -- name, figure number, file path, etc.
-        self.comments: list[str] = (
-            []
-        )  # A list of caller-defined strings, to be filled in later.
+        self.metadata: list[str] = []  # A list of standard string fields -- name, figure number, file path, etc.
+        self.comments: list[str] = []  # A list of caller-defined strings, to be filled in later.
         self.axis: plt.Axes = None  # Matplotlib plot axes object.  Set later.
         self.view: View3d = None  # View3d object.                Set later.
         self.equal = None  # Whether to make axes equal.   Set later.
@@ -73,14 +69,7 @@ class RenderControlFigureRecord:
         for comment_line in self.comments:
             lt.info(comment_line)
 
-    def save(
-        self,
-        output_dir: str,
-        output_file_body: str = None,
-        format: str = None,
-        dpi=600,
-        close_after_save=True,
-    ):
+    def save(self, output_dir: str, output_file_body: str = None, format: str = None, dpi=600, close_after_save=True):
         """Saves this figure record to an image file.
 
         Args:
@@ -116,9 +105,7 @@ class RenderControlFigureRecord:
 
         # If this is a 3-d plot, add the projection choice.
         if self.view != None:
-            output_figure_dir_body_ext = self.view.save(
-                output_dir, output_figure_body, format=format, dpi=dpi
-            )
+            output_figure_dir_body_ext = self.view.save(output_dir, output_figure_body, format=format, dpi=dpi)
         else:
             # Make the figure current.
             plt.figure(self.name)
@@ -140,20 +127,14 @@ class RenderControlFigureRecord:
         if orig_format.lower() == "gif":
             im = PilImage.open(output_figure_dir_body_ext)
             png_file = output_figure_dir_body_ext
-            output_figure_dir_body_ext = (
-                png_file.rstrip("." + format) + "." + orig_format
-            )
+            output_figure_dir_body_ext = png_file.rstrip("." + format) + "." + orig_format
             im.save(output_figure_dir_body_ext)
             ft.delete_file(png_file)
 
         # Save the figure explanation.
-        output_figure_dir, output_figure_body, output_figure_ext = ft.path_components(
-            output_figure_dir_body_ext
-        )
+        output_figure_dir, output_figure_body, output_figure_ext = ft.path_components(output_figure_dir_body_ext)
         output_figure_text_body_ext = output_figure_body + '.txt'
-        output_figure_text_dir_body_ext = os.path.join(
-            output_figure_dir, output_figure_text_body_ext
-        )
+        output_figure_text_dir_body_ext = os.path.join(output_figure_dir, output_figure_text_body_ext)
         lt.info('Saving figure text: ' + output_figure_text_dir_body_ext)
         with open(output_figure_text_dir_body_ext, 'w') as output_stream:
             # Save the figure metadata.

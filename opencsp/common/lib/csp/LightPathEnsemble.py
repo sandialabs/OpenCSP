@@ -31,9 +31,7 @@ class LightPathEnsemble:
 
     @classmethod
     @strict_types
-    def from_parts(
-        cls, init_directions: Uxyz, points: list[Pxyz], curr_directions: Uxyz, colors=[]
-    ):
+    def from_parts(cls, init_directions: Uxyz, points: list[Pxyz], curr_directions: Uxyz, colors=[]):
         lpe = LightPathEnsemble([])
         lpe.current_directions = curr_directions
         lpe.init_directions = init_directions
@@ -63,14 +61,10 @@ class LightPathEnsemble:
             else:
                 self.points_lists[i] = old_points.concatenate(new_point)
 
-        self.current_directions = (
-            new_current_directions  # update the current directions
-        )
+        self.current_directions = new_current_directions  # update the current directions
 
     def concatenate_in_place(self: 'LightPathEnsemble', lpe1: 'LightPathEnsemble'):
-        self.current_directions = self.current_directions.concatenate(
-            lpe1.current_directions
-        )
+        self.current_directions = self.current_directions.concatenate(lpe1.current_directions)
         self.init_directions = self.init_directions.concatenate(lpe1.init_directions)
         self.points_lists += lpe1.points_lists
         self.colors += lpe1.colors
@@ -78,9 +72,7 @@ class LightPathEnsemble:
 
     def asLightPathList(self) -> list[LightPath]:
         lps: list[LightPath] = []
-        for cd, id, pl in zip(
-            self.current_directions, self.init_directions, self.points_lists
-        ):
+        for cd, id, pl in zip(self.current_directions, self.init_directions, self.points_lists):
             lp = LightPath(pl, id, cd)
             lps.append(lp)
         return lps
@@ -91,9 +83,7 @@ class LightPathEnsemble:
 
     def concatenate(self: 'LightPathEnsemble', lpe1: 'LightPathEnsemble'):
         new_lpe = LightPathEnsemble([])
-        new_lpe.current_directions = self.current_directions.concatenate(
-            lpe1.current_directions
-        )
+        new_lpe.current_directions = self.current_directions.concatenate(lpe1.current_directions)
         new_lpe.init_directions = self.init_directions.concatenate(lpe1.init_directions)
         new_lpe.points_lists = self.points_lists + (lpe1.points_lists)
         new_lpe.colors = self.colors + (lpe1.colors)
@@ -101,9 +91,7 @@ class LightPathEnsemble:
 
     def asLightPathList(self) -> list[LightPath]:
         lps: list[LightPath] = []
-        for cd, id, pl in zip(
-            self.current_directions, self.init_directions, self.points_lists
-        ):
+        for cd, id, pl in zip(self.current_directions, self.init_directions, self.points_lists):
             lp = LightPath(pl, id, cd)
             lps.append(lp)
         return lps

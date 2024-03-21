@@ -2,9 +2,7 @@ import cv2
 import dataclasses
 import numpy as np
 
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
-    SpotAnalysisOperable,
-)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImagesProcessor,
 )
@@ -88,11 +86,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         elif input_color <= 255 * 3 + 128:  # yellow to red
             ret = [255, 2 * ((255 * 3 + 128) - input_color), 0]
         else:  # red to white
-            ret = [
-                255,
-                2 * (input_color - (255 * 3 + 128)),
-                2 * (input_color - (255 * 3 + 128)),
-            ]
+            ret = [255, 2 * (input_color - (255 * 3 + 128)), 2 * (input_color - (255 * 3 + 128))]
         return (ret[0] << 16) + (ret[1] << 8) + ret[2]
 
     def apply_mapping_jet_custom(self, operable: SpotAnalysisOperable, map_type: str):
@@ -111,9 +105,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         # red_to_white = 127/255
         representable_colors = 255 * 6 if map_type == 'large' else 255 * 4
         max_value = operable.max_popf
-        new_image: np.ndarray = operable.primary_image.nparray * (
-            (representable_colors - 1) / max_value
-        )
+        new_image: np.ndarray = operable.primary_image.nparray * ((representable_colors - 1) / max_value)
         new_image = np.clip(new_image, 0, representable_colors - 1).astype(np.int32)
         if len(new_image.shape) == 3:
             new_image = np.squeeze(new_image, axis=2)
@@ -126,9 +118,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         assert it.dims_and_nchannels(color_image)[1] == 3
 
         # apply the mapping
-        map_func = (
-            self._map_jet_large_rgb if map_type == 'large' else self._map_jet_human_rgb
-        )
+        map_func = self._map_jet_large_rgb if map_type == 'large' else self._map_jet_human_rgb
         mapping = {k: map_func(k) for k in range(representable_colors)}
         new_image = np.vectorize(mapping.__getitem__)(new_image)
         color_image[:, :, 0] = new_image >> 16
@@ -153,9 +143,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         # rescale to the number of representable colors
         representable_colors = 256
         max_value = operable.max_popf
-        new_image: np.ndarray = operable.primary_image.nparray * (
-            (representable_colors - 1) / max_value
-        )
+        new_image: np.ndarray = operable.primary_image.nparray * ((representable_colors - 1) / max_value)
         new_image = np.clip(new_image, 0, representable_colors - 1)
         new_image = new_image.astype(np.uint8)
 
@@ -164,9 +152,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
 
         return dataclasses.replace(operable, primary_image=ret)
 
-    def _execute(
-        self, operable: SpotAnalysisOperable, is_last: bool
-    ) -> list[SpotAnalysisOperable]:
+    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         image = operable.primary_image.nparray
 
         # verify that this is a grayscale image

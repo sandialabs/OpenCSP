@@ -32,22 +32,14 @@ def downsample_dataset_1(base_dir):
 
     # Define location of sample data
     file_measurement_facet = abspath(join(base_dir, 'sofast/measurement_facet.h5'))
-    file_measurement_ensemble = abspath(
-        join(base_dir, 'sofast/measurement_facet_ensemble.h5')
-    )
+    file_measurement_ensemble = abspath(join(base_dir, 'sofast/measurement_facet_ensemble.h5'))
     file_calibration = abspath(join(base_dir, 'sofast/image_calibration.h5'))
     file_camera = abspath(join(base_dir, 'calibration_files/camera.h5'))
-    file_display_1 = abspath(
-        join(base_dir, 'calibration_files/display_distorted_2d.h5')
-    )
-    file_display_2 = abspath(
-        join(base_dir, 'calibration_files/display_distorted_3d.h5')
-    )
+    file_display_1 = abspath(join(base_dir, 'calibration_files/display_distorted_2d.h5'))
+    file_display_2 = abspath(join(base_dir, 'calibration_files/display_distorted_3d.h5'))
     file_display_3 = abspath(join(base_dir, 'calibration_files/display_rectangular.h5'))
 
-    dir_dataset_out = abspath(
-        join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
-    )
+    dir_dataset_out = abspath(join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe'))
 
     if not exists(dir_dataset_out):
         raise FileNotFoundError(f'Output directory {dir_dataset_out} does not exist.')
@@ -71,12 +63,8 @@ def downsample_dataset_1(base_dir):
     plt.title('Ensemble Mask Image')
 
     # Save data
-    measurement_facet.save_to_hdf(
-        join(dir_dataset_out, basename(file_measurement_facet))
-    )
-    measurement_ensemble.save_to_hdf(
-        join(dir_dataset_out, basename(file_measurement_ensemble))
-    )
+    measurement_facet.save_to_hdf(join(dir_dataset_out, basename(file_measurement_facet)))
+    measurement_ensemble.save_to_hdf(join(dir_dataset_out, basename(file_measurement_ensemble)))
     camera.save_to_hdf(join(dir_dataset_out, basename(file_camera)))
     display_1.save_to_hdf(join(dir_dataset_out, basename(file_display_1)))
     display_2.save_to_hdf(join(dir_dataset_out, basename(file_display_2)))
@@ -88,7 +76,5 @@ def downsample_dataset_1(base_dir):
 
 if __name__ == '__main__':
     # Create downsample dataset 1 (NSTTF Optics Lab data)
-    dir_sample_data = join(
-        opencsp_code_dir(), '../../sample_data/sofast/measurement_set_1'
-    )
+    dir_sample_data = join(opencsp_code_dir(), '../../sample_data/sofast/measurement_set_1')
     downsample_dataset_1(dir_sample_data)

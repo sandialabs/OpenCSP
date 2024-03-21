@@ -12,10 +12,10 @@ import opencsp.common.lib.tool.file_tools as ft
 class test_opencsp_root_path(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
-        cls.tmp_settings_file = os.path.join(
-            os.path.expanduser("~"), ".opencsp", "settings.json"
+        cls.tmp_settings_file = os.path.join(os.path.expanduser("~"), ".opencsp", "settings.json")
+        cls.tmp_settings_contents = (
+            '{ "opencsp_root_path": { "example_data_dir": "e/f", "scratch_dir": "s/t", "scratch_name": "u" } }'
         )
-        cls.tmp_settings_contents = '{ "opencsp_root_path": { "example_data_dir": "e/f", "scratch_dir": "s/t", "scratch_name": "u" } }'
         cls.did_create_settings_file = False
         if not ft.file_exists(cls.tmp_settings_file):
             path, _, _ = ft.path_components(cls.tmp_settings_file)
@@ -38,9 +38,7 @@ class test_opencsp_root_path(unittest.TestCase):
 
         if "opencsp" not in self_path_dirs:
             self.skipTest(f"Can't find directory 'opencsp' in {self_path}.")
-        opencsp_idx = len(self_path_dirs) - list(reversed(self_path_dirs)).index(
-            "opencsp"
-        )
+        opencsp_idx = len(self_path_dirs) - list(reversed(self_path_dirs)).index("opencsp")
         root_to_opencsp_dirs = self_path_dirs[:opencsp_idx]
         return os.path.sep.join(root_to_opencsp_dirs)
 
@@ -69,18 +67,13 @@ class test_opencsp_root_path(unittest.TestCase):
 
     def test_opencsp_temporary_dir(self):
         """Just test that the opencsp_temporary_dir() method works. TODO actually test the returned value."""
-        self.assertTrue(
-            ("temp" in orp.opencsp_temporary_dir())
-            or ("tmp" in orp.opencsp_temporary_dir())
-        )
+        self.assertTrue(("temp" in orp.opencsp_temporary_dir()) or ("tmp" in orp.opencsp_temporary_dir()))
 
     def test__opencsp_settings_dirs(self):
         """Just test that the _opencsp_settings_dirs() method works. TODO actually test the returned value."""
         orp._opencsp_settings_dirs()
 
-    @unittest.skip(
-        "Can't get this test to work. Maybe someone smarter than me can make it work? :("
-    )
+    @unittest.skip("Can't get this test to work. Maybe someone smarter than me can make it work? :(")
     @unittest.mock.patch.dict(os.environ, {"OPENCSP_SETTINGS_DIRS": "~/.opencsp/"})
     def test_settings_file(self):
         """Creates a temporary "settings.json" file if one doesn't already

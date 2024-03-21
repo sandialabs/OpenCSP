@@ -32,12 +32,7 @@ def read_connected_components(filename=None, path=None):
         while i < n_claus:
             key = input_row[i]
             value = input_row[i + 1]
-            if (
-                value != 'left'
-                and value != 'right'
-                and value != 'top'
-                and value != 'bottom'
-            ):
+            if value != 'left' and value != 'right' and value != 'top' and value != 'bottom':
                 value = eval(input_row[i + 1])
             component[key] = value
             i += 2
@@ -48,9 +43,7 @@ def read_connected_components(filename=None, path=None):
     input_file = os.path.join(csv_path, filename)
     # Check if the input file exists.
     if not os.path.exists(input_file):
-        raise OSError(
-            'In read_connected_components(), file does not exist: ' + str(input_file)
-        )
+        raise OSError('In read_connected_components(), file does not exist: ' + str(input_file))
     # Open and read the file.
     components = []
     with open(input_file, newline='') as input_stream:
@@ -86,9 +79,7 @@ def save_fitted_lines_connected_components(components=None, filename=None, path=
             writer.writerow(row_output)
 
 
-def save_fitted_lines_inliers_connected_components(
-    components=None, filename=None, path=None
-):
+def save_fitted_lines_inliers_connected_components(components=None, filename=None, path=None):
     csv_path = os.path.join(path, 'csv_files')
     if not os.path.exists(csv_path):
         os.makedirs(csv_path)
@@ -134,9 +125,7 @@ def save_fitted_lines_inliers_connected_components(
             writer.writerow(row_output)
 
 
-def save_corners_facets(
-    corners=None, filename=None, path=None, corners_type='top_left', facets=None
-):
+def save_corners_facets(corners=None, filename=None, path=None, corners_type='top_left', facets=None):
     csv_path = os.path.join(path, 'csv_files')
     if not os.path.exists(csv_path):
         os.makedirs(csv_path)
@@ -227,9 +216,7 @@ def read_corners_facets(filename=None, path=None, facets_flag=False):
     input_file = os.path.join(csv_path, filename)
     # Check if the input file exists.
     if not os.path.exists(input_file):
-        raise OSError(
-            'In read_corners_facets(), file "' + str(input_file) + '" does not exist.'
-        )
+        raise OSError('In read_corners_facets(), file "' + str(input_file) + '" does not exist.')
     # Open and read the file.
     corners = []
     with open(input_file, newline='') as csvfile:
@@ -284,12 +271,7 @@ def save_facets(facets=None, filename=None, path=None):
             bottom_right_corner = facet["bottom_right"]
             bottom_left_corner = facet["bottom_left"]
             center = facet["center"]
-            corners = [
-                top_left_corner,
-                top_right_corner,
-                bottom_right_corner,
-                bottom_left_corner,
-            ]
+            corners = [top_left_corner, top_right_corner, bottom_right_corner, bottom_left_corner]
             for corner in corners:
                 row_output = []
                 row_output.append('corner_type')
@@ -360,9 +342,7 @@ def centers3d_to_corners3d(facet_centers, facet_width, facet_height):
 def read_centers3d(input_file):
     # Check if the input file exists.
     if not os.path.exists(input_file):
-        raise OSError(
-            'In read_centers3d(), file "' + str(input_file) + '" does not exist.'
-        )
+        raise OSError('In read_centers3d(), file "' + str(input_file) + '" does not exist.')
     # Open and read the file.
     facets_coords = []
     with open(input_file, newline='') as csvfile:
@@ -373,12 +353,7 @@ def read_centers3d(input_file):
             if not count:
                 count += 1
                 continue  # get rid of header
-            _, x, y, z = (
-                input_row[0],
-                float(input_row[1]),
-                float(input_row[2]),
-                float(input_row[3]),
-            )
+            _, x, y, z = (input_row[0], float(input_row[1]), float(input_row[2]), float(input_row[3]))
             facets_coords.append([x, y, z])
 
     return facets_coords
@@ -399,9 +374,7 @@ def read_projected_corners(filename=None, corners_per_heliostat=None, path=None)
     input_file = os.path.join(path, 'csv_files', filename)
     # Check if the input file exists.
     if not os.path.exists(input_file):
-        raise OSError(
-            'In read_projected_corners(), file does not exist: ' + str(input_file)
-        )
+        raise OSError('In read_projected_corners(), file does not exist: ' + str(input_file))
     # Open and read the file.
     with open(input_file, newline='') as csvfile:
         reader = csv.reader(csvfile)

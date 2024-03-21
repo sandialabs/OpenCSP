@@ -98,16 +98,7 @@ def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
     image: PIL.Image
         The image representation of the input array.
     """
-    allowed_int_types = [
-        np.int8,
-        np.uint8,
-        np.int16,
-        np.uint16,
-        np.int32,
-        np.uint32,
-        np.int64,
-        np.uint64,
-    ]
+    allowed_int_types = [np.int8, np.uint8, np.int16, np.uint16, np.int32, np.uint32, np.int64, np.uint64]
 
     # get the current integer size, and convert to integer type
     if not np.issubdtype(arr.dtype, np.integer):
@@ -136,9 +127,7 @@ def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
     return img
 
 
-def images_are_identical(
-    image_1: np.ndarray, image_2: np.ndarray, tolerance_pixel: int
-):
+def images_are_identical(image_1: np.ndarray, image_2: np.ndarray, tolerance_pixel: int):
     """Checks if two images are identical.
 
     Args:
@@ -225,11 +214,7 @@ def min_max_colors(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         max_per_row: np.ndarray = np.max(image, axis=1)
         min_colors: np.ndarray = np.min(min_per_row, axis=0)
         max_colors: np.ndarray = np.max(max_per_row, axis=0)
-        if (
-            max_colors.ndim != 1
-            or max_colors.shape[0] != nchannels
-            or max_colors.shape[0] <= 1
-        ):
+        if max_colors.ndim != 1 or max_colors.shape[0] != nchannels or max_colors.shape[0] <= 1:
             lt.error_and_raise(
                 RuntimeError,
                 "Programmer error in image_tools.min_max(): "

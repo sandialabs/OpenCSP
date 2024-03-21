@@ -49,22 +49,14 @@ class VideoTracks:
     ):  # Flags to control rendering on this run, for the confirmed video.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError(
-                'In VideoTracks.__init__(), null input_video_dir_body_ext encountered.'
-            )
+            raise ValueError('In VideoTracks.__init__(), null input_video_dir_body_ext encountered.')
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError(
-                'In VideoTracks.__init__(), null output_data_dir encountered.'
-            )
+            raise ValueError('In VideoTracks.__init__(), null output_data_dir encountered.')
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError(
-                'In VideoTracks.__init__(), null output_render_dir encountered.'
-            )
+            raise ValueError('In VideoTracks.__init__(), null output_render_dir encountered.')
 
         # Parse input video path components.
-        input_video_dir, input_video_body, input_video_ext = ft.path_components(
-            input_video_dir_body_ext
-        )
+        input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
 
         # Store input.
         # Execution control.
@@ -91,95 +83,59 @@ class VideoTracks:
 
         # Found video tracks file names.
         # Projected.
-        self.video_projected_tracks_body = (
-            self.input_video_body + '_video_projected_tracks_fnxl'
-        )
+        self.video_projected_tracks_body = self.input_video_body + '_video_projected_tracks_fnxl'
         self.video_projected_tracks_body_ext = self.video_projected_tracks_body + '.csv'
         self.video_projected_tracks_dir_body_ext = os.path.join(
             self.output_data_dir, self.video_projected_tracks_body_ext
         )
         # Confirmed.
-        self.video_confirmed_tracks_body = (
-            self.input_video_body + '_video_confirmed_tracks_fnxl'
-        )
+        self.video_confirmed_tracks_body = self.input_video_body + '_video_confirmed_tracks_fnxl'
         self.video_confirmed_tracks_body_ext = self.video_confirmed_tracks_body + '.csv'
         self.video_confirmed_tracks_dir_body_ext = os.path.join(
             self.output_data_dir, self.video_confirmed_tracks_body_ext
         )
 
         # Output construction frame directories.
-        self.output_construction_projected_dir = os.path.join(
-            self.output_construction_dir, 'projected'
-        )
-        self.output_construction_confirmed_dir = os.path.join(
-            self.output_construction_dir, 'confirmed'
-        )
+        self.output_construction_projected_dir = os.path.join(self.output_construction_dir, 'projected')
+        self.output_construction_confirmed_dir = os.path.join(self.output_construction_dir, 'confirmed')
 
         # Output video file name.
         # Projected.
-        self.output_video_projected_body = (
-            self.input_video_body + '_video_projected_tracks'
-        )
-        self.output_video_projected_dir_body = os.path.join(
-            self.output_render_dir, self.output_video_projected_body
-        )
+        self.output_video_projected_body = self.input_video_body + '_video_projected_tracks'
+        self.output_video_projected_dir_body = os.path.join(self.output_render_dir, self.output_video_projected_body)
         # Confirmed.
-        self.output_video_confirmed_body = (
-            self.input_video_body + '_video_confirmed_tracks'
-        )
-        self.output_video_confirmed_dir_body = os.path.join(
-            self.output_render_dir, self.output_video_confirmed_body
-        )
+        self.output_video_confirmed_body = self.input_video_body + '_video_confirmed_tracks'
+        self.output_video_confirmed_dir_body = os.path.join(self.output_render_dir, self.output_video_confirmed_body)
 
         # Summary statistics file name.
         # Projected.
-        self.dict_projected_body = (
-            self.input_video_body + '_video_projected_tracks_statistics'
-        )
+        self.dict_projected_body = self.input_video_body + '_video_projected_tracks_statistics'
         self.dict_projected_body_ext = self.dict_projected_body + '.csv'
-        self.dict_projected_dir_body_ext = os.path.join(
-            self.output_data_dir, self.dict_projected_body_ext
-        )
+        self.dict_projected_dir_body_ext = os.path.join(self.output_data_dir, self.dict_projected_body_ext)
         # Confirmed.
-        self.dict_confirmed_body = (
-            self.input_video_body + '_video_confirmed_tracks_statistics'
-        )
+        self.dict_confirmed_body = self.input_video_body + '_video_confirmed_tracks_statistics'
         self.dict_confirmed_body_ext = self.dict_confirmed_body + '.csv'
-        self.dict_confirmed_dir_body_ext = os.path.join(
-            self.output_data_dir, self.dict_confirmed_body_ext
-        )
+        self.dict_confirmed_dir_body_ext = os.path.join(self.output_data_dir, self.dict_confirmed_body_ext)
 
         # Heliostats per video frame file name.
         # Projected.
-        self.phpvf_body = (
-            self.input_video_body + '_projected_heliostats_per_video_frame'
-        )
+        self.phpvf_body = self.input_video_body + '_projected_heliostats_per_video_frame'
         self.phpvf_body_ext = self.phpvf_body + '.csv'
-        self.phpvf_dir_body_ext = os.path.join(
-            self.output_data_dir, self.phpvf_body_ext
-        )
+        self.phpvf_dir_body_ext = os.path.join(self.output_data_dir, self.phpvf_body_ext)
         # Confirmed.
-        self.chpvf_body = (
-            self.input_video_body + '_confirmed_heliostats_per_video_frame'
-        )
+        self.chpvf_body = self.input_video_body + '_confirmed_heliostats_per_video_frame'
         self.chpvf_body_ext = self.chpvf_body + '.csv'
-        self.chpvf_dir_body_ext = os.path.join(
-            self.output_data_dir, self.chpvf_body_ext
-        )
+        self.chpvf_dir_body_ext = os.path.join(self.output_data_dir, self.chpvf_body_ext)
 
         # Points per video frame file name.
         # Projected.
         self.pppvf_body = self.input_video_body + '_projected_points_per_video_frame'
         self.pppvf_body_ext = self.pppvf_body + '.csv'
-        self.pppvf_dir_body_ext = os.path.join(
-            self.output_data_dir, self.pppvf_body_ext
-        )
+        self.pppvf_dir_body_ext = os.path.join(self.output_data_dir, self.pppvf_body_ext)
         # Confirmed.
         self.cppvf_body = self.input_video_body + '_confirmed_points_per_video_frame'
         self.cppvf_body_ext = self.cppvf_body + '.csv'
-        self.cppvf_dir_body_ext = os.path.join(
-            self.output_data_dir, self.cppvf_body_ext
-        )
+        self.cppvf_dir_body_ext = os.path.join(self.output_data_dir, self.cppvf_body_ext)
 
         # Load key frame track files.
         # Projected.
@@ -187,18 +143,12 @@ class VideoTracks:
             'In VideoTracks.__init__(), reading found key frame projected tracks directory: ',
             self.input_key_projected_tracks_dir,
         )
-        key_projected_tracks_body_ext_list = ft.files_in_directory(
-            self.input_key_projected_tracks_dir
-        )
+        key_projected_tracks_body_ext_list = ft.files_in_directory(self.input_key_projected_tracks_dir)
         self.key_projected_tracks_dict = {}
         for key_projected_tracks_body_ext in key_projected_tracks_body_ext_list:
-            key_frame_id_str = upf.frame_id_str_given_key_projected_tracks_body_ext(
-                key_projected_tracks_body_ext
-            )
+            key_frame_id_str = upf.frame_id_str_given_key_projected_tracks_body_ext(key_projected_tracks_body_ext)
             key_frame_id = upf.frame_id_given_frame_id_str(key_frame_id_str)
-            if (self.specific_frame_ids is None) or (
-                key_frame_id in self.specific_frame_ids
-            ):
+            if (self.specific_frame_ids is None) or (key_frame_id in self.specific_frame_ids):
                 key_projected_tracks_dir_body_ext = os.path.join(
                     self.input_key_projected_tracks_dir, key_projected_tracks_body_ext
                 )
@@ -214,49 +164,37 @@ class VideoTracks:
                 # Store results.
                 key_frame_dict = {}
                 self.key_projected_tracks_dict[key_frame_id] = key_frame_dict
-                self.key_projected_tracks_dict[key_frame_id][
-                    'key_frame_id_str'
-                ] = key_frame_id_str
+                self.key_projected_tracks_dict[key_frame_id]['key_frame_id_str'] = key_frame_id_str
                 self.key_projected_tracks_dict[key_frame_id][
                     'key_projected_track_body_ext'
                 ] = key_projected_tracks_body_ext
                 self.key_projected_tracks_dict[key_frame_id][
                     'key_projected_track_dir_body_ext'
                 ] = key_projected_tracks_dir_body_ext
-                self.key_projected_tracks_dict[key_frame_id][
-                    'key_projected_track_fnxl'
-                ] = key_projected_track_fnxl
-                self.key_projected_tracks_dict[key_frame_id][
-                    'key_projected_track_n_frames'
-                ] = len(key_projected_track_fnxl_sorted_frame_id_list)
-                self.key_projected_tracks_dict[key_frame_id][
-                    'key_projected_track_min_frame_id'
-                ] = key_projected_track_fnxl_sorted_frame_id_list[0]
-                self.key_projected_tracks_dict[key_frame_id][
-                    'key_projected_track_max_frame_id'
-                ] = key_projected_track_fnxl_sorted_frame_id_list[-1]
+                self.key_projected_tracks_dict[key_frame_id]['key_projected_track_fnxl'] = key_projected_track_fnxl
+                self.key_projected_tracks_dict[key_frame_id]['key_projected_track_n_frames'] = len(
+                    key_projected_track_fnxl_sorted_frame_id_list
+                )
+                self.key_projected_tracks_dict[key_frame_id]['key_projected_track_min_frame_id'] = (
+                    key_projected_track_fnxl_sorted_frame_id_list[0]
+                )
+                self.key_projected_tracks_dict[key_frame_id]['key_projected_track_max_frame_id'] = (
+                    key_projected_track_fnxl_sorted_frame_id_list[-1]
+                )
         # Confirm what was read.
         print('In KeyTracks.__init__(), found key frame projected tracks dictionary:')
-        dt.print_dict_of_dicts(
-            self.key_projected_tracks_dict, max_value_2_length=200, indent_1=4
-        )
+        dt.print_dict_of_dicts(self.key_projected_tracks_dict, max_value_2_length=200, indent_1=4)
         # Confirmed.
         print(
             'In VideoTracks.__init__(), reading found key frame confirmed tracks directory: ',
             self.input_key_confirmed_tracks_dir,
         )
-        key_confirmed_tracks_body_ext_list = ft.files_in_directory(
-            self.input_key_confirmed_tracks_dir
-        )
+        key_confirmed_tracks_body_ext_list = ft.files_in_directory(self.input_key_confirmed_tracks_dir)
         self.key_confirmed_tracks_dict = {}
         for key_confirmed_tracks_body_ext in key_confirmed_tracks_body_ext_list:
-            key_frame_id_str = upf.frame_id_str_given_key_confirmed_tracks_body_ext(
-                key_confirmed_tracks_body_ext
-            )
+            key_frame_id_str = upf.frame_id_str_given_key_confirmed_tracks_body_ext(key_confirmed_tracks_body_ext)
             key_frame_id = upf.frame_id_given_frame_id_str(key_frame_id_str)
-            if (self.specific_frame_ids is None) or (
-                key_frame_id in self.specific_frame_ids
-            ):
+            if (self.specific_frame_ids is None) or (key_frame_id in self.specific_frame_ids):
                 key_confirmed_tracks_dir_body_ext = os.path.join(
                     self.input_key_confirmed_tracks_dir, key_confirmed_tracks_body_ext
                 )
@@ -272,45 +210,35 @@ class VideoTracks:
                 # Store results.
                 key_frame_dict = {}
                 self.key_confirmed_tracks_dict[key_frame_id] = key_frame_dict
-                self.key_confirmed_tracks_dict[key_frame_id][
-                    'key_frame_id_str'
-                ] = key_frame_id_str
+                self.key_confirmed_tracks_dict[key_frame_id]['key_frame_id_str'] = key_frame_id_str
                 self.key_confirmed_tracks_dict[key_frame_id][
                     'key_confirmed_track_body_ext'
                 ] = key_confirmed_tracks_body_ext
                 self.key_confirmed_tracks_dict[key_frame_id][
                     'key_confirmed_track_dir_body_ext'
                 ] = key_confirmed_tracks_dir_body_ext
-                self.key_confirmed_tracks_dict[key_frame_id][
-                    'key_confirmed_track_fnxl'
-                ] = key_confirmed_track_fnxl
-                self.key_confirmed_tracks_dict[key_frame_id][
-                    'key_confirmed_track_n_frames'
-                ] = len(key_confirmed_track_fnxl_sorted_frame_id_list)
-                self.key_confirmed_tracks_dict[key_frame_id][
-                    'key_confirmed_track_min_frame_id'
-                ] = key_confirmed_track_fnxl_sorted_frame_id_list[0]
-                self.key_confirmed_tracks_dict[key_frame_id][
-                    'key_confirmed_track_max_frame_id'
-                ] = key_confirmed_track_fnxl_sorted_frame_id_list[-1]
+                self.key_confirmed_tracks_dict[key_frame_id]['key_confirmed_track_fnxl'] = key_confirmed_track_fnxl
+                self.key_confirmed_tracks_dict[key_frame_id]['key_confirmed_track_n_frames'] = len(
+                    key_confirmed_track_fnxl_sorted_frame_id_list
+                )
+                self.key_confirmed_tracks_dict[key_frame_id]['key_confirmed_track_min_frame_id'] = (
+                    key_confirmed_track_fnxl_sorted_frame_id_list[0]
+                )
+                self.key_confirmed_tracks_dict[key_frame_id]['key_confirmed_track_max_frame_id'] = (
+                    key_confirmed_track_fnxl_sorted_frame_id_list[-1]
+                )
         # Confirm what was read.
         print('In KeyTracks.__init__(), found key frame confirmed tracks dictionary:')
-        dt.print_dict_of_dicts(
-            self.key_confirmed_tracks_dict, max_value_2_length=200, indent_1=4
-        )
+        dt.print_dict_of_dicts(self.key_confirmed_tracks_dict, max_value_2_length=200, indent_1=4)
 
         # Fetch a list of all frame ids in the video (not just key frames).
         # The corresponding frame_ids are not necessarily in sequential order, because
         # we previously removed spurious duplicate frames.
-        self.all_frame_file_list = ft.files_in_directory(
-            self.input_frame_dir, sort=True
-        )
+        self.all_frame_file_list = ft.files_in_directory(self.input_frame_dir, sort=True)
         # Confirm what was read.
         max_print_files = 12
         print('In VideoTracks.__init__(), self.all_frame_file_list:')
-        for frame_file in self.all_frame_file_list[
-            0 : min(max_print_files, len(self.all_frame_file_list))
-        ]:
+        for frame_file in self.all_frame_file_list[0 : min(max_print_files, len(self.all_frame_file_list))]:
             print('In VideoTracks.__init__()   ', frame_file)
         print('...')
 
@@ -339,19 +267,13 @@ class VideoTracks:
             self.generated_video_projected_tracks = False
             self.generated_video_confirmed_tracks = False
             # Projected.
-            self.construct_and_save_video_tracks_aux(
-                self.key_projected_tracks_dict, 'projected'
-            )
+            self.construct_and_save_video_tracks_aux(self.key_projected_tracks_dict, 'projected')
             self.generated_video_projected_tracks = True
             # Confirmed.
-            self.construct_and_save_video_tracks_aux(
-                self.key_confirmed_tracks_dict, 'confirmed'
-            )
+            self.construct_and_save_video_tracks_aux(self.key_confirmed_tracks_dict, 'confirmed')
             self.generated_video_confirmed_tracks = True
 
-    def construct_and_save_video_tracks_aux(
-        self, key_tracks_dict, projected_or_confirmed_str
-    ):
+    def construct_and_save_video_tracks_aux(self, key_tracks_dict, projected_or_confirmed_str):
         print(
             'In VideoTracks.construct_and_save_video_tracks_aux(), constructing '
             + projected_or_confirmed_str
@@ -370,20 +292,14 @@ class VideoTracks:
         # Add key frame tracks.
         # (The selection of which key frames to consider has already been taken into account, by only including key frames of interest in the key_tracks_dict.)
         # Determine which key frames to process.
-        key_frame_ids_to_process = dt.sorted_keys(
-            key_tracks_dict
-        )  # Already pruned to key frame ids of interest.
+        key_frame_ids_to_process = dt.sorted_keys(key_tracks_dict)  # Already pruned to key frame ids of interest.
         for key_frame_id in key_frame_ids_to_process:
             # Fetch the FrameNameXyList object for holding the tracks for this key frame.
             key_frame_dict = key_tracks_dict[key_frame_id]
-            key_track_fnxl = key_frame_dict[
-                'key_' + projected_or_confirmed_str + '_track_fnxl'
-            ]
+            key_track_fnxl = key_frame_dict['key_' + projected_or_confirmed_str + '_track_fnxl']
             for (
                 frame_id
-            ) in (
-                key_track_fnxl.sorted_frame_id_list()
-            ):  # Use sorted list so status output is easier to understand.
+            ) in key_track_fnxl.sorted_frame_id_list():  # Use sorted list so status output is easier to understand.
                 video_tracks_fnxl.merge_list_of_name_xy_lists(
                     frame_id,
                     key_track_fnxl.list_of_name_xy_lists(frame_id),
@@ -423,10 +339,7 @@ class VideoTracks:
             )
             print('ERROR: ' + msg)
             raise ValueError(msg)
-        print(
-            'In VideoTracks.save_video_tracks(), writing video track file: ',
-            video_tracks_dir_body_ext,
-        )
+        print('In VideoTracks.save_video_tracks(), writing video track file: ', video_tracks_dir_body_ext)
         ft.create_directories_if_necessary(self.output_data_dir)
         video_tracks_fnxl.save(video_tracks_dir_body_ext)
 
@@ -456,9 +369,7 @@ class VideoTracks:
         summary_dict = {}
         summary_dict['n_video_track_frames'] = video_tracks_fnxl.number_of_frames()
         print(
-            'In VideoTracks.save_data(), writing video frame '
-            + projected_or_confirmed_str
-            + ' summary statistics...'
+            'In VideoTracks.save_data(), writing video frame ' + projected_or_confirmed_str + ' summary statistics...'
         )
         ft.write_dict_file(
             'video ' + projected_or_confirmed_str + ' tracks summary statistics',
@@ -469,23 +380,17 @@ class VideoTracks:
         # Heliostats per video frame.
         heliostats_per_video_frame_dict = video_tracks_fnxl.heliostats_per_frame()
         print(
-            'In VideoTracks.save_data(), writing '
-            + projected_or_confirmed_str
-            + ' heliostats per video frame:',
+            'In VideoTracks.save_data(), writing ' + projected_or_confirmed_str + ' heliostats per video frame:',
             os.path.join(self.output_data_dir, hpvf_body_ext),
         )
-        ft.write_dict_file(
-            None, self.output_data_dir, hpvf_body, heliostats_per_video_frame_dict
-        )
+        ft.write_dict_file(None, self.output_data_dir, hpvf_body, heliostats_per_video_frame_dict)
         # Points per video frame.
         points_per_key_frame_dict = video_tracks_fnxl.points_per_frame()
         print(
             'In VideoTracks.save_data(), writing points per video frame:    ',
             os.path.join(self.output_data_dir, ppvf_body_ext),
         )
-        ft.write_dict_file(
-            None, self.output_data_dir, ppvf_body, points_per_key_frame_dict
-        )
+        ft.write_dict_file(None, self.output_data_dir, ppvf_body, points_per_key_frame_dict)
 
     # LOAD RESULT
 
@@ -499,9 +404,7 @@ class VideoTracks:
         self.video_projected_tracks_fnxl.load(self.video_projected_tracks_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_video_tracks(), video projected tracks read:')
-        self.video_projected_tracks_fnxl.print(
-            max_keys=12, max_value_length=200, indent=4
-        )
+        self.video_projected_tracks_fnxl.print(max_keys=12, max_value_length=200, indent=4)
         # Confirmed.
         print(
             'In VideoTracks.read_video_tracks(), reading video confirmed tracks file: ',
@@ -511,67 +414,43 @@ class VideoTracks:
         self.video_confirmed_tracks_fnxl.load(self.video_confirmed_tracks_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_video_tracks(), video confirmed tracks read:')
-        self.video_confirmed_tracks_fnxl.print(
-            max_keys=12, max_value_length=200, indent=4
-        )
+        self.video_confirmed_tracks_fnxl.print(max_keys=12, max_value_length=200, indent=4)
 
     def read_data(self):
         # Projected.
         # Statistics.
-        print(
-            'In VideoTracks.read_data(), reading projected frame statistics: ',
-            self.dict_projected_dir_body_ext,
-        )
-        self.projected_frame_statistics_dict = ft.read_dict(
-            self.dict_projected_dir_body_ext
-        )
+        print('In VideoTracks.read_data(), reading projected frame statistics: ', self.dict_projected_dir_body_ext)
+        self.projected_frame_statistics_dict = ft.read_dict(self.dict_projected_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_data(), projected frame statistics read:')
         dt.print_dict(self.projected_frame_statistics_dict, indent=4)
         # Heliostats per video frame.
-        print(
-            'In VideoTracks.read_data(), reading projected heliostats per video frame: ',
-            self.phpvf_dir_body_ext,
-        )
+        print('In VideoTracks.read_data(), reading projected heliostats per video frame: ', self.phpvf_dir_body_ext)
         self.phpvf_dict = ft.read_dict(self.phpvf_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_data(), projected heliostats per video frame read:')
         dt.print_dict(self.phpvf_dict, max_keys=12, max_value_length=200, indent=4)
         # Points per video frame.
-        print(
-            'In VideoTracks.read_data(), reading projected points per video frame: ',
-            self.pppvf_dir_body_ext,
-        )
+        print('In VideoTracks.read_data(), reading projected points per video frame: ', self.pppvf_dir_body_ext)
         self.pppvf_dict = ft.read_dict(self.pppvf_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_data(), projected points per video frame read:')
         dt.print_dict(self.pppvf_dict, max_keys=7, max_value_length=200, indent=4)
         # Confirmed.
         # Statistics.
-        print(
-            'In VideoTracks.read_data(), reading confirmed frame statistics: ',
-            self.dict_confirmed_dir_body_ext,
-        )
-        self.confirmed_frame_statistics_dict = ft.read_dict(
-            self.dict_confirmed_dir_body_ext
-        )
+        print('In VideoTracks.read_data(), reading confirmed frame statistics: ', self.dict_confirmed_dir_body_ext)
+        self.confirmed_frame_statistics_dict = ft.read_dict(self.dict_confirmed_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_data(), confirmed frame statistics read:')
         dt.print_dict(self.confirmed_frame_statistics_dict, indent=4)
         # Heliostats per video frame.
-        print(
-            'In VideoTracks.read_data(), reading confirmed heliostats per video frame: ',
-            self.phpvf_dir_body_ext,
-        )
+        print('In VideoTracks.read_data(), reading confirmed heliostats per video frame: ', self.phpvf_dir_body_ext)
         self.phpvf_dict = ft.read_dict(self.phpvf_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_data(), confirmed heliostats per video frame read:')
         dt.print_dict(self.phpvf_dict, max_keys=12, max_value_length=200, indent=4)
         # Points per video frame.
-        print(
-            'In VideoTracks.read_data(), reading confirmed points per video frame: ',
-            self.pppvf_dir_body_ext,
-        )
+        print('In VideoTracks.read_data(), reading confirmed points per video frame: ', self.pppvf_dir_body_ext)
         self.pppvf_dict = ft.read_dict(self.pppvf_dir_body_ext)
         # Confirm what was read.
         print('In VideoTracks.read_data(), confirmed points per video frame read:')
@@ -581,17 +460,14 @@ class VideoTracks:
 
     def render(self):
         print(
-            'In VideoTracks.render(), self.output_construction_projected_dir=',
-            self.output_construction_projected_dir,
+            'In VideoTracks.render(), self.output_construction_projected_dir=', self.output_construction_projected_dir
         )  # ?? SCFFOLDING RCB -- TEMPORARY
         print(
-            'In VideoTracks.render(), self.output_construction_confirmed_dir=',
-            self.output_construction_confirmed_dir,
+            'In VideoTracks.render(), self.output_construction_confirmed_dir=', self.output_construction_confirmed_dir
         )  # ?? SCFFOLDING RCB -- TEMPORARY
         # Projected.
         if (
-            self.render_control_projected.draw_video_tracks
-            and self.generated_video_projected_tracks
+            self.render_control_projected.draw_video_tracks and self.generated_video_projected_tracks
         ):  # Don't render unless we generated.
             self.render_aux(
                 self.video_projected_tracks_fnxl,
@@ -602,8 +478,7 @@ class VideoTracks:
             )
         # Confirmed.
         if (
-            self.render_control_confirmed.draw_video_tracks
-            and self.generated_video_confirmed_tracks
+            self.render_control_confirmed.draw_video_tracks and self.generated_video_confirmed_tracks
         ):  # Don't render unless we generated.
             self.render_aux(
                 self.video_confirmed_tracks_fnxl,
@@ -621,14 +496,9 @@ class VideoTracks:
         render_control,
         projected_or_confirmed_str,
     ):
+        print('In VideoTracks.render_aux(), rendering video ' + projected_or_confirmed_str + ' tracks...')
         print(
-            'In VideoTracks.render_aux(), rendering video '
-            + projected_or_confirmed_str
-            + ' tracks...'
-        )
-        print(
-            'In VideoTracks.render_aux(), output_construction_dir=',
-            output_construction_dir,
+            'In VideoTracks.render_aux(), output_construction_dir=', output_construction_dir
         )  # ?? SCFFOLDING RCB -- TEMPORARY
         # Descriptive strings.
         title_name = projected_or_confirmed_str.capitalize() + ' Corners'
@@ -637,9 +507,7 @@ class VideoTracks:
         fig_suffix = '_video_' + projected_or_confirmed_str + '_tracks_fig'
         delete_suffix = '.JPG' + fig_suffix + '.png'
         # Prepare directory for frames.
-        upc.prepare_render_directory(
-            output_construction_dir, delete_suffix, render_control
-        )
+        upc.prepare_render_directory(output_construction_dir, delete_suffix, render_control)
         # Setup annotation styles.
         style_dict = {}
         style_dict['point_seq'] = rcps.marker(
@@ -672,48 +540,26 @@ class VideoTracks:
             crop=render_control.video_tracks_crop,
         )
 
-        print(
-            'In VideoTracks.render_aux() for '
-            + projected_or_confirmed_str
-            + ' tracks, draw_frames() has returned.'
-        )
+        print('In VideoTracks.render_aux() for ' + projected_or_confirmed_str + ' tracks, draw_frames() has returned.')
 
         # Prepare directory for video.
         ft.create_directories_if_necessary(self.output_render_dir)
         # Construct the video.
-        print(
-            'In VideoTracks.render_aux(), constructing video of '
-            + projected_or_confirmed_str
-            + ' tracks...'
-        )
+        print('In VideoTracks.render_aux(), constructing video of ' + projected_or_confirmed_str + ' tracks...')
         vm.construct_video(output_construction_dir, output_video_dir_body)
-        print(
-            'In VideoTracks.render_aux(), '
-            + projected_or_confirmed_str
-            + ' tracks video construction finished.'
-        )
+        print('In VideoTracks.render_aux(), ' + projected_or_confirmed_str + ' tracks video construction finished.')
         print()
 
         # Check to see if all the frames have been constructed.
-        all_written_frame_file_list = ft.files_in_directory(
-            self.output_construction_dir, sort=True
-        )
+        all_written_frame_file_list = ft.files_in_directory(self.output_construction_dir, sort=True)
         # Confirm what was read.
         max_print_files = 12
         print('In VideoTracks.render_aux(), self.all_written_frame_file_list:')
-        for frame_file in all_written_frame_file_list[
-            0 : min(max_print_files, len(all_written_frame_file_list))
-        ]:
+        for frame_file in all_written_frame_file_list[0 : min(max_print_files, len(all_written_frame_file_list))]:
             print('In VideoTracks.render_aux()   ', frame_file)
         print('...')
-        print(
-            'In VideoTracks.render_aux(), len(self.all_frame_file_list) =',
-            len(self.all_frame_file_list),
-        )
-        print(
-            'In VideoTracks.render(), len(all_written_frame_file_list)  =',
-            len(all_written_frame_file_list),
-        )
+        print('In VideoTracks.render_aux(), len(self.all_frame_file_list) =', len(self.all_frame_file_list))
+        print('In VideoTracks.render(), len(all_written_frame_file_list)  =', len(all_written_frame_file_list))
         print()
 
 
@@ -740,8 +586,7 @@ if __name__ == "__main__":
     )
     # Input/output sources.
     input_video_dir_body_ext = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
     )
     input_key_projected_tracks_dir = (
         experiment_dir()
@@ -755,20 +600,15 @@ if __name__ == "__main__":
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/'
     )
-    input_frame_id_format = (
-        '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
-    )
+    input_frame_id_format = '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
     output_data_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/160_VideoTracks/mavic_zoom/data/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/160_VideoTracks/mavic_zoom/data/'
     )
     output_render_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/160_VideoTracks/mavic_zoom/render/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/160_VideoTracks/mavic_zoom/render/'
     )
     output_construction_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/160c_VideoTracks/mavic_zoom/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/160c_VideoTracks/mavic_zoom/'
     )
     # Render control.
     # render_control_projected     = rcvt.default(color='m')

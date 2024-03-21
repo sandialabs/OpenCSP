@@ -59,16 +59,12 @@ class Facet(RayTraceable):
         # if additional information (backside structure, bolt locations, etc) is needed
         # Fill in here
 
-    def set_position_in_space(
-        self, translation: np.ndarray, rotation: Rotation
-    ) -> None:
+    def set_position_in_space(self, translation: np.ndarray, rotation: Rotation) -> None:
         # Sets facet's position given heliostat configuration.
         self.origin: np.ndarray = np.array(translation) + rotation.apply(
             np.array(self.centroid_offset)
         )  # R_aiming * T_pivot * T_offset * R_canting * M_origin
-        self.composite_rotation: Rotation = (
-            rotation * self.canting
-        )  # TODO tjlarki: is this right?
+        self.composite_rotation: Rotation = rotation * self.canting  # TODO tjlarki: is this right?
         self.surface_normal = self.composite_rotation.apply(
             [0, 0, 1]
         )  # TODO tjlarki: rename this center surface normal, or normal direction.
@@ -78,43 +74,23 @@ class Facet(RayTraceable):
         self._update_corners_position_in_space()
         pass
 
-    def set_facet_position_in_space(
-        self, hel_centroid: np.ndarray, hel_rotation: Rotation
-    ) -> None:
-        warn(
-            "Use Facet.set_position_in_space() instead.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
+    def set_facet_position_in_space(self, hel_centroid: np.ndarray, hel_rotation: Rotation) -> None:
+        warn("Use Facet.set_position_in_space() instead.", category=DeprecationWarning, stacklevel=2)
         self.set_position_in_space(hel_centroid, hel_rotation)
         pass
 
     def _update_corners_position_in_space(self) -> None:
         # following are not set up for canting angle
-        self.top_left_corner = self.origin + self.composite_rotation.apply(
-            self.top_left_corner_offset
-        )
-        self.top_right_corner = self.origin + self.composite_rotation.apply(
-            self.top_right_corner_offset
-        )
-        self.bottom_right_corner = self.origin + self.composite_rotation.apply(
-            self.bottom_right_corner_offset
-        )
-        self.bottom_left_corner = self.origin + self.composite_rotation.apply(
-            self.bottom_left_corner_offset
-        )
+        self.top_left_corner = self.origin + self.composite_rotation.apply(self.top_left_corner_offset)
+        self.top_right_corner = self.origin + self.composite_rotation.apply(self.top_right_corner_offset)
+        self.bottom_right_corner = self.origin + self.composite_rotation.apply(self.bottom_right_corner_offset)
+        self.bottom_left_corner = self.origin + self.composite_rotation.apply(self.bottom_left_corner_offset)
 
     # def update_position_in_space(self):
     #     self.set_position_in_space(self.origin, self.canting)
 
-    def set_facet_position_in_space(
-        self, hel_centroid: np.ndarray, hel_rotation: Rotation
-    ) -> None:
-        warn(
-            "Use Facet.set_position_in_space() instead.",
-            category=DeprecationWarning,
-            stacklevel=2,
-        )
+    def set_facet_position_in_space(self, hel_centroid: np.ndarray, hel_rotation: Rotation) -> None:
+        warn("Use Facet.set_position_in_space() instead.", category=DeprecationWarning, stacklevel=2)
         self.set_position_in_space(hel_centroid, hel_rotation)
 
     def surface_normal_ray(self, base: np.ndarray, length: float):
@@ -145,49 +121,27 @@ class Facet(RayTraceable):
 
         # Outline.
         if facet_style.draw_outline:
-            corners = [
-                self.top_left_corner,
-                self.top_right_corner,
-                self.bottom_right_corner,
-                self.bottom_left_corner,
-            ]
+            corners = [self.top_left_corner, self.top_right_corner, self.bottom_right_corner, self.bottom_left_corner]
             view.draw_xyz_list(corners, close=True, style=facet_style.outline_style)
 
         # Surface normal.
         if facet_style.draw_surface_normal:
             # Construct ray.
-            surface_normal_ray = self.surface_normal_ray(
-                self.origin, facet_style.surface_normal_length
-            )
+            surface_normal_ray = self.surface_normal_ray(self.origin, facet_style.surface_normal_length)
             # Draw ray and its base.
             view.draw_xyz(self.origin, style=facet_style.surface_normal_base_style)
-            view.draw_xyz_list(
-                surface_normal_ray, style=facet_style.surface_normal_style
-            )
+            view.draw_xyz_list(surface_normal_ray, style=facet_style.surface_normal_style)
 
         # Surface normal drawn at corners.
         # (Not the surface normal at the corner.  Facet curvature is not shown.)
         if facet_style.draw_surface_normal_at_corners:
             # Construct rays.
-            top_left_ray = self.surface_normal_ray(
-                self.top_left_corner, facet_style.corner_normal_length
-            )
-            top_right_ray = self.surface_normal_ray(
-                self.top_right_corner, facet_style.corner_normal_length
-            )
-            bottom_left_ray = self.surface_normal_ray(
-                self.bottom_left_corner, facet_style.corner_normal_length
-            )
-            bottom_right_ray = self.surface_normal_ray(
-                self.bottom_right_corner, facet_style.corner_normal_length
-            )
+            top_left_ray = self.surface_normal_ray(self.top_left_corner, facet_style.corner_normal_length)
+            top_right_ray = self.surface_normal_ray(self.top_right_corner, facet_style.corner_normal_length)
+            bottom_left_ray = self.surface_normal_ray(self.bottom_left_corner, facet_style.corner_normal_length)
+            bottom_right_ray = self.surface_normal_ray(self.bottom_right_corner, facet_style.corner_normal_length)
             rays = [top_left_ray, top_right_ray, bottom_left_ray, bottom_right_ray]
-            corners = [
-                self.top_left_corner,
-                self.top_right_corner,
-                self.bottom_right_corner,
-                self.bottom_left_corner,
-            ]
+            corners = [self.top_left_corner, self.top_right_corner, self.bottom_right_corner, self.bottom_left_corner]
             # Draw each ray and its base.
             for base, ray in zip(corners, rays):
                 view.draw_xyz(base, style=facet_style.corner_normal_base_style)
@@ -200,9 +154,7 @@ class Facet(RayTraceable):
         if facet_style.draw_mirror_curvature:
             self.mirror.draw(view, facet_style.mirror_styles)
 
-    def survey_of_points(
-        self, resolution, random_dist: bool = False
-    ) -> tuple[Pxyz, Vxyz]:
+    def survey_of_points(self, resolution, random_dist: bool = False) -> tuple[Pxyz, Vxyz]:
         return self.mirror.survey_of_points(resolution, random_dist)
 
     # override function from RayTraceable

@@ -23,9 +23,7 @@ def test_SystemSofastFringe():
     F = Fringes(periods_x, periods_y)
 
     # Instantiate image projection class
-    im_proj = ImageProjection.load_from_hdf_and_display(
-        os.path.join(base_dir, 'general/image_projection_test.h5')
-    )
+    im_proj = ImageProjection.load_from_hdf_and_display(os.path.join(base_dir, 'general/image_projection_test.h5'))
 
     # Instantiate image acquisition class
     im_aq = ImageAcquisition()

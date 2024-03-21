@@ -9,12 +9,7 @@ from opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets, load_hdf5_dat
 
 
 class Surface2DParabolic(Surface2DAbstract):
-    def __init__(
-        self,
-        initial_focal_lengths_xy: tuple[float, float],
-        robust_least_squares: bool,
-        downsample: int,
-    ):
+    def __init__(self, initial_focal_lengths_xy: tuple[float, float], robust_least_squares: bool, downsample: int):
         """
         Representation of 2D fit parabolic surface.
 
@@ -35,15 +30,7 @@ class Surface2DParabolic(Surface2DAbstract):
         self.slope_fit_poly_order = 1
         self.initial_focal_lengths_xy = initial_focal_lengths_xy
         self.surf_coefs = np.array(
-            [
-                0,
-                0,
-                1 / 4 / initial_focal_lengths_xy[0],
-                0,
-                0,
-                1 / 4 / initial_focal_lengths_xy[1],
-            ],
-            dtype=float,
+            [0, 0, 1 / 4 / initial_focal_lengths_xy[0], 0, 0, 1 / 4 / initial_focal_lengths_xy[1]], dtype=float
         )
         self.slope_coefs = np.zeros((2, 3))
 
@@ -80,9 +67,7 @@ class Surface2DParabolic(Surface2DAbstract):
 
         """
         # Downsample and save measurement data
-        self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic[
-            :: self.downsample
-        ]
+        self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic[:: self.downsample]
         self.v_screen_points_optic = v_screen_points_optic[:: self.downsample]
 
         # Save position data
@@ -133,15 +118,7 @@ class Surface2DParabolic(Surface2DAbstract):
 
         # Solve quadratic formula for ray intersections with parabola
         a = (A * q**2) + (B * r**2) + (C * q * r)
-        b = (
-            (2 * A * Xc * q)
-            + (2 * B * Yc * r)
-            + (C * Xc * r)
-            + (C * Yc * q)
-            + (D * q)
-            + (E * r)
-            - s
-        )
+        b = (2 * A * Xc * q) + (2 * B * Yc * r) + (C * Xc * r) + (C * Yc * q) + (D * q) + (E * r) - s
         c = (A * Xc**2) + (B * Yc**2) + (C * Xc * Yc) + (D * Xc) + (E * Yc) + F - Zc
 
         a[mask] = np.nan
@@ -154,9 +131,7 @@ class Surface2DParabolic(Surface2DAbstract):
         mean_2 = scale_2.mean()
 
         if mean_1 < 0 and mean_2 < 0:
-            raise ValueError(
-                'Camera ray intersection points with parabolic surface are found to be behind camera.'
-            )
+            raise ValueError('Camera ray intersection points with parabolic surface are found to be behind camera.')
         elif mean_1 > 0 and mean_2 > 0:  # Default to use scale 1
             scale = scale_1
         elif mean_2 > 0:
@@ -174,9 +149,7 @@ class Surface2DParabolic(Surface2DAbstract):
             scale[mask] = z_scale
 
         # Calculate intersection points
-        int_pts = (
-            v_origin + u_pixel_pointing.as_Vxyz() * scale[np.newaxis, :]
-        )  # optic coordinates
+        int_pts = v_origin + u_pixel_pointing.as_Vxyz() * scale[np.newaxis, :]  # optic coordinates
         return int_pts
 
     def normal_design_at_align_point(self) -> Vxyz:
@@ -189,12 +162,8 @@ class Surface2DParabolic(Surface2DAbstract):
             Surface normal vector.
 
         """
-        dzdx_design = (
-            -self.v_align_point_optic.x[0] / 2 / self.initial_focal_lengths_xy[0]
-        )
-        dzdy_design = (
-            -self.v_align_point_optic.y[0] / 2 / self.initial_focal_lengths_xy[1]
-        )
+        dzdx_design = -self.v_align_point_optic.x[0] / 2 / self.initial_focal_lengths_xy[0]
+        dzdy_design = -self.v_align_point_optic.y[0] / 2 / self.initial_focal_lengths_xy[1]
         return Uxyz([dzdx_design, dzdy_design, 1])
 
     def normal_fit_at_align_point(self) -> Vxyz:
@@ -225,20 +194,14 @@ class Surface2DParabolic(Surface2DAbstract):
 
         """
         # Calculate pixel intersection points with existing fitting function
-        self.v_surf_int_pts_optic = self.intersect(
-            self.u_active_pixel_pointing_optic, self.v_optic_cam_optic
-        )
+        self.v_surf_int_pts_optic = self.intersect(self.u_active_pixel_pointing_optic, self.v_optic_cam_optic)
 
     def calculate_slopes(self) -> tuple[Vxyz, np.ndarray]:
         """
         Calculate slopes of each measurement point.
 
         """
-        self.slopes = sf2.calc_slopes(
-            self.v_surf_int_pts_optic,
-            self.v_optic_cam_optic,
-            self.v_screen_points_optic,
-        )
+        self.slopes = sf2.calc_slopes(self.v_surf_int_pts_optic, self.v_optic_cam_optic, self.v_screen_points_optic)
 
     def fit_slopes(self) -> None:
         """
@@ -248,25 +211,15 @@ class Surface2DParabolic(Surface2DAbstract):
         # Fit Nth order surfaces to slope distributions in X and Y
         if self.robust_least_squares:
             slope_coefs_x, weights_x = sf2.fit_slope_robust_ls(
-                self.slope_fit_poly_order,
-                self.slopes[0],
-                self.weights.copy(),
-                self.v_surf_int_pts_optic,
+                self.slope_fit_poly_order, self.slopes[0], self.weights.copy(), self.v_surf_int_pts_optic
             )
             slope_coefs_y, weights_y = sf2.fit_slope_robust_ls(
-                self.slope_fit_poly_order,
-                self.slopes[1],
-                self.weights.copy(),
-                self.v_surf_int_pts_optic,
+                self.slope_fit_poly_order, self.slopes[1], self.weights.copy(), self.v_surf_int_pts_optic
             )
             self.weights = np.array((weights_x, weights_y)).min(0)
         else:
-            slope_coefs_x = sf2.fit_slope_ls(
-                self.slope_fit_poly_order, self.slopes[0], self.v_surf_int_pts_optic
-            )
-            slope_coefs_y = sf2.fit_slope_ls(
-                self.slope_fit_poly_order, self.slopes[1], self.v_surf_int_pts_optic
-            )
+            slope_coefs_x = sf2.fit_slope_ls(self.slope_fit_poly_order, self.slopes[0], self.v_surf_int_pts_optic)
+            slope_coefs_y = sf2.fit_slope_ls(self.slope_fit_poly_order, self.slopes[1], self.v_surf_int_pts_optic)
 
         # Save slope coefficients
         self.slope_coefs = np.array((slope_coefs_x, slope_coefs_y))
@@ -284,9 +237,7 @@ class Surface2DParabolic(Surface2DAbstract):
         )
 
         # Calculate z coordinate
-        z_pt = self.v_align_point_optic.z[0] - sf2.coef_to_points(
-            self.v_align_point_optic, self.surf_coefs, 2
-        )
+        z_pt = self.v_align_point_optic.z[0] - sf2.coef_to_points(self.v_align_point_optic, self.surf_coefs, 2)
         self.surf_coefs[0] = z_pt
 
     def rotate_all(self, r_align_step: Rotation) -> None:
@@ -299,21 +250,11 @@ class Surface2DParabolic(Surface2DAbstract):
             Rotation object to rotate all vectors by.
 
         """
-        self.v_optic_cam_optic = self.v_optic_cam_optic.rotate_about(
-            r_align_step, self.v_align_point_optic
-        )
-        self.v_screen_points_optic = self.v_screen_points_optic.rotate_about(
-            r_align_step, self.v_align_point_optic
-        )
-        self.u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate(
-            r_align_step
-        )
-        self.u_measure_pixel_pointing_optic = (
-            self.u_measure_pixel_pointing_optic.rotate(r_align_step)
-        )
-        self.v_optic_screen_optic = self.v_optic_screen_optic.rotate_about(
-            r_align_step, self.v_align_point_optic
-        )
+        self.v_optic_cam_optic = self.v_optic_cam_optic.rotate_about(r_align_step, self.v_align_point_optic)
+        self.v_screen_points_optic = self.v_screen_points_optic.rotate_about(r_align_step, self.v_align_point_optic)
+        self.u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate(r_align_step)
+        self.u_measure_pixel_pointing_optic = self.u_measure_pixel_pointing_optic.rotate(r_align_step)
+        self.v_optic_screen_optic = self.v_optic_screen_optic.rotate_about(r_align_step, self.v_align_point_optic)
 
     def shift_all(self, v_align_optic_step: Vxyz) -> None:
         """
@@ -330,12 +271,7 @@ class Surface2DParabolic(Surface2DAbstract):
         self.v_optic_screen_optic += v_align_optic_step
 
     def save_to_hdf(self, file: str, prefix: str = ''):
-        data = [
-            self.initial_focal_lengths_xy,
-            self.robust_least_squares,
-            self.downsample,
-            'parabolic'
-        ]
+        data = [self.initial_focal_lengths_xy, self.robust_least_squares, self.downsample, 'parabolic']
         datasets = [
             prefix + 'ParamsSurface/initial_focal_lengths_xy',
             prefix + 'ParamsSurface/robust_least_squares',
@@ -349,8 +285,7 @@ class Surface2DParabolic(Surface2DAbstract):
         # Check surface type
         data = load_hdf5_datasets([prefix + 'ParamsSurface/surface_type'], file)
         if data['surface_type'] != 'parabolic':
-            raise ValueError(
-                f'Surface2DParabolic cannot load surface type, {data["surface_type"]:s}')
+            raise ValueError(f'Surface2DParabolic cannot load surface type, {data["surface_type"]:s}')
 
         # Load
         datasets = [

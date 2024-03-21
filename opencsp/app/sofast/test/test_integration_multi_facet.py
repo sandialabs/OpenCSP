@@ -33,9 +33,7 @@ class TestMulti(unittest.TestCase):
         """
         # Get test data location
         if base_dir is None:
-            base_dir = os.path.join(
-                opencsp_code_dir(), 'test/data/measurements_sofast_fringe'
-            )
+            base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
 
         # Directory Setup
         file_dataset = os.path.join(base_dir, 'calculations_facet_ensemble/data.h5')
@@ -75,21 +73,15 @@ class TestMulti(unittest.TestCase):
         sofast.params.mask_thresh_active_pixels = params['mask_thresh_active_pixels']
         sofast.params.mask_keep_largest_area = params['mask_keep_largest_area']
 
-        sofast.params.geometry_params.perimeter_refine_axial_search_dist = params[
-            'perimeter_refine_axial_search_dist'
+        sofast.params.geometry_params.perimeter_refine_axial_search_dist = params['perimeter_refine_axial_search_dist']
+        sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = params[
+            'perimeter_refine_perpendicular_search_dist'
         ]
-        sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = (
-            params['perimeter_refine_perpendicular_search_dist']
-        )
-        sofast.params.geometry_params.facet_corns_refine_step_length = params[
-            'facet_corns_refine_step_length'
+        sofast.params.geometry_params.facet_corns_refine_step_length = params['facet_corns_refine_step_length']
+        sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = params[
+            'facet_corns_refine_perpendicular_search_dist'
         ]
-        sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = (
-            params['facet_corns_refine_perpendicular_search_dist']
-        )
-        sofast.params.geometry_params.facet_corns_refine_frac_keep = params[
-            'facet_corns_refine_frac_keep'
-        ]
+        sofast.params.geometry_params.facet_corns_refine_frac_keep = params['facet_corns_refine_frac_keep']
 
         # Load array data
         datasets = [
@@ -114,11 +106,7 @@ class TestMulti(unittest.TestCase):
                 f'DataSofastInput/optic_definition/facet_{idx:03d}/v_facet_corners',
             ]
             data = load_hdf5_datasets(datasets, file_dataset)
-            facet_data.append(
-                DefinitionFacet(
-                    Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet'])
-                )
-            )
+            facet_data.append(DefinitionFacet(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet'])))
 
         # Load surface data
         surfaces = []
@@ -142,12 +130,8 @@ class TestMulti(unittest.TestCase):
         cls.file_dataset = file_dataset
 
         for idx in range(sofast.num_facets):
-            cls.data_test['slopes_facet_xy'].append(
-                sofast.data_characterization_facet[idx].slopes_facet_xy
-            )
-            cls.data_test['surf_coefs_facet'].append(
-                sofast.data_characterization_facet[idx].surf_coefs_facet
-            )
+            cls.data_test['slopes_facet_xy'].append(sofast.data_characterization_facet[idx].slopes_facet_xy)
+            cls.data_test['surf_coefs_facet'].append(sofast.data_characterization_facet[idx].surf_coefs_facet)
 
     def test_slope(self):
         for idx in range(self.num_facets):
@@ -156,15 +140,11 @@ class TestMulti(unittest.TestCase):
                 data_calc = self.data_test['slopes_facet_xy'][idx]
 
                 # Get expected data
-                datasets = [
-                    f'DataSofastCalculation/facet/facet_{idx:03d}/slopes_facet_xy'
-                ]
+                datasets = [f'DataSofastCalculation/facet/facet_{idx:03d}/slopes_facet_xy']
                 data = load_hdf5_datasets(datasets, self.file_dataset)
 
                 # Test
-                np.testing.assert_allclose(
-                    data['slopes_facet_xy'], data_calc, atol=1e-7, rtol=0
-                )
+                np.testing.assert_allclose(data['slopes_facet_xy'], data_calc, atol=1e-7, rtol=0)
 
     def test_surf_coefs(self):
         for idx in range(self.num_facets):
@@ -173,15 +153,11 @@ class TestMulti(unittest.TestCase):
                 data_calc = self.data_test['surf_coefs_facet'][idx]
 
                 # Get expected data
-                datasets = [
-                    f'DataSofastCalculation/facet/facet_{idx:03d}/surf_coefs_facet'
-                ]
+                datasets = [f'DataSofastCalculation/facet/facet_{idx:03d}/surf_coefs_facet']
                 data = load_hdf5_datasets(datasets, self.file_dataset)
 
                 # Test
-                np.testing.assert_allclose(
-                    data['surf_coefs_facet'], data_calc, atol=1e-8, rtol=0
-                )
+                np.testing.assert_allclose(data['surf_coefs_facet'], data_calc, atol=1e-8, rtol=0)
 
 
 if __name__ == '__main__':

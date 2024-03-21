@@ -44,11 +44,7 @@ def example_driver(dir_save):
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
 
     # Define surface definition (parabolic surface)
-    surface = Surface2DParabolic(
-        initial_focal_lengths_xy=(300., 300.),
-        robust_least_squares=True,
-        downsample=10,
-    )
+    surface = Surface2DParabolic(initial_focal_lengths_xy=(300.0, 300.0), robust_least_squares=True, downsample=10)
 
     # Calibrate fringes
     measurement.calibrate_fringe_images(calibration)
@@ -63,8 +59,7 @@ def example_driver(dir_save):
     # Calculate focal length from parabolic fit
     surf_coefs = sofast.data_characterization_facet[0].surf_coefs_facet
     focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
-    lt.info(f'Facet xy focal lengths (meters): '
-            f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
+    lt.info(f'Facet xy focal lengths (meters): ' f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
 
     # Get optic representation
     facet: Facet = sofast.get_optic()
@@ -76,13 +71,7 @@ def example_driver(dir_save):
     # Visualize setup
     fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
     spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
-    visualize_setup(
-        display,
-        camera,
-        spatial_ori.v_screen_optic_screen,
-        spatial_ori.r_optic_screen,
-        ax=fig_record.axis,
-    )
+    visualize_setup(display, camera, spatial_ori.v_screen_optic_screen, spatial_ori.r_optic_screen, ax=fig_record.axis)
     fig_record.save(dir_save, 'physical_setup_layout', 'png')
 
     # Plot slope map

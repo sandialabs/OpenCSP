@@ -33,9 +33,7 @@ class SceneReconstruction:
         triangulation, by default 0.02 meters.
     """
 
-    def __init__(
-        self, camera: Camera, known_point_locations: ndarray, image_filter_path: str
-    ) -> 'SceneReconstruction':
+    def __init__(self, camera: Camera, known_point_locations: ndarray, image_filter_path: str) -> 'SceneReconstruction':
         """Instantiates SceneReconstruction class
 
         Parameters
@@ -94,21 +92,15 @@ class SceneReconstruction:
     @property
     def unlocated_marker_ids(self) -> ndarray:
         """Returns all unlocated marker IDs"""
-        return np.unique(
-            np.hstack([image.unlocated_point_ids for image in self.images])
-        )
+        return np.unique(np.hstack([image.unlocated_point_ids for image in self.images]))
 
     def convert_to_four_corners(self) -> None:
         """Converts all images to four corner images instead of single points"""
         for image in self.images:
             image.convert_to_four_corner()
 
-        self.unique_point_ids = np.unique(
-            np.hstack([im.point_ids for im in self.images])
-        )
-        self.unique_marker_ids = np.floor(
-            self.unique_point_ids.astype(float) / 4
-        ).astype(int)
+        self.unique_point_ids = np.unique(np.hstack([im.point_ids for im in self.images]))
+        self.unique_marker_ids = np.floor(self.unique_point_ids.astype(float) / 4).astype(int)
 
         mask_nan = np.array([1, np.nan, np.nan, np.nan] * self.num_points)
         mask_zero = np.array([1, 0, 0, 0] * self.num_points)
@@ -116,9 +108,7 @@ class SceneReconstruction:
         self.num_points = self.unique_point_ids.size
         self.points_xyz = np.repeat(self.points_xyz, 4, axis=0) * mask_nan[:, None]
         self.located_point_ids = self.located_point_ids * 4
-        self.located_point_mask = (
-            np.repeat(self.located_point_mask, 4) * mask_zero
-        ).astype(bool)
+        self.located_point_mask = (np.repeat(self.located_point_mask, 4) * mask_zero).astype(bool)
 
     def set_id_known(self, id_: int, pt: np.ndarray) -> None:
         """Sets given ID as known in all images
@@ -164,15 +154,11 @@ class SceneReconstruction:
     def load_images(self) -> None:
         """Saves loaded dataset in class"""
         self.images: list[ImageMarker] = []
-        for idx, file in enumerate(
-            tqdm(self.image_paths, desc='Loading marker images')
-        ):
+        for idx, file in enumerate(tqdm(self.image_paths, desc='Loading marker images')):
             self.images.append(ImageMarker.load_aruco_origin(file, idx, self.camera))
 
         # Save unique markers
-        self.unique_point_ids = np.unique(
-            np.hstack([im.point_ids for im in self.images])
-        )
+        self.unique_point_ids = np.unique(np.hstack([im.point_ids for im in self.images]))
         self.unique_marker_ids = self.unique_point_ids.copy()
         self.num_markers = self.unique_point_ids.size
         self.num_points = self.unique_point_ids.size
@@ -227,9 +213,7 @@ class SceneReconstruction:
             tvecs = []
             pts_img = []
             for im in images:
-                idx = im.point_ids.tolist().index(
-                    id_
-                )  # Index of point in current image
+                idx = im.point_ids.tolist().index(id_)  # Index of point in current image
                 pts_img.append(im.pts_im_xy[idx])  # Location of 2d point in image
                 rots.append(Rotation.from_rotvec(im.rvec))
                 tvecs.append(im.tvec)
@@ -263,9 +247,7 @@ class SceneReconstruction:
             camera_idxs.append([image.img_id] * image.num_located_markers)
             # Point (0-based) index for every point observation that has been located
             pt_ids = image.located_point_ids  # ID number
-            pt_idxs = [
-                self.unique_point_ids.tolist().index(pt_id) for pt_id in pt_ids
-            ]  # index
+            pt_idxs = [self.unique_point_ids.tolist().index(pt_id) for pt_id in pt_ids]  # index
             point_indices.append(pt_idxs)
             # 2d image points of every point observation
             points2d.append(image.pts_im_xy[image.located_markers_mask])
@@ -292,9 +274,7 @@ class SceneReconstruction:
         )
 
         # Update 3d marker points
-        self.set_ids_known(
-            self.located_point_ids, pts_marker_opt[self.located_point_mask]
-        )
+        self.set_ids_known(self.located_point_ids, pts_marker_opt[self.located_point_mask])
 
         # Update rvec/tvec
         for idx in self.located_camera_idxs:
@@ -322,9 +302,7 @@ class SceneReconstruction:
             (N,) array of distances between point pairs
         """
         # Calculate scales
-        scales = ph.scale_points(
-            Vxyz(self.points_xyz.T), self.unique_point_ids, point_pairs * 4, distances
-        )
+        scales = ph.scale_points(Vxyz(self.points_xyz.T), self.unique_point_ids, point_pairs * 4, distances)
 
         lt.info('Point cloud scaling summary:')
         lt.info(f'Calculated average point cloud scale: {scales.mean():.4f}.')
@@ -333,12 +311,7 @@ class SceneReconstruction:
         # Apply scale to points
         self.points_xyz *= scales.mean()
 
-    def align_points(
-        self,
-        marker_ids: ndarray[int],
-        alignment_values: Vxyz,
-        apply_scale: bool = False,
-    ) -> None:
+    def align_points(self, marker_ids: ndarray[int], alignment_values: Vxyz, apply_scale: bool = False) -> None:
         """Aligns selected markers origin points (corner index 0) within
         point cloud to match given alignment values. Set to NAN for floating.
         Points are aligned FIRST, then transformed.
@@ -498,8 +471,7 @@ class SceneReconstruction:
         # Check that all markers have been found
         if self.unlocated_marker_ids.size != 0:
             lt.warn(
-                f'{self.unlocated_marker_ids.size:d} markers remain unlocated. '
-                'More camera images may be needed.'
+                f'{self.unlocated_marker_ids.size:d} markers remain unlocated. ' 'More camera images may be needed.'
             )
 
         # Convert to 4-corner model
@@ -513,8 +485,7 @@ class SceneReconstruction:
         self.refine_located_poses_and_points()
 
     def run_calibration(self) -> None:
-        """Runs the calibration sequence
-        """
+        """Runs the calibration sequence"""
         # Run calibration
         self.load_images()
         self.save_ids_known()
@@ -538,10 +509,4 @@ class SceneReconstruction:
             Marker ID, point ID, X, Y, Z
 
         """
-        return np.hstack(
-            (
-                self.unique_marker_ids[:, None],
-                self.unique_point_ids[:, None],
-                self.points_xyz,
-            )
-        )
+        return np.hstack((self.unique_marker_ids[:, None], self.unique_point_ids[:, None], self.points_xyz))

@@ -50,9 +50,7 @@ class MeasurementSofastFringe:
         """
         # Check mask image size
         if mask_images.shape[2] != 2 or np.ndim(mask_images) != 3:
-            raise ValueError(
-                f'Two mask images needed, but {mask_images.shape[2]} given.'
-            )
+            raise ValueError(f'Two mask images needed, but {mask_images.shape[2]} given.')
 
         # Save input measurement data
         self.mask_images = mask_images
@@ -72,12 +70,8 @@ class MeasurementSofastFringe:
         self.num_x_ims = self.fringe_periods_x.size * self.phase_shifts
         self.num_fringe_ims = self.fringe_images.shape[2]
         # Check number of input fringes
-        if (self.num_y_ims + self.num_x_ims) != self.num_fringe_ims or np.ndim(
-            fringe_images
-        ) != 3:
-            raise ValueError(
-                f'Incorrect number of fringe images given. Fringe images shape = {fringe_images.shape}.'
-            )
+        if (self.num_y_ims + self.num_x_ims) != self.num_fringe_ims or np.ndim(fringe_images) != 3:
+            raise ValueError(f'Incorrect number of fringe images given. Fringe images shape = {fringe_images.shape}.')
 
         # Instantiate calibration objected fringes
         self._fringe_images_calibrated = None
@@ -113,9 +107,7 @@ class MeasurementSofastFringe:
         """Returns calibrated x-only fringes"""
         return self.fringe_images_calibrated[..., self.num_y_ims :]
 
-    def calibrate_fringe_images(
-        self, calibration: ImageCalibrationAbstract, **kwargs
-    ) -> None:
+    def calibrate_fringe_images(self, calibration: ImageCalibrationAbstract, **kwargs) -> None:
         """
         Performs brightness level calibration on the raw captured fringes.
 
@@ -129,9 +121,7 @@ class MeasurementSofastFringe:
 
         """
         if not isinstance(calibration, ImageCalibrationAbstract):
-            raise ValueError(
-                'Input calibration must be instance of ImageCalibrationAbstract.'
-            )
+            raise ValueError('Input calibration must be instance of ImageCalibrationAbstract.')
 
         self._fringe_images_calibrated = calibration.apply_to_images(self, **kwargs)
 

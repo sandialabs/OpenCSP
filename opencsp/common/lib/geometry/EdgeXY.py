@@ -4,9 +4,7 @@ from opencsp.common.lib.geometry.Pxy import Vxy
 
 
 class EdgeXY:
-    def __init__(
-        self, vertices: Vxy, curve_data: dict = {'type': 'line'}, closed: bool = False
-    ):
+    def __init__(self, vertices: Vxy, curve_data: dict = {'type': 'line'}, closed: bool = False):
         """
         Representation of a 2D edge.
 
@@ -26,13 +24,9 @@ class EdgeXY:
         """
         # Check inputs
         if len(vertices) != 2:
-            raise ValueError(
-                'Input vertices must have length 2, not {:d}.'.format(len(vertices))
-            )
+            raise ValueError('Input vertices must have length 2, not {:d}.'.format(len(vertices)))
         if closed is True:
-            raise NotImplementedError(
-                'Curves that are not closed are not currently supported.'
-            )
+            raise NotImplementedError('Curves that are not closed are not currently supported.')
 
         # Save properties
         self._vertices = vertices
@@ -43,9 +37,7 @@ class EdgeXY:
         if curve_data['type'] == 'line':
             self._curve = LineXY.from_two_points(vertices[0], vertices[1])
         else:
-            raise ValueError(
-                'Curve type {:s} not currently supported.'.format(curve_data['type'])
-            )
+            raise ValueError('Curve type {:s} not currently supported.'.format(curve_data['type']))
 
     @property
     def vertices(self) -> Vxy:

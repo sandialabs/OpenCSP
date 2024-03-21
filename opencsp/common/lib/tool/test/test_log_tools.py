@@ -23,9 +23,7 @@ class TestLogTools(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.out_dir = os.path.join(
-            'common', 'lib', 'test', 'data', 'output', 'tool', 'log_tools'
-        )
+        cls.out_dir = os.path.join('common', 'lib', 'test', 'data', 'output', 'tool', 'log_tools')
         ft.create_directories_if_necessary(cls.out_dir)
         ft.delete_files_in_directory(cls.out_dir, "*")
         super().setUpClass()
@@ -35,26 +33,10 @@ class TestLogTools(unittest.TestCase):
         self.log_dir_body_ext = os.path.join(self.out_dir, test_method + ".txt")
 
     def proc_exec(self, func_name1: str, func_name2: str = None):
-        with subprocess.Popen(
-            [
-                sys.executable,
-                __file__,
-                "--funcname",
-                func_name1,
-                "--logname",
-                self.log_dir_body_ext,
-            ]
-        ):
+        with subprocess.Popen([sys.executable, __file__, "--funcname", func_name1, "--logname", self.log_dir_body_ext]):
             if func_name2 != None:
                 with subprocess.Popen(
-                    [
-                        sys.executable,
-                        __file__,
-                        "--funcname",
-                        func_name2,
-                        "--logname",
-                        self.log_dir_body_ext,
-                    ]
+                    [sys.executable, __file__, "--funcname", func_name2, "--logname", self.log_dir_body_ext]
                 ):
                     pass
 
@@ -71,10 +53,7 @@ class TestLogTools(unittest.TestCase):
     def test_single_process_logger(self):
         self.proc_exec("_log_single_process_logger")
         log_contents = self.get_log_contents()
-        self.assertTrue(
-            "Hello, world!" in log_contents,
-            f"Can't find hello log in log contents:\n\t\"{log_contents}\"",
-        )
+        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
 
     def _log_single_process_dont_delete(self, logname):
         lt.logger(logname, delete_existing_log=False)
@@ -86,13 +65,9 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_single_process_dont_delete")
 
         log_contents = self.get_log_contents()
+        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
         self.assertTrue(
-            "Hello, world!" in log_contents,
-            f"Can't find hello log in log contents:\n\t\"{log_contents}\"",
-        )
-        self.assertTrue(
-            "Goodbye, world!" in log_contents,
-            f"Can't find goodbye log in log contents:\n\t\"{log_contents}\"",
+            "Goodbye, world!" in log_contents, f"Can't find goodbye log in log contents:\n\t\"{log_contents}\""
         )
 
     def _log_multiprocess_logger1(self, logname):
@@ -110,17 +85,10 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_multiprocess_logger1", "_log_multiprocess_logger2")
 
         log_contents = self.get_log_contents()
+        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
+        self.assertTrue("other process" in log_contents, f"Can't find other log in log contents:\n\t\"{log_contents}\"")
         self.assertTrue(
-            "Hello, world!" in log_contents,
-            f"Can't find hello log in log contents:\n\t\"{log_contents}\"",
-        )
-        self.assertTrue(
-            "other process" in log_contents,
-            f"Can't find other log in log contents:\n\t\"{log_contents}\"",
-        )
-        self.assertTrue(
-            "Goodbye, world!" in log_contents,
-            f"Can't find goodbye log in log contents:\n\t\"{log_contents}\"",
+            "Goodbye, world!" in log_contents, f"Can't find goodbye log in log contents:\n\t\"{log_contents}\""
         )
 
     def _log_log_level_screening(self, logname):
@@ -132,13 +100,9 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_log_level_screening")
 
         log_contents = self.get_log_contents()
-        self.assertTrue(
-            "Hello, world!" in log_contents,
-            f"Can't find hello log in log contents:\n\t\"{log_contents}\"",
-        )
+        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
         self.assertFalse(
-            "Goodbye, world!" in log_contents,
-            "Found goodbye log in log contents when it shouldn't be there",
+            "Goodbye, world!" in log_contents, "Found goodbye log in log contents when it shouldn't be there"
         )
 
     def _log_set_log_level(self, logname):
@@ -150,13 +114,9 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_set_log_level")
 
         log_contents = self.get_log_contents()
+        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
         self.assertTrue(
-            "Hello, world!" in log_contents,
-            f"Can't find hello log in log contents:\n\t\"{log_contents}\"",
-        )
-        self.assertTrue(
-            "Goodbye, world!" in log_contents,
-            f"Can't find goodbye log in log contents:\n\t\"{log_contents}\"",
+            "Goodbye, world!" in log_contents, f"Can't find goodbye log in log contents:\n\t\"{log_contents}\""
         )
 
     def _log_error_and_raise(self, logname):
@@ -170,10 +130,7 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_error_and_raise")
 
         log_contents = self.get_log_contents()
-        self.assertTrue(
-            "Error, world!" in log_contents,
-            f"Can't find error log in log contents:\n\t\"{log_contents}\"",
-        )
+        self.assertTrue("Error, world!" in log_contents, f"Can't find error log in log contents:\n\t\"{log_contents}\"")
         self.assertTrue(
             "RuntimeError encountered" in log_contents,
             f"Can't find evidence of RuntimeError in log contents:\n\t\"{log_contents}\"",
@@ -183,9 +140,7 @@ class TestLogTools(unittest.TestCase):
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(
-        prog=__file__.rstrip(".py"), description='Testing log tools'
-    )
+    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description='Testing log tools')
     parser.add_argument('--logname', help="The name of the log file to log to.")
     parser.add_argument('--funcname', help="Calls the given function")
     args = parser.parse_args()

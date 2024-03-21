@@ -15,16 +15,13 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 def test_project_fixed_pattern_target():
     # Set pattern parameters
     file_image_projection = os.path.join(
-        opencsp_code_dir(),
-        "test/data/measurements_sofast_fringe/general/image_projection_test.h5",
+        opencsp_code_dir(), "test/data/measurements_sofast_fringe/general/image_projection_test.h5"
     )
 
     # Load ImageProjection
     im_proj = ImageProjection.load_from_hdf_and_display(file_image_projection)
 
-    fixed_pattern = SystemSofastFixed(
-        im_proj.size_x, im_proj.size_y, width_pattern=3, spacing_pattern=6
-    )
+    fixed_pattern = SystemSofastFixed(im_proj.size_x, im_proj.size_y, width_pattern=3, spacing_pattern=6)
     image = fixed_pattern.get_image('uint8', 255, 'square')
 
     # Project image

@@ -28,9 +28,7 @@ def main():
     # Define file locations
     data_dir = '../../sofast_2_system_calibration_files/'
 
-    file_image_projection = os.path.join(
-        data_dir, 'Image_Projection_optics_lab_landscape_rectangular.h5'
-    )
+    file_image_projection = os.path.join(data_dir, 'Image_Projection_optics_lab_landscape_rectangular.h5')
     file_display = os.path.join(data_dir, 'Display_optics_lab_landscape_distorted2D.h5')
     file_camera = os.path.join(data_dir, 'Camera_optics_lab_landscape.h5')
     file_facet = os.path.join(data_dir, 'Facet_NSTTF.json')
@@ -48,10 +46,7 @@ def main():
 
     # Define surface fitting parameters
     surface_data = dict(
-        surface_type='parabolic',
-        initial_focal_lengths_xy=(100.0, 100.0),
-        robust_least_squares=False,
-        downsample=10,
+        surface_type='parabolic', initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=False, downsample=10
     )
 
     # Create fringe object
@@ -83,19 +78,13 @@ def main():
     # Capture calibration data
     def func_capture_calibration_frames():
         print('Capturing display-camera response calibration data')
-        system.run_display_camera_response_calibration(
-            res=10, run_next=system.run_next_in_queue
-        )
+        system.run_display_camera_response_calibration(res=10, run_next=system.run_next_in_queue)
 
     # Process calibration data
     def func_process_calibration_data():
         print('Processing calibration data')
         calibration_images = system.get_calibration_images()
-        calibrations.append(
-            ImageCalibrationScaling.from_data(
-                calibration_images[0], system.calibration_display_values
-            )
-        )
+        calibrations.append(ImageCalibrationScaling.from_data(calibration_images[0], system.calibration_display_values))
         system.run_next_in_queue()
 
     # Load fringe object
@@ -137,9 +126,7 @@ def main():
     print('Saving Data')
 
     # Get Measurement object
-    measurement = system.get_measurements(
-        optic_measure_point, optic_screen_dist, optic_name
-    )[0]
+    measurement = system.get_measurements(optic_measure_point, optic_screen_dist, optic_name)[0]
     calibration = calibrations[0]
 
     # Process data

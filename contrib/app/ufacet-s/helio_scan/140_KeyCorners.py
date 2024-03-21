@@ -52,22 +52,14 @@ class KeyCorners:
     ):  # Flags to control rendering on this run.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError(
-                'In KeyCorners.__init__(), null input_video_dir_body_ext encountered.'
-            )
+            raise ValueError('In KeyCorners.__init__(), null input_video_dir_body_ext encountered.')
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError(
-                'In KeyCorners.__init__(), null output_data_dir encountered.'
-            )
+            raise ValueError('In KeyCorners.__init__(), null output_data_dir encountered.')
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError(
-                'In KeyCorners.__init__(), null output_render_dir encountered.'
-            )
+            raise ValueError('In KeyCorners.__init__(), null output_render_dir encountered.')
 
         # Parse input video path components.
-        input_video_dir, input_video_body, input_video_ext = ft.path_components(
-            input_video_dir_body_ext
-        )
+        input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
 
         # Store input.
         # Execution control.
@@ -90,9 +82,7 @@ class KeyCorners:
         self.render_control = render_control
 
         # Found key corners file name.
-        self.all_key_frames_corners_body = (
-            self.input_video_body + '_all_frames_corners_fnxl'
-        )
+        self.all_key_frames_corners_body = self.input_video_body + '_all_frames_corners_fnxl'
         self.all_key_frames_corners_body_ext = self.all_key_frames_corners_body + '.csv'
         self.all_key_frames_corners_dir_body_ext = os.path.join(
             self.output_data_dir, self.all_key_frames_corners_body_ext
@@ -107,9 +97,7 @@ class KeyCorners:
         # File listing key frames with mismatched heliostats.
         self.mismatched_ids_body = self.input_video_body + '_mismatched_key_frame_ids'
         self.mismatched_ids_body_ext = self.mismatched_ids_body + '.txt'
-        self.mismatched_ids_dir_body_ext = os.path.join(
-            self.output_data_dir, self.mismatched_ids_body_ext
-        )
+        self.mismatched_ids_dir_body_ext = os.path.join(self.output_data_dir, self.mismatched_ids_body_ext)
 
         # Heliostats per key frame file name.
         self.hpkf_body = self.input_video_body + '_heliostats_per_key_frame'
@@ -122,10 +110,7 @@ class KeyCorners:
         self.ppkf_dir_body_ext = os.path.join(self.output_data_dir, self.ppkf_body_ext)
 
         # Load key frames file.
-        print(
-            'In KeyCorners.__init__(), reading key frame specs: ',
-            self.input_key_frames_dir_body_ext,
-        )
+        print('In KeyCorners.__init__(), reading key frame specs: ', self.input_key_frames_dir_body_ext)
         self.key_frames_fnxl = fnxl.FrameNameXyList()
         self.key_frames_fnxl.load(self.input_key_frames_dir_body_ext)
         # Confirm what was read.
@@ -135,9 +120,7 @@ class KeyCorners:
         # Fetch a list of all frame ids in the video (not just key frames).
         # The corresponding frame_ids are not necessarily in sequential order, because
         # we previously removed spurious duplicate frames.
-        self.all_frame_file_list = ft.files_in_directory(
-            self.input_frame_dir, sort=True
-        )
+        self.all_frame_file_list = ft.files_in_directory(self.input_frame_dir, sort=True)
         # # Confirm what was read.
         # print('In KeyCorners.__init__(), self.all_frame_file_list:')
         # for frame_file in self.all_frame_file_list:
@@ -164,9 +147,7 @@ class KeyCorners:
             or (not ft.directory_exists(self.output_data_dir))
             or ft.directory_is_empty(self.output_data_dir)
         ):
-            print(
-                'In KeyCorners.find_and_save_key_corners(), searching for key corners...'
-            )
+            print('In KeyCorners.find_and_save_key_corners(), searching for key corners...')
 
             # Determine which key frames to process.
             if self.specific_frame_ids == None:
@@ -178,31 +159,20 @@ class KeyCorners:
 
             # Process each key frame_id.
             if self.single_processor:
-                print(
-                    'In KeyCorners.search_key_frames(), starting key frame corner search (single processor)...'
-                )
+                print('In KeyCorners.search_key_frames(), starting key frame corner search (single processor)...')
                 list_of_result_dicts = []
                 for key_frame_id in key_frame_ids_to_process:
                     list_of_result_dicts.append(self.search_key_frame(key_frame_id))
             else:
-                print(
-                    'In KeyCorners.search_key_frames(), starting key frame corner search (multi-processor)...'
-                )
-                logger = logt.multiprocessing_logger(
-                    self.log_dir_body_ext, level=logging.INFO
-                )
-                logger.info(
-                    '================================= Execution ================================='
-                )
+                print('In KeyCorners.search_key_frames(), starting key frame corner search (multi-processor)...')
+                logger = logt.multiprocessing_logger(self.log_dir_body_ext, level=logging.INFO)
+                logger.info('================================= Execution =================================')
                 with Pool(36) as pool:
-                    list_of_result_dicts = pool.map(
-                        self.search_key_frame, key_frame_ids_to_process
-                    )
+                    list_of_result_dicts = pool.map(self.search_key_frame, key_frame_ids_to_process)
 
             # Remove "None" entries.
             list_of_fnxl_or_None_results = [
-                result_dict['pair_projected_fnxl_or_None']
-                for result_dict in list_of_result_dicts
+                result_dict['pair_projected_fnxl_or_None'] for result_dict in list_of_result_dicts
             ]
             key_frame_fnxls = [x for x in list_of_fnxl_or_None_results if x is not None]
             print(
@@ -212,12 +182,9 @@ class KeyCorners:
 
             # Extract mismatched heliostat frame_ids.
             mismatched_key_frame_id_or_None_list = [
-                result_dict['mismatched_key_frame_id_or_None']
-                for result_dict in list_of_result_dicts
+                result_dict['mismatched_key_frame_id_or_None'] for result_dict in list_of_result_dicts
             ]
-            mismatched_key_frame_ids = [
-                x for x in mismatched_key_frame_id_or_None_list if x is not None
-            ]
+            mismatched_key_frame_ids = [x for x in mismatched_key_frame_id_or_None_list if x is not None]
             print(
                 'In KeyCorners.search_key_frames(), mismatched corner frames extracted.  len(mismatched_key_frame_ids) =',
                 len(mismatched_key_frame_ids),
@@ -231,10 +198,7 @@ class KeyCorners:
             all_key_frames_corners_fnxl = fnxl.construct_merged_copy(key_frame_fnxls)
 
             # Summarize search results.
-            print(
-                'In KeyCorners.find_and_save_key_corners(), len(key_frame_fnxls) =',
-                len(key_frame_fnxls),
-            )
+            print('In KeyCorners.find_and_save_key_corners(), len(key_frame_fnxls) =', len(key_frame_fnxls))
             for key_frame_fnxl in key_frame_fnxls:
                 print('In KeyCorners.find_and_save_key_corners(),     key_frame_fnxl:')
                 if key_frame_fnxl is None:
@@ -245,9 +209,7 @@ class KeyCorners:
                 '\nIn KeyCorners.find_and_save_key_corners(), all_key_frames_corners_fnxl.number_of_frames() =',
                 all_key_frames_corners_fnxl.number_of_frames(),
             )
-            print(
-                'In KeyCorners.find_and_save_key_corners(), all_key_frames_corners_fnxl:'
-            )
+            print('In KeyCorners.find_and_save_key_corners(), all_key_frames_corners_fnxl:')
             all_key_frames_corners_fnxl.print(max_value_length=200, indent=8)
 
             # Write found corners files.
@@ -265,11 +227,7 @@ class KeyCorners:
 
     def search_key_frame(self, key_frame_id):
         # Notify start.
-        print(
-            'In KeyCorners.search_key_frame(), fetching key frames for key_frame_id='
-            + str(key_frame_id)
-            + '...'
-        )
+        print('In KeyCorners.search_key_frame(), fetching key frames for key_frame_id=' + str(key_frame_id) + '...')
 
         # Find the filenames of the key frame and the frame that follows it.
         key_frame_body_ext_1 = upf.frame_file_body_ext_given_frame_id(
@@ -299,46 +257,28 @@ class KeyCorners:
         # Get the ids of the key frame pair.
         key_frame_id_1 = key_frame_id
         key_frame_id_2 = upf.frame_id_given_frame_file_body_ext(key_frame_body_ext_2)
-        print(
-            'In KeyCorners.search_key_frames(), key_frame_id_1 =', key_frame_id_1
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
-        print(
-            'In KeyCorners.search_key_frames(), key_frame_id_2 =', key_frame_id_2
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyCorners.search_key_frames(), key_frame_id_1 =', key_frame_id_1)  # ?? SCAFFOLDING RCB -- TEMPORARY
+        print('In KeyCorners.search_key_frames(), key_frame_id_2 =', key_frame_id_2)  # ?? SCAFFOLDING RCB -- TEMPORARY
 
         # Get the key frame name_polygon list.
-        list_of_name_polygons = self.key_frames_fnxl.list_of_name_xy_lists(
-            key_frame_id
-        )  # Applies to both frames.
+        list_of_name_polygons = self.key_frames_fnxl.list_of_name_xy_lists(key_frame_id)  # Applies to both frames.
 
         # Assemble construction output directory paths.
-        key_frame_id_str_1 = upf.frame_id_str_given_frame_file_body_ext(
-            key_frame_body_ext_1
-        )
-        output_construction_dir_1 = os.path.join(
-            self.output_construction_dir, key_frame_id_str_1, 'frame1'
-        )
-        output_construction_dir_2 = os.path.join(
-            self.output_construction_dir, key_frame_id_str_1, 'frame2'
-        )
+        key_frame_id_str_1 = upf.frame_id_str_given_frame_file_body_ext(key_frame_body_ext_1)
+        output_construction_dir_1 = os.path.join(self.output_construction_dir, key_frame_id_str_1, 'frame1')
+        output_construction_dir_2 = os.path.join(self.output_construction_dir, key_frame_id_str_1, 'frame2')
 
         # Initialize logger.
         if not self.single_processor:
             # Don't make this a data member of self -- it will cause error: "can't pickle _thread.RLock objects"
-            local_logger = logt.multiprocessing_logger(
-                self.log_dir_body_ext, level=logging.INFO
-            )
+            local_logger = logt.multiprocessing_logger(self.log_dir_body_ext, level=logging.INFO)
         else:
             local_logger = None
 
         # Search for key_frame 1 corners.
         try:
             search_result_1 = self.search_key_frame_aux(
-                local_logger,
-                key_frame_id_1,
-                list_of_name_polygons,
-                key_frame_body_ext_1,
-                output_construction_dir_1,
+                local_logger, key_frame_id_1, list_of_name_polygons, key_frame_body_ext_1, output_construction_dir_1
             )
         except:
             error_type, error_instance, traceback = sys.exc_info()
@@ -353,11 +293,7 @@ class KeyCorners:
         # Search for key_frame 2 corners.
         try:
             search_result_2 = self.search_key_frame_aux(
-                local_logger,
-                key_frame_id_2,
-                list_of_name_polygons,
-                key_frame_body_ext_2,
-                output_construction_dir_2,
+                local_logger, key_frame_id_2, list_of_name_polygons, key_frame_body_ext_2, output_construction_dir_2
             )
         except:
             error_type, error_instance, traceback = sys.exc_info()
@@ -378,12 +314,8 @@ class KeyCorners:
             # Construct a new fnxl that combines both key frame search results.
             # Take care to ensure that both have the same set of heliostat names.
             # This can return None if there are no xy_lists with a common name.
-            (pair_projected_fnxl_or_None, mismatched) = (
-                self.construct_merged_fnxl_synchronizing_heliostat_names(
-                    local_logger,
-                    search_result_1.projected_fnxl(),
-                    search_result_2.projected_fnxl(),
-                )
+            (pair_projected_fnxl_or_None, mismatched) = self.construct_merged_fnxl_synchronizing_heliostat_names(
+                local_logger, search_result_1.projected_fnxl(), search_result_2.projected_fnxl()
             )
 
         # Determine whether any found heliostats were lost from one frame to the next.
@@ -399,33 +331,22 @@ class KeyCorners:
         return result_dict
 
     def search_key_frame_aux(
-        self,
-        local_logger,
-        key_frame_id,
-        list_of_name_polygons,
-        key_frame_body_ext,
-        output_construction_dir,
+        self, local_logger, key_frame_id, list_of_name_polygons, key_frame_body_ext, output_construction_dir
     ):
-        key_frame_id_str = upf.frame_id_str_given_frame_file_body_ext(
-            key_frame_body_ext
-        )
+        key_frame_id_str = upf.frame_id_str_given_frame_file_body_ext(key_frame_body_ext)
         # Read the key frame image.
         key_frame_dir_body_ext = os.path.join(self.input_frame_dir, key_frame_body_ext)
         key_frame_img = cv.imread(key_frame_dir_body_ext)
         if key_frame_img is None:
             logt.log_and_raise_value_error(
-                self.logger,
-                'In KeyCorners.search_key_frame_aux(), error reading image file:',
-                key_frame_body_ext,
+                self.logger, 'In KeyCorners.search_key_frame_aux(), error reading image file:', key_frame_body_ext
             )
         # Initialize output directory.
         ft.create_directories_if_necessary(output_construction_dir)
         # Execute search.
         logt.info(
             local_logger,
-            'In KeyCorners.search_key_frame_aux(), searching for corners in key_frame_id='
-            + str(key_frame_id)
-            + '...',
+            'In KeyCorners.search_key_frame_aux(), searching for corners in key_frame_id=' + str(key_frame_id) + '...',
         )
         search_result = kfcs.KeyFrameCornerSearch(
             key_frame_id=key_frame_id,
@@ -438,16 +359,11 @@ class KeyCorners:
             render_control=self.render_control,
         )
         logt.info(
-            local_logger,
-            'In KeyCorners.search_key_frame_aux(), corners done key_frame_id='
-            + str(key_frame_id)
-            + '.',
+            local_logger, 'In KeyCorners.search_key_frame_aux(), corners done key_frame_id=' + str(key_frame_id) + '.'
         )
         return search_result
 
-    def construct_merged_fnxl_synchronizing_heliostat_names(
-        self, local_logger, fnxl_1, fnxl_2
-    ):
+    def construct_merged_fnxl_synchronizing_heliostat_names(self, local_logger, fnxl_1, fnxl_2):
         """
         This rouitne merges the key frame 1 and key frame 2 corner search results into a combined FrameNameXyList
         object containing the corners found for both frames.  However, it does not simply transcribe the corner
@@ -501,17 +417,11 @@ class KeyCorners:
 
         # Createa a new FrameNameXyList and add the synchronized name_xy_lists to it.
         pair_projected_fnxl = fnxl.FrameNameXyList()
-        pair_projected_fnxl.add_list_of_name_xy_lists(
-            frame_id_1, common_list_of_name_xy_lists_1
-        )
-        pair_projected_fnxl.add_list_of_name_xy_lists(
-            frame_id_2, common_list_of_name_xy_lists_2
-        )
+        pair_projected_fnxl.add_list_of_name_xy_lists(frame_id_1, common_list_of_name_xy_lists_1)
+        pair_projected_fnxl.add_list_of_name_xy_lists(frame_id_2, common_list_of_name_xy_lists_2)
 
         # Determine whether heliostats are mismatched from key frame 1 to key frame 2.
-        if (len(common_names) == len(name_set_1)) and (
-            len(common_names) == len(name_set_2)
-        ):
+        if (len(common_names) == len(name_set_1)) and (len(common_names) == len(name_set_2)):
             mismatched = False
         else:
             mismatched = True
@@ -534,24 +444,16 @@ class KeyCorners:
             if key_frame_fnxl is not None:
                 frame_id_list = key_frame_fnxl.sorted_frame_id_list()
                 if len(frame_id_list) == 0:
-                    raise ValueError(
-                        'In KeyCorners.save_key_corners(), empty key_frame_fnxl encountered.'
-                    )
+                    raise ValueError('In KeyCorners.save_key_corners(), empty key_frame_fnxl encountered.')
                 if len(frame_id_list) != 2:
                     raise ValueError(
                         'In KeyCorners.save_key_corners(), encountered key_frame_fnxl with frames != 2.  len(frame_id_list) =',
                         len(frame_id_list),
                     )
                 frame_id = frame_id_list[0]  # Sorted, so this is the key frame.
-                frame_id_str = upf.frame_id_str_given_frame_id(
-                    frame_id, self.input_frame_id_format
-                )
-                key_frame_corners_body_ext = (
-                    self.input_video_body + '_' + frame_id_str + '_corners_fnxl.csv'
-                )
-                key_frame_corners_dir_body_ext = os.path.join(
-                    self.key_frame_corners_dir, key_frame_corners_body_ext
-                )
+                frame_id_str = upf.frame_id_str_given_frame_id(frame_id, self.input_frame_id_format)
+                key_frame_corners_body_ext = self.input_video_body + '_' + frame_id_str + '_corners_fnxl.csv'
+                key_frame_corners_dir_body_ext = os.path.join(self.key_frame_corners_dir, key_frame_corners_body_ext)
                 print(
                     'In KeyCorners.save_key_corners(), writing found frame_id key corners:              ',
                     key_frame_corners_dir_body_ext,
@@ -561,43 +463,27 @@ class KeyCorners:
     def save_data(self, all_key_frames_corners_fnxl, mismatched_key_frame_ids):
         # Statistics.
         summary_dict = {}
-        summary_dict['n_key_frames_with_corners'] = (
-            all_key_frames_corners_fnxl.number_of_frames()
-        )
+        summary_dict['n_key_frames_with_corners'] = all_key_frames_corners_fnxl.number_of_frames()
         print('In KeyCorners.save_data(), writing key frame summary statistics...')
-        ft.write_dict_file(
-            'key frame corners summary statistics',
-            self.output_data_dir,
-            self.dict_body,
-            summary_dict,
-        )
+        ft.write_dict_file('key frame corners summary statistics', self.output_data_dir, self.dict_body, summary_dict)
         # Key frames with mismatched heliostats.
         ft.write_text_file(
-            'mismatched key frame ids',
-            self.output_data_dir,
-            self.mismatched_ids_body,
-            mismatched_key_frame_ids,
+            'mismatched key frame ids', self.output_data_dir, self.mismatched_ids_body, mismatched_key_frame_ids
         )
         # Heliostats per key frame.
-        heliostats_per_key_frame_dict = (
-            all_key_frames_corners_fnxl.heliostats_per_frame()
-        )
+        heliostats_per_key_frame_dict = all_key_frames_corners_fnxl.heliostats_per_frame()
         print(
             'In KeyCorners.save_data(), writing heliostats per key frame:',
             os.path.join(self.output_data_dir, self.hpkf_body_ext),
         )
-        ft.write_dict_file(
-            None, self.output_data_dir, self.hpkf_body, heliostats_per_key_frame_dict
-        )
+        ft.write_dict_file(None, self.output_data_dir, self.hpkf_body, heliostats_per_key_frame_dict)
         # Points per key frame.
         points_per_key_frame_dict = all_key_frames_corners_fnxl.points_per_frame()
         print(
             'In KeyCorners.save_data(), writing points per key frame:    ',
             os.path.join(self.output_data_dir, self.ppkf_body_ext),
         )
-        ft.write_dict_file(
-            None, self.output_data_dir, self.ppkf_body, points_per_key_frame_dict
-        )
+        ft.write_dict_file(None, self.output_data_dir, self.ppkf_body, points_per_key_frame_dict)
 
     # LOAD RESULT
 
@@ -610,25 +496,14 @@ class KeyCorners:
         self.all_key_frames_corners_fnxl.load(self.all_key_frames_corners_dir_body_ext)
         # Confirm what was read.
         print('In KeyCorners.read_key_corners(), all-frame key corners read:')
-        self.all_key_frames_corners_fnxl.print(
-            max_keys=7, max_value_length=200, indent=4
-        )
-        print(
-            'In KeyCorners.read_key_corners(), reading found key corners directory: ',
-            self.key_frame_corners_dir,
-        )
-        key_frame_corners_body_ext_list = ft.files_in_directory(
-            self.key_frame_corners_dir
-        )
+        self.all_key_frames_corners_fnxl.print(max_keys=7, max_value_length=200, indent=4)
+        print('In KeyCorners.read_key_corners(), reading found key corners directory: ', self.key_frame_corners_dir)
+        key_frame_corners_body_ext_list = ft.files_in_directory(self.key_frame_corners_dir)
         self.list_of_key_frame_corners_dir_body_ext = []
         self.list_of_key_frame_corners_fnxls = []
         for key_frame_corners_body_ext in key_frame_corners_body_ext_list:
-            key_frame_corners_dir_body_ext = os.path.join(
-                self.key_frame_corners_dir, key_frame_corners_body_ext
-            )
-            self.list_of_key_frame_corners_dir_body_ext.append(
-                key_frame_corners_dir_body_ext
-            )
+            key_frame_corners_dir_body_ext = os.path.join(self.key_frame_corners_dir, key_frame_corners_body_ext)
+            self.list_of_key_frame_corners_dir_body_ext.append(key_frame_corners_dir_body_ext)
             print(
                 'In KeyCorners.read_key_corners(), reading found key corners file:      ',
                 key_frame_corners_dir_body_ext,
@@ -639,10 +514,7 @@ class KeyCorners:
 
     def read_data(self):
         # Statistics.
-        print(
-            'In KeyCorners.read_data(), reading frame statistics: ',
-            self.dict_dir_body_ext,
-        )
+        print('In KeyCorners.read_data(), reading frame statistics: ', self.dict_dir_body_ext)
         self.frame_statistics_dict = ft.read_dict(self.dict_dir_body_ext)
         # Confirm what was read.
         print('In KeyCorners.read_data(), frame statistics read:')
@@ -655,19 +527,13 @@ class KeyCorners:
         for key_frame_id in self.mismatched_key_frame_ids:
             print('    ', key_frame_id)
         # Heliostats per key frame.
-        print(
-            'In KeyCorners.read_data(), reading heliostats per key frame: ',
-            self.hpkf_dir_body_ext,
-        )
+        print('In KeyCorners.read_data(), reading heliostats per key frame: ', self.hpkf_dir_body_ext)
         self.hpkf_dict = ft.read_dict(self.hpkf_dir_body_ext)
         # Confirm what was read.
         print('In KeyCorners.read_data(), heliostats per key frame read:')
         dt.print_dict(self.hpkf_dict, max_keys=7, max_value_length=200, indent=4)
         # Points per key frame.
-        print(
-            'In KeyCorners.read_data(), reading points per key frame: ',
-            self.ppkf_dir_body_ext,
-        )
+        print('In KeyCorners.read_data(), reading points per key frame: ', self.ppkf_dir_body_ext)
         self.ppkf_dict = ft.read_dict(self.ppkf_dir_body_ext)
         # Confirm what was read.
         print('In KeyCorners.read_data(), points per key frame read:')
@@ -676,9 +542,7 @@ class KeyCorners:
     # RENDER RESULT
 
     def render(self):
-        if (
-            self.render_control.draw_key_corners and self.generated_key_corners
-        ):  # Don't render unless we generated.
+        if self.render_control.draw_key_corners and self.generated_key_corners:  # Don't render unless we generated.
             print('In KeyCorners.render(), rendering frames with key corners...')
             # Descriptive strings.
             title_name = 'Key Frame Corners'
@@ -687,9 +551,7 @@ class KeyCorners:
             fig_suffix = '_key_corners_fig'
             delete_suffix = '.JPG' + fig_suffix + '.png'
             # Prepare directory.
-            upc.prepare_render_directory(
-                self.output_render_dir, delete_suffix, self.render_control
-            )
+            upc.prepare_render_directory(self.output_render_dir, delete_suffix, self.render_control)
             # Setup annotation styles.
             style_dict = {}
             style_dict['point_seq'] = rcps.marker(
@@ -734,8 +596,7 @@ if __name__ == "__main__":
     )
     # Input/output sources.
     input_video_dir_body_ext = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
     )
     input_key_frames_dir_body_ext = (
         experiment_dir()
@@ -745,20 +606,15 @@ if __name__ == "__main__":
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/'
     )
-    input_frame_id_format = (
-        '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
-    )
+    input_frame_id_format = '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
     output_data_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/data/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/data/'
     )
     output_render_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/render/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/render/'
     )
     output_construction_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/140c_KeyCorners/mavic_zoom/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/140c_KeyCorners/mavic_zoom/'
     )
     # Render control.
     render_control = rckc.default()

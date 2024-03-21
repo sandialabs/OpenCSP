@@ -8,9 +8,7 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-def find_checkerboard_corners(
-    npts: tuple[int, int], img: np.ndarray
-) -> tuple[Vxyz, Vxy]:
+def find_checkerboard_corners(npts: tuple[int, int], img: np.ndarray) -> tuple[Vxyz, Vxy]:
     """
     Finds checkerboard corners in given image.
 
@@ -33,11 +31,7 @@ def find_checkerboard_corners(
 
     """
     # Find corners
-    chessboard_flags = (
-        cv.CALIB_CB_ADAPTIVE_THRESH
-        + cv.CALIB_CB_FAST_CHECK
-        + cv.CALIB_CB_NORMALIZE_IMAGE
-    )
+    chessboard_flags = cv.CALIB_CB_ADAPTIVE_THRESH + cv.CALIB_CB_FAST_CHECK + cv.CALIB_CB_NORMALIZE_IMAGE
     ret, corners = cv.findChessboardCorners(img, npts, chessboard_flags)
 
     # Check corners were found
@@ -48,9 +42,7 @@ def find_checkerboard_corners(
     p_corners = Vxy(corners[:, 0, :].T, dtype=np.float32)
 
     # Refine the corners
-    p_corners_refined = refine_checkerboard_corners(
-        img, p_corners, window_size=(11, 11)
-    )
+    p_corners_refined = refine_checkerboard_corners(img, p_corners, window_size=(11, 11))
 
     # Define object points (x,y,z) as in: (0,0,0), (1,0,0), (2,0,0), ... (6,5,0)
     objp = np.zeros((npts[0] * npts[1], 3), dtype=np.float32)
@@ -95,9 +87,7 @@ def refine_checkerboard_corners(
     return Vxy(imgpts_refined.T, dtype=np.float32)
 
 
-def annotate_found_corners(
-    npts: tuple[int, int], img: np.ndarray, img_points: Vxy
-) -> None:
+def annotate_found_corners(npts: tuple[int, int], img: np.ndarray, img_points: Vxy) -> None:
     """
     Updates an image with found checkerboard corner annotations.
 

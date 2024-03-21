@@ -49,10 +49,7 @@ class FileFingerprint(ci.CsvInterface, aff.AbstractFileFingerprint):
 
     def __lt__(self, other: 'FileFingerprint'):
         if not isinstance(other, FileFingerprint):
-            lt.error_and_raise(
-                TypeError,
-                f"'other' is not of type FileFingerprint but instead of type {type(other)}",
-            )
+            lt.error_and_raise(TypeError, f"'other' is not of type FileFingerprint but instead of type {type(other)}")
         if self.relative_path == other.relative_path:
             return self.name_ext < other.name_ext
         return self.relative_path < other.relative_path

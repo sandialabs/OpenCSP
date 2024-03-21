@@ -27,11 +27,7 @@ def robust_arccos(x: float) -> float:
     """
     if (x < (-1.0 - INVERSE_TRIG_TOLERANCE)) or (x > (1.0 + INVERSE_TRIG_TOLERANCE)):
         # TODO RCB: REPLACE THIS WITH LOG/EXCEPTION THROW.
-        print(
-            'ERROR: In robust_arccos(), input value '
-            + str(x)
-            + ' is out of valid range [-1,1].'
-        )
+        print('ERROR: In robust_arccos(), input value ' + str(x) + ' is out of valid range [-1,1].')
         assert False
     elif x < -1.0:
         return np.pi
@@ -47,11 +43,7 @@ def robust_arcsin(x: float) -> float:
     """
     if (x < (-1.0 - INVERSE_TRIG_TOLERANCE)) or (x > (1.0 + INVERSE_TRIG_TOLERANCE)):
         # TODO RCB: REPLACE THIS WITH LOG/EXCEPTION THROW.
-        print(
-            'ERROR: In robust_arcsin(), input value '
-            + str(x)
-            + ' is out of valid range [-1,1].'
-        )
+        print('ERROR: In robust_arcsin(), input value ' + str(x) + ' is out of valid range [-1,1].')
         assert False
     elif x < -1.0:
         return -(np.pi / 2.0)
@@ -108,9 +100,7 @@ def overlapping_range(
     --------
         - overlap (list[float,float]|list): The overlapping range. If there is no overlap, returns an empty list.
     """
-    if (len(range1) == 0 or len(range2) == 0) or (
-        range2[0] > range1[1] or range1[0] > range2[1]
-    ):
+    if (len(range1) == 0 or len(range2) == 0) or (range2[0] > range1[1] or range1[0] > range2[1]):
         if default is None:
             default = []
         return default
@@ -300,8 +290,7 @@ def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int
         return data
     if window_size < 1:
         lt.error_and_raise(
-            ValueError,
-            f"Error: in math_tools.rolling_average(), window_size must be >= 1, but is {window_size}",
+            ValueError, f"Error: in math_tools.rolling_average(), window_size must be >= 1, but is {window_size}"
         )
     window_size = min(window_size, len(data))
 
@@ -332,9 +321,7 @@ def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int
 
 
 @strict_types
-def lambda_symmetric_paraboloid(
-    focal_length: numbers.Number,
-) -> Callable[[float, float], float]:
+def lambda_symmetric_paraboloid(focal_length: numbers.Number) -> Callable[[float, float], float]:
     a = 1.0 / (4 * focal_length)
     return lambda x, y: a * (x**2 + y**2)
     # return FunctionXYContinuous(f"{a} * (x**2 + y**2)")

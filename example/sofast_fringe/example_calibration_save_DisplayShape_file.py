@@ -18,9 +18,7 @@ def example_save_display_shape_file():
 
     # Load screen distortion data
     file_screen_distortion_data = join(
-        opencsp_code_dir(),
-        'app/sofast/test/data/data_expected',
-        'screen_distortion_data_100_100.h5',
+        opencsp_code_dir(), 'app/sofast/test/data/data_expected', 'screen_distortion_data_100_100.h5'
     )
     datasets = ['pts_xy_screen_fraction', 'pts_xyz_screen_coords']
     data = load_hdf5_datasets(datasets, file_screen_distortion_data)
@@ -31,9 +29,7 @@ def example_save_display_shape_file():
 
     # Load rvec and tvec
     file_rvec_tvec = join(
-        opencsp_code_dir(),
-        'common/lib/deflectometry/test/data/data_expected',
-        'camera_rvec_tvec.csv',
+        opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_expected', 'camera_rvec_tvec.csv'
     )
     pose_data = np.loadtxt(file_rvec_tvec, delimiter=',')
     rvec = pose_data[0]

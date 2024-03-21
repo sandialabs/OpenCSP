@@ -17,9 +17,7 @@ def construct_blue_under_red_cross_green(
 
     Blue underlying red cross green.
     """
-    print(
-        "In construct_blue_under_red_cross_green()..."
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print("In construct_blue_under_red_cross_green()...")  # ?? SCAFFOLDING RCB -- TEMPORARY
 
     # Create an empty image.
     n_rows = ny
@@ -40,9 +38,7 @@ def construct_blue_under_red_cross_green(
             y = n_rows - row
             x_frac = x / x_max
             y_frac = y / y_max
-            diagonal_frac = np.sqrt(x * x + y * y) / np.sqrt(
-                x_max * x_max + y_max * y_max
-            )
+            diagonal_frac = np.sqrt(x * x + y * y) / np.sqrt(x_max * x_max + y_max * y_max)
             image[row, col, 0] = x_frac * max_intensity
             image[row, col, 1] = y_frac * max_intensity
             image[row, col, 2] = (1 - diagonal_frac) * max_intensity
@@ -63,9 +59,7 @@ def construct_rgb_cube_inscribed_square_image(
     the Red, Green, and Blue basis vectors, and their pairwise combinations to
     form Cyan, Magenta, and Yellow secondary vectors.
     """
-    print(
-        "In construct_rgb_cube_inscribed_square_image()..."
-    )  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print("In construct_rgb_cube_inscribed_square_image()...")  # ?? SCAFFOLDING RCB -- TEMPORARY
 
     # Create container for color vectors
     l = 0.4
@@ -81,12 +75,7 @@ def construct_rgb_cube_inscribed_square_image(
 
     # Create mask for non-valid points
     mask = (
-        (vecs[:, 0] > 1)
-        + (vecs[:, 0] < 0)
-        + (vecs[:, 1] > 1)
-        + (vecs[:, 1] < 0)
-        + (vecs[:, 2] > 1)
-        + (vecs[:, 2] < 0)
+        (vecs[:, 0] > 1) + (vecs[:, 0] < 0) + (vecs[:, 1] > 1) + (vecs[:, 1] < 0) + (vecs[:, 2] > 1) + (vecs[:, 2] < 0)
     )
 
     # Apply mask
@@ -130,12 +119,7 @@ if __name__ == "__main__":
 
     # Create mask for non-valid points
     mask = (
-        (vecs[:, 0] > 1)
-        + (vecs[:, 0] < 0)
-        + (vecs[:, 1] > 1)
-        + (vecs[:, 1] < 0)
-        + (vecs[:, 2] > 1)
-        + (vecs[:, 2] < 0)
+        (vecs[:, 0] > 1) + (vecs[:, 0] < 0) + (vecs[:, 1] > 1) + (vecs[:, 1] < 0) + (vecs[:, 2] > 1) + (vecs[:, 2] < 0)
     )
 
     # Apply mask

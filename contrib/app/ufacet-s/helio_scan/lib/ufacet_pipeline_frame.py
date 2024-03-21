@@ -42,9 +42,7 @@ def frame_id_given_frame_id_str(frame_id_str):
     return int(frame_id_str)
 
 
-def frame_file_body_ext_given_frame_id(
-    input_video_body, frame_id, input_frame_id_format
-):
+def frame_file_body_ext_given_frame_id(input_video_body, frame_id, input_frame_id_format):
     """Our extracted video file names are of the form:
        VideoFileBody.nnnnnn.JPG
     where the "nnnnnn" is a zero-padded numerical string such as "001258" and the
@@ -88,9 +86,7 @@ def frame_file_body_ext_given_frame_id_str(input_video_body: str, frame_id_str: 
     return input_video_body + '.' + frame_id_str + '.JPG'
 
 
-def frame_id_str_given_prefix_number_KeyWord_body_ext(
-    prefix_number_keyword_body_ext, keyword
-):
+def frame_id_str_given_prefix_number_KeyWord_body_ext(prefix_number_keyword_body_ext, keyword):
     # For multiple items (key corners, key frame tracks, ...), our canonical file names are of the form:
     #    VideoFileBody_nnnnnn_<keyword>_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258" and <keyword>
@@ -252,18 +248,14 @@ def frame_id_str_given_key_corners_body_ext(key_corners_body_ext):
     #    VideoFileBody_nnnnnn_corners_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
     #
-    return frame_id_str_given_prefix_number_KeyWord_body_ext(
-        key_corners_body_ext, 'corners'
-    )
+    return frame_id_str_given_prefix_number_KeyWord_body_ext(key_corners_body_ext, 'corners')
 
 
 def frame_id_given_key_corners_body_ext(key_corners_body_ext):
     # Our key corners FrameNameXyList file names are of the form:
     #    VideoFileBody_nnnnnn_corners_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
-    return frame_id_given_frame_id_str(
-        frame_id_str_given_key_corners_body_ext(key_corners_body_ext)
-    )
+    return frame_id_given_frame_id_str(frame_id_str_given_key_corners_body_ext(key_corners_body_ext))
 
 
 def frame_id_str_given_key_projected_tracks_body_ext(key_track_body_ext):
@@ -271,18 +263,14 @@ def frame_id_str_given_key_projected_tracks_body_ext(key_track_body_ext):
     #    VideoFileBody_nnnnnn_track_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
     #
-    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(
-        key_track_body_ext, 'projected', 'tracks'
-    )
+    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(key_track_body_ext, 'projected', 'tracks')
 
 
 def frame_id_given_key_projected_tracks_body_ext(key_track_body_ext):
     # Our key frame track FrameNameXyList file names are of the form:
     #    VideoFileBody_nnnnnn_track_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
-    return frame_id_given_frame_id_str(
-        frame_id_str_given_key_projected_tracks_body_ext(key_track_body_ext)
-    )
+    return frame_id_given_frame_id_str(frame_id_str_given_key_projected_tracks_body_ext(key_track_body_ext))
 
 
 def frame_id_str_given_key_confirmed_tracks_body_ext(key_track_body_ext):
@@ -290,18 +278,14 @@ def frame_id_str_given_key_confirmed_tracks_body_ext(key_track_body_ext):
     #    VideoFileBody_nnnnnn_track_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
     #
-    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(
-        key_track_body_ext, 'confirmed', 'tracks'
-    )
+    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(key_track_body_ext, 'confirmed', 'tracks')
 
 
 def frame_id_given_key_confirmed_tracks_body_ext(key_track_body_ext):
     # Our key frame track FrameNameXyList file names are of the form:
     #    VideoFileBody_nnnnnn_track_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
-    return frame_id_given_frame_id_str(
-        frame_id_str_given_key_confirmed_tracks_body_ext(key_track_body_ext)
-    )
+    return frame_id_given_frame_id_str(frame_id_str_given_key_confirmed_tracks_body_ext(key_track_body_ext))
 
 
 def frame_id_str_given_frame_file_body_ext(frame_file_body_ext):
@@ -340,17 +324,11 @@ def frame_id_given_frame_file_body_ext(frame_file_body_ext):
     # Our extracted video file names are of the form:
     #    VideoFileBody.nnnnnn.JPG
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
-    return frame_id_given_frame_id_str(
-        frame_id_str_given_frame_file_body_ext(frame_file_body_ext)
-    )
+    return frame_id_given_frame_id_str(frame_id_str_given_frame_file_body_ext(frame_file_body_ext))
 
 
 def draw_example_frame(
-    input_full_frame_dir,
-    input_frame_file,
-    output_render_dir,
-    render_control,
-    include_figure_idx_in_filename=False,
+    input_full_frame_dir, input_frame_file, output_render_dir, render_control, include_figure_idx_in_filename=False
 ):
     # Load frame.
     input_dir_body_ext = os.path.join(
@@ -406,9 +384,7 @@ def draw_example_frames(
         # Create sample frame figures.
         if len(sample_idx_list) > 0:
             # Prepare directory.
-            upc.prepare_render_directory(
-                output_render_dir, delete_suffix, render_control
-            )
+            upc.prepare_render_directory(output_render_dir, delete_suffix, render_control)
 
             # Draw example frames.
             for sample_idx in sample_idx_list:
