@@ -158,7 +158,7 @@ class TestCameraCalibration:
     def test_calibration_error(self):
         np.testing.assert_allclose(self.calibration_error, self.calibration_error_exp)
 
-    def reprojection_errors(self):
+    def test_reprojection_errors(self):
         np.testing.assert_allclose(
             self.reprojection_errors, self.reprojection_errors_exp
         )
