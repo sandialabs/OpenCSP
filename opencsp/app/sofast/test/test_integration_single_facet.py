@@ -12,6 +12,7 @@ from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
@@ -55,6 +56,7 @@ class TestSingle(unittest.TestCase):
         for file_dataset in cls.files_dataset:
             # Load display
             camera = Camera.load_from_hdf(file_dataset)
+            orientation = SpatialOrientation.load_from_hdf(file_dataset)
             calibration = ImageCalibrationScaling.load_from_hdf(file_dataset)
             display = Display.load_from_hdf(file_dataset)
 
@@ -111,7 +113,7 @@ class TestSingle(unittest.TestCase):
             params = load_hdf5_datasets(datasets, file_dataset)
 
             # Instantiate sofast object
-            sofast = Sofast(measurement, camera, display)
+            sofast = Sofast(measurement, orientation, camera, display)
 
             # Update parameters
             sofast.params.mask_hist_thresh = params['mask_hist_thresh']
