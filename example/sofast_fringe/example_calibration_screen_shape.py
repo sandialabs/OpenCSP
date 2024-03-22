@@ -27,7 +27,7 @@ def example_run_screen_shape_calibration(save_dir):
     corner_ids = pts_marker_data[:, 1]
 
     # Define desired resolution of screen sample grid
-    resolution_xy = [100, 100]
+    resolution_xy = [20, 20]
 
     # Define directory where screen shape calibration data is saved
     base_dir_sofast_cal = join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement')
@@ -37,6 +37,7 @@ def example_run_screen_shape_calibration(save_dir):
     file_camera_distortion = join(base_dir_sofast_cal, 'camera_screen_shape.h5')
     file_image_projection = join(base_dir_sofast_cal, 'image_projection.h5')
     files_screen_shape_measurement = glob(join(base_dir_sofast_cal, 'screen_shape_sofast_measurements/pose_*.h5'))
+    files_screen_shape_measurement.sort()
 
     # Load input data
     camera = Camera.load_from_hdf(file_camera_distortion)
@@ -52,6 +53,7 @@ def example_run_screen_shape_calibration(save_dir):
         camera,
         image_projection_data,
         [MeasurementSofastFringe.load_from_hdf(f) for f in files_screen_shape_measurement],
+        ray_intersection_threshold=0.1
     )
 
     # Perform screen shape calibration
