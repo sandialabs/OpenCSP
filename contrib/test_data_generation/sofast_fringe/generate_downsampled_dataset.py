@@ -31,11 +31,8 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
     # Copy files that don't need downsampling
     print('Copying files with no downsampling...')
     files = [
-        "camera_sofast.h5",
         "screen_calibration_point_pairs.csv",
         "image_projection.h5",
-        "image_sofast_camera.png",
-        "point_locations.csv",
     ]
     for file in files:
         shutil.copy(join(dir_input, file), join(dir_output, file))
@@ -70,7 +67,7 @@ if __name__ == '__main__':
     downsample_dataset(
         dir_input=join(
             opencsp_code_dir(),
-            '../../sample_data/sofast/data_photogrammetric_calibration/data_measurement',
+            '../../sample_data/deflectometry/calibration_screen_shape_photogrammetric/data_measurement',
         ),
-        dir_output=join(opencsp_code_dir, 'test/data/measurements_sofast_fringe'),
+        dir_output=join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement'),
     )
