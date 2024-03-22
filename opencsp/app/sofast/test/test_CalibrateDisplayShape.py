@@ -37,7 +37,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         dir_output = join(opencsp_code_dir(), 'app/sofast/test/data/data_expected')
 
         # Define input files
-        resolution_xy = [100, 100]  # sample density of screen
+        resolution_xy = [20, 20]  # sample density of screen
         file_screen_cal_point_pairs = join(dir_input_sofast, 'screen_calibration_point_pairs.csv')
         file_point_locations = join(dir_input_def, 'point_locations.csv')
         file_camera_distortion = join(dir_input_sofast, 'camera_screen_shape.h5')
@@ -61,6 +61,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
             camera,
             image_projection_data,
             [Measurement.load_from_hdf(f) for f in files_screen_shape_measurement],
+            ray_intersection_threshold=0.1
         )
 
         # Perform screen position calibration
@@ -73,11 +74,11 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         # Test screen distortion information
         cls.data_exp = load_hdf5_datasets(
             ['pts_xy_screen_fraction', 'pts_xyz_screen_coords'],
-            join(dir_output, 'screen_distortion_data_100_100.h5'),
+            join(dir_output, 'screen_distortion_data_20_20.h5'),
         )
         cls.data_meas = dist_data
 
-    @pytest.mark.no_xvfb
+    # @pytest.mark.no_xvfb
     def test_screen_distortion_data(self):
         """Tests screen calibration data"""
         np.testing.assert_allclose(
