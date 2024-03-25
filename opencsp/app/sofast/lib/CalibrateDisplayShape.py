@@ -339,8 +339,7 @@ class CalibrateDisplayShape:
         return {'xy_screen_fraction': pts_xy_screen_fraction, 'xyz_screen_coords': pts_xyz_screen}
 
     def as_DisplayShape(self, name: str) -> DisplayShape:
-        """Saves data to DisplayShape hdf file using the distorted3d model, see
-        DisplayShape documentation for more information.
+        """Returns calibrated DisplayShape object.
 
         Parameters
         ----------
