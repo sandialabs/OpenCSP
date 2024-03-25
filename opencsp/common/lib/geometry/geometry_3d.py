@@ -12,9 +12,7 @@ import scipy.linalg as sla
 from warnings import warn
 
 
-def direction_uxyz_given_azimuth_elevation(
-    azimuth: float, elevation: float
-):  # Both radians.
+def direction_uxyz_given_azimuth_elevation(azimuth: float, elevation: float):  # Both radians.
     warn(
         'geometry_3d.direction_uxyz_given_azimuth_elevation is deprecated. This function should be migrated to another library.',
         DeprecationWarning,
@@ -54,9 +52,7 @@ def distance_between_xyz_points(xyz_1, xyz_2):
 
 def vector_3d_cross_product(vxyz_1, vxyz_2):
     warn(
-        'geometry_3d.vector_3d_cross_product is deprecated. Use Vxyz.cross() instead.',
-        DeprecationWarning,
-        stacklevel=2,
+        'geometry_3d.vector_3d_cross_product is deprecated. Use Vxyz.cross() instead.', DeprecationWarning, stacklevel=2
     )
     return list(
         np.cross(np.array(vxyz_1), np.array(vxyz_2))
@@ -64,19 +60,13 @@ def vector_3d_cross_product(vxyz_1, vxyz_2):
 
 
 def vector_3d_norm(vxyz):
-    warn(
-        'geometry_3d.vector_3d_norm is deprecated. Use Vxyz.magnitude() instead.',
-        DeprecationWarning,
-        stacklevel=2,
-    )
+    warn('geometry_3d.vector_3d_norm is deprecated. Use Vxyz.magnitude() instead.', DeprecationWarning, stacklevel=2)
     return np.sqrt(vxyz[0] ** 2 + vxyz[1] ** 2 + vxyz[2] ** 2)
 
 
 def normalize_vector_3d(vxyz):
     warn(
-        'geometry_3d.normalize_vector_3d is deprecated. Use Vxyz.normalize() instead.',
-        DeprecationWarning,
-        stacklevel=2,
+        'geometry_3d.normalize_vector_3d is deprecated. Use Vxyz.normalize() instead.', DeprecationWarning, stacklevel=2
     )
     norm = vector_3d_norm(vxyz)
     return [vxyz[0] / norm, vxyz[1] / norm, vxyz[2] / norm]
@@ -232,14 +222,8 @@ def construct_line_3d_given_two_points(
     y2 = xyz_2[1]
     z2 = xyz_2[2]
     # Check input.
-    if (
-        (abs(x1 - x2) <= tolerance)
-        and (abs(y1 - y2) <= tolerance)
-        and (abs(z1 - z2) <= tolerance)
-    ):
-        print(
-            'ERROR: In construct_line_3d_given_two_points(), degenerate point pair encountered.'
-        )
+    if (abs(x1 - x2) <= tolerance) and (abs(y1 - y2) <= tolerance) and (abs(z1 - z2) <= tolerance):
+        print('ERROR: In construct_line_3d_given_two_points(), degenerate point pair encountered.')
         assert False
     # Compute attributes.
     length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
@@ -257,29 +241,19 @@ def construct_line_3d_given_two_points(
     line_3d['xyz_1'] = xyz_1  # First example point.
     line_3d['xyz_2'] = xyz_2  # Second example point.
     line_3d['length'] = length  # Euclidean distance between example points.
-    line_3d['length_xy'] = (
-        length_xy  # Euclidean distance between example points, projected onto the xy plane.
-    )
+    line_3d['length_xy'] = length_xy  # Euclidean distance between example points, projected onto the xy plane.
     line_3d['mid_xyz'] = mid_xyz  # Point midway between the two example points.
-    line_3d['vxyz'] = (
-        vxyz  # Vector pointing from first example point to second example point.
-    )
-    line_3d['uxyz'] = (
-        uxyz  # Unit vector pointing from first example point to second example point.
-    )
+    line_3d['vxyz'] = vxyz  # Vector pointing from first example point to second example point.
+    line_3d['uxyz'] = uxyz  # Unit vector pointing from first example point to second example point.
     line_3d['theta'] = (
         theta  # Angle the line points, after projecting onto the xy plane, measured ccw about the z axis.
     )
-    line_3d['eta'] = (
-        eta  # Angle the line points above the xy plane (negative values indicate below the xy plane).
-    )
+    line_3d['eta'] = eta  # Angle the line points above the xy plane (negative values indicate below the xy plane).
     # Return.
     return line_3d
 
 
-def closest_point_on_line_3d(
-    xyz, line_3d
-):  # ?? SCAFFOLDING RCB -- THE 3-D LINE SHOULD BE A CLASS.
+def closest_point_on_line_3d(xyz, line_3d):  # ?? SCAFFOLDING RCB -- THE 3-D LINE SHOULD BE A CLASS.
     """
     Returns the point on the infinite 3d line that is closest to the given point.
     """
@@ -306,9 +280,7 @@ def closest_point_on_line_3d(
     # Because (v1 dot v2) = |v1|*|v2|*cos(theta), where theta is the angle betwe the vectors,
     # and because uxyz is a unit vector, the dot product is the signed distance along the line,
     # measured from the mid point.
-    signed_distance_along_line = (
-        (ux * mid_to_xyz_x) + (uy * mid_to_xyz_y) + (uz * mid_to_xyz_z)
-    )
+    signed_distance_along_line = (ux * mid_to_xyz_x) + (uy * mid_to_xyz_y) + (uz * mid_to_xyz_z)
     # Construct the closest point.
     closest_x = mid_x + (ux * signed_distance_along_line)
     closest_y = mid_y + (uy * signed_distance_along_line)
@@ -318,9 +290,7 @@ def closest_point_on_line_3d(
     return closest_xyz
 
 
-def distance_to_line_3d(
-    xyz, line_3d
-):  # ?? SCAFFOLDING RCB -- THE 3-D LINE SHOULD BE A CLASS.
+def distance_to_line_3d(xyz, line_3d):  # ?? SCAFFOLDING RCB -- THE 3-D LINE SHOULD BE A CLASS.
     """
     Returns the shortest distance from the given point to the infinite 3-d line.
     """

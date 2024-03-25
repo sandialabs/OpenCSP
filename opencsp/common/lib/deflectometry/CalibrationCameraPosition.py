@@ -30,11 +30,7 @@ class CalibrationCameraPosition:
     """
 
     def __init__(
-        self,
-        camera: Camera,
-        pts_xyz_corners: Vxyz,
-        ids_corners: ndarray,
-        cal_image: ndarray,
+        self, camera: Camera, pts_xyz_corners: Vxyz, ids_corners: ndarray, cal_image: ndarray
     ) -> 'CalibrationCameraPosition':
         """Instantiates class
 
@@ -83,10 +79,8 @@ class CalibrationCameraPosition:
             # Get index of current marker
             index = ids_corners_list.index(marker_id * 4)
             # Extract calibrated corner locations (4 corners per marker)
-            self.pts_xyz_active_corner_locations = (
-                self.pts_xyz_active_corner_locations.concatenate(
-                    self.pts_xyz_corners[index : index + 4]
-                )
+            self.pts_xyz_active_corner_locations = self.pts_xyz_active_corner_locations.concatenate(
+                self.pts_xyz_corners[index : index + 4]
             )
 
     def calculate_camera_pose(self) -> None:
@@ -96,10 +90,7 @@ class CalibrationCameraPosition:
 
         # Calculate rvec/tvec
         ret, rvec, tvec = cv.solvePnP(
-            self.pts_xyz_active_corner_locations.data.T,
-            pts_img,
-            self.camera.intrinsic_mat,
-            self.camera.distortion_coef,
+            self.pts_xyz_active_corner_locations.data.T, pts_img, self.camera.intrinsic_mat, self.camera.distortion_coef
         )
         if not ret:
             raise ValueError('Camera calibration was not successful.')
@@ -109,9 +100,7 @@ class CalibrationCameraPosition:
 
         self.rot_screen_cam = Rotation.from_rotvec(rvec)
         self.v_cam_screen_cam = Vxyz(tvec)
-        self.v_cam_screen_screen = self.v_cam_screen_cam.rotate(
-            self.rot_screen_cam.inv()
-        )
+        self.v_cam_screen_screen = self.v_cam_screen_cam.rotate(self.rot_screen_cam.inv())
 
         lt.info('Camera pose calculated:')
         lt.info(f'rvec: {self.rot_screen_cam.as_rotvec()}')
@@ -143,9 +132,7 @@ class CalibrationCameraPosition:
         """Calculates reprojection error"""
         # Project points
         self.pts_xy_marker_corners_reprojected = self.camera.project(
-            self.pts_xyz_active_corner_locations,
-            self.rot_screen_cam,
-            self.v_cam_screen_cam,
+            self.pts_xyz_active_corner_locations, self.rot_screen_cam, self.v_cam_screen_cam
         )
 
         # Calculate errors
@@ -178,24 +165,11 @@ class CalibrationCameraPosition:
         pts_img = np.vstack(self.pts_xy_marker_corners_list)
 
         ax.imshow(self.image, cmap='gray')
-        ax.scatter(
-            *pts_img.T, edgecolor='green', facecolor='none', label='Image Points'
-        )
-        ax.scatter(
-            *self.pts_xy_marker_corners_reprojected.data,
-            marker='.',
-            color='blue',
-            label='Reprojected',
-        )
+        ax.scatter(*pts_img.T, edgecolor='green', facecolor='none', label='Image Points')
+        ax.scatter(*self.pts_xy_marker_corners_reprojected.data, marker='.', color='blue', label='Reprojected')
         dx = self.errors_reprojection_xy.x
         dy = -self.errors_reprojection_xy.y
-        ax.quiver(
-            *self.pts_xy_marker_corners_reprojected.data,
-            dx,
-            dy,
-            label='Error',
-            color='red',
-        )
+        ax.quiver(*self.pts_xy_marker_corners_reprojected.data, dx, dy, label='Error', color='red')
         ax.legend()
         ax.axis('off')
 

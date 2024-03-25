@@ -29,26 +29,16 @@ class ExtractedFrames:
     ):  # Flags to control rendering on this run.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError(
-                'In ExtractedFrames.__init__(), null input_video_dir_body_ext encountered.'
-            )
+            raise ValueError('In ExtractedFrames.__init__(), null input_video_dir_body_ext encountered.')
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError(
-                'In ExtractedFrames.__init__(), null output_data_dir encountered.'
-            )
+            raise ValueError('In ExtractedFrames.__init__(), null output_data_dir encountered.')
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError(
-                'In ExtractedFrames.__init__(), null output_render_dir encountered.'
-            )
+            raise ValueError('In ExtractedFrames.__init__(), null output_render_dir encountered.')
         if (output_frame_dir == None) or (len(output_frame_dir) == 0):
-            raise ValueError(
-                'In ExtractedFrames.__init__(), null output_frame_dir encountered.'
-            )
+            raise ValueError('In ExtractedFrames.__init__(), null output_frame_dir encountered.')
 
         # Parse input video path components.
-        input_video_dir, input_video_body, input_video_ext = ft.path_components(
-            input_video_dir_body_ext
-        )
+        input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
 
         # Store input.
         self.input_video_dir_body_ext = input_video_dir_body_ext
@@ -82,14 +72,10 @@ class ExtractedFrames:
 
         # Check if frames are already extracted.
         if ft.directory_is_empty(self.output_frame_dir):
-            print(
-                'In ExtractedFrames.extract_frames_and_write_data(), extracting frames...'
-            )
+            print('In ExtractedFrames.extract_frames_and_write_data(), extracting frames...')
             # Extract the frames.
             n_frames = vm.extract_frames(
-                self.input_video_dir_body_ext,
-                self.output_frame_dir,
-                self.output_frame_id_format,
+                self.input_video_dir_body_ext, self.output_frame_dir, self.output_frame_id_format
             )
 
             # Write the summary information.
@@ -97,9 +83,7 @@ class ExtractedFrames:
             ft.create_directories_if_necessary(self.output_data_dir)
             summary_dict = {}
             summary_dict['n_frames_maybe_duplicates'] = n_frames
-            print(
-                'In ExtractedFrames.extract_frames_and_write_data(), writing frame summary statistics...'
-            )
+            print('In ExtractedFrames.extract_frames_and_write_data(), writing frame summary statistics...')
             ft.write_dict_file(
                 'frame summary statistics (possibly includes duplicates)',
                 self.output_data_dir,
@@ -109,10 +93,7 @@ class ExtractedFrames:
 
     # LOAD RESULT
     def read_data(self):
-        print(
-            'In ExtractedFrames.read_data(), reading frame statistics: ',
-            self.dict_dir_body_ext,
-        )
+        print('In ExtractedFrames.read_data(), reading frame statistics: ', self.dict_dir_body_ext)
         self.frame_statistics_dict = ft.read_dict(self.dict_dir_body_ext)
 
     # RENDER RESULT
@@ -134,12 +115,10 @@ class ExtractedFrames:
 
 if __name__ == "__main__":
     input_video_dir_body_ext = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
     )
     output_data_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/070_ExtractedFrames/mavic_zoom/data/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/070_ExtractedFrames/mavic_zoom/data/'
     )
     output_render_dir = (
         experiment_dir()

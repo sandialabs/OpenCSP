@@ -9,9 +9,7 @@ from numpy import ndarray
 import numpy as np
 
 from opencsp.app.sofast.lib.Fringes import Fringes
-from opencsp.app.sofast.lib.MeasurementSofastFringe import (
-    MeasurementSofastFringe as Measurement,
-)
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -38,16 +36,12 @@ class SystemSofastFringe:
         self.root = image_projection.root
 
         self.image_projection = image_projection
-        if isinstance(image_acquisition, list) and isinstance(
-            image_acquisition[0], ImageAcquisitionAbstract
-        ):
+        if isinstance(image_acquisition, list) and isinstance(image_acquisition[0], ImageAcquisitionAbstract):
             self.image_acquisition = image_acquisition
         elif isinstance(image_acquisition, ImageAcquisitionAbstract):
             self.image_acquisition = [image_acquisition]
         else:
-            raise TypeError(
-                f'ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.'
-            )
+            raise TypeError(f'ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.')
 
         # Show crosshairs
         self.image_projection.show_crosshairs()
@@ -121,10 +115,7 @@ class SystemSofastFringe:
         self.mask_images_to_display.append(array)
 
     def _measure_sequence_display(
-        self,
-        im_disp_list: list,
-        im_cap_list: list[list[ndarray]],
-        run_next: Callable | None = None,
+        self, im_disp_list: list, im_cap_list: list[list[ndarray]], run_next: Callable | None = None
     ) -> None:
         """
         Displays next image in sequence, waits, then captures frame from camera
@@ -150,10 +141,7 @@ class SystemSofastFringe:
         )
 
     def _measure_sequence_capture(
-        self,
-        im_disp_list: list,
-        im_cap_list: list[list],
-        run_next: Callable | None = None,
+        self, im_disp_list: list, im_cap_list: list[list], run_next: Callable | None = None
     ) -> None:
         """
         Captures image from camera. If more images to display, loops to
@@ -185,12 +173,7 @@ class SystemSofastFringe:
 
         if len(im_cap_list[0]) < len(im_disp_list):
             # Display next image if not finished
-            self.root.after(
-                10,
-                lambda: self._measure_sequence_display(
-                    im_disp_list, im_cap_list, run_next
-                ),
-            )
+            self.root.after(10, lambda: self._measure_sequence_display(im_disp_list, im_cap_list, run_next))
         elif run_next is not None:
             # Run next operation if finished
             run_next()
@@ -211,10 +194,7 @@ class SystemSofastFringe:
         self.fringes = fringes
 
         # Get fringe range
-        fringe_range = (
-            min_display_value,
-            self.image_projection.display_data['projector_max_int'],
-        )
+        fringe_range = (min_display_value, self.image_projection.display_data['projector_max_int'])
 
         # Get fringe base images
         fringe_images_base = fringes.get_frames(
@@ -228,13 +208,9 @@ class SystemSofastFringe:
         self.fringe_images_to_display = []
         for idx in range(fringe_images_base.shape[2]):
             # Create image
-            self.fringe_images_to_display.append(
-                np.concatenate([fringe_images_base[:, :, idx : idx + 1]] * 3, axis=2)
-            )
+            self.fringe_images_to_display.append(np.concatenate([fringe_images_base[:, :, idx : idx + 1]] * 3, axis=2))
 
-    def check_saturation(
-        self, image: ndarray, camera_max_int: int, thresh: float = 0.005
-    ) -> None:
+    def check_saturation(self, image: ndarray, camera_max_int: int, thresh: float = 0.005) -> None:
         """
         Checks if input image is saturated. Gives warning if image is saturated
         above given threshold.
@@ -275,9 +251,7 @@ class SystemSofastFringe:
             self.mask_images_captured.append([])
 
         # Start capturing images
-        self._measure_sequence_display(
-            self.mask_images_to_display, self.mask_images_captured, run_next
-        )
+        self._measure_sequence_display(self.mask_images_to_display, self.mask_images_captured, run_next)
 
     def capture_fringe_images(self, run_next: Callable | None = None) -> None:
         """
@@ -301,9 +275,7 @@ class SystemSofastFringe:
             self.fringe_images_captured.append([])
 
         # Start capturing images
-        self._measure_sequence_display(
-            self.fringe_images_to_display, self.fringe_images_captured, run_next
-        )
+        self._measure_sequence_display(self.fringe_images_to_display, self.fringe_images_captured, run_next)
 
     def capture_mask_and_fringe_images(self, run_next: Callable | None = None) -> None:
         """
@@ -330,9 +302,7 @@ class SystemSofastFringe:
         # Capture mask images, then capture fringe images, then run_next
         self.capture_mask_images(run_after_capture)
 
-    def run_display_camera_response_calibration(
-        self, res: int = 10, run_next: Callable | None = None
-    ) -> None:
+    def run_display_camera_response_calibration(self, res: int = 10, run_next: Callable | None = None) -> None:
         """
         Calculates camera-projector response data. Data is saved in
         calibration_display_values and calibration_images.
@@ -348,10 +318,7 @@ class SystemSofastFringe:
         """
         # Generate grayscale values
         self.calibration_display_values = np.arange(
-            0,
-            self.image_projection.max_int + 1,
-            res,
-            dtype=self.image_projection.display_data['projector_data_type'],
+            0, self.image_projection.max_int + 1, res, dtype=self.image_projection.display_data['projector_data_type']
         )
         if self.calibration_display_values[-1] != self.image_projection.max_int:
             self.calibration_display_values = np.concatenate(
@@ -375,9 +342,7 @@ class SystemSofastFringe:
         self.calibration_images = []
         for _ in range(len(self.image_acquisition)):
             self.calibration_images.append([])
-        self._measure_sequence_display(
-            cal_images_display, self.calibration_images, run_next
-        )
+        self._measure_sequence_display(cal_images_display, self.calibration_images, run_next)
 
     def run_camera_exposure_calibration(self, run_next: Callable | None = None) -> None:
         """
@@ -401,9 +366,7 @@ class SystemSofastFringe:
                 run_next()
 
         # Set displayed image to white and calibrate exposure
-        self.image_projection.display_image_in_active_area(
-            self.mask_images_to_display[1]
-        )
+        self.image_projection.display_image_in_active_area(self.mask_images_to_display[1])
         self.root.after(100, run_cal)
 
     def get_calibration_images(self) -> list[ndarray]:
@@ -424,9 +387,7 @@ class SystemSofastFringe:
             images.append(np.concatenate(ims, axis=2))
         return images
 
-    def get_measurements(
-        self, v_measure_point: Vxyz, optic_screen_dist: float, name: str
-    ) -> list[Measurement]:
+    def get_measurements(self, v_measure_point: Vxyz, optic_screen_dist: float, name: str) -> list[Measurement]:
         """
         Returns measurement object once mask and fringe images have been
         captured.
@@ -453,9 +414,7 @@ class SystemSofastFringe:
             raise ValueError('Mask images have not been captured.')
 
         measurements = []
-        for fringe_images, mask_images in zip(
-            self.fringe_images_captured, self.mask_images_captured
-        ):
+        for fringe_images, mask_images in zip(self.fringe_images_captured, self.mask_images_captured):
             # Create measurement object
             kwargs = dict(
                 fringe_periods_x=np.array(self.fringes.periods_x),

@@ -17,8 +17,7 @@ def example_project_fixed_pattern():
     """Projects fixed pattern image on display"""
     # Set pattern parameters
     file_image_projection = join(
-        opencsp_code_dir(),
-        "test/data/measurements_sofast_fringe/general/Image_Projection_test.h5",
+        opencsp_code_dir(), "test/data/measurements_sofast_fringe/general/Image_Projection_test.h5"
     )
     width_pattern = 3
     spacing_pattern = 6
@@ -26,9 +25,7 @@ def example_project_fixed_pattern():
     # Load ImageProjection
     im_proj = ImageProjection.load_from_hdf_and_display(file_image_projection)
 
-    fixed_pattern = SystemSofastFixed(
-        im_proj.size_x, im_proj.size_y, width_pattern, spacing_pattern
-    )
+    fixed_pattern = SystemSofastFixed(im_proj.size_x, im_proj.size_y, width_pattern, spacing_pattern)
     image = fixed_pattern.get_image('uint8', 255, 'square')
 
     # Project image

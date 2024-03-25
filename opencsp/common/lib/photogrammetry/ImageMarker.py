@@ -24,14 +24,7 @@ class ImageMarker:
     """Class to hold images of Aruco markers. Contains methods
     to process locations of Aruco markers."""
 
-    def __init__(
-        self,
-        image: ndarray,
-        point_ids: ndarray[int],
-        pts_im_xy: ndarray,
-        img_id: int,
-        camera: Camera,
-    ):
+    def __init__(self, image: ndarray, point_ids: ndarray[int], pts_im_xy: ndarray, img_id: int, camera: Camera):
         """
         Instantiates ImageMarker class.
 
@@ -80,27 +73,17 @@ class ImageMarker:
         """Plots captured image with image point and reprojected point locations"""
         # Calculate reprojected points
         pts_obj_known = self.pts_obj_xyz[self.located_markers_mask]
-        pts_reproj = self.camera.project_mat(
-            pts_obj_known, self.rvec, self.tvec
-        )  # Nx2 points
+        pts_reproj = self.camera.project_mat(pts_obj_known, self.rvec, self.tvec)  # Nx2 points
 
         # Plot
         ax = plt.axes()
         ax.imshow(self.image)
-        ax.scatter(
-            *pts_reproj.T,
-            marker='o',
-            facecolor='none',
-            edgecolor='red',
-            label='Reprojected',
-        )
+        ax.scatter(*pts_reproj.T, marker='o', facecolor='none', edgecolor='red', label='Reprojected')
         ax.scatter(*self.pts_im_xy.T, marker='.', color='blue', label='Image points')
         ax.legend()
 
     @classmethod
-    def load_aruco_origin(
-        cls, file: str, img_id: int, camera: Camera, **kwargs
-    ) -> 'ImageMarker':
+    def load_aruco_origin(cls, file: str, img_id: int, camera: Camera, **kwargs) -> 'ImageMarker':
         """Loads an image file, finds Aruco markers, saves the origin point.
 
         Parameters
@@ -151,9 +134,7 @@ class ImageMarker:
         self.pts_im_xy = pts_im_xy
 
         mask = np.array([1, 0, 0, 0] * num_markers)
-        self.located_markers_mask = (
-            np.repeat(self.located_markers_mask, 4) * mask
-        ).astype(bool)
+        self.located_markers_mask = (np.repeat(self.located_markers_mask, 4) * mask).astype(bool)
 
         mask = np.array([1, np.nan, np.nan, np.nan] * num_markers)
         self.pts_obj_xyz = np.repeat(self.pts_obj_xyz, 4, axis=0) * mask[:, None]
@@ -180,9 +161,7 @@ class ImageMarker:
         pts_img = self.located_marker_points_image
 
         # Use SolvePNP
-        ret, rvec, tvec = cv.solvePnP(
-            pts_obj, pts_img, self.camera.intrinsic_mat, self.camera.distortion_coef
-        )
+        ret, rvec, tvec = cv.solvePnP(pts_obj, pts_img, self.camera.intrinsic_mat, self.camera.distortion_coef)
         rvec: ndarray = rvec.squeeze()
         tvec: ndarray = tvec.squeeze()
 
@@ -193,8 +172,7 @@ class ImageMarker:
         lt.debug(f'Camera pose {self.img_id:d} solved')
 
         # Check if pose is valid
-        valid = ph.valid_camera_pose(
-            self.camera, rvec, tvec, pts_img, pts_obj)
+        valid = ph.valid_camera_pose(self.camera, rvec, tvec, pts_img, pts_obj)
         if not valid:
             lt.debug(f'Camera pose {self.img_id:d} not valid')
             return -1
@@ -303,6 +281,4 @@ class ImageMarker:
         pts_world = self.pts_obj_xyz[self.located_markers_mask]  # Nx3
         pts_im_reproj = self.camera.project_mat(pts_world, self.rvec, self.tvec)
         # Calculate error
-        return np.sqrt(
-            np.sum((self.pts_im_xy[self.located_markers_mask] - pts_im_reproj) ** 2, 1)
-        )
+        return np.sqrt(np.sum((self.pts_im_xy[self.located_markers_mask] - pts_im_reproj) ** 2, 1))

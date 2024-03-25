@@ -101,10 +101,7 @@ class OpticalFlow:
 
         if st.is_production_run():
             if cache:
-                lt.error_and_raise(
-                    ValueError,
-                    "OpticalFlow(cache=True) should not be used in production code!",
-                )
+                lt.error_and_raise(ValueError, "OpticalFlow(cache=True) should not be used in production code!")
 
     def clear_cache(self):
         if ft.directory_exists(self._cache_dir):
@@ -164,9 +161,7 @@ class OpticalFlow:
                     ft.delete_file(cache_dat_file, error_on_not_exists=False)
             else:
                 cache_txt_file_down = os.path.join(self._cache_dir, f"cache{i+1}.txt")
-                cache_dat_file_down = os.path.join(
-                    self._cache_dir, f"cache{i+1}.pickle"
-                )
+                cache_dat_file_down = os.path.join(self._cache_dir, f"cache{i+1}.pickle")
                 if ft.file_exists(cache_txt_file):
                     shutil.move(cache_txt_file, cache_txt_file_down)
                     shutil.move(cache_dat_file, cache_dat_file_down)
@@ -229,9 +224,7 @@ class OpticalFlow:
             - np.ndarray: self.mag, the magnitude of the flow per pixel (pixels)
             - np.ndarray: self.ang, the direction of the flow per pixel (radians, 0 to the right, positive counter-clockwise)
         """
-        if (
-            self._mag is None
-        ):  # use "is", with "==" numpy does an element-wise comparison
+        if self._mag is None:  # use "is", with "==" numpy does an element-wise comparison
             if not self._load_from_cache():
                 # load the images
                 frame1 = self._load_image(1)
@@ -350,9 +343,7 @@ class OpticalFlow:
         # HSV range is 0-179 (H), 0-255 (S), 0-255 (V)
         # https://docs.opencv.org/3.4/df/d9d/tutorial_py_colorspaces.html
         if not isinstance(self.mag, np.ndarray):
-            raise RuntimeError(
-                "Error: in OpticalFlow.to_img: self.mag is not an np.ndarray, must call dense() first!"
-            )
+            raise RuntimeError("Error: in OpticalFlow.to_img: self.mag is not an np.ndarray, must call dense() first!")
 
         h, w = self.mag.shape
         hsv = np.zeros(shape=(h, w, 3), dtype=np.uint8)
@@ -462,32 +453,16 @@ class OpticalFlow:
         fig_record.view.draw_image(square_rgb)
 
         fig_record.view.draw_pq_text(
-            (1, 0.5),
-            "0",
-            style=rct.RenderControlText(
-                color='k', fontsize=20, horizontalalignment='right'
-            ),
+            (1, 0.5), "0", style=rct.RenderControlText(color='k', fontsize=20, horizontalalignment='right')
         )
         fig_record.view.draw_pq_text(
-            (0.5, 1),
-            "π/2",
-            style=rct.RenderControlText(
-                color='k', fontsize=20, verticalalignment='top'
-            ),
+            (0.5, 1), "π/2", style=rct.RenderControlText(color='k', fontsize=20, verticalalignment='top')
         )
         fig_record.view.draw_pq_text(
-            (0, 0.5),
-            "π",
-            style=rct.RenderControlText(
-                color='k', fontsize=20, horizontalalignment='left'
-            ),
+            (0, 0.5), "π", style=rct.RenderControlText(color='k', fontsize=20, horizontalalignment='left')
         )
         fig_record.view.draw_pq_text(
-            (0.5, 0),
-            "3π/2",
-            style=rct.RenderControlText(
-                color='k', fontsize=20, verticalalignment='bottom'
-            ),
+            (0.5, 0), "3π/2", style=rct.RenderControlText(color='k', fontsize=20, verticalalignment='bottom')
         )
 
         ang = 0
@@ -502,9 +477,7 @@ class OpticalFlow:
                 sang = "." + sang.split(".")[1]
             else:
                 sang = "%d" % int(ang)
-            fig_record.view.draw_pq_text(
-                (x, y), sang, style=rct.RenderControlText(color='k', fontsize=20)
-            )
+            fig_record.view.draw_pq_text((x, y), sang, style=rct.RenderControlText(color='k', fontsize=20))
             prev_ang = ang
 
         fig_record.view.show(block=True)
@@ -547,9 +520,7 @@ class OpticalFlow:
         dir_name_ext = os.path.join(dir, name_ext)
 
         # sanity check
-        if (
-            self._mag is None
-        ):  # "is" instead of "==" to avoid np.ndarray element-wise comparison
+        if self._mag is None:  # "is" instead of "==" to avoid np.ndarray element-wise comparison
             lt.error_and_raise(
                 RuntimeError,
                 "Error: in OpticalFlow.save: unable to save non-existant matrices 'magnitude' and 'angle'. Run dense() first!",
@@ -600,10 +571,7 @@ class OpticalFlow:
         # check that the file exists
         if not ft.file_exists(dir_name_ext):
             if error_on_not_exist:
-                lt.error_and_raise(
-                    RuntimeError,
-                    f"Error: in OpticalFlow.load: file \"{dir_name_ext}\" doesn't exist!",
-                )
+                lt.error_and_raise(RuntimeError, f"Error: in OpticalFlow.load: file \"{dir_name_ext}\" doesn't exist!")
             return None, None
 
         # load!

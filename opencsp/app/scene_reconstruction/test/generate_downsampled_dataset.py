@@ -33,11 +33,7 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
 
     # Copy files that don't need downsampling
     print('Copying files with no downsampling...')
-    files = [
-        "point_pair_distances.csv",
-        "known_point_locations.csv",
-        "alignment_points.csv",
-    ]
+    files = ["point_pair_distances.csv", "known_point_locations.csv", "alignment_points.csv"]
     for file in files:
         shutil.copy(join(dir_input, file), join(dir_output, file))
 
@@ -53,9 +49,7 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
         # Convert to monochrome and downsample
         im_ds = dd.downsample_images(im.astype(float).mean(2), n_aruco)
         # Save image
-        imageio.imwrite(
-            join(dir_output_aruco_images, file_name), im_ds, quality=jpg_quality
-        )
+        imageio.imwrite(join(dir_output_aruco_images, file_name), im_ds, quality=jpg_quality)
 
     # Downsample aruco marker camera
     print('Downsampling camera...')
@@ -65,9 +59,6 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
 
 if __name__ == '__main__':
     downsample_dataset(
-        dir_input=join(
-            opencsp_code_dir(),
-            '../../sample_data/scene_reconstruction/data_measurement',
-        ),
+        dir_input=join(opencsp_code_dir(), '../../sample_data/scene_reconstruction/data_measurement'),
         dir_output=join(os.path.dirname(__file__), 'data/data_measurement'),
     )

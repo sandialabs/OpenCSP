@@ -10,10 +10,7 @@ class RayTraceable:
 
     @abstractmethod
     def survey_of_points(
-        self,
-        resolution: int,
-        resolution_type: str = 'pixelX',
-        random_seed: int | None = None,
+        self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None
     ) -> tuple[Pxyz, Vxyz]:
         """Returns a set of points sampled from inside the optic region in the optic's
         parent coordinate reference frame.
@@ -38,9 +35,7 @@ class RayTraceable:
         """
 
     @abstractmethod
-    def set_position_in_space(
-        self, translation: Pxyz | Vxyz, rotation: Rotation
-    ) -> None:
+    def set_position_in_space(self, translation: Pxyz | Vxyz, rotation: Rotation) -> None:
         """Sets the optic's base coordinate reference frame location
         relative to the parent reference frame. When combined into a 3d
         transformation, this converts base coordinates into parent coordinates.

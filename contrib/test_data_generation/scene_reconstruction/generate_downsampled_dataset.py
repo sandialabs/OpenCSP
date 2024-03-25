@@ -20,9 +20,7 @@ import contrib.test_data_generation.downsample_data_general as ddg  # nopep8
 def generate_data():
     """Downsamples and saves files"""
     # Define file locations
-    dir_sample_data = join(
-        opencsp_code_dir(), '../../sample_data/scene_reconstruction/data_measurement'
-    )
+    dir_sample_data = join(opencsp_code_dir(), '../../sample_data/scene_reconstruction/data_measurement')
 
     files_images = glob(join(dir_sample_data, 'aruco_marker_images/*.JPG'))
     file_alignment_points = join(dir_sample_data, 'alignment_points.csv')
@@ -30,9 +28,7 @@ def generate_data():
     file_point_pair_dists = join(dir_sample_data, 'point_pair_distances.csv')
     file_camera_cal = join(dir_sample_data, 'camera.h5')
 
-    dir_save = join(
-        opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement'
-    )
+    dir_save = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
 
     # Downsample marker/dot images
     n_downsample = 5

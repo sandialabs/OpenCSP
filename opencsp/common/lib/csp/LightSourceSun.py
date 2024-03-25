@@ -22,11 +22,7 @@ class LightSourceSun(LightSource):
 
     @classmethod
     def from_given_sun_position(
-        cls,
-        sun_pointing: Uxyz,
-        resolution: int,
-        sun_dia: float = 0.009308,
-        verbose=False,
+        cls, sun_pointing: Uxyz, resolution: int, sun_dia: float = 0.009308, verbose=False
     ) -> 'LightSourceSun':
         """Returns LightSourceSun object initialized from a given pointing direction. Represents
         the sun as a tophat function in space.
@@ -86,9 +82,7 @@ class LightSourceSun(LightSource):
         # Calculate direction of sun pointing
         alt = pysolar.solar.get_altitude(loc[0], loc[1], time)
         azm = pysolar.solar.get_azimuth(loc[0], loc[1], time)
-        sun_pointing = -Vxyz((0, 1, 0)).rotate(
-            Rotation.from_euler('xz', [alt, -azm], degrees=True)
-        )
+        sun_pointing = -Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [alt, -azm], degrees=True))
 
         # Calculate sun ray cone pointing down (z=-1)
         sun_rays = cls._calc_sun_ray_cone(resolution, sun_dia, verbose)
@@ -106,9 +100,7 @@ class LightSourceSun(LightSource):
         return obj
 
     @staticmethod
-    def _calc_sun_ray_cone(
-        resolution: int, sun_dia: float, verbose: bool = False
-    ) -> Vxyz:
+    def _calc_sun_ray_cone(resolution: int, sun_dia: float, verbose: bool = False) -> Vxyz:
         # Calculate sun radius
         sun_radius = sun_dia / 2
 
@@ -143,12 +135,7 @@ class LightSourceSun(LightSource):
         return sun_rays
 
     def set_incident_rays(
-        self,
-        loc: tuple[float, float],
-        time: tuple,
-        resolution: int,
-        sun_dia: float = 0.009308,
-        verbose=False,
+        self, loc: tuple[float, float], time: tuple, resolution: int, sun_dia: float = 0.009308, verbose=False
     ) -> None:
         """
         Defines the rays that will be used from this light source for ray tracing.
@@ -207,17 +194,11 @@ class LightSourceSun(LightSource):
         # rotate the cone of sun rays
         print("Rotating sun rays...")
         angle: float = np.arccos(np.dot(np.array([0, 0, -1]), real_center_vector))
-        cross_prod = np.cross(
-            real_center_vector, np.array([0, 0, 1])
-        )  # angle to rotate the rays
-        axis_of_rotation = cross_prod / np.linalg.norm(
-            cross_prod
-        )  # axis to rotate around
+        cross_prod = np.cross(real_center_vector, np.array([0, 0, 1]))  # angle to rotate the rays
+        axis_of_rotation = cross_prod / np.linalg.norm(cross_prod)  # axis to rotate around
         rotation_from_sun_position = Rotation.from_rotvec(angle * axis_of_rotation)
         # print(f"rot from sun: {rotation_from_sun_position}")
         # print(f"SUN RAYS: {sun_rays}") # TODO
         rotated_sun_rays = sun_rays.rotate(rotation_from_sun_position)
-        self.incident_rays = LightPath.many_rays_from_many_vectors(
-            None, rotated_sun_rays
-        )
+        self.incident_rays = LightPath.many_rays_from_many_vectors(None, rotated_sun_rays)
         print("Sun rays are initialized\n")

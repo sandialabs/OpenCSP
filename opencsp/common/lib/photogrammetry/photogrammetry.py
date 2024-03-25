@@ -33,9 +33,7 @@ def load_image_grayscale(file: str) -> ndarray:
 
 
 def find_aruco_marker(
-    image: ndarray,
-    adaptiveThreshConstant: float = 10,
-    minMarkerPerimeterRate: float = 0.01,
+    image: ndarray, adaptiveThreshConstant: float = 10, minMarkerPerimeterRate: float = 0.01
 ) -> tuple[ndarray[int], list[ndarray]]:  # ,
     """
     Finds aruco marker corners in given image to the nearest pixel.
@@ -65,9 +63,7 @@ def find_aruco_marker(
     aruco_detect_params.minMarkerPerimeterRate = minMarkerPerimeterRate
 
     # Find targets
-    (corners, ids, _) = cv.aruco.detectMarkers(
-        image, aruco_dict, parameters=aruco_detect_params
-    )
+    (corners, ids, _) = cv.aruco.detectMarkers(image, aruco_dict, parameters=aruco_detect_params)
 
     # Refine corner locations (inaccurate using cv.cornerSubPix)
     #     criteria = (cv.TERM_CRITERIA_EPS + cv.TermCriteria_COUNT, max_iterations, precision)
@@ -85,12 +81,7 @@ def find_aruco_marker(
 
 
 def valid_camera_pose(
-    camera: Camera,
-    rvec: ndarray,
-    tvec: ndarray,
-    pts_image: ndarray,
-    pts_object: ndarray,
-    reproj_thresh: float = 100.0,
+    camera: Camera, rvec: ndarray, tvec: ndarray, pts_image: ndarray, pts_object: ndarray, reproj_thresh: float = 100.0
 ) -> bool:
     """
     Returns image IDs that have points behind the camera or have high
@@ -173,13 +164,7 @@ def reprojection_errors(
     return pts.reshape((-1, 2))
 
 
-def plot_pts_3d(
-    ax: plt.Axes,
-    pts_obj: ndarray,
-    rots: list[Rotation],
-    tvecs: Vxyz,
-    needle_length: float = 1,
-) -> None:
+def plot_pts_3d(ax: plt.Axes, pts_obj: ndarray, rots: list[Rotation], tvecs: Vxyz, needle_length: float = 1) -> None:
     """
     Plots 3D points and camera poses (points with needles defined by rvec/tvec).
 
@@ -221,9 +206,7 @@ def plot_pts_3d(
     ax.set_zlabel('z')
 
 
-def align_points(
-    pts_obj: Vxyz, vals: Vxyz, scale: bool = False
-) -> tuple[TransformXYZ, float, ndarray[float]]:
+def align_points(pts_obj: Vxyz, vals: Vxyz, scale: bool = False) -> tuple[TransformXYZ, float, ndarray[float]]:
     """
     Returns 2D homogeneous transform to apply to input data according to
     alignment criteria. Values are scaled (if applicable) FIRST, then
@@ -324,9 +307,7 @@ def _ref_coord_error(pts_obj: Vxyz, pts_exp: Vxyz) -> np.ndarray:
     return np.array(error)
 
 
-def scale_points(
-    pts_obj: Vxyz, point_ids: ndarray, point_pairs: ndarray, dists: ndarray
-) -> ndarray[float]:
+def scale_points(pts_obj: Vxyz, point_ids: ndarray, point_pairs: ndarray, dists: ndarray) -> ndarray[float]:
     """
     Scales object points and tvecs. A list of point pairs is given, and the
     corresponding expected distance between them. The object points are scaled
@@ -394,10 +375,7 @@ def dist_from_rays(v_pt: Vxyz, u_ray_dir: Vxyz | Uxyz, v_ray_ori: Vxyz) -> ndarr
 
 
 def triangulate(
-    cameras: list[Camera],
-    rots: list[Rotation],
-    tvecs: Vxyz | list[Vxyz],
-    pts_img: Vxy | list[Vxy],
+    cameras: list[Camera], rots: list[Rotation], tvecs: Vxyz | list[Vxyz], pts_img: Vxy | list[Vxy]
 ) -> tuple[Vxyz, ndarray]:
     """Triangulates position of unknown marker.
 
@@ -422,9 +400,7 @@ def triangulate(
     u_rays = np.zeros((3, len(cameras)))  # direction of rays
 
     # Collect rays/origins and convert to lab reference frame
-    for idx, (camera, rvec, tvec, pt_img) in enumerate(
-        zip(cameras, rots, tvecs, pts_img)
-    ):
+    for idx, (camera, rvec, tvec, pt_img) in enumerate(zip(cameras, rots, tvecs, pts_img)):
         # Calculate camera position and rays in object reference frame
         r_cam_world = rvec.inv()
         v_world_cam_world = -tvec.rotate(r_cam_world)
@@ -445,9 +421,7 @@ def triangulate(
     return pt_int, dists
 
 
-def nearest_ray_intersection(
-    p_origins: Vxyz, u_dirs: Vxyz | Uxyz
-) -> tuple[Vxyz, ndarray]:
+def nearest_ray_intersection(p_origins: Vxyz, u_dirs: Vxyz | Uxyz) -> tuple[Vxyz, ndarray]:
     """
     Finds the least squares point of intersection between N skew rays. And
     calculates residuals.
@@ -480,9 +454,7 @@ def nearest_ray_intersection(
     #    x: 3d point                                -> (3 ,1) array
     i_mat = np.eye(3)
     p_int = np.linalg.lstsq(
-        a=(i_mat - u_dirs_mat).sum(axis=0),
-        b=((i_mat - u_dirs_mat) @ p_origins_mat).sum(axis=0),
-        rcond=None,
+        a=(i_mat - u_dirs_mat).sum(axis=0), b=((i_mat - u_dirs_mat) @ p_origins_mat).sum(axis=0), rcond=None
     )[0]
 
     # Calculate intersection errors (perpendicular distances to rays)

@@ -118,47 +118,31 @@ def default(marker='o', color='b', linewidth=1, markersize=8):
     """
     What to draw if no particular preference is expressed.
     """
-    return RenderControlPointSeq(
-        linestyle='-', linewidth=1, color=color, marker='.', markersize=markersize
-    )
+    return RenderControlPointSeq(linestyle='-', linewidth=1, color=color, marker='.', markersize=markersize)
 
 
 def outline(color='k', linewidth=1):
     """
     Outlines of physical objects.
     """
-    return RenderControlPointSeq(
-        linestyle='-', linewidth=linewidth, color=color, marker='None'
-    )
+    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker='None')
 
 
-def data_curve(
-    color='b', linewidth=1, marker='.', markersize=3
-) -> RenderControlPointSeq:
+def data_curve(color='b', linewidth=1, marker='.', markersize=3) -> RenderControlPointSeq:
     """
     A data curve with data points identified.
     """
-    return RenderControlPointSeq(
-        linestyle='-',
-        linewidth=linewidth,
-        color=color,
-        marker=marker,
-        markersize=markersize,
-    )
+    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
 def marker(marker='o', color='b', markersize=3) -> RenderControlPointSeq:
     """
     A data curve with data points identified.
     """
-    return RenderControlPointSeq(
-        linestyle='None', color=color, marker=marker, markersize=markersize
-    )
+    return RenderControlPointSeq(linestyle='None', color=color, marker=marker, markersize=markersize)
 
 
-def vector_field(
-    marker='.', color='b', markersize=3, vector_linewidth=1, vector_scale=1.0
-) -> RenderControlPointSeq:
+def vector_field(marker='.', color='b', markersize=3, vector_linewidth=1, vector_scale=1.0) -> RenderControlPointSeq:
     """
     A field of vector needles.
     """

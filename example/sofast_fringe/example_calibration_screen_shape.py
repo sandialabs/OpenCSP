@@ -14,13 +14,10 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_run_screen_shape_calibration(save_dir):
-    """Runs screen shape calibration. Saves data to ./data/output/screen_shape
-    """
+    """Runs screen shape calibration. Saves data to ./data/output/screen_shape"""
     # Load output data from Scene Reconstruction (Aruco marker xyz points)
     file_pts_data = join(
-        opencsp_code_dir(),
-        'common/lib/deflectometry/test/data/data_measurement',
-        'point_locations.csv',
+        opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement', 'point_locations.csv'
     )
     pts_marker_data = np.loadtxt(file_pts_data, delimiter=',', skiprows=1)
     pts_xyz_marker = Vxyz(pts_marker_data[:, 2:].T)

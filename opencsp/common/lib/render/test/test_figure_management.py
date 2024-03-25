@@ -19,12 +19,8 @@ of the unit test methods. """
 
 
 class test_figure_management(unittest.TestCase):
-    dir_in = os.path.join(
-        'common', 'lib', 'render', 'test', 'data', 'input', 'figure_management'
-    )
-    dir_out = os.path.join(
-        'common', 'lib', 'render', 'test', 'data', 'output', 'figure_management'
-    )
+    dir_in = os.path.join('common', 'lib', 'render', 'test', 'data', 'input', 'figure_management')
+    dir_out = os.path.join('common', 'lib', 'render', 'test', 'data', 'output', 'figure_management')
 
     def __init__(self, *vargs, **kwargs):
         super().__init__(*vargs, **kwargs)
@@ -58,11 +54,7 @@ class test_figure_management(unittest.TestCase):
         fm.reset_figure_management()
 
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
-        fig_record = fm.setup_figure(
-            figure_control,
-            name=name,
-            code_tag=f"{__file__}.test_save_all_figures_line()",
-        )
+        fig_record = fm.setup_figure(figure_control, name=name, code_tag=f"{__file__}.test_save_all_figures_line()")
         view = fig_record.view
         line = list(range(100))
         view.draw_p_list(line)
@@ -77,13 +69,9 @@ class test_figure_management(unittest.TestCase):
 
         lines = [[100] * 100, [0] * 100]
         for i in range(2):
-            figure_control = rcfg.RenderControlFigure(
-                tile_array=(1, 1), tile_square=True
-            )
+            figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
             fig_record = fm.setup_figure(
-                figure_control,
-                name=names[i],
-                code_tag=f"{__file__}.test_save_all_figures_two_lines()",
+                figure_control, name=names[i], code_tag=f"{__file__}.test_save_all_figures_two_lines()"
             )
             view = fig_record.view
             line = lines[i]
@@ -99,9 +87,7 @@ class test_figure_management(unittest.TestCase):
 
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         fig_record = fm.setup_figure(
-            figure_control,
-            name=name,
-            code_tag=f"{__file__}.test_save_all_figures_timeout_0()",
+            figure_control, name=name, code_tag=f"{__file__}.test_save_all_figures_timeout_0()"
         )
         view = fig_record.view
         line = list(range(100))
@@ -112,9 +98,7 @@ class test_figure_management(unittest.TestCase):
             r".*failed to save.*",
             msg="Failed to time out in 0 seconds while trying to save figure",
         ):
-            figs, txts, failed = fm.save_all_figures(
-                self.dir_out, timeout=0, raise_on_timeout=True
-            )
+            figs, txts, failed = fm.save_all_figures(self.dir_out, timeout=0, raise_on_timeout=True)
             self.assertEqual(len(figs), 0)
             self.assertEqual(len(txts), 0)
 
@@ -124,11 +108,7 @@ class test_figure_management(unittest.TestCase):
         fm.reset_figure_management()
 
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
-        fig_old = fm.setup_figure(
-            figure_control,
-            name=name,
-            code_tag=f"{__file__}._figure_manager_timeout_1()",
-        )
+        fig_old = fm.setup_figure(figure_control, name=name, code_tag=f"{__file__}._figure_manager_timeout_1()")
 
         # replace the figure record with one that will never finish saving
         fig_record = rcfr_is.RenderControlFigureRecordInfSave(
@@ -152,9 +132,7 @@ class test_figure_management(unittest.TestCase):
     def save_all_figures_fail_and_raise_executor(self):
         """try to save (should fail and raise an error)"""
         fm = self._figure_manager_timeout_1()
-        figs, txts, failed = fm.save_all_figures(
-            self.dir_out, timeout=1, raise_on_timeout=True
-        )
+        figs, txts, failed = fm.save_all_figures(self.dir_out, timeout=1, raise_on_timeout=True)
 
     def test_save_all_figures_fail_and_raise(self):
         """Verifies that the save_all_figures() method will eventually time out for a figure record whose save() method never finishes."""
@@ -180,17 +158,9 @@ class test_figure_management(unittest.TestCase):
         """try to save (should fail and return the failed figure record)"""
         fm = self._figure_manager_timeout_1()
         figs, txts, failed = fm.save_all_figures(self.dir_out, timeout=1)
-        self.assertEqual(
-            1,
-            len(failed),
-            "save_all_figures() didn't return the correct number of figure records",
-        )
+        self.assertEqual(1, len(failed), "save_all_figures() didn't return the correct number of figure records")
         fig_record = fm.fig_record_list[0]
-        self.assertIn(
-            fig_record,
-            failed,
-            "save_all_figures() didn't return the correct figure record",
-        )
+        self.assertIn(fig_record, failed, "save_all_figures() didn't return the correct figure record")
         lt.error("Failed gracefully")
         sys.exit(0)  # force this process to exit (waits forever on save_all_figures())
 
@@ -205,9 +175,7 @@ class test_figure_management(unittest.TestCase):
                 timeout=10.0,
             )
             stdout = [line.val for line in stdout]
-            self.assertIn(
-                "Failed gracefully", stdout, f"Subprocess didn't exit correctly."
-            )
+            self.assertIn("Failed gracefully", stdout, f"Subprocess didn't exit correctly.")
 
     def test_save_all_figures_notimeout_100(self):
         """Test that with a long 100 second timeout, the figure is saved."""
@@ -216,26 +184,20 @@ class test_figure_management(unittest.TestCase):
 
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         fig_record = fm.setup_figure(
-            figure_control,
-            name=name,
-            code_tag=f"{__file__}.test_save_all_figures_notimeout_100()",
+            figure_control, name=name, code_tag=f"{__file__}.test_save_all_figures_notimeout_100()"
         )
         view = fig_record.view
         line = list(range(100))
         view.draw_p_list(line)
 
-        figs_txts_fails = fm.save_all_figures(
-            self.dir_out, timeout=100, raise_on_timeout=True
-        )
+        figs_txts_fails = fm.save_all_figures(self.dir_out, timeout=100, raise_on_timeout=True)
         self.assert_exists(figs_txts_fails, 1)
 
 
 if __name__ == '__main__':
     import argparse
 
-    parser = argparse.ArgumentParser(
-        prog=__file__.rstrip(".py"), description='Testing figure management'
-    )
+    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description='Testing figure management')
     parser.add_argument('--funcname', help="Calls the given function")
     args = parser.parse_args()
     func_name = args.funcname

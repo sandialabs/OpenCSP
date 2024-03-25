@@ -58,9 +58,7 @@ class ProcessSofastFixed:
         self.measurement: MeasurementSofastFixed
 
         # Define blob detector
-        self.blob_detector: cv.SimpleBlobDetector_Params = (
-            cv.SimpleBlobDetector_Params()
-        )
+        self.blob_detector: cv.SimpleBlobDetector_Params = cv.SimpleBlobDetector_Params()
         self.blob_detector.minDistBetweenBlobs = 2
         self.blob_detector.filterByArea = True
         self.blob_detector.minArea = 3
@@ -99,9 +97,7 @@ class ProcessSofastFixed:
         """
         # Calculate mask
         im_dark = self.measurement.image * 0
-        images = np.concatenate(
-            (im_dark[..., None], self.measurement.image[..., None]), axis=2
-        )
+        images = np.concatenate((im_dark[..., None], self.measurement.image[..., None]), axis=2)
         params = [
             self.params.mask_hist_thresh,
             self.params.mask_filt_width,
@@ -160,9 +156,7 @@ class ProcessSofastFixed:
         # Define optic orientation w.r.t. camera
         rot_optic_cam = self.data_geometry_general.r_optic_cam_refine_1
         v_cam_optic_cam = self.data_geometry_general.v_cam_optic_cam_refine_2
-        u_cam_measure_point_facet = self.data_geometry_facet[
-            0
-        ].u_cam_measure_point_facet
+        u_cam_measure_point_facet = self.data_geometry_facet[0].u_cam_measure_point_facet
 
         # Get screen-camera pose
         rot_cam_optic = rot_optic_cam.inv()
@@ -174,12 +168,8 @@ class ProcessSofastFixed:
         v_optic_screen_optic = v_optic_cam_optic + v_cam_screen_optic
 
         # Calculate xyz screen points
-        v_screen_points_screen = (
-            self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
-        )
-        v_screen_points_facet = v_optic_screen_optic + v_screen_points_screen.rotate(
-            rot_screen_optic
-        )
+        v_screen_points_screen = self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
+        v_screen_points_facet = v_optic_screen_optic + v_screen_points_screen.rotate(rot_screen_optic)
 
         # Calculate active pixel pointing
         u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
@@ -241,24 +231,15 @@ class ProcessSofastFixed:
         """
         self.data_slope_solver.save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
         self.data_geometry_general.save_to_hdf(file, 'CalculationsFixedPattern/')
-        self.data_image_proccessing_general.save_to_hdf(
-            file, 'CalculationsFixedPattern/'
-        )
-        self.data_geometry_facet[0].save_to_hdf(
-            file, 'CalculationsFixedPattern/Facet_000/'
-        )
-        self.data_image_processing_facet[0].save_to_hdf(
-            file, 'CalculationsFixedPattern/Facet_000/'
-        )
+        self.data_image_proccessing_general.save_to_hdf(file, 'CalculationsFixedPattern/')
+        self.data_geometry_facet[0].save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
+        self.data_image_processing_facet[0].save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
         self.data_error.save_to_hdf(file, 'CalculationsFixedPattern/')
 
         lt.info(f'SofastFixed data saved to: {file:s} with prefix: {prefix:s}')
 
     def get_mirror(
-        self,
-        interpolation_type: Literal[
-            'given', 'bilinear', 'clough_tocher', 'nearest'
-        ] = 'nearest',
+        self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest'
     ) -> MirrorPoint:
         """Returns mirror object with slope data"""
         v_surf_pts = self.data_slope_solver.v_surf_points_facet

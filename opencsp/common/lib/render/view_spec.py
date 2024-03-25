@@ -126,9 +126,7 @@ def xyz2pqw(xyz, view_spec):
         return [xyz[1], xyz[2], xyz[0]]
     elif view_spec['type'] == 'vplane':
         # Fetch section coordinate system.
-        origin_xyz = np.array(
-            view_spec['origin_xyz']
-        )  # Make arrays so we can do simple vactor math.
+        origin_xyz = np.array(view_spec['origin_xyz'])  # Make arrays so we can do simple vactor math.
         p_uxyz = np.array(view_spec['p_uxyz'])  #
         q_uxyz = np.array(view_spec['q_uxyz'])  #
         w_uxyz = np.array(view_spec['w_uxyz'])  #
@@ -153,11 +151,7 @@ def xyz2pqw(xyz, view_spec):
             # Return.
             return [p, q, w]
     else:
-        print(
-            "ERROR: In xyz2pqw(), unrecognized view_spec['type'] = '"
-            + str(view_spec['type'])
-            + "' encountered."
-        )
+        print("ERROR: In xyz2pqw(), unrecognized view_spec['type'] = '" + str(view_spec['type']) + "' encountered.")
         assert False
 
 
@@ -182,9 +176,7 @@ def pqw2xyz(pqw, view_spec):
         return [pqw[2], pqw[0], pqw[1]]
     elif view_spec['type'] == 'vplane':
         # Fetch section coordinate system.
-        origin_xyz = np.array(
-            view_spec['origin_xyz']
-        )  # Make arrays so we can do simple vactor math.
+        origin_xyz = np.array(view_spec['origin_xyz'])  # Make arrays so we can do simple vactor math.
         p_uxyz = np.array(view_spec['p_uxyz'])  #
         q_uxyz = np.array(view_spec['q_uxyz'])  #
         w_uxyz = np.array(view_spec['w_uxyz'])  #
@@ -196,11 +188,7 @@ def pqw2xyz(pqw, view_spec):
         xyz = origin_xyz + (p * p_uxyz) + (q * q_uxyz) + (w * w_uxyz)
         return [xyz[0], xyz[1], xyz[2]]
     else:
-        print(
-            "ERROR: In pqw2xyz(), unrecognized view_spec['type'] = '"
-            + str(view_spec['type'])
-            + "' encountered."
-        )
+        print("ERROR: In pqw2xyz(), unrecognized view_spec['type'] = '" + str(view_spec['type']) + "' encountered.")
         assert False
 
 

@@ -128,9 +128,7 @@ class SlopeSolver:
                     self._plot_debug_plots(idx1, idx2)
 
             # Calculate measure point intersection point with existing fitting function
-            v_meas_pts_surf_int_optic = self.surface.intersect(
-                u_measure_pixel_pointing_optic, v_optic_cam_optic
-            )
+            v_meas_pts_surf_int_optic = self.surface.intersect(u_measure_pixel_pointing_optic, v_optic_cam_optic)
 
             # Calculate design normal at alignment point
             n_design = self.surface.normal_design_at_align_point()
@@ -182,38 +180,28 @@ class SlopeSolver:
         """
         # Check alignment has been completed
         if self._data.trans_alignment is None:
-            raise ValueError(
-                'Initial alignment needs to be completed before final slope fitting (self.fit_surface).'
-            )
+            raise ValueError('Initial alignment needs to be completed before final slope fitting (self.fit_surface).')
 
         # Apply alignment transforms about alignment point
         trans_shift_1 = TransformXYZ.from_V(-self.surface.v_align_point_optic)
         trans_shift_2 = TransformXYZ.from_V(self.surface.v_align_point_optic)
         trans: TransformXYZ = trans_shift_2 * self._data.trans_alignment * trans_shift_1
 
-        u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate(
-            trans.R
-        )
+        u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate(trans.R)
         v_screen_points_facet = trans.apply(self.v_screen_points_facet)
 
         # Calculate intersection points on optic surface
-        v_surf_points_facet = self.surface.intersect(
-            u_active_pixel_pointing_optic, self.surface.v_optic_cam_optic
-        )
+        v_surf_points_facet = self.surface.intersect(u_active_pixel_pointing_optic, self.surface.v_optic_cam_optic)
 
         # Calculate pixel slopes (assuming parabolic surface intersection)
-        slopes_facet_xy = sf2.calc_slopes(
-            v_surf_points_facet, self.surface.v_optic_cam_optic, v_screen_points_facet
-        )
+        slopes_facet_xy = sf2.calc_slopes(v_surf_points_facet, self.surface.v_optic_cam_optic, v_screen_points_facet)
 
         self._data.v_surf_points_facet = v_surf_points_facet
         self._data.slopes_facet_xy = slopes_facet_xy
 
     def _plot_debug_plots(self, idx1: int, idx2: int):
         # Create figure and axes
-        if self.debug.slope_solver_single_plot and isinstance(
-            self.debug.slope_solver_figures, list
-        ):
+        if self.debug.slope_solver_single_plot and isinstance(self.debug.slope_solver_figures, list):
             # Create first figure if needed
             fig = plt.figure()
             axes = fig.add_subplot(projection='3d')

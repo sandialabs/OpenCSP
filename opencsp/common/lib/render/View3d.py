@@ -115,9 +115,7 @@ class View3d:
         # Axes aspect ratio.
         if equal:
             if self.view_spec['type'] == '3d':
-                ax3d.set_3d_axes_equal(
-                    self.axis
-                )  # , set_zmin_zero=True, box_aspect=None)
+                ax3d.set_3d_axes_equal(self.axis)  # , set_zmin_zero=True, box_aspect=None)
             elif (
                 (self.view_spec['type'] == 'xy')
                 or (self.view_spec['type'] == 'xz')
@@ -197,9 +195,7 @@ class View3d:
 
     # WRITE
 
-    def show_and_save_multi_axis_limits(
-        self, output_dir, output_figure_body, limits_list, grid=True
-    ):
+    def show_and_save_multi_axis_limits(self, output_dir, output_figure_body, limits_list, grid=True):
         # Draw and save.
         if limits_list != None:
             for limits in limits_list:
@@ -217,11 +213,7 @@ class View3d:
                         )
                     else:
                         self.show_and_save(
-                            output_dir,
-                            output_figure_body,
-                            x_limits=limits[0],
-                            y_limits=limits[1],
-                            grid=grid,
+                            output_dir, output_figure_body, x_limits=limits[0], y_limits=limits[1], grid=grid
                         )
 
     def show_and_save(
@@ -286,17 +278,11 @@ class View3d:
     def limit_suffix(self):
         limit_suffix_str = ''
         if self.x_limits:
-            limit_suffix_str += (
-                '_' + str(self.x_limits[0]) + 'x' + str(self.x_limits[1])
-            )
+            limit_suffix_str += '_' + str(self.x_limits[0]) + 'x' + str(self.x_limits[1])
         if self.y_limits:
-            limit_suffix_str += (
-                '_' + str(self.y_limits[0]) + 'y' + str(self.y_limits[1])
-            )
+            limit_suffix_str += '_' + str(self.y_limits[0]) + 'y' + str(self.y_limits[1])
         if self.z_limits:
-            limit_suffix_str += (
-                '_' + str(self.z_limits[0]) + 'z' + str(self.z_limits[1])
-            )
+            limit_suffix_str += '_' + str(self.z_limits[0]) + 'z' + str(self.z_limits[1])
         return limit_suffix_str
 
     # Image Plotting
@@ -307,9 +293,7 @@ class View3d:
         top of other plots (example on top of 3D data) use draw_image instead."""
         if self.view_spec['type'] == 'image':
             # load the image, as necessary
-            load_as_necessary = lambda img: (
-                img if not isinstance(img, str) else Image.open(img)
-            )
+            load_as_necessary = lambda img: (img if not isinstance(img, str) else Image.open(img))
             if 'X' in kwargs:
                 img = kwargs['X']
                 kwargs['X'] = load_as_necessary(img)
@@ -346,9 +330,7 @@ class View3d:
         ymid = (ybnd[1] - ybnd[0]) / 2 + ybnd[0]
         ydraw = [ymid - height / 2, ymid + height / 2]
 
-        self.axis.imshow(
-            img, extent=[xdraw[0], xdraw[1], ydraw[0], ydraw[1]], zorder=-1
-        )
+        self.axis.imshow(img, extent=[xdraw[0], xdraw[1], ydraw[0], ydraw[1]], zorder=-1)
 
     def pcolormesh(self, *args, colorbar=False, **kwargs) -> None:
         """Allows plotting like imshow, with the additional option of sizing the boxes at will.
@@ -418,9 +400,7 @@ class View3d:
 
     def draw_xyz_text(self, xyz, text, style=rctxt.default()):  # An xyz is [x,y,z]
         if len(xyz) != 3:
-            lt.error(
-                'ERROR: In draw_xyz_text(), len(xyz)=', len(xyz), ' is not equal to 3.'
-            )
+            lt.error('ERROR: In draw_xyz_text(), len(xyz)=', len(xyz), ' is not equal to 3.')
             assert False
         if self.view_spec['type'] == '3d':
             self.axis.text(
@@ -509,12 +489,7 @@ class View3d:
             )
             assert False
 
-    def draw_xyz(
-        self,
-        xyz,  # An xyz is [x,y,z]
-        style: rcps.RenderControlPointSeq = None,
-        label: str = None,
-    ):
+    def draw_xyz(self, xyz, style: rcps.RenderControlPointSeq = None, label: str = None):  # An xyz is [x,y,z]
         """Plots a single point, I think (BGB)."""
         if style == None:
             style = rcps.default()
@@ -605,12 +580,7 @@ class View3d:
             )
             assert False
 
-    def draw_single_Pxyz(
-        self,
-        p: Pxyz,
-        style: rcps.RenderControlPointSeq = None,
-        labels: list[str] = None,
-    ):
+    def draw_single_Pxyz(self, p: Pxyz, style: rcps.RenderControlPointSeq = None, labels: list[str] = None):
         if labels == None:
             labels = [None] * len(p)
         if style == None:
@@ -618,9 +588,7 @@ class View3d:
         for x, y, z, label in zip(p.x, p.y, p.z, labels):
             self.draw_xyz((x, y, z), style, label)
 
-    def draw_xyz_list(
-        self, input_xyz_list: list[list], close=False, style=None, label=None
-    ) -> None:
+    def draw_xyz_list(self, input_xyz_list: list[list], close=False, style=None, label=None) -> None:
         """Draw lines or closed polygons.
 
         Parameters
@@ -770,44 +738,23 @@ class View3d:
             )
 
     def draw_xyz_trisurface(
-        self,
-        x: ndarray,
-        y: ndarray,
-        z: ndarray,
-        surface_style: RenderControlSurface = None,
-        **kwargs
+        self, x: ndarray, y: ndarray, z: ndarray, surface_style: RenderControlSurface = None, **kwargs
     ):
         if surface_style == None:
             surface_style = RenderControlSurface()
         if self.view_spec['type'] == '3d':
-            self.axis.plot_trisurf(
-                x, y, z, color=surface_style.color, alpha=surface_style.alpha, **kwargs
-            )
+            self.axis.plot_trisurf(x, y, z, color=surface_style.color, alpha=surface_style.alpha, **kwargs)
 
     # TODO tjlarki: currently unused
     # TODO tjlarki: might want to remove, this is a very slow function
-    def quiver(
-        self,
-        X: ndarray,
-        Y: ndarray,
-        Z: ndarray,
-        U: ndarray,
-        V: ndarray,
-        W: ndarray,
-        length: float = 0,
-    ) -> None:
+    def quiver(self, X: ndarray, Y: ndarray, Z: ndarray, U: ndarray, V: ndarray, W: ndarray, length: float = 0) -> None:
         self.axis.quiver(X, Y, Z, U, V, W, length=0)
 
     # PQ PLOTTING
 
     def draw_pq_text(self, pq, text, style=rctxt.default()):  # A pq is [p,q]
         if (len(pq) != 2) and (len(pq) != 3):
-            lt.error_and_raise(
-                RuntimeError,
-                'ERROR: In draw_pq_text(), len(pq)=',
-                len(pq),
-                ' is not equal to 2 or 3.',
-            )
+            lt.error_and_raise(RuntimeError, 'ERROR: In draw_pq_text(), len(pq)=', len(pq), ' is not equal to 2 or 3.')
         if self.view_spec['type'] == '3d':
             lt.error_and_raise(
                 RuntimeError,
@@ -845,11 +792,7 @@ class View3d:
 
     def draw_pq(self, pq, style=rcps.default(), label=None):  # A pq is [p,q]
         if (len(pq) != 2) and (len(pq) != 3):
-            lt.error(
-                'ERROR: In draw_pq_text(), len(pq)=',
-                len(pq),
-                ' is not equal to 2 or 3.',
-            )
+            lt.error('ERROR: In draw_pq_text(), len(pq)=', len(pq), ' is not equal to 2 or 3.')
             assert False
         if self.view_spec['type'] == '3d':
             lt.error(
@@ -942,9 +885,7 @@ class View3d:
 
     def draw_xyzdxyz_list(
         self,
-        input_xyzdxyz_list: list[
-            list[list, list]
-        ],  # An xyzdxyz is [[x,y,z], [dx,dy,dz]]
+        input_xyzdxyz_list: list[list[list, list]],  # An xyzdxyz is [[x,y,z], [dx,dy,dz]]
         close: bool = False,  # Draw as a closed polygon. Ignore if less than three points.
         style: rcps.RenderControlPointSeq = rcps.default(),
         label: str = None,
@@ -956,9 +897,7 @@ class View3d:
             xyz_list = [xyzdxyz[0] for xyzdxyz in xyzdxyz_list]
             self.draw_xyz_list(xyz_list, close=close, style=style, label=label)
             # Setup the vector drawing style.
-            vector_style = rcps.outline(
-                color=style.vector_color, linewidth=style.vector_linewidth
-            )
+            vector_style = rcps.outline(color=style.vector_color, linewidth=style.vector_linewidth)
             # Draw the vectors.
             for xyzdxyz in xyzdxyz_list:
                 xyz0 = xyzdxyz[0]
@@ -992,9 +931,7 @@ class View3d:
             pq_list = [pqdpq[0] for pqdpq in pqdpq_list]
             self.draw_pq_list(pq_list, close=close, style=style, label=label)
             # Setup the vector drawing style.
-            vector_style = rcps.outline(
-                color=style.vector_color, linewidth=style.vector_linewidth
-            )
+            vector_style = rcps.outline(color=style.vector_color, linewidth=style.vector_linewidth)
             # Draw the vectors.
             for pqdpq in pqdpq_list:
                 pq0 = pqdpq[0]

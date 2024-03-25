@@ -48,22 +48,14 @@ class HeliostatTracks:
     ):  # Flags to control rendering on this run, for the confirmed data.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError(
-                'In HeliostatTracks.__init__(), null input_video_dir_body_ext encountered.'
-            )
+            raise ValueError('In HeliostatTracks.__init__(), null input_video_dir_body_ext encountered.')
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError(
-                'In HeliostatTracks.__init__(), null output_data_dir encountered.'
-            )
+            raise ValueError('In HeliostatTracks.__init__(), null output_data_dir encountered.')
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError(
-                'In HeliostatTracks.__init__(), null output_render_dir encountered.'
-            )
+            raise ValueError('In HeliostatTracks.__init__(), null output_render_dir encountered.')
 
         # Parse input video path components.
-        input_video_dir, input_video_body, input_video_ext = ft.path_components(
-            input_video_dir_body_ext
-        )
+        input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
 
         # Store input.
         # Execution control.
@@ -76,12 +68,8 @@ class HeliostatTracks:
         self.input_video_dir = input_video_dir
         self.input_video_body = input_video_body
         self.input_video_ext = input_video_ext
-        self.input_video_projected_tracks_dir_body_ext = (
-            input_video_projected_tracks_dir_body_ext
-        )
-        self.input_video_confirmed_tracks_dir_body_ext = (
-            input_video_confirmed_tracks_dir_body_ext
-        )
+        self.input_video_projected_tracks_dir_body_ext = input_video_projected_tracks_dir_body_ext
+        self.input_video_confirmed_tracks_dir_body_ext = input_video_confirmed_tracks_dir_body_ext
         self.input_frame_dir = input_frame_dir
         self.input_frame_id_format = input_frame_id_format
         self.output_data_dir = output_data_dir
@@ -93,22 +81,14 @@ class HeliostatTracks:
 
         # Found heliostat tracks file name.
         # Projected.
-        self.heliostat_projected_tracks_body = (
-            self.input_video_body + '_heliostat_projected_tracks_nfxl'
-        )
-        self.heliostat_projected_tracks_body_ext = (
-            self.heliostat_projected_tracks_body + '.csv'
-        )
+        self.heliostat_projected_tracks_body = self.input_video_body + '_heliostat_projected_tracks_nfxl'
+        self.heliostat_projected_tracks_body_ext = self.heliostat_projected_tracks_body + '.csv'
         self.heliostat_projected_tracks_dir_body_ext = os.path.join(
             self.output_data_dir, self.heliostat_projected_tracks_body_ext
         )
         # Confirmed.
-        self.heliostat_confirmed_tracks_body = (
-            self.input_video_body + '_heliostat_confirmed_tracks_nfxl'
-        )
-        self.heliostat_confirmed_tracks_body_ext = (
-            self.heliostat_confirmed_tracks_body + '.csv'
-        )
+        self.heliostat_confirmed_tracks_body = self.input_video_body + '_heliostat_confirmed_tracks_nfxl'
+        self.heliostat_confirmed_tracks_body_ext = self.heliostat_confirmed_tracks_body + '.csv'
         self.heliostat_confirmed_tracks_dir_body_ext = os.path.join(
             self.output_data_dir, self.heliostat_confirmed_tracks_body_ext
         )
@@ -128,48 +108,28 @@ class HeliostatTracks:
         )
 
         # Output construction frame directories.
-        self.output_construction_projected_dir = os.path.join(
-            self.output_construction_dir, 'projected'
-        )
-        self.output_construction_confirmed_dir = os.path.join(
-            self.output_construction_dir, 'confirmed'
-        )
+        self.output_construction_projected_dir = os.path.join(self.output_construction_dir, 'projected')
+        self.output_construction_confirmed_dir = os.path.join(self.output_construction_dir, 'confirmed')
 
         # Summary statistics file name.
         # Projected.
-        self.dict_projected_body = (
-            self.input_video_body + '_heliostat_projected_tracks_statistics'
-        )
+        self.dict_projected_body = self.input_video_body + '_heliostat_projected_tracks_statistics'
         self.dict_projected_body_ext = self.dict_projected_body + '.csv'
-        self.dict_projected_dir_body_ext = os.path.join(
-            self.output_data_dir, self.dict_projected_body_ext
-        )
+        self.dict_projected_dir_body_ext = os.path.join(self.output_data_dir, self.dict_projected_body_ext)
         # Conifrmed.
-        self.dict_confirmed_body = (
-            self.input_video_body + '_heliostat_confirmed_tracks_statistics'
-        )
+        self.dict_confirmed_body = self.input_video_body + '_heliostat_confirmed_tracks_statistics'
         self.dict_confirmed_body_ext = self.dict_confirmed_body + '.csv'
-        self.dict_confirmed_dir_body_ext = os.path.join(
-            self.output_data_dir, self.dict_confirmed_body_ext
-        )
+        self.dict_confirmed_dir_body_ext = os.path.join(self.output_data_dir, self.dict_confirmed_body_ext)
 
         # Video frames per heliostat dictionary name.
         # Projected.
-        self.vfpph_body = (
-            self.input_video_body + '_video_projected_frames_per_heliostat'
-        )
+        self.vfpph_body = self.input_video_body + '_video_projected_frames_per_heliostat'
         self.vfpph_body_ext = self.vfpph_body + '.csv'
-        self.vfpph_dir_body_ext = os.path.join(
-            self.output_data_dir, self.vfpph_body_ext
-        )
+        self.vfpph_dir_body_ext = os.path.join(self.output_data_dir, self.vfpph_body_ext)
         # Confirmed.
-        self.vfpch_body = (
-            self.input_video_body + '_video_confirmed_frames_per_heliostat'
-        )
+        self.vfpch_body = self.input_video_body + '_video_confirmed_frames_per_heliostat'
         self.vfpch_body_ext = self.vfpch_body + '.csv'
-        self.vfpch_dir_body_ext = os.path.join(
-            self.output_data_dir, self.vfpch_body_ext
-        )
+        self.vfpch_dir_body_ext = os.path.join(self.output_data_dir, self.vfpch_body_ext)
 
         # Load video tracks files.
         # Projected.
@@ -178,41 +138,29 @@ class HeliostatTracks:
             self.input_video_projected_tracks_dir_body_ext,
         )
         self.video_projected_tracks_fnxl = fnxl.FrameNameXyList()
-        self.video_projected_tracks_fnxl.load(
-            self.input_video_projected_tracks_dir_body_ext
-        )
+        self.video_projected_tracks_fnxl.load(self.input_video_projected_tracks_dir_body_ext)
         # Confirm what was read.
         print('In HeliostatTracks.__init__(), projected video tracks read:')
-        self.video_projected_tracks_fnxl.print(
-            max_keys=12, max_value_length=200, indent=4
-        )
+        self.video_projected_tracks_fnxl.print(max_keys=12, max_value_length=200, indent=4)
         # Confirmed.
         print(
             'In HeliostatTracks.__init__(), reading confirmed video tracks file: ',
             self.input_video_confirmed_tracks_dir_body_ext,
         )
         self.video_confirmed_tracks_fnxl = fnxl.FrameNameXyList()
-        self.video_confirmed_tracks_fnxl.load(
-            self.input_video_confirmed_tracks_dir_body_ext
-        )
+        self.video_confirmed_tracks_fnxl.load(self.input_video_confirmed_tracks_dir_body_ext)
         # Confirm what was read.
         print('In HeliostatTracks.__init__(), confirmed video tracks read:')
-        self.video_confirmed_tracks_fnxl.print(
-            max_keys=12, max_value_length=200, indent=4
-        )
+        self.video_confirmed_tracks_fnxl.print(max_keys=12, max_value_length=200, indent=4)
 
         # Fetch a list of all frame ids in the video (not just key frames).
         # The corresponding frame_ids are not necessarily in sequential order, because
         # we previously removed spurious duplicate frames.
-        self.all_frame_file_list = ft.files_in_directory(
-            self.input_frame_dir, sort=True
-        )
+        self.all_frame_file_list = ft.files_in_directory(self.input_frame_dir, sort=True)
         # Confirm what was read.
         max_print_files = 12
         print('In HeliostatTracks.__init__(), self.all_frame_file_list:')
-        for frame_file in self.all_frame_file_list[
-            0 : min(max_print_files, len(self.all_frame_file_list))
-        ]:
+        for frame_file in self.all_frame_file_list[0 : min(max_print_files, len(self.all_frame_file_list))]:
             print('In HeliostatTracks.__init__()   ', frame_file)
         print('...')
 
@@ -242,19 +190,13 @@ class HeliostatTracks:
             self.generated_heliostat_projected_tracks = False
             self.generated_heliostat_confirmed_tracks = False
             # Projected.
-            self.construct_and_save_heliostat_tracks_aux(
-                self.video_projected_tracks_fnxl, 'projected'
-            )
+            self.construct_and_save_heliostat_tracks_aux(self.video_projected_tracks_fnxl, 'projected')
             self.generated_heliostat_projected_tracks = True
             # Confirmed.
-            self.construct_and_save_heliostat_tracks_aux(
-                self.video_confirmed_tracks_fnxl, 'confirmed'
-            )
+            self.construct_and_save_heliostat_tracks_aux(self.video_confirmed_tracks_fnxl, 'confirmed')
             self.generated_heliostat_confirmed_tracks = True
 
-    def construct_and_save_heliostat_tracks_aux(
-        self, video_tracks_fnxl, projected_or_confirmed_str
-    ):
+    def construct_and_save_heliostat_tracks_aux(self, video_tracks_fnxl, projected_or_confirmed_str):
         print(
             'In HeliostatTracks.construct_and_save_heliostat_tracks_aux(), constructing '
             + projected_or_confirmed_str
@@ -268,9 +210,7 @@ class HeliostatTracks:
         heliostat_tracks_nfxl.add_FrameNameXyList(video_tracks_fnxl)
 
         # Summarize construction result.
-        print(
-            'In HeliostatTracks.construct_and_save_heliostat_tracks_aux(), constructed heliostat_tracks_nfxl:'
-        )
+        print('In HeliostatTracks.construct_and_save_heliostat_tracks_aux(), constructed heliostat_tracks_nfxl:')
         heliostat_tracks_nfxl.print(indent=4)
 
         # Write heliostat tracks file.
@@ -300,8 +240,7 @@ class HeliostatTracks:
             print('ERROR: ' + msg)
             raise ValueError(msg)
         print(
-            'In HeliostatTracks.save_heliostat_tracks(), writing heliostat track file: ',
-            heliostat_tracks_dir_body_ext,
+            'In HeliostatTracks.save_heliostat_tracks(), writing heliostat track file: ', heliostat_tracks_dir_body_ext
         )
         ft.create_directories_if_necessary(self.output_data_dir)
         heliostat_tracks_nfxl.save(heliostat_tracks_dir_body_ext)
@@ -327,13 +266,9 @@ class HeliostatTracks:
             raise ValueError(msg)
         # Statistics.
         summary_dict = {}
-        summary_dict['n_heliostat_track_frames'] = (
-            heliostat_tracks_nfxl.number_of_frames()
-        )
+        summary_dict['n_heliostat_track_frames'] = heliostat_tracks_nfxl.number_of_frames()
         print(
-            'In HeliostatTracks.save_data(), writing key frame '
-            + projected_or_confirmed_str
-            + ' summary statistics...'
+            'In HeliostatTracks.save_data(), writing key frame ' + projected_or_confirmed_str + ' summary statistics...'
         )
         ft.write_dict_file(
             'heliostat ' + projected_or_confirmed_str + ' tracks summary statistics',
@@ -344,14 +279,10 @@ class HeliostatTracks:
         # Video frames per heliostat.
         video_frames_per_heliostat_dict = heliostat_tracks_nfxl.frames_per_heliostat()
         print(
-            'In HeliostatTracks.save_data(), writing video frames per '
-            + projected_or_confirmed_str
-            + ' heliostat:',
+            'In HeliostatTracks.save_data(), writing video frames per ' + projected_or_confirmed_str + ' heliostat:',
             os.path.join(self.output_data_dir, vfph_body_ext),
         )
-        ft.write_dict_file(
-            None, self.output_data_dir, vfph_body, video_frames_per_heliostat_dict
-        )
+        ft.write_dict_file(None, self.output_data_dir, vfph_body, video_frames_per_heliostat_dict)
 
     # LOAD RESULT
 
@@ -362,79 +293,47 @@ class HeliostatTracks:
             self.heliostat_projected_tracks_dir_body_ext,
         )
         self.heliostat_projected_tracks_nfxl = nfxl.NameFrameXyList()
-        self.heliostat_projected_tracks_nfxl.load(
-            self.heliostat_projected_tracks_dir_body_ext
-        )
+        self.heliostat_projected_tracks_nfxl.load(self.heliostat_projected_tracks_dir_body_ext)
         # Confirm what was read.
-        print(
-            'In HeliostatTracks.read_heliostat_tracks(), heliostat projected tracks read:'
-        )
-        self.heliostat_projected_tracks_nfxl.print(
-            max_keys=12, max_value_length=200, indent=4
-        )
+        print('In HeliostatTracks.read_heliostat_tracks(), heliostat projected tracks read:')
+        self.heliostat_projected_tracks_nfxl.print(max_keys=12, max_value_length=200, indent=4)
         # Confirmed.
         print(
             'In HeliostatTracks.read_heliostat_tracks(), reading heliostat confirmed tracks file: ',
             self.heliostat_confirmed_tracks_dir_body_ext,
         )
         self.heliostat_confirmed_tracks_nfxl = nfxl.NameFrameXyList()
-        self.heliostat_confirmed_tracks_nfxl.load(
-            self.heliostat_confirmed_tracks_dir_body_ext
-        )
+        self.heliostat_confirmed_tracks_nfxl.load(self.heliostat_confirmed_tracks_dir_body_ext)
         # Confirm what was read.
-        print(
-            'In HeliostatTracks.read_heliostat_tracks(), heliostat confirmed tracks read:'
-        )
-        self.heliostat_confirmed_tracks_nfxl.print(
-            max_keys=12, max_value_length=200, indent=4
-        )
+        print('In HeliostatTracks.read_heliostat_tracks(), heliostat confirmed tracks read:')
+        self.heliostat_confirmed_tracks_nfxl.print(max_keys=12, max_value_length=200, indent=4)
 
     def read_data(self):
         # Projected.
         # Statistics.
-        print(
-            'In HeliostatTracks.read_data(), reading projected frame statistics: ',
-            self.dict_projected_dir_body_ext,
-        )
-        self.projected_frame_statistics_dict = ft.read_dict(
-            self.dict_projected_dir_body_ext
-        )
+        print('In HeliostatTracks.read_data(), reading projected frame statistics: ', self.dict_projected_dir_body_ext)
+        self.projected_frame_statistics_dict = ft.read_dict(self.dict_projected_dir_body_ext)
         # Confirm what was read.
         print('In HeliostatTracks.read_data(), projected frame statistics read:')
         dt.print_dict(self.projected_frame_statistics_dict, indent=4)
         # Heliostats per video frame.
-        print(
-            'In HeliostatTracks.read_data(), reading projected heliostats per video frame: ',
-            self.vfpph_dir_body_ext,
-        )
+        print('In HeliostatTracks.read_data(), reading projected heliostats per video frame: ', self.vfpph_dir_body_ext)
         self.vfpph_dict = ft.read_dict(self.vfpph_dir_body_ext)
         # Confirm what was read.
-        print(
-            'In HeliostatTracks.read_data(), projected heliostats per video frame read:'
-        )
+        print('In HeliostatTracks.read_data(), projected heliostats per video frame read:')
         dt.print_dict(self.vfpph_dict, max_keys=12, max_value_length=200, indent=4)
         # Confirmed.
         # Statistics.
-        print(
-            'In HeliostatTracks.read_data(), reading confirmed frame statistics: ',
-            self.dict_confirmed_dir_body_ext,
-        )
-        self.confirmed_frame_statistics_dict = ft.read_dict(
-            self.dict_confirmed_dir_body_ext
-        )
+        print('In HeliostatTracks.read_data(), reading confirmed frame statistics: ', self.dict_confirmed_dir_body_ext)
+        self.confirmed_frame_statistics_dict = ft.read_dict(self.dict_confirmed_dir_body_ext)
         # Confirm what was read.
         print('In HeliostatTracks.read_data(), confirmed frame statistics read:')
         dt.print_dict(self.confirmed_frame_statistics_dict, indent=4)
         # Heliostats per video frame.
-        print(
-            'In HeliostatTracks.read_data(), reading confirmed heliostats per video frame: ',
-            self.vfpph_dir_body_ext,
-        )
+        print('In HeliostatTracks.read_data(), reading confirmed heliostats per video frame: ', self.vfpph_dir_body_ext)
         self.vfpph_dict = ft.read_dict(self.vfpph_dir_body_ext)
         # Confirm what was read.
-        print(
-            'In HeliostatTracks.read_data(), confirmed heliostats per video frame read:'
-        )
+        print('In HeliostatTracks.read_data(), confirmed heliostats per video frame read:')
         dt.print_dict(self.vfpph_dict, max_keys=12, max_value_length=200, indent=4)
 
     # RENDER RESULT
@@ -450,8 +349,7 @@ class HeliostatTracks:
         )  # ?? SCAFFOLDING RCB -- TEMPORARY
         # Projected.
         if (
-            self.render_control_projected.draw_heliostat_tracks
-            and self.generated_heliostat_projected_tracks
+            self.render_control_projected.draw_heliostat_tracks and self.generated_heliostat_projected_tracks
         ):  # Don't render unless we generated.
             self.render_aux(
                 self.heliostat_projected_tracks_nfxl,
@@ -461,8 +359,7 @@ class HeliostatTracks:
             )
         # Confirmed.
         if (
-            self.render_control_confirmed.draw_heliostat_tracks
-            and self.generated_heliostat_confirmed_tracks
+            self.render_control_confirmed.draw_heliostat_tracks and self.generated_heliostat_confirmed_tracks
         ):  # Don't render unless we generated.
             self.render_aux(
                 self.heliostat_confirmed_tracks_nfxl,
@@ -471,21 +368,10 @@ class HeliostatTracks:
                 'confirmed',
             )
 
-    def render_aux(
-        self,
-        heliostat_tracks_nfxl,
-        output_construction_dir,
-        render_control,
-        projected_or_confirmed_str,
-    ):
+    def render_aux(self, heliostat_tracks_nfxl, output_construction_dir, render_control, projected_or_confirmed_str):
+        print('In HeliostatTracks.render_aux(), rendering heliostat ' + projected_or_confirmed_str + ' tracks...')
         print(
-            'In HeliostatTracks.render_aux(), rendering heliostat '
-            + projected_or_confirmed_str
-            + ' tracks...'
-        )
-        print(
-            'In HeliostatTracks.render_aux(), output_construction_dir=',
-            output_construction_dir,
+            'In HeliostatTracks.render_aux(), output_construction_dir=', output_construction_dir
         )  # ?? SCAFFOLDING RCB -- TEMPORARY
         print('WARNING: In HeliostatTracks.render_aux(), not implemented yet.')
 
@@ -503,8 +389,7 @@ if __name__ == "__main__":
     )
     # Input/output sources.
     input_video_dir_body_ext = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
     )
     input_video_projected_tracks_dir_body_ext = (
         experiment_dir()
@@ -518,9 +403,7 @@ if __name__ == "__main__":
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/'
     )
-    input_frame_id_format = (
-        '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
-    )
+    input_frame_id_format = '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
     output_data_dir = (
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/Small_170_HeliostatTracks/mavic_zoom/data/'

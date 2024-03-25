@@ -24,10 +24,7 @@ class RenderControlFramesNoDuplicates(rcvf.RenderControlVideoFrames):
         if "outframe_format" not in kwargs:
             kwargs["outframe_format"] = frame_format
         super().__init__(
-            clear_dir=clear_dir,
-            draw_example_frames=draw_example_frames,
-            example_dpi=example_dpi,
-            **kwargs
+            clear_dir=clear_dir, draw_example_frames=draw_example_frames, example_dpi=example_dpi, **kwargs
         )
 
 

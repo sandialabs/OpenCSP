@@ -62,9 +62,7 @@ class Surface2DPlano(Surface2DAbstract):
 
         """
         # Downsample and save measurement data
-        self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic[
-            :: self.downsample
-        ]
+        self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic[:: self.downsample]
         self.v_screen_points_optic = v_screen_points_optic[:: self.downsample]
 
         # Save position data
@@ -131,20 +129,14 @@ class Surface2DPlano(Surface2DAbstract):
 
         """
         # Calculate pixel intersection points with existing fitting function
-        self.v_surf_int_pts_optic = self.intersect(
-            self.u_active_pixel_pointing_optic, self.v_optic_cam_optic
-        )
+        self.v_surf_int_pts_optic = self.intersect(self.u_active_pixel_pointing_optic, self.v_optic_cam_optic)
 
     def calculate_slopes(self) -> tuple[Vxyz, np.ndarray]:
         """
         Calculate slopes of each measurement point.
 
         """
-        self.slopes = sf2.calc_slopes(
-            self.v_surf_int_pts_optic,
-            self.v_optic_cam_optic,
-            self.v_screen_points_optic,
-        )
+        self.slopes = sf2.calc_slopes(self.v_surf_int_pts_optic, self.v_optic_cam_optic, self.v_screen_points_optic)
 
     def fit_slopes(self) -> dict:
         """
@@ -154,25 +146,15 @@ class Surface2DPlano(Surface2DAbstract):
         # Fit Nth order surfaces to slope distributions in X and Y
         if self.robust_least_squares:
             slope_coefs_x, weights_x = sf2.fit_slope_robust_ls(
-                self.slope_fit_poly_order,
-                self.slopes[0],
-                self.weights.copy(),
-                self.v_surf_int_pts_optic,
+                self.slope_fit_poly_order, self.slopes[0], self.weights.copy(), self.v_surf_int_pts_optic
             )
             slope_coefs_y, weights_y = sf2.fit_slope_robust_ls(
-                self.slope_fit_poly_order,
-                self.slopes[1],
-                self.weights.copy(),
-                self.v_surf_int_pts_optic,
+                self.slope_fit_poly_order, self.slopes[1], self.weights.copy(), self.v_surf_int_pts_optic
             )
             self.weights = np.array((weights_x, weights_y)).min(0)
         else:
-            slope_coefs_x = sf2.fit_slope_ls(
-                self.slope_fit_poly_order, self.slopes[0], self.v_surf_int_pts_optic
-            )
-            slope_coefs_y = sf2.fit_slope_ls(
-                self.slope_fit_poly_order, self.slopes[1], self.v_surf_int_pts_optic
-            )
+            slope_coefs_x = sf2.fit_slope_ls(self.slope_fit_poly_order, self.slopes[0], self.v_surf_int_pts_optic)
+            slope_coefs_y = sf2.fit_slope_ls(self.slope_fit_poly_order, self.slopes[1], self.v_surf_int_pts_optic)
 
         # Save slope coefficients
         self.slope_coefs = np.array([slope_coefs_x[0], slope_coefs_y[0]])
@@ -181,9 +163,7 @@ class Surface2DPlano(Surface2DAbstract):
         self.surf_coefs = np.array([0, slope_coefs_x[0], slope_coefs_x[0]])
 
         # Calculate z coordinate
-        z_pt = self.v_align_point_optic.z[0] - sf2.coef_to_points(
-            self.v_align_point_optic, self.surf_coefs, 1
-        )
+        z_pt = self.v_align_point_optic.z[0] - sf2.coef_to_points(self.v_align_point_optic, self.surf_coefs, 1)
         self.surf_coefs[0] = z_pt
 
     def rotate_all(self, r_align_step: Rotation) -> None:
@@ -196,25 +176,15 @@ class Surface2DPlano(Surface2DAbstract):
             Rotation object to rotate all vectors by.
 
         """
-        self.v_optic_cam_optic = self.v_optic_cam_optic.rotate_about(
+        self.v_optic_cam_optic = self.v_optic_cam_optic.rotate_about(r_align_step, self.v_align_point_optic)
+        self.v_screen_points_optic = self.v_screen_points_optic.rotate_about(r_align_step, self.v_align_point_optic)
+        self.u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate_about(
             r_align_step, self.v_align_point_optic
         )
-        self.v_screen_points_optic = self.v_screen_points_optic.rotate_about(
+        self.u_measure_pixel_pointing_optic = self.u_measure_pixel_pointing_optic.rotate_about(
             r_align_step, self.v_align_point_optic
         )
-        self.u_active_pixel_pointing_optic = (
-            self.u_active_pixel_pointing_optic.rotate_about(
-                r_align_step, self.v_align_point_optic
-            )
-        )
-        self.u_measure_pixel_pointing_optic = (
-            self.u_measure_pixel_pointing_optic.rotate_about(
-                r_align_step, self.v_align_point_optic
-            )
-        )
-        self.v_optic_screen_optic = self.v_optic_screen_optic.rotate_about(
-            r_align_step, self.v_align_point_optic
-        )
+        self.v_optic_screen_optic = self.v_optic_screen_optic.rotate_about(r_align_step, self.v_align_point_optic)
 
     def shift_all(self, v_align_optic_step: Vxyz) -> None:
         """
@@ -233,11 +203,7 @@ class Surface2DPlano(Surface2DAbstract):
         self.v_optic_screen_optic += v_align_optic_step
 
     def save_to_hdf(self, file: str, prefix: str = ''):
-        data = [
-            self.robust_least_squares,
-            self.downsample,
-            'parabolic'
-        ]
+        data = [self.robust_least_squares, self.downsample, 'parabolic']
         datasets = [
             prefix + 'ParamsSurface/robust_least_squares',
             prefix + 'ParamsSurface/downsample',
@@ -250,13 +216,9 @@ class Surface2DPlano(Surface2DAbstract):
         # Check surface type
         data = load_hdf5_datasets([prefix + 'ParamsSurface/surface_type'], file)
         if data['surface_type'] != 'parabolic':
-            raise ValueError(
-                f'Surface2DPlano cannot load surface type, {data["surface_type"]:s}')
+            raise ValueError(f'Surface2DPlano cannot load surface type, {data["surface_type"]:s}')
 
         # Load
-        datasets = [
-            prefix + 'ParamsSurface/robust_least_squares',
-            prefix + 'ParamsSurface/downsample',
-        ]
+        datasets = [prefix + 'ParamsSurface/robust_least_squares', prefix + 'ParamsSurface/downsample']
         data = load_hdf5_datasets(datasets, file)
         return cls(**data)

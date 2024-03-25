@@ -79,19 +79,9 @@ def to_datetime(ymdhmsz: list[int, int, int, int, int, float, int] | datetime):
     if isinstance(ymdhmsz, datetime):
         return ymdhmsz
     if len(ymdhmsz) != 7:
-        raise RuntimeError(
-            f"Unexpected datetime representation for the input list {ymdhmsz}!"
-        )
+        raise RuntimeError(f"Unexpected datetime representation for the input list {ymdhmsz}!")
     tzinfo = timezone(timedelta(hours=ymdhmsz[6]))
-    return datetime(
-        ymdhmsz[0],
-        ymdhmsz[1],
-        ymdhmsz[2],
-        ymdhmsz[3],
-        ymdhmsz[4],
-        ymdhmsz[5],
-        tzinfo=tzinfo,
-    )
+    return datetime(ymdhmsz[0], ymdhmsz[1], ymdhmsz[2], ymdhmsz[3], ymdhmsz[4], ymdhmsz[5], tzinfo=tzinfo)
 
 
 def from_datetime(dt: datetime) -> list[int, int, int, int, int, float, int]:
@@ -139,16 +129,11 @@ def tz(name_or_offset: str | float | timedelta):
             return tz
 
     # failed to match
-    lt.error_and_raise(
-        RuntimeError,
-        f"Error: in time_date_tools.tz(), failed to find a timezone with the name {name}",
-    )
+    lt.error_and_raise(RuntimeError, f"Error: in time_date_tools.tz(), failed to find a timezone with the name {name}")
 
 
 def add_seconds_to_ymdhmsz(
-    ymdhmsz: list[int, int, int, int, int, float, int],
-    time_sec: float,
-    ignore_legacy=None,
+    ymdhmsz: list[int, int, int, int, int, float, int], time_sec: float, ignore_legacy=None
 ) -> list[int, int, int, int, int, float, int]:
     ignore_legacy = tdt_ignore_legacy if (ignore_legacy == None) else ignore_legacy
     if ignore_legacy == False:
@@ -179,18 +164,14 @@ def add_seconds_to_ymdhmsz(
                 second -= 60
                 second += time_sec
             else:
-                print(
-                    'ERROR: In add_seconds_to_ymdhms(), rolling over a day boundary not implemented yet.'
-                )
+                print('ERROR: In add_seconds_to_ymdhms(), rolling over a day boundary not implemented yet.')
                 assert False
     # Return.
     return [year, month, day, hour, minute, second, zone]
 
 
 def subtract_seconds_from_ymdhmsz(
-    ymdhmsz: list[int, int, int, int, int, float, int],
-    time_sec: float,
-    ignore_legacy=None,
+    ymdhmsz: list[int, int, int, int, int, float, int], time_sec: float, ignore_legacy=None
 ) -> list[int, int, int, int, int, float, int]:
     ignore_legacy = tdt_ignore_legacy if (ignore_legacy == None) else ignore_legacy
     if ignore_legacy == False:

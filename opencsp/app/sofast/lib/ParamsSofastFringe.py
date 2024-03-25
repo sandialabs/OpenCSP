@@ -22,12 +22,8 @@ class ParamsSofastFringe:
     geometry_params: ParamsOpticGeometry = field(default_factory=ParamsOpticGeometry)
 
     # Debug objects
-    slope_solver_data_debug: SlopeSolverDataDebug = field(
-        default_factory=SlopeSolverDataDebug
-    )
-    geometry_data_debug: DebugOpticsGeometry = field(
-        default_factory=DebugOpticsGeometry
-    )
+    slope_solver_data_debug: SlopeSolverDataDebug = field(default_factory=SlopeSolverDataDebug)
+    geometry_data_debug: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsSofastFringe/...

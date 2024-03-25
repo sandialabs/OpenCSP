@@ -5,6 +5,6 @@ from opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract import ParamsSlo
 
 @dataclass
 class ParamsSlopeSolverParaboloid(ParamsSlopeSolverAbstract):
-    """SlopeSolver input parameters class for parabolic surface type
-    """
+    """SlopeSolver input parameters class for parabolic surface type"""
+
     initial_focal_lengths_xy: tuple[float, float]

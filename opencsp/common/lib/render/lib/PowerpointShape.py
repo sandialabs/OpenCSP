@@ -4,11 +4,7 @@ from typing import Iterable, overload
 
 
 class PowerpointShape:
-    def __init__(
-        self,
-        cell_dims: tuple[float, float, float, float] = None,
-        code_location: str = None,
-    ):
+    def __init__(self, cell_dims: tuple[float, float, float, float] = None, code_location: str = None):
         """This class supplements the shape class from python-pptx. It allows us to do our custom layouts a little bit easier.
 
         Args:

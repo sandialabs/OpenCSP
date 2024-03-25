@@ -79,10 +79,7 @@ class DefinitionEnsemble:
             data_json = json.load(f)
 
         ensemble_perimeter = np.array(
-            (
-                data_json['ensemble_perimeter']['facet_indices'],
-                data_json['ensemble_perimeter']['corner_indices'],
-            )
+            (data_json['ensemble_perimeter']['facet_indices'], data_json['ensemble_perimeter']['corner_indices'])
         ).T  # Nx2 ndarray
 
         # Put data in dictionary
@@ -107,9 +104,7 @@ class DefinitionEnsemble:
 
         data_dict = {
             'v_facet_locations': _Vxyz_to_dict(self.v_facet_locations),  # Vxyz
-            'r_facet_ensemble': _rot_list_to_dict(
-                self.r_facet_ensemble
-            ),  # list[Rotation]
+            'r_facet_ensemble': _rot_list_to_dict(self.r_facet_ensemble),  # list[Rotation]
             'ensemble_perimeter': {
                 'facet_indices': ensemble_perimeter[:, 0].tolist(),  # list
                 'corner_indices': ensemble_perimeter[:, 1].tolist(),  # list
@@ -167,9 +162,7 @@ class DefinitionEnsemble:
         r_facet_ensemble = [Rotation.from_rotvec(r) for r in data['r_facet_ensemble']]
         ensemble_perimeter = data['ensemble_perimeter']
         v_centroid_ensemble = Vxyz(data['v_centroid_ensemble'])
-        return cls(
-            v_facet_locations, r_facet_ensemble, ensemble_perimeter, v_centroid_ensemble
-        )
+        return cls(v_facet_locations, r_facet_ensemble, ensemble_perimeter, v_centroid_ensemble)
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:

@@ -54,28 +54,18 @@ class KeyFramesGivenManual:
     ):  # Flags to control rendering on this run.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError(
-                'In KeyFramesGivenManual.__init__(), null input_video_dir_body_ext encountered.'
-            )
-        if (input_original_keyinfo_dir_body_ext == None) or (
-            len(input_original_keyinfo_dir_body_ext) == 0
-        ):
+            raise ValueError('In KeyFramesGivenManual.__init__(), null input_video_dir_body_ext encountered.')
+        if (input_original_keyinfo_dir_body_ext == None) or (len(input_original_keyinfo_dir_body_ext) == 0):
             raise ValueError(
                 'In KeyFramesGivenManual.__init__(), null input_original_keyinfo_dir_body_ext encountered.'
             )
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError(
-                'In KeyFramesGivenManual.__init__(), null output_data_dir encountered.'
-            )
+            raise ValueError('In KeyFramesGivenManual.__init__(), null output_data_dir encountered.')
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError(
-                'In KeyFramesGivenManual.__init__(), null output_render_dir encountered.'
-            )
+            raise ValueError('In KeyFramesGivenManual.__init__(), null output_render_dir encountered.')
 
         # Parse input video path components.
-        input_video_dir, input_video_body, input_video_ext = ft.path_components(
-            input_video_dir_body_ext
-        )
+        input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
 
         # Store input.
         # Execution control.
@@ -101,16 +91,12 @@ class KeyFramesGivenManual:
 
         # Lookup frames per second.
         video = cv.VideoCapture(input_video_dir_body_ext)
-        self.fps = (
-            int(video.get(cv.CAP_PROP_FPS)) + 1
-        )  # +1 hard value  # RCB doesn't understand this.
+        self.fps = int(video.get(cv.CAP_PROP_FPS)) + 1  # +1 hard value  # RCB doesn't understand this.
 
         # Key frame file name.
         self.key_frames_body = self.input_video_body + '_key_frames_fnxl'
         self.key_frames_body_ext = self.key_frames_body + '.csv'
-        self.key_frames_dir_body_ext = os.path.join(
-            self.output_data_dir, self.key_frames_body_ext
-        )
+        self.key_frames_dir_body_ext = os.path.join(self.output_data_dir, self.key_frames_body_ext)
 
         # Summary statistics file name.
         self.dict_body = self.input_video_body + '_key_frame_statistics'
@@ -177,16 +163,10 @@ class KeyFramesGivenManual:
                     heliostat_names = keyinfo[3]
                     frame_id = instance_frame_correspondence_dict[instance_key]
                     # Construct key frame entry.
-                    (key_frame_id, list_of_name_polygons) = (
-                        self.construct_key_frame_entry(
-                            instance_key,
-                            keyinfo_dict,
-                            instance_frame_correspondence_dict,
-                        )
+                    (key_frame_id, list_of_name_polygons) = self.construct_key_frame_entry(
+                        instance_key, keyinfo_dict, instance_frame_correspondence_dict
                     )
-                    key_frames_fnxl.add_list_of_name_xy_lists(
-                        key_frame_id, list_of_name_polygons
-                    )
+                    key_frames_fnxl.add_list_of_name_xy_lists(key_frame_id, list_of_name_polygons)
                 # for key_frame_id_key in key_frame_dict.keys():
                 #     print('In KeyFramesGivenManual.convert_and_save_original_keyinfo_file(),   ' + str(key_frame_id_key) + ':  ' + str(key_frame_dict[key_frame_id_key]))
             else:
@@ -201,9 +181,7 @@ class KeyFramesGivenManual:
                 key_frames_fnxl = fnxl.FrameNameXyList()
                 key_frames_fnxl.load(self.input_edited_key_frames_dir_body_ext)
                 # Confirm what was read.
-                print(
-                    'KeyFramesGivenManual.convert_and_save_original_keyinfo_file(), key frame specfication read:'
-                )
+                print('KeyFramesGivenManual.convert_and_save_original_keyinfo_file(), key frame specfication read:')
                 key_frames_fnxl.print(max_keys=7, max_value_length=200, indent=4)
 
             # Write key frame file.
@@ -220,31 +198,18 @@ class KeyFramesGivenManual:
             print(
                 'In KeyFramesGivenManual.convert_and_save_original_keyinfo_file(), writing key frame summary statistics...'
             )
-            ft.write_dict_file(
-                'key frame summary statistics',
-                self.output_data_dir,
-                self.dict_body,
-                summary_dict,
-            )
+            ft.write_dict_file('key frame summary statistics', self.output_data_dir, self.dict_body, summary_dict)
             # Heliostats per key frame.
             heliostats_per_key_frame_dict = key_frames_fnxl.heliostats_per_frame()
             print(
                 'In KeyFramesGivenManual.convert_and_save_original_keyinfo_file(), writing heliostats per key frame:',
                 os.path.join(self.output_data_dir, self.hpkf_body_ext),
             )
-            ft.write_dict_file(
-                None,
-                self.output_data_dir,
-                self.hpkf_body,
-                heliostats_per_key_frame_dict,
-            )
+            ft.write_dict_file(None, self.output_data_dir, self.hpkf_body, heliostats_per_key_frame_dict)
 
     def read_keyinfo(self):
         # Load original keyinfo file.
-        print(
-            'In KeyFramesGivenManual.read_keyinfo(), reading file:',
-            self.input_original_keyinfo_dir_body_ext,
-        )
+        print('In KeyFramesGivenManual.read_keyinfo(), reading file:', self.input_original_keyinfo_dir_body_ext)
         keyinfo_stream = open(self.input_original_keyinfo_dir_body_ext, "r")
         keyinfo_lines_with_newline = keyinfo_stream.readlines()
         keyinfo_lines = [line.rstrip('\n') for line in keyinfo_lines_with_newline]
@@ -289,9 +254,7 @@ class KeyFramesGivenManual:
         # Return.
         return starting_id, ending_id
 
-    def construct_key_frame_entry(
-        self, instance_key, keyinfo_dict, instance_frame_correspondence_dict
-    ):
+    def construct_key_frame_entry(self, instance_key, keyinfo_dict, instance_frame_correspondence_dict):
         # Fetch information.
         key_frame_id = instance_frame_correspondence_dict[instance_key]
         keyinfo = keyinfo_dict[
@@ -301,15 +264,11 @@ class KeyFramesGivenManual:
         box_coords = keyinfo[2]
         heliostat_names = keyinfo[3]
         # Construct entry.
-        entry = self.construct_key_frame_entry_aux(
-            number_of_heliostats, heliostat_names, box_coords
-        )
+        entry = self.construct_key_frame_entry_aux(number_of_heliostats, heliostat_names, box_coords)
         # Return.
         return key_frame_id, entry
 
-    def construct_key_frame_entry_aux(
-        self, number_of_heliostats, heliostat_names, box_coords
-    ):
+    def construct_key_frame_entry_aux(self, number_of_heliostats, heliostat_names, box_coords):
         """
         A key frame entry is a list:
 
@@ -345,12 +304,7 @@ class KeyFramesGivenManual:
         bboxes = []
         for idx in range(0, number_of_heliostats):
             bbox_idx = idx * 4
-            bbox = [
-                box_coords[bbox_idx],
-                box_coords[bbox_idx + 1],
-                box_coords[bbox_idx + 2],
-                box_coords[bbox_idx + 3],
-            ]
+            bbox = [box_coords[bbox_idx], box_coords[bbox_idx + 1], box_coords[bbox_idx + 2], box_coords[bbox_idx + 3]]
             bboxes.append(bbox)
         # Assemble the entry.
         list_of_name_polygons = []
@@ -386,16 +340,10 @@ class KeyFramesGivenManual:
         y_2 = bbox[3]
         # Check validity.
         if x_1 == x_2:
-            print(
-                'ERROR: In KeyFramesGivenManual.polygon_given_bbox(), corner x values are equal.  x_1 == x_2 ==',
-                x_1,
-            )
+            print('ERROR: In KeyFramesGivenManual.polygon_given_bbox(), corner x values are equal.  x_1 == x_2 ==', x_1)
             assert False
         if y_1 == y_2:
-            print(
-                'ERROR: In KeyFramesGivenManual.polygon_given_bbox(), corner y values are equal.  y_1 == y_2 ==',
-                y_1,
-            )
+            print('ERROR: In KeyFramesGivenManual.polygon_given_bbox(), corner y values are equal.  y_1 == y_2 ==', y_1)
             assert False
         # Identify boundaries.
         x_min = min(x_1, x_2)
@@ -413,10 +361,7 @@ class KeyFramesGivenManual:
     # LOAD RESULT
 
     def read_key_frames(self):
-        print(
-            'In KeyFramesGivenManual.read_key_frames(), reading key frames: ',
-            self.key_frames_dir_body_ext,
-        )
+        print('In KeyFramesGivenManual.read_key_frames(), reading key frames: ', self.key_frames_dir_body_ext)
         self.key_frames_fnxl = fnxl.FrameNameXyList()
         self.key_frames_fnxl.load(self.key_frames_dir_body_ext)
         # Confirm what was read.
@@ -424,15 +369,9 @@ class KeyFramesGivenManual:
         self.key_frames_fnxl.print(max_keys=7, max_value_length=200, indent=4)
 
     def read_data(self):
-        print(
-            'In KeyFramesGivenManual.read_data(), reading frame statistics: ',
-            self.dict_dir_body_ext,
-        )
+        print('In KeyFramesGivenManual.read_data(), reading frame statistics: ', self.dict_dir_body_ext)
         self.frame_statistics_dict = ft.read_dict(self.dict_dir_body_ext)
-        print(
-            'In KeyFramesGivenManual.read_data(), reading heliostats per key frame: ',
-            self.hpkf_dir_body_ext,
-        )
+        print('In KeyFramesGivenManual.read_data(), reading heliostats per key frame: ', self.hpkf_dir_body_ext)
         self.hpkf_dict = ft.read_dict(self.hpkf_dir_body_ext)
         # Confirm what was read.
         print('In KeyFramesGivenManual.read_data(), heliostats per key frame read:')
@@ -442,9 +381,7 @@ class KeyFramesGivenManual:
 
     def render(self):
         if self.render_control.draw_key_frames:
-            print(
-                'In KeyFramesGivenManual.render(), rendering frames with key corners...'
-            )
+            print('In KeyFramesGivenManual.render(), rendering frames with key corners...')
             # Descriptive strings.
             title_name = 'Key Frame'
             context_str = 'KeyFramesGivenManual.render()'
@@ -452,9 +389,7 @@ class KeyFramesGivenManual:
             fig_suffix = '_key_frame_fig'
             delete_suffix = '.JPG' + fig_suffix + '.png'
             # Prepare directory.
-            upc.prepare_render_directory(
-                self.output_render_dir, delete_suffix, self.render_control
-            )
+            upc.prepare_render_directory(self.output_render_dir, delete_suffix, self.render_control)
             # Setup annotation styles.
             style_dict = {}
             style_dict['point_seq'] = rcps.outline(
@@ -498,8 +433,7 @@ if __name__ == "__main__":
     )
     # Input/output sources.
     input_video_dir_body_ext = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
     )
     input_original_keyinfo_dir_body_ext = (
         experiment_dir()
@@ -515,16 +449,12 @@ if __name__ == "__main__":
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/'
     )
-    input_frame_id_format = (
-        '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
-    )
+    input_frame_id_format = '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
     output_data_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/130_KeyFrames/mavic_zoom/data/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/130_KeyFrames/mavic_zoom/data/'
     )
     output_render_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/130_KeyFrames/mavic_zoom/render/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/130_KeyFrames/mavic_zoom/render/'
     )
     # Render control.
     render_control = rckfgm.default()

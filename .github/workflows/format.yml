@@ -32,4 +32,5 @@ jobs:
       - name: Black formatting check
         run: |
           pip install black
-          black . -S -C --check --diff
+          cd OpenCSP
+          black . -S -C --check --diff --config ./pyproject.toml

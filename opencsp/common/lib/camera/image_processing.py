@@ -34,9 +34,7 @@ def encode_RG_to_RGB(image: np.ndarray) -> np.ndarray:
     return np.concatenate((im_r, im_g, im_b), 2)
 
 
-def highlight_saturation(
-    image: np.ndarray, saturation_value: int | float
-) -> np.ndarray:
+def highlight_saturation(image: np.ndarray, saturation_value: int | float) -> np.ndarray:
     """
     Highlights saturated pixels red. Image can be 2d or 3d, a 3d
     image is returned.
@@ -60,9 +58,7 @@ def highlight_saturation(
     elif np.ndim(image) == 3:
         rgb = image
     else:
-        raise ValueError(
-            f'Input image must have 1 or 3 channels, but image has shape: {image.shape}'
-        )
+        raise ValueError(f'Input image must have 1 or 3 channels, but image has shape: {image.shape}')
 
     # Mask saturated pixels
     mask = (rgb >= saturation_value).max(2)

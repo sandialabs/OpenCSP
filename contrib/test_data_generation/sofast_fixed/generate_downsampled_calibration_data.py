@@ -20,8 +20,7 @@ def generate_data():
     """Downsamples and saves files"""
     # Define file locations
     dir_sample_data = join(
-        opencsp_code_dir(),
-        '../../sample_data/deflectometry/calibration_dot_locations/data_measurement',
+        opencsp_code_dir(), '../../sample_data/deflectometry/calibration_dot_locations/data_measurement'
     )
 
     files_images = glob(join(dir_sample_data, 'images/*.JPG'))
@@ -30,10 +29,7 @@ def generate_data():
     file_camera_def = join(dir_sample_data, 'camera_deflectometry.h5')
     file_image_def = join(dir_sample_data, 'image_deflectometry_camera.png')
 
-    dir_save = join(
-        opencsp_code_dir(),
-        'test/data/measurements_sofast_fixed/dot_location_calibration/measurements',
-    )
+    dir_save = join(opencsp_code_dir(), 'test/data/measurements_sofast_fixed/dot_location_calibration/measurements')
 
     # Downsample marker/dot images
     n_downsample = 4

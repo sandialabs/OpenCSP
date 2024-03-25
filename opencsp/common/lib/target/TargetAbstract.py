@@ -18,10 +18,7 @@ class TargetAbstract(ABC):
     """
 
     def __init__(
-        self,
-        image_width: float,  # Meters
-        image_height: float,  # Meters
-        dpm: float,  # dots per meter
+        self, image_width: float, image_height: float, dpm: float  # Meters  # Meters  # dots per meter
     ) -> None:
         super().__init__()
         self.image_width = image_width
@@ -29,9 +26,7 @@ class TargetAbstract(ABC):
         self.dpm = dpm
         self.comments = ["Target Comments:"]
         # Construct image object.
-        self.image = ti.construct_target_image(
-            self.image_width, self.image_height, self.dpm
-        )
+        self.image = ti.construct_target_image(self.image_width, self.image_height, self.dpm)
         # Set initial pattern.
         self.pattern_description = 'blank'  # ?? SCAFFOLDING RCB -- RENAME THIS VARIABLE TO "NAME"?  SEE splice_targets_above_below() FOR MAYBE REASON WHY
 
@@ -49,9 +44,7 @@ class TargetAbstract(ABC):
         return n_rows, n_cols, n_bands
 
     def image_size_str_meter(self) -> str:
-        return 'w{w:.3f}m_h{h:.3f}m_{dpm:.1f}dpm'.format(
-            w=self.image_width, h=self.image_height, dpm=round(self.dpm)
-        )
+        return 'w{w:.3f}m_h{h:.3f}m_{dpm:.1f}dpm'.format(w=self.image_width, h=self.image_height, dpm=round(self.dpm))
 
     def image_size_str_inch(self) -> str:
         return 'w{w:.3f}in_h{h:.3f}in_{dpi:d}dpi'.format(

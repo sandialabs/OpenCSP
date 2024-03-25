@@ -22,9 +22,7 @@ class RenderControlWayPoint:
         draw_position=True,
         position_style=rcps.marker(marker='.'),
         draw_stop=True,
-        stop_style=rcps.marker(
-            color='r', marker='x', markersize=7
-        ),  # Same color as heading.
+        stop_style=rcps.marker(color='r', marker='x', markersize=7),  # Same color as heading.
         draw_heading=True,
         heading_scale=3,
         heading_style=rcps.outline(color='r'),
@@ -39,10 +37,7 @@ class RenderControlWayPoint:
         # outline_style = rcps.outline(),
         draw_idx=True,
         idx_style=rctxt.RenderControlText(
-            color='k',
-            fontsize='small',
-            horizontalalignment='right',
-            verticalalignment='top',
+            color='k', fontsize='small', horizontalalignment='right', verticalalignment='top'
         ),
     ):
         super(RenderControlWayPoint, self).__init__()

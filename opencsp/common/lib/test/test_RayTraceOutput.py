@@ -40,9 +40,7 @@ from opencsp.common.lib.csp.ufacet.Facet import Facet
 from opencsp.common.lib.csp.ufacet.Heliostat import Heliostat
 from opencsp.common.lib.csp.LightPath import LightPath
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from opencsp.common.lib.csp.MirrorParametricRectangular import (
-    MirrorParametricRectangular,
-)
+from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Pxyz import Pxyz
@@ -50,19 +48,11 @@ from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
-from opencsp.common.lib.render_control.RenderControlEnsemble import (
-    RenderControlEnsemble,
-)
+from opencsp.common.lib.render_control.RenderControlEnsemble import RenderControlEnsemble
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import (
-    RenderControlFigureRecord,
-)
-from opencsp.common.lib.render_control.RenderControlLightPath import (
-    RenderControlLightPath,
-)
-from opencsp.common.lib.render_control.RenderControlRayTrace import (
-    RenderControlRayTrace,
-)
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
 from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
 
 
@@ -93,16 +83,8 @@ class TestRayTraceOutput(to.TestOutput):
         self.m1_len_y = 3.0  # m
         self.m1_rectangle_xy = (self.m1_len_x, self.m1_len_y)
         self.m1 = MirrorParametricRectangular(self.m1_fxn, self.m1_rectangle_xy)
-        self.m1_shape_description = (
-            'rectangle ' + str(self.m1_len_x) + 'm x ' + str(self.m1_len_y) + 'm'
-        )
-        self.m1_title = (
-            'Mirror ('
-            + self.m1_shape_description
-            + ', f='
-            + str(self.m1_focal_length)
-            + 'm), Face Up'
-        )
+        self.m1_shape_description = 'rectangle ' + str(self.m1_len_x) + 'm x ' + str(self.m1_len_y) + 'm'
+        self.m1_title = 'Mirror (' + self.m1_shape_description + ', f=' + str(self.m1_focal_length) + 'm), Face Up'
         self.m1_caption = (
             'A single mirror of shape ('
             + self.m1_shape_description
@@ -133,26 +115,16 @@ class TestRayTraceOutput(to.TestOutput):
         # Set canting angles.
         cos5 = np.cos(np.deg2rad(8))
         sin5 = np.sin(np.deg2rad(8))
-        tilt_up = Rotation.from_matrix(
-            np.asarray([[1, 0, 0], [0, cos5, -sin5], [0, sin5, cos5]])
-        )
-        tilt_down = Rotation.from_matrix(
-            np.asarray([[1, 0, 0], [0, cos5, sin5], [0, -sin5, cos5]])
-        )
-        tilt_left = Rotation.from_matrix(
-            np.asarray([[cos5, 0, sin5], [0, 1, 0], [-sin5, 0, cos5]])
-        )
-        tilt_right = Rotation.from_matrix(
-            np.asarray([[cos5, 0, -sin5], [0, 1, 0], [sin5, 0, cos5]])
-        )
+        tilt_up = Rotation.from_matrix(np.asarray([[1, 0, 0], [0, cos5, -sin5], [0, sin5, cos5]]))
+        tilt_down = Rotation.from_matrix(np.asarray([[1, 0, 0], [0, cos5, sin5], [0, -sin5, cos5]]))
+        tilt_left = Rotation.from_matrix(np.asarray([[cos5, 0, sin5], [0, 1, 0], [-sin5, 0, cos5]]))
+        tilt_right = Rotation.from_matrix(np.asarray([[cos5, 0, -sin5], [0, 1, 0], [sin5, 0, cos5]]))
         self.h2x2_f1.canting = tilt_left * tilt_up
         self.h2x2_f2.canting = tilt_right * tilt_up
         self.h2x2_f3.canting = tilt_left * tilt_down
         self.h2x2_f4.canting = tilt_right * tilt_down
         self.h2x2_facets = [self.h2x2_f1, self.h2x2_f2, self.h2x2_f3, self.h2x2_f4]
-        self.h2x2 = Heliostat(
-            'Simple 2x2 Heliostat', [0, 0, 0], 4, 2, 2, self.h2x2_facets, 0, 0
-        )
+        self.h2x2 = Heliostat('Simple 2x2 Heliostat', [0, 0, 0], 4, 2, 2, self.h2x2_facets, 0, 0)
         self.h2x2_title = 'Heliostat with Parametrically Defined Facets'
         self.h2x2_caption = (
             'Heliostat with four facets ('
@@ -164,37 +136,15 @@ class TestRayTraceOutput(to.TestOutput):
         self.h2x2_comments = []
 
         # Simple solar field, with two simple heliostats.
-        self.sf2x2_h1 = Heliostat(
-            'Heliostat 1',
-            [0, 0, 0],
-            4,
-            2,
-            2,
-            copy.deepcopy(self.h2x2_facets),
-            4.02,
-            0.1778,
-        )
-        self.sf2x2_h2 = Heliostat(
-            'Heliostat 2',
-            [0, 10, 0],
-            4,
-            2,
-            2,
-            copy.deepcopy(self.h2x2_facets),
-            4.02,
-            0.1778,
-        )
+        self.sf2x2_h1 = Heliostat('Heliostat 1', [0, 0, 0], 4, 2, 2, copy.deepcopy(self.h2x2_facets), 4.02, 0.1778)
+        self.sf2x2_h2 = Heliostat('Heliostat 2', [0, 10, 0], 4, 2, 2, copy.deepcopy(self.h2x2_facets), 4.02, 0.1778)
         self.sf2x2_heliostats = [self.sf2x2_h1, self.sf2x2_h2]
-        self.sf2x2 = SolarField(
-            'Test Field', 'test', [-106.509606, 34.962276], self.sf2x2_heliostats
-        )
+        self.sf2x2 = SolarField('Test Field', 'test', [-106.509606, 34.962276], self.sf2x2_heliostats)
         self.sf2x2_title = 'Two Heliostats'
         self.sf2x2_caption = 'Two 4-facet heliostats, tracking.'
         self.sf2x2_comments = []
 
-    def lambda_symmetric_paraboloid(
-        self, focal_length: float
-    ) -> Callable[[float, float], float]:
+    def lambda_symmetric_paraboloid(self, focal_length: float) -> Callable[[float, float], float]:
         """
         Helper function that makes lambdas of paraboloids of a given focal length.
         """
@@ -228,9 +178,7 @@ class TestRayTraceOutput(to.TestOutput):
         incoming_vector = Vxyz([0, 1, -1])
         ref_vec = rt.calc_reflected_ray(normal_vector, incoming_vector)
         ray = LightPath(points, incoming_vector, ref_vec)
-        light_path_control = RenderControlLightPath(
-            line_render_control=rcps.RenderControlPointSeq(color='y')
-        )
+        light_path_control = RenderControlLightPath(line_render_control=rcps.RenderControlPointSeq(color='y'))
         ray.draw(view, light_path_control)
 
         # Output.
@@ -257,9 +205,7 @@ class TestRayTraceOutput(to.TestOutput):
 
         # Face Up, Parallel Beams yz
 
-        ls.incident_rays = LightPath.many_rays_from_many_vectors(
-            None, Vxyz([0, 0, -1])
-        )  # straight down
+        ls.incident_rays = LightPath.many_rays_from_many_vectors(None, Vxyz([0, 0, -1]))  # straight down
 
         m1.set_position_in_space(tran, rot_id)
 
@@ -283,24 +229,18 @@ class TestRayTraceOutput(to.TestOutput):
         )
         view1_yz = fig_record.view
 
-        trace1.draw(
-            view1_yz, RenderControlRayTrace(light_path_control=light_path_control)
-        )
+        trace1.draw(view1_yz, RenderControlRayTrace(light_path_control=light_path_control))
         m1.draw(view1_yz, mirror_control)
 
         # Output.
         self.show_save_and_check_figure(fig_record, dpi=150)
 
         # set of inc vectors to test
-        test_vecs = Uxyz(
-            [[0, 0, 0, 0.1, -0.1], [0, 0.1, -0.1, 0, 0], [-1, -1, -1, -1, -1]]
-        )
+        test_vecs = Uxyz([[0, 0, 0, 0.1, -0.1], [0, 0.1, -0.1, 0, 0], [-1, -1, -1, -1, -1]])
 
         # 45 degree rotation, cone of beams 3d
 
-        ls.incident_rays = LightPath.many_rays_from_many_vectors(
-            None, test_vecs.rotate(rot_45_deg)
-        )
+        ls.incident_rays = LightPath.many_rays_from_many_vectors(None, test_vecs.rotate(rot_45_deg))
 
         m1.set_position_in_space(tran, rot_45_deg)
 
@@ -355,9 +295,7 @@ class TestRayTraceOutput(to.TestOutput):
             facet_height=1.2192,
             default_mirror_shape=h_func,
         )
-        sf_curved = sf.SolarField(
-            "mini Nsttf with 5W1 and 14W1", "mini Field", loc, [h_curved]
-        )
+        sf_curved = sf.SolarField("mini Nsttf with 5W1 and 14W1", "mini Field", loc, [h_curved])
 
         h_canted = helio.h_from_facet_centroids(
             "NSTTF Heliostat 05W01",
@@ -373,13 +311,9 @@ class TestRayTraceOutput(to.TestOutput):
             default_mirror_shape=h_func,
         )
         h_canted.set_canting_from_equation(h_func)
-        sf_canted = sf.SolarField(
-            "mini Nsttf with 5W1 and 14W1", "mini Field", loc, [h_canted]
-        )
+        sf_canted = sf.SolarField("mini Nsttf with 5W1 and 14W1", "mini Field", loc, [h_canted])
 
-        mirror_control = rcm.RenderControlMirror(
-            surface_normals=False, norm_len=8, norm_res=2, resolution=3
-        )
+        mirror_control = rcm.RenderControlMirror(surface_normals=False, norm_len=8, norm_res=2, resolution=3)
         facet_control = rcf.RenderControlFacet(
             draw_mirror_curvature=True,
             mirror_styles=mirror_control,
@@ -407,9 +341,7 @@ class TestRayTraceOutput(to.TestOutput):
         # RAY TRACING
 
         # set of inc vectors to test
-        test_vecs = Uxyz(
-            [[0, 0, 0, 0.1, -0.1], [0, 0.1, -0.1, 0, 0], [-1, -1, -1, -1, -1]]
-        )
+        test_vecs = Uxyz([[0, 0, 0, 0.1, -0.1], [0, 0.1, -0.1, 0, 0], [-1, -1, -1, -1, -1]])
 
         sun = LightSourceSun()
         # sun.set_incident_rays(loc, when_ymdhmsz, 3)
@@ -469,9 +401,7 @@ class TestRayTraceOutput(to.TestOutput):
 
     def test_changing_time_of_day(self) -> None:
         # create a figure that shows 5w1 reflecting the sun towards an aimpoint -- TODO tjlarki: sun rays coming from wrong direction
-        def _heliostat_at_moment(
-            name: str, aimpoint_xyz: tuple, when_ymdhmsz: tuple, i: int
-        ) -> None:
+        def _heliostat_at_moment(name: str, aimpoint_xyz: tuple, when_ymdhmsz: tuple, i: int) -> None:
             self.start_test()
 
             local_comments = []
@@ -496,13 +426,9 @@ class TestRayTraceOutput(to.TestOutput):
 
             heliostats = [h_05w01]
 
-            sf1 = sf.SolarField(
-                "mini Nsttf with 5W1", "mini Field", lln.NSTTF_ORIGIN, heliostats
-            )
+            sf1 = sf.SolarField("mini Nsttf with 5W1", "mini Field", lln.NSTTF_ORIGIN, heliostats)
 
-            mirror_control = rcm.RenderControlMirror(
-                surface_normals=False, norm_len=8, norm_res=2, resolution=3
-            )
+            mirror_control = rcm.RenderControlMirror(surface_normals=False, norm_len=8, norm_res=2, resolution=3)
             facet_control = rcf.RenderControlFacet(
                 draw_mirror_curvature=True,
                 mirror_styles=mirror_control,
@@ -536,9 +462,7 @@ class TestRayTraceOutput(to.TestOutput):
                 scene.add_object(sf1)
                 scene.add_light_source(sun)
 
-                path_control = RenderControlLightPath(
-                    current_length=100, init_length=20
-                )
+                path_control = RenderControlLightPath(current_length=100, init_length=20)
                 trace_control = RenderControlRayTrace(light_path_control=path_control)
 
                 trace = rt.trace_scene(scene, obj_resolution=1)
@@ -578,9 +502,7 @@ class TestRayTraceOutput(to.TestOutput):
             view_xz = fig_record.view
             _draw_helper(view_xz)
 
-        _heliostat_at_moment(
-            "5w1 at 15:02", [60.0, 8.8, 28.9], (2021, 5, 13, 15, 2, 0, -6), 24
-        )
+        _heliostat_at_moment("5w1 at 15:02", [60.0, 8.8, 28.9], (2021, 5, 13, 15, 2, 0, -6), 24)
         return
 
     # partial field test
@@ -624,35 +546,25 @@ class TestRayTraceOutput(to.TestOutput):
             '5W5',
         ]
 
-        solar_field_csv = os.path.join(
-            self.actual_output_dir, 'test_partial_field_trace.csv'
-        )
+        solar_field_csv = os.path.join(self.actual_output_dir, 'test_partial_field_trace.csv')
         solar_field = stest.load_solar_field_partition(heliostat_list, solar_field_csv)
 
         # Tracking setup
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
 
         # Style setup
         solar_field_style = rcsf.heliostat_outlines(color='b')
 
         # Comment
         fig_record.comments.append("Partial Solar Field Trace.")
-        fig_record.comments.append(
-            "Using 1 ray per surface normal and one surface normal per mirror."
-        )
+        fig_record.comments.append("Using 1 ray per surface normal and one surface normal per mirror.")
         fig_record.comments.append(
             "Mirror curvature and canting is defined per heliostat. They are both parabolic and have focal lengths based on the distance of the heliostat to the tower."
         )
-        fig_record.comments.append(
-            "Traces one in every 13 heliostats in the NSTTF field."
-        )
+        fig_record.comments.append("Traces one in every 13 heliostats in the NSTTF field.")
 
         # Draw
-        mirror_control = rcm.RenderControlMirror(
-            surface_normals=False, norm_len=8, norm_res=2, resolution=2
-        )
+        mirror_control = rcm.RenderControlMirror(surface_normals=False, norm_len=8, norm_res=2, resolution=2)
         facet_control = rcf.RenderControlFacet(
             draw_mirror_curvature=False,
             mirror_styles=mirror_control,
@@ -675,9 +587,7 @@ class TestRayTraceOutput(to.TestOutput):
         )
 
         solar_field.draw(view, solar_field_style)
-        view.draw_xyz(
-            aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz'
-        )
+        view.draw_xyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
 
         sun = LightSourceSun()
         sun.set_incident_rays(lln.NSTTF_ORIGIN, when_ymdhmsz, 1)
@@ -689,9 +599,7 @@ class TestRayTraceOutput(to.TestOutput):
         trace = rt.trace_scene(scene, 1, verbose=True)
         trace.draw(view, RenderControlRayTrace(RenderControlLightPath(15, 200)))
 
-        view.draw_xyz(
-            aimpoint_xyz, rcps.RenderControlPointSeq(color='orange', marker='.')
-        )
+        view.draw_xyz(aimpoint_xyz, rcps.RenderControlPointSeq(color='orange', marker='.'))
 
         self.show_save_and_check_figure(fig_record, dpi=150)
 

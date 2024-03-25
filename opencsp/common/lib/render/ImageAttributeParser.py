@@ -60,9 +60,7 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
         except:
             pass
         if self._previous_attr != None:
-            prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(
-                ImageAttributeParser
-            )
+            prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(ImageAttributeParser)
 
             # Sanity check: are we trying to overwrite the "original_image_source" value?
             if prev_image_attr != None:
@@ -84,13 +82,9 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
         # Specifically for image attributes, for original image source, we
         # really want to maintain the absolute original image source throughout
         # all processing steps and files.
-        self.original_image_source = tt.default(
-            other.original_image_source, self.original_image_source
-        )
+        self.original_image_source = tt.default(other.original_image_source, self.original_image_source)
         # the rest of these attributes can be set as normal
-        self.current_image_source = tt.default(
-            self.current_image_source, other.current_image_source
-        )
+        self.current_image_source = tt.default(self.current_image_source, other.current_image_source)
         self.date_collected = tt.default(self.date_collected, other.date_collected)
         self.experiment_name = tt.default(self.experiment_name, other.experiment_name)
         self.notes = tt.default(self.notes, other.notes)
@@ -104,16 +98,12 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
             or (self.notes != None)
         )
 
-    def parse_my_contents(
-        self, file_path_name_ext: str, raw_contents: str, my_contents: any
-    ):
+    def parse_my_contents(self, file_path_name_ext: str, raw_contents: str, my_contents: any):
         self.current_image_source = my_contents['current_image_source']
         self.original_image_source = my_contents['original_image_source']
         self.date_collected = None
         if my_contents['date_collected'] != None:
-            self.date_collected = datetime.datetime.fromisoformat(
-                my_contents['date_collected']
-            )
+            self.date_collected = datetime.datetime.fromisoformat(my_contents['date_collected'])
         self.experiment_name = my_contents['experiment_name']
         self.notes = my_contents['notes']
 

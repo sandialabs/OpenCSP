@@ -74,77 +74,41 @@ class Reconstruct:
 
         # Supporting information.  # ?? SCAFFOLDING RCB -- SHOULD BE READ FROM ELSEWHERE.
         # Solar field parameters.
-        self.specifications = (
-            Dspec.nsttf_specifications()
-        )  # ?? SCAFFOLDING RCB -- MAKE THIS GENERAL
+        self.specifications = Dspec.nsttf_specifications()  # ?? SCAFFOLDING RCB -- MAKE THIS GENERAL
 
         self.heliostat_theoretical = uh3a.read_txt_file_to_heliostat(
             self.theoretical_heliostat_dir_body_ext, self.specifications
         )
 
     def execute_reconstruction(self, file):
-        hel_name = (
-            self.heliostat_name_given_heliostat_2d_corner_trajectories_dir_body_ext(
-                file
-            )
-        )
+        hel_name = self.heliostat_name_given_heliostat_2d_corner_trajectories_dir_body_ext(file)
         # hel_name   = file.split('/')[-1].split('_')[0]
 
         # Perform the reconstruction.
-        print(
-            'In execute_reconstruction(), calling call_executable() for heliostat '
-            + hel_name
-            + '...'
-        )
+        print('In execute_reconstruction(), calling call_executable() for heliostat ' + hel_name + '...')
         self.call_executable(file)
-        print(
-            'In execute_reconstruction(), call_executable() for heliostat '
-            + hel_name
-            + ' finished.'
-        )
+        print('In execute_reconstruction(), call_executable() for heliostat ' + hel_name + ' finished.')
 
         # We plan to recompile the C++ executable to have more fine-grain control over its output filename, but not today.
         # So rename the output file to match our naming standard.
-        print(
-            'In execute_reconstruction(), renaming output file for heliostat '
-            + hel_name
-            + '...'
-        )
+        print('In execute_reconstruction(), renaming output file for heliostat ' + hel_name + '...')
         executable_output_body_ext = hel_name + '_reconstructed.txt'
-        executable_output_dir_body_ext = os.path.join(
-            self.output_heliostat_3d_dir, executable_output_body_ext
-        )
+        executable_output_dir_body_ext = os.path.join(self.output_heliostat_3d_dir, executable_output_body_ext)
         heliostat_3d_dir_body_ext = os.path.join(
-            self.output_heliostat_3d_dir,
-            hel_name + '_' + self.confirm_distort_str + '_corners_3d.txt',
+            self.output_heliostat_3d_dir, hel_name + '_' + self.confirm_distort_str + '_corners_3d.txt'
         )
         ft.rename_file(executable_output_dir_body_ext, heliostat_3d_dir_body_ext)
 
-        print(
-            'In execute_reconstruction(), calling generate_plots() for heliostat '
-            + hel_name
-            + '...'
-        )
+        print('In execute_reconstruction(), calling generate_plots() for heliostat ' + hel_name + '...')
         uh3a.generate_plots(
-            heliostat_3d_dir_body_ext,
-            output_evaluation_plot_dir,
-            self.specifications,
-            self.heliostat_theoretical,
+            heliostat_3d_dir_body_ext, output_evaluation_plot_dir, self.specifications, self.heliostat_theoretical
         )
-        print(
-            'In execute_reconstruction(), generate_plots() for heliostat '
-            + hel_name
-            + ' finished.'
-        )
+        print('In execute_reconstruction(), generate_plots() for heliostat ' + hel_name + ' finished.')
 
         return heliostat_3d_dir_body_ext
 
     def call_executable(self, file):
-        hel_name = (
-            self.heliostat_name_given_heliostat_2d_corner_trajectories_dir_body_ext(
-                file
-            )
-        )
+        hel_name = self.heliostat_name_given_heliostat_2d_corner_trajectories_dir_body_ext(file)
         # hel_name = file.split('/')[-1].split('_')[0]
         fx = self.cam_matrix[0][0]
         fy = self.cam_matrix[1][1]
@@ -158,32 +122,16 @@ class Reconstruct:
         print('In call_executable(), str(cx)   =', str(cx))
         print('In call_executable(), str(cy)   =', str(cy))
         print('In call_executable(), heliostat =', hel_name)
-        print(
-            'In call_executable(), self.output_heliostat_3d_dir =',
-            self.output_heliostat_3d_dir,
-        )
+        print('In call_executable(), self.output_heliostat_3d_dir =', self.output_heliostat_3d_dir)
 
-        print(
-            'In call_executable(), calling executable for heliostat ' + hel_name + '...'
-        )
+        print('In call_executable(), calling executable for heliostat ' + hel_name + '...')
 
         proc = subprocess.Popen(
-            [
-                self.executable_path,
-                file,
-                str(fx),
-                str(fy),
-                str(cx),
-                str(cy),
-                hel_name,
-                self.output_heliostat_3d_dir,
-            ]
+            [self.executable_path, file, str(fx), str(fy), str(cx), str(cy), hel_name, self.output_heliostat_3d_dir]
         )
         proc.wait()
 
-        print(
-            'In call_executable(), executable for heliostat ' + hel_name + ' finished.'
-        )
+        print('In call_executable(), executable for heliostat ' + hel_name + ' finished.')
 
     def perform_reconstruction(self, single_execution=True):
         print('self.files =', self.files)
@@ -194,9 +142,7 @@ class Reconstruct:
                 heliostat_3d_dir_body_ext_list.append(self.execute_reconstruction(file))
         else:
             with Pool(36) as pool:
-                heliostat_3d_dir_body_ext_list = pool.map(
-                    self.execute_reconstruction, self.files
-                )
+                heliostat_3d_dir_body_ext_list = pool.map(self.execute_reconstruction, self.files)
         print('In perform_reconstruction() reconstruction finished.')
 
         print('heliostat_3d_dir_body_ext_list = ', heliostat_3d_dir_body_ext_list)
@@ -206,10 +152,7 @@ class Reconstruct:
             self.output_evaluation_csv_dir + '/'
         )  # ?? SCAFFOLDING RCB -- MAKE THIS PLATFORM INDEPENDENT.
         uh3a.generate_csv(
-            heliostat_3d_dir_body_ext_list,
-            output_evaluation_csv_dir_2,
-            self.specifications,
-            self.heliostat_theoretical,
+            heliostat_3d_dir_body_ext_list, output_evaluation_csv_dir_2, self.specifications, self.heliostat_theoretical
         )
         print('In perform_reconstruction() csv files finished.')
 

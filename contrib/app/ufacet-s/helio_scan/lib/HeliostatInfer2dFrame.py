@@ -109,16 +109,12 @@ class HeliostatInfer2dFrame:
         for homography_dict in homography_dicts:
             z = homography_dict['z']
             coplanar_corner_dicts = []  # All points within homography plane.
-            common_corner_dicts = (
-                []
-            )  # Points within homography plane, excluding missing points.
+            common_corner_dicts = []  # Points within homography plane, excluding missing points.
             for corner_dict in self.corner_dicts:
                 if corner_dict['flat_xyz'][2] == z:
                     corner_dict['homography_z'] = z
                     coplanar_corner_dicts.append(corner_dict)
-                    if (corner_dict['observed_xy'][0] != -1) or (
-                        corner_dict['observed_xy'][1] != -1
-                    ):
+                    if (corner_dict['observed_xy'][0] != -1) or (corner_dict['observed_xy'][1] != -1):
                         common_corner_dicts.append(corner_dict)
             homography_dict['coplanar_corner_dicts'] = coplanar_corner_dicts
             homography_dict['common_corner_dicts'] = common_corner_dicts
@@ -127,16 +123,12 @@ class HeliostatInfer2dFrame:
 
     def contruct_homographies(self):
         for homography_dict in self.homography_dicts:
-            self.contruct_homography(
-                homography_dict
-            )  # Adds to homography_dict as a side effect.
+            self.contruct_homography(homography_dict)  # Adds to homography_dict as a side effect.
 
     def contruct_homography(self, homography_dict):
         common_corner_dicts = homography_dict['common_corner_dicts']
         common_observed_xy_list = [d['observed_xy'] for d in common_corner_dicts]
-        common_flat_xy_list = [
-            d['flat_xyz'][0:2] for d in common_corner_dicts
-        ]  # Note drop z.
+        common_flat_xy_list = [d['flat_xyz'][0:2] for d in common_corner_dicts]  # Note drop z.
         source_points = np.array(common_observed_xy_list)
         destination_points = np.array(common_flat_xy_list)
         H, retval = cv.findHomography(source_points, destination_points)
@@ -159,9 +151,7 @@ class HeliostatInfer2dFrame:
             normalized_onto_flat_xy1 = mapped_onto_flat_xy1 / mapped_onto_flat_xy1[2]
             # Construct a 3-d point for convenience in rendering up to this point in the computation.
             normalized_onto_flat_xy = normalized_onto_flat_xy1[0:2]
-            normalized_onto_flat_xyz = list(normalized_onto_flat_xy) + [
-                corner_dict['homography_z']
-            ]
+            normalized_onto_flat_xyz = list(normalized_onto_flat_xy) + [corner_dict['homography_z']]
             # Store mapped points.
             corner_dict['observed_xy1'] = observed_xy1
             corner_dict['mapped_onto_flat_xy1'] = mapped_onto_flat_xy1

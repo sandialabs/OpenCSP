@@ -11,9 +11,7 @@ import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 class DotLocationsFixedPattern:
     """Class that holds locations of dots for fixed pattern deflectometry."""
 
-    def __init__(
-        self, x_dot_index: ndarray, y_dot_index: ndarray, xyz_dot_loc: ndarray
-    ) -> 'DotLocationsFixedPattern':
+    def __init__(self, x_dot_index: ndarray, y_dot_index: ndarray, xyz_dot_loc: ndarray) -> 'DotLocationsFixedPattern':
         """Instantiates class with xy indices and xyz points.
 
         Parameters
@@ -26,13 +24,9 @@ class DotLocationsFixedPattern:
             Shape (N, M, 3) array holding xyz locations of dots in screen coordinates
         """
         if x_dot_index.size != xyz_dot_loc.shape[1]:
-            raise ValueError(
-                f'X dimensions do not match: {x_dot_index.size} and {xyz_dot_loc.shape}'
-            )
+            raise ValueError(f'X dimensions do not match: {x_dot_index.size} and {xyz_dot_loc.shape}')
         if y_dot_index.size != xyz_dot_loc.shape[0]:
-            raise ValueError(
-                f'Y dimensions do not match: {y_dot_index.size} and {xyz_dot_loc.shape}'
-            )
+            raise ValueError(f'Y dimensions do not match: {y_dot_index.size} and {xyz_dot_loc.shape}')
 
         # Store data
         self.x_dot_index = x_dot_index
@@ -43,12 +37,7 @@ class DotLocationsFixedPattern:
         # Calculate extents
         self.nx = x_dot_index.size
         self.ny = y_dot_index.size
-        self.dot_extent = (
-            x_dot_index.min(),
-            x_dot_index.max(),
-            y_dot_index.min(),
-            y_dot_index.max(),
-        )
+        self.dot_extent = (x_dot_index.min(), x_dot_index.max(), y_dot_index.min(), y_dot_index.max())
 
         self.x_min = self.x_dot_index.min()
         self.x_offset = -self.x_min
@@ -73,22 +62,12 @@ class DotLocationsFixedPattern:
 
         # Calculate xyz locations
         xyz_dot_loc = display.interp_func(xy_pts_frac)
-        x = xyz_dot_loc.x.reshape(
-            (fixed_pattern_projection.ny, fixed_pattern_projection.nx, 1)
-        )
-        y = xyz_dot_loc.y.reshape(
-            (fixed_pattern_projection.ny, fixed_pattern_projection.nx, 1)
-        )
-        z = xyz_dot_loc.z.reshape(
-            (fixed_pattern_projection.ny, fixed_pattern_projection.nx, 1)
-        )
+        x = xyz_dot_loc.x.reshape((fixed_pattern_projection.ny, fixed_pattern_projection.nx, 1))
+        y = xyz_dot_loc.y.reshape((fixed_pattern_projection.ny, fixed_pattern_projection.nx, 1))
+        z = xyz_dot_loc.z.reshape((fixed_pattern_projection.ny, fixed_pattern_projection.nx, 1))
         xyz_dot_loc_mat = np.concatenate((x, y, z), axis=2)
 
-        return cls(
-            fixed_pattern_projection.x_indices,
-            fixed_pattern_projection.y_indices,
-            xyz_dot_loc_mat,
-        )
+        return cls(fixed_pattern_projection.x_indices, fixed_pattern_projection.y_indices, xyz_dot_loc_mat)
 
     def xy_indices_to_screen_coordinates(self, pts_idxs: Vxy) -> Vxyz:
         """Convertes xy point indices to xyz screen coordinates.

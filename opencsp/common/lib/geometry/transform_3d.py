@@ -10,9 +10,7 @@ import numpy as np
 from warnings import warn
 
 
-def axisrotation(
-    unit_vector, angle
-):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BETWEEN "AXIS" AND "ROTATION"
+def axisrotation(unit_vector, angle):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BETWEEN "AXIS" AND "ROTATION"
     warn(
         'transform_3d.axisrotation is deprecated. Replace with scipy.spatial.transform.Rotation',
         DeprecationWarning,
@@ -33,12 +31,7 @@ def axisrotation(
     # The input vector must be a unit vector.
     norm = np.sqrt(ux**2 + uy**2 + uz**2)
     if abs(norm - 1.0) > 1e-9:  # tolerance
-        print(
-            'ERROR: In axisrotation(), input unit_vector =',
-            unit_vector,
-            ' is not of unit length.  Length =',
-            norm,
-        )
+        print('ERROR: In axisrotation(), input unit_vector =', unit_vector, ' is not of unit length.  Length =', norm)
 
     c = np.cos(lhr_angle)
     s = np.sin(lhr_angle)

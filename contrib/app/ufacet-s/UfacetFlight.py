@@ -49,16 +49,12 @@ class UfacetFlight:
     ]
     _flights: dict[str, "UfacetFlight"] = {}
 
-    def __init__(
-        self, name: str, extracted_frames_name_format: str, extracted_frames_dir: str
-    ):
+    def __init__(self, name: str, extracted_frames_name_format: str, extracted_frames_dir: str):
         """This class holds onto relevant information for a variety of UFACET flights."""
         self._name = name
 
         self._frames_name_format_extracted = extracted_frames_name_format
-        self._frames_dir_extracted = os.path.join(
-            orp.opencsp_scratch_dir("ufacetnio"), extracted_frames_dir
-        )
+        self._frames_dir_extracted = os.path.join(orp.opencsp_scratch_dir("ufacetnio"), extracted_frames_dir)
         self._num_frames_extracted: int = None
 
         self._frames_name_format_deduplicated = None
@@ -147,9 +143,7 @@ class UfacetFlight:
         # check for a similar name
         else:
             exp = f"{video_dir}/{video_name}*{video_extension}"
-            lt.debug(
-                f"In UfacetFlight.video_dir_name_ext(): searching for videos matching the expression \"{exp}\""
-            )
+            lt.debug(f"In UfacetFlight.video_dir_name_ext(): searching for videos matching the expression \"{exp}\"")
             matches = list(glob.glob(exp))
             to_remove, to_append_to_end = [], []
             for m in matches:
@@ -226,15 +220,10 @@ class UfacetFlight:
         return self.frames_name_format_deduplicated() % frame_number
 
     def frame_path_name_ext_extracted(self, frame_number: int):
-        return os.path.join(
-            self.frames_dir_extracted(), self.frame_name_ext_extracted(frame_number)
-        )
+        return os.path.join(self.frames_dir_extracted(), self.frame_name_ext_extracted(frame_number))
 
     def frame_path_name_ext_deduplicated(self, frame_number: int):
-        return os.path.join(
-            self.frames_dir_deduplicated(),
-            self.frame_name_ext_deduplicated(frame_number),
-        )
+        return os.path.join(self.frames_dir_deduplicated(), self.frame_name_ext_deduplicated(frame_number))
 
     def _count_frames(self, path: str, name_format: str):
         if ft.directory_exists(path, follow_symlinks=True):

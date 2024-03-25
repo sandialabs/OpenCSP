@@ -47,9 +47,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
         # Check number of instances
         if instance >= len(devices):
-            raise ValueError(
-                f'Cannot load instance {instance:d}. Only {len(devices):d} devices found.'
-            )
+            raise ValueError(f'Cannot load instance {instance:d}. Only {len(devices):d} devices found.')
 
         # Connect to camera
         self.cap = pylon.InstantCamera(tlFactory.CreateDevice(devices[instance]))
@@ -67,9 +65,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         # Set exposure values to be stepped over when performing exposure calibration
         shutter_min = self.cap.ExposureTimeRaw.Min
         shutter_max = self.cap.ExposureTimeRaw.Max
-        self._shutter_cal_values = np.linspace(
-            shutter_min, shutter_max, 2**13
-        ).astype(int)
+        self._shutter_cal_values = np.linspace(shutter_min, shutter_max, 2**13).astype(int)
 
     @classmethod
     def _check_pypylon_version(cls):
@@ -78,10 +74,12 @@ class ImageAcquisition(ImageAcquisitionAbstract):
             suggested_pypylon_version = "3.0"  # latest release as of 2024/03/21
 
             if pypylon_version < suggested_pypylon_version:
-                lt.warn("Warning in ImageAcquisition_DCAM_mono.py: " +
-                        f"pypylon version {pypylon_version} is behind the suggested version {suggested_pypylon_version}. " +
-                        "If you have trouble grabbing frames with the basler camera, try upgrading your version of pypylon " +
-                        "with \"python -m pip install --upgrade pypylon\".")
+                lt.warn(
+                    "Warning in ImageAcquisition_DCAM_mono.py: "
+                    + f"pypylon version {pypylon_version} is behind the suggested version {suggested_pypylon_version}. "
+                    + "If you have trouble grabbing frames with the basler camera, try upgrading your version of pypylon "
+                    + "with \"python -m pip install --upgrade pypylon\"."
+                )
 
             cls._has_checked_pypylon_version = True
 

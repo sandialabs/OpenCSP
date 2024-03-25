@@ -24,12 +24,8 @@ from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlPointSeq import (
-    RenderControlPointSeq,
-)
-from opencsp.common.lib.render_control.RenderControlRayTrace import (
-    RenderControlRayTrace,
-)
+from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
 from opencsp.common.lib.tool.typing_tools import strict_types
 
@@ -42,9 +38,7 @@ class Intersection:
     def plane_intersect_from_ray_trace(
         cls,
         ray_trace: RayTrace,
-        plane: tuple[
-            Pxyz, Uxyz
-        ],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
+        plane: tuple[Pxyz, Uxyz],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
         epsilon: float = 1e-6,
         save_in_file: bool = False,
         save_name: str = None,
@@ -103,9 +97,7 @@ class Intersection:
         # filter out points that miss the plane
         if verbose:
             print("filtering out missed vectors")
-        filtered_intersec_points = Pxyz.merge(
-            list(filter(lambda vec: not vec.hasnan(), intersection_points))
-        )
+        filtered_intersec_points = Pxyz.merge(list(filter(lambda vec: not vec.hasnan(), intersection_points)))
 
         # if verbose:
         #     print("Rotating.")
@@ -137,9 +129,7 @@ class Intersection:
     # TODO tjlarki: for maddie, make this better
     def _from_ray_trace_vec_maddie(
         lines: tuple[Pxyz, Vxyz],
-        plane: tuple[
-            Pxyz, Uxyz
-        ],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
+        plane: tuple[Pxyz, Uxyz],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
         epsilon: float = 1e-6,
         verbose: bool = False,
     ):
@@ -182,7 +172,9 @@ class Intersection:
         # filter out points that miss the plane
         if verbose:
             print("filtering out missed vectors")
-        filtered_intersec_points = intersection_points  # Pxyz.merge(list(filter(lambda vec: not vec.hasnan(),intersection_points)))
+        filtered_intersec_points = (
+            intersection_points  # Pxyz.merge(list(filter(lambda vec: not vec.hasnan(),intersection_points)))
+        )
 
         if verbose:
             print("Rotating.")
@@ -202,11 +194,7 @@ class Intersection:
     def from_hdf(cls, filename: str, intersection_name: str = "000"):
         # get the names of the batches to loop through
         intersection_points = Pxyz(
-            list(
-                load_hdf5_datasets(
-                    [f"Intersection_{intersection_name}/Points"], filename
-                ).values()
-            )[0]
+            list(load_hdf5_datasets([f"Intersection_{intersection_name}/Points"], filename).values())[0]
         )
         return Intersection(intersection_points)
 
@@ -215,18 +203,13 @@ class Intersection:
         return cls(Pxyz.empty())
 
     def __add__(self, intersection: 'Intersection'):
-        return Intersection(
-            self.intersection_points.concatenate(intersection.intersection_points)
-        )
+        return Intersection(self.intersection_points.concatenate(intersection.intersection_points))
 
     def __len__(self):
         return len(self.intersection_points)
 
     def save_to_hdf(self, hdf_filename: str, intersection_name: str = "000"):
-        datasets = [
-            f"Intersection_{intersection_name}/Points",
-            f"Intersection_{intersection_name}/Metatdata",
-        ]
+        datasets = [f"Intersection_{intersection_name}/Points", f"Intersection_{intersection_name}/Metatdata"]
         data = [self.intersection_points.data, "Placeholder"]
         save_hdf5_datasets(data, datasets, hdf_filename)
 
@@ -251,9 +234,7 @@ class Intersection:
         pyz = Pxy([self.intersection_points.y, self.intersection_points.z])
         return Intersection._Pxy_to_flux_map(pyz, bins, resolution_type)
 
-    def _Pxy_to_flux_map(
-        points: Pxy, bins: int, resolution_type: str = "pixelX"
-    ) -> FunctionXYGrid:
+    def _Pxy_to_flux_map(points: Pxy, bins: int, resolution_type: str = "pixelX") -> FunctionXYGrid:
         xbins = bins
         x_low, x_high = min(points.x), max(points.x)
         y_low, y_high = min(points.y), max(points.y)
@@ -278,8 +259,6 @@ class Intersection:
     def draw(self, view: View3d, style: RenderControlPointSeq = None):
         view.draw_single_Pxyz(self.intersection_points, style)
 
-    def draw_subset(
-        self, view: View3d, count: int, points_style: RenderControlPointSeq = None
-    ):
+    def draw_subset(self, view: View3d, count: int, points_style: RenderControlPointSeq = None):
         for i in np.floor(np.linspace(0, len(self.intersection_points) - 1, count)):
             view.draw_single_Pxyz(self.intersection_points[int(i)])

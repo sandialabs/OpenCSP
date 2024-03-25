@@ -8,11 +8,7 @@ import sys
 import opencsp.common.lib.tool.log_tools as lt
 
 _orp_settings_key = "opencsp_root_path"
-_orp_settings_default = {
-    "example_data_dir": None,
-    "scratch_dir": None,
-    "scratch_name": "scratch",
-}
+_orp_settings_default = {"example_data_dir": None, "scratch_dir": None, "scratch_name": "scratch"}
 """ example_data_dir: The directory containing the opencsp example data, for examples that have very large data inputs.
 scratch_dir: The directory containing the scratch folder, for use with HPC clusters.
 scratch_name: The name of the scratch directory. Default to "scratch".
@@ -55,16 +51,16 @@ def __load_settings_files():
         settings_file_name_path_ext = os.path.join(dir, 'settings.json')
 
         # would use file_tools.directory_exists() except that I don't want to depend on any other part of opencsp
-        if os.path.exists(settings_file_name_path_ext) and os.path.isfile(
-            settings_file_name_path_ext
-        ):
+        if os.path.exists(settings_file_name_path_ext) and os.path.isfile(settings_file_name_path_ext):
             with open(settings_file_name_path_ext, 'r') as fin:
                 lines = fin.readlines()
             lines = map(lambda l: "" if l.strip().startswith("//") else l, lines)
             settings = json.loads("\n".join(lines))
 
             # verify the types for the loaded settings
-            err_msg_preamble = f"Error in opencsp_path.__init__(): while parsing settings file {settings_file_name_path_ext}, "
+            err_msg_preamble = (
+                f"Error in opencsp_path.__init__(): while parsing settings file {settings_file_name_path_ext}, "
+            )
             found_err = False
             if not isinstance(settings, dict):
                 lt.error(
@@ -127,13 +123,9 @@ def __populate_settings_list() -> list[tuple[str, dict[str, any]]]:
     opencsp_path = os.path.dirname(inspect.getfile(opencsp))
     for package_name in _opencsp_code_settings_packages:
         module_name = "opencsp_code." + package_name
-        package_dir = os.path.abspath(
-            os.path.join(opencsp_path, "..", package_name.replace(".", "/"))
-        )
+        package_dir = os.path.abspath(os.path.join(opencsp_path, "..", package_name.replace(".", "/")))
         if os.path.exists(package_dir):
-            spec = importlib.util.spec_from_file_location(
-                module_name, package_dir + "/__init__.py"
-            )
+            spec = importlib.util.spec_from_file_location(module_name, package_dir + "/__init__.py")
             module = importlib.util.module_from_spec(spec)
             sys.modules[module_name] = module
             spec.loader.exec_module(module)

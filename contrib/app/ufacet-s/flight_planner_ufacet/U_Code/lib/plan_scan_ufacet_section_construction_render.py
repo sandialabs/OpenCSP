@@ -16,20 +16,13 @@ import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
 
 
 def draw_construct_ufacet_section(
-    figure_control,
-    solar_field,
-    section,
-    render_view_spec,
-    render_control_scan_section_setup,
+    figure_control, solar_field, section, render_view_spec, render_control_scan_section_setup
 ):
     # Draw setup of the section.
     if render_control_scan_section_setup.draw_section_setup:
         # Setup figure.
         fig_record = fm.setup_figure_for_3d_data(
-            figure_control,
-            rca.meters(),
-            render_view_spec,
-            title='UFACET Section Construction',
+            figure_control, rca.meters(), render_view_spec, title='UFACET Section Construction'
         )
         view = fig_record.view
         # Comment.
@@ -51,13 +44,11 @@ def draw_construct_ufacet_section(
         else:
             if render_control_scan_section_setup.highlight_selected_heliostats:
                 solar_field_style.heliostat_styles.add_special_names(
-                    section['selected_heliostat_name_list'],
-                    rch.normal_outline(color='g'),
+                    section['selected_heliostat_name_list'], rch.normal_outline(color='g')
                 )
             if render_control_scan_section_setup.highlight_rejected_heliostats:
                 solar_field_style.heliostat_styles.add_special_names(
-                    section['rejected_heliostat_name_list'],
-                    rch.normal_outline(color='r'),
+                    section['rejected_heliostat_name_list'], rch.normal_outline(color='r')
                 )
         # Draw the solar field.
         solar_field.draw(view, solar_field_style)
@@ -66,17 +57,13 @@ def draw_construct_ufacet_section(
         # Fetch view spec projection information.
         segment_xy = section_view_spec['defining_segment_xy']
         line_xy = section_view_spec['line_intersecting_xy_plane']
-        origin_xyz = np.array(
-            section_view_spec['origin_xyz']
-        )  # Make arrays so we can do simple vactor math.
+        origin_xyz = np.array(section_view_spec['origin_xyz'])  # Make arrays so we can do simple vactor math.
         p_uxyz = np.array(section_view_spec['p_uxyz'])  #
         q_uxyz = np.array(section_view_spec['q_uxyz'])  #
         w_uxyz = np.array(section_view_spec['w_uxyz'])  #
         # Defining segment.
         segment_xyz = [p + [0] for p in segment_xy]
-        view.draw_xyz_list(
-            segment_xyz, style=rcps.outline(color='brown', linewidth=2.5)
-        )
+        view.draw_xyz_list(segment_xyz, style=rcps.outline(color='brown', linewidth=2.5))
         # Section plane.
         box_xyz = solar_field.heliostat_bounding_box_xyz()
         box_min_xyz = box_xyz[0]
@@ -95,24 +82,19 @@ def draw_construct_ufacet_section(
         line_segment_xy0 = line_segment_xy[0]
         line_segment_xy1 = line_segment_xy[1]
         view.draw_xyz_list(
-            [line_segment_xy0 + [0], line_segment_xy1 + [0]],
-            style=rcps.outline(color='c', linewidth=0.5),
+            [line_segment_xy0 + [0], line_segment_xy1 + [0]], style=rcps.outline(color='c', linewidth=0.5)
         )
         view.draw_xyz_list(
-            [line_segment_xy0 + [z_min], line_segment_xy1 + [z_min]],
-            style=rcps.outline(color='c', linewidth=0.5),
+            [line_segment_xy0 + [z_min], line_segment_xy1 + [z_min]], style=rcps.outline(color='c', linewidth=0.5)
         )
         view.draw_xyz_list(
-            [line_segment_xy0 + [z_max], line_segment_xy1 + [z_max]],
-            style=rcps.outline(color='c', linewidth=0.5),
+            [line_segment_xy0 + [z_max], line_segment_xy1 + [z_max]], style=rcps.outline(color='c', linewidth=0.5)
         )
         view.draw_xyz_list(
-            [line_segment_xy0 + [z_min], line_segment_xy0 + [z_max]],
-            style=rcps.outline(color='c', linewidth=0.5),
+            [line_segment_xy0 + [z_min], line_segment_xy0 + [z_max]], style=rcps.outline(color='c', linewidth=0.5)
         )
         view.draw_xyz_list(
-            [line_segment_xy1 + [z_min], line_segment_xy1 + [z_max]],
-            style=rcps.outline(color='c', linewidth=0.5),
+            [line_segment_xy1 + [z_min], line_segment_xy1 + [z_max]], style=rcps.outline(color='c', linewidth=0.5)
         )
         # Origin
         view.draw_xyz(origin_xyz, style=rcps.marker(marker='o', color='r'))
@@ -146,11 +128,7 @@ def draw_construct_ufacet_section(
 
 
 def draw_construct_ufacet_sections(
-    figure_control,
-    solar_field,
-    section_list,
-    input_view_spec,
-    render_control_scan_section_setup,
+    figure_control, solar_field, section_list, input_view_spec, render_control_scan_section_setup
 ):
     for section in section_list:
         if input_view_spec == None:
@@ -158,9 +136,5 @@ def draw_construct_ufacet_sections(
         else:
             render_view_spec = input_view_spec
         draw_construct_ufacet_section(
-            figure_control,
-            solar_field,
-            section,
-            render_view_spec,
-            render_control_scan_section_setup,
+            figure_control, solar_field, section, render_view_spec, render_control_scan_section_setup
         )

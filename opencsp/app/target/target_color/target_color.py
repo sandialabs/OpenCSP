@@ -21,9 +21,7 @@ import opencsp.common.lib.target.target_image
 if __name__ == "__main__":
     plt.close('all')
 
-    base_dir = (
-        opencsp_dir() + '\\common\\lib\\test\\output\\TestTargetColor\\actual_output'
-    )
+    base_dir = opencsp_dir() + '\\common\\lib\\test\\output\\TestTargetColor\\actual_output'
     output_dir = os.path.join(
         'app', 'target', 'target_color', 'test', 'data', 'output', source_file_body
     )  # ?? SCAFFOLDING RCB -- ADD CODE TO CREATE DIRECTORY IF NECESSARY.
@@ -66,38 +64,24 @@ if __name__ == "__main__":
 
     # Discrete linear color bar
     target_color_1d_gradient.linear_color_bar(
-        'discrete',
-        color_bar,
-        color_below_min,
-        color_above_max,
-        img,
-        dpi,
-        output_dir,
-        output_ext,
+        'discrete', color_bar, color_below_min, color_above_max, img, dpi, output_dir, output_ext
     )
 
     # Continuous linear color bar
     target_color_1d_gradient.linear_color_bar(
-        'continuous',
-        color_bar,
-        color_below_min,
-        color_above_max,
-        img,
-        dpi,
-        output_dir,
-        output_ext,
+        'continuous', color_bar, color_below_min, color_above_max, img, dpi, output_dir, output_ext
     )
 
     assert False
 
     # Discrete bullseye color bar
     # Target definition parameters.
-    target_design_focal_length_m = 100  # meters.  Standard focal length for a multi-purpose target.  To measure a mirror with a different
+    target_design_focal_length_m = (
+        100  # meters.  Standard focal length for a multi-purpose target.  To measure a mirror with a different
+    )
     #          focal length, adjust scale on color bar in final commmunication.
     target_design_err_max_mrad = 3.0  # mrad.  To match Braden's SOFAST plot, which has a color bar from 0 to 3 mrad.
-    target_design_err_min_mrad = (
-        0.005 * target_design_err_max_mrad
-    )  # Size of center circle for placing pilot drill.
+    target_design_err_min_mrad = 0.005 * target_design_err_max_mrad  # Size of center circle for placing pilot drill.
     color_below_min = [255, 255, 255]  # White center circle for placing pilot drill.
     color_above_max = [255, 255, 255]  # White background for "saturated data."
     color_frame = [240, 240, 240]  # Overall image frame color
@@ -114,9 +98,7 @@ if __name__ == "__main__":
     )  # Required target diameter is d=8*f*err_max.
     target_diameter_in = target_diameter_m * (1000 / 25.4)  # Convert to inches.
     # Image height and width determined by bullseye size.
-    target_img_width_in = (
-        target_diameter_in  # Margin is controlled by the cx offset parameters.
-    )
+    target_img_width_in = target_diameter_in  # Margin is controlled by the cx offset parameters.
     target_img_height_in = target_img_width_in  # For designing a square image
     print('target_img_width_in  = ', target_img_width_in)
     print('target_img_height_in = ', target_img_height_in)
@@ -144,24 +126,18 @@ if __name__ == "__main__":
     leader_up_over_board_in = up_over_board_in - (target_img_height_in / 2.0)
     # Add leader and trailer.
     spool_diameter_in = 3.5  # PVC tube outer diameter.
-    num_turns_when_unfurled = (
-        1.75  # Number of wraps still around the spool when the target is installed.
-    )
+    num_turns_when_unfurled = 1.75  # Number of wraps still around the spool when the target is installed.
     wrap_distance_when_unfurled_in = num_turns_when_unfurled * (
         np.pi * spool_diameter_in
     )  # Length around spool when target installed.
     leader_margin_in = up_over_board_in - (
         target_img_height_in / 2.0
     )  # Leader required to go up over board and back to board center.
-    trailer_margin_in = (
-        6.0  # inch. Maximum distance from target bottom edge to spool when installed.
-    )
+    trailer_margin_in = 6.0  # inch. Maximum distance from target bottom edge to spool when installed.
     leader_in = leader_margin_in + wrap_distance_when_unfurled_in
     trailer_in = trailer_margin_in + wrap_distance_when_unfurled_in
     img_height_in = target_img_height_in + leader_in + trailer_in
-    y_offset_in = trailer_in + (
-        target_img_height_in / 2
-    )  # Defined from bottom of image.
+    y_offset_in = trailer_in + (target_img_height_in / 2)  # Defined from bottom of image.
     y_offset_pix = y_offset_in * dpi  #
     # Image size in pixels.
     img_rows = int(img_height_in * dpi)
@@ -176,12 +152,8 @@ if __name__ == "__main__":
     y_max = n_rows
 
     # Define image offsets.
-    cx_offset_1_pix = round(
-        0.30 * x_max
-    )  # Defined from center of image.  Controls total image width.
-    cx_offset_2_pix = round(
-        -0.55 * x_max
-    )  # Defined from center of image.  Does not affect total image width.
+    cx_offset_1_pix = round(0.30 * x_max)  # Defined from center of image.  Controls total image width.
+    cx_offset_2_pix = round(-0.55 * x_max)  # Defined from center of image.  Does not affect total image width.
 
     # Generate image #1.
     alignment_line_start_x, dummy = bullseye_color_bar(

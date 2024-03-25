@@ -215,15 +215,7 @@ def nikon_D3300_monitor_equal_step_color_bar():
 
 
 # Color lookup
-def color_given_value(
-    val,
-    val_min,
-    val_max,
-    color_below_min,
-    color_bar,
-    color_above_max,
-    discrete_or_continuous,
-):
+def color_given_value(val, val_min, val_max, color_below_min, color_bar, color_above_max, discrete_or_continuous):
     # Out-of-bounds cases.
     if val < val_min:
         return color_below_min
@@ -236,9 +228,7 @@ def color_given_value(
     # From here on we know (val_min <= val <= val_max), and color_bar contains multiple colors.
     n_steps = n_colors - 1  # Last block on color bar is not a step.
     val_step = (val_max - val_min) / n_steps
-    step = (
-        val - val_min
-    ) / val_step  # Since (val_min <= val <= val_max), we know (0 <= step <= 1).
+    step = (val - val_min) / val_step  # Since (val_min <= val <= val_max), we know (0 <= step <= 1).
     idx = int(step)
     if discrete_or_continuous == 'discrete':
         return color_bar[idx]
@@ -258,11 +248,7 @@ def color_given_value(
             d_green = color_1[1] - color_0[1]
             d_blue = color_1[2] - color_0[2]
             # Return.
-            return [
-                (color_0[0] + (frac * d_red)),
-                (color_0[1] + (frac * d_green)),
-                (color_0[2] + (frac * d_blue)),
-            ]
+            return [(color_0[0] + (frac * d_red)), (color_0[1] + (frac * d_green)), (color_0[2] + (frac * d_blue))]
     else:
         print(
             'ERROR: In color_given_value(), encountered unexpected discrete_or_continuous value:',
@@ -282,15 +268,9 @@ def angle_between_color_vectors(rgb_1, rgb_2):
 
 def color_bar_segment_spanned_angle(idx, color_bar):
     if idx < 0:
-        print(
-            'ERROR: In angle_between_color_vectors(), idx = ',
-            str(idx),
-            ' is less than zero.',
-        )
+        print('ERROR: In angle_between_color_vectors(), idx = ', str(idx), ' is less than zero.')
         assert False  # ?? SCAFFOLDING RCB -- REPLACE WITH RAISING AN EXCEPTION?  (THROUGHOUT)
-    if idx >= (
-        len(color_bar) - 1
-    ):  # Below we fetch color_bar(idx+1), so compare against (len(color-bar)-1).
+    if idx >= (len(color_bar) - 1):  # Below we fetch color_bar(idx+1), so compare against (len(color-bar)-1).
         print(
             'ERROR: In angle_between_color_vectors(), idx = ',
             str(idx),
@@ -306,9 +286,7 @@ def color_bar_segment_spanned_angle(idx, color_bar):
 
 def construct_color_bar_spanned_angle_list(color_bar):
     angle_list = []
-    for idx in range(
-        len(color_bar) - 1
-    ):  # One less than n_colors, because we look at pairs of (idx, idx+1).
+    for idx in range(len(color_bar) - 1):  # One less than n_colors, because we look at pairs of (idx, idx+1).
         angle_1_2 = color_bar_segment_spanned_angle(idx, color_bar)
         angle_list.append(angle_1_2)
     # Return.
@@ -319,9 +297,7 @@ def survey_color_bar(color_bar):
     angle_sum = 0.0
     first_non_zero_angle_idx = -1
     last_non_zero_angle_idx = -1
-    for idx in range(
-        len(color_bar) - 1
-    ):  # One less than n_colors, because we look at pairs of (idx, idx+1).
+    for idx in range(len(color_bar) - 1):  # One less than n_colors, because we look at pairs of (idx, idx+1).
         angle_1_2 = color_bar_segment_spanned_angle(idx, color_bar)
         if (first_non_zero_angle_idx < 0) and (angle_1_2 > 0):
             first_non_zero_angle_idx = idx
@@ -332,15 +308,11 @@ def survey_color_bar(color_bar):
     return angle_sum, first_non_zero_angle_idx, last_non_zero_angle_idx
 
 
-def construct_rgb_cumulative_angle_pair_list(
-    color_bar, first_color_idx, last_color_idx
-):
+def construct_rgb_cumulative_angle_pair_list(color_bar, first_color_idx, last_color_idx):
     cumulative_angle = 0.0
     rgb_cumulative_angle_list = []
     # TODO RCB:  This logic is confusing and opaque.  Can it be simplified?
-    if last_color_idx < (
-        len(color_bar) - 1
-    ):  # Routine color_bar_segment_spanned_angle() will access color_bar[idx+1].
+    if last_color_idx < (len(color_bar) - 1):  # Routine color_bar_segment_spanned_angle() will access color_bar[idx+1].
         last_idx = last_color_idx
     else:
         last_idx = len(color_bar) - 1
@@ -415,22 +387,14 @@ def interpolate_color(desired_angle, rgb_before, angle_before, rgb_after, angle_
         interpolated_b = b_before + (angle_frac * (b_after - b_before))
     # Assemble.
     # We round values because [R,G,B] colors are defined by ints.  Another approximation.
-    interpolated_rgb = (
-        round(interpolated_r),
-        round(interpolated_g),
-        round(interpolated_b),
-    )
+    interpolated_rgb = (round(interpolated_r), round(interpolated_g), round(interpolated_b))
     return interpolated_rgb
 
 
 def interpolate_color_given_angle(rgb_angle_list, desired_angle):
-    rgb_before, angle_before = lookup_color_and_angle_before(
-        rgb_angle_list, desired_angle
-    )
+    rgb_before, angle_before = lookup_color_and_angle_before(rgb_angle_list, desired_angle)
     rgb_after, angle_after = lookup_color_and_angle_after(rgb_angle_list, desired_angle)
-    interpolated_rgb = interpolate_color(
-        desired_angle, rgb_before, angle_before, rgb_after, angle_after
-    )
+    interpolated_rgb = interpolate_color(desired_angle, rgb_before, angle_before, rgb_after, angle_after)
     # print("In interpolate_color_given_angle(), angle before/desired/after: {ab:.4f} / {da:.4f} / {aa:.4f}  rgb before/interpolated/after: {rb} / {ir} / {ra}".format(ab=angle_before, da=desired_angle, aa=angle_after, rb=rgb_before, ir=interpolated_rgb, ra=rgb_after))
     return interpolated_rgb
 
@@ -442,9 +406,7 @@ def normalize_color_bar_to_equal_angles(color_bar):
     # Survey color bar, computing total color spanning angle and identifying preamble/postamble
     # boundary sections with zero color spanning angle.
     # Note: Input color bar must not have interior segments with zero color spanning angle.
-    angle_sum, first_non_zero_angle_idx, last_non_zero_angle_idx = survey_color_bar(
-        color_bar
-    )
+    angle_sum, first_non_zero_angle_idx, last_non_zero_angle_idx = survey_color_bar(color_bar)
 
     # Interpolation parameters.
     first_color_idx = first_non_zero_angle_idx
@@ -453,9 +415,7 @@ def normalize_color_bar_to_equal_angles(color_bar):
     angle_step = angle_sum / n_steps
 
     # Construct reference color/angle pair list.
-    rgb_cumulative_angle_list = construct_rgb_cumulative_angle_pair_list(
-        color_bar, first_color_idx, last_color_idx
-    )
+    rgb_cumulative_angle_list = construct_rgb_cumulative_angle_pair_list(color_bar, first_color_idx, last_color_idx)
 
     # Generate equal-angle colors, along the same path in the [R,G,B] color space.
     rgb_0 = color_bar[first_color_idx]
@@ -464,9 +424,7 @@ def normalize_color_bar_to_equal_angles(color_bar):
     equal_angle_rgb_angle_list.append([rgb_0, cumulative_angle])
     while cumulative_angle < (angle_sum - 1e-6):  # tolerance to prevent additional step
         cumulative_angle += angle_step
-        interpolated_rgb = interpolate_color_given_angle(
-            rgb_cumulative_angle_list, cumulative_angle
-        )
+        interpolated_rgb = interpolate_color_given_angle(rgb_cumulative_angle_list, cumulative_angle)
         equal_angle_rgb_angle_list.append([interpolated_rgb, cumulative_angle])
 
     # Construct a color bar, without angles.
@@ -496,7 +454,5 @@ if __name__ == "__main__":
     print("\nequal_angle_color_bar = ", equal_angle_color_bar)
 
     # Print angle list.
-    normalized_angle_list = construct_color_bar_spanned_angle_list(
-        equal_angle_color_bar
-    )
+    normalized_angle_list = construct_color_bar_spanned_angle_list(equal_angle_color_bar)
     print("\nNormalized spanned angle list=", normalized_angle_list)

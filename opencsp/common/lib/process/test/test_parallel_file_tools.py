@@ -9,9 +9,7 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 class TestSubprocess(unittest.TestCase):
-    path = os.path.join(
-        'common', 'lib', 'process', 'test', 'data', 'output', 'parallel_file_tools'
-    )
+    path = os.path.join('common', 'lib', 'process', 'test', 'data', 'output', 'parallel_file_tools')
 
     def setUp(self):
         super().setUp()

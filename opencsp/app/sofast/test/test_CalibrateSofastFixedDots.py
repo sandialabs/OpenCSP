@@ -24,30 +24,20 @@ import opencsp.common.lib.tool.log_tools as lt
 def test_FixedPatternSetupCalibrate():
     """Tests dot-location calibration"""
     # Define dot location images and origins
-    base_dir = join(
-        opencsp_code_dir(),
-        'test',
-        'data',
-        'measurements_sofast_fixed',
-        'dot_location_calibration',
-    )
+    base_dir = join(opencsp_code_dir(), 'test', 'data', 'measurements_sofast_fixed', 'dot_location_calibration')
     files = [
         join(base_dir, 'measurements/images/DSC03965.JPG'),
         join(base_dir, 'measurements/images/DSC03967.JPG'),
         join(base_dir, 'measurements/images/DSC03970.JPG'),
         join(base_dir, 'measurements/images/DSC03972.JPG'),
     ]
-    origins = (
-        np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
-    )
+    origins = np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
     origins = Vxy(origins.astype(int))
 
     # Define other files
     file_camera_marker = join(base_dir, 'measurements/camera_image_calibration.h5')
     file_xyz_points = join(base_dir, 'measurements/point_locations.csv')
-    file_fpd_dot_locs_exp = join(
-        base_dir, 'calculations/fixed_pattern_dot_locations.h5'
-    )
+    file_fpd_dot_locs_exp = join(base_dir, 'calculations/fixed_pattern_dot_locations.h5')
     dir_save = join(dirname(__file__), 'data/output/dot_location_calibration')
 
     if not exists(dir_save):

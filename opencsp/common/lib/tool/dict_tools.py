@@ -101,9 +101,7 @@ def print_dict_of_dicts(
             if len(value_2_str) > len(trimmed_value_2_str):
                 trimmed_value_2_str += '...'
             # Print key : value.
-            print(
-                indent_str_2 + format_str.format(str(key_2) + ':', trimmed_value_2_str)
-            )
+            print(indent_str_2 + format_str.format(str(key_2) + ':', trimmed_value_2_str))
         # Level 2 postamble.
         if max_keys_2 < len(key_list_2):
             print(indent_str_2 + '...')
@@ -146,9 +144,7 @@ def print_dict_of_dict_of_dicts(
             print(indent_str_2 + str(key_2) + ':')
             # Fetch level 3 dictionary.
             dict_3 = dict_2[key_2]
-            key_list_3 = sorted_keys(
-                dict_3
-            )  # Sort key list for consistent output order.
+            key_list_3 = sorted_keys(dict_3)  # Sort key list for consistent output order.
             # Determine the length of the longest key in this level 3 dictionary.
             level_3_key_max_len = max([len(str(x)) for x in key_list_3])
             format_str = '{0:<' + str(level_3_key_max_len + 2) + 's}{1:s}'
@@ -161,10 +157,7 @@ def print_dict_of_dict_of_dicts(
                 if len(value_3_str) > len(trimmed_value_3_str):
                     trimmed_value_3_str += '...'
                 # Print key : value.
-                print(
-                    indent_str_3
-                    + format_str.format(str(key_3) + ':', trimmed_value_3_str)
-                )
+                print(indent_str_3 + format_str.format(str(key_3) + ':', trimmed_value_3_str))
             # Level 3 postamble.
             if max_keys_3 < len(key_list_3):
                 print(indent_str_3 + '...')
@@ -185,12 +178,7 @@ def print_dict_of_dict_of_dicts(
 
 
 def save_list_of_one_level_dicts(
-    list_of_one_level_dicts,
-    output_dir,
-    output_body,
-    explain,
-    error_if_dir_not_exist,
-    first_key=None,
+    list_of_one_level_dicts, output_dir, output_body, explain, error_if_dir_not_exist, first_key=None
 ):
     """
     A "one_level_dict" is a dictionary with entries that can be converted to strings and written as single entries in a csv file.
@@ -199,9 +187,7 @@ def save_list_of_one_level_dicts(
     """
     if len(list_of_one_level_dicts) == 0:
         explain += ' (EMPTY)'
-    key_list, heading_line = one_level_dict_csv_heading_line(
-        list_of_one_level_dicts, first_key
-    )
+    key_list, heading_line = one_level_dict_csv_heading_line(list_of_one_level_dicts, first_key)
     data_lines = []
     for one_level_dict in list_of_one_level_dicts:
         data_lines.append(one_level_dict_csv_data_line(key_list, one_level_dict))
@@ -238,9 +224,7 @@ def one_level_dict_csv_heading_line_aux(first_one_level_dict, first_key):
     # Verify that selceted first key is present.
     if (first_key != None) and (not first_key_found):
         print(
-            'ERROR: In one_level_dict_heading_line_aux(), expected first key='
-            + str(first_key)
-            + ' not found in keys:',
+            'ERROR: In one_level_dict_heading_line_aux(), expected first key=' + str(first_key) + ' not found in keys:',
             key_list,
         )
         assert False
@@ -291,11 +275,7 @@ def save_list_of_one_level_dict_pairs(
     )
     data_lines = []
     for one_level_dict_pair in list_of_one_level_dict_pairs:
-        data_lines.append(
-            one_level_dict_pair_csv_data_line(
-                key_list_1, key_list_2, one_level_dict_pair
-            )
-        )
+        data_lines.append(one_level_dict_pair_csv_data_line(key_list_1, key_list_2, one_level_dict_pair))
     output_dir_body_ext = ft.write_csv_file(
         explain,  # Explanatory string to include in notification output.  None to skip.
         output_dir,  # Directory to write file.  See below if not exist.
@@ -308,9 +288,7 @@ def save_list_of_one_level_dict_pairs(
     return output_dir_body_ext
 
 
-def one_level_dict_pair_csv_heading_line(
-    list_of_one_level_dict_pairs, first_key_1, first_key_2
-):
+def one_level_dict_pair_csv_heading_line(list_of_one_level_dict_pairs, first_key_1, first_key_2):
     """
     This routine extracts the headings from each of the two dicts, adding suffixes "_1" or "_2" to the first and
     second dictionary keys, respectively.  These suffixes are added regardless of whether the dictionaries have
@@ -323,17 +301,13 @@ def one_level_dict_pair_csv_heading_line(
     first_pair = list_of_one_level_dict_pairs[0]
     # Determine headings from keys of first dictionary.
     one_level_dict_1 = first_pair[0]
-    key_list_1, heading_line_1 = one_level_dict_csv_heading_line_aux(
-        one_level_dict_1, first_key_1
-    )
+    key_list_1, heading_line_1 = one_level_dict_csv_heading_line_aux(one_level_dict_1, first_key_1)
     heading_line_tokens_1 = heading_line_1.split(',')
     heading_line_tokens_1b = [token + '_1' for token in heading_line_tokens_1]
     heading_line_1b = ','.join(heading_line_tokens_1b)
     # Determine headings from keys of second dictionary.
     one_level_dict_2 = first_pair[1]
-    key_list_2, heading_line_2 = one_level_dict_csv_heading_line_aux(
-        one_level_dict_2, first_key_2
-    )
+    key_list_2, heading_line_2 = one_level_dict_csv_heading_line_aux(one_level_dict_2, first_key_2)
     heading_line_tokens_2 = heading_line_2.split(',')
     heading_line_tokens_2b = [token + '_2' for token in heading_line_tokens_2]
     heading_line_2b = ','.join(heading_line_tokens_2b)

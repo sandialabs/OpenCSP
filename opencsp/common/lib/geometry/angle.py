@@ -70,9 +70,7 @@ def normalize(angles: npt.NDArray[np.float_] | Iterable) -> npt.NDArray[np.float
     pass
 
 
-def normalize(
-    angle_or_angles: float | npt.NDArray[np.float_] | Iterable,
-) -> float | npt.NDArray[np.float_]:
+def normalize(angle_or_angles: float | npt.NDArray[np.float_] | Iterable) -> float | npt.NDArray[np.float_]:
     """Adjusts the given angle_or_angles to be in the range 0-2π.
     Note that because this function operates on floating point math,
     your answer is not guaranteed to be exact (for example, a value
