@@ -113,7 +113,8 @@ class TestDisplayShape(unittest.TestCase):
         self.assertEqual(disp.grid_data['screen_model'], disp_load.grid_data['screen_model'])
         self.assertEqual(disp.name, disp_load.name)
         np.testing.assert_equal(
-            disp.grid_data['xy_screen_fraction'].data, disp_load.grid_data['xy_screen_fraction'].data)
+            disp.grid_data['xy_screen_fraction'].data, disp_load.grid_data['xy_screen_fraction'].data
+        )
         np.testing.assert_equal(disp.grid_data['xyz_screen_coords'].data, disp_load.grid_data['xyz_screen_coords'].data)
 
     def test_save_load_hdf_dist_2d(self):
@@ -132,7 +133,8 @@ class TestDisplayShape(unittest.TestCase):
         self.assertEqual(disp.grid_data['screen_model'], disp_load.grid_data['screen_model'])
         self.assertEqual(disp.name, disp_load.name)
         np.testing.assert_equal(
-            disp.grid_data['xy_screen_fraction'].data, disp_load.grid_data['xy_screen_fraction'].data)
+            disp.grid_data['xy_screen_fraction'].data, disp_load.grid_data['xy_screen_fraction'].data
+        )
         np.testing.assert_equal(disp.grid_data['xy_screen_coords'].data, disp_load.grid_data['xy_screen_coords'].data)
 
     def test_save_load_hdf_rectangular(self):
