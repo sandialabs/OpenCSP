@@ -99,7 +99,7 @@ class TestDisplayShape(unittest.TestCase):
 
     def test_save_load_hdf_dist_3d(self):
         # Instantiate display object
-        name = 'Test DisplayShape'
+        name = 'Test DisplayShape 3D'
         disp = DisplayShape(self.grid_data_3D, name)
         file = join(self.save_dir, 'test_display_shape_dist_3d.h5')
 
@@ -107,11 +107,18 @@ class TestDisplayShape(unittest.TestCase):
         disp.save_to_hdf(file)
 
         # Load
-        DisplayShape.load_from_hdf(file)
+        disp_load = DisplayShape.load_from_hdf(file)
+
+        # Compare
+        self.assertEqual(disp.grid_data['screen_model'], disp_load.grid_data['screen_model'])
+        self.assertEqual(disp.name, disp_load.name)
+        np.testing.assert_equal(
+            disp.grid_data['xy_screen_fraction'].data, disp_load.grid_data['xy_screen_fraction'].data)
+        np.testing.assert_equal(disp.grid_data['xyz_screen_coords'].data, disp_load.grid_data['xyz_screen_coords'].data)
 
     def test_save_load_hdf_dist_2d(self):
         # Instantiate display object
-        name = 'Test DisplayShape'
+        name = 'Test DisplayShape 2D'
         disp = DisplayShape(self.grid_data_2D, name)
         file = join(self.save_dir, 'test_display_shape_dist_2d.h5')
 
@@ -119,11 +126,18 @@ class TestDisplayShape(unittest.TestCase):
         disp.save_to_hdf(file)
 
         # Load
-        DisplayShape.load_from_hdf(file)
+        disp_load = DisplayShape.load_from_hdf(file)
+
+        # Compare
+        self.assertEqual(disp.grid_data['screen_model'], disp_load.grid_data['screen_model'])
+        self.assertEqual(disp.name, disp_load.name)
+        np.testing.assert_equal(
+            disp.grid_data['xy_screen_fraction'].data, disp_load.grid_data['xy_screen_fraction'].data)
+        np.testing.assert_equal(disp.grid_data['xy_screen_coords'].data, disp_load.grid_data['xy_screen_coords'].data)
 
     def test_save_load_hdf_rectangular(self):
         # Instantiate display object
-        name = 'Test DisplayShape'
+        name = 'Test DisplayShape Rectangular'
         disp = DisplayShape(self.grid_data_rect2D, name)
         file = join(self.save_dir, 'test_display_shape_rect.h5')
 
@@ -131,7 +145,13 @@ class TestDisplayShape(unittest.TestCase):
         disp.save_to_hdf(file)
 
         # Load
-        DisplayShape.load_from_hdf(file)
+        disp_load = DisplayShape.load_from_hdf(file)
+
+        # Compare
+        self.assertEqual(disp.grid_data['screen_model'], disp_load.grid_data['screen_model'])
+        self.assertEqual(disp.name, disp_load.name)
+        self.assertEqual(disp.grid_data['screen_x'], disp_load.grid_data['screen_x'])
+        self.assertEqual(disp.grid_data['screen_y'], disp_load.grid_data['screen_y'])
 
 
 if __name__ == '__main__':
