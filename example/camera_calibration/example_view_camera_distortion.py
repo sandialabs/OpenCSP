@@ -7,7 +7,7 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
-def example_driver():
+def example_show_camera_distortion():
     """Example SOFAST script
 
     Plots visualization of camera distortion given a saved Camera HDF file
@@ -38,4 +38,4 @@ def example_driver():
 
 
 if __name__ == '__main__':
-    example_driver()
+    example_show_camera_distortion()

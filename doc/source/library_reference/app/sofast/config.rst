@@ -117,3 +117,13 @@ opencsp.app.sofast.SofastGUI
    :members:
    :undoc-members:
    :show-inheritance:
+
+opencsp.app.sofast.lib.CalibrateDisplayShape
+=============================================================
+
+.. currentmodule:: opencsp.app.sofast.lib.CalibrateDisplayShape
+
+.. automodule:: opencsp.app.sofast.lib.CalibrateDisplayShape
+   :members:
+   :undoc-members:
+   :show-inheritance:
