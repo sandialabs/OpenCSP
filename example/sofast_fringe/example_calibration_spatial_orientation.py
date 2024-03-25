@@ -14,7 +14,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_run_camera_position_calibration(save_dir: str):
-    """Calibrates the relative position of the Sofast camera and display. 
+    """Calibrates the relative position of the Sofast camera and display.
     Saves the rvec/tvec in a SpatialOrientation file at ./data/output/spatial_orientation.h5
     """
     # Define directory where screen shape calibration data is saved

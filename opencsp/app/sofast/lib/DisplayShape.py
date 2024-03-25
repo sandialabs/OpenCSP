@@ -177,33 +177,24 @@ class DisplayShape(ht.HDF5_IO_Abstract):
             Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
         # Load grid data
-        datasets = [
-            prefix + 'DisplayShape/screen_model',
-            prefix + 'DisplayShape/name',
-        ]
+        datasets = [prefix + 'DisplayShape/screen_model', prefix + 'DisplayShape/name']
         data = ht.load_hdf5_datasets(datasets, file)
 
         # Rectangular
         if data['screen_model'] == 'rectangular2D':
-            datasets = ['DisplayShape/screen_x', 'DisplayShape/screen_y']
+            datasets = [prefix + 'DisplayShape/screen_x', prefix + 'DisplayShape/screen_y']
             grid_data = ht.load_hdf5_datasets(datasets, file)
 
         # Distorted 2D
         elif data['screen_model'] == 'distorted2D':
-            datasets = [
-                'DisplayShape/xy_screen_fraction',
-                'DisplayShape/xy_screen_coords',
-            ]
+            datasets = [prefix + 'DisplayShape/xy_screen_fraction', prefix + 'DisplayShape/xy_screen_coords']
             grid_data = ht.load_hdf5_datasets(datasets, file)
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xy_screen_coords'] = Vxy(grid_data['xy_screen_coords'])
 
         # Distorted 3D
         elif data['screen_model'] == 'distorted3D':
-            datasets = [
-                'DisplayShape/xy_screen_fraction',
-                'DisplayShape/xyz_screen_coords',
-            ]
+            datasets = [prefix + 'DisplayShape/xy_screen_fraction', prefix + 'DisplayShape/xyz_screen_coords']
             grid_data = ht.load_hdf5_datasets(datasets, file)
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xyz_screen_coords'] = Vxyz(grid_data['xyz_screen_coords'])
@@ -213,10 +204,7 @@ class DisplayShape(ht.HDF5_IO_Abstract):
 
         grid_data.update({'screen_model': data['screen_model']})
         # Return display object
-        kwargs = {
-            'name': data['name'],
-            'grid_data': grid_data,
-        }
+        kwargs = {'name': data['name'], 'grid_data': grid_data}
         return cls(**kwargs)
 
     def save_to_hdf(self, file: str, prefix: str = '') -> None:

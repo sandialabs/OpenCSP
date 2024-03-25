@@ -189,10 +189,7 @@ class SpatialOrientation(ht.HDF5_IO_Abstract):
 
         # If optic is oriented, load optic orientation information
         if data['optic_oriented']:
-            datasets = [
-                prefix + 'SpatialOrientation/r_cam_optic',
-                prefix + 'SpatialOrientation/v_cam_optic_cam',
-            ]
+            datasets = [prefix + 'SpatialOrientation/r_cam_optic', prefix + 'SpatialOrientation/v_cam_optic_cam']
             data = ht.load_hdf5_datasets(datasets, file)
             r_cam_optic = Rotation.from_rotvec(data['r_cam_optic'])
             v_cam_optic_cam = Vxyz(data['v_cam_optic_cam'])
