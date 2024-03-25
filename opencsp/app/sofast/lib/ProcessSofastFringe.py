@@ -158,11 +158,9 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
                 - v_mask_centroid_image
     """
 
-    def __init__(self,
-                 measurement: MeasurementSofastFringe,
-                 orientation: SpatialOrientation,
-                 camera: Camera,
-                 display: Display) -> 'ProcessSofastFringe':
+    def __init__(
+        self, measurement: MeasurementSofastFringe, orientation: SpatialOrientation, camera: Camera, display: Display
+    ) -> 'ProcessSofastFringe':
         """
         SOFAST processing class.
 
