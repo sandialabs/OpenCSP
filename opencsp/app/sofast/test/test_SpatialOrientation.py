@@ -78,7 +78,7 @@ class TestSpatialOrientation(unittest.TestCase):
         # Load
         ori = SpatialOrientation.load_from_hdf(file)
         # Check optic is oriented
-        np.testing.assert_equal(ori.optic_oriented, True)
+        self.assertEqual(ori.optic_oriented, True)
 
     def test_io_unoriented_optic(self):
         file = join(self.save_dir, 'test_spatial_orientation_unoriented_optic.h5')
@@ -90,8 +90,8 @@ class TestSpatialOrientation(unittest.TestCase):
         # Load
         ori_2 = SpatialOrientation.load_from_hdf(file)
         # Check optic not oriented
-        np.testing.assert_equal(ori_1.optic_oriented, False)
-        np.testing.assert_equal(ori_2.optic_oriented, False)
+        self.assertEqual(ori_1.optic_oriented, False)
+        self.assertEqual(ori_2.optic_oriented, False)
 
 
 if __name__ == '__main__':
