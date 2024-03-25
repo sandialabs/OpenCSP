@@ -2,10 +2,10 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-import opencsp.common.lib.tool.hdf5_tools as ht
+import opencsp.common.lib.tool.hdf5_tools as h5
 
 
-class SpatialOrientation(ht.HDF5_IO_Abstract):
+class SpatialOrientation(h5.HDF5_IO_Abstract):
     """Holds relative orientations of camera, screen, and optic for deflectometry systems"""
 
     def __init__(self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz) -> 'SpatialOrientation':
@@ -163,7 +163,7 @@ class SpatialOrientation(ht.HDF5_IO_Abstract):
             ]
             data = [self.r_cam_screen.as_rotvec(), self.v_cam_screen_cam.data, self.optic_oriented]
 
-        ht.save_hdf5_datasets(data, datasets, file)
+        h5.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
     def load_from_hdf(cls, file: str, prefix: str = '') -> 'SpatialOrientation':
@@ -182,7 +182,7 @@ class SpatialOrientation(ht.HDF5_IO_Abstract):
             prefix + 'SpatialOrientation/v_cam_screen_cam',
             prefix + 'SpatialOrientation/optic_oriented',
         ]
-        data = ht.load_hdf5_datasets(datasets, file)
+        data = h5.load_hdf5_datasets(datasets, file)
         r_cam_screen = Rotation.from_rotvec(data['r_cam_screen'])
         v_cam_screen_cam = Vxyz(data['v_cam_screen_cam'])
         ori = cls(r_cam_screen, v_cam_screen_cam)
@@ -190,7 +190,7 @@ class SpatialOrientation(ht.HDF5_IO_Abstract):
         # If optic is oriented, load optic orientation information
         if data['optic_oriented']:
             datasets = [prefix + 'SpatialOrientation/r_cam_optic', prefix + 'SpatialOrientation/v_cam_optic_cam']
-            data = ht.load_hdf5_datasets(datasets, file)
+            data = h5.load_hdf5_datasets(datasets, file)
             r_cam_optic = Rotation.from_rotvec(data['r_cam_optic'])
             v_cam_optic_cam = Vxyz(data['v_cam_optic_cam'])
             ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
