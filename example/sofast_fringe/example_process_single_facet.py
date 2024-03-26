@@ -20,7 +20,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_driver(dir_save: str):
+def example(dir_save: str):
     """Example SOFAST script
 
     Performs processing of previously collected Sofast data of single facet mirror.
@@ -85,7 +85,7 @@ def example_driver(dir_save: str):
     sofast.save_to_hdf(f'{dir_save}/data_singlefacet.h5')
 
 
-if __name__ == '__main__':
+def example_driver():
     # Define save dir
     save_path = join(dirname(__file__), 'data/output/single_facet')
     ft.create_directories_if_necessary(save_path)
@@ -93,4 +93,8 @@ if __name__ == '__main__':
     # Set up logger
     lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
 
-    example_driver(save_path)
+    example(save_path)
+
+
+if __name__ == '__main__':
+    example_driver()

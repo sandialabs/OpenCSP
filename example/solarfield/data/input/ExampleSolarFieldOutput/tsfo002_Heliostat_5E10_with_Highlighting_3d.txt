@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo002_Heliostat 5E10, with Highlighting
 Title: Heliostat 5E10, with Highlighting
-Code tag: ExampleSolarFieldOutput.example_annotated_heliostat()
+Code tag: ExampleSolarFieldOutput.annotated_heliostat()
 View spec: 3d
 
 Title:

@@ -32,7 +32,7 @@ class ExampleTargetColor(to.TestOutput):
             output_path='targetcolor',
         )
         # Setup matplotlib backend
-        matplotlib.use('TkAgg')
+        # matplotlib.use('TkAgg')
 
         # Define image size and resolution for all tests.
         # self.image_width_in  = 3.0 # 48.0 # inch
