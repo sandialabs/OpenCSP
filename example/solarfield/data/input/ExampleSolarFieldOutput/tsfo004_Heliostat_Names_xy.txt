@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo004_Heliostat Names
 Title: Heliostat Names
-Code tag: ExampleSolarFieldOutput.example_solar_field_h_names()
+Code tag: ExampleSolarFieldOutput.solar_field_h_names()
 View spec: xy
 
 Title:

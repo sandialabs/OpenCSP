@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo017_Dense Tracking Vector Field
 Title: Dense Tracking Vector Field
-Code tag: ExampleSolarFieldOutput.example_dense_vector_field()
+Code tag: ExampleSolarFieldOutput.dense_vector_field()
 View spec: xy
 
 Title:

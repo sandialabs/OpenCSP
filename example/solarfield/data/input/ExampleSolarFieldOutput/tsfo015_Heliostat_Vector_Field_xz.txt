@@ -2,9 +2,8 @@ Metadata:
 Figure number: 3
 Name: tsfo015_Heliostat Vector Field
 Title: Heliostat Vector Field
-Code tag: TestSolarFieldOutput.test_heliostat_vector_field()
+Code tag: ExampleSolarFieldOutput.heliostat_vector_field()
 View spec: xz
-Path: common\lib\test\data\output\TestSolarFieldOutput\tsfo015_Heliostat_Vector_Field_xz.png
 
 Title:
 Heliostat Vector Field

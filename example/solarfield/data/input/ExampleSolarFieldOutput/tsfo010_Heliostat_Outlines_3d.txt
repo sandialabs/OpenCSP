@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo010_Heliostat Outlines
 Title: Heliostat Outlines
-Code tag: ExampleSolarFieldOutput.example_solar_field_h_outlines()
+Code tag: ExampleSolarFieldOutput.solar_field_h_outlines()
 View spec: 3d
 
 Title:
