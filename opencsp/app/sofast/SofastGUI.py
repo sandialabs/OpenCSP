@@ -3,6 +3,7 @@ and data capture. Can capture datasets and save to HDF format.
 """
 
 import datetime as dt
+import functools
 import tkinter
 from tkinter import messagebox, simpledialog
 from tkinter.filedialog import askopenfilename, asksaveasfilename
@@ -13,39 +14,24 @@ import numpy as np
 
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
-from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as ImageAcquisition_DCAM
-from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import ImageAcquisition as ImageAcquisition_DCAM_color
-from opencsp.common.lib.camera.ImageAcquisition_MSMF import ImageAcquisition as ImageAcquisition_MSMF
 from opencsp.common.lib.camera.image_processing import highlight_saturation
 from opencsp.common.lib.camera.LiveView import LiveView
-from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
-from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
+import opencsp.app.sofast.lib.SofastServiceCallback as ssc
+from opencsp.app.sofast.SofastService import SofastService
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool import hdf5_tools
 from opencsp.common.lib.tool.TkToolTip import TkToolTip
 
 
-class SofastGUI:
+class SofastGUI(ssc.SofastServiceCallback):
     """Class that contains SOFAST GUI controls and methods"""
 
     def __init__(self) -> 'SofastGUI':
         """
         Instantiates GUI in new window
         """
-        # Define camera objects to choose from
-        self.cam_options = ['DCAM Mono', 'DCAM Color', 'MSMF Mono']  # Description of camera
-        self.cam_objects = [  # Camera object to use
-            ImageAcquisition_DCAM,
-            ImageAcquisition_DCAM_color,
-            ImageAcquisition_MSMF,
-        ]
-
-        # Define calibration objects to use
-        self.cal_options = ['Global', 'Scaling']
-        self.cal_objects = [ImageCalibrationGlobal, ImageCalibrationScaling]
+        # Create the service object
+        self.service = SofastService()
 
         # Create tkinter object
         self.root = tkinter.Tk()
@@ -58,12 +44,6 @@ class SofastGUI:
 
         # Add all buttons/widgets to window
         self._create_layout()
-
-        # Set defaults
-        self.image_projection: ImageProjection = None
-        self.image_acquisition: ImageAcquisitionAbstract = None
-        self.calibration: ImageCalibrationAbstract = None
-        self.system: SystemSofastFringe = None
 
         # Disable buttons
         self._enable_btns()
@@ -81,15 +61,12 @@ class SofastGUI:
             2D image from camera.
 
         """
-        # Check camera is loaded
-        if self.image_acquisition is None:
-            messagebox.showerror('Error', 'Camera is not connected.')
-            return
-
-        # Get frame
-        frame = self.image_acquisition.get_frame()
-
-        return frame
+        try:
+            frame = self.service.get_frame()
+            return frame
+        except RuntimeError as ex:
+            messagebox.showerror('Error', repr(ex))
+            return None
 
     def _plot_hist(self, ax: plt.Axes, frame: np.ndarray) -> None:
         """
@@ -132,6 +109,17 @@ class SofastGUI:
         ax.set_title(title)
         ax.set_xlabel(xlabel)
         ax.set_ylabel(ylabel)
+
+    @functools.cached_property
+    def cam_options(self):
+        all_cam_options = SofastService.cam_options
+
+        ret: dict[str, type[ImageAcquisitionAbstract]] = {}
+        for description in all_cam_options:
+            if "file" not in description.lower():
+                ret[description] = all_cam_options[description]
+
+        return ret
 
     def _create_layout(self) -> None:
         """Creates GUI widgets"""
@@ -295,9 +283,13 @@ class SofastGUI:
         # =============== Second Column - Settings ===============
         r = 0
         # Camera type dropdown
-        self.var_cam_select = tkinter.StringVar(value=self.cam_options[0])
-        lbl_camera_type = tkinter.Label(label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold'))
-        drop_camera_type = tkinter.OptionMenu(label_frame_settings, self.var_cam_select, *self.cam_options)
+        self.var_cam_select = tkinter.StringVar(value=list(self.cam_options.keys())[0])
+        lbl_camera_type = tkinter.Label(
+            label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold')
+        )
+        drop_camera_type = tkinter.OptionMenu(
+            label_frame_settings, self.var_cam_select, *list(self.cam_options.keys())
+        )
         TkToolTip(drop_camera_type, 'Select type of camera object to load.')
 
         lbl_camera_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
@@ -305,11 +297,12 @@ class SofastGUI:
         r += 1
 
         # Calibration type dropdown
-        self.var_cal_select = tkinter.StringVar(value=self.cal_options[0])
+        self.var_cal_select = tkinter.StringVar(value=list(SofastService.cal_options.keys())[0])
         lbl_cal_type = tkinter.Label(
             label_frame_settings, text='Select calibration method:', font=('calibre', 10, 'bold')
         )
-        drop_cal_type = tkinter.OptionMenu(label_frame_settings, self.var_cal_select, *self.cal_options)
+        drop_cal_type = tkinter.OptionMenu(label_frame_settings, self.var_cal_select,
+                                           *list(SofastService.cal_options.keys()))
         TkToolTip(drop_cal_type, 'Select type of Projector-Camera Brightness Calibration process to use.')
 
         lbl_cal_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
@@ -416,17 +409,17 @@ class SofastGUI:
 
         """
         # Check ImageAcquisition
-        if self.image_acquisition is not None:
+        if self.service.image_acquisition is not None:
             state_im_acqu = 'normal'
         else:
             state_im_acqu = 'disabled'
         # Check ImageProjection
-        if self.image_projection is not None:
+        if self.service.image_projection is not None:
             state_projection = 'normal'
         else:
             state_projection = 'disabled'
         # Check System
-        if self.image_projection is not None and self.image_acquisition is not None:
+        if self.service.image_projection is not None and self.service.image_acquisition is not None:
             state_system = 'normal'
         else:
             state_system = 'disabled'
@@ -451,37 +444,40 @@ class SofastGUI:
         self.btn_live_view.config(state=state_im_acqu)
         self.btn_close_camera.config(state=state_im_acqu)
 
-    def _check_system_loaded(self) -> None:
+    def on_service_set(self):
+        super().on_service_set()
+        self._enable_btns()
+
+    def on_service_unset(self):
+        super().on_service_unset()
+        self._enable_btns()
+
+    def _check_system_loaded(self) -> bool:
         """Checks if the system class has been instantiated"""
-        if self.system is None:
-            messagebox.showerror('Error', 'Both ImageAcquisiton and ImageProjection must both be loaded.')
-            return
+        try:
+            system = self.service.system
+            return True
+        except Exception as ex:
+            messagebox.showerror('Error', repr(ex))
+            return False
 
     def _check_calibration_loaded(self) -> bool:
         """Checks if calibration is loaded. Returns True, if loaded,
         returns False and shows error message if not loaded.
         """
-        if self.calibration is None:  # Not loaded
+        if self.service.calibration is None:  # Not loaded
             messagebox.showerror('Error', 'Camera-Projector calibration must be loaded/performed.')
             return False
         else:  # Loaded
             return True
 
-    def _load_system_elements(self) -> None:
-        """
-        Checks if System object can be instantiated (if both
-        ImageAcquisition and ImageProjection classes are loaded)
-
-        """
-        if self.image_acquisition is not None and self.image_projection is not None:
-            self.system = SystemSofastFringe(self.image_projection, self.image_acquisition)
-
     def _save_measurement_data(self, file: str) -> None:
         """Saves last measurement to HDF file"""
         # Check measurement images have been captured
-        if self.system.fringe_images_captured is None or self.system.mask_images_captured is None:
+        sys = self.service.system
+        if sys.fringe_images_captured is None or sys.mask_images_captured is None:
             raise ValueError('Measurement data has not been captured.')
-        elif self.calibration is None:
+        elif self.service.calibration is None:
             raise ValueError('Calibration data has not been processed.')
 
         # Check save name is valid
@@ -494,27 +490,21 @@ class SofastGUI:
         meas_name = self.var_meas_name.get()
 
         # Create measurement object
-        measurement = self.system.get_measurements(meas_pt, meas_dist, meas_name)[0]
+        measurement = self.service.system.get_measurements(meas_pt, meas_dist, meas_name)[0]
 
         # Save measurement
         measurement.save_to_hdf(file)
 
         # Save calibration data
-        self.calibration.save_to_hdf(file)
+        self.service.calibration.save_to_hdf(file)
 
     def load_image_acquisition(self) -> None:
         """Loads and connects to ImageAcquisition"""
         # Get selected camera object and run
-        idx = self.cam_options.index(self.var_cam_select.get())
-        self.image_acquisition = self.cam_objects[idx]()
+        cam_description = self.var_cam_select.get()
+        self.service.image_acquisition = self.cam_options[cam_description]()
 
         print('Camera connected.')
-
-        # Enable buttons
-        self._enable_btns()
-
-        # Instantiate system class if possible
-        self._load_system_elements()
 
     def load_image_projection(self) -> None:
         """Loads and displays ImageProjection"""
@@ -528,35 +518,25 @@ class SofastGUI:
             # Create new window
             projector_root = tkinter.Toplevel(self.root)
             # Show window
-            self.image_projection = ImageProjection(projector_root, image_projection_data)
+            self.service.image_projection = ImageProjection(projector_root, image_projection_data)
 
             print(f'ImageProjection loaded:\n    {file}')
 
-            # Enable buttons
-            self._enable_btns()
-
-            # Instantiate system class if possible
-            self._load_system_elements()
-
     def show_calibration_image(self) -> None:
         """Shows calibration image"""
-        self.image_projection.show_calibration_image()
+        self.service.image_projection.show_calibration_image()
 
     def show_crosshairs(self) -> None:
         """Shows crosshairs"""
-        self.image_projection.show_crosshairs()
+        self.service.image_projection.show_crosshairs()
 
     def show_axes(self) -> None:
         """Shows ImageProjection axes"""
-        self.image_projection.show_axes()
+        self.service.image_projection.show_axes()
 
     def close_projection_window(self) -> None:
         """Close only projection window"""
-        self.image_projection.close()
-
-        # Remove image projection and update buttons
-        self.image_projection = None
-        self._enable_btns()
+        self.service.image_projection = None
 
     def run_measurement(self) -> None:
         """Runs data collect and saved data."""
@@ -582,12 +562,6 @@ class SofastGUI:
         # Create fringe object
         fringes = Fringes(periods_x, periods_y)
 
-        # Get minimum display value from calibration
-        min_disp_value = self.calibration.calculate_min_display_camera_values()[0]
-
-        # Load fringes
-        self.system.load_fringes(fringes, min_disp_value)
-
         # Define what to run after measurement sequence
         def run_next():
             # Save measurement data
@@ -598,21 +572,14 @@ class SofastGUI:
             print(f'Measurement data saved to:\n    {file}')
 
         # Capture images
-        self.system.capture_mask_and_fringe_images(run_next)
+        self.service.run_measurement(fringes, run_next)
 
     def run_exposure_cal(self) -> None:
         """Runs camera exposure calibration"""
-        # If only camera is loaded
-        if self.image_acquisition is not None and self.image_projection is None:
-            print('Running calibration without displayed white image.')
-            self.image_acquisition.calibrate_exposure()
-        elif self.image_acquisition is not None and self.image_projection is not None:
-            print('Running calibration with displayed white image.')
-            run_next = self.show_crosshairs
-            self.system.run_camera_exposure_calibration(run_next)
-        else:
-            messagebox.showerror('Error', 'Camera must be connected.')
-            return
+        try:
+            self.service.run_exposure_cal()
+        except Exception as ex:
+            messagebox.showerror('Error', repr(ex))
 
     def run_gray_levels_cal(self) -> None:
         """Runs the projector-camera intensity calibration"""
@@ -627,38 +594,26 @@ class SofastGUI:
         # Check system class exists
         self._check_system_loaded()
 
-        # Get selected calibration object
-        idx = self.cal_options.index(self.var_cal_select.get())
-        cal_object = self.cal_objects[idx]
+        # Get selected calibration type
+        cal_type = SofastService.cal_options[self.var_cal_select.get()]
 
-        # Capture images
-        def _func_0():
+        # Let us know when each phase is starting/has finished
+        def on_calibrating():
             print('Calibrating...')
-            self.system.run_display_camera_response_calibration(res=10, run_next=self.system.run_next_in_queue)
 
-        # Process data
-        def _func_1():
+        def on_processing():
             print('Processing calibration data')
-            # Get calibration images from System
-            calibration_images = self.system.get_calibration_images()[0]  # only calibrating one camera
-            # Load calibration object
-            self.calibration = cal_object.from_data(calibration_images, self.system.calibration_display_values)
-            # Save calibration object
-            self.calibration.save_to_hdf(file)
-            # Save calibration raw data
-            data = [self.system.calibration_display_values, calibration_images]
-            datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
-            hdf5_tools.save_hdf5_datasets(data, datasets, file)
-            # Show crosshairs
-            self.show_crosshairs()
-            # Display message
+
+        def on_processed():
             self.var_gray_lvl_cal_status.set('Calibration data: Loaded/Saved')
             print(f'Calibration complete. Results loaded and saved to\n    {file}')
-            # Continue
-            self.system.run_next_in_queue()
 
-        self.system.set_queue([_func_0, _func_1])
-        self.system.run_next_in_queue()
+        # Run calibration
+        self.service.run_gray_levels_cal(calibration_class=cal_type,
+                                         calibration_hdf5_path_name_ext=file,
+                                         on_calibrating=on_calibrating,
+                                         on_processing=on_processing,
+                                         on_processed=on_processed)
 
     def load_gray_levels_cal(self) -> None:
         """Loads saved results of a projector-camera intensity calibration"""
@@ -668,15 +623,13 @@ class SofastGUI:
         if file == '':
             return
 
-        # Load file
-        cal_type = hdf5_tools.load_hdf5_datasets(['Calibration/calibration_type'], file)['calibration_type']
+        # Load the calibration
+        try:
+            self.service.load_gray_levels_cal(file)
+        except Exception as ex:
+            messagebox.showerror('Error', repr(ex))
 
-        if cal_type == 'ImageCalibrationGlobal':
-            self.calibration = ImageCalibrationGlobal.load_from_hdf(file)
-        elif cal_type == 'ImageCalibrationScaling':
-            self.calibration = ImageCalibrationScaling.load_from_hdf(file)
-        else:
-            raise ValueError(f'Selected calibration type, {cal_type}, not supported.')
+        cal_type = self.service.calibration.get_calibration_name()
 
         # Display message
         self.var_gray_lvl_cal_status.set('Calibration data: Loaded')
@@ -690,20 +643,14 @@ class SofastGUI:
             return
 
         # Plot figure
-        fig = plt.figure()
-        ax = fig.gca()
-        ax.plot(self.calibration.display_values, self.calibration.camera_values)
-        ax.set_xlabel('Display Values')
-        ax.set_ylabel('Camera Values')
-        ax.grid(True)
-        ax.set_title('Projector-Camera Calibration Curve')
+        self.service.plot_gray_levels_cal()
 
         plt.show()
 
     def set_exposure(self) -> None:
         """Sets camera exposure time value to user defined value"""
         # Get current exposure_time value
-        cur_exp = self.image_acquisition.exposure_time
+        cur_exp = self.service.get_exposure()
 
         # Get new exposure_time value
         new_exp = simpledialog.askfloat(
@@ -712,7 +659,7 @@ class SofastGUI:
 
         # Set new exposure_time value
         if new_exp is not None:
-            self.image_acquisition.exposure_time = new_exp
+            self.service.set_exposure(new_exp)
 
     def save_snapshot(self) -> None:
         """Save current snapshot from camera"""
@@ -763,25 +710,14 @@ class SofastGUI:
     def close_image_acquisition(self) -> None:
         """Closes connection to camera"""
         # Close camera
-        self.image_acquisition.close()
-
-        # Clear objects
         self.image_acquisition = None
-        self.system = None
-        self._enable_btns()
 
     def close(self) -> None:
         """
         Closes all windows
 
         """
-        # Close image projection
-        if self.image_projection is not None:
-            self.image_projection.close()
-
-        # Close image acquisition
-        if self.image_acquisition is not None:
-            self.image_acquisition.close()
+        self.service.close()
 
         # Close Sofast window
         self.root.destroy()
