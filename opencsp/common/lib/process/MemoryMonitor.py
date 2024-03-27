@@ -3,6 +3,7 @@ import datetime
 import multiprocessing
 from multiprocessing.synchronize import Event as multiprocessing_event_type
 import time
+from typing import Callable
 
 import opencsp.common.lib.process.ParallelPartitioner as ppart
 import opencsp.common.lib.tool.system_tools as st
@@ -18,6 +19,7 @@ class MemoryMonitor:
         print_threshold=0.95,
         print_on_new_min=True,
         always_print=False,
+        log_func: Callable = lt.info,
     ):
         """Monitors total system memory usage in a separate subprocess while the rest of the application continues running.
 
@@ -32,13 +34,24 @@ class MemoryMonitor:
             finally:
                 monitor.stop()
 
-        Args:
-            - server_index (int): Used to identify this monitor when running multiple tasks on the same system.
-            - cpu_index (int): Used to identify this monitor when running multiple tasks on the same system.
-            - max_lifetime_hours (float): Maximum lifetime for the monitor subprocess. Setting this guarantees that the subprocess will at some point stop. Defaults to 2 hours.
-            - print_threshold (float): If the memory used/total exceeds this threshold, then print out the usage every second. Defaults to 0.95.
-            - print_on_new_min (bool): If true, then for each second, if the memory available has reached a new minimum print out the usage for that second. Defaults to True.
-            - always_print (bool): If True, then print out the usage every second. Defaults to False.
+        Params:
+        -------
+        server_index: int
+            Used to identify this monitor when running multiple tasks on the same system.
+        cpu_index: int
+            Used to identify this monitor when running multiple tasks on the same system.
+        max_lifetime_hours: float
+            Maximum lifetime for the monitor subprocess. Setting this guarantees that the subprocess will at some point
+            stop. Defaults to 2 hours.
+        print_threshold: float
+            If the memory used/total exceeds this threshold, then print out the usage every second. Defaults to 0.95.
+        print_on_new_min: bool
+            If true, then for each second, if the memory available has reached a new minimum print out the usage for
+            that second. Defaults to True.
+        always_print: bool
+            If True, then print out the usage every second. Defaults to False.
+        log_func: Callable
+            The function to call to log output to. Must accept a string as the first argument. Default is log_tools.info
         """
         partitioner = ppart.ParallelPartitioner(server_index + 1, server_index, cpu_index + 1, cpu_index)
         self.identifier = partitioner.identifier()
@@ -56,6 +69,8 @@ class MemoryMonitor:
         self._print_threshold = print_threshold
         self._print_on_new_min = print_on_new_min
         self._always_print = always_print
+        self._log_func = log_func
+
         self._start_datetime: datetime.datetime = None
         self._end_datetime: datetime.datetime = None
         self._process_finished = False
@@ -128,6 +143,7 @@ class MemoryMonitor:
                 self._print_threshold,
                 self._print_on_new_min,
                 self._always_print,
+                self._log_func
             ],
         )
         self._proc.start()
@@ -201,6 +217,7 @@ def _monitor_sys_memory(
     print_threshold: float,
     print_on_new_min: bool,
     always_print: bool,
+    log_func: Callable,
 ):
     start = time.time()
     # print("monitor started")
@@ -221,7 +238,7 @@ def _monitor_sys_memory(
 
         queue.put(tuple([elapsed, sys_tot, sys_used, sys_free]))
         if do_print_min or do_print_threshold or always_print:
-            lt.info(
+            log_func(
                 "MM: %s %s %s %s"
                 % (
                     f"{int(elapsed):>3d}",
