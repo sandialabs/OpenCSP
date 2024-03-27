@@ -48,15 +48,21 @@ class TestMemoryMonitor(unittest.TestCase):
         monitor = mm.MemoryMonitor()
         monitor.start()
         import opencsp.common.lib.tool.log_tools as lt
+        lt.error(f"{monitor.min_usage()=}, {monitor.max_usage()=}")
         monitor2 = mm.MemoryMonitor(always_print=True, log_func=lt.error)
         monitor2.start()
         time.sleep(1)
+        import tracemalloc
+        tracemalloc.start()
         a = [1] * 1_000_000_000
         time.sleep(1.1)
+        current, peak = tracemalloc.get_traced_memory()
+        current, peak = current / 1e9, peak / 1e9
+        lt.error(f"{current=}, {peak=}")
+        tracemalloc.stop()
         monitor.stop(wait=True)
         monitor2.stop(wait=True)
-        lt.error(monitor.min_usage())
-        lt.error(monitor.max_usage())
+        lt.error(f"{monitor.min_usage()=}, {monitor.max_usage()=}")
         self.assertGreaterEqual(monitor.max_usage() - monitor.min_usage(), 0.5)
 
 
