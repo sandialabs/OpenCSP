@@ -47,10 +47,16 @@ class TestMemoryMonitor(unittest.TestCase):
     def test_large_memory_usage(self):
         monitor = mm.MemoryMonitor()
         monitor.start()
+        import opencsp.common.lib.tool.log_tools as lt
+        monitor2 = mm.MemoryMonitor(always_print=True, log_func=lt.error)
+        monitor2.start()
         time.sleep(1)
         a = [1] * 1_000_000_000
         time.sleep(1.1)
         monitor.stop(wait=True)
+        monitor2.stop(wait=True)
+        lt.error(monitor.min_usage())
+        lt.error(monitor.max_usage())
         self.assertGreaterEqual(monitor.max_usage() - monitor.min_usage(), 0.5)
 
 
