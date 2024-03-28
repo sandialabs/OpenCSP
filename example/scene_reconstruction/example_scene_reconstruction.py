@@ -10,7 +10,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_scene_reconstruction(save_dir: str):
+def scene_reconstruction(save_dir):
     """Example script that reconstructs the XYZ locations of Aruco markers in a scene."""
     # Define input directory
     dir_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
@@ -45,7 +45,7 @@ def example_scene_reconstruction(save_dir: str):
         fig.savefig(join(save_dir, fig.get_label() + '.png'))
 
 
-if __name__ == '__main__':
+def example_driver():
     # Define output directory
     save_path = join(dirname(__file__), 'data/output/scene_reconstruction')
     ft.create_directories_if_necessary(save_path)
@@ -53,4 +53,8 @@ if __name__ == '__main__':
     # Set up logger
     lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
 
-    example_scene_reconstruction(save_path)
+    scene_reconstruction(save_path)
+
+
+if __name__ == '__main__':
+    example_driver()

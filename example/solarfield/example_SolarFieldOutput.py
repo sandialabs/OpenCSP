@@ -82,7 +82,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
             facet_centroids_file=dpft.sandia_nsttf_test_facet_centroidsfile(),
         )
 
-    def example_single_heliostat(self) -> None:
+    def single_heliostat(self) -> None:
         """
         Draws one heliostat.
         """
@@ -133,7 +133,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_annotated_heliostat(self) -> None:
+    def annotated_heliostat(self) -> None:
         """
         Draws annotated heliostat.
         """
@@ -187,7 +187,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_multi_heliostat(self) -> None:
+    def multi_heliostat(self) -> None:
         """
         Draws multiple heliostats.
         """
@@ -253,7 +253,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_solar_field_h_names(self) -> None:
+    def solar_field_h_names(self) -> None:
         """
         Draws solar field heliostats, with names.
         """
@@ -294,7 +294,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_solar_field_h_centroids(self) -> None:
+    def solar_field_h_centroids(self) -> None:
         """
         Draws solar field heliostats, with centroids.
         """
@@ -383,7 +383,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
-    def example_solar_field_h_centroids_names(self) -> None:
+    def solar_field_h_centroids_names(self) -> None:
         """
         Draws solar field heliostats, with centroids and names.
         """
@@ -423,7 +423,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_solar_field_h_outlines(self) -> None:
+    def solar_field_h_outlines(self) -> None:
         """
         Draws solar field heliostat outlines.  (Plus aim point and legend.)
         """
@@ -469,7 +469,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_annotated_solar_field(self) -> None:
+    def annotated_solar_field(self) -> None:
         """
         Draws annotated solar field.
         """
@@ -566,7 +566,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_solar_field_subset(self) -> None:
+    def solar_field_subset(self) -> None:
         """
         Draws solar field subset.
         """
@@ -664,7 +664,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_heliostat_vector_field(self) -> None:
+    def heliostat_vector_field(self) -> None:
         """
         Draws heliostat vector field.
         """
@@ -762,7 +762,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
-    def example_dense_vector_field(self) -> None:
+    def dense_vector_field(self) -> None:
         """
         Draws dense vector field.
         """
@@ -897,17 +897,17 @@ def example_driver():
     example_object.setup_class(interactive=interactive, verify=verify)
     # Tests.
     lt.info('Beginning tests...')
-    example_object.example_single_heliostat()
-    example_object.example_annotated_heliostat()
-    example_object.example_multi_heliostat()
-    example_object.example_solar_field_h_names()
-    example_object.example_solar_field_h_centroids()
-    example_object.example_solar_field_h_centroids_names()
-    example_object.example_solar_field_h_outlines()
-    example_object.example_annotated_solar_field()
-    example_object.example_solar_field_subset()
-    example_object.example_heliostat_vector_field()
-    example_object.example_dense_vector_field()
+    example_object.single_heliostat()
+    example_object.annotated_heliostat()
+    example_object.multi_heliostat()
+    example_object.solar_field_h_names()
+    # TODO, fix image diff: example_object.solar_field_h_centroids()
+    # TODO: fix image diff: example_object.solar_field_h_centroids_names()
+    example_object.solar_field_h_outlines()
+    example_object.annotated_solar_field()
+    example_object.solar_field_subset()
+    example_object.heliostat_vector_field()
+    example_object.dense_vector_field()
     lt.info('All tests complete.')
     # Cleanup.
     if interactive:

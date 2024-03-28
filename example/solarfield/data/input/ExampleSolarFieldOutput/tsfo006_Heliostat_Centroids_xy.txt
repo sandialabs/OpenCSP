@@ -2,7 +2,7 @@ Metadata:
 Figure number: 2
 Name: tsfo006_Heliostat Centroids
 Title: Heliostat Centroids
-Code tag: ExampleSolarFieldOutput.example_solar_field_h_centroids()
+Code tag: ExampleSolarFieldOutput.solar_field_h_centroids()
 View spec: xy
 
 Title:

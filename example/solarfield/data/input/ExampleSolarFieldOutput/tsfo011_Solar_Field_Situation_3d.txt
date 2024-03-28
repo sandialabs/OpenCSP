@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo011_Solar Field Situation
 Title: Solar Field Situation
-Code tag: ExampleSolarFieldOutput.example_annotated_solar_field()
+Code tag: ExampleSolarFieldOutput.annotated_solar_field()
 View spec: 3d
 
 Title:

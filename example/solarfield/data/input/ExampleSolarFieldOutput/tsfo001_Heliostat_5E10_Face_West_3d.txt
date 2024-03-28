@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo001_Heliostat 5E10, Face West
 Title: Heliostat 5E10, Face West
-Code tag: ExampleSolarFieldOutput.example_single_heliostat()
+Code tag: ExampleSolarFieldOutput.single_heliostat()
 View spec: 3d
 
 Title:

@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo012_Selected Heliostats
 Title: Selected Heliostats
-Code tag: ExampleSolarFieldOutput.example_solar_field_subset()
+Code tag: ExampleSolarFieldOutput.solar_field_subset()
 View spec: 3d
 
 Title:
