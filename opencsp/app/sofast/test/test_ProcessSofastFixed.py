@@ -22,7 +22,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class test_ProcessSofastFixed(unittest.TestCase):
+class TestProcessSofastFixed(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Loads data and runs ProcessSofastFixed"""
