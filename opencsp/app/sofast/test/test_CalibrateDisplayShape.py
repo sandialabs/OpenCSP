@@ -1,6 +1,7 @@
 """Tests Sofast screen distortion calibration
 """
 
+import os
 from os.path import join, dirname
 import unittest
 
@@ -71,7 +72,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         )
         cls.data_meas = dist_data
 
-    @pytest.mark.no_xvfb
+    @pytest.mark.skipif(os.name != 'nt')
     def test_screen_distortion_data(self):
         """Tests screen calibration data"""
         np.testing.assert_allclose(
