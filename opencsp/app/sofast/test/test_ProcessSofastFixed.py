@@ -4,6 +4,7 @@
 from os.path import join
 import unittest
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
@@ -81,6 +82,10 @@ class TestProcessSofastFixed(unittest.TestCase):
         np.testing.assert_allclose(
             self.process_sofast_fixed.data_slope_solver.slopes_facet_xy, self.exp_slopes_xy, rtol=0, atol=1e-6
         )
+
+    @classmethod
+    def tearDownClass(cls):
+        plt.close('all')
 
 
 if __name__ == '__main__':

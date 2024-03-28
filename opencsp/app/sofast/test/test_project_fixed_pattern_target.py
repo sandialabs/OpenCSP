@@ -3,7 +3,6 @@
 
 import os
 
-import matplotlib
 import pytest
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
