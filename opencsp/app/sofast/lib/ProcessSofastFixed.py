@@ -20,9 +20,10 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
+from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
-from opencsp.common.lib.tool import log_tools as lt
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class ProcessSofastFixed:
@@ -198,9 +199,13 @@ class ProcessSofastFixed:
         """
         self.measurement = measurement
 
-    def process_single_facet_optic(self, surface_data: dict) -> None:
-        """Processes single facet optic. Sets attribute
-        self.data_slope_solver
+    def process_single_facet_optic(self, surface: Surface2DAbstract) -> None:
+        """Processes single facet optic. Saves data to self.data_slope_solver
+
+        Parameters
+        ----------
+        surface : Surface2DAbstract
+            Surface 2d class
         """
         # Find blobs
         blob_index = self.find_blobs()
@@ -213,7 +218,7 @@ class ProcessSofastFixed:
         kwargs = self.generate_geometry(blob_index, mask_raw)
 
         # Add surface fitting parameters
-        kwargs.update({'surface_data': surface_data})
+        kwargs.update({'surface': surface})
 
         # Calculate slope
         slope_solver = SlopeSolver(**kwargs)
