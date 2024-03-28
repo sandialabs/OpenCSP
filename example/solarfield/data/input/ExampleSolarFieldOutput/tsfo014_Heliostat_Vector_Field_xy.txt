@@ -2,7 +2,7 @@ Metadata:
 Figure number: 2
 Name: tsfo014_Heliostat Vector Field
 Title: Heliostat Vector Field
-Code tag: ExampleSolarFieldOutput.example_heliostat_vector_field()
+Code tag: ExampleSolarFieldOutput.heliostat_vector_field()
 View spec: xy
 
 Title:

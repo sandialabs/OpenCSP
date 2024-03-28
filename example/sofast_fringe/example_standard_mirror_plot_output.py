@@ -3,7 +3,7 @@ from os.path import join
 
 from scipy.spatial.transform import Rotation
 
-import opencsp.app.sofast.lib.load_saved_data as lsd
+import contrib.app.sofast.load_saved_data as lsd
 import opencsp.common.lib.csp.standard_output as so
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.geometry.Uxyz import Uxyz

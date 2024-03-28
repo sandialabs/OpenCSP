@@ -13,7 +13,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_run_screen_shape_calibration(save_dir):
+def run_screen_shape_calibration(save_dir):
     """Runs screen shape calibration. Saves data to ./data/output/screen_shape"""
     # Load output data from Scene Reconstruction (Aruco marker xyz points)
     file_pts_data = join(
@@ -66,7 +66,7 @@ def example_run_screen_shape_calibration(save_dir):
         fig.savefig(file)
 
 
-if __name__ == '__main__':
+def example_driver():
     # Define save directory
     save_path = join(dirname(__file__), 'data/output/screen_shape')
     ft.create_directories_if_necessary(save_path)
@@ -74,4 +74,8 @@ if __name__ == '__main__':
     # Set up logger
     lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
 
-    example_run_screen_shape_calibration(save_path)
+    run_screen_shape_calibration(save_path)
+
+
+if __name__ == '__main__':
+    example_driver()

@@ -2,7 +2,7 @@ Metadata:
 Figure number: 1
 Name: tsfo009_Heliostat Labelled Centroids
 Title: Heliostat Labelled Centroids
-Code tag: ExampleSolarFieldOutput.example_solar_field_h_centroids_names()
+Code tag: ExampleSolarFieldOutput.solar_field_h_centroids_names()
 View spec: xy
 
 Title:
