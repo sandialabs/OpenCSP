@@ -72,7 +72,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         )
         cls.data_meas = dist_data
 
-    @pytest.mark.skipif(os.name != 'nt')
+    @pytest.mark.skipif(os.name != 'nt', reason='Does not pass in Linux environment for unkonwn reason.')
     def test_screen_distortion_data(self):
         """Tests screen calibration data"""
         np.testing.assert_allclose(
