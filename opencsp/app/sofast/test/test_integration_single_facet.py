@@ -34,7 +34,7 @@ class TestSingle(unittest.TestCase):
         """
         # Get test data location
         if base_dir is None:
-            base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+            base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Find all test files
         cls.files_dataset = glob.glob(os.path.join(base_dir, 'calculations_facet/data*.h5'))
