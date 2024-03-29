@@ -61,7 +61,7 @@ class TestDisplayShape(unittest.TestCase):
         )
 
         # Set up save path
-        cls.save_dir = join(dirname(__file__), 'data/output')
+        cls.save_dir = join(dirname(__file__), 'data/output/display_shape')
         ft.create_directories_if_necessary(cls.save_dir)
 
     def test_rectangular2D(self):
