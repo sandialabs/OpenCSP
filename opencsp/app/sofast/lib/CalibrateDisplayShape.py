@@ -350,17 +350,6 @@ class CalibrateDisplayShape:
         grid_data.update({'screen_model': 'distorted3D'})
         return DisplayShape(grid_data, name)
 
-    def save_data_as_hdf(self, file: str) -> None:
-        """Saves distortion data to given HDF file"""
-        # Get data
-        data = self.get_data()
-
-        # Save distortion data
-        with h5py.File(file, 'w') as f:
-            f.create_dataset('xy_screen_fraction', data=data['xy_screen_fraction'].data)
-            f.create_dataset('xyz_screen_coords', data=data['xyz_screen_coords'].data)
-        print(f'Saved distortion data to: {os.path.abspath(file):s}')
-
     def visualize_located_cameras(self) -> None:
         """Plots cameras and alignment points"""
         # Visualize located cameras
