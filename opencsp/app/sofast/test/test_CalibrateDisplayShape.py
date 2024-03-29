@@ -65,7 +65,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
 
         # Test screen distortion information
         cls.data_exp = load_hdf5_datasets(['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], file_exp)
-        cls.save_dir_local = join(opencsp_code_dir(), 'app/sofast/test/data/output/display_shape')
+        cls.save_dir_local = join(opencsp_code_dir(), 'app/sofast/test/data/output/display_shape_calibrate')
         ft.create_directories_if_necessary(cls.save_dir_local)
 
     @pytest.mark.skipif(os.name != 'nt', reason='Does not pass in Linux environment for unkonwn reason.')
@@ -93,7 +93,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
 
 if __name__ == '__main__':
     # Set up save dir
-    save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/display_shape')
+    save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/display_shape_calibrate')
     ft.create_directories_if_necessary(save_dir)
 
     # Set up logger
