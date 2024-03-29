@@ -18,6 +18,7 @@ from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScali
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 import opencsp.app.sofast.lib.SofastServiceCallback as ssc
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as h5
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -43,14 +44,18 @@ class SofastService():
         # Set defaults
         self._image_projection: ImageProjection = None
         self._image_acquisition: ImageAcquisitionAbstract = None
-        self.calibration: ImageCalibrationAbstract = None
+        self._calibration: ImageCalibrationAbstract = None
         self._system: SystemSofastFringe = None
 
     def __del__(self):
-        self.image_acquisition = None
-        self.image_projection = None
-        self._system.close_all()
-        self._system = None
+        with et.ignored(Exception):
+            self.image_acquisition = None
+        with et.ignored(Exception):
+            self.image_projection = None
+        with et.ignored(Exception):
+            self._system.close_all()
+        with et.ignored(Exception):
+            self._system = None
 
     @property
     def system(self) -> SystemSofastFringe:
@@ -278,7 +283,9 @@ class SofastService():
 
         """
         # Close image projection
-        self.image_projection = None
+        with et.ignored(Exception):
+            self.image_projection = None
 
         # Close image acquisition
-        self.image_acquisition = None
+        with et.ignored(Exception):
+            self.image_acquisition = None
