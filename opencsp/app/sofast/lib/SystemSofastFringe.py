@@ -13,6 +13,7 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.exception_tools as et
 
 
 class SystemSofastFringe:
@@ -208,7 +209,7 @@ class SystemSofastFringe:
         self.fringe_images_to_display = []
         for idx in range(fringe_images_base.shape[2]):
             # Create image
-            self.fringe_images_to_display.append(np.concatenate([fringe_images_base[:, :, idx : idx + 1]] * 3, axis=2))
+            self.fringe_images_to_display.append(np.concatenate([fringe_images_base[:, :, idx: idx + 1]] * 3, axis=2))
 
     def check_saturation(self, image: ndarray, camera_max_int: int, thresh: float = 0.005) -> None:
         """
@@ -434,10 +435,12 @@ class SystemSofastFringe:
         """Closes all windows"""
         # Close image acquisition
         for im_aq in self.image_acquisition:
-            im_aq.close()
+            with et.ignored(Exception):
+                im_aq.close()
 
         # Close window
-        self.root.destroy()
+        with et.ignored(Exception):
+            self.root.destroy()
 
     def set_queue(self, funcs: list[Callable]) -> None:
         """Sets the queue to given list of Callables"""
