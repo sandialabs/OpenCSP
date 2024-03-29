@@ -32,7 +32,7 @@ def example_single_facet() -> None:
 
     # Load data
     optic_meas = lsd.load_facet_from_hdf(file_data)
-    optic_ref = lsd.load_ideal_facet_from_hdf(file_data, 100.)
+    optic_ref = lsd.load_ideal_facet_from_hdf(file_data, 100.0)
 
     # Define scene
     v_target_center = Vxyz((0, 0, 56.57))
@@ -84,7 +84,7 @@ def example_facet_ensemble() -> None:
 
     # Load data
     optic_meas = lsd.load_facet_ensemble_from_hdf(file_data)
-    optic_ref = lsd.load_ideal_facet_ensemble_from_hdf(file_data, 1000.)
+    optic_ref = lsd.load_ideal_facet_ensemble_from_hdf(file_data, 1000.0)
 
     # Define scene
     v_target_center = Vxyz((0, 0, 56.57))
