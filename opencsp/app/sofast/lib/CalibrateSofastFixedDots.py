@@ -106,12 +106,17 @@ class CalibrateSofastFixedDots:
 
         # Settings
         self.plot = False
+        """To plot output figures"""
         self.intersection_threshold = 0.002  # meters
+        """Ray intersection threshold to consider rays intersected, meters"""
         self.figures: list[plt.Figure] = []
+        """List of output figures. Empty list if figures not generated."""
         self.blob_search_threshold = 20  # pixels
+        """Location threshold when finding expected dots, pixels."""
 
         # Blob detection parameters
         self.blob_detector = cv.SimpleBlobDetector_Params()
+        """OpenCV SimpleBlobDetector object used to find blobs in images"""
         self.blob_detector.minDistBetweenBlobs = 2
         self.blob_detector.filterByArea = True
         self.blob_detector.minArea = 50
@@ -179,7 +184,7 @@ class CalibrateSofastFixedDots:
         """Calculates 3d camera poses"""
         for cam_idx in range(self._num_images):
             # Calculate camera pose
-            ret = self._images[cam_idx].attempt_calculate_pose(True)
+            ret = self._images[cam_idx].attempt_calculate_pose()
             if ret == -1:
                 lt.critical_and_raise(ValueError, f'Camera pose {cam_idx:d} not calculated successfully')
 
