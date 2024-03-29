@@ -1,44 +1,47 @@
-"""Unit test suite to test the SpatialOrientation class
-"""
+"""Unit test suite to test the SpatialOrientation class"""
 
-import os
+from os.path import join
 import unittest
 
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+import opencsp.common.lib.tool.file_tools as ft
 
 
 class TestSpatialOrientation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+        base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
 
         # Define test data files for single facet processing
-        data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
+        data_file_facet = join(base_dir, 'calculations_facet/data.h5')
 
-        # Create spatial orientation objects
+        # Load data
         datasets = [
             'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
             'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
         ]
-        # Load data
-        data = load_hdf5_datasets(datasets, data_file_facet)
-        display = Display.load_from_hdf(data_file_facet)
 
+        ori = SpatialOrientation.load_from_hdf(data_file_facet)
+
+        data = load_hdf5_datasets(datasets, data_file_facet)
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1']).inv()
         v_cam_optic_cam = Vxyz(data['v_cam_optic_cam_refine_2'])
-        ori = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
+
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         # Save spatial orientation
         cls.so = ori
+
+        # Set up save path
+        cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output')
+        ft.create_directories_if_necessary(cls.save_dir)
 
     def test_translation_ring_1(self):
         v_exp = np.zeros(3)
@@ -67,6 +70,28 @@ class TestSpatialOrientation(unittest.TestCase):
         I_exp = np.eye(3)
         I_calc = self.so.r_cam_screen * self.so.r_optic_cam * self.so.r_screen_optic
         np.testing.assert_allclose(I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
+
+    def test_io_oriented_optic(self):
+        file = join(self.save_dir, 'test_spatial_orientation_oriented_optic.h5')
+        # Save
+        self.so.save_to_hdf(file)
+        # Load
+        ori = SpatialOrientation.load_from_hdf(file)
+        # Check optic is oriented
+        self.assertEqual(ori.optic_oriented, True)
+
+    def test_io_unoriented_optic(self):
+        file = join(self.save_dir, 'test_spatial_orientation_unoriented_optic.h5')
+        # Save
+        r_cam_screen = self.so.r_cam_screen
+        v_cam_screen_cam = self.so.v_cam_screen_cam
+        ori_1 = SpatialOrientation(r_cam_screen, v_cam_screen_cam)
+        ori_1.save_to_hdf(file)
+        # Load
+        ori_2 = SpatialOrientation.load_from_hdf(file)
+        # Check optic not oriented
+        self.assertEqual(ori_1.optic_oriented, False)
+        self.assertEqual(ori_2.optic_oriented, False)
 
 
 if __name__ == '__main__':

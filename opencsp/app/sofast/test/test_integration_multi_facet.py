@@ -7,12 +7,13 @@ import unittest
 from scipy.spatial.transform import Rotation
 import numpy as np
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -41,8 +42,9 @@ class TestMulti(unittest.TestCase):
 
         # Load data
         camera = Camera.load_from_hdf(file_dataset)
-        display = Display.load_from_hdf(file_dataset)
-        measurement = Measurement.load_from_hdf(file_measurement)
+        display = DisplayShape.load_from_hdf(file_dataset)
+        orientation = SpatialOrientation.load_from_hdf(file_dataset)
+        measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
         calibration = ImageCalibrationScaling.load_from_hdf(file_dataset)
 
         # Load sofast params
@@ -64,7 +66,7 @@ class TestMulti(unittest.TestCase):
         measurement.calibrate_fringe_images(calibration)
 
         # Instantiate sofast object
-        sofast = Sofast(measurement, camera, display)
+        sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
         # Update parameters
         sofast.params.mask_hist_thresh = params['mask_hist_thresh']

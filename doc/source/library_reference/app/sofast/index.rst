@@ -1,4 +1,4 @@
-sofast
+SOFAST
 ======
 
 High-precision deflectometry measurement of CSP mirrors, including heliostat facets, full heliostats, and dishes.
@@ -7,4 +7,3 @@ High-precision deflectometry measurement of CSP mirrors, including heliostat fac
    :maxdepth: 1
 
    config.rst
-   calibration/index.rst

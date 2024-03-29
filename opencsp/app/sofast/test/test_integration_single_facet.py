@@ -7,11 +7,12 @@ import unittest
 
 import numpy as np
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
@@ -37,6 +38,7 @@ class TestSingle(unittest.TestCase):
 
         # Find all test files
         cls.files_dataset = glob.glob(os.path.join(base_dir, 'calculations_facet/data*.h5'))
+        cls.files_dataset.sort()
         if len(cls.files_dataset) == 0:
             raise ValueError('No single-facet datsets found.')
 
@@ -44,7 +46,7 @@ class TestSingle(unittest.TestCase):
         file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
 
         # Load components
-        measurement = Measurement.load_from_hdf(file_measurement)
+        measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
 
         # Initialize data containers
         cls.slopes = []
@@ -55,8 +57,9 @@ class TestSingle(unittest.TestCase):
         for file_dataset in cls.files_dataset:
             # Load display
             camera = Camera.load_from_hdf(file_dataset)
+            orientation = SpatialOrientation.load_from_hdf(file_dataset)
             calibration = ImageCalibrationScaling.load_from_hdf(file_dataset)
-            display = Display.load_from_hdf(file_dataset)
+            display = DisplayShape.load_from_hdf(file_dataset)
 
             # Calibrate measurement
             measurement.calibrate_fringe_images(calibration)
@@ -111,7 +114,7 @@ class TestSingle(unittest.TestCase):
             params = load_hdf5_datasets(datasets, file_dataset)
 
             # Instantiate sofast object
-            sofast = Sofast(measurement, camera, display)
+            sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
             # Update parameters
             sofast.params.mask_hist_thresh = params['mask_hist_thresh']

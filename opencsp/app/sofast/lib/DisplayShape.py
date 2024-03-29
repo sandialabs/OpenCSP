@@ -1,77 +1,63 @@
 import numpy as np
 from scipy.interpolate import LinearNDInterpolator
-from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
+import opencsp.common.lib.tool.hdf5_tools as h5
 
 
-class DisplayShape:
+class DisplayShape(h5.HDF5_IO_Abstract):
     """Representation of a screen/projector for deflectometry."""
 
-    def __init__(
-        self, v_cam_screen_screen: Vxyz, r_screen_cam: Rotation, grid_data: dict, name: str = ''
-    ) -> 'DisplayShape':
+    def __init__(self, grid_data: dict, name: str = '') -> 'DisplayShape':
         """
         Instantiates deflectometry display representation.
 
         Parameters
         ----------
-        v_cam_screen_screen : Vxyz
-            Translation vector from camera to screen in screen coordinates.
-        r_screen_cam : Rotation
-            Rotation vector from camera to screen coordinates.
         grid_data : dict
-            DisplayShape distortion data. Must contain the field "screen_model"
-            that defines distortion model and necessary input data.
+            Contains different data depending on the model being used.
 
-            1) Rectangular 2D
+            - Rectangular 2D
                 - Description: Model with no distortion (useful for LCD
                 screens, etc.).
 
                 - Needs the following fields.
-                    "screen_model" : str
-                        'rectangular2D'
+                    - "screen_model" : str
+                        - 'rectangular2D'
+                    - "screen_x" : float
+                        - Screen dimension in x
+                    - "screen_y" : float
+                        - Screen dimension in y
 
-            2) Distorted 2D
+            - Distorted 2D
                 - Description: Model that assumes screen ia perfectly flat
                 2D surface (useful for projector system with very flat
                 wall).
 
                 - Needs the following fields.
-                    "screen_model" : str
-                        'distorted2D'
-                    "xy_screen_fraction" : Vxy
-                        XY screen points in fractional screens.
-                    "xy_screen_coords" : Vxy
-                        XY screen points in meters (screen coordinates).
+                    - "screen_model" : str
+                        - 'distorted2D'
+                    - "xy_screen_fraction" : Vxy
+                        - XY screen points in fractional screens.
+                    - "xy_screen_coords" : Vxy
+                        - XY screen points in meters (screen coordinates).
 
-            3) Distorted 3D
+            - Distorted 3D
                 - Description: Model that can completely define the 3D
                 shape of a distorted screen in 3D.
 
                 - Needs the following fields.
-                    "screen_model" : str
-                        'distorted3D'
-                    "xy_screen_fraction" : Vxy
-                        XY screen points in fractional screens.
-                    "xyz_screen_coords" : Vxyz
-                        XYZ screen points in meters (screen coordinates).
+                    - "screen_model" : str
+                        - 'distorted3D'
+                    - "xy_screen_fraction" : Vxy
+                        - XY screen points in fractional screens.
+                    - "xyz_screen_coords" : Vxyz
+                        - XYZ screen points in meters (screen coordinates).
 
         name : str, optional
             The name of the calibrated display.
-
         """
-
-        # Rotation matrices
-        self.r_screen_cam = r_screen_cam
-        self.r_cam_screen = self.r_screen_cam.inv()
-
-        # Translation vectors
-        self.v_cam_screen_screen = v_cam_screen_screen
-        self.v_cam_screen_cam = self.v_cam_screen_screen.rotate(self.r_screen_cam)
-
         # Save display model name
         self.name = name
 
@@ -134,7 +120,6 @@ class DisplayShape:
         -------
         Vxyz
             XYZ points in display coordinates.
-
         """
         xm = (uv_display_pts.x - 0.5) * self.grid_data['screen_x']  # meters
         ym = (uv_display_pts.y - 0.5) * self.grid_data['screen_y']  # meters
@@ -156,7 +141,6 @@ class DisplayShape:
         -------
         Vxyz
             XYZ points in display coordinates.
-
         """
         xy = func_xy(uv_display_pts.x, uv_display_pts.y).T  # (2, N) ndarray meters
         zm = np.zeros((1, len(uv_display_pts)))  # (1, N) ndarray meters
@@ -177,84 +161,75 @@ class DisplayShape:
         -------
         Vxyz
             XYZ points in display coordinates.
-
         """
         xyz = func_xyz(uv_display_pts.x, uv_display_pts.y).T  # (3, N) ndarray meters
         return Vxyz(xyz)  # meters, display coordinates
 
     @classmethod
-    def load_from_hdf(cls, file: str):
-        """
-        Loads from HDF file
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'DisplayShape':
+        """Loads data from given file. Assumes data is stored as: PREFIX + DisplayShape/Field_1
 
         Parameters
         ----------
-        file : string
-            HDF5 file to load
-
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
         # Load grid data
-        grid_data = hdf5_tools.load_hdf5_datasets(['DisplayShape/screen_model'], file)
+        datasets = [prefix + 'DisplayShape/screen_model', prefix + 'DisplayShape/name']
+        data = h5.load_hdf5_datasets(datasets, file)
 
         # Rectangular
-        if grid_data['screen_model'] == 'rectangular2D':
-            datasets = ['DisplayShape/screen_x', 'DisplayShape/screen_y']
-            grid_data.update(hdf5_tools.load_hdf5_datasets(datasets, file))
+        if data['screen_model'] == 'rectangular2D':
+            datasets = [prefix + 'DisplayShape/screen_x', prefix + 'DisplayShape/screen_y']
+            grid_data = h5.load_hdf5_datasets(datasets, file)
 
         # Distorted 2D
-        elif grid_data['screen_model'] == 'distorted2D':
-            datasets = ['DisplayShape/xy_screen_fraction', 'DisplayShape/xy_screen_coords']
-            grid_data.update(hdf5_tools.load_hdf5_datasets(datasets, file))
+        elif data['screen_model'] == 'distorted2D':
+            datasets = [prefix + 'DisplayShape/xy_screen_fraction', prefix + 'DisplayShape/xy_screen_coords']
+            grid_data = h5.load_hdf5_datasets(datasets, file)
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xy_screen_coords'] = Vxy(grid_data['xy_screen_coords'])
 
         # Distorted 3D
-        elif grid_data['screen_model'] == 'distorted3D':
-            datasets = ['DisplayShape/xy_screen_fraction', 'DisplayShape/xyz_screen_coords']
-            grid_data.update(hdf5_tools.load_hdf5_datasets(datasets, file))
+        elif data['screen_model'] == 'distorted3D':
+            datasets = [prefix + 'DisplayShape/xy_screen_fraction', prefix + 'DisplayShape/xyz_screen_coords']
+            grid_data = h5.load_hdf5_datasets(datasets, file)
             grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
             grid_data['xyz_screen_coords'] = Vxyz(grid_data['xyz_screen_coords'])
 
         else:
-            raise ValueError(f'Model, {grid_data["screen_model"]}, not supported.')
+            raise ValueError(f'Model, {data["screen_model"]}, not supported.')
 
-        # Load display parameters
-        datasets = ['DisplayShape/rvec_screen_cam', 'DisplayShape/tvec_cam_screen_screen', 'DisplayShape/name']
-        data = hdf5_tools.load_hdf5_datasets(datasets, file)
-
+        grid_data.update({'screen_model': data['screen_model']})
         # Return display object
-        kwargs = {
-            'r_screen_cam': Rotation.from_rotvec(data['rvec_screen_cam']),
-            'v_cam_screen_screen': Vxyz(data['tvec_cam_screen_screen']),
-            'name': data['name'],
-            'grid_data': grid_data,
-        }
+        kwargs = {'name': data['name'], 'grid_data': grid_data}
         return cls(**kwargs)
 
-    def save_to_hdf(self, file: str):
-        """
-        Saves to HDF file
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+        """Saves data to given file. Data is stored as: PREFIX + DisplayShape/Field_1
 
         Parameters
         ----------
-        file : string
-            HDF5 file to save
-
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
-
         # Get "grid data" datset names and data
         datasets = []
         data = []
         for dataset in self.grid_data.keys():
-            datasets.append('DisplayShape/' + dataset)
-            if isinstance(self.grid_data[dataset], Vxy) or isinstance(self.grid_data[dataset], Vxyz):
+            datasets.append(prefix + 'DisplayShape/' + dataset)
+            if isinstance(self.grid_data[dataset], (Vxy, Vxyz)):
                 data.append(self.grid_data[dataset].data)
             else:
                 data.append(self.grid_data[dataset])
 
-        # Screen data
-        datasets += ['DisplayShape/rvec_screen_cam', 'DisplayShape/tvec_cam_screen_screen', 'DisplayShape/name']
-        data += [self.r_screen_cam.as_rotvec(), self.v_cam_screen_screen.data, self.name]
+        # Add name
+        datasets.append(prefix + 'DisplayShape/name')
+        data.append(self.name)
 
         # Save data
-        hdf5_tools.save_hdf5_datasets(data, datasets, file)
+        h5.save_hdf5_datasets(data, datasets, file)

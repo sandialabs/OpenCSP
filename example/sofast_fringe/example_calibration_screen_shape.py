@@ -14,7 +14,9 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def run_screen_shape_calibration(save_dir):
-    """Runs screen shape calibration. Saves data to ./data/output/screen_shape"""
+    """Runs screen shape calibration. Saves a DisplayShape HDF5 file
+    to ./data/output/screen_shape/display_shape.h5
+    """
     # Load output data from Scene Reconstruction (Aruco marker xyz points)
     file_pts_data = join(
         opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement', 'point_locations.csv'
@@ -56,8 +58,13 @@ def run_screen_shape_calibration(save_dir):
     cal.make_figures = True
     cal.run_calibration()
 
-    # Save screen shape data as HDF5 file
-    cal.save_data_as_hdf(join(save_dir, 'screen_distortion_data.h5'))
+    # Get screen shape data
+    display_shape = cal.as_DisplayShape('Example display shape')
+
+    # Save DisplayShape file
+    file = join(save_dir, 'display_shape.h5')
+    display_shape.save_to_hdf(file)
+    lt.info(f'Saved DisplayShape file to {file:s}')
 
     # Save calibration figures
     for fig in cal.figures:

@@ -105,7 +105,7 @@ class CalculationDataGeometryFacet:
             prefix + 'CalculationDataGeometryFacet/u_pixel_pointing_facet',
             prefix + 'CalculationDataGeometryFacet/v_screen_points_facet',
         ]
-        self.spatial_orientation.save_all_to_hdf(file, prefix + 'CalculationDataGeometryFacet/')
+        self.spatial_orientation.save_to_hdf(file, prefix + 'CalculationDataGeometryFacet/')
         _save_data_in_file(data, datasets, file)
 
 

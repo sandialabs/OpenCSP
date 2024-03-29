@@ -15,8 +15,9 @@ from scipy.signal import medfilt
 from scipy.spatial.transform import Rotation
 from tqdm import tqdm
 
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 import opencsp.app.sofast.lib.image_processing as ip
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import CalParams
 from opencsp.common.lib.geometry.Vxy import Vxy
@@ -44,7 +45,7 @@ class DataInput:
         Camera object used to capture screen distortion data
     image_projection_data : dict
         Image projection parameters
-    measurements_screen : list[Measurement]
+    measurements_screen : list[MeasurementSofastFringe]
         Screen shape Sofast measurement objects
     assume_located_points : bool
         To assume that points are located accuratly, does not optimize point location, by default True.
@@ -58,7 +59,7 @@ class DataInput:
     pts_xyz_marker: Vxyz
     camera: Camera
     image_projection_data: dict
-    measurements_screen: list[Measurement]
+    measurements_screen: list[MeasurementSofastFringe]
     assume_located_points: bool = True
     ray_intersection_threshold: float = 0.001
 
@@ -335,18 +336,19 @@ class CalibrateDisplayShape:
             self.data_calculation.pts_xyz_screen_aligned.data[:, self.data_calculation.intersection_points_mask]
         )
 
-        return {'pts_xy_screen_fraction': pts_xy_screen_fraction, 'pts_xyz_screen_coords': pts_xyz_screen}
+        return {'xy_screen_fraction': pts_xy_screen_fraction, 'xyz_screen_coords': pts_xyz_screen}
 
-    def save_data_as_hdf(self, file: str) -> None:
-        """Saves distortion data to given HDF file"""
-        # Get data
-        data = self.get_data()
+    def as_DisplayShape(self, name: str) -> DisplayShape:
+        """Returns calibrated DisplayShape object.
 
-        # Save distortion data
-        with h5py.File(file, 'w') as f:
-            f.create_dataset('pts_xy_screen_fraction', data=data['pts_xy_screen_fraction'].data)
-            f.create_dataset('pts_xyz_screen_coords', data=data['pts_xyz_screen_coords'].data)
-        lt.info(f'Saved distortion data to: {os.path.abspath(file):s}')
+        Parameters
+        ----------
+        name : str
+            Name of DisplayShape.
+        """
+        grid_data = self.get_data()
+        grid_data.update({'screen_model': 'distorted3D'})
+        return DisplayShape(grid_data, name)
 
     def visualize_located_cameras(self) -> None:
         """Plots cameras and alignment points"""

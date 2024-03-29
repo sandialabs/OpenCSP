@@ -11,7 +11,7 @@ from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 import opencsp.app.sofast.lib.image_processing as ip
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
 import opencsp.app.sofast.lib.process_optics_geometry as po
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
@@ -158,25 +158,28 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
                 - v_mask_centroid_image
     """
 
-    def __init__(self, measurement: Measurement, camera: Camera, display: Display) -> 'ProcessSofastFringe':
+    def __init__(
+        self, measurement: MeasurementSofastFringe, orientation: SpatialOrientation, camera: Camera, display: Display
+    ) -> 'ProcessSofastFringe':
         """
         SOFAST processing class.
 
         Parameters
         ----------
-        measurement : Measurement
-            Measurement class to process.
+        measurement : MeasurementSofastFringe
+            MeasurementSofastFringe class to process.
+        orientation : SpatialOrientation
+            SpatialOrientation object
         camera : Camera
             Camera object used to capture data.
         display : Display
             Display object used to capture data.
-
         """
         # Store data
         self.measurement = measurement
         self.display = display
         self.camera = camera
-        self.orientation = SpatialOrientation(display.r_cam_screen, display.v_cam_screen_cam)
+        self.orientation = orientation
 
         # Define default calculation parameters
         self.params = ParamsSofastFringe()

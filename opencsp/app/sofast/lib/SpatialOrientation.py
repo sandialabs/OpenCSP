@@ -2,10 +2,10 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool import hdf5_tools
+import opencsp.common.lib.tool.hdf5_tools as h5
 
 
-class SpatialOrientation:
+class SpatialOrientation(h5.HDF5_IO_Abstract):
     """Holds relative orientations of camera, screen, and optic for deflectometry systems"""
 
     def __init__(self, r_cam_screen: Rotation, v_cam_screen_cam: Vxyz) -> 'SpatialOrientation':
@@ -139,16 +139,35 @@ class SpatialOrientation:
             HDF file to save to
         prefix : str
             Prefix to append to folder path within HDF file (folders must be separated by "/")
-
         """
-        datasets = [prefix + 'SpatialOrientation/r_cam_screen', prefix + 'SpatialOrientation/v_cam_screen_cam']
+        if self.optic_oriented:
+            datasets = [
+                prefix + 'SpatialOrientation/r_cam_screen',
+                prefix + 'SpatialOrientation/v_cam_screen_cam',
+                prefix + 'SpatialOrientation/optic_oriented',
+                prefix + 'SpatialOrientation/r_cam_optic',
+                prefix + 'SpatialOrientation/v_cam_optic_cam',
+            ]
+            data = [
+                self.r_cam_screen.as_rotvec(),
+                self.v_cam_screen_cam.data,
+                self.optic_oriented,
+                self.r_cam_optic.as_rotvec(),
+                self.v_cam_optic_cam.data,
+            ]
+        else:
+            datasets = [
+                prefix + 'SpatialOrientation/r_cam_screen',
+                prefix + 'SpatialOrientation/v_cam_screen_cam',
+                prefix + 'SpatialOrientation/optic_oriented',
+            ]
+            data = [self.r_cam_screen.as_rotvec(), self.v_cam_screen_cam.data, self.optic_oriented]
 
-        data = [self.r_cam_screen.as_rotvec(), self.v_cam_screen_cam.data]
+        h5.save_hdf5_datasets(data, datasets, file)
 
-        hdf5_tools.save_hdf5_datasets(data, datasets, file)
-
-    def save_all_to_hdf(self, file: str, prefix: str = '') -> None:
-        """Saves all data to HDF file. Data is stored as prefix + SpatialOrientation/...
+    @classmethod
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'SpatialOrientation':
+        """Loads data from given file. Assumes data is stored as: PREFIX + SpatialOrientation/...
 
         Parameters
         ----------
@@ -156,50 +175,24 @@ class SpatialOrientation:
             HDF file to save to
         prefix : str
             Prefix to append to folder path within HDF file (folders must be separated by "/")
-
         """
+        # Load screen-camera orientation information
         datasets = [
             prefix + 'SpatialOrientation/r_cam_screen',
             prefix + 'SpatialOrientation/v_cam_screen_cam',
-            prefix + 'SpatialOrientation/r_cam_optic',
-            prefix + 'SpatialOrientation/v_cam_optic_cam',
+            prefix + 'SpatialOrientation/optic_oriented',
         ]
-
-        data = [
-            self.r_cam_screen.as_rotvec(),
-            self.v_cam_screen_cam.data,
-            self.r_cam_optic.as_rotvec(),
-            self.v_cam_optic_cam.data,
-        ]
-
-        hdf5_tools.save_hdf5_datasets(data, datasets, file)
-
-    @classmethod
-    def load_from_hdf(cls, file: str) -> 'SpatialOrientation':
-        """Loads camera-screen orientation data from HDF file"""
-        datasets = ['SpatialOrientation/r_cam_screen', 'SpatialOrientation/v_cam_screen_cam']
-        data = hdf5_tools.load_hdf5_datasets(datasets, file)
+        data = h5.load_hdf5_datasets(datasets, file)
         r_cam_screen = Rotation.from_rotvec(data['r_cam_screen'])
         v_cam_screen_cam = Vxyz(data['v_cam_screen_cam'])
-        return cls(r_cam_screen, v_cam_screen_cam)
-
-    @classmethod
-    def load_all_from_hdf(cls, file: str) -> 'SpatialOrientation':
-        """Loads all data from HDF file"""
-        datasets = [
-            'SpatialOrientation/r_cam_screen',
-            'SpatialOrientation/v_cam_screen_cam',
-            'SpatialOrientation/r_cam_optic',
-            'SpatialOrientation/v_cam_optic_cam',
-        ]
-        data = hdf5_tools.load_hdf5_datasets(datasets, file)
-
-        r_cam_screen = Rotation.from_rotvec(data['r_cam_screen'])
-        v_cam_screen_cam = Vxyz(data['v_cam_screen_cam'])
-        r_cam_optic = Rotation.from_rotvec(data['r_cam_optic'])
-        v_cam_optic_cam = Vxyz(data['v_cam_optic_cam'])
-
         ori = cls(r_cam_screen, v_cam_screen_cam)
-        ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
+
+        # If optic is oriented, load optic orientation information
+        if data['optic_oriented']:
+            datasets = [prefix + 'SpatialOrientation/r_cam_optic', prefix + 'SpatialOrientation/v_cam_optic_cam']
+            data = h5.load_hdf5_datasets(datasets, file)
+            r_cam_optic = Rotation.from_rotvec(data['r_cam_optic'])
+            v_cam_optic_cam = Vxyz(data['v_cam_optic_cam'])
+            ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         return ori
