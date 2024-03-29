@@ -688,7 +688,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         frame = self._get_frame()
 
         # Highlight saturation
-        frame_rgb = highlight_saturation(frame, self.image_acquisition.max_value)
+        frame_rgb = highlight_saturation(frame, self.service.image_acquisition.max_value)
 
         # Create figure
         fig = plt.figure(figsize=(10, 4))
@@ -706,7 +706,7 @@ class SofastGUI(ssc.SofastServiceCallback):
 
     def live_view(self) -> None:
         """Shows live stream from the camera."""
-        LiveView(self.image_acquisition)
+        LiveView(self.service.image_acquisition)
 
     def close_image_acquisition(self) -> None:
         """Closes connection to camera"""
