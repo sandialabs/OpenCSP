@@ -19,27 +19,34 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example(dir_save: str):
-    """Example SOFAST script
+def example_process_facet_ensemble():
+    """Example Sofast script
 
     Performs processing of previously collected Sofast data of multi facet mirror ensemble.
-        1. Loads saved "multi-facet" SOFAST collection data
-        2. Processes data with SOFAST (without using facet file)
+        1. Loads saved facet ensemble Sofast collection data
+        2. Processes data with Sofast
         3. Logs best-fit parabolic focal lengths
-        4. Plots slope magnitude, physical setup
+        4. Plots slope magnitude
     """
+    # Define save dir
+    dir_save = join(dirname(__file__), 'data/output/facet_ensemble')
+    ft.create_directories_if_necessary(dir_save)
+
+    # Set up logger
+    lt.logger(join(dir_save, 'log.txt'), lt.log.INFO)
 
     # Define sample data directory
-    sample_data_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe/')
+    dir_data_sofast = join(opencsp_code_dir(), 'test/data/sofast_fringe')
+    dir_data_common = join(opencsp_code_dir(), 'test/data/sofast_common')
 
     # Directory setup
-    file_measurement = join(sample_data_dir, 'measurement_ensemble.h5')
-    file_camera = join(sample_data_dir, 'camera.h5')
-    file_display = join(sample_data_dir, 'display_distorted_2d.h5')
-    file_orientation = join(sample_data_dir, 'spatial_orientation.h5')
-    file_calibration = join(sample_data_dir, 'image_calibration.h5')
-    file_facet = join(sample_data_dir, 'Facet_lab_6x4.json')
-    file_ensemble = join(sample_data_dir, 'Ensemble_lab_6x4.json')
+    file_measurement = join(dir_data_sofast, 'measurement_ensemble.h5')
+    file_camera = join(dir_data_common, 'camera_sofast_downsampled.h5')
+    file_display = join(dir_data_common, 'display_distorted_2d.h5')
+    file_orientation = join(dir_data_common, 'spatial_orientation.h5')
+    file_calibration = join(dir_data_sofast, 'image_calibration.h5')
+    file_facet = join(dir_data_common, 'Facet_lab_6x4.json')
+    file_ensemble = join(dir_data_common, 'Ensemble_lab_6x4.json')
 
     # Load data
     camera = Camera.load_from_hdf(file_camera)
@@ -102,16 +109,5 @@ def example(dir_save: str):
     sofast.save_to_hdf(f'{dir_save}/data_multifacet.h5')
 
 
-def example_driver():
-    # Define save dir
-    save_path = join(dirname(__file__), 'data/output/facet_ensemble')
-    ft.create_directories_if_necessary(save_path)
-
-    # Set up logger
-    lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
-
-    example(save_path)
-
-
 if __name__ == '__main__':
-    example_driver()
+    example_process_facet_ensemble()
