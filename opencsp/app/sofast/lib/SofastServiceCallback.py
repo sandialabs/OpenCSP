@@ -4,7 +4,7 @@ import opencsp.app.sofast.lib.ImageCalibrationAbstract as ica
 import opencsp.app.sofast.lib.SystemSofastFringe as ssf
 
 
-class SofastServiceCallback():
+class SofastServiceCallback:
     def on_service_set(self):
         pass
 

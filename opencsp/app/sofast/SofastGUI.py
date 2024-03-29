@@ -285,12 +285,8 @@ class SofastGUI(ssc.SofastServiceCallback):
         r = 0
         # Camera type dropdown
         self.var_cam_select = tkinter.StringVar(value=list(self.cam_options.keys())[0])
-        lbl_camera_type = tkinter.Label(
-            label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold')
-        )
-        drop_camera_type = tkinter.OptionMenu(
-            label_frame_settings, self.var_cam_select, *list(self.cam_options.keys())
-        )
+        lbl_camera_type = tkinter.Label(label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold'))
+        drop_camera_type = tkinter.OptionMenu(label_frame_settings, self.var_cam_select, *list(self.cam_options.keys()))
         TkToolTip(drop_camera_type, 'Select type of camera object to load.')
 
         lbl_camera_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
@@ -302,8 +298,9 @@ class SofastGUI(ssc.SofastServiceCallback):
         lbl_cal_type = tkinter.Label(
             label_frame_settings, text='Select calibration method:', font=('calibre', 10, 'bold')
         )
-        drop_cal_type = tkinter.OptionMenu(label_frame_settings, self.var_cal_select,
-                                           *list(SofastService.cal_options.keys()))
+        drop_cal_type = tkinter.OptionMenu(
+            label_frame_settings, self.var_cal_select, *list(SofastService.cal_options.keys())
+        )
         TkToolTip(drop_cal_type, 'Select type of Projector-Camera Brightness Calibration process to use.')
 
         lbl_cal_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
@@ -610,11 +607,13 @@ class SofastGUI(ssc.SofastServiceCallback):
             print(f'Calibration complete. Results loaded and saved to\n    {file}')
 
         # Run calibration
-        self.service.run_gray_levels_cal(calibration_class=cal_type,
-                                         calibration_hdf5_path_name_ext=file,
-                                         on_calibrating=on_calibrating,
-                                         on_processing=on_processing,
-                                         on_processed=on_processed)
+        self.service.run_gray_levels_cal(
+            calibration_class=cal_type,
+            calibration_hdf5_path_name_ext=file,
+            on_calibrating=on_calibrating,
+            on_processing=on_processing,
+            on_processed=on_processed,
+        )
 
     def load_gray_levels_cal(self) -> None:
         """Loads saved results of a projector-camera intensity calibration"""
