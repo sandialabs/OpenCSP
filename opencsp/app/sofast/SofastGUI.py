@@ -20,6 +20,7 @@ import opencsp.app.sofast.lib.SofastServiceCallback as ssc
 from opencsp.app.sofast.SofastService import SofastService
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.exception_tools as et
 from opencsp.common.lib.tool.TkToolTip import TkToolTip
 
 
@@ -710,17 +711,20 @@ class SofastGUI(ssc.SofastServiceCallback):
     def close_image_acquisition(self) -> None:
         """Closes connection to camera"""
         # Close camera
-        self.image_acquisition = None
+        with et.ignored(Exception):
+            self.service.image_acquisition = None
 
     def close(self) -> None:
         """
         Closes all windows
 
         """
-        self.service.close()
+        with et.ignored(Exception):
+            self.service.close()
 
         # Close Sofast window
-        self.root.destroy()
+        with et.ignored(Exception):
+            self.root.destroy()
 
 
 if __name__ == '__main__':
