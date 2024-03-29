@@ -4,6 +4,7 @@
 from os.path import join
 import unittest
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
@@ -84,6 +85,10 @@ class TestFixedPatternSetupCalibrate(unittest.TestCase):
         np.testing.assert_allclose(dot_locs.xyz_dot_loc, dot_locs_exp.xyz_dot_loc, atol=1e-6, rtol=0)
         np.testing.assert_allclose(dot_locs.x_dot_index, dot_locs_exp.x_dot_index, atol=1e-6, rtol=0)
         np.testing.assert_allclose(dot_locs.y_dot_index, dot_locs_exp.y_dot_index, atol=1e-6, rtol=0)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        plt.close('all')
 
 
 if __name__ == '__main__':
