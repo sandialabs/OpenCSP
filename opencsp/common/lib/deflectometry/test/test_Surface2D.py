@@ -1,7 +1,7 @@
 """Unit test suite to test Surface2D type classes
 """
 
-from os.path import dirname, join
+from os.path import join
 import unittest
 
 import numpy as np
@@ -11,6 +11,7 @@ from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabol
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
 
 
@@ -20,7 +21,7 @@ class Test2DSurface(unittest.TestCase):
         # Generate test data
         cls.data_test = [generate_2DParabolic(), generate_2DPlano()]
         # Save location
-        cls.dir_save = join(dirname(__file__), 'data/output')
+        cls.dir_save = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/output/Surface2D')
         ft.create_directories_if_necessary(cls.dir_save)
 
     def test_intersect(self):
