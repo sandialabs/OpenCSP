@@ -26,18 +26,18 @@ class TestCalibrateDisplayShape(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Define default data directories
-        dir_input_sofast = join(opencsp_code_dir(), 'app/sofast/test/data/data_measurement')
-        dir_input_def = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement')
-        dir_output = join(opencsp_code_dir(), 'app/sofast/test/data/data_expected')
+        dir_meas_data = join(opencsp_code_dir(), 'test/data/display_shape_calibration/data_measurement')
 
         # Define input files
         resolution_xy = [100, 100]  # sample density of screen
-        file_screen_cal_point_pairs = join(dir_input_sofast, 'screen_calibration_point_pairs.csv')
-        file_point_locations = join(dir_input_def, 'point_locations.csv')
-        file_camera_distortion = join(dir_input_sofast, 'camera_screen_shape.h5')
-        file_image_projection = join(dir_input_sofast, 'image_projection.h5')
-        files_screen_shape_measurement = glob(join(dir_input_sofast, 'screen_shape_sofast_measurements/pose_*.h5'))
+        file_screen_cal_point_pairs = join(dir_meas_data, 'screen_calibration_point_pairs.csv')
+        file_point_locations = join(opencsp_code_dir(), 'test/data/sofast_common/aruco_corner_locations.csv')
+        file_camera_distortion = join(dir_meas_data, 'camera_screen_shape.h5')
+        file_image_projection = join(opencsp_code_dir(), 'test/data/sofast_common/image_projection.h5')
+        files_screen_shape_measurement = glob(join(dir_meas_data, 'screen_shape_sofast_measurements/pose_*.h5'))
         files_screen_shape_measurement.sort()
+        file_exp = join(opencsp_code_dir(),
+                        'test/data/display_shape_calibration/data_expected/screen_distortion_data_100_100.h5')
 
         # Load input data
         pts_marker_data = np.loadtxt(file_point_locations, delimiter=',', dtype=float, skiprows=1)
@@ -64,11 +64,8 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         cls.cal = cal_screen_position
 
         # Test screen distortion information
-        cls.data_exp = load_hdf5_datasets(
-            ['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], join(dir_output, 'screen_distortion_data_100_100.h5')
-        )
-
-        cls.save_dir_local = join(opencsp_code_dir(), 'app/sofast/test/data/output')
+        cls.data_exp = load_hdf5_datasets(['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], file_exp)
+        cls.save_dir_local = join(opencsp_code_dir(), 'app/sofast/test/data/output/display_shape')
         ft.create_directories_if_necessary(cls.save_dir_local)
 
     @pytest.mark.skipif(os.name != 'nt', reason='Does not pass in Linux environment for unkonwn reason.')
@@ -96,7 +93,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
 
 if __name__ == '__main__':
     # Set up save dir
-    save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output')
+    save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/display_shape')
     ft.create_directories_if_necessary(save_dir)
 
     # Set up logger
