@@ -1,8 +1,5 @@
 from os.path import join, dirname
 
-import matplotlib
-
-from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
@@ -35,11 +32,13 @@ def example(dir_save):
     file_measurement = join(sample_data_dir, 'measurement_facet.h5')
     file_camera = join(sample_data_dir, 'camera.h5')
     file_display = join(sample_data_dir, 'display_distorted_2d.h5')
+    file_orientation = join(sample_data_dir, 'spatial_orientation.h5')
     file_calibration = join(sample_data_dir, 'image_calibration.h5')
 
     # Load data
     camera = Camera.load_from_hdf(file_camera)
     display = Display.load_from_hdf(file_display)
+    orientation = SpatialOrientation.load_from_hdf(file_orientation)
     measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
 
@@ -50,7 +49,7 @@ def example(dir_save):
     measurement.calibrate_fringe_images(calibration)
 
     # Instantiate sofast object
-    sofast = Sofast(measurement, camera, display)
+    sofast = Sofast(measurement, orientation, camera, display)
     sofast.params.mask_keep_largest_area = True
 
     # Process
@@ -68,12 +67,6 @@ def example(dir_save):
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
     axis_control_m = rca.meters()
 
-    # Visualize setup
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
-    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
-    visualize_setup(display, camera, spatial_ori.v_screen_optic_screen, spatial_ori.r_optic_screen, ax=fig_record.axis)
-    fig_record.save(dir_save, 'physical_setup_layout', 'png')
-
     # Plot slope map
     fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
     facet.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
@@ -85,7 +78,7 @@ def example(dir_save):
 
 def example_driver():
     # Define save dir
-    save_path = join(dirname(__file__), 'data/output/single_facet')
+    save_path = join(dirname(__file__), 'data/output/undefined_shape')
     ft.create_directories_if_necessary(save_path)
 
     # Set up logger
