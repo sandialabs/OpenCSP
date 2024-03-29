@@ -1,7 +1,5 @@
 from os.path import join, dirname
 
-import matplotlib
-
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
@@ -9,7 +7,6 @@ from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScali
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
-from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
@@ -39,6 +36,7 @@ def example(dir_save: str):
     file_measurement = join(sample_data_dir, 'measurement_ensemble.h5')
     file_camera = join(sample_data_dir, 'camera.h5')
     file_display = join(sample_data_dir, 'display_distorted_2d.h5')
+    file_orientation = join(sample_data_dir, 'spatial_orientation.h5')
     file_calibration = join(sample_data_dir, 'image_calibration.h5')
     file_facet = join(sample_data_dir, 'Facet_lab_6x4.json')
     file_ensemble = join(sample_data_dir, 'Ensemble_lab_6x4.json')
@@ -46,6 +44,7 @@ def example(dir_save: str):
     # Load data
     camera = Camera.load_from_hdf(file_camera)
     display = Display.load_from_hdf(file_display)
+    orientation = SpatialOrientation.load_from_hdf(file_orientation)
     measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
     ensemble_data = DefinitionEnsemble.load_from_json(file_ensemble)
@@ -62,7 +61,7 @@ def example(dir_save: str):
     measurement.calibrate_fringe_images(calibration)
 
     # Instantiate sofast object
-    sofast = Sofast(measurement, camera, display)
+    sofast = Sofast(measurement, orientation, camera, display)
 
     # Update search parameters
     sofast.params.mask_hist_thresh = 0.83
@@ -87,12 +86,6 @@ def example(dir_save: str):
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
     mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
     axis_control_m = rca.meters()
-
-    # Visualize setup
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='')
-    spatial_ori: SpatialOrientation = sofast.data_geometry_facet[0].spatial_orientation
-    visualize_setup(display, camera, spatial_ori.v_screen_optic_screen, spatial_ori.r_optic_screen, ax=fig_record.axis)
-    fig_record.save(dir_save, 'physical_setup_layout', 'png')
 
     # Plot scenario
     fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='Facet Ensemble')
