@@ -18,7 +18,7 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-import opencsp.common.lib.tool.hdf5_tools as ht
+import opencsp.common.lib.tool.hdf5_tools as h5
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -53,7 +53,7 @@ class TestProcessSofastFixed(unittest.TestCase):
 
         # Load expected data
         datasets = ['CalculationsFixedPattern/Facet_000/SlopeSolverData/slopes_facet_xy']
-        data = ht.load_hdf5_datasets(datasets, file_exp)
+        data = h5.load_hdf5_datasets(datasets, file_exp)
         cls.exp_slopes_xy = data['slopes_facet_xy']
 
         # Instantiate class
