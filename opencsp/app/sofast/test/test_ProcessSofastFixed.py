@@ -31,7 +31,7 @@ class TestProcessSofastFixed(unittest.TestCase):
         dir_sofast_common = join(opencsp_code_dir(), 'test/data/sofast_common')
 
         # Definitions
-        file_camera = join(dir_sofast_fixed, "camera_sofast.h5")
+        file_camera = join(dir_sofast_common, "camera_sofast.h5")
         file_facet = join(dir_sofast_common, "Facet_NSTTF.json")
         file_ori = join(dir_sofast_common, 'spatial_orientation.h5')
         file_dot_locs = join(dir_sofast_fixed, 'fixed_pattern_dot_locations.h5')
