@@ -31,7 +31,7 @@ class TestImageProcessing(unittest.TestCase):
         cls.data_file_multi = join(dir_sofast_fringe, 'calculations_facet_ensemble/data.h5')
 
         # Define component files
-        cls.data_file_camera = join(dir_sofast_common, 'camera_sofast.h5')
+        cls.data_file_camera = join(dir_sofast_common, 'camera_sofast_downsampled.h5')
         cls.data_file_measurement_facet = join(dir_sofast_fringe, 'measurement_facet.h5')
         cls.data_file_measurement_ensemble = join(dir_sofast_fringe, 'measurement_ensemble.h5')
         cls.data_file_calibration = join(dir_sofast_fringe, 'image_calibration.h5')
