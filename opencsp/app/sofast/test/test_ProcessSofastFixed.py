@@ -27,15 +27,16 @@ class TestProcessSofastFixed(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Loads data and runs ProcessSofastFixed"""
-        dir_base = join(opencsp_code_dir(), 'test/data/measurements_sofast_fixed')
+        dir_sofast_fixed = join(opencsp_code_dir(), 'test/data/sofast_fixed')
+        dir_sofast_common = join(opencsp_code_dir(), 'test/data/sofast_common')
 
         # Definitions
-        file_camera = join(dir_base, "camera.h5")
-        file_facet = join(dir_base, "Facet_NSTTF.json")
-        file_ori = join(dir_base, 'spatial_orientation.h5')
-        file_dot_locs = join(dir_base, 'sofast_fixed_dot_locations.h5')
-        file_meas = join(dir_base, 'sofast_fixed_measurement.h5')
-        file_exp = join(dir_base, 'data_calculation_sofast_fixed.h5')
+        file_camera = join(dir_sofast_fixed, "camera_sofast.h5")
+        file_facet = join(dir_sofast_common, "Facet_NSTTF.json")
+        file_ori = join(dir_sofast_common, 'spatial_orientation.h5')
+        file_dot_locs = join(dir_sofast_fixed, 'fixed_pattern_dot_locations.h5')
+        file_meas = join(dir_sofast_fixed, 'measurement_facet.h5')
+        file_exp = join(dir_sofast_fixed, 'calculation_facet.h5')
 
         cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/process_sofast_fixed_single_facet')
         ft.create_directories_if_necessary(cls.save_dir)
