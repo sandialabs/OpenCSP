@@ -83,7 +83,8 @@ class TestSlopeSolver(unittest.TestCase):
 
     def test_int_pts(self):
         data = h5.load_hdf5_datasets(
-            ['DataSofastCalculation/facet/facet_000/v_surf_points_facet'], self.data_file_facet)
+            ['DataSofastCalculation/facet/facet_000/v_surf_points_facet'], self.data_file_facet
+        )
         np.testing.assert_allclose(
             data['v_surf_points_facet'], self.data_slope.v_surf_points_facet.data, atol=1e-8, rtol=0
         )

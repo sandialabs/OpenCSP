@@ -36,8 +36,9 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         file_image_projection = join(opencsp_code_dir(), 'test/data/sofast_common/image_projection.h5')
         files_screen_shape_measurement = glob(join(dir_meas_data, 'screen_shape_sofast_measurements/pose_*.h5'))
         files_screen_shape_measurement.sort()
-        file_exp = join(opencsp_code_dir(),
-                        'test/data/display_shape_calibration/data_expected/screen_distortion_data_100_100.h5')
+        file_exp = join(
+            opencsp_code_dir(), 'test/data/display_shape_calibration/data_expected/screen_distortion_data_100_100.h5'
+        )
 
         # Load input data
         pts_marker_data = np.loadtxt(file_point_locations, delimiter=',', dtype=float, skiprows=1)

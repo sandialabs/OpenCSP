@@ -27,12 +27,18 @@ def example_screen_shape_calibration():
     # Define input files
     file_pts_data = join(opencsp_code_dir(), 'test/data/sofast_common/aruco_corner_locations.csv')
     file_screen_cal_point_pairs = join(
-        opencsp_code_dir(), 'test/data/display_shape_calibration/data_measurement/screen_calibration_point_pairs.csv')
+        opencsp_code_dir(), 'test/data/display_shape_calibration/data_measurement/screen_calibration_point_pairs.csv'
+    )
     file_camera_distortion = join(
-        opencsp_code_dir(), 'test/data/display_shape_calibration/data_measurement/camera_screen_shape.h5')
+        opencsp_code_dir(), 'test/data/display_shape_calibration/data_measurement/camera_screen_shape.h5'
+    )
     file_image_projection = join(opencsp_code_dir(), 'test/data/sofast_common/image_projection.h5')
-    files_screen_shape_measurement = glob(join(
-        opencsp_code_dir(), 'test/data/display_shape_calibration/data_measurement/screen_shape_sofast_measurements/pose_*.h5'))
+    files_screen_shape_measurement = glob(
+        join(
+            opencsp_code_dir(),
+            'test/data/display_shape_calibration/data_measurement/screen_shape_sofast_measurements/pose_*.h5',
+        )
+    )
 
     # Load output data from Scene Reconstruction (Aruco marker xyz points)
     pts_marker_data = np.loadtxt(file_pts_data, delimiter=',', skiprows=1)

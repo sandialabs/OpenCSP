@@ -15,9 +15,7 @@ class TestProjectFixedPatternTarget(unittest.TestCase):
     @pytest.mark.no_xvfb
     def test_project_fixed_pattern_target(self):
         # Set pattern parameters
-        file_image_projection = os.path.join(
-            opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5"
-        )
+        file_image_projection = os.path.join(opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5")
 
         # Load ImageProjection
         im_proj = ImageProjection.load_from_hdf_and_display(file_image_projection)
