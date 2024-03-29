@@ -17,7 +17,7 @@ class TestSpatialOrientation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+        base_dir = join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Define test data files for single facet processing
         data_file_facet = join(base_dir, 'calculations_facet/data.h5')
@@ -40,7 +40,7 @@ class TestSpatialOrientation(unittest.TestCase):
         cls.so = ori
 
         # Set up save path
-        cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output')
+        cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/spatial_orientation')
         ft.create_directories_if_necessary(cls.save_dir)
 
     def test_translation_ring_1(self):
