@@ -21,7 +21,7 @@ class TestSpatialProcessing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+        base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Define test data files for single facet processing
         cls.data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
