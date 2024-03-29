@@ -209,7 +209,7 @@ class SystemSofastFringe:
         self.fringe_images_to_display = []
         for idx in range(fringe_images_base.shape[2]):
             # Create image
-            self.fringe_images_to_display.append(np.concatenate([fringe_images_base[:, :, idx: idx + 1]] * 3, axis=2))
+            self.fringe_images_to_display.append(np.concatenate([fringe_images_base[:, :, idx : idx + 1]] * 3, axis=2))
 
     def check_saturation(self, image: ndarray, camera_max_int: int, thresh: float = 0.005) -> None:
         """

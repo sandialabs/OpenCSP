@@ -3,7 +3,7 @@ from contextlib import contextmanager
 
 @contextmanager
 def ignored(*exceptions):
-    """ Easy wrapper to ignore specific kinds of exceptions.
+    """Easy wrapper to ignore specific kinds of exceptions.
 
     From https://stackoverflow.com/questions/15572288/general-decorator-to-wrap-try-except-in-python
 
