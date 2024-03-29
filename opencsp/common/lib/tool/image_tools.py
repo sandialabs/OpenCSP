@@ -10,6 +10,8 @@ from PIL import Image
 
 import opencsp.common.lib.tool.log_tools as lt
 
+# disable auto formatting
+# fmt: off
 # from https://pillow.readthedocs.io/en/stable/handbook/image-file-formats.html
 pil_image_formats_rw = ["blp", "bmp", "dds", "dib", "eps", "gif", "icns", "ico", "im", "jpg", "jpeg",
                         "msp", "pcx", "png", "apng", "pbm", "pgm", "ppm", "pnm", "sgi", "spider", "tga", "tiff", "webp", "xbm"]
@@ -19,6 +21,7 @@ pil_image_formats_readable = pil_image_formats_rw + ["cur", "dcx", "fits", "fli"
 """ A list of all image image formats that can be read by the Python Imaging Library (PIL). Note that not all of these formats can be written by PIL. """
 pil_image_formats_writable = pil_image_formats_rw + ["palm", "pdf", "xv"]
 """ A list of all image image formats that can be written by the Python Imaging Library (PIL). Note that not all of these formats can be ready by PIL. """
+# fmt: on
 
 
 def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):

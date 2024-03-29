@@ -9,9 +9,9 @@ import numpy as np
 
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
-from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import (ImageAcquisition as ImageAcquisition_DCAM)
-from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import (ImageAcquisition as ImageAcquisition_DCAM_color)
-from opencsp.common.lib.camera.ImageAcquisition_MSMF import (ImageAcquisition as ImageAcquisition_MSMF)
+from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as ImageAcquisition_DCAM
+from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import ImageAcquisition as ImageAcquisition_DCAM_color
+from opencsp.common.lib.camera.ImageAcquisition_MSMF import ImageAcquisition as ImageAcquisition_MSMF
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
@@ -23,7 +23,7 @@ import opencsp.common.lib.tool.hdf5_tools as h5
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class SofastService():
+class SofastService:
     """Class that interfaces with SOFAST to run data acquisition and process results"""
 
     cam_options: dict[str, type[ImageAcquisitionAbstract]] = {
@@ -59,7 +59,7 @@ class SofastService():
 
     @property
     def system(self) -> SystemSofastFringe:
-        """ Get the sofast system object.
+        """Get the sofast system object.
 
         Checks if the system object has been instantiated, or if the system
         object can be instantiated.
@@ -67,7 +67,7 @@ class SofastService():
         Raises:
         -------
         RuntimeError:
-            If the system instance hasn't been and can't be instantiated yet """
+            If the system instance hasn't been and can't be instantiated yet"""
         if self._system is None:
             if not self._load_system_elements():
                 lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
@@ -155,7 +155,7 @@ class SofastService():
         return frame
 
     def _load_system_elements(self) -> bool:
-        """ Loads the system instance, as appropriate.
+        """Loads the system instance, as appropriate.
 
         Checks if System object can be instantiated (if both
         ImageAcquisition and ImageProjection classes are loaded)
@@ -191,19 +191,19 @@ class SofastService():
             run_next = self.image_projection.show_crosshairs
             self.system.run_camera_exposure_calibration(run_next)
 
-    def run_gray_levels_cal(self,
-                            calibration_class: type[ImageCalibrationAbstract],
-                            calibration_hdf5_path_name_ext: str = None,
-                            on_captured: Callable = None,
-                            on_processing: Callable = None,
-                            on_processed: Callable = None) -> None:
+    def run_gray_levels_cal(
+        self,
+        calibration_class: type[ImageCalibrationAbstract],
+        calibration_hdf5_path_name_ext: str = None,
+        on_captured: Callable = None,
+        on_processing: Callable = None,
+        on_processed: Callable = None,
+    ) -> None:
         """Runs the projector-camera intensity calibration"""
 
         # Capture images
         def _func_0():
-            self.system.run_display_camera_response_calibration(
-                res=10, run_next=self.system.run_next_in_queue
-            )
+            self.system.run_display_camera_response_calibration(res=10, run_next=self.system.run_next_in_queue)
 
             # Run the "on captured" callback
             if on_captured != None:
@@ -241,8 +241,7 @@ class SofastService():
     def load_gray_levels_cal(self, hdf5_file_path_name_ext: str) -> None:
         """Loads saved results of a projector-camera intensity calibration"""
         # Load file
-        cal_type = h5.load_hdf5_datasets(['Calibration/calibration_type'],
-                                         hdf5_file_path_name_ext)['calibration_type']
+        cal_type = h5.load_hdf5_datasets(['Calibration/calibration_type'], hdf5_file_path_name_ext)['calibration_type']
 
         if cal_type == 'ImageCalibrationGlobal':
             self.calibration = ImageCalibrationGlobal.load_from_hdf(hdf5_file_path_name_ext)
