@@ -74,8 +74,18 @@ class SofastService():
 
         return self._system
 
+    @system.setter
+    def system(self, val: SystemSofastFringe):
+        if val is None:
+            old = self._system
+            self._system = None
+            self.callback.on_system_unset(old)
+        else:
+            self._system = val
+            self.callback.on_system_set(val)
+
     @property
-    def image_projection(self):
+    def image_projection(self) -> ImageProjection:
         return self._image_projection
 
     @image_projection.setter
@@ -83,20 +93,17 @@ class SofastService():
         if val is None:
             if self._image_projection is not None:
                 old_ip = self._image_projection
-                self._image_projection.close()
                 self._image_projection = None
                 self.callback.on_image_projection_unset(old_ip)
-            if self._system is not None:
-                old_sys = self._system
-                self._system = None
-                self.callback.on_system_unset(old_sys)
+                old_ip.close()
+            self.system = None
         else:
             self._image_projection = val
             self.callback.on_image_projection_set(val)
             self._load_system_elements()
 
     @property
-    def image_acquisition(self):
+    def image_acquisition(self) -> ImageAcquisitionAbstract:
         return self._image_acquisition
 
     @image_acquisition.setter
@@ -104,17 +111,28 @@ class SofastService():
         if val is None:
             if self._image_acquisition is not None:
                 old_ia = self._image_acquisition
-                self._image_acquisition.close()
                 self._image_acquisition = None
                 self.callback.on_image_acquisition_unset(old_ia)
-            if self._system is not None:
-                old_sys = self._system
-                self._system = None
-                self.callback.on_system_unset(old_sys)
+                old_ia.close()
+            self.system = None
         else:
             self._image_acquisition = val
             self.callback.on_image_acquisition_set(val)
             self._load_system_elements()
+
+    @property
+    def calibration(self) -> ImageCalibrationAbstract:
+        return self._calibration
+
+    @calibration.setter
+    def calibration(self, val: ImageCalibrationAbstract):
+        if val is None:
+            old = self._calibration
+            self._calibration = None
+            self.callback.on_calibration_unset(old)
+        else:
+            self._calibration = val
+            self.callback.on_calibration_set(val)
 
     def get_frame(self) -> np.ndarray:
         """
@@ -143,8 +161,7 @@ class SofastService():
         ImageAcquisition and ImageProjection classes are loaded)
         """
         if self.image_acquisition is not None and self.image_projection is not None:
-            self._system = SystemSofastFringe(self.image_projection, self.image_acquisition)
-            self.callback.on_system_set(self._system)
+            self.system = SystemSofastFringe(self.image_projection, self.image_acquisition)
             return True
         return False
 
