@@ -32,7 +32,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         Instantiates GUI in new window
         """
         # Create the service object
-        self.service = SofastService()
+        self.service = SofastService(self)
 
         # Create tkinter object
         self.root = tkinter.Tk()
