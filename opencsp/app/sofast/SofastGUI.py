@@ -552,14 +552,10 @@ class SofastGUI(ssc.SofastServiceCallback):
         if not self._check_calibration_loaded():
             return
 
-        # Get fringe periods
-        periods_x = [4**idx for idx in range(self.var_fringe_periods_x.get())]
-        periods_y = [4**idx for idx in range(self.var_fringe_periods_y.get())]
-        periods_x[0] -= 0.1
-        periods_y[0] -= 0.1
-
-        # Create fringe object
-        fringes = Fringes(periods_x, periods_y)
+        # Get fringe object
+        fringe_periods_x = self.var_fringe_periods_x.get()
+        fringe_periods_y = self.var_fringe_periods_y.get()
+        fringes = Fringes.from_num_periods(fringe_periods_x, fringe_periods_y)
 
         # Define what to run after measurement sequence
         def run_next():
