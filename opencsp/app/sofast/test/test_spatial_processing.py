@@ -147,7 +147,7 @@ class TestSpatialProcessing(unittest.TestCase):
 
         # Perform calculation
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1'])
-        v_meas_pt_optic_cam = measurement.measure_point.rotate(r_cam_optic)
+        v_meas_pt_optic_cam = measurement.v_measure_point_facet.rotate(r_cam_optic)
         v_cam_optic_cam_refine_2 = sp.refine_v_distance(
             Vxyz(data['v_cam_optic_cam_refine_1']),
             measurement.dist_optic_screen,

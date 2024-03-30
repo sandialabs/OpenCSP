@@ -10,7 +10,7 @@ class DistanceOpticScreen(h5.HDF5_IO_Abstract):
     achieved by displaying the crosshairs from the SofastGUI and measuring from the center of the optic
     (measurement_point 0,0,0) to the center of the crosshairs."""
 
-    measure_point: Vxyz = field(default_factory=lambda: Vxyz(0.0, 0.0, 0.0))
+    v_measure_point_facet: Vxyz = field(default_factory=lambda: Vxyz(0.0, 0.0, 0.0))
     """ Location of measure point, meters. """
     dist_optic_screen: float = 0
     """ Optic-screen distance, meters. """
@@ -19,8 +19,8 @@ class DistanceOpticScreen(h5.HDF5_IO_Abstract):
         """
         Saves to HDF file
         """
-        datasets = [prefix + '/measure_point', prefix + '/dist_optic_screen']
-        data = [self.measure_point.data.squeeze(), self.dist_optic_screen]
+        datasets = [prefix + '/v_measure_point_facet', prefix + '/dist_optic_screen']
+        data = [self.v_measure_point_facet.data.squeeze(), self.dist_optic_screen]
 
         # Save data
         h5.save_hdf5_datasets(data, datasets, file)
@@ -43,9 +43,10 @@ class DistanceOpticScreen(h5.HDF5_IO_Abstract):
         # datasets = [prefix + '/measure_point', prefix + '/dist_optic_screen']
         kwargs = h5.load_hdf5_datasets(datasets, file)
 
-        if 'v_measure_point_facet' in kwargs:
-            kwargs['measure_point'] = kwargs['v_measure_point_facet']
-            del kwargs['v_measure_point_facet']
+        # TODO update all existing HDF5 files to use consistent naming
+        if 'measure_point' in kwargs:
+            kwargs['v_measure_point_facet'] = kwargs['measure_point']
+            del kwargs['measure_point']
         if 'optic_screen_dist' in kwargs:
             kwargs['dist_optic_screen'] = kwargs['optic_screen_dist']
             del kwargs['optic_screen_dist']

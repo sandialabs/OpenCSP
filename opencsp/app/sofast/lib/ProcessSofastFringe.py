@@ -362,7 +362,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         ) = po.process_singlefacet_geometry(
             facet_data,
             mask_raw,
-            self.measurement.measure_point,
+            self.measurement.v_measure_point_facet,
             self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
@@ -424,7 +424,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             facet_data,
             ensemble_data,
             mask_raw,
-            self.measurement.measure_point,
+            self.measurement.v_measure_point_facet,
             self.orientation,
             self.camera,
             self.measurement.dist_optic_screen,
