@@ -2,12 +2,14 @@ import datetime as dt
 
 import numpy as np
 
+import opencsp.app.sofast.lib.AbstractMeasurementSofast as ams
+import opencsp.app.sofast.lib.OpticScreenDistance as osd
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
-class MeasurementSofastFixed:
+class MeasurementSofastFixed(ams.AbstractMeasurementSofast):
     """Fixed pattern measuremnt class. Stores measurement data. Can save
     and load to HDF file format.
     """
@@ -15,10 +17,9 @@ class MeasurementSofastFixed:
     def __init__(
         self,
         image: np.ndarray,
-        v_measure_point_facet: Vxyz,
-        dist_optic_screen: float,
+        optic_screen_dist_measure: osd.OpticScreenDistance,
         origin: Vxy,
-        date: dt.datetime = dt.datetime.now(),
+        date: dt.datetime = None,
         name: str = '',
     ):
         """Saves measurement data in class.
@@ -33,20 +34,19 @@ class MeasurementSofastFixed:
             Optic to screen distance, meters
         origin : Vxy
             The centroid of the origin dot, pixels
-        date : datetime
-            Collection date/time.
-        name : str
-            Name or serial number of measurement.
+        date : datetime, optional
+            Collection date/time. Default is dt.datetime.now()
+        name : str, optional
+            Name or serial number of measurement. Default is empty string ''
         """
+        super().__init__(optic_screen_dist_measure, date, name)
         self.image = image
-        self.v_measure_point_facet = v_measure_point_facet
-        self.dist_optic_screen = dist_optic_screen
         self.origin = origin
         self.date = date
         self.name = name
 
     @classmethod
-    def load_from_hdf(cls, file) -> 'MeasurementSofastFixed':
+    def load_from_hdf(cls, file: str, prefix='') -> 'MeasurementSofastFixed':
         """
         Loads from HDF file
 
@@ -57,23 +57,15 @@ class MeasurementSofastFixed:
 
         """
         # Load grid data
-        datasets = [
-            'MeasurementSofastFixed/image',
-            'MeasurementSofastFixed/v_measure_point_facet',
-            'MeasurementSofastFixed/dist_optic_screen',
-            'MeasurementSofastFixed/origin',
-            'MeasurementSofastFixed/date',
-            'MeasurementSofastFixed/name',
-        ]
+        datasets = [prefix + 'MeasurementSofastFixed/image', prefix + 'MeasurementSofastFixed/origin']
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
+        kwargs.update(super()._load_from_hdf(file, prefix + 'MeasurementSofastFixed'))
 
-        kwargs['v_measure_point_facet'] = Vxyz(kwargs['v_measure_point_facet'])
         kwargs['origin'] = Vxy(kwargs['origin'])
-        kwargs['date'] = dt.datetime.fromisoformat(kwargs['date'])
 
         return cls(**kwargs)
 
-    def save_to_hdf(self, file) -> None:
+    def save_to_hdf(self, file: str, prefix='') -> None:
         """
         Saves to HDF file
 
@@ -81,25 +73,10 @@ class MeasurementSofastFixed:
         ----------
         file : string
             HDF file to save
-
-        NOTE: Collection date is saved as string in iso-format.
         """
-        datasets = [
-            'MeasurementSofastFixed/image',
-            'MeasurementSofastFixed/v_measure_point_facet',
-            'MeasurementSofastFixed/dist_optic_screen',
-            'MeasurementSofastFixed/origin',
-            'MeasurementSofastFixed/date',
-            'MeasurementSofastFixed/name',
-        ]
-        data = [
-            self.image,
-            self.v_measure_point_facet.data.squeeze(),
-            self.dist_optic_screen,
-            self.origin.data.squeeze(),
-            self.date.isoformat(),
-            self.name,
-        ]
+        datasets = [prefix + 'MeasurementSofastFixed/image', prefix + 'MeasurementSofastFixed/origin']
+        data = [self.image, self.origin.data.squeeze()]
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
+        super()._save_to_hdf(file, prefix + 'MeasurementSofastFixed')

@@ -7,6 +7,7 @@ from typing import Callable
 import matplotlib.pyplot as plt
 import numpy as np
 
+import opencsp.app.sofast.lib.MeasurementSofastFringe as msf
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as ImageAcquisition_DCAM
@@ -47,6 +48,8 @@ class SofastService:
         self._image_acquisition: ImageAcquisitionAbstract = None
         self._calibration: ImageCalibrationAbstract = None
         self._system: SystemSofastFringe = None
+        self._last_measurement: msf.MeasurementSofastFringe = None
+        """ The most recent sofast measurment object. """
 
     def __del__(self):
         with et.ignored(Exception):

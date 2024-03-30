@@ -8,6 +8,7 @@ import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+import opencsp.app.sofast.lib.OpticScreenDistance as osd
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
@@ -47,8 +48,15 @@ class TestImageCalibrationGlobal:
         )
 
         # Create measurement object
+        optic_screen_dist_measure = osd.OpticScreenDistance(Vxyz((0, 0, 0)), 10)
         measurement = Measurement(
-            mask_images, fringe_images, np.array([0.0]), np.array([0.0]), Vxyz((0, 0, 0)), 10, dt.datetime.now(), 'Test'
+            mask_images,
+            fringe_images,
+            np.array([0.0]),
+            np.array([0.0]),
+            optic_screen_dist_measure,
+            dt.datetime.now(),
+            'Test',
         )
 
         # Calibrate

@@ -27,7 +27,7 @@ class Fringes:
 
     @classmethod
     def from_num_periods(cls, fringe_periods_x=4, fringe_periods_y=4) -> 'Fringes':
-        """ Creates fringes to be displayed during run_measurement().
+        """Creates fringes to be displayed during run_measurement().
 
         The fringes are displayed as sinusoidal grayscale images. A value of 1 means that only a single large sinusoidal
         will be used. A higher value will display more images with a faster sinusoidal. Therefore, a higher value will
