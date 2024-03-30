@@ -33,7 +33,7 @@ def downsample_measurement(file: str, n: int) -> Measurement:
     mask_images = ddg.downsample_images(measurement_orig.mask_images, n)
     fringe_images = ddg.downsample_images(measurement_orig.fringe_images, n)
     dist_optic_screen_measure = osd.DistanceOpticScreen(
-        measurement_orig.measure_point, measurement_orig.dist_optic_screen
+        measurement_orig.v_measure_point_facet, measurement_orig.dist_optic_screen
     )
     return Measurement(
         mask_images=mask_images,

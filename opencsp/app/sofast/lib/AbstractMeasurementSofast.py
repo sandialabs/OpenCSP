@@ -50,9 +50,9 @@ class AbstractMeasurementSofast(h5.HDF5_IO_Abstract, ABC):
         return cls_name + ': { ' + self.name + ' }'
 
     @property
-    def measure_point(self):
-        """Convenience method for accessing dist_optic_screen_measure.measure_point"""
-        return self.dist_optic_screen_measure.measure_point
+    def v_measure_point_facet(self):
+        """Convenience method for accessing dist_optic_screen_measure.v_measure_point_facet"""
+        return self.dist_optic_screen_measure.v_measure_point_facet
 
     @property
     def dist_optic_screen(self):
