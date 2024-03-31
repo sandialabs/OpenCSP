@@ -205,7 +205,7 @@ def coef_to_points(Pxy: Vxyz, coefficients: np.ndarray, poly_order: int) -> np.n
     return np.matmul(terms, coefficients.reshape((coefficients.size, -1))).squeeze()
 
 
-def optic_screen_dist_error(
+def dist_optic_screen_error(
     scale: float,
     dist_meas: float,
     v_align_point_optic: Vxyz,

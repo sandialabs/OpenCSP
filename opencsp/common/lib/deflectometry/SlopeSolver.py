@@ -150,7 +150,7 @@ class SlopeSolver:
                 v_optic_screen_optic,
                 v_meas_pts_surf_int_optic,
             )
-            out = minimize(sf2.optic_screen_dist_error, np.array([1.0]), args=args)
+            out = minimize(sf2.dist_optic_screen_error, np.array([1.0]), args=args)
             scale = out.x[0]
             v_align_optic_step = (v_optic_cam_optic - v_align_point_optic) * (scale - 1)
 

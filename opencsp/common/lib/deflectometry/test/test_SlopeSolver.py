@@ -66,7 +66,7 @@ class TestSlopeSolver(unittest.TestCase):
             'v_screen_points_facet': Vxyz(data['v_screen_points_facet']),
             'v_optic_screen_optic': ori.v_optic_screen_optic,
             'v_align_point_optic': measurement.measure_point,
-            'dist_optic_screen': measurement.optic_screen_dist,
+            'dist_optic_screen': measurement.dist_optic_screen,
             'surface': surface,
         }
 
