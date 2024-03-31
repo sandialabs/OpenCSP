@@ -13,7 +13,7 @@ import matplotlib.pyplot as plt
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
-import opencsp.app.sofast.lib.OpticScreenDistance as osd
+import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
@@ -103,8 +103,8 @@ def run() -> None:
             # Capture image
             frame = image_acquisition.get_frame()
             # Process
-            optic_screen_dist_measure = osd.OpticScreenDistance(v_measure_point_facet, dist_optic_screen)
-            measurement = MeasurementSofastFixed(frame, optic_screen_dist_measure, pt_origin, name='NSTTF Facet')
+            dist_optic_screen_measure = osd.DistanceOpticScreen(v_measure_point_facet, dist_optic_screen)
+            measurement = MeasurementSofastFixed(frame, dist_optic_screen_measure, pt_origin, name='NSTTF Facet')
             process(fixed_pattern_dot_locs, spatial_orientation, camera, facet_data, measurement, surface_data)
             # Continue or exit
             image_projection.root.after(200, run_next)

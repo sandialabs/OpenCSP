@@ -3,7 +3,7 @@ import datetime as dt
 import numpy as np
 
 import opencsp.app.sofast.lib.AbstractMeasurementSofast as ams
-import opencsp.app.sofast.lib.OpticScreenDistance as osd
+import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
@@ -17,7 +17,7 @@ class MeasurementSofastFixed(ams.AbstractMeasurementSofast):
     def __init__(
         self,
         image: np.ndarray,
-        optic_screen_dist_measure: osd.OpticScreenDistance,
+        dist_optic_screen_measure: osd.DistanceOpticScreen,
         origin: Vxy,
         date: dt.datetime = None,
         name: str = '',
@@ -39,7 +39,7 @@ class MeasurementSofastFixed(ams.AbstractMeasurementSofast):
         name : str, optional
             Name or serial number of measurement. Default is empty string ''
         """
-        super().__init__(optic_screen_dist_measure, date, name)
+        super().__init__(dist_optic_screen_measure, date, name)
         self.image = image
         self.origin = origin
         self.date = date

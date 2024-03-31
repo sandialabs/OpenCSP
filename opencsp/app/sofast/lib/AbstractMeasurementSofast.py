@@ -7,7 +7,7 @@ import datetime as dt
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-import opencsp.app.sofast.lib.OpticScreenDistance as sod
+import opencsp.app.sofast.lib.DistanceOpticScreen as sod
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as h5
 
@@ -22,12 +22,12 @@ class AbstractMeasurementSofast(h5.HDF5_IO_Abstract, ABC):
     """
 
     def __init__(
-        self, optic_screen_dist_measure: sod.OpticScreenDistance, date: dt.datetime, name: str
+        self, dist_optic_screen_measure: sod.DistanceOpticScreen, date: dt.datetime, name: str
     ) -> 'AbstractMeasurementSofast':
         """
         Parameters
         ----------
-        optic_screen_dist_measure : MeasurementDistance
+        dist_optic_screen_measure : MeasurementDistance
             Optic-screen distance measurement.
         date : datetime
             Collection date/time.
@@ -40,7 +40,7 @@ class AbstractMeasurementSofast(h5.HDF5_IO_Abstract, ABC):
             date = dt.datetime.now()
 
         # Save input measurement data
-        self.optic_screen_dist_measure = optic_screen_dist_measure
+        self.dist_optic_screen_measure = dist_optic_screen_measure
         self.date = date
         self.name = name
 
@@ -51,15 +51,13 @@ class AbstractMeasurementSofast(h5.HDF5_IO_Abstract, ABC):
 
     @property
     def measure_point(self):
-        """Convenience method for accessing optic_screen_dist_measure.measure_point"""
-        # Added as a property (1) for convenience, and (2) so that we don't need to go update everything
-        return self.optic_screen_dist_measure.measure_point
+        """Convenience method for accessing dist_optic_screen_measure.measure_point"""
+        return self.dist_optic_screen_measure.measure_point
 
     @property
-    def optic_screen_dist(self):
-        """Convenience method for accessing optic_screen_dist_measure.optic_screen_dist"""
-        # Added as a property (1) for convenience, and (2) so that we don't need to go update everything
-        return self.optic_screen_dist_measure.optic_screen_dist
+    def dist_optic_screen(self):
+        """Convenience method for accessing dist_optic_screen_measure.dist_optic_screen"""
+        return self.dist_optic_screen_measure.dist_optic_screen
 
     @classmethod
     def _load_from_hdf(cls, file: str, prefix: str) -> dict[str, any]:
@@ -97,4 +95,4 @@ class AbstractMeasurementSofast(h5.HDF5_IO_Abstract, ABC):
 
         # Save data
         h5.save_hdf5_datasets(data, datasets, file)
-        self.optic_screen_dist_measure.save_to_hdf(file, prefix)
+        self.dist_optic_screen_measure.save_to_hdf(file, prefix)

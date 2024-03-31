@@ -7,7 +7,7 @@ import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 import opencsp.app.sofast.lib.AbstractMeasurementSofast as ams
-import opencsp.app.sofast.lib.OpticScreenDistance as osd
+import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
@@ -23,7 +23,7 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
         fringe_images: np.ndarray,
         fringe_periods_x: np.ndarray,
         fringe_periods_y: np.ndarray,
-        optic_screen_dist_measure: osd.OpticScreenDistance,
+        dist_optic_screen_measure: osd.DistanceOpticScreen,
         date: dt.datetime,
         name: str = '',
     ) -> 'MeasurementSofastFringe':
@@ -39,7 +39,7 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
             MxNxN frame array. Y fringes first
         fringe_periods_x/y : 1d array
             Periods used to generate x/y fringes, fractional screens.
-        optic_screen_dist_measure : MeasurementDistance
+        dist_optic_screen_measure : MeasurementDistance
             Optic-screen distance measurement.
         date : datetime
             Collection date/time.
@@ -47,7 +47,7 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
             Name or serial number of measurement.
 
         """
-        super().__init__(optic_screen_dist_measure, date, name)
+        super().__init__(dist_optic_screen_measure, date, name)
 
         # Check mask image size
         if mask_images.shape[2] != 2 or np.ndim(mask_images) != 3:
