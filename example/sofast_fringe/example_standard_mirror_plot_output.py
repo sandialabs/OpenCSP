@@ -34,7 +34,7 @@ def example_single_facet() -> None:
     ft.create_directories_if_necessary(dir_save)
 
     # Define data file
-    file_data = join(opencsp_code_dir(), 'test/data/sofast_fringe/calculations_facet/data.h5')
+    file_data = join(opencsp_code_dir(), 'test/data/sofast_fringe/data_expected_facet/data.h5')
 
     # 1. Load Sofast measurement data
     # ===============================
@@ -99,7 +99,7 @@ def example_facet_ensemble() -> None:
     ft.create_directories_if_necessary(dir_save)
 
     # Define data file
-    file_data = join(opencsp_code_dir(), 'test/data/sofast_fringe/calculations_facet_ensemble/data.h5')
+    file_data = join(opencsp_code_dir(), 'test/data/sofast_fringe/data_expected_facet_ensemble/data.h5')
 
     # 1. Load Sofast measurement data
     # ===============================
