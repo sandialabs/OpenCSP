@@ -45,11 +45,11 @@ def example_process_facet_ensemble():
     dir_data_common = join(opencsp_code_dir(), 'test/data/sofast_common')
 
     # Directory setup
-    file_measurement = join(dir_data_sofast, 'measurement_ensemble.h5')
+    file_measurement = join(dir_data_sofast, 'data_measurement/measurement_ensemble.h5')
     file_camera = join(dir_data_common, 'camera_sofast_downsampled.h5')
     file_display = join(dir_data_common, 'display_distorted_2d.h5')
     file_orientation = join(dir_data_common, 'spatial_orientation.h5')
-    file_calibration = join(dir_data_sofast, 'image_calibration.h5')
+    file_calibration = join(dir_data_sofast, 'data_measurement/image_calibration.h5')
     file_facet = join(dir_data_common, 'Facet_lab_6x4.json')
     file_ensemble = join(dir_data_common, 'Ensemble_lab_6x4.json')
 

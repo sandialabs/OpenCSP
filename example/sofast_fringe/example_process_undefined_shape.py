@@ -41,11 +41,11 @@ def example_process_undefined_shape_facet():
     dir_data_common = join(opencsp_code_dir(), 'test/data/sofast_common')
 
     # Directory Setup
-    file_measurement = join(dir_data_sofast, 'measurement_facet.h5')
+    file_measurement = join(dir_data_sofast, 'data_measurement/measurement_facet.h5')
     file_camera = join(dir_data_common, 'camera_sofast_downsampled.h5')
     file_display = join(dir_data_common, 'display_distorted_2d.h5')
     file_orientation = join(dir_data_common, 'spatial_orientation.h5')
-    file_calibration = join(dir_data_sofast, 'image_calibration.h5')
+    file_calibration = join(dir_data_sofast, 'data_measurement/image_calibration.h5')
 
     # 1. Load saved single facet Sofast collection data
     # =================================================
