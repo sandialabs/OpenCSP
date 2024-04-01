@@ -1,32 +1,32 @@
 """Example script that finds blobs in image and saves annotated image.
 """
 
-import os
-from os.path import join, dirname, exists
+from os.path import join, dirname
 
 import cv2 as cv
 
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.image_processing import detect_blobs_annotate
+import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_find_blobs_in_image():
-    """Finds blobs in image, annotates, and saves image"""
-    file_meas = join(
-        opencsp_code_dir(),
-        '../../sample_data/deflectometry/sandia_lab/fixed_pattern/measurement_screen_square_width3_space6.h5',
-    )
-    file_save = join(dirname(__file__), 'data/output/blob_detection/image_with_detected_blobs.png')
+    """Example script that finds blobs in image, annotates image, and saves
+    """
+    # General Setup
+    dir_save = join(dirname(__file__), 'data/output/find_blobs_in_image')
+    ft.create_directories_if_necessary(dir_save)
 
-    if not exists(dirname(file_save)):
-        os.makedirs(dirname(file_save))
+    lt.logger(join(dir_save, 'log.txt'), lt.log.INFO)
 
-    # Load image
+    # Load image from measurement file
+    file_meas = join(opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_facet.h5')
     measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
     image = measurement.image
 
-    # Detect blobs
+    # Detect blobs and annotate image
     params = cv.SimpleBlobDetector_Params()
     params.minDistBetweenBlobs = 2
     params.filterByArea = True
@@ -37,7 +37,8 @@ def example_find_blobs_in_image():
     params.filterByInertia = False
     image_annotate = detect_blobs_annotate(image, params)
 
-    cv.imwrite(file_save, image_annotate)
+    # Save image
+    cv.imwrite(join(dir_save, 'annotated_blobs.png'), image_annotate)
 
 
 if __name__ == '__main__':
