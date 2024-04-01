@@ -22,7 +22,7 @@ from opencsp.app.sofast.SofastService import SofastService
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.exception_tools as et
-from opencsp.common.lib.tool.TkToolTip import TkToolTip
+import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class SofastGUI(ssc.SofastServiceCallback):
@@ -36,7 +36,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         self.service = SofastService(self)
 
         # Create tkinter object
-        self.root = tkinter.Tk()
+        self.root = tkt._window()
 
         # Set title
         self.root.title('SOFAST')
@@ -148,7 +148,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_load_system, text='Connect Camera', command=self.load_image_acquisition
         )
         self.btn_load_image_acquisition.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(
+        tkt.TkToolTip(
             self.btn_load_image_acquisition,
             'Select the type of camera in the dropdown menu to the right. Click to connect to the camera.',
         )
@@ -159,7 +159,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_load_system, text='Load ImageProjection', command=self.load_image_projection
         )
         self.btn_load_image_projection.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_load_image_projection, 'Select an ImageProjection HDF file to load and display.')
+        tkt.TkToolTip(self.btn_load_image_projection, 'Select an ImageProjection HDF file to load and display.')
         r += 1
 
         # =============== First Column - Projection controls ===============
@@ -168,26 +168,26 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_projector, text='Show Calibration Image', command=self.show_calibration_image
         )
         self.btn_show_cal_image.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_show_cal_image, 'Shows calibration image on projection window.')
+        tkt.TkToolTip(self.btn_show_cal_image, 'Shows calibration image on projection window.')
         r += 1
 
         self.btn_show_axes = tkinter.Button(label_frame_projector, text='Show Screen Axes', command=self.show_axes)
         self.btn_show_axes.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_show_axes, 'Shows screen axes on projection window.')
+        tkt.TkToolTip(self.btn_show_axes, 'Shows screen axes on projection window.')
         r += 1
 
         self.btn_show_crosshairs = tkinter.Button(
             label_frame_projector, text='Show Crosshairs', command=self.show_crosshairs
         )
         self.btn_show_crosshairs.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_show_crosshairs, 'Shows crosshairs on projection window.')
+        tkt.TkToolTip(self.btn_show_crosshairs, 'Shows crosshairs on projection window.')
         r += 1
 
         self.btn_close_projection = tkinter.Button(
             label_frame_projector, text='Close Display Window', command=self.close_projection_window
         )
         self.btn_close_projection.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_close_projection, 'Close only projection window.')
+        tkt.TkToolTip(self.btn_close_projection, 'Close only projection window.')
         r += 1
 
         # =============== First Column - Camera controls ===============
@@ -197,13 +197,13 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_camera, text='Calibrate Exposure Time', command=self.run_exposure_cal
         )
         self.btn_exposure_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_exposure_cal, 'Automatically performs camera exposure calibration.')
+        tkt.TkToolTip(self.btn_exposure_cal, 'Automatically performs camera exposure calibration.')
         r += 1
 
         # Set camera exposure
         self.btn_set_exposure = tkinter.Button(label_frame_camera, text='Set Exposure Time', command=self.set_exposure)
         self.btn_set_exposure.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(
+        tkt.TkToolTip(
             self.btn_set_exposure, 'Set the camera exposure time value. The current value is displayed when clicked.'
         )
         r += 1
@@ -211,19 +211,19 @@ class SofastGUI(ssc.SofastServiceCallback):
         # Show snapshot button
         self.btn_show_snapshot = tkinter.Button(label_frame_camera, text='Show Snapshot', command=self.show_snapshot)
         self.btn_show_snapshot.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_show_snapshot, 'Shows a camera image and pixel brightness histogram.')
+        tkt.TkToolTip(self.btn_show_snapshot, 'Shows a camera image and pixel brightness histogram.')
         r += 1
 
         # Save snapshot button
         self.btn_save_snapshot = tkinter.Button(label_frame_camera, text='Save Snapshot', command=self.save_snapshot)
         self.btn_save_snapshot.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_save_snapshot, 'Saves image from camera as a PNG.')
+        tkt.TkToolTip(self.btn_save_snapshot, 'Saves image from camera as a PNG.')
         r += 1
 
         # Live view button
         self.btn_live_view = tkinter.Button(label_frame_camera, text='Live View', command=self.live_view)
         self.btn_live_view.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_live_view, 'Shows live view from connected camera.')
+        tkt.TkToolTip(self.btn_live_view, 'Shows live view from connected camera.')
         r += 1
 
         # Perform exposure calibration
@@ -231,7 +231,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_camera, text='Close Camera', command=self.close_image_acquisition
         )
         self.btn_close_camera.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_close_camera, 'Closes connection to camera.')
+        tkt.TkToolTip(self.btn_close_camera, 'Closes connection to camera.')
         r += 1
 
         # =============== First Column - System run controls ===============
@@ -241,7 +241,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_run, text='Run Data Capture', command=self.run_measurement
         )
         self.btn_run_measurement.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_run_measurement, 'Runs SOFAST data capture. Mask then fringes are captured.')
+        tkt.TkToolTip(self.btn_run_measurement, 'Runs SOFAST data capture. Mask then fringes are captured.')
         r += 1
 
         # Perform projector-camera brightness calibration
@@ -249,7 +249,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_run, text='Run Response Calibration', command=self.run_gray_levels_cal
         )
         self.btn_gray_levels_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(
+        tkt.TkToolTip(
             self.btn_gray_levels_cal,
             'Performs Projector-Camera Brightness Calibration sequence. Must select a destination HDF file first.',
         )
@@ -260,7 +260,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_run, text='Load Response Calibration', command=self.load_gray_levels_cal
         )
         self.btn_load_gray_levels_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(
+        tkt.TkToolTip(
             self.btn_load_gray_levels_cal,
             'Loads a previously saved Projector-Camera Brightness Calibration sequence data file.',
         )
@@ -271,7 +271,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             label_frame_run, text='View Response Calibration', command=self.view_gray_levels_cal
         )
         self.btn_view_gray_levels_cal.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(
+        tkt.TkToolTip(
             self.btn_view_gray_levels_cal, 'Views current Projector-Camera Brightness Calibration sequence data file.'
         )
         r += 1
@@ -280,7 +280,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         # Close window button
         self.btn_close = tkinter.Button(self.root, text='Close All', command=self.close)
         self.btn_close.grid(row=4, column=0, pady=2, padx=2, sticky='nesw')
-        TkToolTip(self.btn_close, 'Closes all windows.')
+        tkt.TkToolTip(self.btn_close, 'Closes all windows.')
 
         # =============== Second Column - Settings ===============
         r = 0
@@ -288,7 +288,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         self.var_cam_select = tkinter.StringVar(value=list(self.cam_options.keys())[0])
         lbl_camera_type = tkinter.Label(label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold'))
         drop_camera_type = tkinter.OptionMenu(label_frame_settings, self.var_cam_select, *list(self.cam_options.keys()))
-        TkToolTip(drop_camera_type, 'Select type of camera object to load.')
+        tkt.TkToolTip(drop_camera_type, 'Select type of camera object to load.')
 
         lbl_camera_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
         drop_camera_type.grid(row=r, column=2, pady=2, padx=2, sticky='nsw')
@@ -302,7 +302,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         drop_cal_type = tkinter.OptionMenu(
             label_frame_settings, self.var_cal_select, *list(SofastService.cal_options.keys())
         )
-        TkToolTip(drop_cal_type, 'Select type of Projector-Camera Brightness Calibration process to use.')
+        tkt.TkToolTip(drop_cal_type, 'Select type of Projector-Camera Brightness Calibration process to use.')
 
         lbl_cal_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
         drop_cal_type.grid(row=r, column=2, pady=2, padx=2, sticky='nsw')
@@ -329,11 +329,11 @@ class SofastGUI(ssc.SofastServiceCallback):
             to=100,
             width=5,
         )
-        TkToolTip(
+        tkt.TkToolTip(
             entry_fringe_x,
             'Number of fringe X periods to show during a data capture. Each fringe period will always be phase shifted four times.',
         )
-        TkToolTip(
+        tkt.TkToolTip(
             entry_fringe_y,
             'Number of fringe Y periods to show during a data capture. Each fringe period will always be phase shifted four times.',
         )
@@ -360,7 +360,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         entry_meas_pt = tkinter.Entry(
             label_frame_settings, textvariable=self.var_meas_pt, font=('calibre', 10, 'normal'), width=20
         )
-        TkToolTip(
+        tkt.TkToolTip(
             entry_meas_pt,
             'Location, in mirror coordinates (meters), of the point on the mirror where the "mirror-to-screen distance" is measured.',
         )
@@ -378,7 +378,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         entry_meas_dist = tkinter.Entry(
             label_frame_settings, textvariable=self.var_meas_dist, font=('calibre', 10, 'normal'), width=20
         )
-        TkToolTip(
+        tkt.TkToolTip(
             entry_meas_dist,
             'The distance in meters from the display crosshairs to the "Measure Point XYZ" location on the mirror.',
         )
@@ -394,7 +394,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         entry_meas_name = tkinter.Entry(
             label_frame_settings, textvariable=self.var_meas_name, font=('calibre', 10, 'normal'), width=20
         )
-        TkToolTip(entry_meas_name, 'The name of the measurement to be saved in the measurement HDF file.')
+        tkt.TkToolTip(entry_meas_name, 'The name of the measurement to be saved in the measurement HDF file.')
 
         lbl_meas_name.grid(row=r, column=1, pady=2, padx=2, sticky='nsw', columnspan=2)
         r += 1
@@ -515,7 +515,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             # Load data
             image_projection_data = ImageProjection.load_from_hdf(file)
             # Create new window
-            projector_root = tkinter.Toplevel(self.root)
+            projector_root = tkt._window(self.root, TopLevel=True)
             # Show window
             self.service.image_projection = ImageProjection(projector_root, image_projection_data)
 
