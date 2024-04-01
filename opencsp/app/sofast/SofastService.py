@@ -191,57 +191,11 @@ class SofastService:
             run_next = self.image_projection.show_crosshairs
             self.system.run_camera_exposure_calibration(run_next)
 
-    def run_gray_levels_cal(
-        self,
-        calibration_class: type[ImageCalibrationAbstract],
-        calibration_hdf5_path_name_ext: str = None,
-        on_captured: Callable = None,
-        on_processing: Callable = None,
-        on_processed: Callable = None,
-    ) -> None:
-        """Runs the projector-camera intensity calibration"""
-
-        # Capture images
-        def _func_0():
-            self.system.run_display_camera_response_calibration(res=10, run_next=self.system.run_next_in_queue)
-
-            # Run the "on captured" callback
-            if on_captured != None:
-                on_captured()
-
-        # Process data
-        def _func_1():
-            # Run the "on processing" callback
-            if on_processing != None:
-                on_processing()
-
-            # Get calibration images from System
-            calibration_images = self.system.get_calibration_images()[0]  # only calibrating one camera
-            # Load calibration object
-            self.calibration = calibration_class.from_data(calibration_images, self.system.calibration_display_values)
-            # Save calibration object
-            if calibration_hdf5_path_name_ext != None:
-                self.calibration.save_to_hdf(calibration_hdf5_path_name_ext)
-            # Save calibration raw data
-            data = [self.system.calibration_display_values, calibration_images]
-            datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
-            if calibration_hdf5_path_name_ext != None:
-                h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
-            # Show crosshairs
-            self.image_projection.show_crosshairs()
-            # Run the "on done" callback
-            if on_processed != None:
-                on_processed()
-            # Continue
-            self.system.run_next_in_queue()
-
-        self.system.set_queue([_func_0, _func_1])
-        self.system.run_next_in_queue()
-
     def load_gray_levels_cal(self, hdf5_file_path_name_ext: str) -> None:
         """Loads saved results of a projector-camera intensity calibration"""
         # Load file
-        cal_type = h5.load_hdf5_datasets(['Calibration/calibration_type'], hdf5_file_path_name_ext)['calibration_type']
+        datasets = ['ImageCalibration/calibration_type']
+        cal_type = h5.load_hdf5_datasets(datasets, hdf5_file_path_name_ext)['calibration_type']
 
         if cal_type == 'ImageCalibrationGlobal':
             self.calibration = ImageCalibrationGlobal.load_from_hdf(hdf5_file_path_name_ext)

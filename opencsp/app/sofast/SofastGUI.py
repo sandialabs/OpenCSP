@@ -13,6 +13,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.sofast.lib.Fringes import Fringes
+from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.camera.image_processing import highlight_saturation
 from opencsp.common.lib.camera.LiveView import LiveView
@@ -596,21 +597,28 @@ class SofastGUI(ssc.SofastServiceCallback):
         cal_type = SofastService.cal_options[self.var_cal_select.get()]
 
         # Let us know when each phase is starting/has finished
-        def on_calibrating():
+        def on_capturing():
             print('Calibrating...')
 
         def on_processing():
             print('Processing calibration data')
 
-        def on_processed():
+        def on_processed(calibration: ImageCalibrationAbstract):
+            # Register the calibration
+            self.service.calibration = calibration
+
+            # Show crosshairs
+            self.service.image_projection.show_crosshairs()
+
+            # Notify user
             self.var_gray_lvl_cal_status.set('Calibration data: Loaded/Saved')
             print(f'Calibration complete. Results loaded and saved to\n    {file}')
 
         # Run calibration
-        self.service.run_gray_levels_cal(
+        self.service.system.run_gray_levels_cal(
             calibration_class=cal_type,
             calibration_hdf5_path_name_ext=file,
-            on_calibrating=on_calibrating,
+            on_capturing=on_capturing,
             on_processing=on_processing,
             on_processed=on_processed,
         )
