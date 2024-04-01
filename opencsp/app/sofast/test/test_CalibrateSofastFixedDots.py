@@ -28,21 +28,22 @@ class TestFixedPatternSetupCalibrate(unittest.TestCase):
         lt.logger(log_dir_body_ext=join(cls.dir_save, 'log.txt'), level=lt.log.ERROR)
 
         # Define dot location images and origins
-        base_dir = join(opencsp_code_dir(), 'test/data/dot_location_calibration')
+        dir_meas = join(opencsp_code_dir(), 'test/data/dot_location_calibration/data_measurement')
+        dir_exp = join(opencsp_code_dir(), 'test/data/dot_location_calibration/data_expected')
         files = [
-            join(base_dir, 'images/DSC03992.JPG'),
-            join(base_dir, 'images/DSC03993.JPG'),
-            join(base_dir, 'images/DSC03994.JPG'),
-            join(base_dir, 'images/DSC03995.JPG'),
-            join(base_dir, 'images/DSC03996.JPG'),
+            join(dir_meas, 'images/DSC03992.JPG'),
+            join(dir_meas, 'images/DSC03993.JPG'),
+            join(dir_meas, 'images/DSC03994.JPG'),
+            join(dir_meas, 'images/DSC03995.JPG'),
+            join(dir_meas, 'images/DSC03996.JPG'),
         ]
         origins = np.array(([1201, 1120, 1135, 964, 918], [828, 857, 852, 851, 862]))
         origins = Vxy(origins)
 
         # Define other files
-        file_camera_calibration = join(base_dir, 'camera_calibration.h5')
-        file_xyz_points = join(base_dir, 'aruco_corner_locations.csv')
-        cls.file_fpd_dot_locs_exp = join(base_dir, 'fixed_pattern_dot_locations.h5')
+        file_camera_calibration = join(dir_meas, 'camera_calibration.h5')
+        file_xyz_points = join(dir_meas, 'aruco_corner_locations.csv')
+        cls.file_fpd_dot_locs_exp = join(dir_exp, 'fixed_pattern_dot_locations.h5')
 
         # Load marker corner locations
         data = np.loadtxt(file_xyz_points, delimiter=',')

@@ -28,8 +28,8 @@ class TestSlopeSolver(unittest.TestCase):
         ft.create_directories_if_necessary(cls.dir_save)
 
         # Define test data files for single facet processing
-        cls.data_file_facet = join(base_dir, 'calculations_facet/data.h5')
-        data_file_measurement = join(base_dir, 'measurement_facet.h5')
+        cls.data_file_facet = join(base_dir, 'data_expected_facet/data.h5')
+        data_file_measurement = join(base_dir, 'data_measurement/measurement_facet.h5')
 
         # Create spatial orientation objects
         datasets = [

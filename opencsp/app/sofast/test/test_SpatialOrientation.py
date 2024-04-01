@@ -20,7 +20,7 @@ class TestSpatialOrientation(unittest.TestCase):
         base_dir = join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Define test data files for single facet processing
-        data_file_facet = join(base_dir, 'calculations_facet/data.h5')
+        data_file_facet = join(base_dir, 'data_expected_facet/data.h5')
 
         # Load data
         datasets = [

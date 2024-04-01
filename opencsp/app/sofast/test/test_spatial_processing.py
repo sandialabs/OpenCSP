@@ -24,8 +24,8 @@ class TestSpatialProcessing(unittest.TestCase):
         base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Define test data files for single facet processing
-        cls.data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
-        cls.data_file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
+        cls.data_file_facet = os.path.join(base_dir, 'data_expected_facet/data.h5')
+        cls.data_file_measurement = os.path.join(base_dir, 'data_measurement/measurement_facet.h5')
 
         cls.orientation = SpatialOrientation.load_from_hdf(cls.data_file_facet)
         cls.camera = Camera.load_from_hdf(cls.data_file_facet)

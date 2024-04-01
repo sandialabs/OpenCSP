@@ -22,8 +22,9 @@ class TestCalibrationCameraPosition(unittest.TestCase):
         # Define inputs
         file_camera_sofast = join(opencsp_code_dir(), 'test/data/sofast_common/camera_sofast.h5')
         file_point_locations = join(opencsp_code_dir(), 'test/data/sofast_common/aruco_corner_locations.csv')
-        file_cal_image = join(opencsp_code_dir(), 'test/data/camera_position_calibration/image_sofast_camera.png')
-        file_exp = join(opencsp_code_dir(), 'test/data/camera_position_calibration/camera_rvec_tvec.csv')
+        file_cal_image = join(opencsp_code_dir(),
+                              'test/data/camera_position_calibration/data_measurement/image_sofast_camera.png')
+        file_exp = join(opencsp_code_dir(), 'test/data/camera_position_calibration/data_expected/camera_rvec_tvec.csv')
 
         cls.save_dir = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/output/camera_pose_calibration/')
         ft.create_directories_if_necessary(cls.save_dir)

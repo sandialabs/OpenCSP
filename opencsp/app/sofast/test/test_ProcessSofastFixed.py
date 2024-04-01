@@ -34,9 +34,9 @@ class TestProcessSofastFixed(unittest.TestCase):
         file_camera = join(dir_sofast_common, "camera_sofast.h5")
         file_facet = join(dir_sofast_common, "Facet_NSTTF.json")
         file_ori = join(dir_sofast_common, 'spatial_orientation.h5')
-        file_dot_locs = join(dir_sofast_fixed, 'fixed_pattern_dot_locations.h5')
-        file_meas = join(dir_sofast_fixed, 'measurement_facet.h5')
-        file_exp = join(dir_sofast_fixed, 'calculation_facet.h5')
+        file_dot_locs = join(dir_sofast_fixed, 'data_measurement/fixed_pattern_dot_locations.h5')
+        file_meas = join(dir_sofast_fixed, 'data_measurement/measurement_facet.h5')
+        file_exp = join(dir_sofast_fixed, 'data_expected/calculation_facet.h5')
 
         cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/process_sofast_fixed_single_facet')
         ft.create_directories_if_necessary(cls.save_dir)

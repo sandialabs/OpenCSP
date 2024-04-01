@@ -23,8 +23,8 @@ class test_IntegrationUndefined(unittest.TestCase):
         base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Directory Setup
-        file_dataset = os.path.join(base_dir, 'calculations_undefined_mirror/data.h5')
-        file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
+        file_dataset = os.path.join(base_dir, 'data_expected_undefined_mirror/data.h5')
+        file_measurement = os.path.join(base_dir, 'data_measurement/measurement_facet.h5')
 
         # Load data
         camera = Camera.load_from_hdf(file_dataset)
