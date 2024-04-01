@@ -34,8 +34,9 @@ def example_camera_position_calibration():
 
     # Define inputs
     file_camera_sofast = join(opencsp_code_dir(), 'test/data/sofast_common/camera_sofast.h5')
-    file_cal_image = join(opencsp_code_dir(),
-                          'test/data/camera_position_calibration/data_measurement/image_sofast_camera.png')
+    file_cal_image = join(
+        opencsp_code_dir(), 'test/data/camera_position_calibration/data_measurement/image_sofast_camera.png'
+    )
     file_pts_data = join(opencsp_code_dir(), 'test/data/sofast_common/aruco_corner_locations.csv')
 
     # 1. Load measured calibration data
