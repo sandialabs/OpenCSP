@@ -6,7 +6,6 @@ import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-import opencsp.common.lib.photogrammetry.photogrammetry as ph
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
@@ -14,8 +13,8 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_create_measurement_file_from_png():
-    """Example that creates a SofastFixed measurement file from a PNG image. The PNG image has
+def example_create_measurement_file_from_image():
+    """Example that creates a SofastFixed measurement file from an image. The image has
     a point LED light near origin dot.
     1. Load image
     2. Define measurement parameters
@@ -32,10 +31,11 @@ def example_create_measurement_file_from_png():
 
     # 1. Load image
     # =============
-    file_image = join(
-        opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_image.png'
+    file_meas = join(
+        opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_facet.h5'
     )
-    image = ph.load_image_grayscale(file_image)
+    measurement_old = MeasurementSofastFixed.load_from_hdf(file_meas)
+    image = measurement_old.image
 
     # 2. Define measurement parameters
     # ================================
@@ -82,4 +82,4 @@ def example_create_measurement_file_from_png():
 
 
 if __name__ == '__main__':
-    example_create_measurement_file_from_png()
+    example_create_measurement_file_from_image()
