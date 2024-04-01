@@ -422,8 +422,8 @@ def rectangle_loop_from_two_points(p1: Vxy, p2: Vxy, d_ax: float, d_perp: float)
     # Calculate axial and perpendicular directions
     v_axial = (p2 - p1).normalize()
 
-    R = np.array([[0, 1], [-1, 0]])
-    v_perp = v_axial.rotate(R)
+    rot_mat_90 = np.array([[0, 1], [-1, 0]])
+    v_perp = v_axial.rotate(rot_mat_90)
 
     # Create points
     points = []
@@ -440,7 +440,8 @@ def rectangle_loop_from_two_points(p1: Vxy, p2: Vxy, d_ax: float, d_perp: float)
 
 
 def detect_blobs(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> Vxy:
-    """Detects blobs in image
+    """Detects blobs in image. Blobs are defined as local dark regions in
+    neighboring light background.
 
     Parameters
     ----------
@@ -462,8 +463,35 @@ def detect_blobs(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> Vxy
     return Vxy(np.array(pts).T)
 
 
+def detect_blobs_inverse(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> Vxy:
+    """Detect blobs in image. Blobs are defined as local light regions in
+    neighboring dark background.
+
+    NOTE: This definition of blobs is the inverse as in `image_processing.detect_blobs()`
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image, uint8
+    params : cv.SimpleBlobDetector_Params
+        Blob parameters
+
+    Returns
+    -------
+    Vxy
+        Centroids of blobs
+    """
+    keypoints = _detect_blobs_keypoints(image.max() - image, params)
+
+    pts = []
+    for pt in keypoints:
+        pts.append(pt.pt)
+    return Vxy(np.array(pts).T)
+
+
 def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> np.ndarray:
-    """Detects blobs in image
+    """Detects blobs in image and annotates locations. Blobs are defined as local dark regions in
+    neighboring light background.
 
     Parameters
     ----------
@@ -478,6 +506,28 @@ def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Param
         Annotated image of blobs
     """
     keypoints = _detect_blobs_keypoints(image, params)
+    return cv.drawKeypoints(image, keypoints, np.array([]), (0, 0, 255), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+
+def detect_blobs_inverse_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> np.ndarray:
+    """Detects blobs in image and annotates locations. Blobs are defined as local light regions in
+    neighboring dark background.
+
+    NOTE: This definition of blobs is the inverse as in `image_processing.detect_blobs()`
+
+    Parameters
+    ----------
+    image : np.ndarray
+        Input image, uint8
+    params : cv.SimpleBlobDetector_Params
+        Blob parameters
+
+    Returns
+    -------
+    ndarray
+        Annotated image of blobs
+    """
+    keypoints = _detect_blobs_keypoints(image.max() - image, params)
     return cv.drawKeypoints(image, keypoints, np.array([]), (0, 0, 255), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 
@@ -501,39 +551,3 @@ def _detect_blobs_keypoints(image: np.ndarray, params: cv.SimpleBlobDetector_Par
 
     # Detect blobs
     return detector.detect(image)
-
-
-def find_point_light_in_images(images: list[np.ndarray], filt_width: int = 5) -> Vxy:
-    """Finds locations of point lights in given images. Returns the xy location
-    of the brightest point in the image after filtering the image.
-
-    Parameters
-    ----------
-    images : list[np.ndarray]
-        List of 2d grayscale images to process.
-    filt_width : int
-        Size of square kernel to convolve to image to filter image noise, pixels.
-
-    Returns
-    -------
-    Vxy
-        XY locations of point light in image
-    """
-    locations = np.zeros((2, len(images)))
-    for idx, image in enumerate(images):
-        if filt_width > 1:  # Filter image to remove dead/hot pixels
-            lt.debug(
-                f'Finding point light in image. Spatially filtering image with kernel width {filt_width:.0f} pixels.'
-            )
-            kernel1 = np.ones((filt_width, filt_width)) / filt_width ** 2
-            image_filt = cv.filter2D(src=image, ddepth=-1, kernel=kernel1)
-        else:  # Do not apply filter
-            lt.debug('Finding point light in image. Not spatially filtering image.')
-            image_filt = image
-
-        # Find maximum in image
-        ys, xs = np.where(image_filt == image_filt.max())
-        locations[0, idx] = xs.mean()
-        locations[1, idx] = ys.mean()
-
-    return Vxy(locations)
