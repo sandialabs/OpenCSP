@@ -14,9 +14,17 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_screen_shape_calibration():
-    """Runs screen shape calibration. Saves a DisplayShape HDF5 file
-    to ./data/output/screen_shape/display_shape.h5
+    """Example Sofast calibration script
+
+    Calibrates the 3d shape of a screen:
+    1. Load measured calibration data
+    2. Perform screen shpae calibration
+    3. Save 3d shape data as DisplayShape object
+    4. Save calculation figures
     """
+    # General setup
+    # =============
+
     # Define save directory
     dir_save = join(dirname(__file__), 'data/output/screen_shape')
     ft.create_directories_if_necessary(dir_save)
@@ -39,6 +47,9 @@ def example_screen_shape_calibration():
             'test/data/display_shape_calibration/data_measurement/screen_shape_sofast_measurements/pose_*.h5',
         )
     )
+
+    # 1. Load measured calibration data
+    # =================================
 
     # Load output data from Scene Reconstruction (Aruco marker xyz points)
     pts_marker_data = np.loadtxt(file_pts_data, delimiter=',', skiprows=1)
@@ -64,10 +75,14 @@ def example_screen_shape_calibration():
         [MeasurementSofastFringe.load_from_hdf(f) for f in files_screen_shape_measurement],
     )
 
-    # Perform screen shape calibration
+    # 2. Perform screen shape calibration
+    # ====================================
     cal = CalibrateDisplayShape(data_input)
     cal.make_figures = True
     cal.run_calibration()
+
+    # 3. Save 3d shape data as DisplayShape object
+    # ============================================
 
     # Get screen shape data
     display_shape = cal.as_DisplayShape('Example display shape')
@@ -77,7 +92,8 @@ def example_screen_shape_calibration():
     display_shape.save_to_hdf(file)
     lt.info(f'Saved DisplayShape file to {file:s}')
 
-    # Save calibration figures
+    # 4. Save calculation figures
+    # ===========================
     for fig in cal.figures:
         file = join(dir_save, fig.get_label() + '.png')
         lt.info(f'Saving figure to: {file:s}')

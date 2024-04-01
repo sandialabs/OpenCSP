@@ -14,10 +14,17 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_camera_position_calibration():
-    """Calibrates the position of the Sofast camera. Saves the rvec/tvec that
-    define the relative pose of the camera/screen in a SpatialOrientation file
-    at ./data/output/spatial_orientation.h5
+    """Example Sofast calibration script
+
+    Calibrates the position of the Sofast camera:
+    1. Load measured calibration data
+    2. Perform camera position calibration
+    3. Save orientation as SpatialOrientation object
+    4. Save calculation figures
     """
+    # General setup
+    # =============
+
     # Define save dir
     dir_save = join(dirname(__file__), 'data/output/camera_pose')
     ft.create_directories_if_necessary(dir_save)
@@ -30,6 +37,9 @@ def example_camera_position_calibration():
     file_cal_image = join(opencsp_code_dir(), 'test/data/camera_position_calibration/image_sofast_camera.png')
     file_pts_data = join(opencsp_code_dir(), 'test/data/sofast_common/aruco_corner_locations.csv')
 
+    # 1. Load measured calibration data
+    # =================================
+
     # Load input data
     camera = Camera.load_from_hdf(file_camera_sofast)
     image = load_image_grayscale(file_cal_image)
@@ -39,10 +49,14 @@ def example_camera_position_calibration():
     pts_xyz_marker = Vxyz(pts_marker_data[:, 2:].T)
     corner_ids = pts_marker_data[:, 1]
 
-    # Perform camera position calibraiton
+    # 2. Perform camera position calibration
+    # ======================================
     cal = CalibrationCameraPosition(camera, pts_xyz_marker, corner_ids, image)
     cal.make_figures = True
     cal.run_calibration()
+
+    # 3. Save orientation as SpatialOrientation object
+    # ================================================
 
     # Get orientation
     r_screen_cam, v_cam_screen_screen = cal.get_data()
@@ -58,7 +72,8 @@ def example_camera_position_calibration():
     # Save data
     orientation.save_to_hdf(join(dir_save, 'spatial_orientation.h5'))
 
-    # Save figures
+    # 4. Save calculation figures
+    # ===========================
     for fig in cal.figures:
         file = join(dir_save, fig.get_label() + '.png')
         lt.info(f'Saving figure to: {file:s}')
