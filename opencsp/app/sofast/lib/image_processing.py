@@ -64,7 +64,7 @@ def calc_mask_raw(
             raise ValueError('Not enough distinction between dark and light pixels in mask images.')
 
         # Calculate minimum between two peaks
-        idx_hist_min = np.argmin(hist[peaks[0] : peaks[1]]) + peaks[0]
+        idx_hist_min = np.argmin(hist[peaks[0]: peaks[1]]) + peaks[0]
 
         # Find index of histogram that is "hist_thresh" the way between the min and max
         thresh_hist_min = edges[idx_hist_min + 1]
@@ -501,3 +501,39 @@ def _detect_blobs_keypoints(image: np.ndarray, params: cv.SimpleBlobDetector_Par
 
     # Detect blobs
     return detector.detect(image)
+
+
+def find_point_light_in_images(images: list[np.ndarray], filt_width: int = 5) -> Vxy:
+    """Finds locations of point lights in given images. Returns the xy location
+    of the brightest point in the image after filtering the image.
+
+    Parameters
+    ----------
+    images : list[np.ndarray]
+        List of 2d grayscale images to process.
+    filt_width : int
+        Size of square kernel to convolve to image to filter image noise, pixels.
+
+    Returns
+    -------
+    Vxy
+        XY locations of point light in image
+    """
+    locations = np.zeros((2, len(images)))
+    for idx, image in enumerate(images):
+        if filt_width > 1:  # Filter image to remove dead/hot pixels
+            lt.debug(
+                f'Finding point light in image. Spatially filtering image with kernel width {filt_width:.0f} pixels.'
+            )
+            kernel1 = np.ones((filt_width, filt_width)) / filt_width ** 2
+            image_filt = cv.filter2D(src=image, ddepth=-1, kernel=kernel1)
+        else:  # Do not apply filter
+            lt.debug('Finding point light in image. Not spatially filtering image.')
+            image_filt = image
+
+        # Find maximum in image
+        ys, xs = np.where(image_filt == image_filt.max())
+        locations[0, idx] = xs.mean()
+        locations[1, idx] = ys.mean()
+
+    return Vxy(locations)
