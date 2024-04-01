@@ -9,6 +9,7 @@ from PIL import Image, ImageTk
 
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
+import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class CalParams:
@@ -126,7 +127,7 @@ class ImageProjection:
 
         """
         # Create new tkinter window
-        root = tkinter.Tk()
+        root = tkt._window()
         # Instantiate class
         return cls(root, display_data)
 
