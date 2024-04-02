@@ -9,10 +9,13 @@ from numpy import ndarray
 import numpy as np
 
 from opencsp.app.sofast.lib.Fringes import Fringes
+from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.exception_tools as et
+import opencsp.common.lib.tool.hdf5_tools as h5
 
 
 class SystemSofastFringe:
@@ -233,6 +236,56 @@ class SystemSofastFringe:
         if saturation >= thresh:
             warn('Image is {:.2f}% saturated.'.format(saturation * 100), stacklevel=2)
 
+    def run_gray_levels_cal(
+        self,
+        calibration_class: type[ImageCalibrationAbstract],
+        calibration_hdf5_path_name_ext: str = None,
+        on_capturing: Callable = None,
+        on_captured: Callable = None,
+        on_processing: Callable = None,
+        on_processed: Callable[[ImageCalibrationAbstract], None] = None,
+    ) -> None:
+        """Runs the projector-camera intensity calibration"""
+
+        # Capture images
+        def _func_0():
+            # Run the "on capturing" callback
+            if on_capturing != None:
+                on_capturing()
+
+            self.run_display_camera_response_calibration(res=10, run_next=self.run_next_in_queue)
+
+            # Run the "on captured" callback
+            if on_captured != None:
+                on_captured()
+
+        # Process data
+        def _func_1():
+            # Run the "on processing" callback
+            if on_processing != None:
+                on_processing()
+
+            # Get calibration images from System
+            calibration_images = self.get_calibration_images()[0]  # only calibrating one camera
+            # Load calibration object
+            calibration = calibration_class.from_data(calibration_images, self.calibration_display_values)
+            # Save calibration object
+            if calibration_hdf5_path_name_ext != None:
+                calibration.save_to_hdf(calibration_hdf5_path_name_ext)
+            # Save calibration raw data
+            data = [self.calibration_display_values, calibration_images]
+            datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
+            if calibration_hdf5_path_name_ext != None:
+                h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
+            # Run the "on done" callback
+            if on_processed != None:
+                on_processed(calibration)
+            # Continue
+            self.run_next_in_queue()
+
+        self.set_queue([_func_0, _func_1])
+        self.run_next_in_queue()
+
     def capture_mask_images(self, run_next: Callable | None = None) -> None:
         """
         Captures mask images only. When finished, "run_next" is called. Images
@@ -242,7 +295,7 @@ class SystemSofastFringe:
         ----------
         run_next : Callable, optional
             Function that is called after all images are captured. The default
-            is self.close_all().
+            is self.close_all(). TODO is this still the default?
 
         """
         # Initialize mask image list
@@ -262,7 +315,7 @@ class SystemSofastFringe:
         ----------
         run_next : Callable
             Function that is called after all images are captured. The default
-            is self.close_all().
+            is self.close_all(). TODO is this still the default?
 
         """
         # Check fringes/camera have been loaded
@@ -289,7 +342,7 @@ class SystemSofastFringe:
         ----------
         run_next : Callable
             Function that is called after all images are captured. The default
-            is self.close_all().
+            is self.close_all(). TODO is this still the default?
 
         """
         # Check fringes/camera have been loaded
@@ -434,10 +487,12 @@ class SystemSofastFringe:
         """Closes all windows"""
         # Close image acquisition
         for im_aq in self.image_acquisition:
-            im_aq.close()
+            with et.ignored(Exception):
+                im_aq.close()
 
         # Close window
-        self.root.destroy()
+        with et.ignored(Exception):
+            self.root.destroy()
 
     def set_queue(self, funcs: list[Callable]) -> None:
         """Sets the queue to given list of Callables"""

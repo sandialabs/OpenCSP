@@ -7,6 +7,7 @@ import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
 
+import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
@@ -73,6 +74,7 @@ class ImageProjection:
         """
         # Save root
         self.root = root
+        self.is_closed = False
 
         # Create drawing canvas
         self.canvas = tkinter.Canvas(self.root)
@@ -99,6 +101,10 @@ class ImageProjection:
 
         # Show crosshairs
         self.show_crosshairs()
+
+    def __del__(self):
+        with et.ignored(Exception):
+            self.close()
 
     def run(self):
         """Runs the Tkinter instance"""
@@ -440,4 +446,11 @@ class ImageProjection:
 
     def close(self):
         """Closes all windows"""
-        self.root.destroy()
+        if self.is_closed:
+            # don't double-close in order to avoid warnings
+            return
+
+        self.is_closed = True
+
+        with et.ignored(Exception):
+            self.root.destroy()

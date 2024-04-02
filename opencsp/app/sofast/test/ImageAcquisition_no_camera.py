@@ -1,5 +1,7 @@
 """Representation of a notional camera for image acquisition"""
 
+from typing import Callable
+
 import numpy as np
 
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
@@ -24,6 +26,9 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
         # Define exposure_time calibration values
         self._shutter_cal_values = np.arange(1, 100, 1, dtype=float)
+
+        # Debugging values
+        self.is_closed = False
 
     def get_frame(self) -> np.ndarray:
         # Return test image
@@ -70,4 +75,4 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return self._shutter_cal_values
 
     def close(self):
-        pass
+        self.is_closed = True
