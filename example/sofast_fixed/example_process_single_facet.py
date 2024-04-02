@@ -44,8 +44,6 @@ def example_process_single_facet():
     file_ori = join(dir_data_common, 'spatial_orientation.h5')
     file_facet = join(dir_data_common, 'Facet_NSTTF.json')
 
-    surface_data = Surface2DParabolic(initial_focal_lengths_xy=(150.0, 150), robust_least_squares=False, downsample=1)
-
     # 1. Load saved single facet SofastFixed collection data
     # ======================================================
     camera = Camera.load_from_hdf(file_camera)
@@ -62,7 +60,8 @@ def example_process_single_facet():
     fixed_pattern.load_measurement_data(measurement)
 
     # Process
-    fixed_pattern.process_single_facet_optic(surface_data)
+    surface = Surface2DParabolic(initial_focal_lengths_xy=(150.0, 150), robust_least_squares=False, downsample=1)
+    fixed_pattern.process_single_facet_optic(surface)
 
     # 3. Log best-fit parabolic focal lengnths
     # ========================================
