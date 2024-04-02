@@ -38,3 +38,10 @@ jobs:
           python3 -m pip install -r ../requirements.txt
           export PYTHONPATH=$PWD/../
           pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
+
+      - name: Pip Upgrade pytest-cov
+        working-directory: OpenCSP/example
+        run: |
+          python3 -m pip install -U -r ../requirements.txt
+          export PYTHONPATH=$PWD/../
+          pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
