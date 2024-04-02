@@ -58,6 +58,9 @@ def process(
     focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
     lt.info(f'Parabolic fit focal xy lengths: ({focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}) m')
 
+    # Save data as HDF5 file
+    system_sofast_fixed.save_to_hdf(join(dir_save, f'sofast_fixed_data_{dt.now().isoformat().replace(":", "_"):s}.h5'))
+
     # Plot slope image
     mirror = system_sofast_fixed.get_mirror()
 
