@@ -1,41 +1,80 @@
-"""Example script that performs dot location calibration using photogrammetry.
-"""
-
 import os
 from os.path import join, dirname, exists
 
+import cv2 as cv
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.CalibrateSofastFixedDots import CalibrateSofastFixedDots
+import opencsp.app.sofast.lib.image_processing as ip
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import CalibrationCameraPosition
-from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
+import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_perform_calibration():
-    """Performs a dot-location calibration using photogrammetry"""
-    # Define dot location images and origins
-    base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fixed/dot_location_calibration/measurements')
+def example_calibrate_sofast_fixed_dot_locations():
+    """Performs a printed fixed pattern dot location calibration
+    using photogrammetry
+    1. Load 
+    """
+    # General Setup
+    # =============
+    dir_save = join(dirname(__file__), 'data/output/calibrate_sofast_fixed_dot_locations')
+    ft.create_directories_if_necessary(dir_save)
+
+    lt.logger(join(dir_save, 'log.txt'), lt.log.INFO)
+
+    # Define dot location images
+    dir_meas = join(opencsp_code_dir(), 'test/data/dot_location_calibration/data_measurement')
+    dir_sofast = join(opencsp_code_dir(), 'test/data/sofast_common')
+
     files_cal_images = [
-        join(base_dir, 'images/DSC03965.JPG'),
-        join(base_dir, 'images/DSC03967.JPG'),
-        join(base_dir, 'images/DSC03970.JPG'),
-        join(base_dir, 'images/DSC03972.JPG'),
+        join(dir_meas, 'images/DSC03965.JPG'),
+        join(dir_meas, 'images/DSC03967.JPG'),
+        join(dir_meas, 'images/DSC03970.JPG'),
+        join(dir_meas, 'images/DSC03972.JPG'),
     ]
-    origins = np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
-    origins = Vxy(origins.astype(int))
+
+    # Define origin dot (here, using an LED)
+
+    # Define blob detection params
+    params = cv.SimpleBlobDetector_Params()
+    params.minDistBetweenBlobs = 2
+    params.filterByArea = True
+    params.minArea = 3
+    params.maxArea = 30
+    params.filterByCircularity = True
+    params.minCircularity = 0.8
+    params.filterByConvexity = False
+    params.filterByInertia = False
+
+    origins = []
+    for file in files_cal_images:
+        # Load image
+        image = ph.load_image_grayscale(file)
+        # Detect origin
+        origin = ip.detect_blobs_inverse(image, params)
+        if len(origin) != 1:
+            lt.error_and_raise(ValueError, f'Expected 1 blob but found {len(origin):d}')
+        origins.append(origin)
+
+        import matplotlib.pyplot as plt
+        plt.imshow(image)
+        plt.scatter(*origin.data)
+        plt.show()
+
+    origins = Vxy.merge(origins)
 
     # Define other files
-    file_camera_position = join(base_dir, 'image_deflectometry_camera.png')
-    file_camera_marker = join(base_dir, 'camera_image_calibration.h5')
-    file_camera_system = join(base_dir, 'camera_deflectometry.h5')
-    file_xyz_points = join(base_dir, 'point_locations.csv')
+    file_camera_marker = join(dir_meas, 'camera_image_calibration.h5')
+    file_camera_system = join(dir_meas, 'camera_deflectometry.h5')
+    file_xyz_points = join(dir_meas, 'point_locations.csv')
     dir_save = join(dirname(__file__), 'data/output/dot_location_calibration')
 
     if not exists(dir_save):
@@ -43,9 +82,6 @@ def example_perform_calibration():
 
     # Set up logger
     lt.logger(log_dir_body_ext=join(dir_save, 'log.txt'), level=lt.log.INFO)
-
-    # Load images
-    image_camera_position = ph.load_image_grayscale(file_camera_position)
 
     # Load marker corner locations
     data = np.loadtxt(file_xyz_points, delimiter=',')
@@ -86,4 +122,4 @@ def example_perform_calibration():
 
 
 if __name__ == '__main__':
-    example_perform_calibration()
+    example_calibrate_sofast_fixed_dot_locations()
