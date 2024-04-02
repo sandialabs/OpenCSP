@@ -64,7 +64,9 @@ def calc_mask_raw(
             raise ValueError('Not enough distinction between dark and light pixels in mask images.')
 
         # Calculate minimum between two peaks
-        idx_hist_min = np.argmin(hist[peaks[0]: peaks[1]]) + peaks[0]
+        # fmt: off
+        idx_hist_min = np.argmin(hist[peaks[0] : peaks[1]]) + peaks[0]
+        # fmt: on
 
         # Find index of histogram that is "hist_thresh" the way between the min and max
         thresh_hist_min = edges[idx_hist_min + 1]
