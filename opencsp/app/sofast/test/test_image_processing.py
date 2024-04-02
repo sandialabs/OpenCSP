@@ -1,7 +1,6 @@
 """Unit test suite to test image_processing library
 """
 
-import os
 from os.path import join
 import unittest
 
@@ -23,18 +22,19 @@ class TestImageProcessing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+        dir_sofast_fringe = join(opencsp_code_dir(), 'test/data/sofast_fringe')
+        dir_sofast_common = join(opencsp_code_dir(), 'test/data/sofast_common')
 
         # Define calculation data files
-        cls.data_file_facet = join(base_dir, 'calculations_facet/data.h5')
-        cls.data_file_undefined = join(base_dir, 'calculations_undefined_mirror/data.h5')
-        cls.data_file_multi = join(base_dir, 'calculations_facet_ensemble/data.h5')
+        cls.data_file_facet = join(dir_sofast_fringe, 'data_expected_facet/data.h5')
+        cls.data_file_undefined = join(dir_sofast_fringe, 'data_expected_undefined_mirror/data.h5')
+        cls.data_file_multi = join(dir_sofast_fringe, 'data_expected_facet_ensemble/data.h5')
 
         # Define component files
-        cls.data_file_camera = join(base_dir, 'camera.h5')
-        cls.data_file_measurement_facet = join(base_dir, 'measurement_facet.h5')
-        cls.data_file_measurement_ensemble = join(base_dir, 'measurement_ensemble.h5')
-        cls.data_file_calibration = join(base_dir, 'image_calibration.h5')
+        cls.data_file_camera = join(dir_sofast_common, 'camera_sofast_downsampled.h5')
+        cls.data_file_measurement_facet = join(dir_sofast_fringe, 'data_measurement/measurement_facet.h5')
+        cls.data_file_measurement_ensemble = join(dir_sofast_fringe, 'data_measurement/measurement_ensemble.h5')
+        cls.data_file_calibration = join(dir_sofast_fringe, 'data_measurement/image_calibration.h5')
 
     def test_calc_mask_raw(self):
         """Tests image_processing.calc_mask_raw()"""

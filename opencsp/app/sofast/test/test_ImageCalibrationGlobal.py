@@ -2,6 +2,7 @@
 """
 
 import datetime as dt
+import unittest
 
 import numpy as np
 
@@ -58,6 +59,4 @@ class TestImageCalibrationGlobal:
 
 
 if __name__ == '__main__':
-    Test = TestImageCalibrationGlobal()
-    Test.setup_class()
-    Test.test_apply_to_images()
+    unittest.main()

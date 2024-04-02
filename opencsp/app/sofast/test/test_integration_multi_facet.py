@@ -34,11 +34,11 @@ class TestMulti(unittest.TestCase):
         """
         # Get test data location
         if base_dir is None:
-            base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+            base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Directory Setup
-        file_dataset = os.path.join(base_dir, 'calculations_facet_ensemble/data.h5')
-        file_measurement = os.path.join(base_dir, 'measurement_ensemble.h5')
+        file_dataset = os.path.join(base_dir, 'data_expected_facet_ensemble/data.h5')
+        file_measurement = os.path.join(base_dir, 'data_measurement/measurement_ensemble.h5')
 
         # Load data
         camera = Camera.load_from_hdf(file_dataset)

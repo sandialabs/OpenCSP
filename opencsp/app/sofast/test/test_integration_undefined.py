@@ -20,11 +20,11 @@ from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 class test_IntegrationUndefined(unittest.TestCase):
     def test_undefined(self):
         # Get test data location
-        base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+        base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Directory Setup
-        file_dataset = os.path.join(base_dir, 'calculations_undefined_mirror/data.h5')
-        file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
+        file_dataset = os.path.join(base_dir, 'data_expected_undefined_mirror/data.h5')
+        file_measurement = os.path.join(base_dir, 'data_measurement/measurement_facet.h5')
 
         # Load data
         camera = Camera.load_from_hdf(file_dataset)

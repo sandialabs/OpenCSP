@@ -13,18 +13,34 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def run_camera_position_calibration(save_dir):
-    """Calibrates the position of the Sofast camera. Saves the rvec/tvec that
-    define the relative pose of the camera/screen in a SpatialOrientation file
-    at ./data/output/spatial_orientation.h5
+def example_camera_position_calibration():
+    """Example Sofast calibration script
+
+    Calibrates the position of the Sofast camera:
+    1. Load measured calibration data
+    2. Perform camera position calibration
+    3. Save orientation as SpatialOrientation object
+    4. Save calculation figures
     """
-    # Define directory where screen shape calibration data is saved
-    base_dir_sofast_cal = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/data_measurement')
+    # General setup
+    # =============
+
+    # Define save dir
+    dir_save = join(dirname(__file__), 'data/output/camera_pose')
+    ft.create_directories_if_necessary(dir_save)
+
+    # Set up logger
+    lt.logger(join(dir_save, 'log.txt'), lt.log.INFO)
 
     # Define inputs
-    file_camera_sofast = join(base_dir_sofast_cal, 'camera_sofast.h5')
-    file_cal_image = join(base_dir_sofast_cal, 'image_sofast_camera.png')
-    file_pts_data = join(base_dir_sofast_cal, 'point_locations.csv')
+    file_camera_sofast = join(opencsp_code_dir(), 'test/data/sofast_common/camera_sofast.h5')
+    file_cal_image = join(
+        opencsp_code_dir(), 'test/data/camera_position_calibration/data_measurement/image_sofast_camera.png'
+    )
+    file_pts_data = join(opencsp_code_dir(), 'test/data/sofast_common/aruco_corner_locations.csv')
+
+    # 1. Load measured calibration data
+    # =================================
 
     # Load input data
     camera = Camera.load_from_hdf(file_camera_sofast)
@@ -35,10 +51,14 @@ def run_camera_position_calibration(save_dir):
     pts_xyz_marker = Vxyz(pts_marker_data[:, 2:].T)
     corner_ids = pts_marker_data[:, 1]
 
-    # Perform camera position calibraiton
+    # 2. Perform camera position calibration
+    # ======================================
     cal = CalibrationCameraPosition(camera, pts_xyz_marker, corner_ids, image)
     cal.make_figures = True
     cal.run_calibration()
+
+    # 3. Save orientation as SpatialOrientation object
+    # ================================================
 
     # Get orientation
     r_screen_cam, v_cam_screen_screen = cal.get_data()
@@ -52,25 +72,15 @@ def run_camera_position_calibration(save_dir):
     orientation = SpatialOrientation(r_cam_screen, v_cam_screen_cam)
 
     # Save data
-    orientation.save_to_hdf(join(save_dir, 'spatial_orientation.h5'))
+    orientation.save_to_hdf(join(dir_save, 'spatial_orientation.h5'))
 
-    # Save figures
+    # 4. Save calculation figures
+    # ===========================
     for fig in cal.figures:
-        file = join(save_dir, fig.get_label() + '.png')
+        file = join(dir_save, fig.get_label() + '.png')
         lt.info(f'Saving figure to: {file:s}')
         fig.savefig(file)
 
 
-def example_driver():
-    # Define save dir
-    save_path = join(dirname(__file__), 'data/output/camera_pose')
-    ft.create_directories_if_necessary(save_path)
-
-    # Set up logger
-    lt.logger(join(save_path, 'log.txt'))
-
-    run_camera_position_calibration(save_path)
-
-
 if __name__ == '__main__':
-    example_driver()
+    example_camera_position_calibration()

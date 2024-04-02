@@ -1,15 +1,11 @@
 """Example script that performs dot location calibration using photogrammetry.
-
-To create new test data, copy the results from the output folder into the
-"calculations" folder.
 """
 
-import os
-from os.path import join, dirname, exists
+from os.path import join
+import unittest
 
-import matplotlib
+import matplotlib.pyplot as plt
 import numpy as np
-import pytest
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.CalibrateSofastFixedDots import CalibrateSofastFixedDots
@@ -17,66 +13,84 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-@pytest.mark.skip("No unit test data (yet)")
-def test_FixedPatternSetupCalibrate():
-    """Tests dot-location calibration"""
-    # Define dot location images and origins
-    base_dir = join(opencsp_code_dir(), 'test', 'data', 'measurements_sofast_fixed', 'dot_location_calibration')
-    files = [
-        join(base_dir, 'measurements/images/DSC03965.JPG'),
-        join(base_dir, 'measurements/images/DSC03967.JPG'),
-        join(base_dir, 'measurements/images/DSC03970.JPG'),
-        join(base_dir, 'measurements/images/DSC03972.JPG'),
-    ]
-    origins = np.array(([4950, 4610, 4221, 3617], [3359, 3454, 3467, 3553]), dtype=float) / 4
-    origins = Vxy(origins.astype(int))
+class TestFixedPatternSetupCalibrate(unittest.TestCase):
+    @classmethod
+    def setUpClass(cls):
+        """Tests dot-location calibration"""
+        cls.dir_save = join(opencsp_code_dir(), 'app/sofast/test/data/output/dot_location_calibration')
+        ft.create_directories_if_necessary(cls.dir_save)
 
-    # Define other files
-    file_camera_marker = join(base_dir, 'measurements/camera_image_calibration.h5')
-    file_xyz_points = join(base_dir, 'measurements/point_locations.csv')
-    file_fpd_dot_locs_exp = join(base_dir, 'calculations/fixed_pattern_dot_locations.h5')
-    dir_save = join(dirname(__file__), 'data/output/dot_location_calibration')
+        # Set up logger
+        lt.logger(log_dir_body_ext=join(cls.dir_save, 'log.txt'), level=lt.log.ERROR)
 
-    if not exists(dir_save):
-        os.makedirs(dir_save)
+        # Define dot location images and origins
+        dir_meas = join(opencsp_code_dir(), 'test/data/dot_location_calibration/data_measurement')
+        dir_exp = join(opencsp_code_dir(), 'test/data/dot_location_calibration/data_expected')
+        files = [
+            join(dir_meas, 'images/DSC03992.JPG'),
+            join(dir_meas, 'images/DSC03993.JPG'),
+            join(dir_meas, 'images/DSC03994.JPG'),
+            join(dir_meas, 'images/DSC03995.JPG'),
+            join(dir_meas, 'images/DSC03996.JPG'),
+        ]
+        origins = np.array(([1201, 1120, 1135, 964, 918], [828, 857, 852, 851, 862]))
+        origins = Vxy(origins)
 
-    # Set up logger
-    lt.logger(log_dir_body_ext=join(dir_save, 'log.txt'), level=lt.log.INFO)
+        # Define other files
+        file_camera_calibration = join(dir_meas, 'camera_calibration.h5')
+        file_xyz_points = join(dir_meas, 'aruco_corner_locations.csv')
+        cls.file_fpd_dot_locs_exp = join(dir_exp, 'fixed_pattern_dot_locations.h5')
 
-    # Load marker corner locations
-    data = np.loadtxt(file_xyz_points, delimiter=',')
-    pts_xyz_corners = Vxyz(data[:, 2:5].T)
-    ids_corners = data[:, 1]
+        # Load marker corner locations
+        data = np.loadtxt(file_xyz_points, delimiter=',')
+        pts_xyz_corners = Vxyz(data[:, 2:5].T)
+        ids_corners = data[:, 1]
 
-    # Load expedted FPD dot locations
-    dot_locs_exp = DotLocationsFixedPattern.load_from_hdf(file_fpd_dot_locs_exp)
+        # Load cameras
+        camera_marker = Camera.load_from_hdf(file_camera_calibration)
 
-    # Load cameras
-    camera_marker = Camera.load_from_hdf(file_camera_marker)
+        # Perform dot location calibration
+        cal_dot_locs = CalibrateSofastFixedDots(
+            files, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
+        )
+        cal_dot_locs.plot = True
+        cal_dot_locs.blob_search_threshold = 3.0
+        cal_dot_locs.blob_detector.minArea = 3.0
+        cal_dot_locs.blob_detector.maxArea = 30.0
 
-    # Perform dot location calibration
-    cal_dot_locs = CalibrateSofastFixedDots(
-        files, origins, camera_marker, pts_xyz_corners, ids_corners, -32, 31, -31, 32
-    )
-    cal_dot_locs.plot = True
-    cal_dot_locs.blob_search_threshold = 3.0
-    cal_dot_locs.blob_detector.minArea = 3.0
-    cal_dot_locs.blob_detector.maxArea = 30.0
-    cal_dot_locs.run()
+        cal_dot_locs.run()
 
-    # Save data
-    dot_locs = cal_dot_locs.get_dot_location_object()
-    dot_locs.save_to_hdf(join(dir_save, 'fixed_pattern_dot_locations.h5'))
-    cal_dot_locs.save_figures(dir_save)
+        cls.cal = cal_dot_locs
 
-    # Test
-    np.testing.assert_allclose(dot_locs.xyz_dot_loc, dot_locs_exp.xyz_dot_loc)
-    np.testing.assert_allclose(dot_locs.x_dot_index, dot_locs_exp.x_dot_index)
-    np.testing.assert_allclose(dot_locs.y_dot_index, dot_locs_exp.y_dot_index)
+    def test_save_dot_location_hdf(self):
+        """Tests saving dot location data"""
+        dot_locs = self.cal.get_dot_location_object()
+        dot_locs.save_to_hdf(join(self.dir_save, 'fixed_pattern_dot_locations.h5'))
+
+    def test_save_figures(self):
+        """Tests saving figures"""
+        self.cal.save_figures(self.dir_save)
+
+    def test_dot_xyz_locations(self):
+        """Tests dot locations"""
+        # Load expected dot locations
+        dot_locs_exp = DotLocationsFixedPattern.load_from_hdf(self.file_fpd_dot_locs_exp)
+
+        dot_locs = self.cal.get_dot_location_object()
+
+        # Test
+        np.testing.assert_allclose(dot_locs.xyz_dot_loc, dot_locs_exp.xyz_dot_loc, atol=1e-6, rtol=0)
+        np.testing.assert_allclose(dot_locs.x_dot_index, dot_locs_exp.x_dot_index, atol=1e-6, rtol=0)
+        np.testing.assert_allclose(dot_locs.y_dot_index, dot_locs_exp.y_dot_index, atol=1e-6, rtol=0)
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        plt.close('all')
 
 
 if __name__ == '__main__':
-    test_FixedPatternSetupCalibrate()
+    unittest.main()

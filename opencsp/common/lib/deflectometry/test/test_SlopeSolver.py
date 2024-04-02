@@ -1,7 +1,7 @@
 """Unit test suite to test SlopeSolver class
 """
 
-import os
+from os.path import join
 import unittest
 
 import numpy as np
@@ -14,18 +14,22 @@ from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabol
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+import opencsp.common.lib.tool.hdf5_tools as h5
+import opencsp.common.lib.tool.file_tools as ft
 
 
 class TestSlopeSolver(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+        base_dir = join(opencsp_code_dir(), 'test/data/sofast_fringe')
+        # Save location
+        cls.dir_save = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/output/SlopeSolver')
+        ft.create_directories_if_necessary(cls.dir_save)
 
         # Define test data files for single facet processing
-        cls.data_file_facet = os.path.join(base_dir, 'calculations_facet/data.h5')
-        data_file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
+        cls.data_file_facet = join(base_dir, 'data_expected_facet/data.h5')
+        data_file_measurement = join(base_dir, 'data_measurement/measurement_facet.h5')
 
         # Create spatial orientation objects
         datasets = [
@@ -40,7 +44,7 @@ class TestSlopeSolver(unittest.TestCase):
             'DataSofastInput/surface_params/facet_000/surface_type',
         ]
         # Load data
-        data = load_hdf5_datasets(datasets, cls.data_file_facet)
+        data = h5.load_hdf5_datasets(datasets, cls.data_file_facet)
         measurement = MeasurementSofastFringe.load_from_hdf(data_file_measurement)
         ori = SpatialOrientation.load_from_hdf(cls.data_file_facet)
 
@@ -73,19 +77,24 @@ class TestSlopeSolver(unittest.TestCase):
         cls.data_slope = ss.get_data()
 
     def test_transform_alignment(self):
-        data = load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/trans_alignment'], self.data_file_facet)
+        data = h5.load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/trans_alignment'], self.data_file_facet)
 
         np.testing.assert_allclose(data['trans_alignment'], self.data_slope.trans_alignment.matrix, atol=1e-8, rtol=0)
 
     def test_int_pts(self):
-        data = load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/v_surf_points_facet'], self.data_file_facet)
+        data = h5.load_hdf5_datasets(
+            ['DataSofastCalculation/facet/facet_000/v_surf_points_facet'], self.data_file_facet
+        )
         np.testing.assert_allclose(
             data['v_surf_points_facet'], self.data_slope.v_surf_points_facet.data, atol=1e-8, rtol=0
         )
 
     def test_slopes(self):
-        data = load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/slopes_facet_xy'], self.data_file_facet)
+        data = h5.load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/slopes_facet_xy'], self.data_file_facet)
         np.testing.assert_allclose(data['slopes_facet_xy'], self.data_slope.slopes_facet_xy, atol=1e-8, rtol=0)
+
+    def test_save_hdf(self):
+        self.data_slope.save_to_hdf(join(self.dir_save, 'slope_solver_data.h5'))
 
 
 if __name__ == '__main__':

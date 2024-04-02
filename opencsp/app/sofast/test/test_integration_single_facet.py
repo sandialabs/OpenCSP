@@ -34,16 +34,16 @@ class TestSingle(unittest.TestCase):
         """
         # Get test data location
         if base_dir is None:
-            base_dir = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+            base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Find all test files
-        cls.files_dataset = glob.glob(os.path.join(base_dir, 'calculations_facet/data*.h5'))
+        cls.files_dataset = glob.glob(os.path.join(base_dir, 'data_expected_facet/data*.h5'))
         cls.files_dataset.sort()
         if len(cls.files_dataset) == 0:
             raise ValueError('No single-facet datsets found.')
 
         # Define component files
-        file_measurement = os.path.join(base_dir, 'measurement_facet.h5')
+        file_measurement = os.path.join(base_dir, 'data_measurement/measurement_facet.h5')
 
         # Load components
         measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
