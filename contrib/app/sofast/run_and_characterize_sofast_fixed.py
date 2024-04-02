@@ -59,10 +59,17 @@ def process(
     lt.info(f'Parabolic fit focal xy lengths: ({focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}) m')
 
     # Save data as HDF5 file
-    system_sofast_fixed.save_to_hdf(join(dir_save, f'sofast_fixed_data_{dt.now().isoformat().replace(":", "_"):s}.h5'))
+    file_save = join(dir_save, f'sofast_fixed_data_{dt.now().isoformat().replace(":", "_"):s}.h5')
+    system_sofast_fixed.save_to_hdf(file_save)
+    fixed_pattern_dot_locs.save_to_hdf(file_save)
+    orientation.save_to_hdf(file_save)
+    camera.save_to_hdf(file_save)
+    facet.save_to_hdf(file_save)
+    measurement.save_to_hdf(file_save)
+    surface.save_to_hdf(file_save)
 
     # Plot slope image
-    mirror = system_sofast_fixed.get_mirror()
+    mirror = system_sofast_fixed.get_mirror(interpolation_type='bilinear')
 
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
     axis_control_m = rca.meters()
@@ -84,8 +91,8 @@ def run(dir_save: str) -> None:
     """
     # Define user inputs
     v_measure_point_facet = Vxyz((0, 0, 0))
-    dist_optic_screen = 10.352  # m
-    pt_origin = Vxy((1134, 682))  # pixels
+    dist_optic_screen = 10.263  # m
+    pt_origin = Vxy((993, 644))  # pixels
     name = 'NSTTF Facet'
     width_pattern = 3  # pixels
     spacing_pattern = 6  # pixels
