@@ -113,7 +113,7 @@ class BlobIndex:
         # Make mask of valid points
         mask_dist_positive = dists_axis > 0
         dists_axis[dists_axis == 0] = np.nan
-        mask_ratio = dists_perp / dists_axis <= self.search_perp_axis_ratio
+        mask_ratio = (dists_perp / dists_axis) <= self.search_perp_axis_ratio
         mask = np.logical_and(mask_dist_positive, mask_ratio)
         # Check there are points to find
         if mask.sum() == 0:
