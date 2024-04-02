@@ -243,7 +243,7 @@ class SystemSofastFringe:
         on_capturing: Callable = None,
         on_captured: Callable = None,
         on_processing: Callable = None,
-        on_processed: Callable[[ImageCalibrationAbstract]] = None,
+        on_processed: Callable[[ImageCalibrationAbstract], None] = None,
     ) -> None:
         """Runs the projector-camera intensity calibration"""
 
@@ -295,7 +295,7 @@ class SystemSofastFringe:
         ----------
         run_next : Callable, optional
             Function that is called after all images are captured. The default
-            is self.close_all().
+            is self.close_all(). TODO is this still the default?
 
         """
         # Initialize mask image list
@@ -315,7 +315,7 @@ class SystemSofastFringe:
         ----------
         run_next : Callable
             Function that is called after all images are captured. The default
-            is self.close_all().
+            is self.close_all(). TODO is this still the default?
 
         """
         # Check fringes/camera have been loaded
@@ -342,7 +342,7 @@ class SystemSofastFringe:
         ----------
         run_next : Callable
             Function that is called after all images are captured. The default
-            is self.close_all().
+            is self.close_all(). TODO is this still the default?
 
         """
         # Check fringes/camera have been loaded

@@ -18,6 +18,7 @@ from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScali
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 import opencsp.app.sofast.lib.SofastServiceCallback as ssc
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as h5
 import opencsp.common.lib.tool.log_tools as lt
@@ -165,10 +166,16 @@ class SofastService:
             return True
         return False
 
-    def run_measurement(self, fringes: Fringes, on_done: Callable) -> None:
+    def run_measurement(self, fringes: Fringes, on_done: Callable = None) -> None:
         """Runs data collect and saved data."""
 
         # Get minimum display value from calibration
+        if self.calibration is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SofastService.run_measurement(): "
+                + "must run or provide calibration before starting a measurement.",
+            )
         min_disp_value = self.calibration.calculate_min_display_camera_values()[0]
 
         # Load fringes
@@ -208,8 +215,16 @@ class SofastService:
         """Shows plot of gray levels calibration data"""
         title = 'Projector-Camera Calibration Curve'
 
+        # Check that we have a calibration
+        if self.calibration is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SofastService.plot_gray_levels_cal(): "
+                + "must run or provide calibration before trying to plot calibration.",
+            )
+
         # Plot figure
-        fig = plt.figure()
+        fig = fm._mpl_pyplot_figure()
         ax = fig.gca()
         ax.plot(self.calibration.display_values, self.calibration.camera_values)
         ax.set_xlabel('Display Values')
@@ -240,7 +255,11 @@ class SofastService:
 
     def get_exposure(self) -> float | None:
         if self.image_acquisition is None:
-            return None
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SofastService.get_exposure(): "
+                + "must initialize image acquisition (camera) before attempting to get the exposure.",
+            )
         return self.image_acquisition.exposure_time
 
     def set_exposure(self, new_exp: float) -> None:
@@ -259,3 +278,12 @@ class SofastService:
         # Close image acquisition
         with et.ignored(Exception):
             self.image_acquisition = None
+
+        # Close system
+        with et.ignored(Exception):
+            self._system.close_all()
+        self.system = None
+
+        # Close plots
+        with et.ignored(Exception):
+            plt.close('all')
