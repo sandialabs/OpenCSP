@@ -658,7 +658,10 @@ class SofastGUI(ssc.SofastServiceCallback):
     def set_exposure(self) -> None:
         """Sets camera exposure time value to user defined value"""
         # Get current exposure_time value
-        cur_exp = self.service.get_exposure()
+        try:
+            cur_exp = self.service.get_exposure()
+        except RuntimeError:
+            cur_exp = None
 
         # Get new exposure_time value
         new_exp = simpledialog.askfloat(
