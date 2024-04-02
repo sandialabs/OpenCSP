@@ -115,8 +115,8 @@ class ImageAcquisitionAbstract(ABC):
         """
         Sets the camera's exposure so that only 1% of pixels are above the set
         saturation threshold. Uses a binary search algorithm.
-
         """
+        lt.info('Starting exposure calibration.')
 
         def _get_exposure_idxs():
             """Returns indices of under/over exposed images"""
@@ -165,13 +165,13 @@ class ImageAcquisitionAbstract(ABC):
 
         # Check if exposure is set
         max_iters = int(np.ceil(np.log2(exposure_values.size)) + 1)
-        for i in range(max_iters):
+        for _ in range(max_iters):
             # Get next exposure index to test
             idx = _get_next_exposure_idx()
 
             # Set exposure
             self.exposure_time = exposure_values[idx]
-            print('Trying: {}'.format(exposure_values[idx]))
+            lt.debug(f'Trying: {exposure_values[idx]}')
 
             # Capture image
             im = self.get_frame()
@@ -192,21 +192,19 @@ class ImageAcquisitionAbstract(ABC):
         if not _check_exposure_set():
             raise ValueError('Error with setting exposure.')
 
-        # Set final exposure and print results
+        # Set final exposure and log results
         exposure_value_set = exposure_values[_get_exposure_idxs()[0]]
         self.exposure_time = exposure_value_set
-        print(f'Exposure set to: {exposure_value_set}')
+        lt.info(f'Exposure set to: {exposure_value_set}')
 
     @abstractmethod
     def get_frame(self):
         """Gets a single frame from the camera"""
-        pass
 
     @property
     @abstractmethod
     def gain(self):
         """Camera gain value"""
-        pass
 
     @property
     @abstractmethod
@@ -226,13 +224,11 @@ class ImageAcquisitionAbstract(ABC):
     @abstractmethod
     def frame_size(self):
         """camera frame size (X pixels by Y pixels)"""
-        pass
 
     @property
     @abstractmethod
     def frame_rate(self):
         """Camera frame rate (units of FPS)"""
-        pass
 
     @property
     @abstractmethod
@@ -242,7 +238,6 @@ class ImageAcquisitionAbstract(ABC):
         Example: If camera outputs 8-bit images, max_value = 255
 
         """
-        pass
 
     @property
     @abstractmethod
@@ -251,7 +246,6 @@ class ImageAcquisitionAbstract(ABC):
         Returns camera exposure_time values to use when calibrating the exposure_time.
 
         """
-        pass
 
     @abstractmethod
     def close(self):
