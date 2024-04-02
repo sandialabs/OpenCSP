@@ -251,8 +251,10 @@ class TestImageProcessing(unittest.TestCase):
         self.assertEqual(len(blobs), 3761, 'Test number of blobs')
         np.testing.assert_allclose(
             blobs[0].data.squeeze(),
-            np.array([672.20654297, 1138.20654297]), rtol=0, atol=1e-6,
-            err_msg='First blob pixel location does not match expected'
+            np.array([672.20654297, 1138.20654297]),
+            rtol=0,
+            atol=1e-6,
+            err_msg='First blob pixel location does not match expected',
         )
 
     def test_detect_blobs_inverse(self):
@@ -271,8 +273,10 @@ class TestImageProcessing(unittest.TestCase):
         self.assertEqual(len(blobs), 1, 'Test number of blobs')
         np.testing.assert_allclose(
             blobs[0].data.squeeze(),
-            np.array([960.64105225, 796.42663574]), rtol=0, atol=1e-6,
-            err_msg='blob pixel location does not match expected'
+            np.array([960.64105225, 796.42663574]),
+            rtol=0,
+            atol=1e-6,
+            err_msg='blob pixel location does not match expected',
         )
 
 

@@ -31,9 +31,7 @@ def example_create_measurement_file_from_image():
 
     # 1. Load image
     # =============
-    file_meas = join(
-        opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_facet.h5'
-    )
+    file_meas = join(opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_facet.h5')
     measurement_old = MeasurementSofastFixed.load_from_hdf(file_meas)
     image = measurement_old.image
 
