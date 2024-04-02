@@ -111,7 +111,10 @@ class BlobIndex:
         dists_axis = v_search.dot(points_rel)  # Distance of points along search axis
         dists_perp = np.abs(v_perp.dot(points_rel))  # Distance of points from line
         # Make mask of valid points
-        mask = np.logical_and(dists_axis > 0, dists_perp / dists_axis <= self.search_perp_axis_ratio)
+        mask_dist_positive = dists_axis > 0
+        dists_axis[dists_axis == 0] = np.nan
+        mask_ratio = dists_perp / dists_axis <= self.search_perp_axis_ratio
+        mask = np.logical_and(mask_dist_positive, mask_ratio)
         # Check there are points to find
         if mask.sum() == 0:
             return False, (None, None)
