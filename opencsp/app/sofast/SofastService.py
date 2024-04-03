@@ -41,6 +41,24 @@ class SofastService:
     """ Available calibration objects to use """
 
     def __init__(self, callback: ssc.SofastServiceCallback = None) -> 'SofastService':
+        """Service object for standard callibration, measurement, and analysis with the SOFAST tool.
+
+        The goal of this class is to provide a standard interface for interactive use of SOFAST, such as from the SOFAST
+        GUI or from a RESTful interface. This class also tracks instances of other necessary classes, such as for a
+        camera or projector. When these instances are free'd they will have their own 'close()' methods evaluated as
+        well. The necessary classes are free'd in several situations, including at least:
+         - in SofastService.close()
+         - when the attribute is unset
+         - when SofastService is destructed
+
+        There are currently two SOFAST systems 'fringe' and 'fixed'. So far this server interacts with the 'fringe'
+        system, with possible extension to use the 'fixed' system in the future.
+
+        Params:
+        -------
+        callback : SofastServiceCallback
+            Callbacks for this instance, for when attributes get set or unset.
+        """
         self.callback = callback if callback else ssc.SofastServiceCallback()
 
         # Set defaults
@@ -80,26 +98,32 @@ class SofastService:
 
     @system.setter
     def system(self, val: SystemSofastFringe):
+        """Set or unset the system instance. Does NOT call system.close() when being unset."""
         if val is None:
             old = self._system
             self._system = None
             self.callback.on_system_unset(old)
+            # 'close_all()' also closes the acquisition and projection instances, which might not be desired
+            # old.close_all()
         else:
             self._system = val
             self.callback.on_system_set(val)
 
     @property
-    def image_projection(self) -> ImageProjection:
+    def image_projection(self) -> ImageProjection | None:
+        """The image projection (projector) instance. None if not yet set."""
         return self._image_projection
 
     @image_projection.setter
     def image_projection(self, val: ImageProjection):
+        """Set or unset the image projection (projector) instance. If being unset, then the instance's 'close()' method
+        will be evaluated."""
         if val is None:
             if self._image_projection is not None:
                 old_ip = self._image_projection
                 self._image_projection = None
                 self.callback.on_image_projection_unset(old_ip)
-                old_ip.close()
+                old_ip.close()  # release system resources
             self.system = None
         else:
             self._image_projection = val
@@ -107,17 +131,20 @@ class SofastService:
             self._load_system_elements()
 
     @property
-    def image_acquisition(self) -> ImageAcquisitionAbstract:
+    def image_acquisition(self) -> ImageAcquisitionAbstract | None:
+        """The image acquisition (camera) instance. None if not yet set."""
         return self._image_acquisition
 
     @image_acquisition.setter
     def image_acquisition(self, val: ImageAcquisitionAbstract):
+        """Set or unset the image acquisition (camera) instance. If being unset, then the instance's 'close()' method
+        will be evaluated."""
         if val is None:
             if self._image_acquisition is not None:
                 old_ia = self._image_acquisition
                 self._image_acquisition = None
                 self.callback.on_image_acquisition_unset(old_ia)
-                old_ia.close()
+                old_ia.close()  # release system resources
             self.system = None
         else:
             self._image_acquisition = val
@@ -125,15 +152,18 @@ class SofastService:
             self._load_system_elements()
 
     @property
-    def calibration(self) -> ImageCalibrationAbstract:
+    def calibration(self) -> ImageCalibrationAbstract | None:
+        """The grayscale calibration instance. None if not yet set"""
         return self._calibration
 
     @calibration.setter
     def calibration(self, val: ImageCalibrationAbstract):
+        """Set or unset the system instance. Does NOT call calibration.close() when being unset."""
         if val is None:
             old = self._calibration
             self._calibration = None
             self.callback.on_calibration_unset(old)
+            # old.close() # no such method
         else:
             self._calibration = val
             self.callback.on_calibration_set(val)
@@ -170,8 +200,11 @@ class SofastService:
         return False
 
     def run_measurement(self, fringes: Fringes, on_done: Callable = None) -> None:
-        """Runs data collect and saved data."""
+        """Runs data collection with the given fringes.
 
+        Once the data has been captured, the images will be available from the system instance. Similarly, the data can
+        then be processed with the system instance, such as with SystemSofastFringe.get_measurements().
+        """
         # Get minimum display value from calibration
         if self.calibration is None:
             lt.error_and_raise(
@@ -188,7 +221,8 @@ class SofastService:
         self.system.capture_mask_and_fringe_images(on_done)
 
     def run_exposure_cal(self) -> None:
-        """Runs camera exposure calibration"""
+        """Runs camera exposure calibration. This adjusts the exposure time of the camera to keep the pixels from being
+        under or over saturated."""
         if self.image_acquisition is None:
             lt.error_and_raise(RuntimeError, 'Camera must be connected.')
 
@@ -202,7 +236,8 @@ class SofastService:
             self.system.run_camera_exposure_calibration(run_next)
 
     def load_gray_levels_cal(self, hdf5_file_path_name_ext: str) -> None:
-        """Loads saved results of a projector-camera intensity calibration"""
+        """Loads saved results of a projector-camera intensity calibration, which can then be accessed via the
+        'calibration' instance."""
         # Load file
         datasets = ['ImageCalibration/calibration_type']
         cal_type = h5.load_hdf5_datasets(datasets, hdf5_file_path_name_ext)['calibration_type']
@@ -215,7 +250,8 @@ class SofastService:
             lt.error_and_raise(ValueError, f'Selected calibration type, {cal_type}, not supported.')
 
     def plot_gray_levels_cal(self) -> None:
-        """Shows plot of gray levels calibration data"""
+        """Shows plot of gray levels calibration data. When the close() method of this instance is called (or this
+        instance is destructed), the plot will be closed automatically."""
         title = 'Projector-Camera Calibration Curve'
 
         # Check that we have a calibration
@@ -257,6 +293,7 @@ class SofastService:
         # return fig_record
 
     def get_exposure(self) -> float | None:
+        """Returns the exposure time of the camera (seconds)."""
         if self.image_acquisition is None:
             lt.error_and_raise(
                 RuntimeError,
@@ -266,12 +303,16 @@ class SofastService:
         return self.image_acquisition.exposure_time
 
     def set_exposure(self, new_exp: float) -> None:
-        """Sets camera exposure time value to the given value"""
+        """Sets camera exposure time value to the given value (seconds)"""
         self.image_acquisition.exposure_time = new_exp
 
     def close(self) -> None:
         """
-        Closes all windows
+        Closes all windows and releases all contained objects. This includes:
+         - image_projection
+         - image_acquisition
+         - system
+         - plots
 
         """
         # Close image projection
