@@ -2,8 +2,11 @@
 and data capture. Can capture datasets and return HDF5 files.
 """
 
+import copy
 from typing import Callable
 
+import matplotlib.backend_bases
+import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -66,18 +69,13 @@ class SofastService:
         self._image_acquisition: ImageAcquisitionAbstract = None
         self._calibration: ImageCalibrationAbstract = None
         self._system: SystemSofastFringe = None
-        self._last_measurement: msf.MeasurementSofastFringe = None
-        """ The most recent sofast measurment object. """
+
+        # Track plots that will need to be eventually closed
+        self._open_plots: list[matplotlib.figure.Figure] = []
 
     def __del__(self):
         with et.ignored(Exception):
-            self.image_acquisition = None
-        with et.ignored(Exception):
-            self.image_projection = None
-        with et.ignored(Exception):
-            self._system.close_all()
-        with et.ignored(Exception):
-            self._system = None
+            self.close()
 
     @property
     def system(self) -> SystemSofastFringe:
@@ -271,6 +269,10 @@ class SofastService:
         ax.grid(True)
         ax.set_title('Projector-Camera Calibration Curve')
 
+        # Track this figure, to be closed eventually
+        self._open_plots.append(fig)
+        fig.canvas.mpl_connect('close_event', self._on_plot_closed)
+
         # TODO use RenderControlFigureRecord:
         # def plot_gray_levels_cal(self, fig_record: fm.RenderControlFigureRecord = None) -> fm.RenderControlFigureRecord:
         # # Create the plot
@@ -291,6 +293,16 @@ class SofastService:
         # ax.grid(True)
 
         # return fig_record
+
+    def _on_plot_closed(self, event: matplotlib.backend_bases.CloseEvent):
+        """Stop tracking plots that are still open when the plots get closed."""
+        to_remove = None
+        for fig in self._open_plots:
+            if fig.canvas == event.canvas:
+                to_remove = fig
+                break
+        if to_remove is not None:
+            self._open_plots.remove(to_remove)
 
     def get_exposure(self) -> float | None:
         """Returns the exposure time of the camera (seconds)."""
@@ -313,8 +325,11 @@ class SofastService:
          - image_acquisition
          - system
          - plots
-
         """
+        # Note that this method is called from the destructor, and so must be resilient to all the possible errors
+        # therein. More information can be found in the python documentation at
+        # https://docs.python.org/3/reference/datamodel.html#object.__del__
+
         # Close image projection
         with et.ignored(Exception):
             self.image_projection = None
@@ -329,5 +344,6 @@ class SofastService:
         self.system = None
 
         # Close plots
-        with et.ignored(Exception):
-            plt.close('all')
+        for fig in copy.copy(self._open_plots):
+            with et.ignored(Exception):
+                plt.close(fig)
