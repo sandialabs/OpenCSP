@@ -17,6 +17,7 @@ import opencsp.common.lib.tool.log_tools as lt
 def example_calibrate_sofast_fixed_dot_locations():
     """Performs a printed fixed pattern dot location calibration
     using photogrammetry
+
     1. Load measured calibration data
     2. Find origin dots in calibration images
     3. Perform dot location calibration

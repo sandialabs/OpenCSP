@@ -15,8 +15,9 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_create_measurement_file_from_image():
-    """Example that creates a SofastFixed measurement file from an image. The image has
+    """Creates a SofastFixed measurement file from an image. The image has
     a point LED light near origin dot.
+
     1. Load image
     2. Define measurement parameters
     3. Find location of origin point

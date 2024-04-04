@@ -9,12 +9,10 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 def example_show_camera_distortion():
-    """Example SOFAST script
+    """Plots visualization of camera distortion given a saved Camera HDF file
 
-    Plots visualization of camera distortion given a saved Camera HDF file
     1. Loads camera HDF file
     2. Plots distortion maps
-
     """
     # Define input camera file
     file = join(opencsp_code_dir(), 'test/data/sofast_common/camera_sofast.h5')

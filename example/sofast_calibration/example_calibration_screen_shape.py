@@ -14,9 +14,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_screen_shape_calibration():
-    """Example Sofast calibration script
+    """Calibrates the 3d shape of a screen using photogrammetry and projected Sofast fringes.
 
-    Calibrates the 3d shape of a screen:
     1. Load measured calibration data
     2. Perform screen shpae calibration
     3. Save 3d shape data as DisplayShape object

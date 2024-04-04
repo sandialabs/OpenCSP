@@ -12,6 +12,7 @@ import opencsp.common.lib.tool.log_tools as lt
 def example_calculate_dot_locations_from_display_shape():
     """Creates a DotLocationsFixedPattern object from previously created DisplayShape and
     ImageProjection files.
+
     1. Load DisplayShape and image projection files
     2. Define dot projection object
     3. Define DotLocationsFixedPattern object

@@ -13,7 +13,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_find_blobs_in_image():
-    """Example script that finds blobs in image, annotates image, and saves"""
+    """Finds blobs in image, annotates image, and saves"""
     # General Setup
     dir_save = join(dirname(__file__), 'data/output/find_blobs_in_image')
     ft.create_directories_if_necessary(dir_save)
