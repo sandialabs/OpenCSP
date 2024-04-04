@@ -16,9 +16,6 @@ from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionA
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as ImageAcquisition_DCAM
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import ImageAcquisition as ImageAcquisition_DCAM_color
 from opencsp.common.lib.camera.ImageAcquisition_MSMF import ImageAcquisition as ImageAcquisition_MSMF
-from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
-from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
-from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 import opencsp.app.sofast.lib.SofastServiceCallback as ssc
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
@@ -37,11 +34,6 @@ class SofastService:
         'MSMF Mono': ImageAcquisition_MSMF,
     }
     """ Defines camera objects to choose from (camera description, python type) """
-    cal_options: dict[str, type[ImageCalibrationAbstract]] = {
-        'Global': ImageCalibrationGlobal,
-        'Scaling': ImageCalibrationScaling,
-    }
-    """ Available calibration objects to use """
 
     def __init__(self, callback: ssc.SofastServiceCallback = None) -> 'SofastService':
         """Service object for standard callibration, measurement, and analysis with the SOFAST tool.
@@ -67,7 +59,6 @@ class SofastService:
         # Set defaults
         self._image_projection: ImageProjection = None
         self._image_acquisition: ImageAcquisitionAbstract = None
-        self._calibration: ImageCalibrationAbstract = None
         self._system: SystemSofastFringe = None
 
         # Track plots that will need to be eventually closed
@@ -149,23 +140,6 @@ class SofastService:
             self.callback.on_image_acquisition_set(val)
             self._load_system_elements()
 
-    @property
-    def calibration(self) -> ImageCalibrationAbstract | None:
-        """The grayscale calibration instance. None if not yet set"""
-        return self._calibration
-
-    @calibration.setter
-    def calibration(self, val: ImageCalibrationAbstract):
-        """Set or unset the system instance. Does NOT call calibration.close() when being unset."""
-        if val is None:
-            old = self._calibration
-            self._calibration = None
-            self.callback.on_calibration_unset(old)
-            # old.close() # no such method
-        else:
-            self._calibration = val
-            self.callback.on_calibration_set(val)
-
     def get_frame(self) -> np.ndarray:
         """
         Captures frame from camera
@@ -204,13 +178,13 @@ class SofastService:
         then be processed with the system instance, such as with SystemSofastFringe.get_measurements().
         """
         # Get minimum display value from calibration
-        if self.calibration is None:
+        if self.system.calibration is None:
             lt.error_and_raise(
                 RuntimeError,
                 "Error in SofastService.run_measurement(): "
                 + "must run or provide calibration before starting a measurement.",
             )
-        min_disp_value = self.calibration.calculate_min_display_camera_values()[0]
+        min_disp_value = self.system.calibration.calculate_min_display_camera_values()[0]
 
         # Load fringes
         self.system.load_fringes(fringes, min_disp_value)
@@ -232,77 +206,6 @@ class SofastService:
             lt.info('Running calibration with displayed white image.')
             run_next = self.image_projection.show_crosshairs
             self.system.run_camera_exposure_calibration(run_next)
-
-    def load_gray_levels_cal(self, hdf5_file_path_name_ext: str) -> None:
-        """Loads saved results of a projector-camera intensity calibration, which can then be accessed via the
-        'calibration' instance."""
-        # Load file
-        datasets = ['ImageCalibration/calibration_type']
-        cal_type = h5.load_hdf5_datasets(datasets, hdf5_file_path_name_ext)['calibration_type']
-
-        if cal_type == 'ImageCalibrationGlobal':
-            self.calibration = ImageCalibrationGlobal.load_from_hdf(hdf5_file_path_name_ext)
-        elif cal_type == 'ImageCalibrationScaling':
-            self.calibration = ImageCalibrationScaling.load_from_hdf(hdf5_file_path_name_ext)
-        else:
-            lt.error_and_raise(ValueError, f'Selected calibration type, {cal_type}, not supported.')
-
-    def plot_gray_levels_cal(self) -> None:
-        """Shows plot of gray levels calibration data. When the close() method of this instance is called (or this
-        instance is destructed), the plot will be closed automatically."""
-        title = 'Projector-Camera Calibration Curve'
-
-        # Check that we have a calibration
-        if self.calibration is None:
-            lt.error_and_raise(
-                RuntimeError,
-                "Error in SofastService.plot_gray_levels_cal(): "
-                + "must run or provide calibration before trying to plot calibration.",
-            )
-
-        # Plot figure
-        fig = fm._mpl_pyplot_figure()
-        ax = fig.gca()
-        ax.plot(self.calibration.display_values, self.calibration.camera_values)
-        ax.set_xlabel('Display Values')
-        ax.set_ylabel('Camera Values')
-        ax.grid(True)
-        ax.set_title('Projector-Camera Calibration Curve')
-
-        # Track this figure, to be closed eventually
-        self._open_plots.append(fig)
-        fig.canvas.mpl_connect('close_event', self._on_plot_closed)
-
-        # TODO use RenderControlFigureRecord:
-        # def plot_gray_levels_cal(self, fig_record: fm.RenderControlFigureRecord = None) -> fm.RenderControlFigureRecord:
-        # # Create the plot
-        # if fig_record is None:
-        #     fig_record = fm.setup_figure(
-        #         rcfg.RenderControlFigure(),
-        #         rca.image(grid=False),
-        #         vs.view_spec_im(),
-        #         title=title,
-        #         code_tag=f"{__file__}",
-        #         equal=False)
-
-        # # Plot the gray levels
-        # ax = fig_record.axis
-        # ax.plot(self.calibration.display_values, self.calibration.camera_values)
-        # ax.set_xlabel('Display Values')
-        # ax.set_ylabel('Camera Values')
-        # ax.grid(True)
-
-        # return fig_record
-
-    def _on_plot_closed(self, event: matplotlib.backend_bases.CloseEvent):
-        """Stop tracking plots that are still open when the plots get closed."""
-        to_remove = None
-        for fig in self._open_plots:
-            if fig.canvas == event.canvas:
-                to_remove = fig
-                break
-        if to_remove is not None:
-            self._open_plots.remove(to_remove)
 
     def get_exposure(self) -> int | None:
         """Returns the exposure time of the camera (microseconds)."""

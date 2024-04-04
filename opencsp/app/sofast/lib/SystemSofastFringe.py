@@ -64,8 +64,13 @@ class SystemSofastFringe:
         self.fringe_images_to_display: list[ndarray]
         self.mask_images_captured: list[ndarray]
         self.fringe_images_captured: list[ndarray]
-        self.calibration_display_values: ndarray
+        self._calibration_display_values: ndarray
         self.calibration_images: list[ndarray]
+        self.calibration: ImageCalibrationAbstract = None
+
+    def __del__(self):
+        # Close Fringe-specific objects
+        self.reset_all_measurement_data()
 
     def run(self) -> None:
         """
@@ -91,7 +96,10 @@ class SystemSofastFringe:
         self.fringe_images_captured = None
 
         self.calibration_images = None
-        self.calibration_display_values = None
+        self._calibration_display_values = None
+        with et.ignored(Exception):
+            self.calibration.close()
+        self.calibration = None
 
     def _create_mask_images_to_display(self) -> None:
         """
@@ -244,9 +252,27 @@ class SystemSofastFringe:
         on_capturing: Callable = None,
         on_captured: Callable = None,
         on_processing: Callable = None,
-        on_processed: Callable[[ImageCalibrationAbstract], None] = None,
+        on_processed: Callable = None,
     ) -> None:
-        """Runs the projector-camera intensity calibration"""
+        """Runs the projector-camera intensity calibration and stores the results in self.calibration_images and
+        self.calibration.
+
+        Params:
+        -------
+        calibration_class : type[ImageCalibrationAbstract]:
+            The type of calibration to use.
+        calibration_hdf5_path_name_ext : str, optional
+            The callback to execute when capturing is about to start. Default is None
+        on_capturing : Callable, optional
+            The callback to execute when capturing is about to start. Default is None
+        on_captured : Callable, optional
+            The callback to execute when capturing has finished. Default is None
+        on_processing : Callable, optional
+            The callback to execute when processing is about to start. Default is None
+        on_processed : Callable, optional
+            The callback to execute when processing has finished. At the point this callback is being called the
+            calibration attribute will be set. Default is None
+        """
 
         # Capture images
         def _func_0():
@@ -269,18 +295,18 @@ class SystemSofastFringe:
             # Get calibration images from System
             calibration_images = self.get_calibration_images()[0]  # only calibrating one camera
             # Load calibration object
-            calibration = calibration_class.from_data(calibration_images, self.calibration_display_values)
+            self.calibration = calibration_class.from_data(calibration_images, self._calibration_display_values)
             # Save calibration object
             if calibration_hdf5_path_name_ext != None:
-                calibration.save_to_hdf(calibration_hdf5_path_name_ext)
+                self.calibration.save_to_hdf(calibration_hdf5_path_name_ext)
             # Save calibration raw data
-            data = [self.calibration_display_values, calibration_images]
+            data = [self.calibration.display_values, calibration_images]
             datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
             if calibration_hdf5_path_name_ext != None:
                 h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
             # Run the "on done" callback
             if on_processed != None:
-                on_processed(calibration)
+                on_processed()
             # Continue
             self.run_next_in_queue()
 
@@ -359,7 +385,7 @@ class SystemSofastFringe:
     def run_display_camera_response_calibration(self, res: int = 10, run_next: Callable | None = None) -> None:
         """
         Calculates camera-projector response data. Data is saved in
-        calibration_display_values and calibration_images.
+        _calibration_display_values and calibration_images.
 
         Parameters
         ----------
@@ -371,17 +397,17 @@ class SystemSofastFringe:
 
         """
         # Generate grayscale values
-        self.calibration_display_values = np.arange(
+        self._calibration_display_values = np.arange(
             0, self.image_projection.max_int + 1, res, dtype=self.image_projection.display_data['projector_data_type']
         )
-        if self.calibration_display_values[-1] != self.image_projection.max_int:
-            self.calibration_display_values = np.concatenate(
-                (self.calibration_display_values, [self.image_projection.max_int])
+        if self._calibration_display_values[-1] != self.image_projection.max_int:
+            self._calibration_display_values = np.concatenate(
+                (self._calibration_display_values, [self.image_projection.max_int])
             )
 
         # Generate grayscale images
         cal_images_display = []
-        for dn in self.calibration_display_values:
+        for dn in self._calibration_display_values:
             # Create image
             array = (
                 np.zeros(

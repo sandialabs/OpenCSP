@@ -1,6 +1,5 @@
 import opencsp.common.lib.camera.ImageAcquisitionAbstract as iaa
 import opencsp.common.lib.deflectometry.ImageProjection as ip
-import opencsp.app.sofast.lib.ImageCalibrationAbstract as ica
 import opencsp.app.sofast.lib.SystemSofastFringe as ssf
 
 
@@ -21,12 +20,6 @@ class SofastServiceCallback:
         self.on_service_set()
 
     def on_image_acquisition_unset(self, image_acquisition: iaa.ImageAcquisitionAbstract):
-        self.on_service_unset()
-
-    def on_calibration_set(self, calibration: ica.ImageCalibrationAbstract):
-        self.on_service_set()
-
-    def on_calibration_unset(self, calibration: ica.ImageCalibrationAbstract):
         self.on_service_unset()
 
     def on_system_set(self, system: ssf.SystemSofastFringe):
