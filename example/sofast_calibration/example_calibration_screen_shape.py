@@ -27,7 +27,8 @@ def example_screen_shape_calibration():
 
     # Define save directory
     dir_save = join(dirname(__file__), 'data/output/screen_shape')
-    ft.create_directories_if_necessary(dir_save)
+    dir_save_figures = join(dir_save, 'figures')
+    ft.create_directories_if_necessary(dir_save_figures)
 
     # Set up logger
     lt.logger(join(dir_save, 'log.txt'), lt.log.INFO)
@@ -95,7 +96,7 @@ def example_screen_shape_calibration():
     # 4. Save calculation figures
     # ===========================
     for fig in cal.figures:
-        file = join(dir_save, fig.get_label() + '.png')
+        file = join(dir_save_figures, fig.get_label() + '.png')
         lt.info(f'Saving figure to: {file:s}')
         fig.savefig(file)
 
