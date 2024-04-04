@@ -210,10 +210,10 @@ class ImageAcquisitionAbstract(ABC):
     @abstractmethod
     def exposure_time(self) -> int:
         """Camera exposure_time value (microseconds)"""
-        pass
 
     @property
     def exposure_time_seconds(self) -> float:
+        """Camera exposure_time value (seconds)"""
         return self.exposure_time / 1_000_000
 
     @exposure_time_seconds.setter
