@@ -6,12 +6,13 @@ import opencsp.common.lib.tool.hdf5_tools as h5
 
 @dataclass
 class DistanceOpticScreen(h5.HDF5_IO_Abstract):
-    """Represents a distance measurement between the optic and the center of the screen. This measurement is typically
-    achieved by displaying the crosshairs from the SofastGUI and measuring from the origin of the optic
-    (measurement_point 0,0,0) to the center of the crosshairs.
+    """Represents a distance measurement between the optic and the origin of the screen coordinate system.
+    This measurement is typically achieved by displaying the crosshairs from the SofastGUI and measuring
+    from a point on the optic (measurement_point x,y,z) to the center of the crosshairs.
 
-    The optic's origin is typically the center of the optic for on-axis optics, such as with spherical or flat mirrors
-    that are symetric around their midpoint."""
+    The measure point is typically the center of the optic for on-axis optics, such as with spherical or flat
+    mirrors that are symmetric around their midpoint.
+    """
 
     v_measure_point_facet: Vxyz = field(default_factory=lambda: Vxyz((0.0, 0.0, 0.0)))
     """ Location of measure point, meters. """
