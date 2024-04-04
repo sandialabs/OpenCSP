@@ -127,7 +127,7 @@ class ImageProjection:
 
         """
         # Create new tkinter window
-        root = tkt._window()
+        root = tkt.window()
         # Instantiate class
         return cls(root, display_data)
 

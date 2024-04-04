@@ -30,7 +30,7 @@ class CalibrationGUI:
 
         """
         # Create tkinter object
-        self.root = tkt._window()
+        self.root = tkt.window()
 
         # Set title
         self.root.title('Camera Calibration')
@@ -276,7 +276,7 @@ class CalibrationGUI:
 
     def view_found_corners(self):
         # Create new window
-        root_corns = tkt._window(self.root, TopLevel=True)
+        root_corns = tkt.window(self.root, TopLevel=True)
 
         # Get number checkerboard points
         npts = self.get_npts()

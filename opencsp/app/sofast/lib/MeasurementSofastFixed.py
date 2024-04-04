@@ -5,7 +5,6 @@ import numpy as np
 import opencsp.app.sofast.lib.AbstractMeasurementSofast as ams
 import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.common.lib.geometry.Vxy import Vxy
-from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
@@ -28,10 +27,8 @@ class MeasurementSofastFixed(ams.AbstractMeasurementSofast):
         ----------
         image : np.ndarray
             (M, N) ndarray, measurement image
-        v_measure_point_facet : Vxyz
-            Location of measurem point on facet, meters
-        dist_optic_screen : float
-            Optic to screen distance, meters
+        dist_optic_screen_measure : DistanceOpticScreen
+            Measurement point on the optic, and distance from that point to the screen
         origin : Vxy
             The centroid of the origin dot, pixels
         date : datetime, optional
@@ -42,8 +39,6 @@ class MeasurementSofastFixed(ams.AbstractMeasurementSofast):
         super().__init__(dist_optic_screen_measure, date, name)
         self.image = image
         self.origin = origin
-        self.date = date
-        self.name = name
 
     @classmethod
     def load_from_hdf(cls, file: str, prefix='') -> 'MeasurementSofastFixed':

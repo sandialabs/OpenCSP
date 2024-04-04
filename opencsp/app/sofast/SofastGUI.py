@@ -36,7 +36,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         self.service = SofastService(self)
 
         # Create tkinter object
-        self.root = tkt._window()
+        self.root = tkt.window()
 
         # Set title
         self.root.title('SOFAST')
@@ -515,7 +515,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             # Load data
             image_projection_data = ImageProjection.load_from_hdf(file)
             # Create new window
-            projector_root = tkt._window(self.root, TopLevel=True)
+            projector_root = tkt.window(self.root, TopLevel=True)
             # Show window
             self.service.image_projection = ImageProjection(projector_root, image_projection_data)
 

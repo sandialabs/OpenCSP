@@ -202,5 +202,5 @@ if __name__ == '__main__':
     )
     if file_selected != '':
         # Create window
-        win = SelectImagePoints(tkt._window(), file_selected)
+        win = SelectImagePoints(tkt.window(), file_selected)
         win.run()

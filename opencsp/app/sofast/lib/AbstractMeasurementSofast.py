@@ -1,14 +1,10 @@
 """Measurement class for SofastFringe
 """
 
-from abc import ABC, abstractmethod
+from abc import ABC
 import datetime as dt
 
-import numpy as np
-
-from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 import opencsp.app.sofast.lib.DistanceOpticScreen as sod
-from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as h5
 
 
