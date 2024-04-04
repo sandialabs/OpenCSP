@@ -105,25 +105,13 @@ class SystemSofastFringe:
         """
         Creates black and white (in that order) images in active area for
         capturing mask of mirror.
-
         """
         self.mask_images_to_display = []
-
         # Create black image
-        array = np.zeros(
-            (self.image_projection.size_y, self.image_projection.size_x, 3),
-            dtype=self.image_projection.display_data['projector_data_type'],
-        )
+        array = np.array(self.image_projection.zeros())
         self.mask_images_to_display.append(array)
-
         # Create white image
-        array = (
-            np.zeros(
-                (self.image_projection.size_y, self.image_projection.size_x, 3),
-                dtype=self.image_projection.display_data['projector_data_type'],
-            )
-            + self.image_projection.max_int
-        )
+        array = np.array(self.image_projection.zeros()) + self.image_projection.max_int
         self.mask_images_to_display.append(array)
 
     def _measure_sequence_display(
