@@ -295,12 +295,13 @@ class SofastGUI(ssc.SofastServiceCallback):
         r += 1
 
         # Calibration type dropdown
-        self.var_cal_select = tkinter.StringVar(value=list(SofastService.cal_options.keys())[0])
+        cal_options = ImageCalibrationAbstract.get_cal_options()
+        self.var_cal_select = tkinter.StringVar(value=list(cal_options.keys())[0])
         lbl_cal_type = tkinter.Label(
             label_frame_settings, text='Select calibration method:', font=('calibre', 10, 'bold')
         )
         drop_cal_type = tkinter.OptionMenu(
-            label_frame_settings, self.var_cal_select, *list(SofastService.cal_options.keys())
+            label_frame_settings, self.var_cal_select, *list(cal_options.keys())
         )
         tkt.TkToolTip(drop_cal_type, 'Select type of Projector-Camera Brightness Calibration process to use.')
 
@@ -464,7 +465,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         """Checks if calibration is loaded. Returns True, if loaded,
         returns False and shows error message if not loaded.
         """
-        if self.service.calibration is None:  # Not loaded
+        if self.service.system.calibration is None:  # Not loaded
             messagebox.showerror('Error', 'Camera-Projector calibration must be loaded/performed.')
             return False
         else:  # Loaded
@@ -476,7 +477,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         sys = self.service.system
         if sys.fringe_images_captured is None or sys.mask_images_captured is None:
             raise ValueError('Measurement data has not been captured.')
-        elif self.service.calibration is None:
+        elif self.service.system.calibration is None:
             raise ValueError('Calibration data has not been processed.')
 
         # Check save name is valid
@@ -495,7 +496,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         measurement.save_to_hdf(file)
 
         # Save calibration data
-        self.service.calibration.save_to_hdf(file)
+        self.service.system.calibration.save_to_hdf(file)
 
     def load_image_acquisition(self) -> None:
         """Loads and connects to ImageAcquisition"""
@@ -590,7 +591,7 @@ class SofastGUI(ssc.SofastServiceCallback):
         self._check_system_loaded()
 
         # Get selected calibration type
-        cal_type = SofastService.cal_options[self.var_cal_select.get()]
+        cal_type = ImageCalibrationAbstract.get_cal_options()[self.var_cal_select.get()]
 
         # Let us know when each phase is starting/has finished
         def on_capturing():
@@ -599,12 +600,12 @@ class SofastGUI(ssc.SofastServiceCallback):
         def on_processing():
             print('Processing calibration data')
 
-        def on_processed(calibration: ImageCalibrationAbstract):
-            # Register the calibration
-            self.service.calibration = calibration
-
+        def on_processed():
             # Show crosshairs
             self.service.image_projection.show_crosshairs()
+
+            # Enable buttons
+            self._enable_btns()
 
             # Notify user
             self.var_gray_lvl_cal_status.set('Calibration data: Loaded/Saved')
@@ -629,11 +630,14 @@ class SofastGUI(ssc.SofastServiceCallback):
 
         # Load the calibration
         try:
-            self.service.load_gray_levels_cal(file)
+            self.service.system.calibration = ImageCalibrationAbstract.load_from_hdf_guess_type(file)
         except Exception as ex:
             messagebox.showerror('Error', repr(ex))
 
-        cal_type = self.service.calibration.get_calibration_name()
+        cal_type = self.service.system.calibration.get_calibration_name()
+
+        # Enable buttons
+        self._enable_btns()
 
         # Display message
         self.var_gray_lvl_cal_status.set('Calibration data: Loaded')
@@ -647,7 +651,7 @@ class SofastGUI(ssc.SofastServiceCallback):
             return
 
         # Plot figure
-        self.service.plot_gray_levels_cal()
+        self.service.system.calibration.plot_gray_levels()
 
         plt.show()
 
