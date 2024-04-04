@@ -13,8 +13,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_find_blobs_in_image():
-    """Example script that finds blobs in image, annotates image, and saves
-    """
+    """Example script that finds blobs in image, annotates image, and saves"""
     # General Setup
     dir_save = join(dirname(__file__), 'data/output/find_blobs_in_image')
     ft.create_directories_if_necessary(dir_save)
@@ -25,6 +24,10 @@ def example_find_blobs_in_image():
     file_meas = join(opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_facet.h5')
     measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
     image = measurement.image
+
+    # Load image from existing image file
+    # image = cv2.imread(file_jpg, cv2.IMREAD_GRAYSCALE)
+    # image = imageio.imread(file_png)
 
     # Detect blobs and annotate image
     params = cv.SimpleBlobDetector_Params()
