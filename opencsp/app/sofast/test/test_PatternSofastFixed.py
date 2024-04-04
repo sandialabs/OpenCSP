@@ -2,13 +2,13 @@ import unittest
 
 import numpy as np
 
-from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
+from opencsp.app.sofast.lib.PatternSofastFixed import PatternSofastFixed
 
 
-class TestSystemSofastFixed(unittest.TestCase):
+class TestPatternSofastFixed(unittest.TestCase):
     def test_FixedPatternDisplay(self):
         # Instantiate
-        pattern = SystemSofastFixed(100, 100, 10, 10)
+        pattern = PatternSofastFixed(100, 100, 10, 10)
 
         # Test screen fractions
         np.testing.assert_allclose(pattern.x_locs_frac, np.array([0.09, 0.29, 0.49, 0.69, 0.89]), rtol=0, atol=1e-6)
