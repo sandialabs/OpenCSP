@@ -17,6 +17,8 @@ import imageio.v3 as imageio
 import numpy as np
 import rawpy
 
+import opencsp.common.lib.tool.tk_tools as tkt
+
 
 class SelectImagePoints:
     """
@@ -200,5 +202,5 @@ if __name__ == '__main__':
     )
     if file_selected != '':
         # Create window
-        win = SelectImagePoints(tk.Tk(), file_selected)
+        win = SelectImagePoints(tkt.window(), file_selected)
         win.run()

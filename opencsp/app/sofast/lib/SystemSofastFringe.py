@@ -11,6 +11,7 @@ import numpy as np
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -440,7 +441,7 @@ class SystemSofastFringe:
             images.append(np.concatenate(ims, axis=2))
         return images
 
-    def get_measurements(self, v_measure_point: Vxyz, optic_screen_dist: float, name: str) -> list[Measurement]:
+    def get_measurements(self, v_measure_point: Vxyz, dist_optic_screen: float, name: str) -> list[Measurement]:
         """
         Returns measurement object once mask and fringe images have been
         captured.
@@ -449,7 +450,7 @@ class SystemSofastFringe:
         ----------
         v_measure_point : Vxyz
             Location of measure point in optic coordinates.
-        optic_screen_dist : float
+        dist_optic_screen : float
             Distance from mirror to center of screen during measurement.
         name : str
             Name/serial number of measurement.
@@ -469,13 +470,13 @@ class SystemSofastFringe:
         measurements = []
         for fringe_images, mask_images in zip(self.fringe_images_captured, self.mask_images_captured):
             # Create measurement object
+            dist_optic_screen_measure = osd.DistanceOpticScreen(v_measure_point, dist_optic_screen)
             kwargs = dict(
                 fringe_periods_x=np.array(self.fringes.periods_x),
                 fringe_periods_y=np.array(self.fringes.periods_y),
                 fringe_images=np.concatenate(fringe_images, axis=2),
                 mask_images=np.concatenate(mask_images, axis=2),
-                measure_point=v_measure_point,
-                optic_screen_dist=optic_screen_dist,
+                dist_optic_screen_measure=dist_optic_screen_measure,
                 date=dt.datetime.now(),
                 name=name,
             )

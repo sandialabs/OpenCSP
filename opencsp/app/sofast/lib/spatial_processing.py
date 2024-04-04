@@ -81,7 +81,7 @@ def r_from_position(v_cam_optic_cam: Vxyz, v_cam_screen_cam: Vxyz) -> Rotation:
 
 
 def refine_v_distance(
-    v_cam_optic_cam: Vxyz, optic_screen_dist: float, v_cam_screen_cam: Vxyz, v_meas_pt_optic_cam: Vxyz
+    v_cam_optic_cam: Vxyz, dist_optic_screen: float, v_cam_screen_cam: Vxyz, v_meas_pt_optic_cam: Vxyz
 ) -> Vxyz:
     """
     Refines the camera to optic translation vector so that measured optic
@@ -91,7 +91,7 @@ def refine_v_distance(
     ----------
     v_cam_optic_cam : Vxyz
         Camera to optic vector in camera coordinates.
-    optic_screen_dist : float
+    dist_optic_screen : float
         Measured optic to screen distance.
     v_cam_screen_cam : Vxyz
         Camera to screen vector in camera coordinates.
@@ -108,7 +108,7 @@ def refine_v_distance(
     def error_func(scale):
         # Calculate the distance error
         v_cam_meas_pt_cam = (v_cam_optic_cam * scale) + v_meas_pt_optic_cam
-        error = distance_error(v_cam_screen_cam, v_cam_meas_pt_cam, optic_screen_dist)
+        error = distance_error(v_cam_screen_cam, v_cam_meas_pt_cam, dist_optic_screen)
         return np.abs(error)
 
     # Perform optimization

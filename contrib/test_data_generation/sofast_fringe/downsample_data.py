@@ -5,6 +5,7 @@ import os
 import sys
 
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 sys.path.append(os.path.join(opencsp_code_dir(), '..'))
@@ -31,13 +32,15 @@ def downsample_measurement(file: str, n: int) -> Measurement:
     # Downsample measurement
     mask_images = ddg.downsample_images(measurement_orig.mask_images, n)
     fringe_images = ddg.downsample_images(measurement_orig.fringe_images, n)
+    dist_optic_screen_measure = osd.DistanceOpticScreen(
+        measurement_orig.v_measure_point_facet, measurement_orig.dist_optic_screen
+    )
     return Measurement(
         mask_images=mask_images,
         fringe_images=fringe_images,
         fringe_periods_x=measurement_orig.fringe_periods_x,
         fringe_periods_y=measurement_orig.fringe_periods_y,
-        measure_point=measurement_orig.measure_point,
-        optic_screen_dist=measurement_orig.optic_screen_dist,
+        dist_optic_screen_measure=dist_optic_screen_measure,
         date=measurement_orig.date,
         name=measurement_orig.name,
     )

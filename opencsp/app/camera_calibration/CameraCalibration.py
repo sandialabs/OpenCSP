@@ -20,6 +20,7 @@ import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class CalibrationGUI:
@@ -29,7 +30,7 @@ class CalibrationGUI:
 
         """
         # Create tkinter object
-        self.root = tkinter.Tk()
+        self.root = tkt.window()
 
         # Set title
         self.root.title('Camera Calibration')
@@ -275,7 +276,7 @@ class CalibrationGUI:
 
     def view_found_corners(self):
         # Create new window
-        root_corns = tkinter.Toplevel(self.root)
+        root_corns = tkt.window(self.root, TopLevel=True)
 
         # Get number checkerboard points
         npts = self.get_npts()

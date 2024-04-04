@@ -12,6 +12,7 @@ import opencsp.common.lib.file.SimpleCsv as sc
 from opencsp.common.lib.opencsp_path import opencsp_settings
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.process.subprocess_tools as st
+import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.hdf5_tools as h5
 import opencsp.common.lib.tool.image_tools as it
@@ -124,15 +125,21 @@ class SensitiveStringsSearcher:
 
         return is_binary_file
 
-    def _enqueue_binary_file_for_later_processing(self, file_path: str, file_name_ext: str):
+    def _enqueue_unknown_binary_files_for_later_processing(self, file_path: str, file_name_ext: str):
+        """If the given file is recognized as an allowed file, and it's fingerprint matches the allowed file, then we
+        can dismiss it from the list of unfound files and add it to the list of the accepted files.
+
+        However, if the given file isn't recognized or it's fingerprint is different, then add it to the unknown list,
+        to be dealt with later."""
         file_ff = ff.FileFingerprint.for_file(self.root_search_dir, file_path, file_name_ext)
 
         if file_ff in self.allowed_binary_files:
             # we already know and trust this binary file
-            self.unfound_allowed_binary_files.remove(file_ff)
+            with et.ignored(ValueError):
+                self.unfound_allowed_binary_files.remove(file_ff)
             self.accepted_binary_files.append(file_ff)
         else:
-            # we'll deal with unknown files as a group
+            # we'll deal with unknown files as a group later
             self.unknown_binary_files.append(file_ff)
 
     def parse_file(self, file_path: str, file_name_ext: str) -> list[str]:
@@ -437,7 +444,7 @@ class SensitiveStringsSearcher:
                 # need to check this file
                 if self._is_binary_file(file_path, file_name_ext):
                     # deal with non-parseable binary files as a group, below
-                    self._enqueue_binary_file_for_later_processing(file_path, file_name_ext)
+                    self._enqueue_unknown_binary_files_for_later_processing(file_path, file_name_ext)
                 else:
                     # check text files for sensitive strings
                     file_matches = self.search_file(file_path, file_name_ext)

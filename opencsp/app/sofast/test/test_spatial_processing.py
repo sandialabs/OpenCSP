@@ -43,7 +43,7 @@ class TestSpatialProcessing(unittest.TestCase):
         # Perform calculation
         v_cam_optic_cam_exp = sp.t_from_distance(
             Vxy(data['v_mask_centroid_image']),
-            measurement.optic_screen_dist,
+            measurement.dist_optic_screen,
             self.camera,
             self.orientation.v_cam_screen_cam,
         ).data.squeeze()
@@ -104,7 +104,7 @@ class TestSpatialProcessing(unittest.TestCase):
 
         # Perform calculation
         error_optic_screen_dist_2 = sp.distance_error(
-            self.orientation.v_cam_screen_cam, Vxyz(data['v_cam_optic_cam_refine_2']), measurement.optic_screen_dist
+            self.orientation.v_cam_screen_cam, Vxyz(data['v_cam_optic_cam_refine_2']), measurement.dist_optic_screen
         )
 
         # Test
@@ -147,10 +147,10 @@ class TestSpatialProcessing(unittest.TestCase):
 
         # Perform calculation
         r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1'])
-        v_meas_pt_optic_cam = measurement.measure_point.rotate(r_cam_optic)
+        v_meas_pt_optic_cam = measurement.v_measure_point_facet.rotate(r_cam_optic)
         v_cam_optic_cam_refine_2 = sp.refine_v_distance(
             Vxyz(data['v_cam_optic_cam_refine_1']),
-            measurement.optic_screen_dist,
+            measurement.dist_optic_screen,
             self.orientation.v_cam_screen_cam,
             v_meas_pt_optic_cam,
         ).data.squeeze()
