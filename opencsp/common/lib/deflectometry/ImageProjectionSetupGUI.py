@@ -81,7 +81,7 @@ class ImageProjectionGUI:
         self.display_data: dict
 
         # Create tkinter object
-        self.root = tkt._window()
+        self.root = tkt.window()
 
         # Set title
         self.root.title('ImageProjection Setup')
@@ -202,7 +202,7 @@ class ImageProjectionGUI:
         self.update_window_size()
 
         # Create a new Toplevel window
-        projector_root = tkt._window(self.root, Toplevel=True)
+        projector_root = tkt.window(self.root, Toplevel=True)
         self.projector = ImageProjection(projector_root, self.display_data)
 
         # Activate buttons

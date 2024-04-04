@@ -271,7 +271,7 @@ class HDF5_IO_Abstract(HDF5_SaveAbstract):
         Parameters
         ----------
         file : str
-            HDF file to save to
+            HDF file to load from
         prefix : str, optional
             Prefix to append to folder path within HDF file (folders must be separated by "/").
             Default is empty string ''.

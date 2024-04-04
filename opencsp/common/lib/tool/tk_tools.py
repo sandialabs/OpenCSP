@@ -37,7 +37,7 @@ class TkToolTip(object):
         x += self.widget.winfo_rootx() + self.widget.winfo_width()
         y += self.widget.winfo_rooty() + self.widget.winfo_height()
         # Creates a toplevel window
-        self.tw = _window(self.widget, TopLevel=True)
+        self.tw = window(self.widget, TopLevel=True)
         # Leaves only the label and removes the app window
         self.tw.wm_overrideredirect(True)
         self.tw.wm_geometry(f"+{x:d}+{y:d}")
@@ -59,7 +59,7 @@ class TkToolTip(object):
             tw.destroy()
 
 
-def _window(*vargs, TopLevel=False, **kwargs):
+def window(*vargs, TopLevel=False, **kwargs):
     """Initializes and returns a new tkinter.Tk (or tkinter.TopLevel) instance.
 
     If creating the window fails, tries again (up to two more times).

@@ -8,7 +8,6 @@ import numpy as np
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 import opencsp.app.sofast.lib.AbstractMeasurementSofast as ams
 import opencsp.app.sofast.lib.DistanceOpticScreen as osd
-from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
