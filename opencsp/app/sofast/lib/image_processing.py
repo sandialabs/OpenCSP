@@ -474,7 +474,7 @@ def detect_blobs_inverse(image: np.ndarray, params: cv.SimpleBlobDetector_Params
     Parameters
     ----------
     image : np.ndarray
-        Input image, uint8
+        2D input image, single color channel, NxM or NxMx1, uint8
     params : cv.SimpleBlobDetector_Params
         Blob parameters
 
@@ -498,7 +498,7 @@ def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Param
     Parameters
     ----------
     image : np.ndarray
-        Input image, uint8
+        2D input image, single color channel, NxM or NxMx1, uint8
     params : cv.SimpleBlobDetector_Params
         Blob parameters
 
@@ -520,7 +520,7 @@ def detect_blobs_inverse_annotate(image: np.ndarray, params: cv.SimpleBlobDetect
     Parameters
     ----------
     image : np.ndarray
-        Input image, uint8
+        2D input image, single color channel, NxM or NxMx1, uint8
     params : cv.SimpleBlobDetector_Params
         Blob parameters
 
@@ -539,7 +539,7 @@ def _detect_blobs_keypoints(image: np.ndarray, params: cv.SimpleBlobDetector_Par
     Parameters
     ----------
     image : np.ndarray
-        Input image, uint8
+        2D input image, single color channel, NxM or NxMx1, uint8
     params : cv.SimpleBlobDetector_Params
         Blob parameters
 
