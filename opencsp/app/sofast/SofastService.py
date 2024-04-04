@@ -304,8 +304,8 @@ class SofastService:
         if to_remove is not None:
             self._open_plots.remove(to_remove)
 
-    def get_exposure(self) -> float | None:
-        """Returns the exposure time of the camera (seconds)."""
+    def get_exposure(self) -> int | None:
+        """Returns the exposure time of the camera (microseconds)."""
         if self.image_acquisition is None:
             lt.error_and_raise(
                 RuntimeError,
@@ -314,9 +314,9 @@ class SofastService:
             )
         return self.image_acquisition.exposure_time
 
-    def set_exposure(self, new_exp: float) -> None:
-        """Sets camera exposure time value to the given value (seconds)"""
-        self.image_acquisition.exposure_time = new_exp
+    def set_exposure(self, new_exp: int) -> None:
+        """Sets camera exposure time value to the given value (microseconds)"""
+        self.image_acquisition.exposure_time = int(new_exp)
 
     def close(self) -> None:
         """
