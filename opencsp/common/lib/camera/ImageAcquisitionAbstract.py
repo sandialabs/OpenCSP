@@ -100,9 +100,17 @@ class ImageAcquisitionAbstract(ABC):
         pass
 
     @abstractproperty
-    def exposure_time(self):
-        """Camera exposure_time value (units of time)"""
+    def exposure_time(self) -> int:
+        """Camera exposure_time value (microseconds)"""
         pass
+
+    @property
+    def exposure_time_seconds(self) -> float:
+        return self.exposure_time / 1_000_000
+
+    @exposure_time_seconds.setter
+    def exposure_time_seconds(self, exposure_time_seconds: float):
+        self.exposure_time = int(exposure_time_seconds / 1_000_000)
 
     @abstractproperty
     def frame_size(self):
