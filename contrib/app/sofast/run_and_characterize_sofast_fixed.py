@@ -45,7 +45,7 @@ def process(
     facet: DefinitionFacet,
     measurement: MeasurementSofastFixed,
     surface: Surface2DParabolic,
-    dir_save: str
+    dir_save: str,
 ) -> None:
     """Performs processing of measured dot data"""
     # Process fixed pattern
@@ -103,9 +103,7 @@ def run(dir_save: str) -> None:
 
     # Load data
     file_camera = join(dir_cal_files, 'Camera_optics_lab_landscape.h5')
-    file_dot_location = join(
-        dir_cal_files, f'fixed_pattern_dot_locations_w{width_pattern:d}_s{spacing_pattern:d}.h5'
-    )
+    file_dot_location = join(dir_cal_files, f'fixed_pattern_dot_locations_w{width_pattern:d}_s{spacing_pattern:d}.h5')
     file_spatial_orientation = join(dir_cal_files, 'spatial_orientation_optics_lab.h5')
     file_facet_data = join(dir_cal_files, 'Facet_NSTTF.json')
     file_image_projection = join(dir_cal_files, 'Image_Projection_optics_lab_landscape_square.h5')
