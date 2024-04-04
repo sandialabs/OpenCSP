@@ -15,7 +15,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_process_single_facet():
+def example_process_facet():
     """Example Sofast script that processes a SofastFixed measurement of a single facet mirror
     1. Load saved single facet SofastFixed collection data
     2. Process data with SofastFixed
@@ -85,4 +85,4 @@ def example_process_single_facet():
 
 
 if __name__ == '__main__':
-    example_process_single_facet()
+    example_process_facet()
