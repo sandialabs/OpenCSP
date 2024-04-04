@@ -1,10 +1,11 @@
-import os
+from os.path import join, dirname
 
 import matplotlib.pyplot as plt
 
 from opencsp.app.camera_calibration.lib.calibration_camera import view_distortion
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+import opencsp.common.lib.tool.file_tools as ft
 
 
 def example_show_camera_distortion():
@@ -16,7 +17,7 @@ def example_show_camera_distortion():
 
     """
     # Define input camera file
-    file = os.path.join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe/camera.h5')
+    file = join(opencsp_code_dir(), 'test/data/sofast_common/camera_sofast.h5')
 
     # Load camera
     cam = Camera.load_from_hdf(file)
@@ -31,10 +32,10 @@ def example_show_camera_distortion():
     view_distortion(cam, ax1, ax2, ax3)
 
     # Save image
-    dir_save = os.path.join(os.path.dirname(__file__), 'data/output/camera_distortion')
-    if not os.path.exists(dir_save):
-        os.makedirs(dir_save)
-    fig.savefig(os.path.join(dir_save, 'distortion_plot.png'))
+    dir_save = join(dirname(__file__), 'data/output/camera_distortion')
+    ft.create_directories_if_necessary(dir_save)
+    fig.savefig(join(dir_save, 'distortion_plot.png'))
+    plt.close('all')
 
 
 if __name__ == '__main__':
