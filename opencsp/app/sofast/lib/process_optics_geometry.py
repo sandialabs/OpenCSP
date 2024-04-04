@@ -27,7 +27,7 @@ def process_singlefacet_geometry(
     facet_data: DefinitionFacet,
     mask_raw: ndarray,
     v_measure_point_facet: Vxyz,
-    optic_screen_dist: float,
+    dist_optic_screen: float,
     orientation: SpatialOrientation,
     camera: Camera,
     params: ParamsOpticGeometry = ParamsOpticGeometry(),
@@ -49,7 +49,7 @@ def process_singlefacet_geometry(
         Raw calculated mask
     v_measure_point_facet : Vxyz
         Measure point location on facet, meters
-    optic_screen_dist : float
+    dist_optic_screen : float
         Optic to screen distance, meters
     orientation : SpatialOrientation
         SpatialOrientation object
@@ -122,7 +122,7 @@ def process_singlefacet_geometry(
 
     # Find expected position of optic centroid
     v_cam_optic_centroid_cam_exp = sp.t_from_distance(
-        v_mask_centroid_image, optic_screen_dist, camera, ori.v_cam_screen_cam
+        v_mask_centroid_image, dist_optic_screen, camera, ori.v_cam_screen_cam
     )
     data_geometry_general.v_cam_optic_centroid_cam_exp = v_cam_optic_centroid_cam_exp
 
@@ -202,7 +202,7 @@ def process_singlefacet_geometry(
 
     # Refine V with measured optic to display distance
     v_cam_optic_cam_refine_2 = sp.refine_v_distance(
-        v_cam_optic_cam_refine_1, optic_screen_dist, ori.v_cam_screen_cam, v_measure_point_optic_cam_refine_1
+        v_cam_optic_cam_refine_1, dist_optic_screen, ori.v_cam_screen_cam, v_measure_point_optic_cam_refine_1
     )
     data_geometry_general.v_cam_optic_cam_refine_2 = v_cam_optic_cam_refine_2
 
@@ -223,27 +223,27 @@ def process_singlefacet_geometry(
     data_geometry_facet.u_cam_measure_point_facet = u_cam_measure_point_facet
 
     # Calculate errors from using only facet corners
-    error_optic_screen_dist_1 = sp.distance_error(
-        ori.v_cam_screen_cam, v_cam_optic_cam_refine_1 + v_measure_point_optic_cam_refine_1, optic_screen_dist
+    error_dist_optic_screen_1 = sp.distance_error(
+        ori.v_cam_screen_cam, v_cam_optic_cam_refine_1 + v_measure_point_optic_cam_refine_1, dist_optic_screen
     )
-    data_error.error_optic_screen_dist_1 = error_optic_screen_dist_1
+    data_error.error_dist_optic_screen_1 = error_dist_optic_screen_1
     error_reprojection_1 = sp.reprojection_error(
         camera, v_facet_corners, loop_facet_image_refine.vertices, r_optic_cam_refine_1, v_cam_optic_cam_refine_1
     )
     data_error.error_reprojection_1 = error_reprojection_1
 
     # Calculate errors after refining with measured distance
-    error_optic_screen_dist_2 = sp.distance_error(
-        ori.v_cam_screen_cam, v_cam_optic_cam_refine_2 + v_measure_point_optic_cam_refine_1, optic_screen_dist
+    error_dist_optic_screen_2 = sp.distance_error(
+        ori.v_cam_screen_cam, v_cam_optic_cam_refine_2 + v_measure_point_optic_cam_refine_1, dist_optic_screen
     )
-    data_error.error_optic_screen_dist_2 = error_optic_screen_dist_2
+    data_error.error_dist_optic_screen_2 = error_dist_optic_screen_2
     error_reprojection_2 = sp.reprojection_error(
         camera, v_facet_corners, loop_facet_image_refine.vertices, r_optic_cam_refine_1, v_cam_optic_cam_refine_2
     )
     data_error.error_reprojection_2 = error_reprojection_2
 
     # Save other data
-    data_geometry_facet.measure_point_screen_distance = optic_screen_dist
+    data_geometry_facet.measure_point_screen_distance = dist_optic_screen
     data_geometry_facet.spatial_orientation = ori
     data_geometry_facet.v_align_point_facet = v_centroid_facet
 
@@ -259,7 +259,7 @@ def process_singlefacet_geometry(
 def process_undefined_geometry(
     mask_raw: ndarray,
     mask_keep_largest_area: bool,
-    optic_screen_dist: float,
+    dist_optic_screen: float,
     orientation: SpatialOrientation,
     camera: Camera,
     debug: DebugOpticsGeometry = DebugOpticsGeometry(),
@@ -278,7 +278,7 @@ def process_undefined_geometry(
         Raw calculated mask
     mask_keep_largest_area : bool
         To apply the "keep largest area" mask operation
-    optic_screen_dist : float
+    dist_optic_screen : float
         Optic centroid to screen distance, meters
     orientation : SpatialOrientation
         SpatialOrientation object
@@ -329,7 +329,7 @@ def process_undefined_geometry(
     data_image_processing_general.v_mask_centroid_image = v_mask_centroid_image
 
     # Find position of optic centroid in space
-    v_cam_optic_cam = sp.t_from_distance(v_mask_centroid_image, optic_screen_dist, camera, orientation.v_cam_screen_cam)
+    v_cam_optic_cam = sp.t_from_distance(v_mask_centroid_image, dist_optic_screen, camera, orientation.v_cam_screen_cam)
     data_geometry_general.v_cam_optic_cam_exp = v_cam_optic_cam
 
     # Find orientation of optic
@@ -345,7 +345,7 @@ def process_undefined_geometry(
 
     # Save processed optic data
     data_geometry_facet.u_cam_measure_point_facet = u_cam_measure_point_facet
-    data_geometry_facet.measure_point_screen_distance = optic_screen_dist
+    data_geometry_facet.measure_point_screen_distance = dist_optic_screen
     data_geometry_facet.spatial_orientation = spatial_orientation
     data_geometry_facet.v_align_point_facet = Vxyz((0, 0, 0))
 
@@ -365,7 +365,7 @@ def process_multifacet_geometry(
     v_meas_pt_ensemble: Vxyz,
     orientation: SpatialOrientation,
     camera: Camera,
-    optic_screen_dist: float,
+    dist_optic_screen: float,
     params: ParamsOpticGeometry = ParamsOpticGeometry(),
     debug: DebugOpticsGeometry = DebugOpticsGeometry(),
 ) -> tuple[
@@ -391,7 +391,7 @@ def process_multifacet_geometry(
         SpatialOrientation object
     camera : Camera
         Camera object
-    optic_screen_dist : float
+    dist_optic_screen : float
         Optic to screen distance, meters
     params : ParamsOpticGeometry, optional
         ParamsOpticGeometry object, by default ParamsOpticGeometry()
@@ -483,7 +483,7 @@ def process_multifacet_geometry(
 
     # Calculate expected position of ensemble centroid
     v_cam_ensemble_cent_cam_exp = sp.t_from_distance(
-        v_mask_centroid_image, optic_screen_dist, camera, orientation.v_cam_screen_cam
+        v_mask_centroid_image, dist_optic_screen, camera, orientation.v_cam_screen_cam
     )
     data_geometry_general.v_cam_optic_centroid_cam_exp = v_cam_ensemble_cent_cam_exp
 
@@ -597,15 +597,15 @@ def process_multifacet_geometry(
 
     # Refine T with measured distance
     v_cam_ensemble_cam_refine_3 = sp.refine_v_distance(
-        v_cam_ensemble_cam_refine_2, optic_screen_dist, orientation.v_cam_screen_cam, v_meas_pt_ensemble_cam_refine_2
+        v_cam_ensemble_cam_refine_2, dist_optic_screen, orientation.v_cam_screen_cam, v_meas_pt_ensemble_cam_refine_2
     )
     data_geometry_general.v_cam_optic_cam_refine_3 = v_cam_ensemble_cam_refine_3
 
     # Calculate error 1 (R/T calculated using only ensemble perimeter points)
-    error_optic_screen_dist_1 = sp.distance_error(
-        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_1 + v_meas_pt_ensemble_cam_refine_1, optic_screen_dist
+    error_dist_optic_screen_1 = sp.distance_error(
+        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_1 + v_meas_pt_ensemble_cam_refine_1, dist_optic_screen
     )
-    data_error.error_optic_screen_dist_1 = error_optic_screen_dist_1
+    data_error.error_dist_optic_screen_1 = error_dist_optic_screen_1
     error_reprojection_1 = sp.reprojection_error(
         camera,
         v_ensemble_corns_ensemble,
@@ -616,10 +616,10 @@ def process_multifacet_geometry(
     data_error.error_reprojection_1 = error_reprojection_1
 
     # Calculate error 2 (R/T calculated using all facet corners)
-    error_optic_screen_dist_2 = sp.distance_error(
-        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_2 + v_meas_pt_ensemble_cam_refine_2, optic_screen_dist
+    error_dist_optic_screen_2 = sp.distance_error(
+        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_2 + v_meas_pt_ensemble_cam_refine_2, dist_optic_screen
     )
-    data_error.error_optic_screen_dist_2 = error_optic_screen_dist_2
+    data_error.error_dist_optic_screen_2 = error_dist_optic_screen_2
     error_reprojection_2 = sp.reprojection_error(
         camera,
         v_ensemble_facet_corns_all,
@@ -630,10 +630,10 @@ def process_multifacet_geometry(
     data_error.error_reprojection_2 = error_reprojection_2
 
     # Calculate error 3 (T refined using measured distance)
-    error_optic_screen_dist_3 = sp.distance_error(
-        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_3 + v_meas_pt_ensemble_cam_refine_2, optic_screen_dist
+    error_dist_optic_screen_3 = sp.distance_error(
+        orientation.v_cam_screen_cam, v_cam_ensemble_cam_refine_3 + v_meas_pt_ensemble_cam_refine_2, dist_optic_screen
     )
-    data_error.error_optic_screen_dist_3 = error_optic_screen_dist_3
+    data_error.error_dist_optic_screen_3 = error_dist_optic_screen_3
     error_reprojection_3 = sp.reprojection_error(
         camera,
         v_ensemble_facet_corns_all,

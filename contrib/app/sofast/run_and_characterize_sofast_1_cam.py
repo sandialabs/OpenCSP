@@ -35,7 +35,7 @@ def main():
     output_file = None
 
     # Define measurement parameters
-    optic_screen_dist = 10.516  # meter
+    dist_optic_screen = 10.516  # meter
     optic_name = 'NSTTF Facet'
     optic_measure_point = Pxyz((0, 0, 0))  # meter
 
@@ -126,7 +126,7 @@ def main():
     print('Saving Data')
 
     # Get Measurement object
-    measurement = system.get_measurements(optic_measure_point, optic_screen_dist, optic_name)[0]
+    measurement = system.get_measurements(optic_measure_point, dist_optic_screen, optic_name)[0]
     calibration = calibrations[0]
 
     # Process data

@@ -41,7 +41,7 @@ def main():
     output_file_base = None
 
     # Define measurement parameters
-    optic_screen_dist = 10.516  # meter
+    dist_optic_screen = 10.516  # meter
     optic_name = 'NSTTF Facet'
     optic_measure_point = Pxyz((0, 0, 0))  # meter
 
@@ -152,7 +152,7 @@ def main():
     print('Saving Data')
 
     # Get Measurement object
-    measurements = system.get_measurements(optic_measure_point, optic_screen_dist, optic_name)
+    measurements = system.get_measurements(optic_measure_point, dist_optic_screen, optic_name)
 
     # Process data
     print('Processing data')

@@ -25,6 +25,38 @@ class Fringes:
         self.num_y_images = np.size(periods_y) * self.phase_shifts_y
         self.num_images = self.num_y_images + self.num_x_images
 
+    @classmethod
+    def from_num_periods(cls, fringe_periods_x=4, fringe_periods_y=4) -> 'Fringes':
+        """Creates fringes to be displayed during run_measurement().
+
+        The fringes are displayed as sinusoidal grayscale images. A value of 1 means that only a single large sinusoidal
+        will be used. A higher value will display more images with a faster sinusoidal. Therefore, a higher value will
+        result in finer slope resolution, up to the resolving power of the optical setup.
+
+        Note that a different number of periods may be required for x and for y, if the x and y resolutions differ
+        enough.
+
+        Params:
+        -------
+        fringe_periods_x: int, optional
+            Granularity for fringe periods in the x direction. Defaults to 4.
+        fringe_periods_y: int, optional
+            Granularity for fringe periods in the y direction. Defaults to 4.
+
+        Returns:
+            fringes: The fringes object, to be used with run_measurement().
+        """
+        # Get fringe periods
+        periods_x = [4**idx for idx in range(fringe_periods_x)]
+        periods_y = [4**idx for idx in range(fringe_periods_y)]
+        periods_x[0] -= 0.1
+        periods_y[0] -= 0.1
+
+        # Create fringe object
+        fringes = cls(periods_x, periods_y)
+
+        return fringes
+
     def get_frames(self, x: int, y: int, dtype: str, range_: list[float, float]) -> np.ndarray:
         """
         Returns 3D ndarray of scaled, monochrome fringe images.

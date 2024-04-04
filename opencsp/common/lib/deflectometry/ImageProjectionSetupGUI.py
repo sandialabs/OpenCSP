@@ -10,6 +10,7 @@ from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class ImageProjectionGUI:
@@ -80,7 +81,7 @@ class ImageProjectionGUI:
         self.display_data: dict
 
         # Create tkinter object
-        self.root = tkinter.Tk()
+        self.root = tkt.window()
 
         # Set title
         self.root.title('ImageProjection Setup')
@@ -201,7 +202,7 @@ class ImageProjectionGUI:
         self.update_window_size()
 
         # Create a new Toplevel window
-        projector_root = tkinter.Toplevel(self.root)
+        projector_root = tkt.window(self.root, Toplevel=True)
         self.projector = ImageProjection(projector_root, self.display_data)
 
         # Activate buttons

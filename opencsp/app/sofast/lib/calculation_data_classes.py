@@ -115,9 +115,9 @@ class CalculationError:
     errors during deflectometry calculations.
     """
 
-    error_optic_screen_dist_1: float = None
-    error_optic_screen_dist_2: float = None
-    error_optic_screen_dist_3: float = None
+    error_dist_optic_screen_1: float = None
+    error_dist_optic_screen_2: float = None
+    error_dist_optic_screen_3: float = None
     error_reprojection_1: float = None
     error_reprojection_2: float = None
     error_reprojection_3: float = None
@@ -133,17 +133,17 @@ class CalculationError:
             Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
         data = [
-            self.error_optic_screen_dist_1,
-            self.error_optic_screen_dist_2,
-            self.error_optic_screen_dist_3,
+            self.error_dist_optic_screen_1,
+            self.error_dist_optic_screen_2,
+            self.error_dist_optic_screen_3,
             self.error_reprojection_1,
             self.error_reprojection_2,
             self.error_reprojection_3,
         ]
         datasets = [
-            prefix + 'CalculationError/error_optic_screen_dist_1',
-            prefix + 'CalculationError/error_optic_screen_dist_2',
-            prefix + 'CalculationError/error_optic_screen_dist_3',
+            prefix + 'CalculationError/error_dist_optic_screen_1',
+            prefix + 'CalculationError/error_dist_optic_screen_2',
+            prefix + 'CalculationError/error_dist_optic_screen_3',
             prefix + 'CalculationError/error_reprojection_1',
             prefix + 'CalculationError/error_reprojection_2',
             prefix + 'CalculationError/error_reprojection_3',

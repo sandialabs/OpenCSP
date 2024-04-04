@@ -144,9 +144,9 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
                 - v_cam_optic_cam_refine_3
                 - v_cam_optic_centroid_cam_exp
             - CalculationError
-                - error_optic_screen_dist_1
-                - error_optic_screen_dist_2
-                - error_optic_screen_dist_3
+                - error_dist_optic_screen_1
+                - error_dist_optic_screen_2
+                - error_dist_optic_screen_3
                 - error_reprojection_1
                 - error_reprojection_2
                 - error_reprojection_3
@@ -310,7 +310,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         ) = po.process_undefined_geometry(
             mask_raw,
             self.params.mask_keep_largest_area,
-            self.measurement.optic_screen_dist,
+            self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
             self.params.geometry_data_debug,
@@ -362,8 +362,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         ) = po.process_singlefacet_geometry(
             facet_data,
             mask_raw,
-            self.measurement.measure_point,
-            self.measurement.optic_screen_dist,
+            self.measurement.v_measure_point_facet,
+            self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
             self.params.geometry_params,
@@ -424,10 +424,10 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             facet_data,
             ensemble_data,
             mask_raw,
-            self.measurement.measure_point,
+            self.measurement.v_measure_point_facet,
             self.orientation,
             self.camera,
-            self.measurement.optic_screen_dist,
+            self.measurement.dist_optic_screen,
             self.params.geometry_params,
             self.params.geometry_data_debug,
         )
