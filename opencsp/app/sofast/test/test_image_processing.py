@@ -4,11 +4,13 @@
 from os.path import join
 import unittest
 
+import cv2 as cv
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
+from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 import opencsp.app.sofast.lib.image_processing as ip
@@ -35,6 +37,11 @@ class TestImageProcessing(unittest.TestCase):
         cls.data_file_measurement_facet = join(dir_sofast_fringe, 'data_measurement/measurement_facet.h5')
         cls.data_file_measurement_ensemble = join(dir_sofast_fringe, 'data_measurement/measurement_ensemble.h5')
         cls.data_file_calibration = join(dir_sofast_fringe, 'data_measurement/image_calibration.h5')
+
+        # Sofast fixed dot image
+        cls.sofast_fixed_meas = MeasurementSofastFixed.load_from_hdf(
+            join(opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_facet.h5')
+        )
 
     def test_calc_mask_raw(self):
         """Tests image_processing.calc_mask_raw()"""
@@ -187,7 +194,7 @@ class TestImageProcessing(unittest.TestCase):
             'DataSofastCalculation/image_processing/facet_000/mask_processed',
         ]
         data = load_hdf5_datasets(datasets, self.data_file_facet)
-        measurement = Measurement.load_from_hdf(self.data_file_measurement_facet)
+        measurement = MeasurementSofastFringe.load_from_hdf(self.data_file_measurement_facet)
         calibration = ImageCalibrationScaling.load_from_hdf(self.data_file_calibration)
 
         measurement.calibrate_fringe_images(calibration)
@@ -227,6 +234,50 @@ class TestImageProcessing(unittest.TestCase):
 
         # Test
         np.testing.assert_allclose(data['u_pixel_pointing_facet'], u_pixel_pointing_optic)
+
+    def test_detect_blobs(self):
+        params = cv.SimpleBlobDetector_Params()
+        params.minDistBetweenBlobs = 2
+        params.filterByArea = True
+        params.minArea = 3
+        params.maxArea = 30
+        params.filterByCircularity = True
+        params.minCircularity = 0.8
+        params.filterByConvexity = False
+        params.filterByInertia = False
+
+        blobs = ip.detect_blobs(self.sofast_fixed_meas.image, params)
+
+        self.assertEqual(len(blobs), 3761, 'Test number of blobs')
+        np.testing.assert_allclose(
+            blobs[0].data.squeeze(),
+            np.array([672.20654297, 1138.20654297]),
+            rtol=0,
+            atol=1e-6,
+            err_msg='First blob pixel location does not match expected',
+        )
+
+    def test_detect_blobs_inverse(self):
+        params = cv.SimpleBlobDetector_Params()
+        params.minDistBetweenBlobs = 2
+        params.filterByArea = True
+        params.minArea = 3
+        params.maxArea = 30
+        params.filterByCircularity = True
+        params.minCircularity = 0.8
+        params.filterByConvexity = False
+        params.filterByInertia = False
+
+        blobs = ip.detect_blobs_inverse(self.sofast_fixed_meas.image, params)
+
+        self.assertEqual(len(blobs), 1, 'Test number of blobs')
+        np.testing.assert_allclose(
+            blobs[0].data.squeeze(),
+            np.array([960.590515, 796.387695]),
+            rtol=0,
+            atol=1e-6,
+            err_msg='blob pixel location does not match expected',
+        )
 
 
 if __name__ == '__main__':

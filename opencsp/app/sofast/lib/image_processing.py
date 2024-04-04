@@ -64,7 +64,9 @@ def calc_mask_raw(
             raise ValueError('Not enough distinction between dark and light pixels in mask images.')
 
         # Calculate minimum between two peaks
+        # fmt: off
         idx_hist_min = np.argmin(hist[peaks[0] : peaks[1]]) + peaks[0]
+        # fmt: on
 
         # Find index of histogram that is "hist_thresh" the way between the min and max
         thresh_hist_min = edges[idx_hist_min + 1]
@@ -422,8 +424,8 @@ def rectangle_loop_from_two_points(p1: Vxy, p2: Vxy, d_ax: float, d_perp: float)
     # Calculate axial and perpendicular directions
     v_axial = (p2 - p1).normalize()
 
-    R = np.array([[0, 1], [-1, 0]])
-    v_perp = v_axial.rotate(R)
+    rot_mat_90 = np.array([[0, 1], [-1, 0]])
+    v_perp = v_axial.rotate(rot_mat_90)
 
     # Create points
     points = []
@@ -440,7 +442,8 @@ def rectangle_loop_from_two_points(p1: Vxy, p2: Vxy, d_ax: float, d_perp: float)
 
 
 def detect_blobs(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> Vxy:
-    """Detects blobs in image
+    """Detects blobs in image. Blobs are defined as local dark regions in
+    neighboring light background.
 
     Parameters
     ----------
@@ -462,13 +465,40 @@ def detect_blobs(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> Vxy
     return Vxy(np.array(pts).T)
 
 
-def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> np.ndarray:
-    """Detects blobs in image
+def detect_blobs_inverse(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> Vxy:
+    """Detect blobs in image. Blobs are defined as local light regions in
+    neighboring dark background.
+
+    NOTE: This definition of blobs is the inverse as in `image_processing.detect_blobs()`
 
     Parameters
     ----------
     image : np.ndarray
-        Input image, uint8
+        2D input image, single color channel, NxM or NxMx1, uint8
+    params : cv.SimpleBlobDetector_Params
+        Blob parameters
+
+    Returns
+    -------
+    Vxy
+        Centroids of blobs
+    """
+    keypoints = _detect_blobs_keypoints(image.max() - image, params)
+
+    pts = []
+    for pt in keypoints:
+        pts.append(pt.pt)
+    return Vxy(np.array(pts).T)
+
+
+def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> np.ndarray:
+    """Detects blobs in image and annotates locations. Blobs are defined as local dark regions in
+    neighboring light background.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        2D input image, single color channel, NxM or NxMx1, uint8
     params : cv.SimpleBlobDetector_Params
         Blob parameters
 
@@ -481,13 +511,35 @@ def detect_blobs_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Param
     return cv.drawKeypoints(image, keypoints, np.array([]), (0, 0, 255), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
 
 
+def detect_blobs_inverse_annotate(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> np.ndarray:
+    """Detects blobs in image and annotates locations. Blobs are defined as local light regions in
+    neighboring dark background.
+
+    NOTE: This definition of blobs is the inverse as in `image_processing.detect_blobs()`
+
+    Parameters
+    ----------
+    image : np.ndarray
+        2D input image, single color channel, NxM or NxMx1, uint8
+    params : cv.SimpleBlobDetector_Params
+        Blob parameters
+
+    Returns
+    -------
+    ndarray
+        Annotated image of blobs
+    """
+    keypoints = _detect_blobs_keypoints(image.max() - image, params)
+    return cv.drawKeypoints(image, keypoints, np.array([]), (0, 0, 255), cv.DRAW_MATCHES_FLAGS_DRAW_RICH_KEYPOINTS)
+
+
 def _detect_blobs_keypoints(image: np.ndarray, params: cv.SimpleBlobDetector_Params) -> list[cv.KeyPoint]:
     """Detects blobs in image
 
     Parameters
     ----------
     image : np.ndarray
-        Input image, uint8
+        2D input image, single color channel, NxM or NxMx1, uint8
     params : cv.SimpleBlobDetector_Params
         Blob parameters
 

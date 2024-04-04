@@ -3,10 +3,8 @@ Saves distortion data and calibrated markers for camera position calibration.
 """
 
 from dataclasses import dataclass
-import os
 
 import cv2 as cv
-import h5py
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import ndarray
