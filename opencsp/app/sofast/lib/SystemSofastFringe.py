@@ -412,31 +412,6 @@ class SystemSofastFringe:
             self.calibration_images.append([])
         self._measure_sequence_display(cal_images_display, self.calibration_images, run_next)
 
-    def run_camera_exposure_calibration(self, run_next: Callable | None = None) -> None:
-        """
-        Calculates the ideal camera exposure as to not saturate above a
-        specified threshold.
-
-        Parameters
-        ----------
-        run_next : Callable
-            Process to run after calibration is performed.
-
-        """
-
-        def run_cal():
-            # Calibrate exposure
-            for im_aq in self.image_acquisition:
-                im_aq.calibrate_exposure()
-
-            # Run next operation
-            if run_next is not None:
-                run_next()
-
-        # Set displayed image to white and calibrate exposure
-        self.image_projection.display_image_in_active_area(self.mask_images_to_display[1])
-        self.root.after(100, run_cal)
-
     def get_calibration_images(self) -> list[ndarray]:
         """
         Returns list of sets of calibration images as 3D ndarrays.
