@@ -91,33 +91,3 @@ def window(*vargs, TopLevel=False, **kwargs):
 
             time.sleep(1)
             return window_class(*vargs, **kwargs)
-
-
-def _window(*vargs, **kwargs):
-    """Initializes and returns a new tkinter.Tk() instance.
-
-    If creating the window fails, tries again (up to two more times).
-
-    Sometimes initializing a tk window fails. But if you try to
-    initialize the window again, it seems to always succeed.
-    When it fails, it is often with an error about not being able to find a
-    file. Something like::
-
-        _tkinter.TclError: Can't find a usable init.tcl in the following directories
-    """
-    try:
-        # try to create a window
-        return tk.Tk(*vargs, **kwargs)
-    except Exception:
-        try:
-            lt.warn("Failed to create a tkinter.Tk() window. Trying again (2nd attempt).")
-            # first attempt failed, try again
-            return tk.Tk(*vargs, **kwargs)
-        except Exception:
-            # second attempt failed, give the system a second to stabalize and
-            # try a third time
-            lt.warn("Failed to create a tkinter.Tk() window. Trying again (3rd attempt).")
-            import time
-
-            time.sleep(1)
-            return tk.Tk(*vargs, **kwargs)
