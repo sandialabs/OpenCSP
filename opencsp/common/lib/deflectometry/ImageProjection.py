@@ -281,6 +281,23 @@ class ImageProjection:
         # Display with black border
         self.display_image_in_active_area(array)
 
+    def zeros(self) -> None:
+        """
+        Creates a black image to fill the entire projected area.
+
+        Returns:
+        --------
+        image : np.ndarray
+            A 2D image with shape (self.size_x, self.size_y, 3), filled with zeros
+        """
+        # Create black image
+        black_image = np.zeros(
+            (self.size_y, self.size_x, 3),
+            dtype=self.display_data['projector_data_type'],
+        )
+
+        return black_image
+
     def display_image(self, array: np.ndarray) -> None:
         """
         Formats and displays input numpy array in entire window.
