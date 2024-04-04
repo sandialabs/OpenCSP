@@ -194,18 +194,25 @@ class SofastService:
 
     def run_exposure_cal(self) -> None:
         """Runs camera exposure calibration. This adjusts the exposure time of the camera to keep the pixels from being
-        under or over saturated."""
+        under or over saturated. Displays the crosshairs on the projector once finished."""
+        # Check that a camera is available
         if self.image_acquisition is None:
             lt.error_and_raise(RuntimeError, 'Camera must be connected.')
 
-        # If only camera is loaded
+        # Try to display a white image on the projector, if there is one
         if self.image_projection is None:
             lt.info('Running calibration without displayed white image.')
             self.image_acquisition.calibrate_exposure()
         else:
             lt.info('Running calibration with displayed white image.')
-            run_next = self.image_projection.show_crosshairs
-            self.system.run_camera_exposure_calibration(run_next)
+
+            def run_cal():
+                self.image_acquisition.calibrate_exposure()
+                self.image_projection.show_crosshairs()
+
+            white_image = np.array(self.image_projection.zeros()) + self.image_projection.max_int
+            self.image_projection.display_image_in_active_area(white_image)
+            self.system.root.after(100, run_cal)
 
     def get_exposure(self) -> int | None:
         """Returns the exposure time of the camera (microseconds)."""
