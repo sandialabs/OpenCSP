@@ -49,7 +49,8 @@ class SystemSofastFringe:
         elif isinstance(image_acquisition, ImageAcquisitionAbstract):
             self.image_acquisition = [image_acquisition]
         else:
-            raise TypeError(f'ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.')
+            lt.error_and_raise(TypeError, 'Error in SystemSofastFringe(): ' +
+                               f'ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.')
 
         # Show crosshairs
         self.image_projection.show_crosshairs()
@@ -339,7 +340,8 @@ class SystemSofastFringe:
         """
         # Check fringes/camera have been loaded
         if self.fringes is None:
-            raise ValueError('Fringes have not been loaded.')
+            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): ' +
+                               'Fringes have not been loaded.')
 
         # Initialize fringe image list
         self.fringe_images_captured = []
@@ -366,7 +368,8 @@ class SystemSofastFringe:
         """
         # Check fringes/camera have been loaded
         if self.fringes is None:
-            raise ValueError('Fringes have not been loaded.')
+            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.capture_mask_and_fringe_images(): ' +
+                               'Fringes have not been loaded.')
 
         def run_after_capture():
             self.capture_fringe_images(run_next)
@@ -452,7 +455,8 @@ class SystemSofastFringe:
 
         """
         if self.calibration_images is None:
-            raise ValueError('Calibration Images have not been collected yet.')
+            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.get_calibration_images(): ' +
+                               'Calibration Images have not been collected yet.')
 
         images = []
         for ims in self.calibration_images:
@@ -481,9 +485,11 @@ class SystemSofastFringe:
         """
         # Check data has been captured
         if self.fringe_images_captured is None:
-            raise ValueError('Fringe images have not been captured.')
+            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.get_measurements(): ' +
+                               'Fringe images have not been captured.')
         if self.mask_images_captured is None:
-            raise ValueError('Mask images have not been captured.')
+            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.get_measurements(): ' +
+                               'Mask images have not been captured.')
 
         measurements = []
         for fringe_images, mask_images in zip(self.fringe_images_captured, self.mask_images_captured):

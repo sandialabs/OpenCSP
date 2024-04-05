@@ -6,6 +6,8 @@ from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionA
 
 class ImageAcquisition(ImageAcquisitionAbstract):
     def __init__(self, instance: int = 0):
+        super().__init__()
+
         # Connect to camera using MicroSoft Media Foundation API
         self.cap = cv.VideoCapture(instance, cv.CAP_MSMF)
 
@@ -79,4 +81,5 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         raise ValueError('exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.')
 
     def close(self):
+        super().close()
         self.cap.release()

@@ -1,8 +1,29 @@
 from abc import abstractmethod, ABC, abstractproperty
+from typing import Callable
+
 import numpy as np
+
+import opencsp.common.lib.tool.exception_tools as et
 
 
 class ImageAcquisitionAbstract(ABC):
+    _instance: 'ImageAcquisitionAbstract' = None
+
+    def __init__(self):
+        if ImageAcquisitionAbstract._instance is None:
+            ImageAcquisitionAbstract._instance = self
+
+        self.on_close: list[Callable] = []
+
+    @classmethod
+    def instance(cls) -> "ImageAcquisitionAbstract" | None:
+        """Get the global ImageAcquisition instance, if one is available.
+
+        We use the singleton design pattern (single global instance) for this class because we don't expect there to be
+        more than one camera in the system.
+        """
+        return cls._instance
+
     def calibrate_exposure(self):
         """
         Sets the camera's exposure so that only 1% of pixels are above the set
@@ -142,4 +163,10 @@ class ImageAcquisitionAbstract(ABC):
     @abstractmethod
     def close(self):
         """Closes the camera connection"""
-        pass
+        if ImageAcquisitionAbstract._instance == self:
+            ImageAcquisitionAbstract._instance = None
+
+        # Callbacks
+        for callback in self.on_close:
+            with et.ignored(Exception):
+                callback()

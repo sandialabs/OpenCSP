@@ -5,25 +5,32 @@ import numpy as np
 
 from opencsp.common.lib.camera.image_processing import highlight_saturation
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+import opencsp.app.sofast.SofastService as ss
 
 
 class LiveView:
     def __init__(
-        self, image_acquisition: ImageAcquisitionAbstract, update_ms: int = 20, highlight_saturation: bool = True
+        self,
+        image_acquisition: ImageAcquisitionAbstract = None,
+        update_ms: int = 20,
+        highlight_saturation: bool = True,
     ):
         """
         Shows live stream from a camera. Escape key closes window.
 
         Parameters
         ----------
-        image_acquisition : ImageAcquisitionAbstract
-            Image acquisition object
-        update_ms : int
-            Update frequency in ms
-        highlight_saturation : bool
-            To highlight saturation red in image
+        image_acquisition : ImageAcquisitionAbstract, optional
+            Image acquisition object. If None, then use the global instance. Default is None
+        update_ms : int, optional
+            Update frequency in ms. Default is 20
+        highlight_saturation : bool, optional
+            To highlight saturation red in image. Default is True
 
         """
+        # Get default values
+        image_acquisition, _ = ss.get_default_or_global_instances(image_acquisition_default=image_acquisition)
+
         # Store variables
         self.image_acquisition = image_acquisition
         self.highlight_saturation = highlight_saturation
