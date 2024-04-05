@@ -15,11 +15,11 @@ import numpy as np
 
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
+import opencsp.app.sofast.lib.sofast_common_functions as scf
 import opencsp.app.sofast.lib.SystemSofastFringe as ssf
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.camera.image_processing import highlight_saturation
 from opencsp.common.lib.camera.LiveView import LiveView
-import opencsp.app.sofast.SofastService as ss
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
@@ -136,7 +136,7 @@ class SofastGUI:
 
     @functools.cached_property
     def cam_options(self):
-        all_cam_options = ss.SofastService.cam_options
+        all_cam_options = ImageAcquisitionAbstract.cam_options()
 
         ret: dict[str, type[ImageAcquisitionAbstract]] = {}
         for description in all_cam_options:
@@ -469,7 +469,7 @@ class SofastGUI:
     def _check_system_fringe_loaded(self, method_name: str) -> bool:
         """Checks if the system class has been instantiated, and that the camera and projector instances are still available"""
         try:
-            return ss.check_system_fringe_loaded(self.sys_fringe, method_name)
+            return scf.check_system_fringe_loaded(self.sys_fringe, method_name)
         except Exception as ex:
             messagebox.showerror('Error', repr(ex))
             return False
@@ -478,21 +478,21 @@ class SofastGUI:
         """Checks if calibration is loaded. Returns True if loaded.
         """
         try:
-            return ss.check_calibration_loaded(self.sys_fringe, method_name)
+            return scf.check_calibration_loaded(self.sys_fringe, method_name)
         except Exception as ex:
             messagebox.showerror('Error', repr(ex))
             return False
 
     def _check_camera_loaded(self, method_name: str) -> bool:
         try:
-            return ss.check_camera_loaded(method_name)
+            return scf.check_camera_loaded(method_name)
         except Exception as ex:
             messagebox.showerror('Error', repr(ex))
             return False
 
     def _check_projector_loaded(self, method_name: str) -> bool:
         try:
-            return ss.check_projector_loaded(method_name)
+            return scf.check_projector_loaded(method_name)
         except Exception as ex:
             messagebox.showerror('Error', repr(ex))
             return False
@@ -641,7 +641,7 @@ class SofastGUI:
     def run_exposure_cal(self) -> None:
         """Runs camera exposure calibration"""
         try:
-            ss.run_exposure_cal()
+            scf.run_exposure_cal()
         except Exception as ex:
             messagebox.showerror('Error', repr(ex))
 
@@ -731,7 +731,7 @@ class SofastGUI:
         """Sets camera exposure time value to user defined value"""
         # Get current exposure_time value
         try:
-            cur_exp = ss.get_exposure()
+            cur_exp = scf.get_exposure()
         except RuntimeError:
             cur_exp = None
 
@@ -742,7 +742,7 @@ class SofastGUI:
 
         # Set new exposure_time value
         if new_exp is not None:
-            ss.set_exposure(new_exp)
+            scf.set_exposure(new_exp)
 
     def save_snapshot(self) -> None:
         """Save current snapshot from camera"""
