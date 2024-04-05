@@ -2,6 +2,7 @@
 """
 
 import tkinter
+from typing import Callable
 
 import cv2 as cv
 import numpy as np
@@ -61,6 +62,8 @@ class CalParams:
 
 
 class ImageProjection:
+    _instance: 'ImageProjection' = None
+
     def __init__(self, root: tkinter.Tk, display_data: dict):
         """
         Image projection control.
@@ -73,9 +76,16 @@ class ImageProjection:
             Display geometry parameters
 
         """
+        # Register this instance as the global instance
+        if ImageProjection._instance is None:
+            ImageProjection._instance = self
+
+        # Declare instance variables
+        self.is_closed = False
+        self.on_close: list[Callable] = []
+
         # Save root
         self.root = root
-        self.is_closed = False
 
         # Create drawing canvas
         self.canvas = tkinter.Canvas(self.root)
@@ -106,6 +116,15 @@ class ImageProjection:
     def __del__(self):
         with et.ignored(Exception):
             self.close()
+
+    @classmethod
+    def instance(cls) -> "ImageProjection" | None:
+        """Get the global ImageProjection instance, if one is available.
+
+        We use the singleton design pattern (single global instance) for this class because we don't expect there to be
+        more than one projector in the system.
+        """
+        return cls._instance
 
     def run(self):
         """Runs the Tkinter instance"""
@@ -464,11 +483,19 @@ class ImageProjection:
 
     def close(self):
         """Closes all windows"""
+        # don't double-close in order to avoid warnings
         if self.is_closed:
-            # don't double-close in order to avoid warnings
             return
-
         self.is_closed = True
+
+        # unset as the global instance
+        if ImageProjection._instance == self:
+            ImageProjection._instance = None
+
+        # callbacks
+        for callback in self.on_close:
+            with et.ignored(Exception):
+                callback()
 
         with et.ignored(Exception):
             self.root.destroy()

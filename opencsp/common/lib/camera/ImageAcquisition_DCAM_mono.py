@@ -27,6 +27,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
                 - Others as defined by Basler
 
         """
+        super().__init__()
         ImageAcquisition._check_pypylon_version()
 
         # Find all instances of DCAM cameras
@@ -143,4 +144,5 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return self._shutter_cal_values
 
     def close(self):
+        super().close()
         self.cap.Close()
