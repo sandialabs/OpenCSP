@@ -17,6 +17,7 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as h5
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class SystemSofastFringe:
@@ -39,6 +40,9 @@ class SystemSofastFringe:
         # Save objects in class
         self.root = image_projection.root
 
+        # Validate input
+        if image_projection is None or image_acquisition is None:
+            lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
         self.image_projection = image_projection
         if isinstance(image_acquisition, list) and isinstance(image_acquisition[0], ImageAcquisitionAbstract):
             self.image_acquisition = image_acquisition
@@ -369,6 +373,31 @@ class SystemSofastFringe:
 
         # Capture mask images, then capture fringe images, then run_next
         self.capture_mask_images(run_after_capture)
+
+    def run_measurement(self, fringes: Fringes, on_done: Callable = None) -> None:
+        """Runs data collection with the given fringes.
+
+        Once the data has been captured, the images will be available from this instance. Similarly, the data can then
+        be processed, such as with get_measurements().
+
+        Params:
+        -------
+        fringes: Fringes
+            The fringes to display and capture images of.
+        on_done: Callable
+            The function to call when capturing fringe images has finished.
+        """
+        # Get minimum display value from calibration
+        if self.calibration is None:
+            lt.error_and_raise(RuntimeError, "Error in SystemSofastFringe.run_measurement(): " +
+                               "must have run or provided a calibration before starting a measurement.")
+        min_disp_value = self.calibration.calculate_min_display_camera_values()[0]
+
+        # Load fringes
+        self.load_fringes(fringes, min_disp_value)
+
+        # Capture images
+        self.capture_mask_and_fringe_images(on_done)
 
     def run_display_camera_response_calibration(self, res: int = 10, run_next: Callable | None = None) -> None:
         """
