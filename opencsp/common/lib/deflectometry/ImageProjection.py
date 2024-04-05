@@ -2,7 +2,7 @@
 """
 
 import tkinter
-from typing import Callable
+from typing import Callable, Optional
 
 import cv2 as cv
 import numpy as np
@@ -82,7 +82,7 @@ class ImageProjection:
 
         # Declare instance variables
         self.is_closed = False
-        self.on_close: list[Callable] = []
+        self.on_close: list[Callable[[ImageProjection], None]] = []
 
         # Save root
         self.root = root
@@ -118,7 +118,7 @@ class ImageProjection:
             self.close()
 
     @classmethod
-    def instance(cls) -> "ImageProjection" | None:
+    def instance(cls) -> Optional["ImageProjection"]:
         """Get the global ImageProjection instance, if one is available.
 
         We use the singleton design pattern (single global instance) for this class because we don't expect there to be
@@ -495,7 +495,7 @@ class ImageProjection:
         # callbacks
         for callback in self.on_close:
             with et.ignored(Exception):
-                callback()
+                callback(self)
 
         with et.ignored(Exception):
             self.root.destroy()

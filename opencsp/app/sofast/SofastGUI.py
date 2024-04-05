@@ -794,14 +794,14 @@ class SofastGUI:
         """Shows live stream from the camera."""
         LiveView()
 
-    def _camera_closed(self):
+    def _camera_closed(self, image_acquisition: ImageAcquisitionAbstract):
         # Release the system instance
         self.sys_fringe = None
         # Update the state of the GUI
         self._enable_btns()
 
-    def _projector_closed(self):
-        self._camera_closed()
+    def _projector_closed(self, image_projection: ImageProjection):
+        self._camera_closed(None)
 
     def close_image_acquisition(self) -> None:
         # Close the camera
