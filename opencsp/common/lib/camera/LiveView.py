@@ -5,7 +5,7 @@ import numpy as np
 
 from opencsp.common.lib.camera.image_processing import highlight_saturation
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
-import opencsp.app.sofast.SofastService as ss
+import opencsp.app.sofast.lib.sofast_common_functions as scf
 
 
 class LiveView:
@@ -29,7 +29,7 @@ class LiveView:
 
         """
         # Get default values
-        image_acquisition, _ = ss.get_default_or_global_instances(image_acquisition_default=image_acquisition)
+        image_acquisition, _ = scf.get_default_or_global_instances(image_acquisition_default=image_acquisition)
 
         # Store variables
         self.image_acquisition = image_acquisition

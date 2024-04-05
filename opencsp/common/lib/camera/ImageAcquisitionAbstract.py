@@ -1,4 +1,5 @@
 from abc import abstractmethod, ABC, abstractproperty
+import functools
 from typing import Callable
 
 import numpy as np
@@ -8,6 +9,22 @@ import opencsp.common.lib.tool.exception_tools as et
 
 class ImageAcquisitionAbstract(ABC):
     _instance: 'ImageAcquisitionAbstract' = None
+
+    @staticmethod
+    @functools.cache
+    def cam_options() -> dict[str, type['ImageAcquisitionAbstract']]:
+        """ Defines camera objects to choose from (camera description, python type) """
+        # import here to avoid circular reference
+        from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as IA_DCAM_mono
+        from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import ImageAcquisition as IA_DCAM_color
+        from opencsp.common.lib.camera.ImageAcquisition_MSMF import ImageAcquisition as IA_MSMF
+
+        cam_options: dict[str, type[ImageAcquisitionAbstract]] = {
+            'DCAM Mono': IA_DCAM_mono,
+            'DCAM Color': IA_DCAM_color,
+            'MSMF Mono': IA_MSMF,
+        }
+        return cam_options
 
     def __init__(self):
         if ImageAcquisitionAbstract._instance is None:

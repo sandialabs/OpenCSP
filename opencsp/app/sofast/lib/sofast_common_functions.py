@@ -185,14 +185,3 @@ def set_exposure(new_exp: int, image_acquisition: ImageAcquisitionAbstract = Non
     image_acquisition, _ = get_default_or_global_instances(image_acquisition=image_acquisition)
 
     image_acquisition.exposure_time = int(new_exp)
-
-
-class SofastService:
-    """Class that interfaces with SOFAST to run data acquisition and process results"""
-
-    cam_options: dict[str, type[ImageAcquisitionAbstract]] = {
-        'DCAM Mono': ImageAcquisition_DCAM,
-        'DCAM Color': ImageAcquisition_DCAM_color,
-        'MSMF Mono': ImageAcquisition_MSMF,
-    }
-    """ Defines camera objects to choose from (camera description, python type) """
