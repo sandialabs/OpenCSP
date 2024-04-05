@@ -1,6 +1,6 @@
 from abc import abstractmethod, ABC, abstractproperty
 import functools
-from typing import Callable
+from typing import Callable, Optional
 
 import numpy as np
 
@@ -30,10 +30,10 @@ class ImageAcquisitionAbstract(ABC):
         if ImageAcquisitionAbstract._instance is None:
             ImageAcquisitionAbstract._instance = self
 
-        self.on_close: list[Callable] = []
+        self.on_close: list[Callable[[ImageAcquisitionAbstract], None]] = []
 
     @classmethod
-    def instance(cls) -> "ImageAcquisitionAbstract" | None:
+    def instance(cls) -> Optional["ImageAcquisitionAbstract"]:
         """Get the global ImageAcquisition instance, if one is available.
 
         We use the singleton design pattern (single global instance) for this class because we don't expect there to be
@@ -186,4 +186,4 @@ class ImageAcquisitionAbstract(ABC):
         # Callbacks
         for callback in self.on_close:
             with et.ignored(Exception):
-                callback()
+                callback(self)
