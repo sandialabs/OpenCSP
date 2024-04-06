@@ -376,7 +376,7 @@ class ImageProjectionGUI:
         self.get_user_data()
 
         # Save as HDF file
-        ImageProjection.save_to_hdf(self.display_data, file)
+        ImageProjection.save_params_to_hdf(self.display_data, file)
 
     def close(self):
         """

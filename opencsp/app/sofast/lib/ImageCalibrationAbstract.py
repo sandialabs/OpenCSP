@@ -35,15 +35,12 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
 
     @staticmethod
     def get_cal_options() -> dict[str, type['ImageCalibrationAbstract']]:
-        """ Available calibration objects that can be instantiated with load_from_hdf_guess_type() """
+        """Available calibration objects that can be instantiated with load_from_hdf_guess_type()"""
         # import here to avoid circular references
         from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
         from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 
-        return {
-            'Global': ImageCalibrationGlobal,
-            'Scaling': ImageCalibrationScaling,
-        }
+        return {'Global': ImageCalibrationGlobal, 'Scaling': ImageCalibrationScaling}
 
     @staticmethod
     @abstractmethod
@@ -240,7 +237,7 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         KeyError:
             If the necessary typing information isn't available in the given file
         ValueError:
-            If the type of the calibration instance in the given file is unknown """
+            If the type of the calibration instance in the given file is unknown"""
         # Load file
         datasets = [prefix + 'ImageCalibration/calibration_type']
         cal_type = hdf5_tools.load_hdf5_datasets(datasets, hdf5_file_path_name_ext)['calibration_type']

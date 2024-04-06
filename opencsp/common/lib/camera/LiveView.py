@@ -10,10 +10,7 @@ import opencsp.app.sofast.lib.sofast_common_functions as scf
 
 class LiveView:
     def __init__(
-        self,
-        image_acquisition: ImageAcquisitionAbstract = None,
-        update_ms: int = 20,
-        highlight_saturation: bool = True,
+        self, image_acquisition: ImageAcquisitionAbstract = None, update_ms: int = 20, highlight_saturation: bool = True
     ):
         """
         Shows live stream from a camera. Escape key closes window.

@@ -1,6 +1,7 @@
 """Class for controlling displaying Sofast patterns and capturing images
 """
 
+import copy
 import datetime as dt
 from typing import Callable
 from warnings import warn
@@ -11,7 +12,6 @@ import numpy as np
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-import opencsp.app.sofast.lib.sofast_common_functions as scf
 import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
@@ -23,8 +23,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 class SystemSofastFringe:
     def __init__(
-        self,
-        image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract] = None,
+        self, image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract] = None
     ) -> 'SystemSofastFringe':
         """
         Instantiates SystemSofastFringe class.
@@ -44,9 +43,13 @@ class SystemSofastFringe:
             The image_acquisition is not the correct type.
 
         """
+        # Import here to avoid circular dependencies
+        import opencsp.app.sofast.lib.sofast_common_functions as scf
+
         # Get defaults
         image_acquisition, image_projection = scf.get_default_or_global_instances(
-            image_acquisition_default=image_acquisition)
+            image_acquisition_default=image_acquisition
+        )
 
         # Validate input
         if image_projection is None or image_acquisition is None:
@@ -72,14 +75,18 @@ class SystemSofastFringe:
         self.fringes: Fringes
         self.fringe_images_to_display: list[ndarray]
         self.mask_images_captured: list[ndarray]
-        self.fringe_images_captured: list[ndarray]
+        self.fringe_images_captured: list[list[ndarray]]
+        """The images captured during run_measurement. Outer index is the camera index. Inner index is the fringe image."""
         self._calibration_display_values: ndarray
         self.calibration_images: list[ndarray]
         self.calibration: ImageCalibrationAbstract = None
 
     def __del__(self):
         # Remove references to this instance from the ImageAcquisition cameras
-        for ia in self.image_acquisitions:
+        image_acquisitions: list[ImageAcquisitionAbstract] = []
+        with et.ignored(Exception):
+            image_acquisitions = self._image_acquisitions
+        for ia in image_acquisitions:
             with et.ignored(Exception):
                 ia.on_close.remove(self._on_image_acquisition_close)
 
@@ -89,22 +96,31 @@ class SystemSofastFringe:
     @property
     def image_acquisitions(self) -> list[ImageAcquisitionAbstract]:
         if len(self._image_acquisitions) == 0:
+            # Import here to avoide circular dependencies
+            import opencsp.app.sofast.lib.sofast_common_functions as scf
+
+            # Check for existance
             scf.check_camera_loaded('SystemSofastFringe')
+            # Use global instance as a backup, in case all previously registered instances have been closed
             self._image_acquisitions = [ImageAcquisitionAbstract.instance()]
         return self._image_acquisitions
 
     @image_acquisitions.setter
     def image_acquisitions(self, image_acquisitions: list[ImageAcquisitionAbstract]):
         # Validate input
-        if isinstance(image_acquisitions, list) and \
-                len(image_acquisitions) > 0 and \
-                isinstance(image_acquisitions[0], ImageAcquisitionAbstract):
+        if (
+            isinstance(image_acquisitions, list)
+            and len(image_acquisitions) > 0
+            and isinstance(image_acquisitions[0], ImageAcquisitionAbstract)
+        ):
             image_acquisitions = image_acquisitions
         elif isinstance(image_acquisitions, ImageAcquisitionAbstract):
             image_acquisitions = [image_acquisitions]
         else:
-            lt.error_and_raise(TypeError, 'Error in SystemSofastFringe(): ' +
-                               f'ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.')
+            lt.error_and_raise(
+                TypeError,
+                f'Error in SystemSofastFringe(): ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.',
+            )
 
         # Set value
         self._image_acquisitions = image_acquisitions
@@ -386,8 +402,9 @@ class SystemSofastFringe:
         """
         # Check fringes/camera have been loaded
         if self.fringes is None:
-            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): ' +
-                               'Fringes have not been loaded.')
+            lt.error_and_raise(
+                ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): Fringes have not been loaded.'
+            )
 
         # Initialize fringe image list
         self.fringe_images_captured = []
@@ -414,8 +431,10 @@ class SystemSofastFringe:
         """
         # Check fringes/camera have been loaded
         if self.fringes is None:
-            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.capture_mask_and_fringe_images(): ' +
-                               'Fringes have not been loaded.')
+            lt.error_and_raise(
+                ValueError,
+                'Error in SystemSofastFringe.capture_mask_and_fringe_images(): Fringes have not been loaded.',
+            )
 
         def run_after_capture():
             self.capture_fringe_images(run_next)
@@ -429,17 +448,24 @@ class SystemSofastFringe:
         Once the data has been captured, the images will be available from this instance. Similarly, the data can then
         be processed, such as with get_measurements().
 
-        Params:
-        -------
+        Params
+        ------
         fringes: Fringes
             The fringes to display and capture images of.
         on_done: Callable
             The function to call when capturing fringe images has finished.
+
+        Raises
+        ------
+        RuntimeError:
+            Calibration hasn't been set
         """
         # Get minimum display value from calibration
         if self.calibration is None:
-            lt.error_and_raise(RuntimeError, "Error in SystemSofastFringe.run_measurement(): " +
-                               "must have run or provided a calibration before starting a measurement.")
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SystemSofastFringe.run_measurement(): must have run or provided a calibration before starting a measurement.",
+            )
         min_disp_value = self.calibration.calculate_min_display_camera_values()[0]
 
         # Load fringes
@@ -503,8 +529,10 @@ class SystemSofastFringe:
 
         """
         if self.calibration_images is None:
-            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.get_calibration_images(): ' +
-                               'Calibration Images have not been collected yet.')
+            lt.error_and_raise(
+                ValueError,
+                'Error in SystemSofastFringe.get_calibration_images(): Calibration Images have not been collected yet.',
+            )
 
         images = []
         for ims in self.calibration_images:
@@ -533,11 +561,13 @@ class SystemSofastFringe:
         """
         # Check data has been captured
         if self.fringe_images_captured is None:
-            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.get_measurements(): ' +
-                               'Fringe images have not been captured.')
+            lt.error_and_raise(
+                ValueError, 'Error in SystemSofastFringe.get_measurements(): Fringe images have not been captured.'
+            )
         if self.mask_images_captured is None:
-            lt.error_and_raise(ValueError, 'Error in SystemSofastFringe.get_measurements(): ' +
-                               'Mask images have not been captured.')
+            lt.error_and_raise(
+                ValueError, 'Error in SystemSofastFringe.get_measurements(): Mask images have not been captured.'
+            )
 
         measurements = []
         for fringe_images, mask_images in zip(self.fringe_images_captured, self.mask_images_captured):
@@ -559,7 +589,7 @@ class SystemSofastFringe:
     def close_all(self):
         """Closes all windows"""
         # Close image acquisitions
-        for im_aq in self.image_acquisitions:
+        for im_aq in copy.copy(self.image_acquisitions):
             with et.ignored(Exception):
                 im_aq.close()
 
