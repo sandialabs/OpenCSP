@@ -5,6 +5,7 @@ from numpy import ndarray
 import numpy as np
 from scipy import interpolate
 
+import opencsp.common.lib.render.lib.AbstractPlotHandler as aph
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 
 
@@ -149,6 +150,44 @@ class ImageCalibrationAbstract(ABC):
         camera_min_value = self.camera_values[idx]
         display_min_value = self.display_values[idx]
         return (display_min_value, camera_min_value)
+
+    def plot_gray_levels(self) -> None:
+        """Shows plot of gray levels calibration data. When the close() method of this instance is called (or this
+        instance is destructed), the plot will be closed automatically."""
+        title = 'Projector-Camera Calibration Curve'
+
+        # Plot figure
+        fig = fm._mpl_pyplot_figure()
+        ax = fig.gca()
+        ax.plot(self.display_values, self.camera_values)
+        ax.set_xlabel('Display Values')
+        ax.set_ylabel('Camera Values')
+        ax.grid(True)
+        ax.set_title('Projector-Camera Calibration Curve')
+
+        # Track this figure, to be closed eventually
+        self._register_plot(fig)
+
+        # TODO use RenderControlFigureRecord:
+        # def plot_gray_levels_cal(self, fig_record: fm.RenderControlFigureRecord = None) -> fm.RenderControlFigureRecord:
+        # # Create the plot
+        # if fig_record is None:
+        #     fig_record = fm.setup_figure(
+        #         rcfg.RenderControlFigure(),
+        #         rca.image(grid=False),
+        #         vs.view_spec_im(),
+        #         title=title,
+        #         code_tag=f"{__file__}",
+        #         equal=False)
+
+        # # Plot the gray levels
+        # ax = fig_record.axis
+        # ax.plot(self.display_values, self.camera_values)
+        # ax.set_xlabel('Display Values')
+        # ax.set_ylabel('Camera Values')
+        # ax.grid(True)
+
+        # return fig_record
 
     @classmethod
     def load_from_hdf(cls, file) -> 'ImageCalibrationAbstract':
