@@ -50,6 +50,12 @@ class TestSceneReconstruction(unittest.TestCase):
             base_dir = dirname(__file__)
             dir_input = join(base_dir, 'data', 'data_measurement')
             dir_output = join(base_dir, 'data', 'data_expected')
+        ft.create_directories_if_necessary(dir_input)
+        ft.create_directories_if_necessary(dir_output)
+
+        path, _, _ = ft.path_components(__file__)
+        cls.out_dir = join(path, "data", "output", "ImageAcquisitionAbstract")
+        ft.create_directories_if_necessary(cls.out_dir)
 
         # Load components
         camera = Camera.load_from_hdf(join(dir_input, 'camera.h5'))
@@ -88,13 +94,12 @@ class TestSceneReconstruction(unittest.TestCase):
 
     def test_save_csv(self):
         """Saves CSV file of points to data location"""
-        base_dir = dirname(__file__)
-        file = join(base_dir, 'data/data_expected/point_locations.csv')
+        file = join(self.out_dir, 'point_locations.csv')
         self.scene_recon.save_data_as_csv(file)
 
 
 if __name__ == '__main__':
-    save_path = join(dirname(__file__), 'data/output')
-    ft.create_directories_if_necessary(save_path)
-    lt.logger(join(save_path, 'log_scene_reconstruction'), lt.log.WARN)
+    tsr = TestSceneReconstruction()
+    tsr.setUpClass()
+    lt.logger(join(tsr.out_dir, 'log_scene_reconstruction'), lt.log.WARN)
     unittest.main()
