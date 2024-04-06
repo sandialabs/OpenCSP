@@ -745,7 +745,7 @@ class SofastGUI:
         """Save current snapshot from camera"""
         # Show image
         frame = self._get_frame()
-        if frame == None:
+        if frame is None:
             return
 
         # Get save file name
@@ -767,7 +767,7 @@ class SofastGUI:
         """
         # Get frame
         frame = self._get_frame()
-        if frame == None:
+        if frame is None:
             return
 
         # Highlight saturation
