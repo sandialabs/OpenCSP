@@ -55,7 +55,7 @@ def reset_figure_management():
     fig_record_list = []
 
 
-def _mpl_pyplot_figure(*vargs, **kwargs):
+def mpl_pyplot_figure(*vargs, **kwargs):
     """Initializes and returns a matplotlib.pyplot.figure() instance.
 
     If creating the figure fails, try again (up to two more times).
@@ -86,7 +86,7 @@ def _mpl_pyplot_figure(*vargs, **kwargs):
             return plt.figure(*vargs, **kwargs)
 
 
-def tile_figure(
+def _tile_figure(
     name=None,  # Handle and title of figure window.
     tile_array: tuple[int, int] = (3, 2),  # (n_y, n_x) ~ (columns, rows)
     tile_square: bool = False,  # Force figure to have equal x:y aspect ratio.
@@ -128,7 +128,7 @@ def tile_figure(
 
     # Create figure.
     # fig = figure(constrained_layout=True).subplots(5, 5)
-    fig = _mpl_pyplot_figure(name, figsize=(size_x, plot_size_y))
+    fig = mpl_pyplot_figure(name, figsize=(size_x, plot_size_y))
     # Turn off the axis around the plot drawing area.  This leads to confusing duplicate, mismatched,
     # axis information.  Why this suddenly appeared is beyond me. - RCB
     # The command below does not suppress the actual plot axes.
@@ -151,7 +151,7 @@ def tile_figure(
     return fig
 
 
-def display_image(
+def _display_image(
     image: np.ndarray | str,
     name: str = None,  # Figure handle and title of figure window.
     title: str = None,  # Title of plot. Used for name if name is None.
@@ -223,9 +223,9 @@ def _setup_figure(
 
     # Create figure.
     if figure_control.tile:
-        fig = tile_figure(name, tile_array=figure_control.tile_array, tile_square=figure_control.tile_square)
+        fig = _tile_figure(name, tile_array=figure_control.tile_array, tile_square=figure_control.tile_square)
     else:
-        fig = _mpl_pyplot_figure(name, figsize=figure_control.figsize)
+        fig = mpl_pyplot_figure(name, figsize=figure_control.figsize)
         if figure_control.upper_left_xy:
             upper_left_xy = figure_control.upper_left_xy
             x = upper_left_xy[0]
@@ -286,6 +286,12 @@ def setup_figure(
         fig_record = fm.setup_figure(figure_control, axis_control, view_spec_2d, title=img_name, code_tag=f"{__file__}", equal=False)
         fig_record.view.imshow(img)
         fig_record.view.show(block=True)
+        # ...
+        fig_record.close()
+
+    Note that even through the returned figure_record will ensure that the associated plot is closed when the associated
+    view object is destructed, it is almost always better to close the figure as soon as it's not needed any more via
+    the figure_record.close() method.
 
     Arguments:
     ----------
@@ -357,6 +363,10 @@ def setup_figure_for_3d_data(
     code_tag: str = None,
 ) -> RenderControlFigureRecord:
     """Create and setup a new RenderControlFigureRecord for rendering on a 3D graph.
+
+    Note that even through the returned figure_record will ensure that the associated plot is closed when the associated
+    view object is destructed, it is almost always better to close the figure as soon as it's not needed any more via
+    the figure_record.close() method.
 
     Arguments:
     ----------
@@ -433,7 +443,7 @@ def setup_figure_for_3d_data(
     return fig_record
 
 
-def display_plot(
+def _display_plot(
     x: float,
     # x_labels,
     y: float,
@@ -451,9 +461,9 @@ def display_plot(
     markersize: float = 2,
 ) -> plt.Figure:
     if tile:
-        fig = tile_figure(name, tile_array=tile_array)
+        fig = _tile_figure(name, tile_array=tile_array)
     else:
-        fig = _mpl_pyplot_figure(name, figsize=figsize)
+        fig = mpl_pyplot_figure(name, figsize=figsize)
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
@@ -471,7 +481,7 @@ def display_plot(
     return fig
 
 
-def display_bar(
+def _display_bar(
     x_labels,
     y_values,
     name: str = None,  # Figure handle and title of figure window.
@@ -482,9 +492,9 @@ def display_bar(
     upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
 ) -> plt.Figure:
     if tile:
-        fig = tile_figure(name, tile_array=tile_array)
+        fig = _tile_figure(name, tile_array=tile_array)
     else:
-        fig = _mpl_pyplot_figure(name, figsize=figsize)
+        fig = mpl_pyplot_figure(name, figsize=figsize)
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
@@ -541,7 +551,7 @@ def save_all_figures(output_path: str, format: str = None, timeout: float = None
 
     if timeout == None:
         for fig_record in fig_record_list:
-            t1, t2 = fig_record.save(output_path, format=format)
+            t1, t2 = fig_record.save(output_path, format=format, close_after_save=False)
             figs.append(t1)
             txts.append(t2)
 
@@ -553,7 +563,8 @@ def save_all_figures(output_path: str, format: str = None, timeout: float = None
         for fig_record in fig_record_list:
             # start the save
             results = []
-            t = Thread(target=lambda: results.append(fig_record.save(output_path, format=format)))
+            t = Thread(target=lambda: results.append(fig_record.save(
+                output_path, format=format, close_after_save=False)))
             t.start()
 
             # wait for the save to finish

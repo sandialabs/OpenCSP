@@ -4,6 +4,8 @@ import sys
 import time
 import unittest
 
+import matplotlib.pyplot as plt
+
 import opencsp.common.lib.opencsp_path.opencsp_root_path as root_path
 import opencsp.common.lib.process.subprocess_tools as st
 import opencsp.common.lib.render.figure_management as fm
@@ -34,6 +36,10 @@ class test_figure_management(unittest.TestCase):
         if is_original_call:
             ft.delete_files_in_directory(cls.dir_out, "*")
         return ret
+
+    def tearDown(self):
+        # Make sure we release all matplotlib resources.
+        plt.close('all')
 
     def assert_exists(self, figs_txts, cnt):
         """Verifies that cnt images and text files exist."""

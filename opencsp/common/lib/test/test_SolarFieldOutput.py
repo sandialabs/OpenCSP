@@ -6,7 +6,6 @@ Demonstrate Solar Field Plotting Routines
 """
 
 from datetime import datetime
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 
@@ -36,8 +35,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 class TestSolarFieldOutput(to.TestOutput):
     @classmethod
-    def setup_class(
-        self,
+    def setUpClass(
+        cls,
         source_file_body: str = 'TestSolarFieldOutput',  # Set these here, because pytest calls
         figure_prefix_root: str = 'tsfo',  # setup_class() with no arguments.
         interactive: bool = False,
@@ -59,13 +58,14 @@ class TestSolarFieldOutput(to.TestOutput):
         #     actually a code error).
         #
 
-        super(TestSolarFieldOutput, self).setup_class(
+        super(TestSolarFieldOutput, cls).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
             verify=verify,
         )
 
+    def setUp(self):
         # Note: It is tempting to put the "Reset rendering" code lines here, to avoid redundant
         # computation and keep all the plots up.  Don't do this, because the plotting system
         # will run low/out of memory, causing adverse effectes on the plots.
@@ -416,7 +416,8 @@ if __name__ == "__main__":
     verify = True  # False
     # Setup.
     test_object = TestSolarFieldOutput()
-    test_object.setup_class(interactive=interactive, verify=verify)
+    test_object.setUpClass(interactive=interactive, verify=verify)
+    test_object.setUp()
     # Tests.
     lt.info('Beginning tests...')
     test_object.test_single_heliostat()
@@ -434,4 +435,4 @@ if __name__ == "__main__":
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    test_object.teardown_method()
+    test_object.tearDown()

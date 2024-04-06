@@ -8,6 +8,7 @@ To create new test data, uncomment/comment the lines below.
 from os.path import join, dirname
 import unittest
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.scene_reconstruction.lib.SceneReconstruction import SceneReconstruction
@@ -75,6 +76,9 @@ class TestSceneReconstruction(unittest.TestCase):
         cls.pts_meas = scene_recon.get_data()
         cls.scene_recon = scene_recon
         cls.dir_output = dir_output
+
+    def tearDown(self) -> None:
+        plt.close('all')
 
     def test_calibrated_corner_locations(self):
         """Tests relative corner locations"""

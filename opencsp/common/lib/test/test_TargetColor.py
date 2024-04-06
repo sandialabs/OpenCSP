@@ -16,21 +16,22 @@ import opencsp.common.lib.tool.unit_conversion as uc
 
 class TestTargetColor(to.TestOutput):
     @classmethod
-    def setup_class(
-        self,
+    def setUpClass(
+        cls,
         source_file_body: str = 'TestTargetColor',  # Set these here, because pytest calls
         figure_prefix_root: str = 'ttc',  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
         # Generic setup.
-        super(TestTargetColor, self).setup_class(
+        super(TestTargetColor, cls).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
             verify=verify,
         )
 
+    def setUp(self):
         # Define image size and resolution for all tests.
         # self.image_width_in  = 3.0 # 48.0 # inch
         # self.image_height_in = 5.0 # 96.0 # inch
@@ -521,7 +522,8 @@ if __name__ == "__main__":
     verify = False  # True
     # Setup.
     test_object = TestTargetColor()
-    test_object.setup_class(interactive=interactive, verify=verify)
+    test_object.setUpClass(interactive=interactive, verify=verify)
+    test_object.setUp()
     # Tests.
     lt.info('Beginning tests...')
     test_object.test_matlab()
@@ -538,4 +540,4 @@ if __name__ == "__main__":
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    test_object.teardown_method()
+    test_object.tearDown()

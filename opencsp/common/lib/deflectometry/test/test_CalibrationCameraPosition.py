@@ -4,6 +4,7 @@
 from os.path import join
 import unittest
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.deflectometry.CalibrationCameraPosition import CalibrationCameraPosition
@@ -48,6 +49,10 @@ class TestCalibrationCameraPosition(unittest.TestCase):
         cls.data_exp = np.loadtxt(file_exp, delimiter=',')
         cls.data_meas = np.vstack((rvec, tvec))
         cls.cal = cal_camera_position
+
+    def tearDown(self) -> None:
+        # Make sure we release all matplotlib resources.
+        plt.close('all')
 
     def test_camera_rvec_tvec(self):
         """Tests the camera position vectors"""

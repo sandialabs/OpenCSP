@@ -88,44 +88,47 @@ class RenderControlFigureRecord:
             - str: output_figure_dir_body_ext, the image file
             - str: output_figure_text_dir_body_ext, the description of the image file (metadata, title, caption, comments, etc)
         """
-        if format is None:
-            format = 'svg'  # Default format was previously 'png'.
-        orig_format = format
-        if format.lower() == "gif":
-            format = "png"
+        try:
+            if format is None:
+                format = 'svg'  # Default format was previously 'png'.
+            orig_format = format
+            if format.lower() == "gif":
+                format = "png"
 
-        # Ensure the output destination is available.
-        if not (os.path.exists(output_dir)):
-            os.makedirs(output_dir)
+            # Ensure the output destination is available.
+            if not (os.path.exists(output_dir)):
+                os.makedirs(output_dir)
 
-        # Contruct the output filename.
-        if not output_file_body:
-            # Add a prefix to ensure unique filenames.      # This is currently done in figure_management.py
-            # prefix = '{0:03d}_'.format(self.figure_num)   #
-            # output_file_body = prefix + self.name         #
-            output_file_body = ft.convert_string_to_file_body(self.name)
-        output_figure_body = output_file_body
-        # Join with output directory.
-        output_figure_dir_body = os.path.join(output_dir, output_figure_body)
+            # Contruct the output filename.
+            if not output_file_body:
+                # Add a prefix to ensure unique filenames.      # This is currently done in figure_management.py
+                # prefix = '{0:03d}_'.format(self.figure_num)   #
+                # output_file_body = prefix + self.name         #
+                output_file_body = ft.convert_string_to_file_body(self.name)
+            output_figure_body = output_file_body
+            # Join with output directory.
+            output_figure_dir_body = os.path.join(output_dir, output_figure_body)
 
-        # If this is a 3-d plot, add the projection choice.
-        if self.view != None:
-            output_figure_dir_body_ext = self.view.save(output_dir, output_figure_body, format=format, dpi=dpi)
-        else:
-            # Make the figure current.
-            plt.figure(self.name)
-            # Save the current figure.
-            output_figure_dir_body_ext = output_figure_dir_body + '.' + format
-            # TODO RCB: THIS CODE IS DEPRECATED AS OF 11/20/2022.  ONCE IT'S CLEAR WE DON'T WANT IT, DELETE THE FOLLOWING COMMENTED-OUT LINES.
-            # if ft.file_exists(output_figure_dir_body_ext):
-            #     print('Skipping save of existing figure: ' + output_figure_dir_body_ext)
-            # else:
-            output_figure_dir_body_ext = output_figure_dir_body + '.' + format
-            lt.info('Saving figure: ' + output_figure_dir_body_ext)
-            plt.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
+            # If this is a 3-d plot, add the projection choice.
+            if self.view != None:
+                output_figure_dir_body_ext = self.view.save(output_dir, output_figure_body, format=format, dpi=dpi)
+            else:
+                # Make the figure current.
+                plt.figure(self.name)
+                # Save the current figure.
+                output_figure_dir_body_ext = output_figure_dir_body + '.' + format
+                # TODO RCB: THIS CODE IS DEPRECATED AS OF 11/20/2022.  ONCE IT'S CLEAR WE DON'T WANT IT, DELETE THE FOLLOWING COMMENTED-OUT LINES.
+                # if ft.file_exists(output_figure_dir_body_ext):
+                #     print('Skipping save of existing figure: ' + output_figure_dir_body_ext)
+                # else:
+                output_figure_dir_body_ext = output_figure_dir_body + '.' + format
+                lt.info('Saving figure: ' + output_figure_dir_body_ext)
+                plt.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
+        finally:
             # Close figure if desired.
-            if close_after_save:
-                plt.close()
+            if self.view is not None:
+                if close_after_save:
+                    plt.close()
 
         # Convert to gif, as necessary
         # Matplotlib doesn't support the gif format, so we convert to it after the fact
