@@ -59,6 +59,11 @@ class RenderControlFigureRecord:
         self.y_limits = None  # Y-axis limits (optional).     Set later.
         self.z_limits = None  # Z-axis limits (optional).     Set later.
 
+    def close(self):
+        """Closes any matplotlib window opened with this instance's view"""
+        if self.view != None:
+            self.view.close()
+
     def add_metadata_line(self, metadata_line: str) -> None:
         self.metadata.append(metadata_line)
 
