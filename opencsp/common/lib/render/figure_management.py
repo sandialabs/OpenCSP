@@ -563,8 +563,9 @@ def save_all_figures(output_path: str, format: str = None, timeout: float = None
         for fig_record in fig_record_list:
             # start the save
             results = []
-            t = Thread(target=lambda: results.append(fig_record.save(
-                output_path, format=format, close_after_save=False)))
+            t = Thread(
+                target=lambda: results.append(fig_record.save(output_path, format=format, close_after_save=False))
+            )
             t.start()
 
             # wait for the save to finish
