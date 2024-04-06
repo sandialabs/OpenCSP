@@ -6,9 +6,10 @@ import numpy as np
 from opencsp.common.lib.camera.image_processing import highlight_saturation
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 import opencsp.app.sofast.lib.sofast_common_functions as scf
+import opencsp.common.lib.render.lib.AbstractPlotHandler as aph
 
 
-class LiveView:
+class LiveView(aph.AbstractPlotHandler):
     def __init__(
         self, image_acquisition: ImageAcquisitionAbstract = None, update_ms: int = 20, highlight_saturation: bool = True
     ):
@@ -25,6 +26,8 @@ class LiveView:
             To highlight saturation red in image. Default is True
 
         """
+        super().__init__()
+
         # Get default values
         image_acquisition, _ = scf.get_default_or_global_instances(image_acquisition_default=image_acquisition)
 
@@ -34,6 +37,7 @@ class LiveView:
 
         # Create figure and axes
         self.fig = plt.figure()
+        self._register_plot(self.fig)
         self.ax = self.fig.gca()
 
         # Create image object
@@ -55,7 +59,8 @@ class LiveView:
         """
         if event.key == 'escape':
             print('Closing window')
-            plt.close(event.canvas.figure)
+        # always free the maptlotlib plot
+        super().close()
 
     def update(self, i: int) -> None:
         """

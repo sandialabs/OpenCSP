@@ -5,6 +5,7 @@ import datetime as dt
 import os
 import unittest
 
+import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
@@ -35,6 +36,10 @@ class TestImageCalibrationGlobal(unittest.TestCase):
 
         # Create calibration object
         cls.calibration = ImageCalibrationGlobal.from_data(frames, cls.display_values)
+
+    def tearDown(self):
+        # Make sure we release all matplotlib resources.
+        plt.close('all')
 
     def test_min_display_camera_values(self):
         disp_min, cam_min = self.calibration.calculate_min_display_camera_values()

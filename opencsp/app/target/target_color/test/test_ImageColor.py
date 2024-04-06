@@ -1,18 +1,19 @@
 """Unit test for ImageColor class
 """
 
+import matplotlib.pyplot as plt
 import numpy as np
+import unittest
 
 from opencsp.app.target.target_color.lib.ImageColor import ImageColor
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Vxy import Vxy
 
 
-class TestImageColor:
+class TestImageColor(unittest.TestCase):
     """Tests the ImageColor class"""
 
-    @classmethod
-    def setup_class(cls) -> 'TestImageColor':
+    def setUp(self) -> None:
         """Creates test RGB image and loads into ImageColor"""
         # Create RGB image with six bands
         # White, gray, black, red, off-red 1, off-red
@@ -31,9 +32,11 @@ class TestImageColor:
         # Off 3
         rgb[500:600, :, 1] = 10
         # Create ImageColor from test image
-        cls.image = ImageColor(rgb)
+        self.image = ImageColor(rgb)
 
-        return cls()
+    def tearDown(self) -> None:
+        # Make sure we release all matplotlib resources.
+        plt.close('all')
 
     def test_normalize(self) -> None:
         """Tests image color normalization of all patches"""

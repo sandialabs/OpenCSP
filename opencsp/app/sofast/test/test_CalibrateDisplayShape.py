@@ -6,6 +6,7 @@ from os.path import join
 import unittest
 
 from glob import glob
+import matplotlib.pyplot as plt
 import numpy as np
 import pytest
 
@@ -68,6 +69,10 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         cls.data_exp = load_hdf5_datasets(['pts_xy_screen_fraction', 'pts_xyz_screen_coords'], file_exp)
         cls.save_dir_local = join(opencsp_code_dir(), 'app/sofast/test/data/output/display_shape_calibrate')
         ft.create_directories_if_necessary(cls.save_dir_local)
+
+    def tearDown(self) -> None:
+        # Make sure we release all matplotlib resources.
+        plt.close('all')
 
     @pytest.mark.skipif(os.name != 'nt', reason='Does not pass in Linux environment for unkonwn reason.')
     def test_xy_screen_fraction(self):

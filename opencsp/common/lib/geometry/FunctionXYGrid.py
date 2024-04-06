@@ -5,7 +5,6 @@ from opencsp.common.lib.geometry.FunctionXYAbstract import FunctionXYAbstract
 from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.render_control.RenderControlFunctionXY as rcfxy
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class FunctionXYGrid(FunctionXYAbstract):

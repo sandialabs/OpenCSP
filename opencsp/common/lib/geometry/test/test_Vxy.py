@@ -263,7 +263,7 @@ class TestVxy:
             res = a.cross(b)
 
     def test_draw(self):
-        fig = fm._mpl_pyplot_figure()
+        fig = fm.mpl_pyplot_figure()
         ax = plt.gca()
         self.V1.draw(ax)
         plt.close(fig)

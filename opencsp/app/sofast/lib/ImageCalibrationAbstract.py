@@ -170,7 +170,7 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         title = 'Projector-Camera Calibration Curve'
 
         # Plot figure
-        fig = fm._mpl_pyplot_figure()
+        fig = fm.mpl_pyplot_figure()
         ax = fig.gca()
         ax.plot(self.display_values, self.camera_values)
         ax.set_xlabel('Display Values')

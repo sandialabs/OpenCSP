@@ -3,7 +3,6 @@ plots after measuring a CSP Mirror/FacetEnsemble.
 """
 
 from dataclasses import dataclass
-import matplotlib.pyplot as plt
 
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure

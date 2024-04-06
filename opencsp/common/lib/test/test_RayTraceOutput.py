@@ -10,7 +10,6 @@ import time
 from cmath import sin
 from typing import Callable
 
-import matplotlib.pyplot as plt
 import numpy as np
 from matplotlib.colors import LightSource
 from scipy.spatial.transform import Rotation
@@ -58,27 +57,27 @@ from opencsp.common.lib.render_control.RenderControlSurface import RenderControl
 
 class TestRayTraceOutput(to.TestOutput):
     @classmethod
-    def setup_class(
-        self,
+    def setUpClass(
+        cls,
         source_file_body: str = 'TestRayTraceOutput',  # Set these here, because pytest calls
         figure_prefix_root: str = 'trto',  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
         # Generic setup.
-        super(TestRayTraceOutput, self).setup_class(
+        super(TestRayTraceOutput, cls).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
             verify=verify,
         )
+
+    def setUp(self):
         # Domain-specific setup.
 
         # Mirror, based on a parameteric model.
         self.m1_focal_length = 2.0  # meters
-        self.m1_fxn = self.lambda_symmetric_paraboloid(
-            self, self.m1_focal_length
-        )  # Include self as a parameter, because this setup_class() function is a @classmethod.
+        self.m1_fxn = self.lambda_symmetric_paraboloid(self.m1_focal_length)
         self.m1_len_x = 2.0  # m
         self.m1_len_y = 3.0  # m
         self.m1_rectangle_xy = (self.m1_len_x, self.m1_len_y)
@@ -615,7 +614,8 @@ if __name__ == "__main__":
     verify = False
     # Setup.
     test_object = TestRayTraceOutput()
-    test_object.setup_class(interactive=interactive, verify=verify)
+    test_object.setUpClass(interactive=interactive, verify=verify)
+    test_object.setUp()
     # Tests.
     lt.info('Beginning tests...')
     test_object.test_draw_simple_ray()
@@ -628,4 +628,4 @@ if __name__ == "__main__":
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    test_object.teardown_method()
+    test_object.tearDown()

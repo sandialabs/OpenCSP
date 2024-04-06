@@ -84,8 +84,8 @@ class TestProcessSofastFixed(unittest.TestCase):
             self.process_sofast_fixed.data_slope_solver.slopes_facet_xy, self.exp_slopes_xy, rtol=0, atol=1e-6
         )
 
-    @classmethod
-    def tearDownClass(cls):
+    def tearDown(self) -> None:
+        # Make sure we release all matplotlib resources.
         plt.close('all')
 
 

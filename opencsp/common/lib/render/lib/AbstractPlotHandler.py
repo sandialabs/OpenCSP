@@ -11,6 +11,9 @@ import opencsp.common.lib.tool.exception_tools as et
 class AbstractPlotHandler(ABC):
     """Class to automatically track and close matplotlib plot windows.
 
+    Note that even through this will ensure that all registered plots are closed when the this instance is destructed,
+    it is almost always better to close the figure as soon as it's not needed any more via the close() method.
+
     Implementing classes need to make calls to:
     - super().__init__()
     - super().__del__()

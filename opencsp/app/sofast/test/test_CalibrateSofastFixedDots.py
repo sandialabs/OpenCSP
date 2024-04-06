@@ -87,8 +87,8 @@ class TestFixedPatternSetupCalibrate(unittest.TestCase):
         np.testing.assert_allclose(dot_locs.x_dot_index, dot_locs_exp.x_dot_index, atol=1e-6, rtol=0)
         np.testing.assert_allclose(dot_locs.y_dot_index, dot_locs_exp.y_dot_index, atol=1e-6, rtol=0)
 
-    @classmethod
-    def tearDownClass(cls) -> None:
+    def tearDown(self) -> None:
+        # Make sure we release all matplotlib resources.
         plt.close('all')
 
 
