@@ -9,6 +9,8 @@ from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionA
 
 class ImageAcquisition(ImageAcquisitionAbstract):
     def __init__(self):
+        super().__init__()
+
         # Define max saturation value
         self._max_value = 250
 
@@ -76,3 +78,13 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
     def close(self):
         self.is_closed = True
+        super().close()
+
+
+class IA_No_Calibrate(ImageAcquisition):
+    def __init__(self):
+        super().__init__()
+        self.is_calibrated = False
+
+    def calibrate_exposure(self):
+        self.is_calibrated = True

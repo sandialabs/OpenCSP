@@ -9,12 +9,12 @@ import opencsp.common.lib.tool.exception_tools as et
 
 
 class AbstractPlotHandler(ABC):
-    """ Class to automatically track and close matplotlib plot windows.
+    """Class to automatically track and close matplotlib plot windows.
 
     Implementing classes need to make calls to:
     - super().__init__()
     - super().__del__()
-    - self._register_plot(fig) """
+    - self._register_plot(fig)"""
 
     def __init__(self, *vargs, **kwargs):
         self._open_plots: list[matplotlib.figure.Figure] = []

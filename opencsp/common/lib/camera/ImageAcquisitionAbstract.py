@@ -13,7 +13,7 @@ class ImageAcquisitionAbstract(ABC):
     @staticmethod
     @functools.cache
     def cam_options() -> dict[str, type['ImageAcquisitionAbstract']]:
-        """ Defines camera objects to choose from (camera description, python type) """
+        """Defines camera objects to choose from (camera description, python type)"""
         # import here to avoid circular reference
         from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as IA_DCAM_mono
         from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import ImageAcquisition as IA_DCAM_color
@@ -148,7 +148,7 @@ class ImageAcquisitionAbstract(ABC):
 
     @exposure_time_seconds.setter
     def exposure_time_seconds(self, exposure_time_seconds: float):
-        self.exposure_time = int(exposure_time_seconds / 1_000_000)
+        self.exposure_time = int(exposure_time_seconds * 1_000_000)
 
     @abstractproperty
     def frame_size(self):

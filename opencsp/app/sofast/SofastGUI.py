@@ -322,9 +322,7 @@ class SofastGUI:
         lbl_cal_type = tkinter.Label(
             label_frame_settings, text='Select calibration method:', font=('calibre', 10, 'bold')
         )
-        drop_cal_type = tkinter.OptionMenu(
-            label_frame_settings, self.var_cal_select, *list(cal_options.keys())
-        )
+        drop_cal_type = tkinter.OptionMenu(label_frame_settings, self.var_cal_select, *list(cal_options.keys()))
         tkt.TkToolTip(drop_cal_type, 'Select type of Projector-Camera Brightness Calibration process to use.')
 
         lbl_cal_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
@@ -475,8 +473,7 @@ class SofastGUI:
             return False
 
     def _check_calibration_loaded(self, method_name: str) -> bool:
-        """Checks if calibration is loaded. Returns True if loaded.
-        """
+        """Checks if calibration is loaded. Returns True if loaded."""
         try:
             return scf.check_calibration_loaded(self.sys_fringe, method_name)
         except Exception as ex:
@@ -828,7 +825,7 @@ class SofastGUI:
 
 if __name__ == '__main__':
     # start the logger
-    log_name_ext = "SOFAST_GUI_"+tdt.current_date_time_string_forfile()+".log"
+    log_name_ext = "SOFAST_GUI_" + tdt.current_date_time_string_forfile() + ".log"
     log_path_name_ext = os.path.join(orp.opencsp_temporary_dir(), log_name_ext)
     lt.logger(log_path_name_ext)
 
