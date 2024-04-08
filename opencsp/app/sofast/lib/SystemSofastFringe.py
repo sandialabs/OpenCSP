@@ -113,7 +113,7 @@ class SystemSofastFringe:
             and len(image_acquisitions) > 0
             and isinstance(image_acquisitions[0], ImageAcquisitionAbstract)
         ):
-            image_acquisitions = image_acquisitions
+            pass
         elif isinstance(image_acquisitions, ImageAcquisitionAbstract):
             image_acquisitions = [image_acquisitions]
         else:
@@ -169,10 +169,10 @@ class SystemSofastFringe:
         self.mask_images_to_display = []
         image_projection = ImageProjection.instance()
         # Create black image
-        array = np.array(image_projection.zeros())
+        array = np.array(image_projection.get_black_array_active_area())
         self.mask_images_to_display.append(array)
         # Create white image
-        array = np.array(image_projection.zeros()) + image_projection.max_int
+        array = np.array(image_projection.get_black_array_active_area()) + image_projection.max_int
         self.mask_images_to_display.append(array)
 
     def _measure_sequence_display(

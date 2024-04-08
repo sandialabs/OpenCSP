@@ -21,7 +21,6 @@ class TestImageCalibrationGlobal(unittest.TestCase):
         # Get data directories
         path, _, _ = ft.path_components(__file__)
         cls.data_dir = os.path.join(path, "data", "input", "ImageCalibrationGlobal")
-        cls.cal_dir = os.path.join(path, "data", "input", "CameraCalibration")
         cls.out_dir = os.path.join(path, "data", "output", "ImageCalibrationGlobal")
         ft.create_directories_if_necessary(cls.data_dir)
         ft.create_directories_if_necessary(cls.out_dir)
@@ -82,7 +81,7 @@ class TestImageCalibrationGlobal(unittest.TestCase):
 
     def test_to_from_hdf(self):
         # load our testing data from a known file
-        file_cal_global = os.path.join(self.cal_dir, "cal_global.h5")
+        file_cal_global = os.path.join(self.data_dir, "cal_global.h5")
         cal = ImageCalibrationGlobal.load_from_hdf(file_cal_global)
         np.testing.assert_almost_equal(cal.camera_values, [5, 10, 15, 20, 25, 30, 35, 40, 45], decimal=0.1)
         np.testing.assert_almost_equal(
@@ -105,7 +104,7 @@ class TestImageCalibrationGlobal(unittest.TestCase):
 
     def test_plot_gray_levels_cal_no_calibration(self):
         # load the calibration
-        file_cal_global = os.path.join(self.cal_dir, "cal_global.h5")
+        file_cal_global = os.path.join(self.data_dir, "cal_global.h5")
         cal = ImageCalibrationGlobal.load_from_hdf(file_cal_global)
 
         # plot (the calibration class should take care of closing the plot)

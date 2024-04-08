@@ -66,7 +66,7 @@ class test_ImageProjection(unittest.TestCase):
         image_projection = _ImageProjection.in_new_window(_ImageProjection.display_dict)
 
         # Get the zeros array and verify its shape and values
-        zeros = image_projection.zeros()
+        zeros = image_projection.get_black_array_active_area()
         self.assertEqual((480, 640, 3), zeros.shape)
         ones = zeros + 1
         self.assertEqual(np.sum(ones), 640 * 480 * 3)

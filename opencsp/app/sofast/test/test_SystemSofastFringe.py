@@ -24,7 +24,6 @@ class TestSystemSofastFringe(unittest.TestCase):
     def setUp(self):
         path, _, _ = ft.path_components(__file__)
         self.data_dir = os.path.join(path, "data", "input", "SystemSofastFringe")
-        self.cal_dir = os.path.join(path, "data", "input", "CameraCalibration")
         self.out_dir = os.path.join(path, "data", "output", "SystemSofastFringe")
         ft.create_directories_if_necessary(self.data_dir)
         ft.create_directories_if_necessary(self.out_dir)

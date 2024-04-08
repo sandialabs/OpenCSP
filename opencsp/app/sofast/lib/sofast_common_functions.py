@@ -9,9 +9,6 @@ from typing import Callable, Literal
 import numpy as np
 
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
-from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as ImageAcquisition_DCAM
-from opencsp.common.lib.camera.ImageAcquisition_DCAM_color import ImageAcquisition as ImageAcquisition_DCAM_color
-from opencsp.common.lib.camera.ImageAcquisition_MSMF import ImageAcquisition as ImageAcquisition_MSMF
 import opencsp.app.sofast.lib.SystemSofastFringe as ssf
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 import opencsp.common.lib.tool.log_tools as lt
@@ -189,7 +186,7 @@ def run_exposure_cal(
             if on_done is not None:
                 on_done()
 
-        white_image = np.array(image_projection.zeros()) + image_projection.max_int
+        white_image = np.array(image_projection.get_black_array_active_area()) + image_projection.max_int
         image_projection.display_image_in_active_area(white_image)
         image_projection.root.after(100, run_cal)
 
