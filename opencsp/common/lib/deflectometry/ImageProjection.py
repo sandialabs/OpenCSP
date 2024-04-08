@@ -300,9 +300,9 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         # Display with black border
         self.display_image_in_active_area(array)
 
-    def zeros(self) -> np.ndarray:
+    def get_black_array_active_area(self) -> np.ndarray:
         """
-        Creates a black image to fill the entire projected area.
+        Creates a black image to fill the active area of self.size_y by self.size_x pixels.
 
         Returns:
         --------

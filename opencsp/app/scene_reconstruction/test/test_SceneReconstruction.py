@@ -54,7 +54,7 @@ class TestSceneReconstruction(unittest.TestCase):
         ft.create_directories_if_necessary(dir_output)
 
         path, _, _ = ft.path_components(__file__)
-        cls.out_dir = join(path, "data", "output", "ImageAcquisitionAbstract")
+        cls.out_dir = join(path, "data", "output", "SceneReconstruction")
         ft.create_directories_if_necessary(cls.out_dir)
 
         # Load components

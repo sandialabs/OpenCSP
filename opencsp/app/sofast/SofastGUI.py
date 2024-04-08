@@ -69,7 +69,7 @@ class SofastGUI:
             if self.sys_fringe is not None:
                 return True
             # Create the new instance
-            self.sys_fringe = ssf.SystemSofastFringe(projector, camera)
+            self.sys_fringe = ssf.SystemSofastFringe()
             # Update the state of the GUI
             self._enable_btns()
             return True

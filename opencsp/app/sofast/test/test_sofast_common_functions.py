@@ -20,7 +20,7 @@ class test_sofast_common_functions(unittest.TestCase):
     def setUp(self) -> None:
         path, _, _ = ft.path_components(__file__)
         self.data_dir = os.path.join(path, "data", "input", "sofast_common_functions")
-        self.cal_dir = os.path.join(path, "data", "input", "CameraCalibration")
+        self.cal_dir = os.path.join(path, "data", "input", "ImageCalibrationGlobal")
         self.out_dir = os.path.join(path, "data", "output", "sofast_common_functions")
         ft.create_directories_if_necessary(self.data_dir)
         ft.create_directories_if_necessary(self.out_dir)
