@@ -119,7 +119,7 @@ def main():
         min_disp_value = np.max(min_disp_vals)
 
         # Load fringe objects
-        system.load_fringes(fringes, min_disp_value)
+        system.set_fringes(fringes, min_disp_value)
 
         system.run_next_in_queue()
 

@@ -68,7 +68,7 @@ class TestSystemSofastFringe(unittest.TestCase):
         system = SystemSofastFringe(im_aq)
 
         # Load fringes
-        system.load_fringes(fringes, 0)
+        system.set_fringes(fringes, 0)
 
         # Define functions to put in system queue
         def f1():
@@ -121,18 +121,20 @@ class TestSystemSofastFringe(unittest.TestCase):
         ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
+        sys.set_fringes(Fringes.from_num_periods(), 0)
         with self.assertRaises(RuntimeError):
-            sys.run_measurement(Fringes.from_num_periods())
+            sys.run_measurement()
 
     def test_run_measurement_without_on_done(self):
         ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
         sys.calibration = self.calibration_global
+        sys.set_fringes(self.fringes)
 
         # Shouldn't raise any errors, everything set
         # Note that this doesn't actually evaluate anything because we don't have a tkinter loop running
-        sys.run_measurement(self.fringes)
+        sys.run_measurement()
 
     def test_run_measurement_with_on_done(self):
         global is_done
@@ -149,10 +151,11 @@ class TestSystemSofastFringe(unittest.TestCase):
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
         sys.calibration = self.calibration_global
+        sys.set_fringes(self.fringes)
 
         # capture images
         self.assertFalse(is_done)
-        sys.run_measurement(self.fringes, on_done)
+        sys.run_measurement(on_done)
         # runs the tkinter gui main loop until close_all() is called in on_done()
         sys.run()
         # if we got to this point, then either 1. run() does nothing, or 2. on_done() got called

@@ -622,6 +622,7 @@ class SofastGUI:
         fringe_periods_x = self.var_fringe_periods_x.get()
         fringe_periods_y = self.var_fringe_periods_y.get()
         fringes = Fringes.from_num_periods(fringe_periods_x, fringe_periods_y)
+        self.sys_fringe.set_fringes(fringes)
 
         # Define what to run after measurement sequence
         def run_next():
@@ -633,7 +634,7 @@ class SofastGUI:
             lt.info(f'Measurement data saved to:\n    {file}')
 
         # Capture images
-        self.sys_fringe.run_measurement(fringes, run_next)
+        self.sys_fringe.run_measurement(run_next)
 
     def run_exposure_cal(self) -> None:
         """Runs camera exposure calibration"""
