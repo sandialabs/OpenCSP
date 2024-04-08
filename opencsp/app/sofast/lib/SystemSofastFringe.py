@@ -72,7 +72,7 @@ class SystemSofastFringe:
         self._queue_funcs = []
 
         # Define variables
-        self.fringes: Fringes
+        self._fringes: Fringes
         self.fringe_images_to_display: list[ndarray]
         self.mask_images_captured: list[ndarray]
         self.fringe_images_captured: list[list[ndarray]]
@@ -92,6 +92,11 @@ class SystemSofastFringe:
 
         # Close Fringe-specific objects
         self.reset_all_measurement_data()
+
+    @property
+    def fringes(self):
+        """ Get the fringes this instance uses. Note, no setter, use set_fringes() instead. """
+        return self._fringes
 
     @property
     def image_acquisitions(self) -> list[ImageAcquisitionAbstract]:
@@ -147,7 +152,7 @@ class SystemSofastFringe:
 
         """
         # Reset measurement attributes to None
-        self.fringes = None
+        self._fringes = None
 
         self.mask_images_to_display = None
         self.mask_images_captured = None
@@ -241,7 +246,7 @@ class SystemSofastFringe:
             # Run next operation if finished
             run_next()
 
-    def load_fringes(self, fringes: Fringes, min_display_value: int) -> None:
+    def set_fringes(self, fringes: Fringes, min_display_value: int = None) -> None:
         """
         Loads fringe object and creates RGB fringe images to display.
 
@@ -251,14 +256,27 @@ class SystemSofastFringe:
         ----------
         fringes : Fringes
             Fringe object to display.
-        min_display_value : int
-            Minimum display value to project.
+        min_display_value : int, None
+            Minimum display value to project. Should be based on the sensitivity of the camera in the optical system. In
+            a perfect system where the camera can tell the difference between the displayed values '0' and '1', this
+            value will be '0'. If None, then the value is retrieved from
+            self.calibration.calculate_min_display_camera_values().
 
         """
         image_projection = ImageProjection.instance()
 
+        # Validate input
+        if min_display_value is None:
+            if self.calibration is None:
+                lt.error_and_raise(
+                    ValueError,
+                    "Error in SystemSofastFringe.set_fringes(): " +
+                    "must provide a min_display_value, or run or provided a calibration, before setting the fringes",
+                )
+            min_display_value = self.calibration.calculate_min_display_camera_values()[0]
+
         # Save fringes
-        self.fringes = fringes
+        self._fringes = fringes
 
         # Get fringe range
         fringe_range = (min_display_value, image_projection.display_data['projector_max_int'])
@@ -401,7 +419,7 @@ class SystemSofastFringe:
 
         """
         # Check fringes/camera have been loaded
-        if self.fringes is None:
+        if self._fringes is None:
             lt.error_and_raise(
                 ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): Fringes have not been loaded.'
             )
@@ -430,7 +448,7 @@ class SystemSofastFringe:
 
         """
         # Check fringes/camera have been loaded
-        if self.fringes is None:
+        if self._fringes is None:
             lt.error_and_raise(
                 ValueError,
                 'Error in SystemSofastFringe.capture_mask_and_fringe_images(): Fringes have not been loaded.',
@@ -442,7 +460,7 @@ class SystemSofastFringe:
         # Capture mask images, then capture fringe images, then run_next
         self.capture_mask_images(run_after_capture)
 
-    def run_measurement(self, fringes: Fringes, on_done: Callable = None) -> None:
+    def run_measurement(self, on_done: Callable = None) -> None:
         """Runs data collection with the given fringes.
 
         Once the data has been captured, the images will be available from this instance. Similarly, the data can then
@@ -450,15 +468,13 @@ class SystemSofastFringe:
 
         Params
         ------
-        fringes: Fringes
-            The fringes to display and capture images of.
         on_done: Callable
             The function to call when capturing fringe images has finished.
 
         Raises
         ------
         RuntimeError:
-            Calibration hasn't been set
+            Calibration hasn't been set, or fringes haven't been set
         """
         # Get minimum display value from calibration
         if self.calibration is None:
@@ -466,10 +482,11 @@ class SystemSofastFringe:
                 RuntimeError,
                 "Error in SystemSofastFringe.run_measurement(): must have run or provided a calibration before starting a measurement.",
             )
-        min_disp_value = self.calibration.calculate_min_display_camera_values()[0]
-
-        # Load fringes
-        self.load_fringes(fringes, min_disp_value)
+        if self._fringes is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SystemSofastFringe.run_measurement(): must have set fringes before starting a measurement.",
+            )
 
         # Capture images
         self.capture_mask_and_fringe_images(on_done)
@@ -574,8 +591,8 @@ class SystemSofastFringe:
             # Create measurement object
             dist_optic_screen_measure = osd.DistanceOpticScreen(v_measure_point, dist_optic_screen)
             kwargs = dict(
-                fringe_periods_x=np.array(self.fringes.periods_x),
-                fringe_periods_y=np.array(self.fringes.periods_y),
+                fringe_periods_x=np.array(self._fringes.periods_x),
+                fringe_periods_y=np.array(self._fringes.periods_y),
                 fringe_images=np.concatenate(fringe_images, axis=2),
                 mask_images=np.concatenate(mask_images, axis=2),
                 dist_optic_screen_measure=dist_optic_screen_measure,
