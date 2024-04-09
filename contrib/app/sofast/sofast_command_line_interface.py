@@ -4,8 +4,10 @@ from os.path import join, dirname
 
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
@@ -14,14 +16,12 @@ from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
+from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.tool.log_tools as lt
-
-# Testing
-# from opencsp.app.sofast.test.ImageAcquisition_no_camera import ImageAcquisition as ianc
 
 
 def _timestamp() -> str:
@@ -43,11 +43,13 @@ def main():
     file_display = join(dir_cal, 'display_shape_optics_lab_landscape_square_distorted_3d_100x100.h5')
     file_camera = join(dir_cal, 'camera_sofast_optics_lab_landscape.h5')
     file_image_projection = join(dir_cal, 'image_projection_optics_lab_landscape_square.h5')
+    file_dot_locs = join(dir_cal, 'dot_locations_optics_lab_landscape_square_width3_space6.h5')
 
     facet_definition = DefinitionFacet.load_from_json(file_facet_definition_json)
     spatial_orientation = SpatialOrientation.load_from_hdf(file_spatial_orientation)
     display = DisplayShape.load_from_hdf(file_display)
     camera = Camera.load_from_hdf(file_camera)
+    fixed_pattern_dot_locs = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
 
     periods_x = [0.9, 4., 16.]  # , 64.]
     periods_y = [0.9, 4., 16.]  # , 64.]
@@ -55,7 +57,9 @@ def main():
     surface = Surface2DParabolic((100.0, 100.0), False, 10)
     measure_point_optic = Vxyz((0, 0, 0))
     dist_optic_screen = 10.0
+    origin = Vxy((993, 644))
     name_optic = 'Test optic'
+    res_plot = 0.002  # m
 
     # Define setup (NSTTF Optics Lab)
     image_projection = ImageProjection.load_from_hdf_and_display(file_image_projection)
@@ -72,6 +76,8 @@ def main():
 
     system_fixed = SystemSofastFixed(image_acquisition)
     system_fixed.set_pattern_parameters(3, 6)
+
+    sofast_fixed = ProcessSofastFixed(spatial_orientation, camera, fixed_pattern_dot_locs, facet_definition)
 
     def func_process_gray_levels_cal():
         """Processes the grey levels calibration data"""
@@ -112,8 +118,8 @@ def main():
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         axis_control_m = rca.meters()
         fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
-        mirror.plot_orthorectified_slope(0.002, clim=7, axis=fig_record.axis)
-        fig_record.save(dir_save, f'{_timestamp():s}_slope_magnitude', 'png')
+        mirror.plot_orthorectified_slope(res_plot, clim=7, axis=fig_record.axis)
+        fig_record.save(dir_save, f'{_timestamp():s}_slope_magnitude_fringe', 'png')
 
         # Save processed sofast data
         sofast.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_data_sofast_fringe.h5')
@@ -121,10 +127,42 @@ def main():
         # Continue
         system_fringe.run_next_in_queue()
 
-    def func_save_measurement():
+    def func_process_sofast_fixed_data():
+        """Process Sofast Fixed data"""
+        lt.debug(f'{_timestamp():s} Processing Sofast Fixed data')
+
+        # Get Measurement object
+        measurement = system_fixed.get_measurement(measure_point_optic, dist_optic_screen, origin, name=name_optic)
+        sofast_fixed.load_measurement_data(measurement)
+
+        # Process
+        sofast_fixed.process_single_facet_optic(surface)
+
+        # Plot optic
+        mirror = sofast_fixed.get_mirror()
+
+        figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
+        axis_control_m = rca.meters()
+        fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
+        mirror.plot_orthorectified_slope(res_plot, clim=7, axis=fig_record.axis)
+        fig_record.save(dir_save, f'{_timestamp():s}_slope_magnitude_fixed', 'png')
+
+        # Save processed sofast data
+        sofast_fixed.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_data_sofast_fixed.h5')
+
+        # Continue
+        system_fixed.run_next_in_queue()
+
+    def func_save_measurement_fixed():
+        """Save fixed measurement files"""
+        measurement = system_fixed.get_measurement(measure_point_optic, dist_optic_screen, origin, name=name_optic)
+        measurement.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_measurement_fixed.h5')
+        system_fixed.run_next_in_queue()
+
+    def func_save_measurement_fringe():
         """Saves measurement to HDF file"""
         measurement = system_fringe.get_measurements(measure_point_optic, dist_optic_screen, name_optic)[0]
-        measurement.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_measurement.h5')
+        measurement.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_measurement_fringe.h5')
         system_fringe.run_next_in_queue()
 
     def func_calibrate_camera_exposure():
@@ -176,7 +214,7 @@ def main():
                 func_show_crosshairs,
                 func_pause,
                 func_process_sofast_fringe_data,
-                func_save_measurement,
+                func_save_measurement_fringe,
                 func_user_input,
             ]
             system_fringe.set_queue(funcs)
@@ -187,15 +225,26 @@ def main():
                 lambda: system_fringe.run_measurement(system_fringe.run_next_in_queue),
                 func_show_crosshairs,
                 func_pause,
-                func_save_measurement,
+                func_save_measurement_fringe,
                 func_user_input,
             ]
             system_fringe.set_queue(funcs)
             system_fringe.run()
-        elif retval == 'mis':
-            lt.info(f'{_timestamp()} Running Sofast Fixed measurement')
+        elif retval == 'mip':
+            lt.info(f'{_timestamp()} Running Sofast Fixed measurement and processing/saving data')
             funcs = [
                 system_fixed.run_measurement,
+                func_process_sofast_fixed_data,
+                func_save_measurement_fixed,
+                func_user_input,
+            ]
+            system_fixed.set_queue(funcs)
+            system_fixed.run()
+        elif retval == 'mis':
+            lt.info(f'{_timestamp()} Running Sofast Fixed measurement and saving data')
+            funcs = [
+                system_fixed.run_measurement,
+                func_save_measurement_fixed,
                 func_user_input,
             ]
             system_fixed.set_queue(funcs)
