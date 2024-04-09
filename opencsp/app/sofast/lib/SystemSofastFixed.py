@@ -3,6 +3,7 @@ from typing import Callable, Literal
 
 from numpy.typing import NDArray
 
+import opencsp.app.sofast.lib.DistanceOpticScreen as dos
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.PatternSofastFixed import PatternSofastFixed
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
@@ -112,14 +113,14 @@ class SystemSofastFixed:
             v_measure_point_facet: Vxyz,
             dist_optic_screen: float,
             origin: Vxy,
-            date: dt.datetime = dt.datetime.now(),
+            date: dt.datetime = None,
             name: str = '',
     ) -> MeasurementSofastFixed:
         """Returns the SofastFixedMeasurement object"""
+        dist_optic_screen_measure = dos.DistanceOpticScreen(v_measure_point_facet, dist_optic_screen)
         return MeasurementSofastFixed(
             self.image_measurement,
-            v_measure_point_facet,
-            dist_optic_screen,
+            dist_optic_screen_measure,
             origin,
             date,
             name,
