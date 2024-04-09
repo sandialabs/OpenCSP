@@ -17,27 +17,29 @@ import opencsp.common.lib.tool.log_tools as lt
 class SystemSofastFixed:
     """Class that orchestrates the running of a SofastFixed system"""
 
-    def __init__(
-        self,
-        image_projection: ImageProjection,
-        image_acquisition: ImageAcquisitionAbstract,
-    ) -> 'SystemSofastFixed':
+    def __init__(self, image_acquisition: ImageAcquisitionAbstract) -> 'SystemSofastFixed':
         """
         Instantiates SystemSofastFringe class.
 
         Parameters
         ----------
-        image_projection : ImageProjection
-            Loaded ImageProjection object.
         image_acquisition : ImageAcquisition
             Loaded ImageAcquisition object.
         """
-        # Save objects in class
-        self.image_projection = image_projection
+        # Import here to avoid circular dependencies
+        import opencsp.app.sofast.lib.sofast_common_functions as scf
+
+        # Get defaults
+        image_acquisition, image_projection = scf.get_default_or_global_instances(
+            image_acquisition_default=image_acquisition
+        )
+        # Validate input
+        if image_projection is None or image_acquisition is None:
+            lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
         self.image_acquisition = image_acquisition
 
         # Show crosshairs
-        self.image_projection.show_crosshairs()
+        image_projection.show_crosshairs()
 
         # Initialize queue
         self._queue_funcs = []
@@ -56,7 +58,7 @@ class SystemSofastFixed:
         """The value that corresponds to pure white"""
         self.dot_shape: Literal['circle', 'square'] = 'circle'
         """The shape of the fixed pattern dots"""
-        self.image_delay = self.image_projection.display_data['image_delay']  # ms
+        self.image_delay = image_projection.display_data['image_delay']  # ms
         """The delay after displaying the image to capturing an image, ms"""
 
     def set_pattern_parameters(self, width_pattern: int, spacing_pattern: int):
@@ -73,8 +75,9 @@ class SystemSofastFixed:
         """
         lt.debug(f'SystemSofastFixed fixed pattern dot width set to {width_pattern:d} pixels')
         lt.debug(f'SystemSofastFixed fixed pattern dot spacing set to {spacing_pattern:d} pixels')
-        size_x = self.image_projection.size_x
-        size_y = self.image_projection.size_y
+        image_projection = ImageProjection.instance()
+        size_x = image_projection.size_x
+        size_y = image_projection.size_y
         self.pattern_sofast_fixed = PatternSofastFixed(size_x, size_y, width_pattern, spacing_pattern)
         self.pattern_image = self.pattern_sofast_fixed.get_image(self.dtype, self.max_int, self.dot_shape)
 
@@ -95,7 +98,8 @@ class SystemSofastFixed:
             return
 
         # Project pattern
-        self.image_projection.display_image_in_active_area(self.pattern_image)
+        image_projection = ImageProjection.instance()
+        image_projection.display_image_in_active_area(self.pattern_image)
         self.run_next_in_queue()
 
     def capture_image(self) -> None:
@@ -132,7 +136,8 @@ class SystemSofastFixed:
         Upon completion, runs self.run_next_in_queue()
         """
         lt.debug(f'SystemSofastFixed pausing by {self.image_delay:.0f} ms')
-        self.image_projection.root.after(self.image_delay, self.run_next_in_queue)
+        image_projection = ImageProjection.instance()
+        image_projection.root.after(self.image_delay, self.run_next_in_queue)
 
     def run_measurement(self) -> None:
         """Runs the measurement sequence
@@ -172,7 +177,8 @@ class SystemSofastFixed:
 
         # Close window
         with et.ignored(Exception):
-            self.image_projection.root.destroy()
+            image_projection = ImageProjection.instance()
+            image_projection.root.destroy()
 
     def prepend_to_queue(self, funcs: list[Callable]) -> None:
         """Prepends the current list of functions to the queue"""
@@ -186,11 +192,17 @@ class SystemSofastFixed:
         """Runs the next funtion in the queue and removes from queue"""
         if len(self._queue_funcs) > 0:
             func = self._queue_funcs.pop(0)
-            func()
+
+            try:
+                func()
+            except Exception as error:
+                lt.error(repr(error))
+                self._queue_funcs = []
 
     def run(self) -> None:
         """
         Instantiates the system by starting the mainloop of the ImageProjection object.
         """
         self.run_next_in_queue()
-        self.image_projection.root.mainloop()
+        image_projection = ImageProjection.instance()
+        image_projection.root.mainloop()
