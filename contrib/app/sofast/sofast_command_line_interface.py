@@ -2,6 +2,8 @@ import datetime as dt
 import glob as glob
 from os.path import join, dirname
 
+import matplotlib.pyplot as plt
+
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
@@ -54,23 +56,23 @@ def main():
     periods_x = [0.9, 4., 16.]  # , 64.]
     periods_y = [0.9, 4., 16.]  # , 64.]
     fringes = Fringes(periods_x, periods_y)
-    surface = Surface2DParabolic((100.0, 100.0), False, 10)
-    measure_point_optic = Vxyz((0, 0, 0))
-    dist_optic_screen = 10.0
-    origin = Vxy((993, 644))
+    surface_fixed = Surface2DParabolic((100.0, 100.0), False, 10)
+    surface_fringe = Surface2DParabolic((100.0, 100.0), False, 10)
+    measure_point_optic = Vxyz((0, 0, 0))  # meters
+    dist_optic_screen = 10.263  # meters
+    origin = Vxy((993, 628))  # pixels
     name_optic = 'Test optic'
-    res_plot = 0.002  # m
+    res_plot = 0.002  # meters
 
     # Define setup (NSTTF Optics Lab)
     image_projection = ImageProjection.load_from_hdf_and_display(file_image_projection)
 
     # Set image delay
-    image_projection.display_data['image_delay'] = 100
+    image_projection.display_data['image_delay'] = 200
 
     image_acquisition = ImageAcquisition(0)
     image_acquisition.frame_size = (1626, 1236)
     image_acquisition.gain = 230
-    image_acquisition.exposure_time = 260025
 
     system_fringe = SystemSofastFringe(image_acquisition)
 
@@ -78,6 +80,7 @@ def main():
     system_fixed.set_pattern_parameters(3, 6)
 
     sofast_fixed = ProcessSofastFixed(spatial_orientation, camera, fixed_pattern_dot_locs, facet_definition)
+    # sofast_fixed.params.geometry_data_debug.debug_active = True
 
     def func_process_gray_levels_cal():
         """Processes the grey levels calibration data"""
@@ -110,7 +113,7 @@ def main():
         sofast = ProcessSofastFringe(measurement, spatial_orientation, camera, display)
 
         # Process
-        sofast.process_optic_singlefacet(facet_definition, surface)
+        sofast.process_optic_singlefacet(facet_definition, surface_fringe)
 
         # Plot optic
         mirror = sofast.get_optic().mirror
@@ -136,7 +139,7 @@ def main():
         sofast_fixed.load_measurement_data(measurement)
 
         # Process
-        sofast_fixed.process_single_facet_optic(surface)
+        sofast_fixed.process_single_facet_optic(surface_fixed)
 
         # Plot optic
         mirror = sofast_fixed.get_mirror()
@@ -192,17 +195,25 @@ def main():
             run_next=system_fringe.run_next_in_queue
         )
 
+    def func_show_cam_image():
+        """Shows a camera image"""
+        image = image_acquisition.get_frame()
+        plt.imshow(image)
+        plt.show()
+
     def func_user_input():
         print('\n')
         print('Value      Command')
         print('------------------')
         print('mrp        run Sofast Fringe measurement and process/save')
         print('mrs        run Sofast Fringe measurement and save only')
-        print('mis        run Sofast Fixed measurement')
+        print('mip        run Sofast Fixed measurement and process/save')
+        print('mis        run Sofast Fixed measurement and save only')
         print('ce         calibrate camera exposure')
         print('cr         calibrate camera-projector response')
         print('lr         load most recent camera-projector response calibration file')
         print('q          quit and close all')
+        print('im         show image from camera.')
         retval = input('Input: ')
 
         lt.debug(f'{_timestamp():s} user input: {retval:s}')
@@ -280,6 +291,10 @@ def main():
             system_fringe.close_all()
             system_fixed.close_all()
             return
+        elif retval == 'im':
+            func_show_cam_image()
+            system_fringe.set_queue([func_user_input])
+            system_fringe.run()
         else:
             lt.error(f'{_timestamp()} Command, {retval}, not recognized')
             funcs = [func_user_input]
