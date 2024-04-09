@@ -4,7 +4,6 @@ import math
 from typing import Callable
 from warnings import warn
 
-import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 import numpy as np
 import sympy.vector as vec

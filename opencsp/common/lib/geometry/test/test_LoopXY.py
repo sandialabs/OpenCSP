@@ -125,7 +125,7 @@ class TestLoopXY(unittest.TestCase):
         verts = Vxy(([1, 0, 0, 1], [1, 1, 0, 0]))
         loop = LoopXY.from_vertices(verts)
 
-        fig = fm._mpl_pyplot_figure()
+        fig = fm.mpl_pyplot_figure()
         loop.draw(fig.gca())
         plt.close(fig)
 

@@ -5,7 +5,6 @@
 
 """
 
-from matplotlib.pyplot import thetagrids
 import math
 import numpy as np
 import scipy.linalg as sla

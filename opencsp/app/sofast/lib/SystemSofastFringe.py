@@ -1,6 +1,7 @@
 """Class for controlling displaying Sofast patterns and capturing images
 """
 
+import copy
 import datetime as dt
 from typing import Callable
 from warnings import warn
@@ -17,38 +18,49 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as h5
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class SystemSofastFringe:
     def __init__(
-        self,
-        image_projection: ImageProjection,
-        image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract],
+        self, image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract] = None
     ) -> 'SystemSofastFringe':
         """
         Instantiates SystemSofastFringe class.
 
         Parameters
         ----------
-        image_projection : ImageProjection
-            Loaded ImageProjection object.
-        image_acquisition : ImageAcquisition | List[ImageAcquisition, ...]
-            Loaded ImageAcquisition object.
+        image_acquisition : ImageAcquisition | List[ImageAcquisition, ...], optional
+            Loaded ImageAcquisition object, for verification of existance and registration in internal list of cameras.
+            These acquisitions are tracked, so that as they are closed this instance releases its reference to them. If
+            all acquisitions are closed at the time when a method is executed, then we fall back on the global instance.
+
+        Raises
+        ------
+        RuntimeError:
+            Either the image_acquisition or the image_projection has not been loaded.
+        TypeError:
+            The image_acquisition is not the correct type.
 
         """
+        # Import here to avoid circular dependencies
+        import opencsp.app.sofast.lib.sofast_common_functions as scf
+
+        # Get defaults
+        image_acquisition, image_projection = scf.get_default_or_global_instances(
+            image_acquisition_default=image_acquisition
+        )
+
+        # Validate input
+        if image_projection is None or image_acquisition is None:
+            lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
+        self.image_acquisitions = image_acquisition
+
         # Save objects in class
         self.root = image_projection.root
 
-        self.image_projection = image_projection
-        if isinstance(image_acquisition, list) and isinstance(image_acquisition[0], ImageAcquisitionAbstract):
-            self.image_acquisition = image_acquisition
-        elif isinstance(image_acquisition, ImageAcquisitionAbstract):
-            self.image_acquisition = [image_acquisition]
-        else:
-            raise TypeError(f'ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.')
-
         # Show crosshairs
-        self.image_projection.show_crosshairs()
+        image_projection.show_crosshairs()
 
         # Instantiate all measurement data
         self.reset_all_measurement_data()
@@ -60,12 +72,70 @@ class SystemSofastFringe:
         self._queue_funcs = []
 
         # Define variables
-        self.fringes: Fringes
+        self._fringes: Fringes
         self.fringe_images_to_display: list[ndarray]
         self.mask_images_captured: list[ndarray]
-        self.fringe_images_captured: list[ndarray]
-        self.calibration_display_values: ndarray
+        self.fringe_images_captured: list[list[ndarray]]
+        """The images captured during run_measurement. Outer index is the camera index. Inner index is the fringe image."""
+        self._calibration_display_values: ndarray
         self.calibration_images: list[ndarray]
+        self.calibration: ImageCalibrationAbstract = None
+
+    def __del__(self):
+        # Remove references to this instance from the ImageAcquisition cameras
+        image_acquisitions: list[ImageAcquisitionAbstract] = []
+        with et.ignored(Exception):
+            image_acquisitions = self._image_acquisitions
+        for ia in image_acquisitions:
+            with et.ignored(Exception):
+                ia.on_close.remove(self._on_image_acquisition_close)
+
+        # Close Fringe-specific objects
+        self.reset_all_measurement_data()
+
+    @property
+    def fringes(self):
+        """Get the fringes this instance uses. Note, no setter, use set_fringes() instead."""
+        return self._fringes
+
+    @property
+    def image_acquisitions(self) -> list[ImageAcquisitionAbstract]:
+        if len(self._image_acquisitions) == 0:
+            # Import here to avoide circular dependencies
+            import opencsp.app.sofast.lib.sofast_common_functions as scf
+
+            # Check for existance
+            scf.check_camera_loaded('SystemSofastFringe')
+            # Use global instance as a backup, in case all previously registered instances have been closed
+            self._image_acquisitions = [ImageAcquisitionAbstract.instance()]
+        return self._image_acquisitions
+
+    @image_acquisitions.setter
+    def image_acquisitions(self, image_acquisitions: list[ImageAcquisitionAbstract]):
+        # Validate input
+        if (
+            isinstance(image_acquisitions, list)
+            and len(image_acquisitions) > 0
+            and isinstance(image_acquisitions[0], ImageAcquisitionAbstract)
+        ):
+            pass
+        elif isinstance(image_acquisitions, ImageAcquisitionAbstract):
+            image_acquisitions = [image_acquisitions]
+        else:
+            lt.error_and_raise(
+                TypeError,
+                f'Error in SystemSofastFringe(): ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.',
+            )
+
+        # Set value
+        self._image_acquisitions = image_acquisitions
+
+        # Register on_close handler
+        for ia in self.image_acquisitions:
+            ia.on_close.append(self._on_image_acquisition_close)
+
+    def _on_image_acquisition_close(self, image_acquisition: ImageAcquisitionAbstract):
+        self._image_acquisitions.remove(image_acquisition)
 
     def run(self) -> None:
         """
@@ -82,7 +152,7 @@ class SystemSofastFringe:
 
         """
         # Reset measurement attributes to None
-        self.fringes = None
+        self._fringes = None
 
         self.mask_images_to_display = None
         self.mask_images_captured = None
@@ -91,38 +161,30 @@ class SystemSofastFringe:
         self.fringe_images_captured = None
 
         self.calibration_images = None
-        self.calibration_display_values = None
+        self._calibration_display_values = None
+        with et.ignored(Exception):
+            self.calibration.close()
+        self.calibration = None
 
     def _create_mask_images_to_display(self) -> None:
         """
         Creates black and white (in that order) images in active area for
         capturing mask of mirror.
-
         """
         self.mask_images_to_display = []
-
+        image_projection = ImageProjection.instance()
         # Create black image
-        array = np.zeros(
-            (self.image_projection.size_y, self.image_projection.size_x, 3),
-            dtype=self.image_projection.display_data['projector_data_type'],
-        )
+        array = np.array(image_projection.get_black_array_active_area())
         self.mask_images_to_display.append(array)
-
         # Create white image
-        array = (
-            np.zeros(
-                (self.image_projection.size_y, self.image_projection.size_x, 3),
-                dtype=self.image_projection.display_data['projector_data_type'],
-            )
-            + self.image_projection.max_int
-        )
+        array = np.array(image_projection.get_black_array_active_area()) + image_projection.max_int
         self.mask_images_to_display.append(array)
 
     def _measure_sequence_display(
         self, im_disp_list: list, im_cap_list: list[list[ndarray]], run_next: Callable | None = None
     ) -> None:
         """
-        Displays next image in sequence, waits, then captures frame from camera
+        Displays next image in sequence, waits, then captures frame from camera.
 
         Parameters
         ----------
@@ -134,13 +196,15 @@ class SystemSofastFringe:
             Function that is run after all images have been captured.
 
         """
+        image_projection = ImageProjection.instance()
+
         # Display image
         frame_idx = len(im_cap_list[0])
-        self.image_projection.display_image_in_active_area(im_disp_list[frame_idx])
+        image_projection.display_image_in_active_area(im_disp_list[frame_idx])
 
         # Wait, then capture image
         self.root.after(
-            self.image_projection.display_data['image_delay'],
+            image_projection.display_data['image_delay'],
             lambda: self._measure_sequence_capture(im_disp_list, im_cap_list, run_next),
         )
 
@@ -161,7 +225,7 @@ class SystemSofastFringe:
             Function that is run after all images have been captured.
 
         """
-        for ims_cap, im_aq in zip(im_cap_list, self.image_acquisition):
+        for ims_cap, im_aq in zip(im_cap_list, self.image_acquisitions):
             # Capture and save image
             im = im_aq.get_frame()
 
@@ -182,29 +246,46 @@ class SystemSofastFringe:
             # Run next operation if finished
             run_next()
 
-    def load_fringes(self, fringes: Fringes, min_display_value: int) -> None:
+    def set_fringes(self, fringes: Fringes, min_display_value: int = None) -> None:
         """
         Loads fringe object and creates RGB fringe images to display.
+
+        Uses the global ImageProjection projector instance as the reference for scale.
 
         Parameters
         ----------
         fringes : Fringes
             Fringe object to display.
-        min_display_value : int
-            Minimum display value to project.
+        min_display_value : int, None
+            Minimum display value to project. Should be based on the sensitivity of the camera in the optical system. In
+            a perfect system where the camera can tell the difference between the displayed values '0' and '1', this
+            value will be '0'. If None, then the value is retrieved from
+            self.calibration.calculate_min_display_camera_values().
 
         """
+        image_projection = ImageProjection.instance()
+
+        # Validate input
+        if min_display_value is None:
+            if self.calibration is None:
+                lt.error_and_raise(
+                    ValueError,
+                    "Error in SystemSofastFringe.set_fringes(): "
+                    + "must provide a min_display_value, or run or provided a calibration, before setting the fringes",
+                )
+            min_display_value = self.calibration.calculate_min_display_camera_values()[0]
+
         # Save fringes
-        self.fringes = fringes
+        self._fringes = fringes
 
         # Get fringe range
-        fringe_range = (min_display_value, self.image_projection.display_data['projector_max_int'])
+        fringe_range = (min_display_value, image_projection.display_data['projector_max_int'])
 
         # Get fringe base images
         fringe_images_base = fringes.get_frames(
-            self.image_projection.size_x,
-            self.image_projection.size_y,
-            self.image_projection.display_data['projector_data_type'],
+            image_projection.size_x,
+            image_projection.size_y,
+            image_projection.display_data['projector_data_type'],
             fringe_range,
         )
 
@@ -244,9 +325,27 @@ class SystemSofastFringe:
         on_capturing: Callable = None,
         on_captured: Callable = None,
         on_processing: Callable = None,
-        on_processed: Callable[[ImageCalibrationAbstract], None] = None,
+        on_processed: Callable = None,
     ) -> None:
-        """Runs the projector-camera intensity calibration"""
+        """Runs the projector-camera intensity calibration and stores the results in self.calibration_images and
+        self.calibration.
+
+        Params:
+        -------
+        calibration_class : type[ImageCalibrationAbstract]:
+            The type of calibration to use.
+        calibration_hdf5_path_name_ext : str, optional
+            The callback to execute when capturing is about to start. Default is None
+        on_capturing : Callable, optional
+            The callback to execute when capturing is about to start. Default is None
+        on_captured : Callable, optional
+            The callback to execute when capturing has finished. Default is None
+        on_processing : Callable, optional
+            The callback to execute when processing is about to start. Default is None
+        on_processed : Callable, optional
+            The callback to execute when processing has finished. At the point this callback is being called the
+            calibration attribute will be set. Default is None
+        """
 
         # Capture images
         def _func_0():
@@ -269,18 +368,18 @@ class SystemSofastFringe:
             # Get calibration images from System
             calibration_images = self.get_calibration_images()[0]  # only calibrating one camera
             # Load calibration object
-            calibration = calibration_class.from_data(calibration_images, self.calibration_display_values)
+            self.calibration = calibration_class.from_data(calibration_images, self._calibration_display_values)
             # Save calibration object
             if calibration_hdf5_path_name_ext != None:
-                calibration.save_to_hdf(calibration_hdf5_path_name_ext)
+                self.calibration.save_to_hdf(calibration_hdf5_path_name_ext)
             # Save calibration raw data
-            data = [self.calibration_display_values, calibration_images]
+            data = [self.calibration.display_values, calibration_images]
             datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
             if calibration_hdf5_path_name_ext != None:
                 h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
             # Run the "on done" callback
             if on_processed != None:
-                on_processed(calibration)
+                on_processed()
             # Continue
             self.run_next_in_queue()
 
@@ -301,7 +400,7 @@ class SystemSofastFringe:
         """
         # Initialize mask image list
         self.mask_images_captured = []
-        for _ in range(len(self.image_acquisition)):
+        for _ in range(len(self.image_acquisitions)):
             self.mask_images_captured.append([])
 
         # Start capturing images
@@ -320,12 +419,14 @@ class SystemSofastFringe:
 
         """
         # Check fringes/camera have been loaded
-        if self.fringes is None:
-            raise ValueError('Fringes have not been loaded.')
+        if self._fringes is None:
+            lt.error_and_raise(
+                ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): Fringes have not been loaded.'
+            )
 
         # Initialize fringe image list
         self.fringe_images_captured = []
-        for _ in range(len(self.image_acquisition)):
+        for _ in range(len(self.image_acquisitions)):
             self.fringe_images_captured.append([])
 
         # Start capturing images
@@ -347,8 +448,11 @@ class SystemSofastFringe:
 
         """
         # Check fringes/camera have been loaded
-        if self.fringes is None:
-            raise ValueError('Fringes have not been loaded.')
+        if self._fringes is None:
+            lt.error_and_raise(
+                ValueError,
+                'Error in SystemSofastFringe.capture_mask_and_fringe_images(): Fringes have not been loaded.',
+            )
 
         def run_after_capture():
             self.capture_fringe_images(run_next)
@@ -356,10 +460,41 @@ class SystemSofastFringe:
         # Capture mask images, then capture fringe images, then run_next
         self.capture_mask_images(run_after_capture)
 
+    def run_measurement(self, on_done: Callable = None) -> None:
+        """Runs data collection with the given fringes.
+
+        Once the data has been captured, the images will be available from this instance. Similarly, the data can then
+        be processed, such as with get_measurements().
+
+        Params
+        ------
+        on_done: Callable
+            The function to call when capturing fringe images has finished.
+
+        Raises
+        ------
+        RuntimeError:
+            Calibration hasn't been set, or fringes haven't been set
+        """
+        # Get minimum display value from calibration
+        if self.calibration is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SystemSofastFringe.run_measurement(): must have run or provided a calibration before starting a measurement.",
+            )
+        if self._fringes is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SystemSofastFringe.run_measurement(): must have set fringes before starting a measurement.",
+            )
+
+        # Capture images
+        self.capture_mask_and_fringe_images(on_done)
+
     def run_display_camera_response_calibration(self, res: int = 10, run_next: Callable | None = None) -> None:
         """
         Calculates camera-projector response data. Data is saved in
-        calibration_display_values and calibration_images.
+        _calibration_display_values and calibration_images.
 
         Parameters
         ----------
@@ -370,23 +505,25 @@ class SystemSofastFringe:
             Process to run after calibration is performed.
 
         """
+        image_projection = ImageProjection.instance()
+
         # Generate grayscale values
-        self.calibration_display_values = np.arange(
-            0, self.image_projection.max_int + 1, res, dtype=self.image_projection.display_data['projector_data_type']
+        self._calibration_display_values = np.arange(
+            0, image_projection.max_int + 1, res, dtype=image_projection.display_data['projector_data_type']
         )
-        if self.calibration_display_values[-1] != self.image_projection.max_int:
-            self.calibration_display_values = np.concatenate(
-                (self.calibration_display_values, [self.image_projection.max_int])
+        if self._calibration_display_values[-1] != image_projection.max_int:
+            self._calibration_display_values = np.concatenate(
+                (self._calibration_display_values, [image_projection.max_int])
             )
 
         # Generate grayscale images
         cal_images_display = []
-        for dn in self.calibration_display_values:
+        for dn in self._calibration_display_values:
             # Create image
             array = (
                 np.zeros(
-                    (self.image_projection.size_y, self.image_projection.size_x, 3),
-                    dtype=self.image_projection.display_data['projector_data_type'],
+                    (image_projection.size_y, image_projection.size_x, 3),
+                    dtype=image_projection.display_data['projector_data_type'],
                 )
                 + dn
             )
@@ -394,34 +531,9 @@ class SystemSofastFringe:
 
         # Capture calibration images
         self.calibration_images = []
-        for _ in range(len(self.image_acquisition)):
+        for _ in range(len(self.image_acquisitions)):
             self.calibration_images.append([])
         self._measure_sequence_display(cal_images_display, self.calibration_images, run_next)
-
-    def run_camera_exposure_calibration(self, run_next: Callable | None = None) -> None:
-        """
-        Calculates the ideal camera exposure as to not saturate above a
-        specified threshold.
-
-        Parameters
-        ----------
-        run_next : Callable
-            Process to run after calibration is performed.
-
-        """
-
-        def run_cal():
-            # Calibrate exposure
-            for im_aq in self.image_acquisition:
-                im_aq.calibrate_exposure()
-
-            # Run next operation
-            if run_next is not None:
-                run_next()
-
-        # Set displayed image to white and calibrate exposure
-        self.image_projection.display_image_in_active_area(self.mask_images_to_display[1])
-        self.root.after(100, run_cal)
 
     def get_calibration_images(self) -> list[ndarray]:
         """
@@ -434,7 +546,10 @@ class SystemSofastFringe:
 
         """
         if self.calibration_images is None:
-            raise ValueError('Calibration Images have not been collected yet.')
+            lt.error_and_raise(
+                ValueError,
+                'Error in SystemSofastFringe.get_calibration_images(): Calibration Images have not been collected yet.',
+            )
 
         images = []
         for ims in self.calibration_images:
@@ -463,17 +578,21 @@ class SystemSofastFringe:
         """
         # Check data has been captured
         if self.fringe_images_captured is None:
-            raise ValueError('Fringe images have not been captured.')
+            lt.error_and_raise(
+                ValueError, 'Error in SystemSofastFringe.get_measurements(): Fringe images have not been captured.'
+            )
         if self.mask_images_captured is None:
-            raise ValueError('Mask images have not been captured.')
+            lt.error_and_raise(
+                ValueError, 'Error in SystemSofastFringe.get_measurements(): Mask images have not been captured.'
+            )
 
         measurements = []
         for fringe_images, mask_images in zip(self.fringe_images_captured, self.mask_images_captured):
             # Create measurement object
             dist_optic_screen_measure = osd.DistanceOpticScreen(v_measure_point, dist_optic_screen)
             kwargs = dict(
-                fringe_periods_x=np.array(self.fringes.periods_x),
-                fringe_periods_y=np.array(self.fringes.periods_y),
+                fringe_periods_x=np.array(self._fringes.periods_x),
+                fringe_periods_y=np.array(self._fringes.periods_y),
                 fringe_images=np.concatenate(fringe_images, axis=2),
                 mask_images=np.concatenate(mask_images, axis=2),
                 dist_optic_screen_measure=dist_optic_screen_measure,
@@ -486,8 +605,8 @@ class SystemSofastFringe:
 
     def close_all(self):
         """Closes all windows"""
-        # Close image acquisition
-        for im_aq in self.image_acquisition:
+        # Close image acquisitions
+        for im_aq in copy.copy(self.image_acquisitions):
             with et.ignored(Exception):
                 im_aq.close()
 

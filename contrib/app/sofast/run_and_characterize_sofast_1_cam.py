@@ -94,7 +94,7 @@ def main():
         min_disp_value = calibrations[0].calculate_min_display_camera_values()[0]
 
         # Load fringe objects with min display value
-        system.load_fringes(fringes, min_disp_value)
+        system.set_fringes(fringes, min_disp_value)
 
         system.run_next_in_queue()
 

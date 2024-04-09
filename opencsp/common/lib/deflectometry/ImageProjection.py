@@ -2,6 +2,7 @@
 """
 
 import tkinter
+from typing import Callable, Optional
 
 import cv2 as cv
 import numpy as np
@@ -60,7 +61,9 @@ class CalParams:
         self.index: np.ndarray[int] = np.arange(self.x_pixel.size, dtype=int)
 
 
-class ImageProjection:
+class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
+    _instance: 'ImageProjection' = None
+
     def __init__(self, root: tkinter.Tk, display_data: dict):
         """
         Image projection control.
@@ -73,9 +76,16 @@ class ImageProjection:
             Display geometry parameters
 
         """
+        # Register this instance as the global instance
+        if ImageProjection._instance is None:
+            ImageProjection._instance = self
+
+        # Declare instance variables
+        self.is_closed = False
+        self.on_close: list[Callable[[ImageProjection], None]] = []
+
         # Save root
         self.root = root
-        self.is_closed = False
 
         # Create drawing canvas
         self.canvas = tkinter.Canvas(self.root)
@@ -106,6 +116,15 @@ class ImageProjection:
     def __del__(self):
         with et.ignored(Exception):
             self.close()
+
+    @classmethod
+    def instance(cls) -> Optional["ImageProjection"]:
+        """Get the global ImageProjection instance, if one is available.
+
+        We use the singleton design pattern (single global instance) for this class because we don't expect there to be
+        more than one projector in the system.
+        """
+        return cls._instance
 
     def run(self):
         """Runs the Tkinter instance"""
@@ -281,6 +300,20 @@ class ImageProjection:
         # Display with black border
         self.display_image_in_active_area(array)
 
+    def get_black_array_active_area(self) -> np.ndarray:
+        """
+        Creates a black image to fill the active area of self.size_y by self.size_x pixels.
+
+        Returns:
+        --------
+        image : np.ndarray
+            A 2D image with shape (self.size_y, self.size_x, 3), filled with zeros
+        """
+        # Create black image
+        black_image = np.zeros((self.size_y, self.size_x, 3), dtype=self.display_data['projector_data_type'])
+
+        return black_image
+
     def display_image(self, array: np.ndarray) -> None:
         """
         Formats and displays input numpy array in entire window.
@@ -369,20 +402,25 @@ class ImageProjection:
         image = Image.fromarray(array, 'RGB')
         return ImageTk.PhotoImage(image)
 
-    @staticmethod
-    def load_from_hdf(file: str) -> dict:
+    @classmethod
+    def load_from_hdf(cls, file: str, prefix: str = '') -> dict[str, int | str]:
         """
-        Loads and returns ImageProjection data from HDF file.
+        Loads ImageProjection data from the given HDF file. Assumes data is stored as: PREFIX + Folder/Field_1
+
+        Note: does NOT return an ImageProjection instance, since that would require creating a new tkinter window.
 
         Parameters
         ----------
         file : str
-            HDF file path.
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
 
         Returns
         -------
-        dict
-            Display data.
+        display_data: dict[str, int | str]
+            The display data which can be used to create an instance of the ImageProjection class.
 
         """
         # Load data
@@ -405,53 +443,85 @@ class ImageProjection:
             'ImageProjection/shift_blue_y',
             'ImageProjection/ui_position_x',
         ]
+        for i in range(len(datasets)):
+            datasets[i] = prefix + datasets[i]
         return hdf5_tools.load_hdf5_datasets(datasets, file)
 
     @classmethod
-    def load_from_hdf_and_display(cls, file: str):
-        """
-        Loads data from HDF and opens window.
+    def load_from_hdf_and_display(cls, file: str, prefix: str = '') -> 'ImageProjection':
+        """Loads display_data from the given file into a new image_projection window. Assumes data is stored as: PREFIX + Folder/Field_1
 
         Parameters
         ----------
         file : str
-            HDF file path.
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
 
+        Returns
+        -------
+        projector: ImageProjection
+            The new ImageProjection instance, opened in a new tkinter window.
         """
         # Load data
-        display_data = cls.load_from_hdf(file)
+        display_data = cls.load_from_hdf(file, prefix)
 
         # Open window
         return cls.in_new_window(display_data)
 
     @staticmethod
-    def save_to_hdf(display_data: dict, file: str):
-        """Saves ImageProjection parameters to HDF file
+    def save_params_to_hdf(display_data: dict, file: str, prefix: str = ''):
+        """Saves image projection display_data parameters to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
         ----------
-        display_data : dict
-            ImageProjection parameters in dictionary form
+        display_data: dict
+            The values to save to the given file. Should be the display_data dict from an ImageProjection instance.
         file : str
-            HDF file to save
+            HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
         # Extract data entries
         datasets = []
         data = []
         for field in display_data.keys():
-            datasets.append('ImageProjection/' + field)
+            datasets.append(prefix + 'ImageProjection/' + field)
             data.append(display_data[field])
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves image projection display_data parameters to given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
+        self.save_params_to_hdf(self.display_data, file, prefix)
+
     def close(self):
         """Closes all windows"""
+        # don't double-close in order to avoid warnings
         if self.is_closed:
-            # don't double-close in order to avoid warnings
             return
-
         self.is_closed = True
+
+        # unset as the global instance
+        if ImageProjection._instance == self:
+            ImageProjection._instance = None
+
+        # callbacks
+        for callback in self.on_close:
+            with et.ignored(Exception):
+                callback(self)
 
         with et.ignored(Exception):
             self.root.destroy()

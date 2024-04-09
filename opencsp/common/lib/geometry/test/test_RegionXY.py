@@ -31,6 +31,6 @@ class TestRegionXY:
         loop = LoopXY.from_vertices(verts)
         region = RegionXY(loop)
 
-        fig = fm._mpl_pyplot_figure()
+        fig = fm.mpl_pyplot_figure()
         region.draw(fig.gca())
         plt.close(fig)

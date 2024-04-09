@@ -20,10 +20,11 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.render.lib.AbstractPlotHandler as aph
 from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
 
 
-class View3d:
+class View3d(aph.AbstractPlotHandler):
     """
     Class representing a view of 3d data.
 
@@ -56,7 +57,7 @@ class View3d:
             equal = equal if equal != None else parent.equal
         equal = equal if equal != None else True
 
-        self.figure = figure
+        self._figure = figure
         self.axis = axis
         self.view_spec = view_spec
         self.equal = equal
@@ -64,6 +65,15 @@ class View3d:
         self.x_limits = None
         self.y_limits = None
         self.z_limits = None
+
+    @property
+    def view(self) -> Figure:
+        return self._figure
+
+    @view.setter
+    def view(self, val: Figure):
+        self._figure = val
+        self._register_plot(val)
 
     # ACCESS
 
@@ -271,7 +281,7 @@ class View3d:
         output_figure_dir_body_ext = output_figure_dir_body + '.' + format
         lt.info('In View3d.save(), saving figure: ' + output_figure_dir_body_ext)
         # plt.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
-        self.figure.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
+        self.view.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
         # Return the outptu file path and directory.
         return output_figure_dir_body_ext
 
