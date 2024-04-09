@@ -1,14 +1,19 @@
-from abc import abstractmethod, ABC, abstractproperty
+from abc import abstractmethod, ABC
 import functools
 from typing import Callable, Optional
 
 import numpy as np
 
 import opencsp.common.lib.tool.exception_tools as et
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class ImageAcquisitionAbstract(ABC):
-    _instance: 'ImageAcquisitionAbstract' = None
+    _instances: dict[int, 'ImageAcquisitionAbstract'] = {}
+    """ All instantiated camera instances. We use a dictionary to ensure that once an index is assigned,
+    then all references to that same index will return the same camera (or None if the camera was closed). """
+    _next_instance_idx: int = 0
+    """ The index to next use when adding a camera to the _instances dict. """
 
     @staticmethod
     @functools.cache
@@ -27,19 +32,81 @@ class ImageAcquisitionAbstract(ABC):
         return cam_options
 
     def __init__(self):
-        if ImageAcquisitionAbstract._instance is None:
-            ImageAcquisitionAbstract._instance = self
+        if not self.instance_matches(ImageAcquisitionAbstract.instances()):
+            idx = ImageAcquisitionAbstract._next_instance_idx
+            ImageAcquisitionAbstract._instances[idx] = self
+            ImageAcquisitionAbstract._next_instance_idx += 1
+        else:
+            lt.error_and_raise(RuntimeError, f"Error in {self.__class__.__name__}(): " +
+                               "we expect to only have one camera instance per connected camera, but one already exists!")
 
         self.on_close: list[Callable[[ImageAcquisitionAbstract], None]] = []
+        self.is_closed = False
 
-    @classmethod
-    def instance(cls) -> Optional["ImageAcquisitionAbstract"]:
-        """Get the global ImageAcquisition instance, if one is available.
+    @staticmethod
+    def instance(idx: int = None) -> Optional["ImageAcquisitionAbstract"]:
+        """Get one of the global camera (ImageAcquisition) instances, if available.
 
-        We use the singleton design pattern (single global instance) for this class because we don't expect there to be
-        more than one camera in the system.
+        If the camera has been closed, then this function will return None, even if the instance exists.
+
+        We use the multiton design pattern (several static global instances) for this class because we should only ever
+        have one open instance per camera.
+
+        Parameters
+        ----------
+        idx: int, None
+            Which instance to return. If None, then the first non-closed instance is returned.
         """
-        return cls._instance
+        if idx is None:
+            for idx in ImageAcquisitionAbstract._instances:
+                camera = ImageAcquisitionAbstract._instances[idx]
+                if not camera.is_closed:
+                    return camera
+            return None
+        elif idx in ImageAcquisitionAbstract._instances:
+            camera = ImageAcquisitionAbstract._instances[idx]
+            if camera.is_closed:
+                return None
+            return camera
+        else:
+            return None
+
+    @staticmethod
+    def instances(subclass: type['ImageAcquisitionAbstract'] = None) -> list['ImageAcquisitionAbstract']:
+        """Get all global camera (ImageAcquisition) instances, as available.
+
+        If a camera has been closed, then this function will not include it, even if the instance exists.
+
+        We use the multiton design pattern (several static global instances) for this class because we should only ever
+        have one open ImageAcquisitionAbstract instance per camera.
+
+        Parameters
+        ----------
+        subclass: type[ImageAcquisitionAbstract], optional
+            Limits the type of camera instances returned. If None, then all available are returned.
+        """
+        ret: list[ImageAcquisitionAbstract] = []
+        for idx in ImageAcquisitionAbstract._instances:
+            camera = ImageAcquisitionAbstract.instance(idx)
+            if camera is None:
+                continue
+            if subclass is not None and not isinstance(camera, subclass):
+                continue
+            ret.append(camera)
+        return ret
+
+    @abstractmethod
+    def instance_matches(self, possible_matches: list['ImageAcquisitionAbstract']) -> bool:
+        """
+        Returns true if there's another instance in the list of possible matches that is equal to this instance. False
+        if no other instances match.
+
+        Parameters
+        ----------
+        possible_matches: list[ImageAcquisitionAbstract]
+            The other cameras to match against. Does not include cameras that have been closed.
+        """
+        pass
 
     def calibrate_exposure(self):
         """
@@ -132,12 +199,14 @@ class ImageAcquisitionAbstract(ABC):
         """Gets a single frame from the camera"""
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def gain(self):
         """Camera gain value"""
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def exposure_time(self) -> int:
         """Camera exposure_time value (microseconds)"""
         pass
@@ -150,17 +219,20 @@ class ImageAcquisitionAbstract(ABC):
     def exposure_time_seconds(self, exposure_time_seconds: float):
         self.exposure_time = int(exposure_time_seconds * 1_000_000)
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def frame_size(self):
         """camera frame size (X pixels by Y pixels)"""
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def frame_rate(self):
         """Camera frame rate (units of FPS)"""
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def max_value(self):
         """
         Camera's maximum saturation value.
@@ -169,7 +241,8 @@ class ImageAcquisitionAbstract(ABC):
         """
         pass
 
-    @abstractproperty
+    @property
+    @abstractmethod
     def shutter_cal_values(self):
         """
         Returns camera exposure_time values to use when calibrating the exposure_time.
@@ -180,8 +253,11 @@ class ImageAcquisitionAbstract(ABC):
     @abstractmethod
     def close(self):
         """Closes the camera connection"""
-        if ImageAcquisitionAbstract._instance == self:
-            ImageAcquisitionAbstract._instance = None
+        # Prevent close() from being evaluated multiple times.
+        # Also used as a check in get_instance().
+        if self.is_closed:
+            return
+        self.is_closed = True
 
         # Callbacks
         for callback in self.on_close:
