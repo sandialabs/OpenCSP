@@ -197,7 +197,7 @@ class SystemSofastFixed:
                 func()
             except Exception as error:
                 lt.error(repr(error))
-                self._queue_funcs = []
+                self.run_next_in_queue()
 
     def run(self) -> None:
         """
