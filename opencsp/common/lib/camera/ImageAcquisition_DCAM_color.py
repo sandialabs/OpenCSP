@@ -4,6 +4,8 @@ from pypylon import pylon
 from opencsp.common.lib.camera.image_processing import encode_RG_to_RGB
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as MonoIA
+import opencsp.common.lib.tool.exception_tools as et
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class ImageAcquisition(ImageAcquisitionAbstract):
@@ -48,8 +50,17 @@ class ImageAcquisition(ImageAcquisitionAbstract):
             raise ValueError(f'Cannot load instance {instance:d}. Only {len(devices):d} devices found.')
 
         # Connect to camera
-        self.cap = pylon.InstantCamera(tlFactory.CreateDevice(devices[instance]))
-        self.cap.Open()
+        self.basler_index = instance
+        try:
+            self.cap = pylon.InstantCamera(tlFactory.CreateDevice(devices[instance]))
+            self.cap.Open()
+        except Exception as ex:
+            lt.error("Failed to connect to camera")
+            raise RuntimeError("Failed to connect to camera") from ex
+
+        # Call super().__init__() once we have enough information for instance_matches() and we know that connecting to
+        # the camera isn't going to fail.
+        super().__init__()
 
         # Set up device to single frame acquisition
         self.cap.AcquisitionMode.SetValue('SingleFrame')
@@ -64,6 +75,14 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         shutter_min = self.cap.ExposureTimeRaw.Min
         shutter_max = self.cap.ExposureTimeRaw.Max
         self._shutter_cal_values = np.linspace(shutter_min, shutter_max, 2**13).astype(int)
+
+    def instance_matches(self, possible_matches: list[ImageAcquisitionAbstract]) -> bool:
+        for camera in possible_matches:
+            if not hasattr(camera, 'basler_index'):
+                continue
+            if getattr(camera, 'basler_index') == self.basler_index:
+                return True
+        return False
 
     def get_frame(self, encode: bool = True) -> np.ndarray:
         # Start frame capture
@@ -129,5 +148,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return self._shutter_cal_values
 
     def close(self):
-        super().close()
-        self.cap.Close()
+        with et.ignored(Exception):
+            super().close()
+        with et.ignored(Exception):
+            self.cap.Close()

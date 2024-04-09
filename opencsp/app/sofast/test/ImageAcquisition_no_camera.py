@@ -29,8 +29,9 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         # Define exposure_time calibration values
         self._shutter_cal_values = np.arange(1, 100, 1, dtype=float)
 
-        # Debugging values
-        self.is_closed = False
+    def instance_matches(self, possible_matches: list[ImageAcquisitionAbstract]) -> bool:
+        # allow for unlimited cameras during unit tests
+        return False
 
     def get_frame(self) -> np.ndarray:
         # Return test image
@@ -77,7 +78,6 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return self._shutter_cal_values
 
     def close(self):
-        self.is_closed = True
         super().close()
 
 
