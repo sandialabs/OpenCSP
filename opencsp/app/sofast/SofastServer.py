@@ -6,11 +6,13 @@ Starter code for this server from "How to Launch an HTTP Server in One Line of P
 """
 
 from concurrent.futures import ThreadPoolExecutor
+import dataclasses
 import gc
 import json
 from functools import cached_property
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, HTTPServer
+from traceback import format_exception
 from urllib.parse import parse_qsl, urlparse
 
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
@@ -18,9 +20,20 @@ import opencsp.common.lib.tool.log_tools as lt
 import opencsp.app.sofast.lib.ServerState as ss
 
 
+@dataclasses.dataclass
+class _UrlParseResult:
+    """Helper class to define the slot names of the ParseResult type"""
+    scheme: str
+    net_location: str
+    path: str
+    params: str
+    query: str
+    fragment: str
+
+
 class SofastServer(BaseHTTPRequestHandler):
     @cached_property
-    def url(self):
+    def url(self) -> _UrlParseResult:
         return urlparse(self.path)
 
     @cached_property
@@ -50,18 +63,29 @@ class SofastServer(BaseHTTPRequestHandler):
         self.do_GET()
 
     def get_response(self):
-        return json.dumps(
-            {
-                "path": self.url.path,
-                "query_data": self.query_data,
-                "post_data": self.post_data.decode("utf-8"),
-                "form_data": self.form_data,
-                "cookies": {
-                    name: cookie.value
-                    for name, cookie in self.cookies.items()
-                },
-            }
-        )
+        action = "N/A"
+        ret = {
+            "error": None
+        }
+
+        try:
+            action = self.url.path.split("/")[-1]
+
+            if action == "start_measure_fringes":
+                with ss.ServerState.instance() as state:
+                    name = self.query_data["name"]
+                    ret["success"] = state.start_measure_fringes(name)
+
+            elif action == "is_busy":
+                with ss.ServerState.instance() as state:
+                    ret["is_busy"] = state.busy
+
+        except Exception as ex:
+            lt.error("Error in SofastServer with action " + action + ": " + repr(ex))
+            ret["error"] = repr(ex)
+            ret["trace"] = "".join(format_exception(ex))
+
+        return json.dumps(ret)
 
 
 if __name__ == "__main__":
@@ -74,8 +98,9 @@ if __name__ == "__main__":
     server = HTTPServer(("0.0.0.0", port), SofastServer)
 
     # Initialize the IO devices
-    state = ss.ServerState()
-    state.init_io()
+    ss.ServerState()
+    with ss.ServerState.instance() as state:
+        state.init_io()
 
     # Lock in the currently allocated memory, to improve garbage collector performance
     gc.collect()
@@ -84,13 +109,14 @@ if __name__ == "__main__":
     # Start a new thread for the server
     # The minimum time between server evaulation loops is determined by the GIL:
     # https://docs.python.org/3/library/sys.html#sys.setswitchinterval
-    pool = ThreadPoolExecutor(max_workers=1)
-    pool.submit(server.serve_forever)
+    server_pool = ThreadPoolExecutor(max_workers=1)
+    server_pool.submit(server.serve_forever)
 
     # Start the GUI thread
     ImageProjection.instance().root.mainloop()
 
     # GUI has exited, shutdown everything
-    state.close_all()
+    with ss.ServerState.instance() as state:
+        state.close_all()
     server.shutdown()
-    pool.shutdown()
+    server_pool.shutdown()
