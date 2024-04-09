@@ -28,7 +28,6 @@ class ImageAcquisition(ImageAcquisitionAbstract):
                 - Others as defined by Basler
 
         """
-        super().__init__()
         ImageAcquisition._check_pypylon_version()
 
         # Find all instances of DCAM cameras
