@@ -224,6 +224,6 @@ def set_exposure(new_exp: int, image_acquisition: ImageAcquisitionAbstract = Non
     RuntimeError:
         If there is no camera instance
     """
-    check_camera_loaded('set_exposure', image_acquisition_default=image_acquisition)
+    check_camera_loaded('set_exposure', image_acquisition=image_acquisition)
     image_acquisition, _ = get_default_or_global_instances(image_acquisition_default=image_acquisition)
     image_acquisition.exposure_time = int(new_exp)

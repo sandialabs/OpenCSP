@@ -26,7 +26,6 @@ class ImageAcquisition(ImageAcquisitionAbstract):
                 - Other RGB based formats as defined by Basler
 
         """
-        super().__init__()
         MonoIA._check_pypylon_version()
 
         # Find all instances of DCAM cameras
