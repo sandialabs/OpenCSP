@@ -37,8 +37,11 @@ class ImageAcquisitionAbstract(ABC):
             ImageAcquisitionAbstract._instances[idx] = self
             ImageAcquisitionAbstract._next_instance_idx += 1
         else:
-            lt.error_and_raise(RuntimeError, f"Error in {self.__class__.__name__}(): " +
-                               "we expect to only have one camera instance per connected camera, but one already exists!")
+            lt.error_and_raise(
+                RuntimeError,
+                f"Error in {self.__class__.__name__}(): "
+                + "we expect to only have one camera instance per connected camera, but one already exists!",
+            )
 
         self.on_close: list[Callable[[ImageAcquisitionAbstract], None]] = []
         self.is_closed = False

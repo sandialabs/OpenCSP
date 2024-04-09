@@ -95,7 +95,7 @@ class SystemSofastFringe:
 
     @property
     def fringes(self):
-        """ Get the fringes this instance uses. Note, no setter, use set_fringes() instead. """
+        """Get the fringes this instance uses. Note, no setter, use set_fringes() instead."""
         return self._fringes
 
     @property
@@ -270,8 +270,8 @@ class SystemSofastFringe:
             if self.calibration is None:
                 lt.error_and_raise(
                     ValueError,
-                    "Error in SystemSofastFringe.set_fringes(): " +
-                    "must provide a min_display_value, or run or provided a calibration, before setting the fringes",
+                    "Error in SystemSofastFringe.set_fringes(): "
+                    + "must provide a min_display_value, or run or provided a calibration, before setting the fringes",
                 )
             min_display_value = self.calibration.calculate_min_display_camera_values()[0]
 
