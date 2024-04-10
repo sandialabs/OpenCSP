@@ -1,6 +1,6 @@
 import datetime as dt
-import glob as glob
-from os.path import join, dirname
+import glob
+from os.path import join, dirname, abspath
 
 import matplotlib.pyplot as plt
 
@@ -33,11 +33,15 @@ def _timestamp() -> str:
 def main():
     """Main system_fringe runner"""
     # Define save direcory and set up logger
-    dir_save = join(dirname(__file__), '../../../../sofast_cli')
-    lt.logger(join(dir_save, f'log_{_timestamp():s}.txt'), lt.log.INFO)
+    dir_save = abspath(join(dirname(__file__), '../../../../sofast_cli'))
+    dir_log = join(dir_save, 'logs')
+    lt.logger(join(dir_log, f'log_{_timestamp():s}.txt'), lt.log.INFO)
+    dir_save_fringe = join(dir_save, 'sofast_fringe')
+    dir_save_fringe_calibration = join(dir_save_fringe, 'calibration')
+    dir_save_fixed = join(dir_save, 'sofast_fixed')
 
     # Define directory containing Sofast calibration files
-    dir_cal = join(dirname(__file__), '../../../../sofast_calibration_files')
+    dir_cal = abspath(join(dirname(__file__), '../../../../sofast_calibration_files'))
 
     # Define common values
     file_facet_definition_json = join(dir_cal, 'facet_NSTTF.json')
@@ -47,20 +51,21 @@ def main():
     file_image_projection = join(dir_cal, 'image_projection_optics_lab_landscape_square.h5')
     file_dot_locs = join(dir_cal, 'dot_locations_optics_lab_landscape_square_width3_space6.h5')
 
+    # Load common data
     facet_definition = DefinitionFacet.load_from_json(file_facet_definition_json)
     spatial_orientation = SpatialOrientation.load_from_hdf(file_spatial_orientation)
     display = DisplayShape.load_from_hdf(file_display)
     camera = Camera.load_from_hdf(file_camera)
     fixed_pattern_dot_locs = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
 
-    periods_x = [0.9, 4., 16.]  # , 64.]
-    periods_y = [0.9, 4., 16.]  # , 64.]
+    periods_x = [0.9, 4., 16., 64.]
+    periods_y = [0.9, 4., 16., 64.]
     fringes = Fringes(periods_x, periods_y)
-    surface_fixed = Surface2DParabolic((100.0, 100.0), False, 10)
+    surface_fixed = Surface2DParabolic((100.0, 100.0), False, 1)
     surface_fringe = Surface2DParabolic((100.0, 100.0), False, 10)
     measure_point_optic = Vxyz((0, 0, 0))  # meters
     dist_optic_screen = 10.263  # meters
-    origin = Vxy((993, 628))  # pixels
+    origin = Vxy((993, 644))  # pixels
     name_optic = 'Test optic'
     res_plot = 0.002  # meters
 
@@ -80,17 +85,15 @@ def main():
     system_fixed.set_pattern_parameters(3, 6)
 
     sofast_fixed = ProcessSofastFixed(spatial_orientation, camera, fixed_pattern_dot_locs, facet_definition)
-    # sofast_fixed.params.geometry_data_debug.debug_active = True
 
     def func_process_gray_levels_cal():
         """Processes the grey levels calibration data"""
-        lt.debug(f'{_timestamp()} Processing gray level data')
         calibration_images = system_fringe.get_calibration_images()[0]
         calibration = ImageCalibrationScaling.from_data(calibration_images, system_fringe._calibration_display_values)
-        calibration.save_to_hdf(join(dir_save, f'image_calibration_scaling_{_timestamp():s}.h5'))
+        calibration.save_to_hdf(join(dir_save_fringe_calibration, f'image_calibration_scaling_{_timestamp():s}.h5'))
         system_fringe.calibration = calibration
-        system_fringe.set_fringes(fringes)  # TODO this should be set earlier
-        lt.info(f'{_timestamp()} ImageCalibration loaded')
+        system_fringe.set_fringes(fringes)
+        lt.info(f'{_timestamp()} ImageCalibration data loaded into SystemSofastFringe')
         system_fringe.run_next_in_queue()
 
     def func_show_crosshairs():
@@ -106,7 +109,7 @@ def main():
         # Get Measurement object
         measurement = system_fringe.get_measurements(measure_point_optic, dist_optic_screen, name_optic)[0]
 
-        # Calibrate measurement
+        # Calibrate fringe images
         measurement.calibrate_fringe_images(system_fringe.calibration)
 
         # Instantiate ProcessSofastFringe
@@ -118,22 +121,23 @@ def main():
         # Plot optic
         mirror = sofast.get_optic().mirror
 
+        lt.debug(f'{_timestamp():s} Plotting Sofast Fringe data')
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         axis_control_m = rca.meters()
         fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
         mirror.plot_orthorectified_slope(res_plot, clim=7, axis=fig_record.axis)
-        fig_record.save(dir_save, f'{_timestamp():s}_slope_magnitude_fringe', 'png')
+        fig_record.save(dir_save_fringe, f'{_timestamp():s}_slope_magnitude_fringe', 'png')
+        fig_record.close()
 
         # Save processed sofast data
-        sofast.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_data_sofast_fringe.h5')
+        sofast.save_to_hdf(f'{dir_save_fringe:s}/{_timestamp():s}_data_sofast_fringe.h5')
+        lt.debug(f'{_timestamp():s} Sofast Fringe data saved to HDF5')
 
         # Continue
         system_fringe.run_next_in_queue()
 
     def func_process_sofast_fixed_data():
         """Process Sofast Fixed data"""
-        lt.debug(f'{_timestamp():s} Processing Sofast Fixed data')
-
         # Get Measurement object
         measurement = system_fixed.get_measurement(measure_point_optic, dist_optic_screen, origin, name=name_optic)
         sofast_fixed.load_measurement_data(measurement)
@@ -144,14 +148,16 @@ def main():
         # Plot optic
         mirror = sofast_fixed.get_mirror()
 
+        lt.debug(f'{_timestamp():s} Plotting Sofast Fixed data')
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         axis_control_m = rca.meters()
         fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
         mirror.plot_orthorectified_slope(res_plot, clim=7, axis=fig_record.axis)
-        fig_record.save(dir_save, f'{_timestamp():s}_slope_magnitude_fixed', 'png')
+        fig_record.save(dir_save_fixed, f'{_timestamp():s}_slope_magnitude_fixed', 'png')
 
         # Save processed sofast data
-        sofast_fixed.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_data_sofast_fixed.h5')
+        sofast_fixed.save_to_hdf(f'{dir_save_fixed:s}/{_timestamp():s}_data_sofast_fixed.h5')
+        lt.debug(f'{_timestamp():s} Sofast Fixed data saved to HDF5')
 
         # Continue
         system_fixed.run_next_in_queue()
@@ -159,18 +165,13 @@ def main():
     def func_save_measurement_fixed():
         """Save fixed measurement files"""
         measurement = system_fixed.get_measurement(measure_point_optic, dist_optic_screen, origin, name=name_optic)
-        measurement.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_measurement_fixed.h5')
+        measurement.save_to_hdf(f'{dir_save_fixed:s}/{_timestamp():s}_measurement_fixed.h5')
         system_fixed.run_next_in_queue()
 
     def func_save_measurement_fringe():
         """Saves measurement to HDF file"""
         measurement = system_fringe.get_measurements(measure_point_optic, dist_optic_screen, name_optic)[0]
-        measurement.save_to_hdf(f'{dir_save:s}/{_timestamp():s}_measurement_fringe.h5')
-        system_fringe.run_next_in_queue()
-
-    def func_calibrate_camera_exposure():
-        """Calibrates camera exposure"""
-        system_fringe.image_acquisitions[0].calibrate_exposure()
+        measurement.save_to_hdf(f'{dir_save_fringe:s}/{_timestamp():s}_measurement_fringe.h5')
         system_fringe.run_next_in_queue()
 
     def func_pause():
@@ -179,12 +180,12 @@ def main():
 
     def func_load_last_sofast_fringe_image_cal():
         """Loads last ImageCalibration object"""
-        files = glob.glob(join(dir_save, 'image_calibration_scaling*.h5'))
+        files = glob.glob(join(dir_save_fringe_calibration, 'image_calibration_scaling*.h5'))
         files.sort()
         file = files[-1]
         image_calibration = ImageCalibrationScaling.load_from_hdf(file)
         system_fringe.calibration = image_calibration
-        system_fringe.set_fringes(fringes)  # TODO this should be set earlier
+        system_fringe.set_fringes(fringes)
         lt.info(f'{_timestamp()} Loaded image calibration file: {file}')
         system_fringe.run_next_in_queue()
 
@@ -214,6 +215,7 @@ def main():
         print('lr         load most recent camera-projector response calibration file')
         print('q          quit and close all')
         print('im         show image from camera.')
+        print('cross      show crosshairs')
         retval = input('Input: ')
 
         lt.debug(f'{_timestamp():s} user input: {retval:s}')
@@ -262,12 +264,8 @@ def main():
             system_fixed.run()
         elif retval == 'ce':
             lt.info(f'{_timestamp()} Calibrating camera exposure')
-            funcs = [
-                func_calibrate_camera_exposure,
-                func_user_input,
-            ]
-            system_fringe.set_queue(funcs)
-            system_fringe.run()
+            image_acquisition.calibrate_exposure()
+            func_user_input()
         elif retval == 'cr':
             lt.info(f'{_timestamp()} Calibrating camera-projector response')
             funcs = [
@@ -295,6 +293,9 @@ def main():
             func_show_cam_image()
             system_fringe.set_queue([func_user_input])
             system_fringe.run()
+        elif retval == 'cross':
+            image_projection.show_crosshairs()
+            func_user_input()
         else:
             lt.error(f'{_timestamp()} Command, {retval}, not recognized')
             funcs = [func_user_input]
