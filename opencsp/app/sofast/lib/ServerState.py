@@ -4,6 +4,7 @@ from typing import Generic, TypeVar
 
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
@@ -69,6 +70,27 @@ class ServerState:
     @staticmethod
     def instance() -> ControlledContext['ServerState']:
         return ServerState._instance
+
+    @property
+    @staticmethod
+    def _state_lock() -> asyncio.Lock:
+        """
+        Return the mutex for providing exclusive access to ServerState singleton.
+
+        I (BGB) use "with instance()" when calling state methods from code external to the state class, and "with
+        _state_lock()" when modifying critical sections of code within the state class (mostly for thread safety in
+        regards to the processing thread).  However, the following statements are equivalent and can be used
+        interchangeably::
+
+            # 1. using the instance() method
+            with self.instance() as state:
+                # do stuff
+
+            # 2. using the _state_lock() method
+            with self._state_lock:
+                # do stuff
+        """
+        return ServerState.instance().mutex
 
     @property
     def system_fixed(self) -> ControlledContext[SystemSofastFixed]:
@@ -186,6 +208,13 @@ class ServerState:
     def start_measure_fringes(self, name: str = None) -> bool:
         """Starts collection and processing of fringe measurement image data.
 
+        Once this method is called it returns immediately without waiting for collection and processing to finish.
+        self.has_fringe_measurement will be False during the period, and will transition to True once collection and
+        processing have both finished.
+
+        The collection is queued up for the main thread (aka the tkinter thread), and processing is done in
+        another thread once collection has finished.
+
         Returns
         -------
         success: bool
@@ -205,30 +234,48 @@ class ServerState:
         self.fringe_measurement_name = name
 
         # Update statuses
-        self._last_measurement_fringe = None
-        self._running_measurement_fringe = True
+        # Critical section, these statuses updates need to be thread safe
+        with self._state_lock:
+            self._last_measurement_fringe = None
+            self._running_measurement_fringe = True
 
         # Start the measurement
         lt.debug("ServerState: collecting fringes")
         with self.system_fringe as sys:
+            # Run the measurement in the main thread (aka the tkinter thread)
             sys.run_measurement(self._on_collect_fringes_done)
 
         return True
 
     def _on_collect_fringes_done(self):
+        """
+        Registers the change in state from having finished capturing fringe images, and starts processing.
+
+        This method is evaluated in the main thread (aka the tkinter thread), and so certain critical sections of code
+        are protected to ensure a consistent state is maintained.
+        """
         lt.debug("ServerState: finished collecting fringes")
         if not self._running_measurement_fringe:
             lt.error("Programmer error in server_api._on_collect_fringes_done(): " +
                      "Did not expect for this method to be called while self._running_measurement_fringe was not True!")
 
         # Update statuses
-        self._processing_measurement_fringe = True
-        self._running_measurement_fringe = False
+        # Critical section, these statuses updates need to be thread safe
+        with self._state_lock:
+            self._processing_measurement_fringe = True
+            self._running_measurement_fringe = False
 
         # Start the processing
         self._processing_pool.submit(self._process_fringes)
 
     def _process_fringes(self):
+        """
+        Processes the fringe images captured during self.system_fringe.run_measurement() and stores the result to
+        self._last_measurement_fringe.
+
+        This method is evaluated in the _processing_pool thread, and so certain critical sections of code are protected
+        to ensure a consistent state is maintained.
+        """
         lt.debug("ServerState: processing fringes")
         if not self._processing_measurement_fringe:
             lt.error("Programmer error in server_api._process_fringes(): " +
@@ -239,11 +286,14 @@ class ServerState:
             name = "fringe_measurement_"+tdt.current_date_time_string_forfile()
             if self.fringe_measurement_name != None:
                 name = self.fringe_measurement_name
-            self._last_measurement_fringe = sys.get_measurements(
+            new_fringe_measurement = sys.get_measurements(
                 self._mirror_measure_point, self._mirror_measure_distance, name)
 
         # update statuses
-        self._processing_fringes = False
+        # Critical section, these statuses updates need to be thread safe
+        with self._state_lock:
+            self._processing_fringes = False
+            self._last_measurement_fringe = new_fringe_measurement
 
     def close_all(self):
         """Closes all cameras, projectors, and sofast systems (currently just sofast fringe)"""

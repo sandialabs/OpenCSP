@@ -12,12 +12,15 @@ import json
 from functools import cached_property
 from http.cookies import SimpleCookie
 from http.server import BaseHTTPRequestHandler, HTTPServer
+import os
 from traceback import format_exception
 from urllib.parse import parse_qsl, urlparse
 
-from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-import opencsp.common.lib.tool.log_tools as lt
 import opencsp.app.sofast.lib.ServerState as ss
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.opencsp_path import opencsp_settings
+import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
 @dataclasses.dataclass
@@ -54,22 +57,31 @@ class SofastServer(BaseHTTPRequestHandler):
         return SimpleCookie(self.headers.get("Cookie"))
 
     def do_GET(self):
-        self.send_response(200)
+        response_code, response_msg = self.get_response()
+        self.send_response(response_code)
         self.send_header("Content-Type", "application/json")
         self.end_headers()
-        self.wfile.write(self.get_response().encode("utf-8"))
+        self.wfile.write(response_msg.encode("utf-8"))
 
     def do_POST(self):
         self.do_GET()
 
-    def get_response(self):
+    def get_response(self) -> tuple[int, str]:
         action = "N/A"
         ret = {
             "error": None
         }
+        response_code = 200
 
         try:
-            action = self.url.path.split("/")[-1]
+            if "/" in self.url.path:
+                action = self.url.path.split("/")[-1]
+            else:
+                action = self.url.path
+
+            if action == "help":
+                ret["actions"] = ["help", "start_measure_fringes",
+                                  "is_busy", "save_measure_fringes", "get_results_fringes"]
 
             if action == "start_measure_fringes":
                 with ss.ServerState.instance() as state:
@@ -80,12 +92,43 @@ class SofastServer(BaseHTTPRequestHandler):
                 with ss.ServerState.instance() as state:
                     ret["is_busy"] = state.busy
 
+            elif action == "save_measure_fringes":
+                if "saves_output_dir" in opencsp_settings and ft.directory_exists(opencsp_settings["saves_output_dir"]):
+                    measurement = None
+                    with ss.ServerState.instance() as state:
+                        if state.has_fringe_measurement:
+                            measurement = state.last_measurement_fringe[0]
+                            file_name_ext = state.fringe_measurement_name+".h5"
+                    if measurement is not None:
+                        file_path_name_ext = os.path.join(opencsp_settings["saves_output_dir"], file_name_ext)
+                        measurement.save_to_hdf(file_path_name_ext)
+                        ret["file_name_ext"] = file_name_ext
+                    else:
+                        ret["error"] = "Fringe measurement is not ready"
+                        ret["trace"] = "SofastServer.get_response::save_measure_fringes"
+                else:
+                    ret["error"] = "Measurements save directory not speicified in settings"
+                    ret["trace"] = "SofastServer.get_response::save_measure_fringes"
+
+            elif action == "get_results_fringes":
+                pass
+
+            else:
+                ret = {
+                    "error": f"Unknown action \"{action}\"",
+                    "trace": "SofastServer.get_response"
+                }
+                response_code = 404
+
         except Exception as ex:
             lt.error("Error in SofastServer with action " + action + ": " + repr(ex))
-            ret["error"] = repr(ex)
-            ret["trace"] = "".join(format_exception(ex))
+            ret = {
+                "error": repr(ex),
+                "trace": "".join(format_exception(ex))
+            }
+            response_code = 500
 
-        return json.dumps(ret)
+        return response_code, json.dumps(ret)
 
 
 if __name__ == "__main__":

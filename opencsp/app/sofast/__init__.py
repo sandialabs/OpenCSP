@@ -1,6 +1,7 @@
 _sofast_server_settings_key = "sofast_server"
 _sofast_server_settings_default: dict[str, None] = {
     "log_output_dir": None,
+    "saves_output_dir": None,
     "camera_files": None,
     "projector_file": None,
     "calibration_file": None,
