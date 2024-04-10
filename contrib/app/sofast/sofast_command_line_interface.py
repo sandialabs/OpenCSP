@@ -58,8 +58,8 @@ def main():
     camera = Camera.load_from_hdf(file_camera)
     fixed_pattern_dot_locs = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
 
-    periods_x = [0.9, 4., 16., 64.]
-    periods_y = [0.9, 4., 16., 64.]
+    periods_x = [0.9, 4.0, 16.0, 64.0]
+    periods_y = [0.9, 4.0, 16.0, 64.0]
     fringes = Fringes(periods_x, periods_y)
     surface_fixed = Surface2DParabolic((100.0, 100.0), False, 1)
     surface_fringe = Surface2DParabolic((100.0, 100.0), False, 10)
@@ -191,10 +191,7 @@ def main():
 
     def func_gray_levels_cal():
         """Runs gray level calibration sequence"""
-        system_fringe.run_display_camera_response_calibration(
-            res=10,
-            run_next=system_fringe.run_next_in_queue
-        )
+        system_fringe.run_display_camera_response_calibration(res=10, run_next=system_fringe.run_next_in_queue)
 
     def func_show_cam_image():
         """Shows a camera image"""
@@ -255,11 +252,7 @@ def main():
             system_fixed.run()
         elif retval == 'mis':
             lt.info(f'{_timestamp()} Running Sofast Fixed measurement and saving data')
-            funcs = [
-                system_fixed.run_measurement,
-                func_save_measurement_fixed,
-                func_user_input,
-            ]
+            funcs = [system_fixed.run_measurement, func_save_measurement_fixed, func_user_input]
             system_fixed.set_queue(funcs)
             system_fixed.run()
         elif retval == 'ce':
@@ -268,20 +261,12 @@ def main():
             func_user_input()
         elif retval == 'cr':
             lt.info(f'{_timestamp()} Calibrating camera-projector response')
-            funcs = [
-                func_gray_levels_cal,
-                func_show_crosshairs,
-                func_process_gray_levels_cal,
-                func_user_input,
-            ]
+            funcs = [func_gray_levels_cal, func_show_crosshairs, func_process_gray_levels_cal, func_user_input]
             system_fringe.set_queue(funcs)
             system_fringe.run()
         elif retval == 'lr':
             lt.info(f'{_timestamp()} Loading response calibration')
-            funcs = [
-                func_load_last_sofast_fringe_image_cal,
-                func_user_input,
-            ]
+            funcs = [func_load_last_sofast_fringe_image_cal, func_user_input]
             system_fringe.set_queue(funcs)
             system_fringe.run()
         elif retval == 'q':

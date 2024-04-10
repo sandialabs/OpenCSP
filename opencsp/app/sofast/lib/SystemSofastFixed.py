@@ -113,22 +113,16 @@ class SystemSofastFixed:
         self.run_next_in_queue()
 
     def get_measurement(
-            self,
-            v_measure_point_facet: Vxyz,
-            dist_optic_screen: float,
-            origin: Vxy,
-            date: dt.datetime = None,
-            name: str = '',
+        self,
+        v_measure_point_facet: Vxyz,
+        dist_optic_screen: float,
+        origin: Vxy,
+        date: dt.datetime = None,
+        name: str = '',
     ) -> MeasurementSofastFixed:
         """Returns the SofastFixedMeasurement object"""
         dist_optic_screen_measure = dos.DistanceOpticScreen(v_measure_point_facet, dist_optic_screen)
-        return MeasurementSofastFixed(
-            self.image_measurement,
-            dist_optic_screen_measure,
-            origin,
-            date,
-            name,
-        )
+        return MeasurementSofastFixed(self.image_measurement, dist_optic_screen_measure, origin, date, name)
 
     def pause(self) -> None:
         """Pause by the given amount defined by self.image_delay (in ms)
@@ -142,18 +136,14 @@ class SystemSofastFixed:
     def run_measurement(self) -> None:
         """Runs the measurement sequence
         - projects the fixed pattern image
-        - captures an image. 
+        - captures an image.
 
         If the fixed pattern image is already projected, use self.capture_image() instead.
         Upon completion, runs self.run_next_in_queue()
         """
         lt.debug('SystemSofastFixed starting measurement sequence')
 
-        funcs = [
-            self.project_pattern,
-            self.pause,
-            self.capture_image,
-        ]
+        funcs = [self.project_pattern, self.pause, self.capture_image]
         self.prepend_to_queue(funcs)
         self.run_next_in_queue()
 
