@@ -23,6 +23,7 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.opencsp_path import opencsp_settings
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.time_date_tools as tdt
 
 
 @dataclasses.dataclass
@@ -173,6 +174,13 @@ class SofastServer(BaseHTTPRequestHandler):
 if __name__ == "__main__":
     port = 8000
 
+    # Set up the logger
+    log_output_dir = opencsp_settings["sofast_server"]["log_output_dir"]
+    if log_output_dir is not None and ft.directory_exists(log_output_dir):
+        log_name_ext = "SofastServer_" + tdt.current_date_time_string_forfile() + ".log"
+        log_path_name_ext = os.path.join(log_output_dir, log_name_ext)
+        lt.logger(log_path_name_ext)
+
     # Start the server
     lt.warn(
         "Warning in SofastServer: this server is unsecured. "
@@ -185,6 +193,7 @@ if __name__ == "__main__":
     ss.ServerState()
     with ss.ServerState.instance() as state:
         state.init_io()
+        state.load_default_settings()
 
     # Lock in the currently allocated memory, to improve garbage collector performance
     gc.collect()
