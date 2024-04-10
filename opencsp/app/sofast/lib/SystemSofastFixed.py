@@ -156,7 +156,7 @@ class SystemSofastFixed:
         # Close window
         with et.ignored(Exception):
             image_projection = ImageProjection.instance()
-            image_projection.root.destroy()
+            image_projection.close()
 
     def prepend_to_queue(self, funcs: list[Callable]) -> None:
         """Prepends the current list of functions to the queue"""
