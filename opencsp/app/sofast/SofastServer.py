@@ -28,6 +28,7 @@ import opencsp.common.lib.tool.log_tools as lt
 @dataclasses.dataclass
 class _UrlParseResult:
     """Helper class to define the slot names of the ParseResult type"""
+
     scheme: str
     net_location: str
     path: str
@@ -70,9 +71,7 @@ class SofastServer(BaseHTTPRequestHandler):
 
     def get_response(self) -> tuple[int, str]:
         action = "N/A"
-        ret = {
-            "error": None
-        }
+        ret = {"error": None}
         response_code = 200
 
         try:
@@ -82,8 +81,13 @@ class SofastServer(BaseHTTPRequestHandler):
                 action = self.url.path
 
             if action == "help":
-                ret["actions"] = ["help", "start_measure_fringes",
-                                  "is_busy", "save_measure_fringes", "get_results_fringes"]
+                ret["actions"] = [
+                    "help",
+                    "start_measure_fringes",
+                    "is_busy",
+                    "save_measure_fringes",
+                    "get_results_fringes",
+                ]
 
             if action == "start_measure_fringes":
                 with ss.ServerState.instance() as state:
@@ -100,7 +104,7 @@ class SofastServer(BaseHTTPRequestHandler):
                     with ss.ServerState.instance() as state:
                         if state.has_fringe_measurement:
                             measurement = state.last_measurement_fringe[0]
-                            file_name_ext = state.fringe_measurement_name+".h5"
+                            file_name_ext = state.fringe_measurement_name + ".h5"
                     if measurement is not None:
                         file_path_name_ext = os.path.join(opencsp_settings["saves_output_dir"], file_name_ext)
                         measurement.save_to_hdf(file_path_name_ext)
@@ -121,14 +125,16 @@ class SofastServer(BaseHTTPRequestHandler):
                         measurement = state.last_measurement_fringe
                         state.system_fringe
                 if measurement is not None:
-                    ret.update({
-                        "focal_length_x": measurement.focal_length_x,
-                        "focal_length_y": measurement.focal_length_y,
-                        "slope_error_x": np.average(measurement.slopes_error[0]),
-                        "slope_error_y": np.average(measurement.slopes_error[1]),
-                        "slope_error": np.average(measurement.slopes_error),
-                        "slope_stddev": np.std(measurement.slopes_error)
-                    })
+                    ret.update(
+                        {
+                            "focal_length_x": measurement.focal_length_x,
+                            "focal_length_y": measurement.focal_length_y,
+                            "slope_error_x": np.average(measurement.slopes_error[0]),
+                            "slope_error_y": np.average(measurement.slopes_error[1]),
+                            "slope_error": np.average(measurement.slopes_error),
+                            "slope_stddev": np.std(measurement.slopes_error),
+                        }
+                    )
                 else:
                     ret["error"] = "Fringe measurement is not ready"
                     ret["trace"] = "SofastServer.get_response::get_results_fringes"
@@ -141,7 +147,7 @@ class SofastServer(BaseHTTPRequestHandler):
 
         except Exception as ex:
             lt.error("Error in SofastServer with action " + action + ": " + repr(ex))
-            ret["error"] = repr(ex),
+            ret["error"] = (repr(ex),)
             ret["trace"] = "".join(format_exception(ex))
             response_code = 500
 
@@ -149,11 +155,17 @@ class SofastServer(BaseHTTPRequestHandler):
         if response_code != 200:
             if ret["error"] is None:
                 lt.error_and_raise(
-                    RuntimeError, f"Programmer error in SofastServer.get_response({action}): " + f"did not correctly set 'error' to match {response_code=}!")
+                    RuntimeError,
+                    f"Programmer error in SofastServer.get_response({action}): "
+                    + f"did not correctly set 'error' to match {response_code=}!",
+                )
         if ret["error"] is not None:
             if response_code == 200:
                 lt.error_and_raise(
-                    RuntimeError, f"Programmer error in SofastServer.get_response({action}): " + f"did not correctly set response_code to match {ret['error']=}!")
+                    RuntimeError,
+                    f"Programmer error in SofastServer.get_response({action}): "
+                    + f"did not correctly set response_code to match {ret['error']=}!",
+                )
 
         return response_code, json.dumps(ret)
 
@@ -162,8 +174,10 @@ if __name__ == "__main__":
     port = 8000
 
     # Start the server
-    lt.warn("Warning in SofastServer: this server is unsecured. " +
-            f"It is suggested that you restrict outside access to port {port} of the host computer.")
+    lt.warn(
+        "Warning in SofastServer: this server is unsecured. "
+        + f"It is suggested that you restrict outside access to port {port} of the host computer."
+    )
     lt.info(f"Starting server on port {port}...")
     server = HTTPServer(("0.0.0.0", port), SofastServer)
 

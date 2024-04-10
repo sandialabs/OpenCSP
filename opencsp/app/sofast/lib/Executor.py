@@ -80,7 +80,19 @@ class Executor:
         with controlled_system as system:
             system.run_measurement(self.on_fringe_collected)
 
-    def start_process_fringe(self, controlled_system: cc.ControlledContext[SystemSofastFringe], mirror_measure_point: vxyz.Vxyz, mirror_measure_distance: float, orientation: SpatialOrientation, camera: Camera, display: DisplayShape, facet_data: DefinitionFacet, surface: Surface2DAbstract, measurement_name: str = None, reference_facet: Facet = None):
+    def start_process_fringe(
+        self,
+        controlled_system: cc.ControlledContext[SystemSofastFringe],
+        mirror_measure_point: vxyz.Vxyz,
+        mirror_measure_distance: float,
+        orientation: SpatialOrientation,
+        camera: Camera,
+        display: DisplayShape,
+        facet_data: DefinitionFacet,
+        surface: Surface2DAbstract,
+        measurement_name: str = None,
+        reference_facet: Facet = None,
+    ):
         """
         Processes the given fringe collected from system.run_measurement().
 
@@ -89,7 +101,7 @@ class Executor:
         """
         lt.debug("Executor: processing fringes")
 
-        name = "fringe_measurement_"+tdt.current_date_time_string_forfile()
+        name = "fringe_measurement_" + tdt.current_date_time_string_forfile()
         if measurement_name != None:
             name = measurement_name
 

@@ -52,18 +52,17 @@ class SofastServerHandler(BaseHTTPRequestHandler):
                 "query_data": self.query_data,
                 "post_data": self.post_data.decode("utf-8"),
                 "form_data": self.form_data,
-                "cookies": {
-                    name: cookie.value
-                    for name, cookie in self.cookies.items()
-                },
+                "cookies": {name: cookie.value for name, cookie in self.cookies.items()},
             }
         )
 
 
 if __name__ == "__main__":
     port = 8000
-    lt.warn("Warning in SofastServer: this server is unsecured. " +
-            f"It is suggested that you restrict outside access to port {port} of the host computer.")
+    lt.warn(
+        "Warning in SofastServer: this server is unsecured. "
+        + f"It is suggested that you restrict outside access to port {port} of the host computer."
+    )
     lt.info(f"Starting server on port {port}...")
     server = HTTPServer(("0.0.0.0", port), SofastServerHandler)
     server.serve_forever()

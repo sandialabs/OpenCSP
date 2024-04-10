@@ -47,8 +47,11 @@ class ServerState:
         if ServerState._instance is None:
             ServerState._instance = cc.ControlledContext(self)
         else:
-            lt.error_and_raise(RuntimeError, "Error in ServerState(): " +
-                               "this class is supposed to be a singleton, but another instance already exists!")
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in ServerState(): "
+                + "this class is supposed to be a singleton, but another instance already exists!",
+            )
 
     def __del__(self):
         with et.ignored(Exception):
@@ -117,12 +120,16 @@ class ServerState:
         if self._last_measurement_fixed is None:
             return False
         elif self._running_measurement_fixed:
-            lt.error("Programmer error in ServerState.fixed_measurement_ready(): " +
-                     f"expected 'last_measurement' to be None while 'running', but {self._last_measurement_fixed=} {self._running_measurement_fixed}")
+            lt.error(
+                "Programmer error in ServerState.fixed_measurement_ready(): "
+                + f"expected 'last_measurement' to be None while 'running', but {self._last_measurement_fixed=} {self._running_measurement_fixed}"
+            )
             return False
         elif self._processing_measurement_fixed:
-            lt.error("Programmer error in ServerState.fixed_measurement_ready(): " +
-                     f"expected 'last_measurement' to be None while 'processing', but {self._last_measurement_fixed=} {self._processing_measurement_fixed}")
+            lt.error(
+                "Programmer error in ServerState.fixed_measurement_ready(): "
+                + f"expected 'last_measurement' to be None while 'processing', but {self._last_measurement_fixed=} {self._processing_measurement_fixed}"
+            )
             return False
         else:
             return True
@@ -142,12 +149,16 @@ class ServerState:
         if self._last_measurement_fringe is None:
             return False
         elif self._running_measurement_fringe:
-            lt.error("Programmer error in ServerState.fringe_measurement_ready(): " +
-                     f"expected 'last_measurement' to be None while 'running', but {self._last_measurement_fringe=} {self._running_measurement_fringe}")
+            lt.error(
+                "Programmer error in ServerState.fringe_measurement_ready(): "
+                + f"expected 'last_measurement' to be None while 'running', but {self._last_measurement_fringe=} {self._running_measurement_fringe}"
+            )
             return False
         elif self._processing_measurement_fringe:
-            lt.error("Programmer error in ServerState.fringe_measurement_ready(): " +
-                     f"expected 'last_measurement' to be None while 'processing', but {self._last_measurement_fringe=} {self._processing_measurement_fringe}")
+            lt.error(
+                "Programmer error in ServerState.fringe_measurement_ready(): "
+                + f"expected 'last_measurement' to be None while 'processing', but {self._last_measurement_fringe=} {self._processing_measurement_fringe}"
+            )
             return False
         else:
             return True
@@ -209,12 +220,16 @@ class ServerState:
         """
         # Check that system resources are available
         if self._running_measurement_fringe or self._processing_measurement_fringe:
-            lt.warn("Warning in server_api.run_measurment_fringe(): " +
-                    "Attempting to start another fringe measurement before the last fringe measurement has finished.")
+            lt.warn(
+                "Warning in server_api.run_measurment_fringe(): "
+                + "Attempting to start another fringe measurement before the last fringe measurement has finished."
+            )
             return False
         if not self.projector_available:
-            lt.warn("Warning in server_api.run_measurment_fringe(): " +
-                    "Attempting to start a fringe measurement while the projector is already in use.")
+            lt.warn(
+                "Warning in server_api.run_measurment_fringe(): "
+                + "Attempting to start a fringe measurement while the projector is already in use."
+            )
             return False
 
         # Latch the name value
@@ -241,8 +256,10 @@ class ServerState:
         """
         lt.debug("ServerState: finished collecting fringes")
         if not self._running_measurement_fringe:
-            lt.error("Programmer error in server_api._on_collect_fringes_done(): " +
-                     "Did not expect for this method to be called while self._running_measurement_fringe was not True!")
+            lt.error(
+                "Programmer error in server_api._on_collect_fringes_done(): "
+                + "Did not expect for this method to be called while self._running_measurement_fringe was not True!"
+            )
 
         # Update statuses
         # Critical section, these statuses updates need to be thread safe
@@ -252,8 +269,18 @@ class ServerState:
 
         # Start the processing
         self._executor.on_fringe_processed = self._on_fringe_processed
-        self._executor.start_process_fringe(self.system_fringe, self.mirror_measure_point, self.mirror_measure_distance, self.orientation,
-                                            self.camera, self.display, self.facet_data, self.surface, self.fringe_measurement_name, self.reference_facet)
+        self._executor.start_process_fringe(
+            self.system_fringe,
+            self.mirror_measure_point,
+            self.mirror_measure_distance,
+            self.orientation,
+            self.camera,
+            self.display,
+            self.facet_data,
+            self.surface,
+            self.fringe_measurement_name,
+            self.reference_facet,
+        )
 
     def _on_fringe_processed(self, fringe_results: sfe.FringeResults):
         """
@@ -265,8 +292,10 @@ class ServerState:
         """
         lt.debug("ServerState: finished processing fringes")
         if not self._processing_measurement_fringe:
-            lt.error("Programmer error in server_api._process_fringes(): " +
-                     "Did not expect for this method to be called while self._processing_measurement_fringe was not True!")
+            lt.error(
+                "Programmer error in server_api._process_fringes(): "
+                + "Did not expect for this method to be called while self._processing_measurement_fringe was not True!"
+            )
 
         # update statuses
         # Critical section, these statuses updates need to be thread safe
@@ -306,11 +335,11 @@ class ServerState:
 
         with et.ignored(Exception):
             lt.debug("ServerState.close_all(): Closing the sofast fixed system")
-        # TODO uncomment in the case that sofast fixed ever gains a close() or close_all() method
-        #     if self._system_fixed is not None:
-        #         with self._system_fixed as sys:
-        #             sys.close_all()
-        #             self._system_fixed = None
+            # TODO uncomment in the case that sofast fixed ever gains a close() or close_all() method
+            #     if self._system_fixed is not None:
+            #         with self._system_fixed as sys:
+            #             sys.close_all()
+            #             self._system_fixed = None
             self._system_fixed = None
 
         with et.ignored(Exception):
