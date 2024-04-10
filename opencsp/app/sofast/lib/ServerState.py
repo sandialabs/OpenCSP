@@ -1,17 +1,29 @@
 import asyncio
 
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
+from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 import opencsp.app.sofast.lib.Executor as sfe
+from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
+from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 import opencsp.common.lib.geometry.Vxyz as vxyz
 import opencsp.common.lib.process.ControlledContext as cc
+from opencsp.common.lib.opencsp_path import opencsp_settings
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.log_tools as lt
 
 
 class ServerState:
+    _default_io_initialized: bool = False
     _instance: cc.ControlledContext['ServerState'] = None
 
     def __init__(self):
@@ -30,6 +42,21 @@ class ServerState:
         self._mirror_measure_distance: float = None
         self._fixed_pattern_diameter: int = None
         self._fixed_pattern_spacing: int = None
+
+        # default values
+        self.mirror_measure_point: vxyz.Vxyz = None
+        self.mirror_screen_distance: float = None
+        self.camera_calibration: Camera = None
+        self.fixed_pattern_diameter_and_spacing: list[int] = None
+        self.spatial_orientation: SpatialOrientation = None
+        self.display_shape: DisplayShape = None
+        self.dot_locations: DotLocationsFixedPattern = None
+        self.facet_definitions: list[DefinitionFacet] = None
+        self.ensemble_definition: DefinitionEnsemble = None
+        self.surface_shape: Surface2DAbstract = None
+        if not ServerState._default_io_initialized:
+            self.init_io()
+        self.load_default_settings()
 
         # statuses
         self._running_measurement_fixed = False
@@ -187,21 +214,86 @@ class ServerState:
             return True
 
     def _connect_default_cameras(self):
-        pass
+        camera_descriptions = opencsp_settings["sofast_defaults"]["camera_files"]
+        if camera_descriptions is not None:
+            cam_options = ImageAcquisitionAbstract.cam_options()
+            for camera_description in camera_descriptions:
+                cam_options[camera_description]()
 
     def _load_default_projector(self):
-        pass
-
-    def _load_default_calibration(self):
-        pass
-
-    def _get_default_mirror_distance_measurement(self):
-        pass
+        projector_file = opencsp_settings["sofast_defaults"]["projector_file"]
+        if projector_file is not None:
+            if ImageProjection.instance() is not None:
+                ImageProjection.instance().close()
+            ImageProjection.load_from_hdf_and_display(projector_file)
 
     def init_io(self):
+        """Connects to the default cameras and projector"""
+        ServerState._default_io_initialized = True
         self._connect_default_cameras()
         self._load_default_projector()
-        self._load_default_calibration()
+
+    def load_default_settings(self):
+        """Loads default settings for fringe and fixed measurements"""
+        # load default calibration
+        calibration_file = opencsp_settings["sofast_defaults"]["calibration_file"]
+        if calibration_file is not None:
+            calibration = ImageCalibrationAbstract.load_from_hdf_guess_type(calibration_file)
+            with self.system_fringe as sys:
+                sys.calibration = calibration
+
+        # latch default mirror measure point
+        self.mirror_measure_point = opencsp_settings["sofast_defaults"]["mirror_measure_point"]
+
+        # latch default mirror measure distance
+        self.mirror_screen_distance = opencsp_settings["sofast_defaults"]["mirror_screen_distance"]
+
+        # load the default camera calibration
+        camera_calibration_file = opencsp_settings["sofast_defaults"]["camera_calibration_file"]
+        if camera_calibration_file is not None:
+            self.camera_calibration = Camera.load_from_hdf(camera_calibration_file)
+
+        # latch fixed pattern diameter and spacing
+        self.fixed_pattern_diameter_and_spacing = opencsp_settings["sofast_defaults"]["fixed_pattern_diameter_and_spacing"]
+
+        # latch default spatial orientation
+        spatial_orientation_file = opencsp_settings["sofast_defaults"]["spatial_orientation_file"]
+        if spatial_orientation_file is not None:
+            self.spatial_orientation = SpatialOrientation.load_from_hdf(spatial_orientation_file)
+
+        # load default display shape
+        display_shape_file = opencsp_settings["sofast_defaults"]["display_shape_file"]
+        if display_shape_file is not None:
+            self.display_shape = DisplayShape.load_from_hdf(display_shape_file)
+
+        # load default dot locations
+        dot_locations_file = opencsp_settings["sofast_defaults"]["dot_locations_file"]
+        if dot_locations_file != None:
+            self.dot_locations = DotLocationsFixedPattern.load_from_hdf(dot_locations_file)
+
+        # load default facet definitions
+        facet_files = opencsp_settings["sofast_defaults"]["facet_definition_files"]
+        if facet_files is not None:
+            if self.facet_definitions is None:
+                self.facet_definitions = []
+            self.facet_definitions.clear()
+            for facet_file in facet_files:
+                self.facet_definitions.append(DefinitionFacet.load_from_hdf(facet_file))
+
+        # load default ensemble definition
+        ensemble_file = opencsp_settings["sofast_defaults"]["ensemble_definition_file"]
+        if ensemble_file is not None:
+            self.ensemble_definition = DefinitionEnsemble.load_from_hdf(ensemble_file)
+
+        # load default reference facet (for slope error computation)
+        reference_facet_file = opencsp_settings["sofast_defaults"]["reference_facet_file"]
+        if reference_facet_file is not None:
+            self.reference_facet = Facet(MirrorPoint.load_from_hdf(reference_facet_file))
+
+        # load default surface shape
+        surface_shape_file = opencsp_settings["sofast_defaults"]["surface_shape_file"]
+        if surface_shape_file is not None:
+            self.surface_shape = Surface2DAbstract.load_from_hdf_guess_type(surface_shape_file)
 
     def start_measure_fringes(self, name: str = None) -> bool:
         """Starts collection and processing of fringe measurement image data.
@@ -272,12 +364,12 @@ class ServerState:
         self._executor.start_process_fringe(
             self.system_fringe,
             self.mirror_measure_point,
-            self.mirror_measure_distance,
-            self.orientation,
-            self.camera,
-            self.display,
-            self.facet_data,
-            self.surface,
+            self.mirror_screen_distance,
+            self.spatial_orientation,
+            self.camera_calibration,
+            self.display_shape,
+            self.facet_definitions[0],
+            self.surface_shape,
             self.fringe_measurement_name,
             self.reference_facet,
         )
