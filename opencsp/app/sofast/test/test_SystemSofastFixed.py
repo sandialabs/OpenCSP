@@ -58,6 +58,6 @@ class TestSystemSofastFixed(unittest.TestCase):
 if __name__ == '__main__':
     save_dir = join(dirname(__file__), 'data/output/system_fixed')
     ft.create_directories_if_necessary(save_dir)
-
     lt.logger(join(save_dir, 'log.txt'), level=lt.log.DEBUG)
+
     unittest.main()

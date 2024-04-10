@@ -34,7 +34,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return False
 
     def get_frame(self) -> np.ndarray:
-        time.sleep(self._shutter)
+        time.sleep(self._shutter / 1e6)
         # Return test image
         return np.zeros(self._frame_size, dtype=np.uint8)
 
