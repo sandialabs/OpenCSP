@@ -235,44 +235,46 @@ class ServerState:
 
     def load_default_settings(self):
         """Loads default settings for fringe and fixed measurements"""
+        sofast_default_settings = opencsp_settings["sofast_defaults"]
+
         # load default calibration
-        calibration_file = opencsp_settings["sofast_defaults"]["calibration_file"]
+        calibration_file = sofast_default_settings["calibration_file"]
         if calibration_file is not None:
             calibration = ImageCalibrationAbstract.load_from_hdf_guess_type(calibration_file)
             with self.system_fringe as sys:
                 sys.calibration = calibration
 
         # latch default mirror measure point
-        self.mirror_measure_point = opencsp_settings["sofast_defaults"]["mirror_measure_point"]
+        self.mirror_measure_point = sofast_default_settings["mirror_measure_point"]
 
         # latch default mirror measure distance
-        self.mirror_screen_distance = opencsp_settings["sofast_defaults"]["mirror_screen_distance"]
+        self.mirror_screen_distance = sofast_default_settings["mirror_screen_distance"]
 
         # load the default camera calibration
-        camera_calibration_file = opencsp_settings["sofast_defaults"]["camera_calibration_file"]
+        camera_calibration_file = sofast_default_settings["camera_calibration_file"]
         if camera_calibration_file is not None:
             self.camera_calibration = Camera.load_from_hdf(camera_calibration_file)
 
         # latch fixed pattern diameter and spacing
-        self.fixed_pattern_diameter_and_spacing = opencsp_settings["sofast_defaults"]["fixed_pattern_diameter_and_spacing"]
+        self.fixed_pattern_diameter_and_spacing = sofast_default_settings["fixed_pattern_diameter_and_spacing"]
 
         # latch default spatial orientation
-        spatial_orientation_file = opencsp_settings["sofast_defaults"]["spatial_orientation_file"]
+        spatial_orientation_file = sofast_default_settings["spatial_orientation_file"]
         if spatial_orientation_file is not None:
             self.spatial_orientation = SpatialOrientation.load_from_hdf(spatial_orientation_file)
 
         # load default display shape
-        display_shape_file = opencsp_settings["sofast_defaults"]["display_shape_file"]
+        display_shape_file = sofast_default_settings["display_shape_file"]
         if display_shape_file is not None:
             self.display_shape = DisplayShape.load_from_hdf(display_shape_file)
 
         # load default dot locations
-        dot_locations_file = opencsp_settings["sofast_defaults"]["dot_locations_file"]
+        dot_locations_file = sofast_default_settings["dot_locations_file"]
         if dot_locations_file != None:
             self.dot_locations = DotLocationsFixedPattern.load_from_hdf(dot_locations_file)
 
         # load default facet definitions
-        facet_files = opencsp_settings["sofast_defaults"]["facet_definition_files"]
+        facet_files = sofast_default_settings["facet_definition_files"]
         if facet_files is not None:
             if self.facet_definitions is None:
                 self.facet_definitions = []
@@ -281,17 +283,17 @@ class ServerState:
                 self.facet_definitions.append(DefinitionFacet.load_from_hdf(facet_file))
 
         # load default ensemble definition
-        ensemble_file = opencsp_settings["sofast_defaults"]["ensemble_definition_file"]
+        ensemble_file = sofast_default_settings["ensemble_definition_file"]
         if ensemble_file is not None:
             self.ensemble_definition = DefinitionEnsemble.load_from_hdf(ensemble_file)
 
         # load default reference facet (for slope error computation)
-        reference_facet_file = opencsp_settings["sofast_defaults"]["reference_facet_file"]
+        reference_facet_file = sofast_default_settings["reference_facet_file"]
         if reference_facet_file is not None:
             self.reference_facet = Facet(MirrorPoint.load_from_hdf(reference_facet_file))
 
         # load default surface shape
-        surface_shape_file = opencsp_settings["sofast_defaults"]["surface_shape_file"]
+        surface_shape_file = sofast_default_settings["surface_shape_file"]
         if surface_shape_file is not None:
             self.surface_shape = Surface2DAbstract.load_from_hdf_guess_type(surface_shape_file)
 

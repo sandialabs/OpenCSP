@@ -150,7 +150,9 @@ class Surface2DAbstract(h5.HDF5_IO_Abstract):
         data = h5.load_hdf5_datasets([prefix + 'ParamsSurface/surface_type'], file)
         if data['surface_type'] == 'parabolic':
             from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
+
             return Surface2DParabolic.load_from_hdf(file, prefix)
         else:
             from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
+
             return Surface2DPlano.load_from_hdf(file, prefix)

@@ -1,8 +1,5 @@
 _sofast_server_settings_key = "sofast_server"
-_sofast_server_settings: dict[str, any] = {
-    "log_output_dir": None,
-    "saves_output_dir": None
-}
+_sofast_server_settings: dict[str, any] = {"log_output_dir": None, "saves_output_dir": None}
 
 _sofast_defaults_settings_key = "sofast_defaults"
 _sofast_defaults_settings: dict[str, any] = {
@@ -30,5 +27,5 @@ calibration_file: Where to find the calibration .h5 file, which defines the defa
 
 _settings_list = [
     [_sofast_server_settings_key, _sofast_server_settings],
-    [_sofast_defaults_settings_key, _sofast_defaults_settings]
+    [_sofast_defaults_settings_key, _sofast_defaults_settings],
 ]
