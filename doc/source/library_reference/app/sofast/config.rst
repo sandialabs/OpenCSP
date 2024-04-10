@@ -89,7 +89,7 @@ opencsp.app.sofast.lib.SystemSofastFringe
    :show-inheritance:
 
 opencsp.app.sofast.lib.PatternSofastFixed
-========================================
+=========================================
 
 .. currentmodule:: opencsp.app.sofast.lib.PatternSofastFixed
 
