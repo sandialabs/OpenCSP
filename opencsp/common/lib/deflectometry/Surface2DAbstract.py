@@ -6,10 +6,10 @@ from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool.hdf5_tools import HDF5_IO_Abstract
+import opencsp.common.lib.tool.hdf5_tools as h5
 
 
-class Surface2DAbstract(HDF5_IO_Abstract):
+class Surface2DAbstract(h5.HDF5_IO_Abstract):
     """Representation of 2d surface for SOFAST processing"""
 
     def __init__(self):
@@ -131,3 +131,26 @@ class Surface2DAbstract(HDF5_IO_Abstract):
         axes.set_xlabel('x (meter)')
         axes.set_ylabel('y (meter)')
         axes.set_zlabel('z (meter)')
+
+    @classmethod
+    def load_from_hdf_guess_type(cls, file: str, prefix: str = ''):
+        """
+        Attempt to guess and load a Surface2D description from the given file. Assumes data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
+        # Imports are here to avoid circular references
+        # Get the surface type
+        data = h5.load_hdf5_datasets([prefix + 'ParamsSurface/surface_type'], file)
+        if data['surface_type'] == 'parabolic':
+            from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
+            return Surface2DParabolic.load_from_hdf(file, prefix)
+        else:
+            from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
+            return Surface2DPlano.load_from_hdf(file, prefix)

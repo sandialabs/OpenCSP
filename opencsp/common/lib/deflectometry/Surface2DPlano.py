@@ -203,7 +203,7 @@ class Surface2DPlano(Surface2DAbstract):
         self.v_optic_screen_optic += v_align_optic_step
 
     def save_to_hdf(self, file: str, prefix: str = ''):
-        data = [self.robust_least_squares, self.downsample, 'parabolic']
+        data = [self.robust_least_squares, self.downsample, 'plano']
         datasets = [
             prefix + 'ParamsSurface/robust_least_squares',
             prefix + 'ParamsSurface/downsample',
@@ -215,7 +215,7 @@ class Surface2DPlano(Surface2DAbstract):
     def load_from_hdf(cls, file: str, prefix: str = ''):
         # Check surface type
         data = load_hdf5_datasets([prefix + 'ParamsSurface/surface_type'], file)
-        if data['surface_type'] != 'parabolic':
+        if data['surface_type'] != 'plano':
             raise ValueError(f'Surface2DPlano cannot load surface type, {data["surface_type"]:s}')
 
         # Load

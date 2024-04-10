@@ -8,7 +8,6 @@ from warnings import warn
 import numpy as np
 import scipy.interpolate as interp
 
-import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 from opencsp.common.lib.geometry.FunctionXYDiscrete import FunctionXYDiscrete as FXYD
 from opencsp.common.lib.geometry.Pxy import Pxy
@@ -19,9 +18,11 @@ from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
+import opencsp.common.lib.tool.hdf5_tools as h5
+import opencsp.common.lib.tool.log_tools as lt
 
 
-class MirrorPoint(MirrorAbstract):
+class MirrorPoint(MirrorAbstract, h5.HDF5_IO_Abstract):
     def __init__(
         self,
         surface_points: Pxyz,
@@ -211,3 +212,50 @@ class MirrorPoint(MirrorAbstract):
         # If surface is interpolated, draw mirror using MirrorAbstract method
         else:
             super().draw(view, mirror_style, transform)
+
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """
+        Saves the key attributes describing this mirror to the given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
+        data = ['MirrorPoint', self.surface_points, self.normal_vectors, self.region, self.interpolation_type]
+        datasets = [
+            prefix + 'ParamsMirror/mirror_type',
+            prefix + 'ParamsMirror/surface_points',
+            prefix + 'ParamsMirror/normal_vectors',
+            prefix + 'ParamsMirror/shape',
+            prefix + 'ParamsMirror/interpolation_type',
+        ]
+        h5.save_hdf5_datasets(data, datasets, file)
+
+    @classmethod
+    def load_from_hdf(cls, file: str, prefix: str = ''):
+        """
+        Loads the key attributes from the given file and contructs a new MirrorPoint instance. Assumes data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
+        datasets = h5.load_hdf5_datasets([prefix + "ParamsMirror/mirror_type"], file)
+        if datasets["mirror_type"] != 'MirrorPoint':
+            lt.error_and_raise(ValueError, f'{prefix}ParamsMirror file is not of type "MirrorPoint"')
+
+        datasets_path_names = [
+            prefix + 'ParamsMirror/surface_points',
+            prefix + 'ParamsMirror/normal_vectors',
+            prefix + 'ParamsMirror/shape',
+            prefix + 'ParamsMirror/interpolation_type',
+        ]
+        h5.load_hdf5_datasets(datasets_path_names, file)
