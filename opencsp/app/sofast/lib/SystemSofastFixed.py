@@ -157,18 +157,6 @@ class SystemSofastFixed:
         self.prepend_to_queue(funcs)
         self.run_next_in_queue()
 
-    def run_camera_exposure_calibration(self) -> None:
-        """
-        Calculates the ideal camera exposure as to not saturate above a
-        specified threshold.
-
-        Upon completion, runs self.run_next_in_queue()
-        """
-        lt.debug('SystemSofastFixed starting camera exposure calibration')
-        self.image_acquisition.calibrate_exposure()
-
-        self.run_next_in_queue()
-
     def close_all(self):
         """Closes all windows and cameras"""
         # Close image acquisition
