@@ -16,6 +16,8 @@ import os
 from traceback import format_exception
 from urllib.parse import parse_qsl, urlparse
 
+import numpy as np
+
 import opencsp.app.sofast.lib.ServerState as ss
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.opencsp_path import opencsp_settings
@@ -106,27 +108,52 @@ class SofastServer(BaseHTTPRequestHandler):
                     else:
                         ret["error"] = "Fringe measurement is not ready"
                         ret["trace"] = "SofastServer.get_response::save_measure_fringes"
+                        response_code = 409
                 else:
                     ret["error"] = "Measurements save directory not speicified in settings"
                     ret["trace"] = "SofastServer.get_response::save_measure_fringes"
+                    response_code = 500
 
             elif action == "get_results_fringes":
-                pass
+                measurement = None
+                with ss.ServerState.instance() as state:
+                    if state.has_fringe_measurement:
+                        measurement = state.last_measurement_fringe
+                        state.system_fringe
+                if measurement is not None:
+                    ret.update({
+                        "focal_length_x": measurement.focal_length_x,
+                        "focal_length_y": measurement.focal_length_y,
+                        "slope_error_x": np.average(measurement.slopes_error[0]),
+                        "slope_error_y": np.average(measurement.slopes_error[1]),
+                        "slope_error": np.average(measurement.slopes_error),
+                        "slope_stddev": np.std(measurement.slopes_error)
+                    })
+                else:
+                    ret["error"] = "Fringe measurement is not ready"
+                    ret["trace"] = "SofastServer.get_response::get_results_fringes"
+                    response_code = 409
 
             else:
-                ret = {
-                    "error": f"Unknown action \"{action}\"",
-                    "trace": "SofastServer.get_response"
-                }
+                ret["error"] = f"Unknown action \"{action}\""
+                ret["trace"] = "SofastServer.get_response::N/A"
                 response_code = 404
 
         except Exception as ex:
             lt.error("Error in SofastServer with action " + action + ": " + repr(ex))
-            ret = {
-                "error": repr(ex),
-                "trace": "".join(format_exception(ex))
-            }
+            ret["error"] = repr(ex),
+            ret["trace"] = "".join(format_exception(ex))
             response_code = 500
+
+        # sanity check: did we synchronize the error and response_code?
+        if response_code != 200:
+            if ret["error"] is None:
+                lt.error_and_raise(
+                    RuntimeError, f"Programmer error in SofastServer.get_response({action}): " + f"did not correctly set 'error' to match {response_code=}!")
+        if ret["error"] is not None:
+            if response_code == 200:
+                lt.error_and_raise(
+                    RuntimeError, f"Programmer error in SofastServer.get_response({action}): " + f"did not correctly set response_code to match {ret['error']=}!")
 
         return response_code, json.dumps(ret)
 
