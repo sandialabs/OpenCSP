@@ -9,6 +9,7 @@ from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -31,7 +32,7 @@ class TestSystemSofastFixed(unittest.TestCase):
         im_aq.gain = 230
 
         # Create system class
-        system = SystemSofastFixed(im_proj, im_aq)
+        system = SystemSofastFixed(im_aq)
         system.image_delay = 300
         system.image_acquisition.exposure_time = 0.1  # seconds
 
@@ -39,10 +40,7 @@ class TestSystemSofastFixed(unittest.TestCase):
         system.set_pattern_parameters(5, 5)
 
         # Define functions to put in system queue
-        funcs = [
-            system.run_measurement,
-            system.close_all,
-        ]
+        funcs = [system.run_measurement, system.close_all]
 
         # Load function in queue
         system.set_queue(funcs)
@@ -58,7 +56,8 @@ class TestSystemSofastFixed(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    save_dir = join(dirname(__file__), 'data/output')
+    save_dir = join(dirname(__file__), 'data/output/system_fixed')
+    ft.create_directories_if_necessary(save_dir)
 
-    lt.logger(level=lt.log.DEBUG)
+    lt.logger(join(save_dir, 'log.txt'), level=lt.log.DEBUG)
     unittest.main()
