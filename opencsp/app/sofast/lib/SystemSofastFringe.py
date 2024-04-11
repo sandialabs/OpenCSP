@@ -81,8 +81,11 @@ class SystemSofastFringe:
         self.fringe_images_captured: list[list[ndarray]]
         """The images captured during run_measurement. Outer index is the camera index. Inner index is the fringe image."""
         self._calibration_display_values: ndarray
-        self.calibration_images: list[ndarray]
+        """The digital numbers sent to the projector for the projector-camera response calibration"""
+        self._calibration_images: list[list[ndarray]]
+        """List of lists of projector-camera response calibration images (one list per camera)"""
         self.calibration: ImageCalibrationAbstract = None
+        """The computed ImageCalibration object"""
 
     def __del__(self):
         # Remove references to this instance from the ImageAcquisition cameras
@@ -160,7 +163,7 @@ class SystemSofastFringe:
         self.fringe_images_to_display = None
         self.fringe_images_captured = None
 
-        self.calibration_images = None
+        self._calibration_images = None
         self._calibration_display_values = None
         self.calibration = None
 
@@ -331,7 +334,7 @@ class SystemSofastFringe:
         on_processing: Callable = None,
         on_processed: Callable = None,
     ) -> None:
-        """Runs the projector-camera intensity calibration and stores the results in self.calibration_images and
+        """Runs the projector-camera intensity calibration and stores the results in self._calibration_images and
         self.calibration.
 
         Params:
@@ -377,9 +380,9 @@ class SystemSofastFringe:
             if calibration_hdf5_path_name_ext != None:
                 self.calibration.save_to_hdf(calibration_hdf5_path_name_ext)
             # Save calibration raw data
-            data = [self.calibration.display_values, calibration_images]
-            datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
             if calibration_hdf5_path_name_ext != None:
+                data = [self.calibration.display_values, calibration_images]
+                datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
                 h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
             # Update the fringe images with the new calibration object
             self.create_fringe_images_from_image_calibration()
@@ -500,7 +503,7 @@ class SystemSofastFringe:
     def run_display_camera_response_calibration(self, res: int = 10, run_next: Callable | None = None) -> None:
         """
         Calculates camera-projector response data. Data is saved in
-        _calibration_display_values and calibration_images.
+        _calibration_display_values and _calibration_images.
 
         Parameters
         ----------
@@ -536,10 +539,10 @@ class SystemSofastFringe:
             cal_images_display.append(array)
 
         # Capture calibration images
-        self.calibration_images = []
+        self._calibration_images = []
         for _ in range(len(self.image_acquisitions)):
-            self.calibration_images.append([])
-        self._measure_sequence_display(cal_images_display, self.calibration_images, run_next)
+            self._calibration_images.append([])
+        self._measure_sequence_display(cal_images_display, self._calibration_images, run_next)
 
     def get_calibration_images(self) -> list[ndarray]:
         """
@@ -551,14 +554,14 @@ class SystemSofastFringe:
             List of shape (N, M, n) arrays.
 
         """
-        if self.calibration_images is None:
+        if self._calibration_images is None:
             lt.error_and_raise(
                 ValueError,
                 'Error in SystemSofastFringe.get_calibration_images(): Calibration Images have not been collected yet.',
             )
 
         images = []
-        for ims in self.calibration_images:
+        for ims in self._calibration_images:
             images.append(np.concatenate(ims, axis=2))
         return images
 
