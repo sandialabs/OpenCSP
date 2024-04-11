@@ -4,7 +4,6 @@
 import copy
 import datetime as dt
 from typing import Callable
-from warnings import warn
 
 from numpy import ndarray
 import numpy as np
@@ -333,7 +332,7 @@ class SystemSofastFringe:
 
         # Compare to threshold
         if saturation >= thresh:
-            warn('Image is {:.2f}% saturated.'.format(saturation * 100), stacklevel=2)
+            lt.warn(f'Image is {saturation * 100:.2f}% saturated.')
 
     def run_gray_levels_cal(
         self,
