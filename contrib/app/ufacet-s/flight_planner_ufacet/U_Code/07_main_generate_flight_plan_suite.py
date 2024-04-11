@@ -93,9 +93,7 @@ def setup_render_control_scan_section_analysis():
     # analysis_render_control.draw_single_heliostat_constraints_assessed_normals = False
     # analysis_render_control.draw_single_heliostat_constraints_detail = False
     # analysis_render_control.draw_single_heliostat_constraints_all_targets = False
-    analysis_render_control.draw_single_heliostat_constraints_summary = (
-        False  # KEY SUMMARY
-    )
+    analysis_render_control.draw_single_heliostat_constraints_summary = False  # KEY SUMMARY
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example = False
     # analysis_render_control.draw_single_heliostat_constraints_gaze_example_C = C_draw
     analysis_render_control.draw_single_heliostat_constraints_legend = False
@@ -117,9 +115,7 @@ def setup_render_control_scan_section_analysis():
     analysis_render_control.draw_multi_heliostat_gaze_angle_example = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_fill = False
     analysis_render_control.draw_multi_heliostat_gaze_angle_legend = False
-    analysis_render_control.draw_multi_heliostat_vertical_fov_required = (
-        False  # KEY SUMMARY
-    )
+    analysis_render_control.draw_multi_heliostat_vertical_fov_required = False  # KEY SUMMARY
     analysis_render_control.draw_multi_heliostat_vertical_fov_required_legend = False
     # analysis_render_control.draw_multi_heliostat_select_gaze = False  # KEY SUMMARY
     # analysis_render_control.draw_multi_heliostat_select_gaze_per_heliostat = False
@@ -180,14 +176,10 @@ if __name__ == "__main__":
     # Scan control parameters.
     # Raster.
     #    scan_type = 'Raster'
-    raster_scan_parameter_file = (
-        'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
-    )
+    raster_scan_parameter_file = 'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
     # UFACET.
     scan_type = 'UFACET'
-    ufacet_scan_parameter_file = (
-        'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
-    )
+    ufacet_scan_parameter_file = 'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
     # Define UFACET control flags.
     ufacet_control_parameters = {}
     # Seed points.
@@ -198,14 +190,10 @@ if __name__ == "__main__":
     #    ufacet_curve_keys_x = [92.7] # ?? SCAFFOLDING RCB -- TEMPORARY
     #    ufacet_curve_keys_x = [112.2] # ?? SCAFFOLDING RCB -- TEMPORARY
     ufacet_curve_keys_y = [136.9] * len(ufacet_curve_keys_x)
-    ufacet_curve_key_xy_list = [
-        [key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)
-    ]
+    ufacet_curve_key_xy_list = [[key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)]
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(
@@ -216,14 +204,8 @@ if __name__ == "__main__":
     solar_field_spec = {}
     solar_field_spec['name'] = 'Sandia NSTTF'
     solar_field_spec['short_name'] = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat'] = (
-        nll.LON_NSTTF_ORIGIN,
-        nll.LAT_NSTTF_ORIGIN,
-    )
-    solar_field_spec['field_origin_lon_lat'] = (
-        nll.LON_NSTTF_ORIGIN,
-        nll.LAT_NSTTF_ORIGIN,
-    )
+    solar_field_spec['field_origin_lon_lat'] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
+    solar_field_spec['field_origin_lon_lat'] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
     solar_field_spec['field_heliostat_file'] = './data/NSTTF_Heliostats.csv'
     solar_field_spec['field_facet_centroids_file'] = './data/NSTTF_Facet_Centroids.csv'
 

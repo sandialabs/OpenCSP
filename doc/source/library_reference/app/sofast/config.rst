@@ -38,52 +38,62 @@ opencsp.app.sofast.lib.ImageCalibrationScaling
    :undoc-members:
    :show-inheritance:
 
-opencsp.app.sofast.lib.Measurement
-==================================
+opencsp.app.sofast.lib.MeasurementSofastFixed
+=============================================
 
-.. currentmodule:: opencsp.app.sofast.lib.Measurement
+.. currentmodule:: opencsp.app.sofast.lib.MeasurementSofastFixed
 
-.. automodule:: opencsp.app.sofast.lib.Measurement
+.. automodule:: opencsp.app.sofast.lib.MeasurementSofastFixed
    :members:
    :undoc-members:
    :show-inheritance:
 
-opencsp.app.sofast.lib.Sofast
-=============================
+opencsp.app.sofast.lib.MeasurementSofastFringe
+==============================================
 
-.. currentmodule:: opencsp.app.sofast.lib.Sofast
+.. currentmodule:: opencsp.app.sofast.lib.MeasurementSofastFringe
 
-.. automodule:: opencsp.app.sofast.lib.Sofast
+.. automodule:: opencsp.app.sofast.lib.MeasurementSofastFringe
    :members:
    :undoc-members:
    :show-inheritance:
 
-opencsp.app.sofast.lib.SofastParams
-===================================
+opencsp.app.sofast.lib.ParamsSofastFringe
+=========================================
 
-.. currentmodule:: opencsp.app.sofast.lib.SofastParams
+.. currentmodule:: opencsp.app.sofast.lib.ParamsSofastFringe
 
-.. automodule:: opencsp.app.sofast.lib.SofastParams
+.. automodule:: opencsp.app.sofast.lib.ParamsSofastFringe
    :members:
    :undoc-members:
    :show-inheritance:
 
-opencsp.app.sofast.lib.System
-=============================
+opencsp.app.sofast.lib.ParamsSofastFixed
+========================================
 
-.. currentmodule:: opencsp.app.sofast.lib.System
+.. currentmodule:: opencsp.app.sofast.lib.ParamsSofastFixed
 
-.. automodule:: opencsp.app.sofast.lib.System
+.. automodule:: opencsp.app.sofast.lib.ParamsSofastFixed
    :members:
    :undoc-members:
    :show-inheritance:
 
-opencsp.app.sofast.lib.load_saved_data
-======================================
+opencsp.app.sofast.lib.SystemSofastFringe
+=========================================
 
-.. currentmodule:: opencsp.app.sofast.lib.load_saved_data
+.. currentmodule:: opencsp.app.sofast.lib.SystemSofastFringe
 
-.. automodule:: opencsp.app.sofast.lib.load_saved_data
+.. automodule:: opencsp.app.sofast.lib.SystemSofastFringe
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+opencsp.app.sofast.lib.SystemSofastFixed
+========================================
+
+.. currentmodule:: opencsp.app.sofast.lib.SystemSofastFixed
+
+.. automodule:: opencsp.app.sofast.lib.SystemSofastFixed
    :members:
    :undoc-members:
    :show-inheritance:
@@ -104,6 +114,16 @@ opencsp.app.sofast.SofastGUI
 .. currentmodule:: opencsp.app.sofast.SofastGUI
 
 .. automodule:: opencsp.app.sofast.SofastGUI
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+opencsp.app.sofast.lib.CalibrateDisplayShape
+=============================================================
+
+.. currentmodule:: opencsp.app.sofast.lib.CalibrateDisplayShape
+
+.. automodule:: opencsp.app.sofast.lib.CalibrateDisplayShape
    :members:
    :undoc-members:
    :show-inheritance:

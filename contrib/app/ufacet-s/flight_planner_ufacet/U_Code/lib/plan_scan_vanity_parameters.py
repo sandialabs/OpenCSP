@@ -28,11 +28,7 @@ def check_eta(eta):
             + str(np.rad2deg(eta))
             + 'encountered.'
         )
-        print(
-            '       We reject positive gaze angles exceeding '
-            + str(np.rad2deg(eta_max))
-            + ' degrees.'
-        )
+        print('       We reject positive gaze angles exceeding ' + str(np.rad2deg(eta_max)) + ' degrees.')
         assert False
     eta_min = np.rad2deg(-90.0)
     if eta < eta_min:
@@ -41,17 +37,11 @@ def check_eta(eta):
             + str(np.rad2deg(eta))
             + 'encountered.'
         )
-        print(
-            '       We reject gaze angles less than '
-            + str(np.rad2deg(eta_min))
-            + ' degrees.'
-        )
+        print('       We reject gaze angles less than ' + str(np.rad2deg(eta_min)) + ' degrees.')
         assert False
 
 
-def construct_vanity_scan_parameters(
-    vanity_scan_parameter_file, vanity_heliostat_name, vanity_heliostat_azimuth
-):
+def construct_vanity_scan_parameters(vanity_scan_parameter_file, vanity_heliostat_name, vanity_heliostat_azimuth):
     # General scan parameters.
     scan_parameters = psp.construct_scan_parameters(vanity_scan_parameter_file)
 
@@ -61,17 +51,13 @@ def construct_vanity_scan_parameters(
     scan_parameters['fly_forward_backward'] = True  # False
 
     if vanity_scan_parameter_file == 'NSTTF':
-        print(
-            'ERROR: In construct_vanity_scan_parameters(), NSTTF case not implemented yet.'
-        )
+        print('ERROR: In construct_vanity_scan_parameters(), NSTTF case not implemented yet.')
         assert False
         # Vanity scan parameters.
         eta = np.deg2rad(-35.0)  # Arbitrary test value.
         scan_parameters['n_horizontal'] = 10  # Number of horizontal passes.
         scan_parameters['n_vertical'] = 6  # Number of vertical passes.
-        scan_parameters[
-            'eta'
-        ] = eta  # rad,  Gaze angle, measured relative to horizontal (positive ==> up).
+        scan_parameters['eta'] = eta  # rad,  Gaze angle, measured relative to horizontal (positive ==> up).
         scan_parameters['relative_z'] = 20  # m.
         scan_parameters['speed'] = 10  # m/sec.
         # Check result and return.

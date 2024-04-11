@@ -2,6 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.geometry.Vxy import Vxy
+import opencsp.common.lib.render.figure_management as fm
 
 
 class TestVxy:
@@ -262,7 +263,7 @@ class TestVxy:
             res = a.cross(b)
 
     def test_draw(self):
-        fig = plt.figure()
+        fig = fm.mpl_pyplot_figure()
         ax = plt.gca()
         self.V1.draw(ax)
         plt.close(fig)

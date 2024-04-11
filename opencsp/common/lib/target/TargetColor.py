@@ -4,7 +4,6 @@ import math
 from typing import Callable
 from warnings import warn
 
-import matplotlib.pyplot as plt
 import matplotlib.tri as mtri
 import numpy as np
 import sympy.vector as vec
@@ -34,9 +33,7 @@ class TargetColor(TargetAbstract):
         dpm: float,  # dots per meter
         initial_color: Color.Color,  # Color to fill canvas before adding patterns.
     ) -> None:
-        super().__init__(
-            image_width, image_height, dpm
-        )  # initalizes the attributes universal to all mirrors
+        super().__init__(image_width, image_height, dpm)  # initalizes the attributes universal to all mirrors
         # Set initial pattern.
         self.initial_color = initial_color
         self.pattern_description = initial_color.name
@@ -63,9 +60,7 @@ class TargetColor(TargetAbstract):
         n_cols = self.image.shape[1]
         n_bands = self.image.shape[2]
         if n_bands != 3:
-            print(
-                'ERROR: In TargetAbstract.row_cols(), number of input image bands is not 3.'
-            )
+            print('ERROR: In TargetAbstract.row_cols(), number of input image bands is not 3.')
             assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION
         return n_rows, n_cols
 
@@ -76,11 +71,7 @@ class TargetColor(TargetAbstract):
 
     # Linear color bar, x direction
     def set_image_to_linear_color_bar_x(
-        self,
-        color_below_min: Color,
-        color_bar,
-        color_above_max: Color,
-        discrete_or_continuous: str,
+        self, color_below_min: Color, color_bar, color_above_max: Color, discrete_or_continuous: str
     ) -> None:
         n_rows, n_cols = self.rows_cols()
         for row in range(0, n_rows):
@@ -90,13 +81,7 @@ class TargetColor(TargetAbstract):
                 val_min = 0
                 val_max = n_cols
                 color = tcc.color_given_value(
-                    val,
-                    val_min,
-                    val_max,
-                    color_below_min,
-                    color_bar,
-                    color_above_max,
-                    discrete_or_continuous,
+                    val, val_min, val_max, color_below_min, color_bar, color_above_max, discrete_or_continuous
                 )
                 # Set pixel color
                 # ?? SCAFFOLDING RCB -- FIXUP ALL THIS CONFUSION REGARDING WHETHER COLORS ARE OVER [0,1] OR [0,255].
@@ -126,21 +111,13 @@ class TargetColor(TargetAbstract):
                 val_min = 0
                 val_max = n_rows  # Last row in color bar is the final color; there is not a color beyond.
                 color = tcc.color_given_value(
-                    val,
-                    val_min,
-                    val_max,
-                    color_below_min,
-                    color_bar,
-                    color_above_max,
-                    discrete_or_continuous,
+                    val, val_min, val_max, color_below_min, color_bar, color_above_max, discrete_or_continuous
                 )  # ?? SCAFFOLDING -- USE "SPLIT" CONTROL PARAMETER.
 
                 # Adjust saturation.
                 lateral_fraction = col / n_cols
                 # Color components.
-                this_red = color[
-                    0
-                ]  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]
+                this_red = color[0]  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]
                 this_green = color[1]  # /255.0
                 this_blue = color[2]  # /255.0
 
@@ -149,9 +126,7 @@ class TargetColor(TargetAbstract):
 
                 elif lateral_gradient_type == "saturated_to_white":
                     # Transition from saturated at left to white.
-                    saturation_factor = 1.0 - pow(
-                        lateral_fraction, saturated_to_white_exponent
-                    )
+                    saturation_factor = 1.0 - pow(lateral_fraction, saturated_to_white_exponent)
                     if saturation_factor < 0.0:
                         saturation_factor = 0.0
                     if saturation_factor > 1.0:
@@ -169,9 +144,7 @@ class TargetColor(TargetAbstract):
                 elif lateral_gradient_type == "light_to_saturated":
                     # Transition from partially saturated at left to fully saturated at boundary.
                     saturation_range = light_to_saturated_max - light_to_saturated_min
-                    saturation_factor = light_to_saturated_min + (
-                        lateral_fraction * saturation_range
-                    )
+                    saturation_factor = light_to_saturated_min + (lateral_fraction * saturation_range)
                     if saturation_factor < 0.0:
                         saturation_factor = 0.0
                     if saturation_factor > 1.0:
@@ -251,13 +224,7 @@ class TargetColor(TargetAbstract):
                 this_radius = math.sqrt((delta_x * delta_x) + (delta_y * delta_y))
                 # Lookup color given angle.# (Saturation not adjusted yet.)
                 color = tcc.color_given_value(
-                    this_angle,
-                    -math.pi,
-                    math.pi,
-                    color_below_min,
-                    color_bar,
-                    color_above_max,
-                    discrete_or_continuous,
+                    this_angle, -math.pi, math.pi, color_below_min, color_bar, color_above_max, discrete_or_continuous
                 )
                 # Compute saturation adjustment.
                 # Determine the radius to use for scaling the saturation.
@@ -272,8 +239,7 @@ class TargetColor(TargetAbstract):
                         radius_for_this_angle = abs(half_height / math.sin(this_angle))
                     else:
                         radius_for_this_angle = min(
-                            abs(half_width / math.cos(this_angle)),
-                            abs(half_height / math.sin(this_angle)),
+                            abs(half_width / math.cos(this_angle)), abs(half_height / math.sin(this_angle))
                         )
                 else:
                     print(
@@ -289,17 +255,13 @@ class TargetColor(TargetAbstract):
 
                 # Adjust saturation.
                 # Color components.
-                this_red = color[
-                    0
-                ]  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]
+                this_red = color[0]  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]
                 this_green = color[1]  # /255.0
                 this_blue = color[2]  # /255.0
 
                 if radial_gradient_type == "saturated_center_to_white":
                     # Transition from saturated at center to white.
-                    saturation_factor = 1.0 - pow(
-                        radius_fraction, saturated_center_to_white_exponent
-                    )
+                    saturation_factor = 1.0 - pow(radius_fraction, saturated_center_to_white_exponent)
                     if saturation_factor < 0.0:
                         saturation_factor = 0.0
                     if saturation_factor > 1.0:
@@ -317,12 +279,9 @@ class TargetColor(TargetAbstract):
                 elif radial_gradient_type == "light_center_to_saturated":
                     # Transition from partially saturated at center to fully saturated at boundary.
                     saturation_range = (
-                        light_center_to_saturated_saturation_max
-                        - light_center_to_saturated_saturation_min
+                        light_center_to_saturated_saturation_max - light_center_to_saturated_saturation_min
                     )
-                    saturation_factor = light_center_to_saturated_saturation_min + (
-                        radius_fraction * saturation_range
-                    )
+                    saturation_factor = light_center_to_saturated_saturation_min + (radius_fraction * saturation_range)
                     if saturation_factor < 0.0:
                         saturation_factor = 0.0
                     if saturation_factor > 1.0:
@@ -353,9 +312,9 @@ class TargetColor(TargetAbstract):
 
                 # Set pixel color
                 # ?? SCAFFOLDING RCB -- FIXUP ALL THIS CONFUSION REGARDING WHETHER COLORS ARE OVER [0,1] OR [0,255].
-                self.image[
-                    row, col, 0
-                ] = this_red  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]?
+                self.image[row, col, 0] = (
+                    this_red  # /255.0  # ?? SCAFFOLDING RCB -- CONVERT COLOR BAR TO INTERVAL [0,1]?
+                )
                 self.image[row, col, 1] = this_green  # /255.0
                 self.image[row, col, 2] = this_blue  # /255.0
 
@@ -363,12 +322,8 @@ class TargetColor(TargetAbstract):
         if draw_center_fiducial:
             self.set_center_fiducial(center_fiducial_width_pix, center_fiducial_color)
         if draw_edge_fiducials:
-            self.set_ticks_along_top_and_bottom_edges(
-                n_ticks_x, tick_length, tick_width_pix, tick_color
-            )
-            self.set_ticks_along_left_and_right_edges(
-                n_ticks_y, tick_length, tick_width_pix, tick_color
-            )
+            self.set_ticks_along_top_and_bottom_edges(n_ticks_x, tick_length, tick_width_pix, tick_color)
+            self.set_ticks_along_left_and_right_edges(n_ticks_y, tick_length, tick_width_pix, tick_color)
 
     # Fiducial tick marks.
     def set_center_fiducial(self, center_fiducial_width_pix, center_fiducial_color):
@@ -382,28 +337,18 @@ class TargetColor(TargetAbstract):
         # Number of pixels in center_fiducial either side of center point.  Use int() to intentionally truncate.
         center_fiducial_half_margin_pix = int(center_fiducial_width_pix / 2.0)
         if center_fiducial_half_margin_pix == 0:
-            if ((center_row >= 0) and (center_row < n_rows)) and (
-                (center_col >= 0) and (center_col < n_cols)
-            ):
+            if ((center_row >= 0) and (center_row < n_rows)) and ((center_col >= 0) and (center_col < n_cols)):
                 self.set_fiducial_pixel(center_row, center_col, center_fiducial_color)
         elif center_fiducial_half_margin_pix > 0:
             for this_row in range(
-                center_row - center_fiducial_half_margin_pix,
-                (center_row + center_fiducial_half_margin_pix) + 1,
+                center_row - center_fiducial_half_margin_pix, (center_row + center_fiducial_half_margin_pix) + 1
             ):
                 for this_col in range(
-                    center_col - center_fiducial_half_margin_pix,
-                    (center_col + center_fiducial_half_margin_pix) + 1,
+                    center_col - center_fiducial_half_margin_pix, (center_col + center_fiducial_half_margin_pix) + 1
                 ):
-                    if ((this_row >= 0) and (this_row < n_rows)) and (
-                        (this_col >= 0) and (this_col < n_cols)
-                    ):
-                        self.set_fiducial_pixel(
-                            this_row, this_col, center_fiducial_color
-                        )
-                        self.set_fiducial_pixel(
-                            this_row, this_col, center_fiducial_color
-                        )
+                    if ((this_row >= 0) and (this_row < n_rows)) and ((this_col >= 0) and (this_col < n_cols)):
+                        self.set_fiducial_pixel(this_row, this_col, center_fiducial_color)
+                        self.set_fiducial_pixel(this_row, this_col, center_fiducial_color)
         else:
             print(
                 'ERROR: In TargetColor.set_center_fiducial(), unexpected negative center_fiducial_half_margin_pix = '
@@ -411,9 +356,7 @@ class TargetColor(TargetAbstract):
             )
             assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION.
 
-    def set_ticks_along_top_and_bottom_edges(
-        self, n_ticks_x, tick_length, tick_width_pix, tick_color
-    ):
+    def set_ticks_along_top_and_bottom_edges(self, n_ticks_x, tick_length, tick_width_pix, tick_color):
         n_rows, n_cols = self.rows_cols()
         width = n_cols
         dx_tick = width / (n_ticks_x - 1)
@@ -429,27 +372,16 @@ class TargetColor(TargetAbstract):
                 if tick_half_margin_pix == 0:
                     if col_tick < 0:
                         col_tick = 0
-                    if (
-                        col_tick == n_cols
-                    ):  # Use "==" because if tick is past end of image, don't draw.
+                    if col_tick == n_cols:  # Use "==" because if tick is past end of image, don't draw.
                         col_tick = n_cols - 1
                     if (col_tick >= 0) and (col_tick < n_cols):
                         self.set_fiducial_pixel(this_row_from_top, col_tick, tick_color)
-                        self.set_fiducial_pixel(
-                            this_row_from_bottom, col_tick, tick_color
-                        )
+                        self.set_fiducial_pixel(this_row_from_bottom, col_tick, tick_color)
                 elif tick_half_margin_pix > 0:
-                    for this_col in range(
-                        col_tick - tick_half_margin_pix,
-                        (col_tick + tick_half_margin_pix) + 1,
-                    ):
+                    for this_col in range(col_tick - tick_half_margin_pix, (col_tick + tick_half_margin_pix) + 1):
                         if (this_col >= 0) and (this_col < n_cols):
-                            self.set_fiducial_pixel(
-                                this_row_from_top, this_col, tick_color
-                            )
-                            self.set_fiducial_pixel(
-                                this_row_from_bottom, this_col, tick_color
-                            )
+                            self.set_fiducial_pixel(this_row_from_top, this_col, tick_color)
+                            self.set_fiducial_pixel(this_row_from_bottom, this_col, tick_color)
                 else:
                     print(
                         'ERROR: In TargetColor.set_ticks_along_top_and_bottom_edges(), unexpected negative tick_half_margin_pix = '
@@ -457,9 +389,7 @@ class TargetColor(TargetAbstract):
                     )
                     assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION.
 
-    def set_ticks_along_left_and_right_edges(
-        self, n_ticks_y, tick_length, tick_width_pix, tick_color
-    ):
+    def set_ticks_along_left_and_right_edges(self, n_ticks_y, tick_length, tick_width_pix, tick_color):
         n_rows, n_cols = self.rows_cols()
         height = n_rows
         dy_tick = height / (n_ticks_y - 1)
@@ -475,29 +405,16 @@ class TargetColor(TargetAbstract):
                 if tick_half_margin_pix == 0:
                     if row_tick < 0:
                         row_tick = 0
-                    if (
-                        row_tick == n_rows
-                    ):  # Use "==" because if tick is past end of image, don't draw.
+                    if row_tick == n_rows:  # Use "==" because if tick is past end of image, don't draw.
                         row_tick = n_rows - 1
                     if (row_tick >= 0) and (row_tick < n_rows):
-                        self.set_fiducial_pixel(
-                            row_tick, this_col_from_left, tick_color
-                        )
-                        self.set_fiducial_pixel(
-                            row_tick, this_col_from_right, tick_color
-                        )
+                        self.set_fiducial_pixel(row_tick, this_col_from_left, tick_color)
+                        self.set_fiducial_pixel(row_tick, this_col_from_right, tick_color)
                 elif tick_half_margin_pix > 0:
-                    for this_row in range(
-                        row_tick - tick_half_margin_pix,
-                        (row_tick + tick_half_margin_pix) + 1,
-                    ):
+                    for this_row in range(row_tick - tick_half_margin_pix, (row_tick + tick_half_margin_pix) + 1):
                         if (this_row >= 0) and (this_row < n_rows):
-                            self.set_fiducial_pixel(
-                                this_row, this_col_from_left, tick_color
-                            )
-                            self.set_fiducial_pixel(
-                                this_row, this_col_from_right, tick_color
-                            )
+                            self.set_fiducial_pixel(this_row, this_col_from_left, tick_color)
+                            self.set_fiducial_pixel(this_row, this_col_from_right, tick_color)
                 else:
                     print(
                         'ERROR: In TargetColor.set_ticks_along_left_and_right_edges(), unexpected negative tick_half_margin_pix = '
@@ -521,9 +438,7 @@ class TargetColor(TargetAbstract):
     # Square inscribed in the [R,G,B] space basis vector hexagon.
     def set_image_to_rgb_cube_inscribed_square(self, project_to_cube):
         n_rows, n_cols = self.rows_cols()
-        self.image = tc2r.construct_rgb_cube_inscribed_square_image(
-            n_cols, n_rows, project_to_cube
-        )
+        self.image = tc2r.construct_rgb_cube_inscribed_square_image(n_cols, n_rows, project_to_cube)
 
     # Compute color saturation adjustment.
     # ?? SCAFFOLDING RCB -- ADD TYPE TIPS.
@@ -535,12 +450,8 @@ class TargetColor(TargetAbstract):
         # Compute new color.
         # ?? SCAFFOLDING RCB -- DOCUMENT ABANDONED MID-IMPLEMENTATION
         new_red = original_red * saturation_fraction  # ?? SCAFFOLDING RCB -- TEMPORARY
-        new_green = (
-            original_green * saturation_fraction
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
-        new_blue = (
-            original_blue * saturation_fraction
-        )  # ?? SCAFFOLDING RCB -- TEMPORARY
+        new_green = original_green * saturation_fraction  # ?? SCAFFOLDING RCB -- TEMPORARY
+        new_blue = original_blue * saturation_fraction  # ?? SCAFFOLDING RCB -- TEMPORARY
         # Return.
         return (new_red, new_green, new_blue)
 
@@ -613,27 +524,17 @@ def construct_target_linear_color_bar(
         )
 
     else:
-        print(
-            'ERROR: In construct_target_linear_color_bar(), x_or_y has unexpected value "'
-            + str(x_or_y)
-            + '"'
-        )
+        print('ERROR: In construct_target_linear_color_bar(), x_or_y has unexpected value "' + str(x_or_y) + '"')
         assert False
     # Set pattern description.
     include_above_below_in_pattern_name = True
     if include_above_below_in_pattern_name:
         color_pattern_name = (
-            color_below_min.short_name
-            + '.'
-            + color_bar_name
-            + '_linear.'
-            + color_above_max.short_name
+            color_below_min.short_name + '.' + color_bar_name + '_linear.' + color_above_max.short_name
         )  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
     else:
         color_pattern_name = color_bar_name  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
-    target.set_pattern_description(
-        color_pattern_name + '_' + x_or_y + '_' + discrete_or_continuous
-    )
+    target.set_pattern_description(color_pattern_name + '_' + x_or_y + '_' + discrete_or_continuous)
     # Return.
     return target
 
@@ -693,13 +594,7 @@ def construct_target_polar_color_bar(  # Target dimensions.
     )
     # Set pattern description.
     # Color bar.
-    pattern_description = (
-        color_below_min.short_name
-        + '.'
-        + color_bar_name
-        + '.'
-        + color_above_max.short_name
-    )
+    pattern_description = color_below_min.short_name + '.' + color_bar_name + '.' + color_above_max.short_name
     # Linear vs. polar.
     pattern_description += '_polar_' + radial_gradient_name
     # Color interpolation.
@@ -715,9 +610,7 @@ def construct_target_polar_color_bar(  # Target dimensions.
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     # Radial gradient.
     if radial_gradient_type == "saturated_center_to_white":
-        pattern_description += '_exp' + '{0:.2f}'.format(
-            saturated_center_to_white_exponent
-        )
+        pattern_description += '_exp' + '{0:.2f}'.format(saturated_center_to_white_exponent)
     elif radial_gradient_type == "light_center_to_saturated":
         pattern_description += (
             '_sat'
@@ -755,9 +648,7 @@ def construct_target_polar_color_bar(  # Target dimensions.
 
 
 def construct_target_blue_under_red_cross_green(
-    image_width: float,  # Meter
-    image_height: float,  # Meter
-    dpm: float,  # Dots per meter
+    image_width: float, image_height: float, dpm: float  # Meter  # Meter  # Dots per meter
 ) -> TargetColor:
     # Blank target.
     target = tc.TargetColor(
@@ -766,7 +657,9 @@ def construct_target_blue_under_red_cross_green(
     # Set colors.
     target.set_image_to_blue_under_red_cross_green()
     # Set pattern description.
-    color_pattern_name_root = 'blue_under_red_cross_green'  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
+    color_pattern_name_root = (
+        'blue_under_red_cross_green'  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
+    )
     color_pattern_name = color_pattern_name_root
     target.set_pattern_description(color_pattern_name)
     # Return.
@@ -774,10 +667,7 @@ def construct_target_blue_under_red_cross_green(
 
 
 def construct_target_rgb_cube_inscribed_square(
-    image_width: float,  # Meter
-    image_height: float,  # Meter
-    dpm: float,  # Dots per meter
-    project_to_cube: bool,
+    image_width: float, image_height: float, dpm: float, project_to_cube: bool  # Meter  # Meter  # Dots per meter
 ) -> TargetColor:
     # Blank target.
     target = tc.TargetColor(
@@ -786,7 +676,9 @@ def construct_target_rgb_cube_inscribed_square(
     # Set colors.
     target.set_image_to_rgb_cube_inscribed_square(project_to_cube)
     # Set pattern description.
-    color_pattern_name_root = 'rgb_cube_inscribed_square'  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
+    color_pattern_name_root = (
+        'rgb_cube_inscribed_square'  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
+    )
     if project_to_cube:
         color_pattern_name_root += '_projected'
     else:
@@ -832,9 +724,7 @@ def extend_target_left(
     new_image_width = new_n_cols / dpm
     new_image_height = target.image_height
     new_image_dpm = dpm
-    new_target = TargetColor(
-        new_image_width, new_image_height, new_image_dpm, new_color
-    )
+    new_target = TargetColor(new_image_width, new_image_height, new_image_dpm, new_color)
 
     # Check code consistency.
     check_n_rows, check_n_cols, check_n_bands = new_target.rows_cols_bands()
@@ -875,11 +765,7 @@ def extend_target_left(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            'l'
-            + str(new_pixels)
-            + new_color.short_name
-            + 'px_'
-            + target.pattern_description
+            'l' + str(new_pixels) + new_color.short_name + 'px_' + target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -912,9 +798,7 @@ def extend_target_right(
     new_image_width = new_n_cols / dpm
     new_image_height = target.image_height
     new_image_dpm = dpm
-    new_target = TargetColor(
-        new_image_width, new_image_height, new_image_dpm, new_color
-    )
+    new_target = TargetColor(new_image_width, new_image_height, new_image_dpm, new_color)
 
     # Check code consistency.
     check_n_rows, check_n_cols, check_n_bands = new_target.rows_cols_bands()
@@ -955,11 +839,7 @@ def extend_target_right(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            target.pattern_description
-            + '_r'
-            + str(new_pixels)
-            + new_color.short_name
-            + 'px'
+            target.pattern_description + '_r' + str(new_pixels) + new_color.short_name + 'px'
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -999,9 +879,7 @@ def extend_target_top(
     new_image_width = target.image_width
     new_image_height = new_n_rows / dpm
     new_image_dpm = dpm
-    new_target = TargetColor(
-        new_image_width, new_image_height, new_image_dpm, new_color
-    )
+    new_target = TargetColor(new_image_width, new_image_height, new_image_dpm, new_color)
 
     # Check code consistency.
     check_n_rows, check_n_cols, check_n_bands = new_target.rows_cols_bands()
@@ -1042,11 +920,7 @@ def extend_target_top(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            't'
-            + str(new_pixels)
-            + new_color.short_name
-            + 'px_'
-            + target.pattern_description
+            't' + str(new_pixels) + new_color.short_name + 'px_' + target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1086,9 +960,7 @@ def extend_target_bottom(
     new_image_width = target.image_width
     new_image_height = new_n_rows / dpm
     new_image_dpm = dpm
-    new_target = TargetColor(
-        new_image_width, new_image_height, new_image_dpm, new_color
-    )
+    new_target = TargetColor(new_image_width, new_image_height, new_image_dpm, new_color)
 
     # Check code consistency.
     check_n_rows, check_n_cols, check_n_bands = new_target.rows_cols_bands()
@@ -1128,11 +1000,7 @@ def extend_target_bottom(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            target.pattern_description
-            + '_b'
-            + str(new_pixels)
-            + new_color.short_name
-            + 'px'
+            target.pattern_description + '_b' + str(new_pixels) + new_color.short_name + 'px'
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1159,26 +1027,16 @@ def extend_target_all(
     """
     # Extend.
     extended_target_l = tc.extend_target_left(target, new_pixels, new_color)
-    extended_target_lr = tc.extend_target_right(
-        extended_target_l, new_pixels, new_color
-    )
-    extended_target_lrt = tc.extend_target_top(
-        extended_target_lr, new_pixels, new_color
-    )
-    extended_target_lrtb = tc.extend_target_bottom(
-        extended_target_lrt, new_pixels, new_color
-    )
+    extended_target_lr = tc.extend_target_right(extended_target_l, new_pixels, new_color)
+    extended_target_lrt = tc.extend_target_top(extended_target_lr, new_pixels, new_color)
+    extended_target_lrtb = tc.extend_target_bottom(extended_target_lrt, new_pixels, new_color)
     new_target = extended_target_lrtb
 
     # Set description.
     if new_target_name == None:
         # Add to target pattern_description to discard per-side description changes.
         new_target.set_pattern_description(
-            'bord'
-            + str(new_pixels)
-            + new_color.short_name
-            + 'px_'
-            + target.pattern_description
+            'bord' + str(new_pixels) + new_color.short_name + 'px_' + target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1198,14 +1056,10 @@ def extend_target_for_splice_left_right(
     target: TargetColor, n_extend: int, fill_color: Color.Color, auto_expand: str
 ) -> TargetColor:
     if auto_expand == 'fill_top':
-        new_target = extend_target_top(
-            target, n_extend, fill_color, new_target_name=target.pattern_description
-        )
+        new_target = extend_target_top(target, n_extend, fill_color, new_target_name=target.pattern_description)
         return new_target
     elif auto_expand == 'fill_bottom':
-        new_target = extend_target_bottom(
-            target, n_extend, fill_color, new_target_name=target.pattern_description
-        )
+        new_target = extend_target_bottom(target, n_extend, fill_color, new_target_name=target.pattern_description)
         return new_target
     elif auto_expand == 'fill_even':
         n_extend_top = int(n_extend / 2)
@@ -1217,19 +1071,13 @@ def extend_target_for_splice_left_right(
             assert False  # ?? SCAFFOLDING -- CONVERT TO EXCEPTION.
         if n_extend_top > 0:
             new_target_top = extend_target_top(
-                target,
-                n_extend_top,
-                fill_color,
-                new_target_name=target.pattern_description,
+                target, n_extend_top, fill_color, new_target_name=target.pattern_description
             )
         else:
             new_target_top = target
         if n_extend_bottom > 0:
             new_target_top_bottom = extend_target_bottom(
-                new_target_top,
-                n_extend_bottom,
-                fill_color,
-                new_target_name=target.pattern_description,
+                new_target_top, n_extend_bottom, fill_color, new_target_name=target.pattern_description
             )
         else:
             new_target_top_bottom = new_target_top
@@ -1280,20 +1128,14 @@ def splice_targets_left_right(
     if (left_n_rows != right_n_rows) and (auto_expand != None):
         if left_n_rows < right_n_rows:
             n_extend = right_n_rows - left_n_rows
-            left_target = extend_target_for_splice_left_right(
-                left_target, n_extend, initial_color, auto_expand
-            )
+            left_target = extend_target_for_splice_left_right(left_target, n_extend, initial_color, auto_expand)
             left_n_rows, left_n_cols, left_n_bands = left_target.rows_cols_bands()
         elif left_n_rows > right_n_rows:
             n_extend = left_n_rows - right_n_rows
-            right_target = extend_target_for_splice_left_right(
-                right_target, n_extend, initial_color, auto_expand
-            )
+            right_target = extend_target_for_splice_left_right(right_target, n_extend, initial_color, auto_expand)
             right_n_rows, right_n_cols, right_n_bands = right_target.rows_cols_bands()
         else:
-            print(
-                'ERROR: In splice_targets_left_right(), unexpected situation encountered.'
-            )
+            print('ERROR: In splice_targets_left_right(), unexpected situation encountered.')
             assert False  # ?? SCAFFOLDING -- CONVERT TO EXCEPTION.
 
     # Check input.
@@ -1314,11 +1156,7 @@ def splice_targets_left_right(
         )
         assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION
     if left_n_bands != 3:
-        print(
-            "ERROR: In splice_targets_left_right(), left_n_bands="
-            + str(left_n_bands)
-            + " is not equal to 3."
-        )
+        print("ERROR: In splice_targets_left_right(), left_n_bands=" + str(left_n_bands) + " is not equal to 3.")
         assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION
     if left_dpm != right_dpm:
         print(
@@ -1338,9 +1176,7 @@ def splice_targets_left_right(
     new_image_width = new_n_cols / left_dpm
     new_image_height = left_target.image_height
     new_image_dpm = left_dpm
-    new_target = TargetColor(
-        new_image_width, new_image_height, new_image_dpm, initial_color
-    )
+    new_target = TargetColor(new_image_width, new_image_height, new_image_dpm, initial_color)
 
     # Check code consistency.
     check_n_rows, check_n_cols, check_n_bands = new_target.rows_cols_bands()
@@ -1389,9 +1225,7 @@ def splice_targets_left_right(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            left_target.pattern_description
-            + "__left__"
-            + right_target.pattern_description
+            left_target.pattern_description + "__left__" + right_target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1430,9 +1264,7 @@ def splice_targets_above_below(
     )  # ?? SCAFFOLDING RCB -- SHOULD THESE BE ACCESSOR FUNCTIONS?  WHAT IS OPENCSP POLICY/PATTERN ON THIS?
 
     # Check input.
-    if (
-        above_n_cols != below_n_cols
-    ):  # ?? SCAFFOLDING RCB -- EXTEND ROUTINE TO ALLOW UNEQUAL COLUMNS?
+    if above_n_cols != below_n_cols:  # ?? SCAFFOLDING RCB -- EXTEND ROUTINE TO ALLOW UNEQUAL COLUMNS?
         print(
             "ERROR: In splice_targets_above_below(), unequal above_n_cols="
             + str(above_n_cols)
@@ -1449,11 +1281,7 @@ def splice_targets_above_below(
         )
         assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION
     if above_n_bands != 3:
-        print(
-            "ERROR: In splice_targets_above_below(), above_n_bands="
-            + str(above_n_bands)
-            + " is not equal to 3."
-        )
+        print("ERROR: In splice_targets_above_below(), above_n_bands=" + str(above_n_bands) + " is not equal to 3.")
         assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION
     if above_dpm != below_dpm:
         print(
@@ -1473,9 +1301,7 @@ def splice_targets_above_below(
     new_image_width = above_target.image_width
     new_image_height = new_n_rows / above_dpm
     new_image_dpm = above_dpm
-    new_target = TargetColor(
-        new_image_width, new_image_height, new_image_dpm, initial_color
-    )
+    new_target = TargetColor(new_image_width, new_image_height, new_image_dpm, initial_color)
 
     # Check code consistency.
     check_n_rows, check_n_cols, check_n_bands = new_target.rows_cols_bands()
@@ -1524,9 +1350,7 @@ def splice_targets_above_below(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            above_target.pattern_description
-            + "__above__"
-            + below_target.pattern_description
+            above_target.pattern_description + "__above__" + below_target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1552,10 +1376,7 @@ def construct_stacked_linear_color_bar(
 ) -> tc.TargetColor:
     # Check input.
     if n_stack < 1:
-        print(
-            'ERROR: In stack_linear_color_bar(), encountered non-positive n_stack = '
-            + str(n_stack)
-        )
+        print('ERROR: In stack_linear_color_bar(), encountered non-positive n_stack = ' + str(n_stack))
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     if n_stack != len(discrete_or_continuous_list):
         print(
@@ -1661,11 +1482,7 @@ def construct_stacked_linear_color_bar(
                     light_to_saturated_max=this_light_to_saturated_max,
                 )
                 stacked_target = tc.splice_targets_above_below(
-                    this_bar_target_discrete,
-                    stacked_target,
-                    gap,
-                    initial_color=gap_color,
-                    new_target_name=target_name,
+                    this_bar_target_discrete, stacked_target, gap, initial_color=gap_color, new_target_name=target_name
                 )
             elif discrete_or_continuous_list[idx] == 'continuous':
                 this_bar_target_continuous = tc.construct_target_linear_color_bar(
@@ -1737,9 +1554,7 @@ def construct_linear_color_bar_cascade(  # Dimensions.
 ) -> tc.TargetColor:
     # Check input.
     if len(stack_sequence) == 0:
-        print(
-            'ERROR: In construct_linear_color_bar_cascade(), encountered len(stack_sequence) == 0.'
-        )
+        print('ERROR: In construct_linear_color_bar_cascade(), encountered len(stack_sequence) == 0.')
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     if len(list_of_discrete_or_continuous_lists) != len(stack_sequence):
         print(
@@ -1767,16 +1582,10 @@ def construct_linear_color_bar_cascade(  # Dimensions.
         'discrete',
     )
     cascade_target = ref_target
-    cascade_target.set_pattern_description = tc.stacked_color_bar_name(
-        1, cascade_target_name
-    )
+    cascade_target.set_pattern_description = tc.stacked_color_bar_name(1, cascade_target_name)
 
     # Adjacent main linear color bar.
-    print(
-        'In construct_linear_color_bar_cascade(), generating "'
-        + color_bar_name
-        + '" linear bar...'
-    )
+    print('In construct_linear_color_bar_cascade(), generating "' + color_bar_name + '" linear bar...')
     main_color_target = tc.construct_target_linear_color_bar(
         color_bar_width,
         color_total_height,
@@ -1789,25 +1598,15 @@ def construct_linear_color_bar_cascade(  # Dimensions.
         'discrete',
     )
     cascade_target = tc.splice_targets_left_right(
-        cascade_target,
-        main_color_target,
-        gap=ref_gap_pix,
-        initial_color=gap_color,
-        new_target_name=cascade_target_name,
+        cascade_target, main_color_target, gap=ref_gap_pix, initial_color=gap_color, new_target_name=cascade_target_name
     )
 
     # Generate cascade.
     for n_bars_in_stack, discrete_or_continuous_list, saturation_spec_list in zip(
-        stack_sequence,
-        list_of_discrete_or_continuous_lists,
-        list_of_saturation_spec_lists,
+        stack_sequence, list_of_discrete_or_continuous_lists, list_of_saturation_spec_lists
     ):
         # Status update.
-        print(
-            'In construct_linear_color_bar_cascade(), generating stacked bar '
-            + str(n_bars_in_stack)
-            + '...'
-        )
+        print('In construct_linear_color_bar_cascade(), generating stacked bar ' + str(n_bars_in_stack) + '...')
 
         # Generate color bar stack and its neighbors.
         stacked_color_target = tc.construct_stacked_linear_color_bar(
@@ -1850,29 +1649,17 @@ def construct_linear_color_bar_cascade(  # Dimensions.
                 'discrete',
             )  # Always discrete.
             stacked_target = tc.splice_targets_left_right(
-                grey_target,
-                stacked_color_target,
-                gap=0,
-                initial_color=gap_color,
-                new_target_name=cascade_target_name,
+                grey_target, stacked_color_target, gap=0, initial_color=gap_color, new_target_name=cascade_target_name
             )
             stacked_target = tc.splice_targets_left_right(
-                stacked_target,
-                grey_target,
-                gap=0,
-                initial_color=gap_color,
-                new_target_name=cascade_target_name,
+                stacked_target, grey_target, gap=0, initial_color=gap_color, new_target_name=cascade_target_name
             )
         else:
             stacked_target = stacked_color_target
 
         # Update cascade.
         cascade_target = tc.splice_targets_left_right(
-            cascade_target,
-            stacked_target,
-            gap_between_bars_pix,
-            gap_color,
-            new_target_name=cascade_target_name,
+            cascade_target, stacked_target, gap_between_bars_pix, gap_color, new_target_name=cascade_target_name
         )
 
     # Return.

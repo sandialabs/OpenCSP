@@ -1,6 +1,7 @@
 """Parametric mirror representing a single reflective surface defined
 by an algebraic function.
 """
+
 import inspect
 from typing import Callable
 
@@ -22,9 +23,7 @@ class MirrorParametric(MirrorAbstract):
     """
 
     def __init__(
-        self,
-        surface_function: Callable[[np.ndarray, np.ndarray], np.ndarray],
-        shape: RegionXY,
+        self, surface_function: Callable[[np.ndarray, np.ndarray], np.ndarray], shape: RegionXY
     ) -> 'MirrorParametric':
         """Instantiates MirrorParametric class
 
@@ -46,11 +45,11 @@ class MirrorParametric(MirrorAbstract):
         self._normals_function = self._define_normals_function(surface_function)
 
     def __repr__(self) -> str:
-        return f"Parametricly defined mirror defined by the function {inspect.getsourcelines(self._surface_function)[0]}"
+        return (
+            f"Parametricly defined mirror defined by the function {inspect.getsourcelines(self._surface_function)[0]}"
+        )
 
-    def _define_normals_function(
-        self, surface_function: Callable[[float, float], float]
-    ) -> Callable:
+    def _define_normals_function(self, surface_function: Callable[[float, float], float]) -> Callable:
         """Returns a normal vector generating function given a surface z coordinate
         function
 
@@ -99,9 +98,7 @@ class MirrorParametric(MirrorAbstract):
                 dfdy_n *= np.ones(y.shape)
             # Create constant z coordinate
             z_norm = np.ones(x.shape)
-            return np.concatenate(
-                (-dfdx_n[..., None], -dfdy_n[..., None], z_norm[..., None]), axis=-1
-            )
+            return np.concatenate((-dfdx_n[..., None], -dfdy_n[..., None], z_norm[..., None]), axis=-1)
 
         return _normals_function
 
@@ -122,9 +119,7 @@ class MirrorParametric(MirrorAbstract):
         return self._surface_function(p.x, p.y)
 
     @classmethod
-    def generate_symmetric_paraboloid(
-        cls, focal_length: float, shape: RegionXY
-    ) -> 'MirrorParametric':
+    def generate_symmetric_paraboloid(cls, focal_length: float, shape: RegionXY) -> 'MirrorParametric':
         """Generate a symmetric parabolic mirror with the given focal length
 
         Parameters

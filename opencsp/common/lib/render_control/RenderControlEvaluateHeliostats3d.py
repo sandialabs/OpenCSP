@@ -30,25 +30,13 @@ class RenderControlEvaluateHeliostats3d:
         self.clear_previous = clear_previous
         self.draw_evaluate_heliostats_3d = draw_evaluate_heliostats_3d
         self.evaluate_heliostats_3d_points_marker = evaluate_heliostats_3d_points_marker
-        self.evaluate_heliostats_3d_points_markersize = (
-            evaluate_heliostats_3d_points_markersize
-        )
+        self.evaluate_heliostats_3d_points_markersize = evaluate_heliostats_3d_points_markersize
         self.evaluate_heliostats_3d_points_color = evaluate_heliostats_3d_points_color
-        self.evaluate_heliostats_3d_label_horizontalalignment = (
-            evaluate_heliostats_3d_label_horizontalalignment
-        )
-        self.evaluate_heliostats_3d_label_verticalalignment = (
-            evaluate_heliostats_3d_label_verticalalignment
-        )
-        self.evaluate_heliostats_3d_label_fontsize = (
-            evaluate_heliostats_3d_label_fontsize
-        )
-        self.evaluate_heliostats_3d_label_fontstyle = (
-            evaluate_heliostats_3d_label_fontstyle
-        )
-        self.evaluate_heliostats_3d_label_fontweight = (
-            evaluate_heliostats_3d_label_fontweight
-        )
+        self.evaluate_heliostats_3d_label_horizontalalignment = evaluate_heliostats_3d_label_horizontalalignment
+        self.evaluate_heliostats_3d_label_verticalalignment = evaluate_heliostats_3d_label_verticalalignment
+        self.evaluate_heliostats_3d_label_fontsize = evaluate_heliostats_3d_label_fontsize
+        self.evaluate_heliostats_3d_label_fontstyle = evaluate_heliostats_3d_label_fontstyle
+        self.evaluate_heliostats_3d_label_fontweight = evaluate_heliostats_3d_label_fontweight
         self.evaluate_heliostats_3d_label_color = evaluate_heliostats_3d_label_color
         self.evaluate_heliostats_3d_dpi = evaluate_heliostats_3d_dpi
         self.evaluate_heliostats_3d_crop = evaluate_heliostats_3d_crop
@@ -59,8 +47,7 @@ class RenderControlEvaluateHeliostats3d:
 
 def default(color='m'):
     return RenderControlEvaluateHeliostats3d(
-        evaluate_heliostats_3d_points_color=color,
-        evaluate_heliostats_3d_label_color=color,
+        evaluate_heliostats_3d_points_color=color, evaluate_heliostats_3d_label_color=color
     )
 
 

@@ -4,39 +4,17 @@ import time
 if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(
-        prog=__file__.rstrip(".py"), description='Tests the subprocess tools.'
-    )
-    parser.add_argument(
-        '--simple_stdout',
-        action='store_true',
-        help="Outputs 'Hello\nworld!' on stdout.",
-    )
-    parser.add_argument(
-        '--simple_stderr',
-        action='store_true',
-        help="Outputs 'Goodbye\nworld!' on stderr.",
-    )
+    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description='Tests the subprocess tools.')
+    parser.add_argument('--simple_stdout', action='store_true', help="Outputs 'Hello\nworld!' on stdout.")
+    parser.add_argument('--simple_stderr', action='store_true', help="Outputs 'Goodbye\nworld!' on stderr.")
     parser.add_argument(
         '--mixed_stdout_stderr',
         action='store_true',
         help="Outputs 'foo', 'bar', and 'baz' on stdout, stderr, and stdout, respectively.",
     )
-    parser.add_argument(
-        '--retcode',
-        type=int,
-        help="Causes this program to exit with the given retcode.",
-    )
-    parser.add_argument(
-        '--delay_before',
-        type=float,
-        help="Sleeps for N seconds before outputing any values.",
-    )
-    parser.add_argument(
-        '--delay_after',
-        type=float,
-        help="Sleeps for N seconds after outputing any values.",
-    )
+    parser.add_argument('--retcode', type=int, help="Causes this program to exit with the given retcode.")
+    parser.add_argument('--delay_before', type=float, help="Sleeps for N seconds before outputing any values.")
+    parser.add_argument('--delay_after', type=float, help="Sleeps for N seconds after outputing any values.")
     args = parser.parse_args()
 
     if args.delay_before != None:

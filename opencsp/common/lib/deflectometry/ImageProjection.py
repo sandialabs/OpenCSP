@@ -1,12 +1,16 @@
 """Class handling the projection of images on a monitor/projector
 """
+
 import tkinter
+from typing import Callable, Optional
 
 import cv2 as cv
 import numpy as np
 from PIL import Image, ImageTk
 
+import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
+import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class CalParams:
@@ -43,12 +47,8 @@ class CalParams:
         y_ax = np.linspace(dy, size_y - dy, ny).astype(int)  # pixels
         self.x_pixel_axis: np.ndarray[int] = x_ax  # pixels
         self.y_pixel_axis: np.ndarray[int] = y_ax  # pixels
-        self.x_screen_axis: np.ndarray[float] = 1 - (
-            self.x_pixel_axis.astype(float) + 0.5
-        ) / float(size_x)
-        self.y_screen_axis: np.ndarray[float] = 1 - (
-            self.y_pixel_axis.astype(float) + 0.5
-        ) / float(size_y)
+        self.x_screen_axis: np.ndarray[float] = 1 - (self.x_pixel_axis.astype(float) + 0.5) / float(size_x)
+        self.y_screen_axis: np.ndarray[float] = 1 - (self.y_pixel_axis.astype(float) + 0.5) / float(size_y)
         # Fiducial x/y locations in image, pixels
         x_mat_pixel, y_mat_pixel = np.meshgrid(self.x_pixel_axis, self.y_pixel_axis)
         self.x_pixel: np.ndarray[int] = x_mat_pixel.flatten()
@@ -61,7 +61,9 @@ class CalParams:
         self.index: np.ndarray[int] = np.arange(self.x_pixel.size, dtype=int)
 
 
-class ImageProjection:
+class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
+    _instance: 'ImageProjection' = None
+
     def __init__(self, root: tkinter.Tk, display_data: dict):
         """
         Image projection control.
@@ -74,6 +76,14 @@ class ImageProjection:
             Display geometry parameters
 
         """
+        # Register this instance as the global instance
+        if ImageProjection._instance is None:
+            ImageProjection._instance = self
+
+        # Declare instance variables
+        self.is_closed = False
+        self.on_close: list[Callable[[ImageProjection], None]] = []
+
         # Save root
         self.root = root
 
@@ -96,15 +106,25 @@ class ImageProjection:
 
         # Create black image
         image = self._format_image(
-            np.zeros(
-                (self.win_size_y, self.win_size_x, 3),
-                dtype=self.display_data['projector_data_type'],
-            )
+            np.zeros((self.win_size_y, self.win_size_x, 3), dtype=self.display_data['projector_data_type'])
         )
         self.canvas_image = self.canvas.create_image(0, 0, image=image, anchor='nw')
 
         # Show crosshairs
         self.show_crosshairs()
+
+    def __del__(self):
+        with et.ignored(Exception):
+            self.close()
+
+    @classmethod
+    def instance(cls) -> Optional["ImageProjection"]:
+        """Get the global ImageProjection instance, if one is available.
+
+        We use the singleton design pattern (single global instance) for this class because we don't expect there to be
+        more than one projector in the system.
+        """
+        return cls._instance
 
     def run(self):
         """Runs the Tkinter instance"""
@@ -126,7 +146,7 @@ class ImageProjection:
 
         """
         # Create new tkinter window
-        root = tkinter.Tk()
+        root = tkt.window()
         # Instantiate class
         return cls(root, display_data)
 
@@ -171,12 +191,7 @@ class ImageProjection:
 
         # Resize window
         self.root.geometry(
-            '{:d}x{:d}+{:d}+{:d}'.format(
-                self.win_size_x,
-                self.win_size_y,
-                self.win_position_x,
-                self.win_position_y,
-            )
+            '{:d}x{:d}+{:d}+{:d}'.format(self.win_size_x, self.win_size_y, self.win_position_x, self.win_position_y)
         )
 
         # Resize canvas size
@@ -188,13 +203,7 @@ class ImageProjection:
 
         """
         # Add white active region
-        array = (
-            np.ones(
-                (self.size_y, self.size_x, 3),
-                dtype=self.display_data['projector_data_type'],
-            )
-            * self.max_int
-        )
+        array = np.ones((self.size_y, self.size_x, 3), dtype=self.display_data['projector_data_type']) * self.max_int
 
         # Add crosshairs vertical
         array[:, self.x_active_mid, :] = 0
@@ -220,13 +229,7 @@ class ImageProjection:
 
         """
         # Add white active region
-        array = (
-            np.ones(
-                (self.size_y, self.size_x, 3),
-                dtype=self.display_data['projector_data_type'],
-            )
-            * self.max_int
-        )
+        array = np.ones((self.size_y, self.size_x, 3), dtype=self.display_data['projector_data_type']) * self.max_int
 
         # Add arrows
         width = int(np.min([self.size_x, self.size_y]) / 4)
@@ -260,13 +263,7 @@ class ImageProjection:
         # Add Y text
         font = cv.FONT_HERSHEY_PLAIN
         array = cv.putText(
-            array,
-            'Y',
-            (self.x_active_mid + 20, self.y_active_mid + width + 20),
-            font,
-            6,
-            (0, int(self.max_int), 0),
-            2,
+            array, 'Y', (self.x_active_mid + 20, self.y_active_mid + width + 20), font, 6, (0, int(self.max_int), 0), 2
         )
 
         # Display image
@@ -283,9 +280,7 @@ class ImageProjection:
         pattern_params = CalParams(self.size_x, self.size_y)
 
         # Add fiducials
-        for x_loc, y_loc, idx in zip(
-            pattern_params.x_pixel, pattern_params.y_pixel, pattern_params.index
-        ):
+        for x_loc, y_loc, idx in zip(pattern_params.x_pixel, pattern_params.y_pixel, pattern_params.index):
             # Place fiducial
             array[y_loc, x_loc, 1] = self.max_int
             # Place label (offset so label is in view)
@@ -300,17 +295,24 @@ class ImageProjection:
             else:
                 dy = -10
             # Draw text
-            cv.putText(
-                array,
-                f'{idx:d}',
-                (x_loc + dx, y_loc + dy),
-                cv.FONT_HERSHEY_PLAIN,
-                1,
-                (0, 255, 0),
-            )
+            cv.putText(array, f'{idx:d}', (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
         # Display with black border
         self.display_image_in_active_area(array)
+
+    def get_black_array_active_area(self) -> np.ndarray:
+        """
+        Creates a black image to fill the active area of self.size_y by self.size_x pixels.
+
+        Returns:
+        --------
+        image : np.ndarray
+            A 2D image with shape (self.size_y, self.size_x, 3), filled with zeros
+        """
+        # Create black image
+        black_image = np.zeros((self.size_y, self.size_x, 3), dtype=self.display_data['projector_data_type'])
+
+        return black_image
 
     def display_image(self, array: np.ndarray) -> None:
         """
@@ -325,9 +327,7 @@ class ImageProjection:
         """
         # Check image is RGB
         if np.ndim(array) != 3 or array.shape[2] != 3:
-            raise ValueError(
-                'Input array must have 3 dimensions and dimension 2 must be length 3.'
-            )
+            raise ValueError('Input array must have 3 dimensions and dimension 2 must be length 3.')
 
         # Check array is correct xy shape
         if array.shape[0] != self.win_size_y or array.shape[1] != self.win_size_x:
@@ -358,9 +358,7 @@ class ImageProjection:
         """
         # Check image is RGB
         if np.ndim(array) != 3 or array.shape[2] != 3:
-            raise ValueError(
-                'Input array must have 3 dimensions and dimension 2 must be length 3.'
-            )
+            raise ValueError('Input array must have 3 dimensions and dimension 2 must be length 3.')
 
         # Check array is correct xy shape
         if array.shape[0] != self.size_y or array.shape[1] != self.size_x:
@@ -371,13 +369,8 @@ class ImageProjection:
             )
 
         # Create black image and place array in correct position
-        array_out = np.zeros(
-            (self.win_size_y, self.win_size_x, 3),
-            dtype=self.display_data['projector_data_type'],
-        )
-        array_out[
-            self.y_active_1 : self.y_active_2, self.x_active_1 : self.x_active_2, :
-        ] = array
+        array_out = np.zeros((self.win_size_y, self.win_size_x, 3), dtype=self.display_data['projector_data_type'])
+        array_out[self.y_active_1 : self.y_active_2, self.x_active_1 : self.x_active_2, :] = array
 
         # Display image
         self.display_image(array_out)
@@ -409,20 +402,25 @@ class ImageProjection:
         image = Image.fromarray(array, 'RGB')
         return ImageTk.PhotoImage(image)
 
-    @staticmethod
-    def load_from_hdf(file: str) -> dict:
+    @classmethod
+    def load_from_hdf(cls, file: str, prefix: str = '') -> dict[str, int | str]:
         """
-        Loads and returns ImageProjection data from HDF file.
+        Loads ImageProjection data from the given HDF file. Assumes data is stored as: PREFIX + Folder/Field_1
+
+        Note: does NOT return an ImageProjection instance, since that would require creating a new tkinter window.
 
         Parameters
         ----------
         file : str
-            HDF file path.
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
 
         Returns
         -------
-        dict
-            Display data.
+        display_data: dict[str, int | str]
+            The display data which can be used to create an instance of the ImageProjection class.
 
         """
         # Load data
@@ -445,46 +443,85 @@ class ImageProjection:
             'ImageProjection/shift_blue_y',
             'ImageProjection/ui_position_x',
         ]
+        for i in range(len(datasets)):
+            datasets[i] = prefix + datasets[i]
         return hdf5_tools.load_hdf5_datasets(datasets, file)
 
     @classmethod
-    def load_from_hdf_and_display(cls, file: str):
-        """
-        Loads data from HDF and opens window.
+    def load_from_hdf_and_display(cls, file: str, prefix: str = '') -> 'ImageProjection':
+        """Loads display_data from the given file into a new image_projection window. Assumes data is stored as: PREFIX + Folder/Field_1
 
         Parameters
         ----------
         file : str
-            HDF file path.
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
 
+        Returns
+        -------
+        projector: ImageProjection
+            The new ImageProjection instance, opened in a new tkinter window.
         """
         # Load data
-        display_data = cls.load_from_hdf(file)
+        display_data = cls.load_from_hdf(file, prefix)
 
         # Open window
         return cls.in_new_window(display_data)
 
     @staticmethod
-    def save_to_hdf(display_data: dict, file: str):
-        """Saves ImageProjection parameters to HDF file
+    def save_params_to_hdf(display_data: dict, file: str, prefix: str = ''):
+        """Saves image projection display_data parameters to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
         ----------
-        display_data : dict
-            ImageProjection parameters in dictionary form
+        display_data: dict
+            The values to save to the given file. Should be the display_data dict from an ImageProjection instance.
         file : str
-            HDF file to save
+            HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
         # Extract data entries
         datasets = []
         data = []
         for field in display_data.keys():
-            datasets.append('ImageProjection/' + field)
+            datasets.append(prefix + 'ImageProjection/' + field)
             data.append(display_data[field])
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves image projection display_data parameters to given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
+        self.save_params_to_hdf(self.display_data, file, prefix)
+
     def close(self):
         """Closes all windows"""
-        self.root.destroy()
+        # don't double-close in order to avoid warnings
+        if self.is_closed:
+            return
+        self.is_closed = True
+
+        # unset as the global instance
+        if ImageProjection._instance == self:
+            ImageProjection._instance = None
+
+        # callbacks
+        for callback in self.on_close:
+            with et.ignored(Exception):
+                callback(self)
+
+        with et.ignored(Exception):
+            self.root.destroy()

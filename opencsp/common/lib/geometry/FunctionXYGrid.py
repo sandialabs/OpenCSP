@@ -5,7 +5,6 @@ from opencsp.common.lib.geometry.FunctionXYAbstract import FunctionXYAbstract
 from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.render_control.RenderControlFunctionXY as rcfxy
 import numpy as np
-import matplotlib.pyplot as plt
 
 
 class FunctionXYGrid(FunctionXYAbstract):
@@ -21,9 +20,7 @@ class FunctionXYGrid(FunctionXYAbstract):
         in the form (smallest x, largest x, smallest y, largest y)
     """
 
-    def __init__(
-        self, values: np.ndarray, limits: tuple[float, float, float, float] = None
-    ) -> None:
+    def __init__(self, values: np.ndarray, limits: tuple[float, float, float, float] = None) -> None:
         """Represents a discrete function of equispaced points in its domain.
         Defined by an array and the location of the 4 corners
         of that array in the funciton space.
@@ -55,9 +52,7 @@ class FunctionXYGrid(FunctionXYAbstract):
     #     ...
 
     # override
-    def value_at(
-        self, x: float | Iterable[float], y: float | Iterable[float]
-    ) -> float | np.ndarray[float]:
+    def value_at(self, x: float | Iterable[float], y: float | Iterable[float]) -> float | np.ndarray[float]:
         # array case
         if isinstance(x, Iterable) or isinstance(y, Iterable):
             if len(x) != len(y):
@@ -85,16 +80,12 @@ class FunctionXYGrid(FunctionXYAbstract):
     # override
     def __getstate__(self) -> dict:
         """Returns a serializable object for pickleing."""
-        raise NotImplementedError(
-            "__getstate__ has not been implemented for FunctionXYGrid"
-        )
+        raise NotImplementedError("__getstate__ has not been implemented for FunctionXYGrid")
 
     # override
     def __setstate__(self, state: dict):
         """Takes in __getstate__(self)'s output to recreate the object `self` that was passed into __getstate__"""
-        raise NotImplementedError(
-            "__setstate__ has not been implemented for FunctionXYGrid"
-        )
+        raise NotImplementedError("__setstate__ has not been implemented for FunctionXYGrid")
 
     def to_index_values(self, x: float, y: float) -> tuple[int, int]:
         x_index = (x - self.x0) / self.x_step
@@ -103,9 +94,7 @@ class FunctionXYGrid(FunctionXYAbstract):
             return False
         return (int(x_index), int(y_index))
 
-    def draw(
-        self, view: View3d, functionXY_style: rcfxy.RenderControlFunctionXY = None
-    ):
+    def draw(self, view: View3d, functionXY_style: rcfxy.RenderControlFunctionXY = None):
         if functionXY_style == None:
             functionXY_style = rcfxy.RenderControlFunctionXY()
 

@@ -1,6 +1,7 @@
 """Abstract class used for visualizing orthorectified slope looking
 down from +z axis
 """
+
 from abc import abstractmethod
 from typing import Literal
 
@@ -14,9 +15,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
     """
 
     @abstractmethod
-    def orthorectified_slope_array(
-        self, x_vec: np.ndarray, y_vec: np.ndarray
-    ) -> np.ndarray:
+    def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
         pass
 
     @property
@@ -120,16 +119,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Add quiver arrows
         if quiver_density is not None:
-            self._add_quivers(
-                x_image,
-                y_image,
-                x_vec,
-                y_vec,
-                quiver_density,
-                axis,
-                quiver_scale,
-                quiver_color,
-            )
+            self._add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
 
         # Label axes
         axis.set_title(title)
@@ -217,16 +207,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Add quiver arrows
         if quiver_density is not None:
-            self._add_quivers(
-                x_image,
-                y_image,
-                x_vec,
-                y_vec,
-                quiver_density,
-                axis,
-                quiver_scale,
-                quiver_color,
-            )
+            self._add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
 
         # Label axes
         axis.set_title(title)
@@ -300,9 +281,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
             extent = (left, right, bottom, top)
 
         # Plot image on axes
-        self._plot_orthorectified_image(
-            image, axis, 'seismic', extent, clims, 'mrad/meter'
-        )
+        self._plot_orthorectified_image(image, axis, 'seismic', extent, clims, 'mrad/meter')
 
         # Label axes
         axis.set_title(title)
@@ -353,9 +332,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         v_dirs = -im_y[y1::Ny, x1::Nx]
 
         # Add quiver arrows to axes
-        axis.quiver(
-            x_locs, y_locs, u_dirs, v_dirs, color=color, scale=scale, scale_units='x'
-        )
+        axis.quiver(x_locs, y_locs, u_dirs, v_dirs, color=color, scale=scale, scale_units='x')
 
     def _plot_orthorectified_image(
         self,

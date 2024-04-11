@@ -33,9 +33,7 @@ class PlotAnnotation:
         self.text = text
         self.style = style
 
-    def plot(
-        self, crop_box=None
-    ):  # Crop box is [[x_min, y_min], [x_max, y_max]] or None.  Only applies to 2-d points.
+    def plot(self, crop_box=None):  # Crop box is [[x_min, y_min], [x_max, y_max]] or None.  Only applies to 2-d points.
         """
         Plot the annotation.  assumes that desired plot is active.
         """
@@ -46,8 +44,7 @@ class PlotAnnotation:
                 if len(pt0) == 2:
                     cropped_pt_list = self.crop_pt_list_to_box(self.pt_list, crop_box)
                     if (len(cropped_pt_list) < len(self.pt_list)) and (
-                        (isinstance(self.style, type(rcps.default())))
-                        and (self.style.linestyle != 'None')
+                        (isinstance(self.style, type(rcps.default()))) and (self.style.linestyle != 'None')
                     ):
                         print(
                             'WARNING: In PlotAnnotation.plot(), current implementation of point cropping does not ensure proper drawing of lines connecting points.'
@@ -128,17 +125,11 @@ class PlotAnnotation:
 
         # Error trap.
         else:
-            print(
-                'ERROR: In PlotAnnotation.plot(), unexpected type="'
-                + str(type)
-                + '" encountered.'
-            )
+            print('ERROR: In PlotAnnotation.plot(), unexpected type="' + str(type) + '" encountered.')
             assert False
 
     def image_draw(
-        self,
-        image,  # Image to annotate. Modifies image as a side effect.
-        crop_box=None,
+        self, image, crop_box=None  # Image to annotate. Modifies image as a side effect.
     ):  # OpenCV drawing routines automatically crop to image boundaries.
         # Only use this if you want to crop to a box that is a subset of the image.
         # crop_box is [[x_min, y_min], [x_max, y_max]] or None.
@@ -183,17 +174,14 @@ class PlotAnnotation:
                     # Crop to box, if given.  (Recall that OpenCV automatically crops to image boundary.)
                     cropped_pt_list = self.crop_pt_list_to_box(self.pt_list, crop_box)
                     if (len(cropped_pt_list) < len(self.pt_list)) and (
-                        (isinstance(self.style, type(rcps.default())))
-                        and (self.style.linestyle != 'None')
+                        (isinstance(self.style, type(rcps.default()))) and (self.style.linestyle != 'None')
                     ):
                         print(
                             'WARNING: In PlotAnnotation.image_draw(), current implementation of point cropping does not ensure proper drawing of lines connecting points.'
                         )
                     # Connecting lines.
                     if (len(cropped_pt_list) > 1) and (self.style.linestyle != 'None'):
-                        if (self.style.linestyle != '-') and (
-                            self.style.linestyle != 'solid'
-                        ):
+                        if (self.style.linestyle != '-') and (self.style.linestyle != 'solid'):
                             print(
                                 'WARNING: In PlotAnnotation.image_draw(), dashed or dotted lines are not implemented yet.  Drawing a solid line instead.'
                             )
@@ -207,14 +195,7 @@ class PlotAnnotation:
                             if prev_int_pt is not None:
                                 connect_line_type = self.opencv_line_type()
                                 # Draw connecting line.
-                                cv.line(
-                                    image,
-                                    prev_int_pt,
-                                    int_pt,
-                                    color,
-                                    thickness,
-                                    connect_line_type,
-                                )
+                                cv.line(image, prev_int_pt, int_pt, color, thickness, connect_line_type)
                             prev_int_pt = int_pt
                     # Markers.
                     if self.style.marker != 'None':
@@ -246,14 +227,7 @@ class PlotAnnotation:
                             color = self.opencv_color(plot_color)
                             marker_line_type = self.opencv_line_type()
                             # Draw marker.
-                            cv.circle(
-                                image,
-                                center,
-                                radius,
-                                color,
-                                thickness,
-                                marker_line_type,
-                            )
+                            cv.circle(image, center, radius, color, thickness, marker_line_type)
                     # Label text.
                     if (self.text is not None) and (len(self.text) > 0):
                         print(
@@ -263,9 +237,7 @@ class PlotAnnotation:
         # Text.
         elif self.type == 'text':
             if (self.pt_list != None) and (len(self.pt_list) > 0):
-                int_or_float_pt0 = self.pt_list[
-                    0
-                ]  # Any points beyond first are ignored.
+                int_or_float_pt0 = self.pt_list[0]  # Any points beyond first are ignored.
                 if len(int_or_float_pt0) != 2:
                     print(
                         'ERROR: In PlotAnnotation.image_draw(), when drawing a text string, unexpected point length len(int_or_float_pt0)="'
@@ -280,9 +252,7 @@ class PlotAnnotation:
                         color = self.opencv_color(self.style.color)
                         font = self.opencv_font(self.style.fontstyle)
                         font_scale = self.opencv_font_scale(self.style.fontsize)
-                        font_thickness = self.opencv_font_thickness(
-                            self.style.fontweight
-                        )
+                        font_thickness = self.opencv_font_thickness(self.style.fontweight)
                         font_line_type = self.opencv_font_line_type()
                         origin = self.opencv_origin(
                             self.text,
@@ -294,24 +264,11 @@ class PlotAnnotation:
                             self.style.verticalalignment,
                         )
                         # Draw text.
-                        cv.putText(
-                            image,
-                            self.text,
-                            origin,
-                            font,
-                            font_scale,
-                            color,
-                            font_thickness,
-                            font_line_type,
-                        )
+                        cv.putText(image, self.text, origin, font, font_scale, color, font_thickness, font_line_type)
 
         # Error trap.
         else:
-            print(
-                'ERROR: In PlotAnnotation.image_draw(), unexpected type="'
-                + str(type)
-                + '" encountered.'
-            )
+            print('ERROR: In PlotAnnotation.image_draw(), unexpected type="' + str(type) + '" encountered.')
             assert False
 
     def crop_pt_list_to_box(self, input_point_list, crop_box):
@@ -466,14 +423,7 @@ class PlotAnnotation:
         return thickness
 
     def opencv_origin(
-        self,
-        text,
-        int_pt,
-        font,
-        font_scale,
-        font_thickness,
-        plot_horizontalalignment,
-        plot_verticalalignment,
+        self, text, int_pt, font, font_scale, font_thickness, plot_horizontalalignment, plot_verticalalignment
     ):
         # Determine size of text.
         text_box, baseline = cv.getTextSize(text, font, font_scale, font_thickness)
@@ -521,36 +471,25 @@ def outline_annotation(point_list, color='k', linewidth=1):
     """
     Outlines of physical objects.
     """
-    return PlotAnnotation(
-        'point_seq', point_list, None, rcps.outline(color=color, linewidth=linewidth)
-    )
+    return PlotAnnotation('point_seq', point_list, None, rcps.outline(color=color, linewidth=linewidth))
 
 
 def data_curve_annotation(point_list, color='b', linewidth=1):
     """
     A data curve with data points identified.
     """
-    return PlotAnnotation(
-        'point_seq', point_list, None, rcps.data_curve(color=color, linewidth=linewidth)
-    )
+    return PlotAnnotation('point_seq', point_list, None, rcps.data_curve(color=color, linewidth=linewidth))
 
 
 def marker_annotation(point_list, marker='o', color='b', markersize=3):
     """
     A data curve with data points identified.
     """
-    return PlotAnnotation(
-        'point_seq', point_list, None, rcps.marker(marker='o', color='b', markersize=3)
-    )
+    return PlotAnnotation('point_seq', point_list, None, rcps.marker(marker='o', color='b', markersize=3))
 
 
 def text_annotation(
-    point,
-    text_str,
-    fontsize='medium',
-    color='b',
-    horizontalalignment='center',
-    verticalalignment='center',
+    point, text_str, fontsize='medium', color='b', horizontalalignment='center', verticalalignment='center'
 ):
     """
     A text annotation.
@@ -560,9 +499,6 @@ def text_annotation(
         [point],
         text_str,
         rctxt.RenderControlText(
-            fontsize=fontsize,
-            color=color,
-            horizontalalignment=horizontalalignment,
-            verticalalignment=verticalalignment,
+            fontsize=fontsize, color=color, horizontalalignment=horizontalalignment, verticalalignment=verticalalignment
         ),
     )

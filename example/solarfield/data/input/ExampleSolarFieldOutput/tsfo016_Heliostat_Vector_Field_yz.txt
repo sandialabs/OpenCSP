@@ -2,9 +2,8 @@ Metadata:
 Figure number: 4
 Name: tsfo016_Heliostat Vector Field
 Title: Heliostat Vector Field
-Code tag: TestSolarFieldOutput.test_heliostat_vector_field()
+Code tag: ExampleSolarFieldOutput.heliostat_vector_field()
 View spec: yz
-Path: common\lib\test\data\output\TestSolarFieldOutput\tsfo016_Heliostat_Vector_Field_yz.png
 
 Title:
 Heliostat Vector Field

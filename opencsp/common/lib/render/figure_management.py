@@ -16,9 +16,7 @@ Features include:
 import matplotlib.pyplot as plt
 import numpy as np
 
-from opencsp.common.lib.render_control.RenderControlFigureRecord import (
-    RenderControlFigureRecord,
-)
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
@@ -57,19 +55,44 @@ def reset_figure_management():
     fig_record_list = []
 
 
-def tile_figure(
+def mpl_pyplot_figure(*vargs, **kwargs):
+    """Initializes and returns a matplotlib.pyplot.figure() instance.
+
+    If creating the figure fails, try again (up to two more times).
+
+    Sometimes initializing a matplotlib figure fails. But if you try to
+    initialize the figure() class again, it seems to always succeed. The
+    measured failure rate for first time initialization is between 7% and 15%.
+    When it fails, it is often with an error about not being able to find a
+    file. Something like::
+
+        _tkinter.TclError: Can't find a usable init.tcl in the following directories
+    """
+    try:
+        # try to create a figure
+        return plt.figure(*vargs, **kwargs)
+    except Exception:
+        try:
+            lt.warn("Failed to create a matplotlib.pyplot.figure instance. Trying again (2nd attempt).")
+            # first attempt failed, try again
+            return plt.figure(*vargs, **kwargs)
+        except Exception:
+            # second attempt failed, give the system a second to stabalize and
+            # try a third time
+            lt.warn("Failed to create a matplotlib.pyplot.figure instance. Trying again (3rd attempt).")
+            import time
+
+            time.sleep(1)
+            return plt.figure(*vargs, **kwargs)
+
+
+def _tile_figure(
     name=None,  # Handle and title of figure window.
     tile_array: tuple[int, int] = (3, 2),  # (n_y, n_x) ~ (columns, rows)
     tile_square: bool = False,  # Force figure to have equal x:y aspect ratio.
-    screen_size: tuple[float, float] = (
-        19.0,
-        10.0,
-    ),  # Screen (width, height) in "inches."  Set by experimentation.
+    screen_size: tuple[float, float] = (19.0, 10.0),  # Screen (width, height) in "inches."  Set by experimentation.
     header_height: float = 0.8,  # Height of window title and display tool header, in "inches."
-    screen_pixels: tuple[float, float] = (
-        1920,
-        1080,
-    ),  # (n_x, n_y).  Subtract task bar pixels from y.
+    screen_pixels: tuple[float, float] = (1920, 1080),  # (n_x, n_y).  Subtract task bar pixels from y.
     task_bar_pixels: float = 40,
 ):  # Height of task bar in pixels.
     """
@@ -104,8 +127,8 @@ def tile_figure(
     ul_y = size_y_pixels * y_idx
 
     # Create figure.
-    # fig = plt.figure(constrained_layout=True).subplots(5, 5)
-    fig = plt.figure(name, figsize=(size_x, plot_size_y))
+    # fig = figure(constrained_layout=True).subplots(5, 5)
+    fig = mpl_pyplot_figure(name, figsize=(size_x, plot_size_y))
     # Turn off the axis around the plot drawing area.  This leads to confusing duplicate, mismatched,
     # axis information.  Why this suddenly appeared is beyond me. - RCB
     # The command below does not suppress the actual plot axes.
@@ -128,25 +151,21 @@ def tile_figure(
     return fig
 
 
-def display_image(
+def _display_image(
     image: np.ndarray | str,
     name: str = None,  # Figure handle and title of figure window.
     title: str = None,  # Title of plot. Used for name if name is None.
     figsize: tuple[float, float] = (6.4, 4.8),  # inch.
     tile: bool = True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
     tile_array: tuple[int, int] = (3, 2),  # (n_x, n_y)
-    upper_left_xy: tuple[
-        float, float
-    ] = None,  # pixel.  (0,0) --> Upper left corner of screen.
+    upper_left_xy: tuple[float, float] = None,  # pixel.  (0,0) --> Upper left corner of screen.
     cmap=None,  # Color scheme to use.
     block=False,
 ) -> plt.Figure:
     """If all you want to do is draw an image to the screen, then this is the method for you."""
     # set up the figure
     axis_control = rca.image(grid=False)
-    figure_control = RenderControlFigure(
-        tile=tile, tile_array=tile_array, figsize=figsize, upper_left_xy=upper_left_xy
-    )
+    figure_control = RenderControlFigure(tile=tile, tile_array=tile_array, figsize=figsize, upper_left_xy=upper_left_xy)
     view_spec_2d = vs.view_spec_im()
     fig_record = setup_figure(
         figure_control,
@@ -174,10 +193,9 @@ def _setup_figure(
     name: str = None,  # Figure handle and title of figure window.  If none, use title.
     title: str = None,  # Title of plot (before number is added, if applicable).
     caption: str = None,  # Caption providing concise descrption plot.  Optional details may be added via comments.
-    comments: list[
-        str
-    ] = None,  # List of strings including comments to associate with the figure.
-    code_tag: str = None,  # String of form "code_file.function_name()" showing where to look in code for call that generated this figure.
+    comments: list[str] = None,  # List of strings including comments to associate with the figure.
+    # String of form "code_file.function_name()" showing where to look in code for call that generated this figure.
+    code_tag: str = None,
 ) -> RenderControlFigureRecord:
     """Common figure setup for 2D and 3D data."""
     # defaults
@@ -205,13 +223,9 @@ def _setup_figure(
 
     # Create figure.
     if figure_control.tile:
-        fig = tile_figure(
-            name,
-            tile_array=figure_control.tile_array,
-            tile_square=figure_control.tile_square,
-        )
+        fig = _tile_figure(name, tile_array=figure_control.tile_array, tile_square=figure_control.tile_square)
     else:
-        fig = plt.figure(name, figsize=figure_control.figsize)
+        fig = mpl_pyplot_figure(name, figsize=figure_control.figsize)
         if figure_control.upper_left_xy:
             upper_left_xy = figure_control.upper_left_xy
             x = upper_left_xy[0]
@@ -227,9 +241,7 @@ def _setup_figure(
         plt.grid()
 
     # Update figure collection variables.
-    fig_record = rcfr.RenderControlFigureRecord(
-        name, title, caption, figure_num, fig, axis_control
-    )
+    fig_record = rcfr.RenderControlFigureRecord(name, title, caption, figure_num, fig, axis_control)
     global fig_record_list
     fig_record_list.append(fig_record)
 
@@ -274,6 +286,12 @@ def setup_figure(
         fig_record = fm.setup_figure(figure_control, axis_control, view_spec_2d, title=img_name, code_tag=f"{__file__}", equal=False)
         fig_record.view.imshow(img)
         fig_record.view.show(block=True)
+        # ...
+        fig_record.close()
+
+    Note that even through the returned figure_record will ensure that the associated plot is closed when the associated
+    view object is destructed, it is almost always better to close the figure as soon as it's not needed any more via
+    the figure_record.close() method.
 
     Arguments:
     ----------
@@ -289,16 +307,7 @@ def setup_figure(
 
     # Setup the figure.
     fig_record = _setup_figure(
-        figure_control,
-        axis_control,
-        equal,
-        number_in_name,
-        input_prefix,
-        name,
-        title,
-        caption,
-        comments,
-        code_tag,
+        figure_control, axis_control, equal, number_in_name, input_prefix, name, title, caption, comments, code_tag
     )
     axis_control = fig_record.axis_control
 
@@ -331,9 +340,7 @@ def setup_figure(
         )
 
     # Create the view object.
-    view = v3d.View3d(
-        fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record
-    )
+    view = v3d.View3d(fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record)
     # Add view to log data.
     fig_record.axis = ax
     fig_record.view = view
@@ -357,6 +364,10 @@ def setup_figure_for_3d_data(
 ) -> RenderControlFigureRecord:
     """Create and setup a new RenderControlFigureRecord for rendering on a 3D graph.
 
+    Note that even through the returned figure_record will ensure that the associated plot is closed when the associated
+    view object is destructed, it is almost always better to close the figure as soon as it's not needed any more via
+    the figure_record.close() method.
+
     Arguments:
     ----------
         - figure_control (RenderControlFigure): Controls how multiple figures get plotted at the same time in multiple windows.
@@ -379,16 +390,7 @@ def setup_figure_for_3d_data(
 
     # Setup the figure.
     fig_record = _setup_figure(
-        figure_control,
-        axis_control,
-        equal,
-        number_in_name,
-        input_prefix,
-        name,
-        title,
-        caption,
-        comments,
-        code_tag,
+        figure_control, axis_control, equal, number_in_name, input_prefix, name, title, caption, comments, code_tag
     )
     axis_control = fig_record.axis_control
 
@@ -431,9 +433,7 @@ def setup_figure_for_3d_data(
         )
 
     # Create the view object.
-    view = v3d.View3d(
-        fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record
-    )
+    view = v3d.View3d(fig_record.figure, ax, view_spec=view_spec, equal=equal, parent=fig_record)
     # Add view to log data.
     fig_record.axis = ax
     fig_record.view = view
@@ -443,7 +443,7 @@ def setup_figure_for_3d_data(
     return fig_record
 
 
-def display_plot(
+def _display_plot(
     x: float,
     # x_labels,
     y: float,
@@ -453,9 +453,7 @@ def display_plot(
     figsize: tuple[float, float] = (6.4, 4.8),  # inch.
     tile: bool = True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
     tile_array: tuple[float, float] = (3, 2),  # (n_x, n_y)
-    upper_left_xy: tuple[
-        float, float
-    ] = None,  # pixel.  (0,0) --> Upper left corner of screen.
+    upper_left_xy: tuple[float, float] = None,  # pixel.  (0,0) --> Upper left corner of screen.
     legend: bool = True,  # Whether to draw a legend.
     color='k',
     linewidth: float = 1,
@@ -463,18 +461,16 @@ def display_plot(
     markersize: float = 2,
 ) -> plt.Figure:
     if tile:
-        fig = tile_figure(name, tile_array=tile_array)
+        fig = _tile_figure(name, tile_array=tile_array)
     else:
-        fig = plt.figure(name, figsize=figsize)
+        fig = mpl_pyplot_figure(name, figsize=figsize)
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
             fig.canvas.manager.window.move(x, y)
     if title and len(title) != 0:
         plt.title(title)
-    (line,) = plt.plot(
-        x, y, color=color, linewidth=linewidth, marker=marker, markersize=markersize
-    )
+    (line,) = plt.plot(x, y, color=color, linewidth=linewidth, marker=marker, markersize=markersize)
     if label:
         line.set_label(label)
     # # Rotate x-axis tick marks.
@@ -485,7 +481,7 @@ def display_plot(
     return fig
 
 
-def display_bar(
+def _display_bar(
     x_labels,
     y_values,
     name: str = None,  # Figure handle and title of figure window.
@@ -496,9 +492,9 @@ def display_bar(
     upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
 ) -> plt.Figure:
     if tile:
-        fig = tile_figure(name, tile_array=tile_array)
+        fig = _tile_figure(name, tile_array=tile_array)
     else:
-        fig = plt.figure(name, figsize=figsize)
+        fig = mpl_pyplot_figure(name, figsize=figsize)
         if upper_left_xy:
             x = upper_left_xy[0]
             y = upper_left_xy[1]
@@ -521,9 +517,7 @@ def print_figure_summary() -> None:
         fig_record.print_comments()
 
 
-def save_all_figures(
-    output_path: str, format: str = None, timeout: float = None, raise_on_timeout=False
-):
+def save_all_figures(output_path: str, format: str = None, timeout: float = None, raise_on_timeout=False):
     """Saves all figures opened with setup_figure (since reset_figure_management) to the given directory.
 
     The purpose for timeout is to let the program fail gracefully
@@ -557,7 +551,7 @@ def save_all_figures(
 
     if timeout == None:
         for fig_record in fig_record_list:
-            t1, t2 = fig_record.save(output_path, format=format)
+            t1, t2 = fig_record.save(output_path, format=format, close_after_save=False)
             figs.append(t1)
             txts.append(t2)
 
@@ -570,9 +564,7 @@ def save_all_figures(
             # start the save
             results = []
             t = Thread(
-                target=lambda: results.append(
-                    fig_record.save(output_path, format=format)
-                )
+                target=lambda: results.append(fig_record.save(output_path, format=format, close_after_save=False))
             )
             t.start()
 

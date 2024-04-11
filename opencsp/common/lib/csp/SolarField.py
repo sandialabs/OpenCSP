@@ -24,9 +24,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.csp.ufacet.HeliostatConfiguration import HeliostatConfiguration
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlSolarField import (
-    RenderControlSolarField,
-)
+from opencsp.common.lib.render_control.RenderControlSolarField import RenderControlSolarField
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 
 
@@ -58,23 +56,23 @@ class SolarField(RayTraceable):
         # Constructed members.
         # self.heliostats, self.heliostat_dict = self.heliostats_read_file(heliostat_file, facet_centroids_file)
         self.heliostats = heliostats
-        self.heliostat_dict = {
-            heliostat.name: i for i, heliostat in enumerate(heliostats)
-        }
+        self.heliostat_dict = {heliostat.name: i for i, heliostat in enumerate(heliostats)}
         self.num_heliostats = len(self.heliostats)
         self.heliostat_origin_xyz_list = [h.origin for h in self.heliostats]
         self.heliostat_origin_fit_plane = g3d.best_fit_plane(
             self.heliostat_origin_xyz_list
         )  # 3-d plane fit through heliostat origins.
-        self._aimpoint_xyz = None  # (x,y,y) in m. Do not access this member externally; use aimpoint_xyz() function instead.
-        self._when_ymdhmsz = None  # (y,m,d,h,m,s,z). Do not access this member externally; use when_ymdhmsz() function instead.
+        self._aimpoint_xyz = (
+            None  # (x,y,y) in m. Do not access this member externally; use aimpoint_xyz() function instead.
+        )
+        self._when_ymdhmsz = (
+            None  # (y,m,d,h,m,s,z). Do not access this member externally; use when_ymdhmsz() function instead.
+        )
 
         self.set_position_in_space(self.origin, self.rotation)
 
     # required for RayTracable object but currently has no use
-    def set_position_in_space(
-        self, translation: np.ndarray, rotation: Rotation
-    ) -> None:
+    def set_position_in_space(self, translation: np.ndarray, rotation: Rotation) -> None:
         for h in self.heliostats:
             h.set_position_in_space(translation + h.origin, rotation)
 
@@ -87,17 +85,13 @@ class SolarField(RayTraceable):
 
     def aimpoint_xyz(self):
         if self._aimpoint_xyz == None:
-            logt.error(
-                'ERROR: In SolarField.aimpoint_xyz(), attempt to fetch unset _aimpoint_xyz.'
-            )
+            logt.error('ERROR: In SolarField.aimpoint_xyz(), attempt to fetch unset _aimpoint_xyz.')
             assert False
         return self._aimpoint_xyz
 
     def when_ymdhmsz(self):
         if self._when_ymdhmsz == None:
-            logt.error(
-                'ERROR: In SolarField.when_ymdhmsz(), attempt to fetch unset _when_ymdhmsz.'
-            )
+            logt.error('ERROR: In SolarField.when_ymdhmsz(), attempt to fetch unset _when_ymdhmsz.')
             assert False
         return self._when_ymdhmsz
 
@@ -161,9 +155,7 @@ class SolarField(RayTraceable):
         day = self.when_ymdhmsz()[2]
         hour = self.when_ymdhmsz()[3]
         minute = self.when_ymdhmsz()[4]
-        date_time = '{0:d}-{1:02d}-{2:02d}-{3:02d}{4:02d}'.format(
-            year, month, day, hour, minute
-        )
+        date_time = '{0:d}-{1:02d}-{2:02d}-{3:02d}{4:02d}'.format(year, month, day, hour, minute)
         aim_Z = 'aimZ=' + str(self.aimpoint_xyz()[2])
         # ?? SCAFFOLDING RCB -- MAKE THIS CONTROLLABLE: ON FOR NSTTF, OFF OTHERWISE.
         #        return self.short_name + '_' + date_time + '_' + aim_Z
@@ -177,9 +169,7 @@ class SolarField(RayTraceable):
         day = self.when_ymdhmsz()[2]
         hour = self.when_ymdhmsz()[3]
         minute = self.when_ymdhmsz()[4]
-        date_time = '{0:d}-{1:d}-{2:d} at {3:02d}{4:02d}'.format(
-            year, month, day, hour, minute
-        )
+        date_time = '{0:d}-{1:d}-{2:d} at {3:02d}{4:02d}'.format(year, month, day, hour, minute)
         aim_pt = 'Aim=({0:.1f}, {1:.1f}, {2:.1f})'.format(
             self.aimpoint_xyz()[0], self.aimpoint_xyz()[1], self.aimpoint_xyz()[2]
         )
@@ -220,25 +210,13 @@ class SolarField(RayTraceable):
 
     # RENDERING
 
-    def draw(
-        self,
-        view: View3d,
-        solar_field_style: RenderControlSolarField = RenderControlSolarField(),
-    ) -> None:
+    def draw(self, view: View3d, solar_field_style: RenderControlSolarField = RenderControlSolarField()) -> None:
         # Heliostats.
         if solar_field_style.draw_heliostats:
             for heliostat in self.heliostats:
                 heliostat.draw(view, solar_field_style.heliostat_styles)
 
-    def draw_figure(
-        self,
-        figure_control,
-        axis_control_m,
-        view_spec,
-        title,
-        solar_field_style,
-        grid=True,
-    ):
+    def draw_figure(self, figure_control, axis_control_m, view_spec, title, solar_field_style, grid=True):
         # Setup view
         fig_record: rcfr.RenderControlFigureRecord = fm.setup_figure_for_3d_data(
             figure_control, axis_control_m, view_spec, grid=grid, title=title
@@ -249,9 +227,7 @@ class SolarField(RayTraceable):
         # Return
         return view
 
-    def survey_of_points(
-        self, resolution, random_dist: bool = False
-    ) -> tuple[Pxyz, Vxyz]:
+    def survey_of_points(self, resolution, random_dist: bool = False) -> tuple[Pxyz, Vxyz]:
         """
         Returns a grid of equispaced points and the normal vectors at those points.
 
@@ -268,9 +244,7 @@ class SolarField(RayTraceable):
         points = Pxyz([[], [], []])
         normals = Vxyz([[], [], []])
         for heliostat in self.heliostats:
-            additional_points, additional_normals = heliostat.survey_of_points(
-                resolution, random_dist
-            )
+            additional_points, additional_normals = heliostat.survey_of_points(resolution, random_dist)
             points = points.concatenate(additional_points)
             normals = normals.concatenate(additional_normals)
 
@@ -282,9 +256,7 @@ class SolarField(RayTraceable):
 #
 
 
-def setup_solar_field(
-    solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames
-) -> SolarField:
+def setup_solar_field(solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames) -> SolarField:
     # Notify progress.
     logt.info('Setting up solar field...')
 
@@ -328,14 +300,7 @@ def setup_solar_field(
 #
 
 
-def draw_solar_field(
-    figure_control,
-    solar_field,
-    solar_field_style,
-    view_spec,
-    name_suffix='',
-    axis_equal=True,
-):
+def draw_solar_field(figure_control, solar_field, solar_field_style, view_spec, name_suffix='', axis_equal=True):
     # Assumes that solar field is already set up with heliostat configurations, etc.
     # Select name and title.
     if (solar_field.short_name == None) or (len(solar_field.short_name) == 0):
@@ -351,12 +316,7 @@ def draw_solar_field(
         figure_title += ' (' + name_suffix + ')'
     # Setup figure.
     fig_record = fm.setup_figure_for_3d_data(
-        figure_control,
-        rca.meters(),
-        view_spec,
-        name=figure_name,
-        title=figure_title,
-        equal=axis_equal,
+        figure_control, rca.meters(), view_spec, name=figure_name, title=figure_title, equal=axis_equal
     )
     view = fig_record.view
     # Comment.
@@ -420,9 +380,7 @@ def construct_solar_field_heliostat_survey_scan(solar_field, raster_scan_paramet
     list_of_xyz_segments = vertical_segments + horizontal_segments
 
     # Construct the scan.
-    scan = Scan.construct_scan_given_segments_of_interest(
-        list_of_xyz_segments, raster_scan_parameters
-    )
+    scan = Scan.construct_scan_given_segments_of_interest(list_of_xyz_segments, raster_scan_parameters)
 
     # Return.
     return scan
@@ -489,14 +447,9 @@ def construct_solar_field_vanity_scan(solar_field, vanity_scan_parameters):
             horizontal_segments.append([[x0, y0, z0], [x1, y1, z1]])
     # All passes.
     # Shuffle to avoid passes that are too close to each other for the UAS to distinguish.
-    list_of_xyz_segments = listt.zamboni_shuffle(
-        vertical_segments
-    ) + listt.zamboni_shuffle(horizontal_segments)
+    list_of_xyz_segments = listt.zamboni_shuffle(vertical_segments) + listt.zamboni_shuffle(horizontal_segments)
 
-    logt.info(
-        'In construct_solar_field_vanity_scan(), number of segments = ',
-        len(list_of_xyz_segments),
-    )
+    logt.info('In construct_solar_field_vanity_scan(), number of segments = ', len(list_of_xyz_segments))
 
     # Rotate to stow azmiuth.
     rotated_segments = []
@@ -515,9 +468,7 @@ def construct_solar_field_vanity_scan(solar_field, vanity_scan_parameters):
         rotated_segments.append([xyz0r, xyz1r])
 
     # Construct the scan.
-    scan = Scan.construct_scan_given_segments_of_interest(
-        rotated_segments, vanity_scan_parameters
-    )
+    scan = Scan.construct_scan_given_segments_of_interest(rotated_segments, vanity_scan_parameters)
 
     # Return.
     return scan
@@ -540,16 +491,12 @@ def sf_from_csv_files(
 
     # Constructed members.
     heliostats: list[Heliostat.Heliostat]
-    heliostats, _ = heliostats_read_file(
-        heliostat_file, facet_centroids_file, autoset_canting_and_curvature
-    )
+    heliostats, _ = heliostats_read_file(heliostat_file, facet_centroids_file, autoset_canting_and_curvature)
     return SolarField(name, short_name, origin_lon_lat, heliostats)
 
 
 def heliostats_read_file(
-    file_field: str,
-    file_centroids_offsets: str,
-    autoset_canting_and_curvature: np.ndarray = None,
+    file_field: str, file_centroids_offsets: str, autoset_canting_and_curvature: np.ndarray = None
 ) -> tuple[list[Heliostat.Heliostat], dict[str, int]]:
     """Reads in a list of heliostats from the given file_field.
 
@@ -586,9 +533,7 @@ def heliostats_read_file(
             if autoset_canting_and_curvature is None:
                 curvature_func: Callable[[float, float], float] = lambda x, y: x * 0
             else:
-                foc_len = np.linalg.norm(
-                    autoset_canting_and_curvature - np.array([x, y, z])
-                )
+                foc_len = np.linalg.norm(autoset_canting_and_curvature - np.array([x, y, z]))
                 a = 1.0 / (4 * foc_len)
 
                 def curvature_func(x, y):

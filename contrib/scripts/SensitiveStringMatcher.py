@@ -74,9 +74,7 @@ class SensitiveStringMatcher:
                         p: re.Pattern = pattern
                         patterns[i] = re.compile(p.pattern.lower())
 
-    def _search_pattern(
-        self, ihaystack: str, pattern: re.Pattern | str
-    ) -> None | list[int]:
+    def _search_pattern(self, ihaystack: str, pattern: re.Pattern | str) -> None | list[int]:
         if isinstance(pattern, str):
             # Check for occurances of string literals
             if pattern in ihaystack:
@@ -93,9 +91,7 @@ class SensitiveStringMatcher:
 
         return None
 
-    def _search_patterns(
-        self, ihaystack: str, patterns: list[re.Pattern | str]
-    ) -> dict[re.Pattern | str, list[int]]:
+    def _search_patterns(self, ihaystack: str, patterns: list[re.Pattern | str]) -> dict[re.Pattern | str, list[int]]:
         ret: dict[re.Pattern | str, list[int]] = {}
 
         for pattern in patterns:
@@ -118,7 +114,7 @@ class SensitiveStringMatcher:
             matching: dict[re.Pattern | str, list[int]] = {}
             for pattern in possible_matching:
                 span = possible_matching[pattern]
-                line_part = iline[span[0]: span[1]]
+                line_part = iline[span[0] : span[1]]
                 if len(self._search_patterns(line_part, self.neg_patterns)) == 0:
                     matching[pattern] = span
 
@@ -130,9 +126,9 @@ class SensitiveStringMatcher:
                 line_part = line[start:end]
                 line_context = f"`{line_part}`"
                 if start > 0:
-                    line_context = line[max(start - 5, 0): start] + line_context
+                    line_context = line[max(start - 5, 0) : start] + line_context
                 if end < len(line):
-                    line_context = line_context + line[end: min(end + 5, len(line))]
+                    line_context = line_context + line[end : min(end + 5, len(line))]
 
                 match = Match(lineno + 1, start, end, line, line_part, self)
                 self.set_match_msg(match, pattern, line_context)

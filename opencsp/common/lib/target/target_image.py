@@ -13,9 +13,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.unit_conversion as uc
 
 
-def construct_target_image(
-    image_width, image_height, dpm  # Meters  # Meters
-):  # Dots per meter
+def construct_target_image(image_width, image_height, dpm):  # Meters  # Meters  # Dots per meter
     image_cols = round(image_width * dpm)
     image_rows = round(image_height * dpm)
     img = np.uint8(

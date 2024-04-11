@@ -10,9 +10,7 @@ import opencsp.common.lib.tool.log_tools as lt
 class _IndexableIterable(Iterable[CacheableImage]):
     """A restartable iterable (via an iter() call) that piggybacks off of an indexable object."""
 
-    def __init__(
-        self, src: list[str | CacheableImage] | Callable[[int], CacheableImage]
-    ):
+    def __init__(self, src: list[str | CacheableImage] | Callable[[int], CacheableImage]):
         self.src = src
         self.idx = 0
 
@@ -62,19 +60,12 @@ class _VideoToFramesIterable(_IndexableIterable):
         video.extract_frames()
         frame_format = video.get_extracted_frame_path_and_name_format()
         frame_dir, _, frame_ext = ft.path_components(frame_format)
-        frame_names: list[str] = ft.files_in_directory_by_extension(
-            frame_dir, [frame_ext]
-        )[frame_ext]
+        frame_names: list[str] = ft.files_in_directory_by_extension(frame_dir, [frame_ext])[frame_ext]
         return [os.path.join(frame_dir, frame_name) for frame_name in frame_names]
 
 
 class ImagesIterable(Iterable[CacheableImage]):
-    def __init__(
-        self,
-        stream: Callable[[int], CacheableImage]
-        | list[str | CacheableImage]
-        | vh.VideoHandler,
-    ):
+    def __init__(self, stream: Callable[[int], CacheableImage] | list[str | CacheableImage] | vh.VideoHandler):
         """A restartable iterable that returns one image at a time, for as long as images are still available.
 
         Iterates over an iterator or callable that returns one image at a time.

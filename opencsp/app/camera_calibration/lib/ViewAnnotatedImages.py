@@ -1,6 +1,7 @@
 """
 GUI used to view annotated checkerboard corners.
 """
+
 import tkinter
 
 from numpy import ndarray
@@ -51,9 +52,7 @@ class ViewAnnotatedImages:
 
         # Create image title
         self.var_title = tkinter.StringVar(value=image_names[self.idx_im])
-        title = tkinter.Label(
-            root, textvariable=self.var_title, font=('calibre', 15, 'bold')
-        )
+        title = tkinter.Label(root, textvariable=self.var_title, font=('calibre', 15, 'bold'))
 
         # Create drawing canvas
         self.canvas = tkinter.Canvas(root, width=self.width, height=self.height)

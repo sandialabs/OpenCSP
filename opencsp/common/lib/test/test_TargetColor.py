@@ -16,21 +16,22 @@ import opencsp.common.lib.tool.unit_conversion as uc
 
 class TestTargetColor(to.TestOutput):
     @classmethod
-    def setup_class(
-        self,
+    def setUpClass(
+        cls,
         source_file_body: str = 'TestTargetColor',  # Set these here, because pytest calls
         figure_prefix_root: str = 'ttc',  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
         # Generic setup.
-        super(TestTargetColor, self).setup_class(
+        super(TestTargetColor, cls).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
             verify=verify,
         )
 
+    def setUp(self):
         # Define image size and resolution for all tests.
         # self.image_width_in  = 3.0 # 48.0 # inch
         # self.image_height_in = 5.0 # 96.0 # inch
@@ -73,12 +74,7 @@ class TestTargetColor(to.TestOutput):
 
     # ?? SCAFFOLDING RCB -- ADD COLOR_BAR TYPE TIP BELOW
     def execute_test_linear_color_bar(
-        self,
-        color_below_min: Color,
-        color_bar,
-        color_bar_name: str,
-        color_above_max: Color,
-        generate_all: bool,
+        self, color_below_min: Color, color_bar, color_bar_name: str, color_above_max: Color, generate_all: bool
     ) -> None:
         if generate_all:
             # Linear color bar in x, continuous.
@@ -93,9 +89,7 @@ class TestTargetColor(to.TestOutput):
                 'x',
                 'continuous',
             )
-            self.save_and_check_image(
-                target.image, self.dpm, target.description_inch(), '.png'
-            )
+            self.save_and_check_image(target.image, self.dpm, target.description_inch(), '.png')
 
         # Linear color bar in y, discrete.
         target = tc.construct_target_linear_color_bar(
@@ -109,25 +103,15 @@ class TestTargetColor(to.TestOutput):
             'y',
             'discrete',
         )
-        self.save_and_check_image(
-            target.image, self.dpm, target.description_inch(), '.png'
-        )
+        self.save_and_check_image(target.image, self.dpm, target.description_inch(), '.png')
 
     # ?? SCAFFOLDING RCB -- ADD COLOR_BAR TYPE TIP BELOW
     def execute_test_polar_color_bar(
-        self,
-        color_below_min: Color,
-        color_bar,
-        color_bar_name: str,
-        color_above_max: Color,
+        self, color_below_min: Color, color_bar, color_bar_name: str, color_above_max: Color
     ) -> None:
         # Default.
-        target = tc.construct_target_polar_color_bar(
-            self.image_width, self.image_height, self.dpm
-        )
-        self.save_and_check_image(
-            target.image, self.dpm, target.description_inch(), '.png'
-        )
+        target = tc.construct_target_polar_color_bar(self.image_width, self.image_height, self.dpm)
+        self.save_and_check_image(target.image, self.dpm, target.description_inch(), '.png')
 
         # Selected for first 3m x 3m print.
         target = tc.construct_target_polar_color_bar(
@@ -140,9 +124,7 @@ class TestTargetColor(to.TestOutput):
             radial_gradient_name='l2s',
             light_center_to_saturated_saturation_min=0.2,
         )
-        self.save_and_check_image(
-            target.image, self.dpm, target.description_inch(), '.png'
-        )
+        self.save_and_check_image(target.image, self.dpm, target.description_inch(), '.png')
 
         # # Saturated center to white, varying exponent.
         # for exponent in np.arange(0, 4.0, 0.5):
@@ -216,51 +198,35 @@ class TestTargetColor(to.TestOutput):
 
     def execute_test_blue_under_red_cross_green(self) -> None:
         # Construct target.
-        target = tc.construct_target_blue_under_red_cross_green(
-            self.image_width, self.image_height, self.dpm
-        )
-        self.save_and_check_image(
-            target.image, self.dpm, target.description_inch(), '.png'
-        )
+        target = tc.construct_target_blue_under_red_cross_green(self.image_width, self.image_height, self.dpm)
+        self.save_and_check_image(target.image, self.dpm, target.description_inch(), '.png')
 
     def execute_test_rgb_cube_inscribed_square(self, project_to_cube: bool) -> None:
         # Construct target.
         target = tc.construct_target_rgb_cube_inscribed_square(
             self.image_width, self.image_height, self.dpm, project_to_cube
         )
-        self.save_and_check_image(
-            target.image, self.dpm, target.description_inch(), '.png'
-        )
+        self.save_and_check_image(target.image, self.dpm, target.description_inch(), '.png')
 
     # TARGET MODIFICATION TESTS
 
     def execute_test_adjust_color_saturation(self, saturation_fraction: float) -> None:
         # Construct target.
-        target = tc.construct_target_blue_under_red_cross_green(
-            self.image_width, self.image_height, self.dpm
-        )
+        target = tc.construct_target_blue_under_red_cross_green(self.image_width, self.image_height, self.dpm)
         # Adjust color saturation.
         target.adjust_color_saturation(saturation_fraction)
-        print(
-            'WARNING:  In execute_test_adjust_color_saturation(), saturation adjustment not implemented yet.'
-        )
+        print('WARNING:  In execute_test_adjust_color_saturation(), saturation adjustment not implemented yet.')
         # Save and check.
-        self.save_and_check_image(
-            target.image, self.dpm, target.description_inch(), '.png'
-        )
+        self.save_and_check_image(target.image, self.dpm, target.description_inch(), '.png')
 
     # TARGET EXTENSION TESTS
 
     def execute_test_extend_target(self) -> None:
         # Target.
-        target = tc.construct_target_blue_under_red_cross_green(
-            self.image_width, self.image_height, self.dpm
-        )
+        target = tc.construct_target_blue_under_red_cross_green(self.image_width, self.image_height, self.dpm)
         # Border all around.
         border_pixels = 5  # Pixels
-        extended_target_left_right_top_bottom_border = tc.extend_target_all(
-            target, border_pixels, Color.magenta()
-        )
+        extended_target_left_right_top_bottom_border = tc.extend_target_all(target, border_pixels, Color.magenta())
         self.save_and_check_image(
             extended_target_left_right_top_bottom_border.image,
             self.dpm,
@@ -273,9 +239,7 @@ class TestTargetColor(to.TestOutput):
     def execute_test_splice_targets_above_below(self) -> None:
         # ?? SCAFFOLDING RCB -- FIXUP PARAMETER PASSING, ETC.
         # Target #1.
-        target_1 = tc.construct_target_blue_under_red_cross_green(
-            self.image_width, self.image_height, self.dpm
-        )
+        target_1 = tc.construct_target_blue_under_red_cross_green(self.image_width, self.image_height, self.dpm)
         # Target #2.
         # Selected for first 3m x 3m print.
         # project_to_cube = True
@@ -293,12 +257,8 @@ class TestTargetColor(to.TestOutput):
         # Combine.
         # ?? SCAFFOLDING RCB -- SHOULD THIS BE IN INCHES?
         gap = 0  # Pixels  # ?? SCAFFOLDING RCB -- SHOULD THIS BE IN INCHES?
-        spliced_target = tc.splice_targets_above_below(
-            target_1, target_2, gap, Color.white()
-        )
-        self.save_and_check_image(
-            spliced_target.image, self.dpm, spliced_target.description_inch(), '.png'
-        )
+        spliced_target = tc.splice_targets_above_below(target_1, target_2, gap, Color.white())
+        self.save_and_check_image(spliced_target.image, self.dpm, spliced_target.description_inch(), '.png')
 
     def execute_test_cascade_target_A(self) -> None:
         # For tall linear target elements.
@@ -336,9 +296,7 @@ class TestTargetColor(to.TestOutput):
         # Main:  Color bar corrected for Nikon D3300 response.
         color_below_min = Color.black()  # Black below bottom of color bar.
         color_bar = tcc.nikon_D3300_monitor_equal_step_color_bar()
-        color_bar_name = (
-            'D3300_monitor'  # ?? SCAFFOLDING RCB -- THIS SHOULD BE A CLASS MEMBER
-        )
+        color_bar_name = 'D3300_monitor'  # ?? SCAFFOLDING RCB -- THIS SHOULD BE A CLASS MEMBER
         color_above_max = Color.white()  # White background for "saturated data."
         # Closed color wheel linear color bar.
         ref_color_below_min = Color.black()  # Black below bottom of color bar.
@@ -387,10 +345,7 @@ class TestTargetColor(to.TestOutput):
             list_of_saturation_spec_lists=[
                 [[None, None, None, None]],
                 # 2-stack
-                [
-                    ['light_to_saturated', None, 0.4, 1.0],
-                    ['saturated_to_white', 1.25, None, None],
-                ],
+                [['light_to_saturated', None, 0.4, 1.0], ['saturated_to_white', 1.25, None, None]],
                 # 5-stack
                 [
                     [None, None, None, None],
@@ -420,9 +375,7 @@ class TestTargetColor(to.TestOutput):
             gap_between_bars_pix=round(
                 gap_between_bars * composite_dpm
             ),  # Pixels  # ?? SCAFFOLDING RCB -- SHOULD THIS BE IN INCHES?
-            ref_gap_pix=round(
-                ref_gap * composite_dpm
-            ),  # Pixels  # ?? SCAFFOLDING RCB -- SHOULD THIS BE IN INCHES?
+            ref_gap_pix=round(ref_gap * composite_dpm),  # Pixels  # ?? SCAFFOLDING RCB -- SHOULD THIS BE IN INCHES?
             gap_color=Color.white(),
         )
 
@@ -430,25 +383,14 @@ class TestTargetColor(to.TestOutput):
         n_ticks_x = 13  # No units.  Number of tick marks to draw along top/bottom horizontal target edges.
         n_ticks_y = 25  # No units.  Number of tick marks to draw along left/right vertical target edges.
         tick_length = 0.010  # Meters.    Length to draw edge tick marks.
-        tick_width_pix = (
-            3  # Pixels.    Width to draw edge tick marks; should be odd number.
-        )
+        tick_width_pix = 3  # Pixels.    Width to draw edge tick marks; should be odd number.
         tick_color: Color = Color.black()  # Color.     Color of edge tick marks.
-        cascade_target.set_ticks_along_top_and_bottom_edges(
-            n_ticks_x, tick_length, tick_width_pix, tick_color
-        )
-        cascade_target.set_ticks_along_left_and_right_edges(
-            n_ticks_y, tick_length, tick_width_pix, tick_color
-        )
+        cascade_target.set_ticks_along_top_and_bottom_edges(n_ticks_x, tick_length, tick_width_pix, tick_color)
+        cascade_target.set_ticks_along_left_and_right_edges(n_ticks_y, tick_length, tick_width_pix, tick_color)
 
         # Save result.
         # self.save_and_check_image(cascade_target.image, composite_dpm, cascade_target.description_inch(), '.tiff')  #'.png')
-        self.save_and_check_image(
-            cascade_target.image,
-            composite_dpm,
-            cascade_target.description_inch(),
-            '.png',
-        )
+        self.save_and_check_image(cascade_target.image, composite_dpm, cascade_target.description_inch(), '.png')
 
     def test_matlab(self) -> None:
         # Initialize test.
@@ -458,9 +400,7 @@ class TestTargetColor(to.TestOutput):
         color_bar = tcc.matlab_color_bar()
         color_bar_name = 'matlab'
         color_above_max = Color.white()  # White background for "saturated data."
-        self.execute_test_linear_color_bar(
-            color_below_min, color_bar, color_bar_name, color_above_max, False
-        )
+        self.execute_test_linear_color_bar(color_below_min, color_bar, color_bar_name, color_above_max, False)
 
     def test_matlab_equal_angle(self) -> None:
         # Initialize test.
@@ -470,9 +410,7 @@ class TestTargetColor(to.TestOutput):
         color_bar = tcc.normalize_color_bar_to_equal_angles(tcc.matlab_color_bar())
         color_bar_name = 'matlab_equal_angle'
         color_above_max = Color.white()  # White background for "saturated data."
-        self.execute_test_linear_color_bar(
-            color_below_min, color_bar, color_bar_name, color_above_max, False
-        )
+        self.execute_test_linear_color_bar(color_below_min, color_bar, color_bar_name, color_above_max, False)
 
     #         # Closed corner tour color bar.
     # # ?? SCAFFOLDING RCB -- USE THIS TO CLARIFY AND THEN FIX PROBLEMS WITH COLOR INTERPOLATION.
@@ -489,14 +427,10 @@ class TestTargetColor(to.TestOutput):
         self.start_test()
         # Normalized closed corner tour color bar.
         color_below_min = Color.black()  # Black below bottom of color bar.
-        color_bar = tcc.normalize_color_bar_to_equal_angles(
-            tcc.corner_tour_closed_color_bar()
-        )
+        color_bar = tcc.normalize_color_bar_to_equal_angles(tcc.corner_tour_closed_color_bar())
         color_bar_name = 'corner_tour_closed_equal_angle'
         color_above_max = Color.white()  # White background for "saturated data."
-        self.execute_test_linear_color_bar(
-            color_below_min, color_bar, color_bar_name, color_above_max, True
-        )
+        self.execute_test_linear_color_bar(color_below_min, color_bar, color_bar_name, color_above_max, True)
 
     # # Closed color wheel linear color bar.
     # color_below_min = Color.black()  # Black below bottom of color bar.
@@ -513,9 +447,7 @@ class TestTargetColor(to.TestOutput):
         color_bar = tcc.O_color_bar()
         color_bar_name = 'O'  # ?? SCAFFOLDING RCB -- THIS SHOULD BE A CLASS MEMBER
         color_above_max = Color.white()  # White background for "saturated data."
-        self.execute_test_polar_color_bar(
-            color_below_min, color_bar, color_bar_name, color_above_max
-        )
+        self.execute_test_polar_color_bar(color_below_min, color_bar, color_bar_name, color_above_max)
 
     def test_blue_under_red_cross_green(self) -> None:
         # Initialize test.
@@ -590,7 +522,8 @@ if __name__ == "__main__":
     verify = False  # True
     # Setup.
     test_object = TestTargetColor()
-    test_object.setup_class(interactive=interactive, verify=verify)
+    test_object.setUpClass(interactive=interactive, verify=verify)
+    test_object.setUp()
     # Tests.
     lt.info('Beginning tests...')
     test_object.test_matlab()
@@ -607,4 +540,4 @@ if __name__ == "__main__":
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    test_object.teardown_method()
+    test_object.tearDown()

@@ -8,9 +8,7 @@ import opencsp.common.lib.csp.LightSource as ls
 import opencsp.common.lib.cv.AbstractFiducial as af
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import (
-    SpotAnalysisPopulationStatistics,
-)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 import opencsp.common.lib.tool.file_tools as ft
 
 
@@ -37,7 +35,9 @@ class SpotAnalysisOperable:
     """ Any fiducials handed to us in the currently processing image. """
     found_fiducials: list[af.AbstractFiducial] = field(default_factory=list)
     """ The identified fiducials in the currently processing image. """
-    camera_intrinsics_characterization: any = None  # TODO figure out how to specify information here, maybe using common/lib/camera/Camera
+    camera_intrinsics_characterization: any = (
+        None  # TODO figure out how to specify information here, maybe using common/lib/camera/Camera
+    )
     """ Distortion, color, bit depth, etc of the camera. Maybe also distortion properties of the lens system. """
     light_sources: list[ls.LightSource] = field(default_factory=list)
     """ The sources that produced the light that landed on the observed
@@ -94,20 +94,14 @@ class SpotAnalysisOperable:
         if requires_update:
             # use __init__ to update frozen values
             self.__init__(
-                primary_image,
-                primary_image_source_path=primary_image_source_path,
-                supporting_images=supporting_images,
+                primary_image, primary_image_source_path=primary_image_source_path, supporting_images=supporting_images
             )
 
     def __sizeof__(self) -> int:
-        return sys.getsizeof(self.primary_image) + sum(
-            [sys.getsizeof(im) for im in self.supporting_images.values()]
-        )
+        return sys.getsizeof(self.primary_image) + sum([sys.getsizeof(im) for im in self.supporting_images.values()])
 
     def replace_use_default_values(
-        self,
-        supporting_images: dict[ImageType, CacheableImage] = None,
-        data: 'SpotAnalysisOperable' = None,
+        self, supporting_images: dict[ImageType, CacheableImage] = None, data: 'SpotAnalysisOperable' = None
     ) -> 'SpotAnalysisOperable':
         """Sets the supporting_images and other data for an operable where they
         are None for this instance. Returns a new operable with the populated
@@ -116,31 +110,19 @@ class SpotAnalysisOperable:
 
         if supporting_images != None:
             for image_type in supporting_images:
-                if (image_type in ret.supporting_images) and (
-                    ret.supporting_images[image_type] != None
-                ):
+                if (image_type in ret.supporting_images) and (ret.supporting_images[image_type] != None):
                     supporting_images[image_type] = ret.supporting_images[image_type]
             ret = replace(ret, supporting_images=supporting_images)
 
         if data != None:
-            given_fiducials = (
-                data.given_fiducials
-                if self.given_fiducials == None
-                else self.given_fiducials
-            )
-            found_fiducials = (
-                data.found_fiducials
-                if self.found_fiducials == None
-                else self.found_fiducials
-            )
+            given_fiducials = data.given_fiducials if self.given_fiducials == None else self.given_fiducials
+            found_fiducials = data.found_fiducials if self.found_fiducials == None else self.found_fiducials
             camera_intrinsics_characterization = (
                 data.camera_intrinsics_characterization
                 if self.camera_intrinsics_characterization == None
                 else self.camera_intrinsics_characterization
             )
-            light_sources = (
-                data.light_sources if self.light_sources == None else self.light_sources
-            )
+            light_sources = data.light_sources if self.light_sources == None else self.light_sources
             ret = replace(
                 ret,
                 given_fiducials=given_fiducials,

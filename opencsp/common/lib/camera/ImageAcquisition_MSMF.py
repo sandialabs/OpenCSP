@@ -2,6 +2,7 @@ import cv2 as cv
 import numpy as np
 
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+import opencsp.common.lib.tool.exception_tools as et
 
 
 class ImageAcquisition(ImageAcquisitionAbstract):
@@ -15,9 +16,19 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         # Save max saturation value
         self._max_value = int(220)
 
+        # Call super().__init__() once we have enough information for instance_matches().
+        super().__init__()
+
         # Check if the webcam is opened correctly
         if not self.cap.isOpened():
             raise IOError("Error opening webcam")
+
+    def instance_matches(self, possible_matches: list[ImageAcquisitionAbstract]) -> bool:
+        for camera in possible_matches:
+            if isinstance(camera, ImageAcquisition):
+                # only one MSMF camera is supported
+                return True
+        return False
 
     def get_frame(self) -> np.ndarray:
         # Capture image
@@ -31,9 +42,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         if np.ndim(frame) == 3:
             frame = frame.mean(axis=2)
         elif np.ndim(frame) != 2:
-            raise ValueError(
-                f'Output frame must have 2 or 3 dimensions, not {np.ndim(frame):d}.'
-            )
+            raise ValueError(f'Output frame must have 2 or 3 dimensions, not {np.ndim(frame):d}.')
 
         return frame
 
@@ -78,9 +87,10 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
     @property
     def shutter_cal_values(self) -> np.ndarray:
-        raise ValueError(
-            'exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.'
-        )
+        raise ValueError('exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.')
 
     def close(self):
-        self.cap.release()
+        with et.ignored(Exception):
+            super().close()
+        with et.ignored(Exception):
+            self.cap.release()

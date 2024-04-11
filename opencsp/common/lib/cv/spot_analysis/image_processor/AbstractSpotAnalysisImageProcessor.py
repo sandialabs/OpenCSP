@@ -5,15 +5,9 @@ from typing import Callable, Iterator, Union
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
-    SpotAnalysisOperable,
-)
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import (
-    SpotAnalysisOperablesStream,
-)
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import (
-    SpotAnalysisImagesStream,
-)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAnalysisImagesStream
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessorLeger import (
     AbstractSpotAnalysisImagesProcessorLeger,
 )
@@ -21,9 +15,7 @@ import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.typing_tools as tt
 
 
-class AbstractSpotAnalysisImagesProcessor(
-    Iterator[SpotAnalysisOperable], AbstractSpotAnalysisImagesProcessorLeger
-):
+class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable], AbstractSpotAnalysisImagesProcessorLeger):
     """Class to perform one step of image processing before spot analysis is performed.
 
     This is an abstract class. Implementations can be found in the same
@@ -52,14 +44,12 @@ class AbstractSpotAnalysisImagesProcessor(
 
     def run(
         self,
-        operables: ImagesIterable
-        | ImagesStream
-        | SpotAnalysisImagesStream
-        | Union[
-            'AbstractSpotAnalysisImagesProcessor',
-            list[SpotAnalysisOperable],
-            Iterator[SpotAnalysisOperable],
-        ],
+        operables: (
+            ImagesIterable
+            | ImagesStream
+            | SpotAnalysisImagesStream
+            | Union['AbstractSpotAnalysisImagesProcessor', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]]
+        ),
     ) -> list[CacheableImage]:
         """Performs image processing on the input images."""
         if isinstance(operables, (ImagesIterable, ImagesStream)):
@@ -71,9 +61,7 @@ class AbstractSpotAnalysisImagesProcessor(
             pass
         return copy.copy(self.all_processed_results)
 
-    def process_image(
-        self, input_operable: SpotAnalysisOperable, is_last: bool = False
-    ) -> list[SpotAnalysisOperable]:
+    def process_image(self, input_operable: SpotAnalysisOperable, is_last: bool = False) -> list[SpotAnalysisOperable]:
         """Should probably not be called by external classes. Evaluate this instance as an iterator instead.
 
         Executes this instance's image processing on a single given input
@@ -141,9 +129,7 @@ class AbstractSpotAnalysisImagesProcessor(
         return ret
 
     @abstractmethod
-    def _execute(
-        self, operable: SpotAnalysisOperable, is_last: bool
-    ) -> list[SpotAnalysisOperable]:
+    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         """Evaluate an input primary image (and other images/data), and generate the output processed image(s) and data.
 
         The actual image processing method. Called from process_image().
@@ -289,9 +275,7 @@ class AbstractSpotAnalysisImagesProcessor(
         This method is designed to be used as a callback with self.on_image_processed().
         """
         idx_list = [0]
-        return lambda operable: self._save_image(
-            operable.primary_image, idx_list, dir, name_prefix, ext
-        )
+        return lambda operable: self._save_image(operable.primary_image, idx_list, dir, name_prefix, ext)
 
     def on_image_processed(self, callback: Callable[[SpotAnalysisOperable], None]):
         """Registers the given callback, to be evaluated for each processed

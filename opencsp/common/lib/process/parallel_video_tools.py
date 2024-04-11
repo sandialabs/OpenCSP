@@ -80,10 +80,7 @@ def parallel_frames_to_videos(
 
 
 def parallel_video_to_frames(
-    num_servers: int,
-    server_index: int,
-    video_handler: vh.VideoHandler,
-    server_synchronizer: ss.ServerSynchronizer,
+    num_servers: int, server_index: int, video_handler: vh.VideoHandler, server_synchronizer: ss.ServerSynchronizer
 ):
     """Extract all frames from the given video, where each server extracts the frames for part of the video.
     To extract all frames, execute this method on each server with that server's server_index.
@@ -113,26 +110,15 @@ def parallel_video_to_frames(
     frame_control = video_handler.frame_control
 
     # build the extraction directories for this server
-    dst_frames_dir_serv = os.path.join(
-        dst_frames_dir, f"extraction_server_{server_index}"
-    )
+    dst_frames_dir_serv = os.path.join(dst_frames_dir, f"extraction_server_{server_index}")
     ft.create_directories_if_necessary(dst_frames_dir_serv)
     if dst_example_frames_dir != None:
-        dst_example_frames_dir_serv = os.path.join(
-            dst_example_frames_dir, f"extraction_server_{server_index}"
-        )
+        dst_example_frames_dir_serv = os.path.join(dst_example_frames_dir, f"extraction_server_{server_index}")
         ft.create_directories_if_necessary(dst_example_frames_dir_serv)
-    frame_name_format = frame_control.get_outframe_name(
-        src_video_dir_name_ext, is_example_frames=False
-    )
-    frame_name_format_example = frame_control.get_outframe_name(
-        src_video_dir_name_ext, is_example_frames=True
-    )
+    frame_name_format = frame_control.get_outframe_name(src_video_dir_name_ext, is_example_frames=False)
+    frame_name_format_example = frame_control.get_outframe_name(src_video_dir_name_ext, is_example_frames=True)
     video_handler = vh.VideoHandler.VideoExtractor(
-        src_video_dir_name_ext,
-        dst_frames_dir_serv,
-        dst_example_frames_dir_serv,
-        frame_control,
+        src_video_dir_name_ext, dst_frames_dir_serv, dst_example_frames_dir_serv, frame_control
     )
 
     # determine the number of frames in the video, and which ones this server should extract
@@ -151,13 +137,8 @@ def parallel_video_to_frames(
     video_handler.extract_frames(start_time=rstart, end_time=rend)
 
     # remove any duplicates
-    duplicates_handler = vh.VideoHandler.VideoCreator(
-        dst_frames_dir_serv, None, None, frame_control
-    )
-    (
-        non_duplicate_frame_files,
-        duplicate_frame_files,
-    ) = duplicates_handler.identify_duplicate_frames(0, 0)
+    duplicates_handler = vh.VideoHandler.VideoCreator(dst_frames_dir_serv, None, None, frame_control)
+    (non_duplicate_frame_files, duplicate_frame_files) = duplicates_handler.identify_duplicate_frames(0, 0)
     for dup_frame in duplicate_frame_files:
         dup_frame = os.path.join(dst_frames_dir_serv, dup_frame)
         ft.delete_file(dup_frame)
@@ -175,10 +156,7 @@ def parallel_video_to_frames(
     server_synchronizer.wait()
 
     if server_index == 0:
-        for dst_dir, fnf in [
-            (dst_frames_dir, frame_name_format),
-            (dst_example_frames_dir, frame_name_format_example),
-        ]:
+        for dst_dir, fnf in [(dst_frames_dir, frame_name_format), (dst_example_frames_dir, frame_name_format_example)]:
             if dst_dir == None:
                 continue
 

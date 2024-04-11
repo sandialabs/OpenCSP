@@ -24,31 +24,23 @@ class ScanPass:
 
         # Defining members.
         self._segment_dict = None  # Dictionary of defining parameters.  Only set if this is a segment scan.
-        self._ufacet_scan_pass = (
-            None  # A UfacetScanPass object.  Only set if this is a UFACET scan.
-        )
+        self._ufacet_scan_pass = None  # A UfacetScanPass object.  Only set if this is a UFACET scan.
         self._lead_in = None  # m. Do not access this member externally; use lead_in() function instead.
         self._run_past = None  # m. Do not access this member externally; use run_past() function instead.
-        self._locale = (
-            None  # Do not access this member externally; use locale() function instead.
-        )
+        self._locale = None  # Do not access this member externally; use locale() function instead.
 
     # ACCESS
 
     def core_waypoints(self):
         # Core waypoints do not include the lead-in and run-past extra travel distance.
         if self._core_waypoint_list == None:
-            print(
-                'ERROR: In ScanPass.core_waypoints(), attempt to fetch unset _core_waypoint_list.'
-            )
+            print('ERROR: In ScanPass.core_waypoints(), attempt to fetch unset _core_waypoint_list.')
             assert False
         return self._core_waypoint_list
 
     def waypoints(self):
         if self._waypoint_list == None:
-            print(
-                'ERROR: In ScanPass.waypoints(), attempt to fetch unset _waypoint_list.'
-            )
+            print('ERROR: In ScanPass.waypoints(), attempt to fetch unset _waypoint_list.')
             assert False
         return self._waypoint_list
 
@@ -60,9 +52,7 @@ class ScanPass:
 
     def ufacet_scan_pass(self):
         if self._ufacet_scan_pass == None:
-            print(
-                'In ScanPass.ufacet_scan_pass(), attempt to fetch unset _ufacet_scan_pass.'
-            )
+            print('In ScanPass.ufacet_scan_pass(), attempt to fetch unset _ufacet_scan_pass.')
             assert False
         return self._ufacet_scan_pass
 
@@ -88,17 +78,13 @@ class ScanPass:
 
     # MODIFICATION
 
-    def set_core_waypoints_given_segment_of_interest(
-        self, segment_xyz, fly_backward, raster_scan_parameters
-    ):
+    def set_core_waypoints_given_segment_of_interest(self, segment_xyz, fly_backward, raster_scan_parameters):
         # This routine does not consider ground clearance.
         # It assumes that the specified eta and relative_z will yield a collisiion-free result.
         #
         # Check input.
         if raster_scan_parameters['eta'] > 0:
-            print(
-                'ERROR: In ScanPass.set_waypoints_given_segment_of_interest(), Postive gaze angle encountered.'
-            )
+            print('ERROR: In ScanPass.set_waypoints_given_segment_of_interest(), Postive gaze angle encountered.')
             assert False
         # Set segment-specific data member.
         self._segment_dict = {}
@@ -151,9 +137,7 @@ class ScanPass:
         start_eta = eta
         end_eta = eta
         # Construct way points.
-        start_wpt = wp.WayPoint(
-            locale, start_xyz, theta, start_eta, stop=False, speed=speed
-        )
+        start_wpt = wp.WayPoint(locale, start_xyz, theta, start_eta, stop=False, speed=speed)
         end_wpt = wp.WayPoint(locale, end_xyz, theta, end_eta, stop=False, speed=speed)
         # Set waypoint list data member.
         self._core_waypoint_list = [start_wpt, end_wpt]
@@ -169,14 +153,10 @@ class ScanPass:
     def set_waypoints_with_margin(self, scan_parameters):
         # Check input.
         if self._core_waypoint_list == None:
-            print(
-                'In ScanPass.set_waypoints_with_margin(), attempt to fetch unset _core_waypoint_list.'
-            )
+            print('In ScanPass.set_waypoints_with_margin(), attempt to fetch unset _core_waypoint_list.')
             assert False
         if len(self._core_waypoint_list) < 2:
-            print(
-                'In ScanPass.set_waypoints_with_margin(), _core_waypoint_list had fewer than two elements.'
-            )
+            print('In ScanPass.set_waypoints_with_margin(), _core_waypoint_list had fewer than two elements.')
             assert False
         # Fetch control parameters.
         lead_in = scan_parameters['lead_in']
@@ -190,9 +170,7 @@ class ScanPass:
         x0 = xyz0[0]
         y0 = xyz0[1]
         z0 = xyz0[2]
-        wptN = self._core_waypoint_list[
-            -1
-        ]  # There might be multiple waypoints in one pass.
+        wptN = self._core_waypoint_list[-1]  # There might be multiple waypoints in one pass.
         xyzN = wptN.xyz
         xN = xyzN[0]
         yN = xyzN[1]
@@ -261,12 +239,8 @@ class ScanPass:
             )
             assert False
         # Construct start and end waypoints.
-        start_wpt = wp.WayPoint(
-            locale0, start_xyz, theta0, start_eta, stop=False, speed=speed0
-        )
-        end_wpt = wp.WayPoint(
-            localeN, end_xyz, thetaN, end_eta, stop=False, speed=speedN
-        )
+        start_wpt = wp.WayPoint(locale0, start_xyz, theta0, start_eta, stop=False, speed=speed0)
+        end_wpt = wp.WayPoint(localeN, end_xyz, thetaN, end_eta, stop=False, speed=speedN)
         # Produce updated waypoint list.
         if len(self._core_waypoint_list) == 2:
             waypoint_list = [
@@ -289,9 +263,7 @@ class ScanPass:
             # Fetch segment of interest.
             segment_xyz = self._segment_dict['segment_xyz']
             # Draw segment.
-            view.draw_xyz_list(
-                segment_xyz, style=scan_pass_style.segment_of_interest_style
-            )
+            view.draw_xyz_list(segment_xyz, style=scan_pass_style.segment_of_interest_style)
 
         # Core waypoint segment.
         if scan_pass_style.draw_core_segment:
@@ -300,9 +272,7 @@ class ScanPass:
             core_wptN = self.core_waypoints()[-1]
             core_segment_xyz = [core_wpt0.xyz, core_wptN.xyz]
             # Draw segment.
-            view.draw_xyz_list(
-                core_segment_xyz, style=scan_pass_style.core_segment_style
-            )
+            view.draw_xyz_list(core_segment_xyz, style=scan_pass_style.core_segment_style)
 
 
 # -------------------------------------------------------------------------------------------------------
@@ -310,13 +280,9 @@ class ScanPass:
 #
 
 
-def construct_scan_pass_given_segment_of_interest(
-    segment_xyz, fly_backward, scan_parameters
-):
+def construct_scan_pass_given_segment_of_interest(segment_xyz, fly_backward, scan_parameters):
     scan_pass = ScanPass()
-    scan_pass.set_core_waypoints_given_segment_of_interest(
-        segment_xyz, fly_backward, scan_parameters
-    )
+    scan_pass.set_core_waypoints_given_segment_of_interest(segment_xyz, fly_backward, scan_parameters)
     scan_pass.set_waypoints_with_margin(scan_parameters)
     return scan_pass
 

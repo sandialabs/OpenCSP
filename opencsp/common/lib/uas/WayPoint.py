@@ -42,9 +42,7 @@ class WayPoint:
             self.lon = lon
             self.lat = lat
         else:
-            print(
-                'In WayPoint. set_longitude_latitude(), unexpected locale encountered.'
-            )
+            print('In WayPoint. set_longitude_latitude(), unexpected locale encountered.')
             assert False
 
     def heading_deg(self):

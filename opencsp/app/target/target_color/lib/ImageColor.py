@@ -2,6 +2,7 @@
 Tool for matching pixels between two images and viewing results.
 
 """
+
 import cv2 as cv
 import imageio.v3 as imageio
 import matplotlib.pyplot as plt
@@ -45,18 +46,14 @@ class ImageColor:
         if file.split('.')[-1] in ['NEF', 'RAW', 'nef', 'raw']:
             # Load image if raw
             with rawpy.imread(file) as raw:
-                im_array = raw.postprocess(
-                    gamma=(1, 1), no_auto_bright=True, output_bps=16
-                )
+                im_array = raw.postprocess(gamma=(1, 1), no_auto_bright=True, output_bps=16)
         else:
             # Load image if not raw
             im_array = imageio.imread(file)
 
         return cls(im_array)
 
-    def _get_normalized_image_data(
-        self,
-    ) -> tuple[np.ndarray, np.ndarray, tuple[int, int]]:
+    def _get_normalized_image_data(self) -> tuple[np.ndarray, np.ndarray, tuple[int, int]]:
         """
         Returns normalized image, RGB values as Nx3 ndarray, and XY shape of image
         """
@@ -70,9 +67,7 @@ class ImageColor:
 
         return image_norm, rgb_vals, image_norm.shape[:2]
 
-    def match_indices(
-        self, rgb: np.ndarray, thresh: float
-    ) -> tuple[np.ndarray, np.ndarray]:
+    def match_indices(self, rgb: np.ndarray, thresh: float) -> tuple[np.ndarray, np.ndarray]:
         """
         Calls returns the indices of pixels matching given color in form (ys, xs).
 

@@ -8,9 +8,7 @@ import opencsp.common.lib.tool.log_tools as lt
 T = TypeVar("T")
 
 
-def default(
-    primary: T | Callable[[], T] | None, *default: T | Callable[[], T] | None
-) -> T | None:
+def default(primary: T | Callable[[], T] | None, *default: T | Callable[[], T] | None) -> T | None:
     # TODO should this be in a different module?
     """Get the default value if the primary value is None or if the value is a
     callable that raises an error.
@@ -78,8 +76,7 @@ def default(
         #     default(dval[3])
         lt.error_and_raise(
             ValueError,
-            "Error in typing_tools.default(): "
-            + "at least one alternative for a default value must be provided.",
+            "Error in typing_tools.default(): " + "at least one alternative for a default value must be provided.",
         )
 
     for val in all_vals:
@@ -178,8 +175,7 @@ def strict_types(func):
             if argname in kwargtypes:
                 if (
                     arg != None
-                    and type(arg).__name__
-                    != kwargtypes[argname]  # for cases of types represented as strings
+                    and type(arg).__name__ != kwargtypes[argname]  # for cases of types represented as strings
                     if type(kwargtypes[argname]) == str
                     else not isinstance(arg, kwargtypes[argname])
                 ):
@@ -190,8 +186,7 @@ def strict_types(func):
             if kw in kwargtypes:
                 if (
                     kwargs[kw] != None
-                    and type(kwargs[kw]).__name__
-                    != kwargtypes[kw]  # for cases of types represented as strings
+                    and type(kwargs[kw]).__name__ != kwargtypes[kw]  # for cases of types represented as strings
                     if type(kwargtypes[kw]) == str
                     else not isinstance(kwargs[kw], kwargtypes[kw])
                 ):

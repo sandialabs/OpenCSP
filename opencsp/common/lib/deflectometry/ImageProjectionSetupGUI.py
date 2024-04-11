@@ -3,12 +3,14 @@ of a computer display (ImageProjection class). To run GUI, use the following:
 ```python ImageProjectionGUI.py```
 
 """
+
 import tkinter
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class ImageProjectionGUI:
@@ -72,32 +74,14 @@ class ImageProjectionGUI:
             'Blue Shift Y',
             'GUI X Position',
         ]
-        self.data_types = [
-            str,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            str,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-            int,
-        ]
+        self.data_types = [str, int, int, int, int, int, int, int, int, str, int, int, int, int, int, int, int]
 
         # Declare variables
         self.projector: ImageProjection
         self.display_data: dict
 
         # Create tkinter object
-        self.root = tkinter.Tk()
+        self.root = tkt.window()
 
         # Set title
         self.root.title('ImageProjection Setup')
@@ -134,60 +118,42 @@ class ImageProjectionGUI:
             self.data_cells.append(e)
 
         # Show projector button
-        self.btn_show_proj = tkinter.Button(
-            self.root, text='Show Display', command=self.show_projector
-        )
+        self.btn_show_proj = tkinter.Button(self.root, text='Show Display', command=self.show_projector)
         r += 1
         self.btn_show_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Update projector button
-        self.btn_update_proj = tkinter.Button(
-            self.root, text='Update All', command=self.update_windows
-        )
+        self.btn_update_proj = tkinter.Button(self.root, text='Update All', command=self.update_windows)
         r += 1
         self.btn_update_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Close display button
-        self.btn_close_proj = tkinter.Button(
-            self.root, text='Close Display', command=self.close_projector
-        )
+        self.btn_close_proj = tkinter.Button(self.root, text='Close Display', command=self.close_projector)
         r += 1
         self.btn_close_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Show crosshairs
-        self.btn_crosshairs = tkinter.Button(
-            self.root, text='Show Crosshairs', command=self.update_windows
-        )
+        self.btn_crosshairs = tkinter.Button(self.root, text='Show Crosshairs', command=self.update_windows)
         r += 1
         self.btn_crosshairs.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Show axes button
-        self.btn_axes = tkinter.Button(
-            self.root, text='Show Display Axes', command=self.show_axes
-        )
+        self.btn_axes = tkinter.Button(self.root, text='Show Display Axes', command=self.show_axes)
         r += 1
         self.btn_axes.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Show calibration image button
-        self.btn_calib = tkinter.Button(
-            self.root,
-            text='Show calibration image',
-            command=self.show_calibration_image,
-        )
+        self.btn_calib = tkinter.Button(self.root, text='Show calibration image', command=self.show_calibration_image)
         r += 1
         self.btn_calib.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Save as button
-        self.btn_save = tkinter.Button(
-            self.root, text='Save as HDF...', command=self.save_as
-        )
+        self.btn_save = tkinter.Button(self.root, text='Save as HDF...', command=self.save_as)
         r += 1
         self.btn_save.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Load button
-        self.btn_load = tkinter.Button(
-            self.root, text='Load from HDF...', command=self.load_from
-        )
+        self.btn_load = tkinter.Button(self.root, text='Load from HDF...', command=self.load_from)
         r += 1
         self.btn_load.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
@@ -236,7 +202,7 @@ class ImageProjectionGUI:
         self.update_window_size()
 
         # Create a new Toplevel window
-        projector_root = tkinter.Toplevel(self.root)
+        projector_root = tkt.window(self.root, Toplevel=True)
         self.projector = ImageProjection(projector_root, self.display_data)
 
         # Activate buttons
@@ -293,9 +259,7 @@ class ImageProjectionGUI:
 
         """
         # Get save file name
-        file = asksaveasfilename(
-            defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")]
-        )
+        file = asksaveasfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
 
         # Save file as HDF
         if file != '':
@@ -307,9 +271,7 @@ class ImageProjectionGUI:
 
         """
         # Get file name
-        file = askopenfilename(
-            defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")]
-        )
+        file = askopenfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
 
         # Load file
         if file != '':
@@ -326,9 +288,7 @@ class ImageProjectionGUI:
 
         # Gets data from user input boxes and saves in class
         data = {}
-        for dtype, name, entry in zip(
-            self.data_types, self.data_names, self.data_cells
-        ):
+        for dtype, name, entry in zip(self.data_types, self.data_names, self.data_cells):
             data.update({name: dtype(entry.get())})
         self.display_data = data
 
@@ -343,15 +303,11 @@ class ImageProjectionGUI:
 
         """
         # Checks inputs are correct
-        for name, dtype, entry in zip(
-            self.data_labels, self.data_types, self.data_cells
-        ):
+        for name, dtype, entry in zip(self.data_labels, self.data_types, self.data_cells):
             try:
                 dtype(entry.get())
             except ValueError:
-                messagebox.showerror(
-                    'Invalid input', f'Input for "{name:s}" must be {dtype}'
-                )
+                messagebox.showerror('Invalid input', f'Input for "{name:s}" must be {dtype}')
                 return False
         return True
 
@@ -420,7 +376,7 @@ class ImageProjectionGUI:
         self.get_user_data()
 
         # Save as HDF file
-        ImageProjection.save_to_hdf(self.display_data, file)
+        ImageProjection.save_params_to_hdf(self.display_data, file)
 
     def close(self):
         """

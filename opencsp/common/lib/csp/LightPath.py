@@ -50,15 +50,11 @@ class LightPath:
             intensity would be [i@v1, i_after_p1, i_after_p2 , i_after_p3 or i@v2]. (list[float])
         """
         if len(init_direction) != 1:
-            raise ValueError(
-                f"Initial direction argument should be a single vector. Given value was {init_direction}."
-            )
+            raise ValueError(f"Initial direction argument should be a single vector. Given value was {init_direction}.")
         self.points_list = points_list
         # TODO: assert -1e-6 < np.linalg.norm(init_direction) - 1 < 1e-6
         self.init_direction = init_direction
-        self.current_direction = (
-            init_direction if current_direction is None else current_direction
-        )
+        self.current_direction = init_direction if current_direction is None else current_direction
         # TODO: assert 1e-6 < np.linalg.norm(self.current_direction) - 1 < 1e-6
         self.color = color
         self.intensity = intensity
@@ -70,25 +66,17 @@ class LightPath:
         return f"{self.init_direction} --> \n{self.points_list} --> \n{self.current_direction}"
 
     def many_rays_from_many_vectors(
-        many_points_lists: list[Pxyz],
-        many_init_directions: Vxyz,
-        many_current_directions: Vxyz = [],
+        many_points_lists: list[Pxyz], many_init_directions: Vxyz, many_current_directions: Vxyz = []
     ) -> list['LightPath']:
         """
         Creates a list of LightPaths from vectors
         If the many_points_lists is None then the function will infer that they are
         all just the current vectors and have no history.
         """
-        if (
-            many_points_lists == None
-        ):  # None implies there are no recorded points at all
+        if many_points_lists == None:  # None implies there are no recorded points at all
             many_points_lists = [Pxyz.empty()] * len(many_init_directions)
-        elif len(many_points_lists) > 0 and len(many_points_lists) != len(
-            many_init_directions
-        ):
-            raise ValueError(
-                f"The number of points lists and initial vectors must be the same."
-            )
+        elif len(many_points_lists) > 0 and len(many_points_lists) != len(many_init_directions):
+            raise ValueError(f"The number of points lists and initial vectors must be the same.")
 
         diff_vectors = len(many_init_directions) - len(many_current_directions)
         many_current_directions = (
@@ -104,11 +92,7 @@ class LightPath:
         # print(f"MANY RESULT : {res}")
         return res
 
-    def draw(
-        self,
-        view: View3d,
-        path_style: rclp.RenderControlLightPath = rclp.default_path(),
-    ) -> None:
+    def draw(self, view: View3d, path_style: rclp.RenderControlLightPath = rclp.default_path()) -> None:
         # print("drawing ray") # TODO tristan print for debug
         # print(f"Points: \n{self.points_list}") # TODO tristan debug print
         points_array = list(self.points_list.data.T)
@@ -120,8 +104,7 @@ class LightPath:
                 [points_array[0] - init_direction_array * path_style.init_length]
                 + points_array  # initial direction
                 + [  # each point passed through
-                    points_array[-1]
-                    + current_direction_array * path_style.current_length
+                    points_array[-1] + current_direction_array * path_style.current_length
                 ],  # current direction
                 style=path_style.line_render_control,
             )
@@ -130,9 +113,7 @@ class LightPath:
         if path_style.end_at_plane != None:
             plane_point, plane_normal_vector = path_style.end_at_plane
 
-            plane_normal_vector = (
-                plane_normal_vector.as_Vxyz()
-            )  # cannot have the directions be Uxyz objects
+            plane_normal_vector = plane_normal_vector.as_Vxyz()  # cannot have the directions be Uxyz objects
             current_direction = self.current_direction.as_Vxyz()
 
             d: float = Vxyz.dot(plane_normal_vector, current_direction)

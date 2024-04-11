@@ -6,6 +6,7 @@ to select image and find key points.
 's' key saves data.
 
 """
+
 import tkinter as tk
 from tkinter.filedialog import askopenfilename
 import os
@@ -15,6 +16,8 @@ from PIL import Image, ImageTk
 import imageio.v3 as imageio
 import numpy as np
 import rawpy
+
+import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class SelectImagePoints:
@@ -42,10 +45,7 @@ class SelectImagePoints:
         # Define system parameters
         screen_width = root.winfo_screenwidth()
         screen_height = root.winfo_screenheight()
-        self.win_size_max = (
-            int(screen_width * frac_window),
-            int(screen_height * frac_window),
-        )
+        self.win_size_max = (int(screen_width * frac_window), int(screen_height * frac_window))
         self.roi_width = int(min(screen_height, screen_width) * frac_roi)  # pixels
         self.save_name = os.path.basename(file_name).split('.')[-2]
         self.image_file_name = file_name
@@ -85,9 +85,7 @@ class SelectImagePoints:
         """
         Updates the current displayed image to current loaded image
         """
-        self.image_display = self.canvas.create_image(
-            0, 0, anchor='nw', image=self.image_tk
-        )
+        self.image_display = self.canvas.create_image(0, 0, anchor='nw', image=self.image_tk)
 
     def click(self, event) -> None:
         """
@@ -104,9 +102,7 @@ class SelectImagePoints:
         """
         Called when fine res image is clicked
         """
-        self.pts[-1] += np.array([event.x / self.scale, event.y / self.scale]).astype(
-            int
-        )  # image pixels
+        self.pts[-1] += np.array([event.x / self.scale, event.y / self.scale]).astype(int)  # image pixels
         self.revert_main_image()
 
     def click_rough(self, event):
@@ -143,12 +139,8 @@ class SelectImagePoints:
         image_pil = Image.fromarray(image.copy(), 'RGB')
 
         # Resize image
-        size_x = (
-            float(self.win_size_max[0]) / image_pil.size[0]
-        )  # window pixels / image pixels
-        size_y = (
-            float(self.win_size_max[1]) / image_pil.size[1]
-        )  # window pixels / image pixels
+        size_x = float(self.win_size_max[0]) / image_pil.size[0]  # window pixels / image pixels
+        size_y = float(self.win_size_max[1]) / image_pil.size[1]  # window pixels / image pixels
         self.scale = min(size_x, size_y)  # window pixels / image pixels
         shape = (
             int(float(image_pil.size[0]) * self.scale),
@@ -206,10 +198,9 @@ class SelectImagePoints:
 if __name__ == '__main__':
     # Select file name
     file_selected = askopenfilename(
-        title='Select file to open',
-        filetypes=[('RAW', '*.NEF'), ('RAW', '*.RAW'), ('All Files', '*.*')],
+        title='Select file to open', filetypes=[('RAW', '*.NEF'), ('RAW', '*.RAW'), ('All Files', '*.*')]
     )
     if file_selected != '':
         # Create window
-        win = SelectImagePoints(tk.Tk(), file_selected)
+        win = SelectImagePoints(tkt.window(), file_selected)
         win.run()

@@ -7,9 +7,7 @@ import matplotlib.testing.compare as mplt
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
-from opencsp.common.lib.render_control.RenderControlFigureRecord import (
-    RenderControlFigureRecord,
-)
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 import opencsp.common.lib.target.target_image as ti
 import opencsp.common.lib.csp.SolarField as sf
 
@@ -22,9 +20,7 @@ def lines_share_common_string(line_1: str, line_2: str, ignore: str) -> bool:
         return False
 
 
-def lines_share_an_ignore_string(
-    line_1: str, line_2: str, ignore_string_list: list[str]
-) -> bool:
+def lines_share_an_ignore_string(line_1: str, line_2: str, ignore_string_list: list[str]) -> bool:
     for ignore_string in ignore_string_list:
         if lines_share_common_string(line_1, line_2, ignore_string):
             return True
@@ -43,9 +39,7 @@ def svg_lines_are_equal(line_1: str, line_2: str) -> bool:
     elif len(line_1) != len(line_2):
         return False
     # svg string analysis.
-    if lines_share_an_ignore_string(
-        line_1, line_2, ['<dc:date>', 'clip-path', 'clipPath', 'path id', '<dc:title>']
-    ):
+    if lines_share_an_ignore_string(line_1, line_2, ['<dc:date>', 'clip-path', 'clipPath', 'path id', '<dc:title>']):
         return True
     else:
         # Walk the lines comparing characters, ignoring hashed addresses.
@@ -119,9 +113,7 @@ def compare_txt_files(expected_file: str, actual_file: str) -> bool:
     return True
 
 
-def verify_output_file_matches_expected(
-    file_created: str, actual_output_dir: str, expected_output_dir: str
-) -> None:
+def verify_output_file_matches_expected(file_created: str, actual_output_dir: str, expected_output_dir: str) -> None:
     """
     Verifies that the actual output file matches what's expected.
     """
@@ -145,9 +137,7 @@ def verify_output_file_matches_expected(
         )
     # Verify both files are equal.
     if created_ext == '.svg':
-        svg_files_are_equal = compare_svg_files(
-            actual_dir_body_ext, expected_dir_body_ext
-        )
+        svg_files_are_equal = compare_svg_files(actual_dir_body_ext, expected_dir_body_ext)
         if not svg_files_are_equal:
             lt.error_and_raise(
                 ValueError,
@@ -156,14 +146,9 @@ def verify_output_file_matches_expected(
                 '    expected_dir_body_ext = ' + str(expected_dir_body_ext),
             )
     elif created_ext == '.png':
-        png_files_are_equal = compare_actual_expected_images(
-            actual_dir_body_ext, expected_dir_body_ext
-        )
+        png_files_are_equal = compare_actual_expected_images(actual_dir_body_ext, expected_dir_body_ext)
         if png_files_are_equal is not None:
-            lt.error_and_raise(
-                ValueError,
-                'In verify_output_file_matches_expected(), ' + png_files_are_equal,
-            )
+            lt.error_and_raise(ValueError, 'In verify_output_file_matches_expected(), ' + png_files_are_equal)
 
     else:
         files_are_equal = compare_txt_files(actual_dir_body_ext, expected_dir_body_ext)
@@ -183,9 +168,7 @@ def verify_output_files_match_expected(
     Verifies that all of the output files match what's expected.
     """
     for file_created in files_created:
-        verify_output_file_matches_expected(
-            file_created, actual_output_dir, expected_output_dir
-        )
+        verify_output_file_matches_expected(file_created, actual_output_dir, expected_output_dir)
 
 
 def show_save_and_check_figure(
@@ -208,14 +191,10 @@ def show_save_and_check_figure(
             z_limits=fig_record.z_limits,
         )
     # Save.
-    files_created = fig_record.save(
-        actual_output_dir, format='png', dpi=dpi
-    )  # Filename inferred from figure title.
+    files_created = fig_record.save(actual_output_dir, format='png', dpi=dpi)  # Filename inferred from figure title.
     # Check.
     if verify:
-        verify_output_files_match_expected(
-            files_created, actual_output_dir, expected_output_dir
-        )
+        verify_output_files_match_expected(files_created, actual_output_dir, expected_output_dir)
 
 
 def save_and_check_image(
@@ -237,26 +216,20 @@ def save_and_check_image(
     files_created = [file_created]
     # Check.
     if verify:
-        verify_output_files_match_expected(
-            files_created, actual_output_dir, expected_output_dir
-        )
+        verify_output_files_match_expected(files_created, actual_output_dir, expected_output_dir)
 
 
-def compare_actual_expected_images(actual_location: str, expected_location: str):
-    return mplt.compare_images(expected_location, actual_location, 0.2)
+def compare_actual_expected_images(actual_location: str, expected_location: str, tolerance=0.2):
+    return mplt.compare_images(expected_location, actual_location, tolerance)
 
 
-def load_solar_field_partition(
-    heliostat_names: list, partitioned_csv_file_name: str
-) -> sf.SolarField:
+def load_solar_field_partition(heliostat_names: list, partitioned_csv_file_name: str) -> sf.SolarField:
     import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
     import opencsp.common.lib.geo.lon_lat_nsttf as lln
     import csv
 
     # Load the CSV into a dictionary
-    with open(
-        dpft.sandia_nsttf_test_heliostats_origin_file(), 'r', newline=''
-    ) as infile:
+    with open(dpft.sandia_nsttf_test_heliostats_origin_file(), 'r', newline='') as infile:
         reader = csv.reader(infile)
         dict = {rows[0]: rows[0:-1] for rows in reader}
 

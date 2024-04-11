@@ -6,9 +6,7 @@ from typing import Iterator, Union
 import sys
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
-    SpotAnalysisOperable,
-)
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.file_tools as ft
@@ -69,25 +67,19 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
         elif len(self.cummulative_processed_results) == 0:
             return 0
         else:
-            return sys.getsizeof(self.cummulative_processed_results[0]) * len(
-                self.cummulative_processed_results
-            )
+            return sys.getsizeof(self.cummulative_processed_results[0]) * len(self.cummulative_processed_results)
 
     def __del__(self):
         # delete cached numpy files
         if ft.directory_exists(self._get_tmp_path()):
-            ft.delete_files_in_directory(
-                self._get_tmp_path(), "*.npy", error_on_dir_not_exists=False
-            )
+            ft.delete_files_in_directory(self._get_tmp_path(), "*.npy", error_on_dir_not_exists=False)
             if ft.directory_is_empty(self._get_tmp_path()):
                 os.rmdir(self._get_tmp_path())
 
         # delete output png files
         if self._my_tmp_dir != None:
             if self._clear_tmp_on_deconstruct:
-                ft.delete_files_in_directory(
-                    self._my_tmp_dir, "*.png", error_on_dir_not_exists=False
-                )
+                ft.delete_files_in_directory(self._my_tmp_dir, "*.png", error_on_dir_not_exists=False)
                 if ft.directory_is_empty(self._my_tmp_dir):
                     os.rmdir(self._my_tmp_dir)
             self._my_tmp_dir = None
@@ -111,12 +103,8 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
         """The input operables that were given to this instance before it did
         any image processing. None if the input wasn't a list or image processor
         type."""
-        if isinstance(
-            self._original_operables, AbstractSpotAnalysisImagesProcessorLeger
-        ):
-            predecessor: AbstractSpotAnalysisImagesProcessorLeger = (
-                self._original_operables
-            )
+        if isinstance(self._original_operables, AbstractSpotAnalysisImagesProcessorLeger):
+            predecessor: AbstractSpotAnalysisImagesProcessorLeger = self._original_operables
             if predecessor.finished:
                 return predecessor.all_results
         elif isinstance(self._original_operables, list):
@@ -151,9 +139,7 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
     def assign_inputs(
         self,
         operables: Union[
-            'AbstractSpotAnalysisImagesProcessorLeger',
-            list[SpotAnalysisOperable],
-            Iterator[SpotAnalysisOperable],
+            'AbstractSpotAnalysisImagesProcessorLeger', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
         ],
     ):
         """Register the input operables to be processed either with the run() method, or as an iterator."""
@@ -164,10 +150,7 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
         self.finished_processing = False
 
     def initialize_cummulative_processed_results(self):
-        if (
-            self.cummulative_processed_results != None
-            and len(self.cummulative_processed_results) > 0
-        ):
+        if self.cummulative_processed_results != None and len(self.cummulative_processed_results) > 0:
             lt.error_and_raise(
                 RuntimeError,
                 f"Programmer error: initialized cummulative_processed_results at incorrect time. There are current {len(self.cummulative_processed_results)} in-flight results when there should be 0.",
@@ -207,9 +190,7 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
     def _get_save_dir(self):
         """Finds a temporary directory to save to for the processed output images from this instance."""
         if self._my_tmp_dir == None:
-            scratch_dir = os.path.join(
-                orp.opencsp_scratch_dir(), "spot_analysis_image_processing"
-            )
+            scratch_dir = os.path.join(orp.opencsp_scratch_dir(), "spot_analysis_image_processing")
             i = 0
             while True:
                 dirname = self.name + str(i)
@@ -234,9 +215,7 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
                 Where to save the image.
         """
         # get the path
-        path_name_ext = os.path.join(
-            self._get_save_dir(), f"{self._tmp_images_saved}.npy"
-        )
+        path_name_ext = os.path.join(self._get_save_dir(), f"{self._tmp_images_saved}.npy")
         self._tmp_images_saved += 1
         return path_name_ext
 
@@ -251,8 +230,7 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
         if self.all_processed_results != None:
             return len(self.all_processed_results)
         lt.error_and_raise(
-            RuntimeError,
-            "Can't get the length of this instance until all input images have been processed.",
+            RuntimeError, "Can't get the length of this instance until all input images have been processed."
         )
 
     def save_processed_images(self, dir: str, name_prefix: str = None, ext="jpg"):
@@ -266,18 +244,9 @@ class AbstractSpotAnalysisImagesProcessorLeger(ABC, Sized):
         for idx, operable in enumerate(self.all_processed_results):
             self._save_image(operable.primary_image, [idx], dir, name_prefix, ext)
 
-    def _save_image(
-        self,
-        im: CacheableImage,
-        idx_list: list[int],
-        dir: str,
-        name_prefix: str = None,
-        ext="jpg",
-    ):
+    def _save_image(self, im: CacheableImage, idx_list: list[int], dir: str, name_prefix: str = None, ext="jpg"):
         idx = idx_list[0]
-        image_name = (
-            "" if name_prefix == None else f"{name_prefix}_"
-        ) + f"SA_preprocess_{self.name}{idx}"
+        image_name = ("" if name_prefix == None else f"{name_prefix}_") + f"SA_preprocess_{self.name}{idx}"
         image_path_name_ext = os.path.join(dir, image_name + "." + ext)
         lt.debug("Saving SpotAnalysis processed image to " + image_path_name_ext)
         im.to_image().save(image_path_name_ext)

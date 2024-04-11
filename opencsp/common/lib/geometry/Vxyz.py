@@ -1,5 +1,6 @@
 """Three dimensional vector representation
 """
+
 from typing import Callable
 
 import numpy as np
@@ -28,9 +29,7 @@ class Vxyz:
             if np.ndim(data) not in [1, 2]:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
             elif np.ndim(data) == 2 and data.shape[0] != 3:
-                raise ValueError(
-                    'First dimension of 2-dimensional data must be length 3 if ndarray.'
-                )
+                raise ValueError('First dimension of 2-dimensional data must be length 3 if ndarray.')
         elif len(data) != 3:
             raise ValueError('Input data must have length 3.')
 
@@ -307,9 +306,7 @@ class Vxyz:
         # Check inputs
         self._check_is_Vxyz(V)
         if not (len(self) == 1 or len(V) == 1 or len(self) == len(V)):
-            raise ValueError(
-                'Operands must be same same length, or at least one must have length 1.'
-            )
+            raise ValueError('Operands must be same same length, or at least one must have length 1.')
 
         # Calculate
         return self._from_data(np.cross(self._data.T, V.data.T).T)

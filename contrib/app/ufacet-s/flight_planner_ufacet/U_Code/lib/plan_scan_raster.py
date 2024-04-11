@@ -14,14 +14,10 @@ def construct_raster_scan(solar_field, raster_scan_parameter_file):
     print('Constructing raster scan...')
 
     # Fetch scan parameters.
-    raster_scan_parameters = psrp.construct_raster_scan_parameters(
-        raster_scan_parameter_file
-    )
+    raster_scan_parameters = psrp.construct_raster_scan_parameters(raster_scan_parameter_file)
 
     # Construct the scan.
-    scan = sf.construct_solar_field_heliostat_survey_scan(
-        solar_field, raster_scan_parameters
-    )
+    scan = sf.construct_solar_field_heliostat_survey_scan(solar_field, raster_scan_parameters)
 
     # Return.
     # Return the scan parameters, because they include information for converting the scan into a flight.

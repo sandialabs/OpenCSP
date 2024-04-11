@@ -35,9 +35,7 @@ if __name__ == "__main__":
     # Load solar field data.
     file_field = './data/Solar_Field.csv'
     file_centroids_offsets = './data/Facets_Centroids.csv'
-    solar_field = SolarField(
-        file_field=file_field, file_centroids_offsets=file_centroids_offsets
-    )
+    solar_field = SolarField(file_field=file_field, file_centroids_offsets=file_centroids_offsets)
 
     # Define tracking time.
     aimpoint = [60.0, 8.8, 28.9]
@@ -103,28 +101,20 @@ if __name__ == "__main__":
 
     # Control parameters.
     scan_parameters = {}
-    scan_parameters[
-        'locale'
-    ] = 'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters['locale'] = (
+        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    )
     scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
     scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters[
-        'section_plane_tolerance'
-    ] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters[
-        'p_margin'
-    ] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters[
-        'altitude_margin'
-    ] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters[
-        'maximum_safe_altitude'
-    ] = 90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
-    scan_parameters[
-        'maximum_target_lookback'
-    ] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
+    scan_parameters['maximum_safe_altitude'] = (
+        90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
+    )
+    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
     scan_parameters['gaze_tolerance'] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
@@ -136,22 +126,10 @@ if __name__ == "__main__":
     E05_x = 43.9  # m.
     E06_x = 53.5  # m.
     E07_x = 63.4  # m.
-    segment_xy_E04 = [
-        [E04_x, R05_y],
-        [E04_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E05 = [
-        [E05_x, R05_y],
-        [E05_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E06 = [
-        [E06_x, R05_y],
-        [E06_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
-    segment_xy_E07 = [
-        [E07_x, R05_y],
-        [E07_x, R14_y],
-    ]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E04 = [[E04_x, R05_y], [E04_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E05 = [[E05_x, R05_y], [E05_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E06 = [[E06_x, R05_y], [E06_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
+    segment_xy_E07 = [[E07_x, R05_y], [E07_x, R14_y]]  # ?? SCAFFOLDING RCB -- REPLACE WITH FLIGHT PLAN
 
     # Construct individual scan passes.
     # # pass_E04 = sp.ScanPass(solar_field, segment_xy_E04, scan_parameters)  # ?? SCAFFOLDING RCB -- CRASHES
@@ -170,9 +148,7 @@ if __name__ == "__main__":
 
     # Write the flight plan file.
     # Output directory.
-    output_path = os.path.join(
-        '..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M'))
-    )
+    output_path = os.path.join('..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M')))
     if not (os.path.exists(output_path)):
         os.makedirs(output_path)
     flight_plan.save_to_lichi_csv(output_path, elevation_offset)

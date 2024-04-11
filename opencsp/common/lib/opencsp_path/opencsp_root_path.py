@@ -38,9 +38,7 @@ def opencsp_data_example_dir():
 
 def opencsp_data_test_dir():
     """This method deprecated. For most tests you can find the data in the neighboring \"data\" directory, inside the \"test\" directory."""
-    lt.warn(
-        "Deprecation warning (opencsp_data_test_dir): " + opencsp_data_test_dir.__doc__
-    )
+    lt.warn("Deprecation warning (opencsp_data_test_dir): " + opencsp_data_test_dir.__doc__)
 
 
 def opencsp_scratch_dir(project_dir=None) -> str:
@@ -53,53 +51,31 @@ def opencsp_scratch_dir(project_dir=None) -> str:
     shared directory between multiple computers (aka network file system)."""
     scratch_dir: str = opencsp_settings["opencsp_root_path"]["scratch_dir"]
     if scratch_dir != None and os.path.exists(scratch_dir):
-        actual_scratch_dir = os.path.join(
-            scratch_dir, opencsp_settings["opencsp_root_path"]["scratch_name"]
-        )
-        return (
-            actual_scratch_dir
-            if project_dir == None
-            else os.path.join(actual_scratch_dir, project_dir)
-        )
+        actual_scratch_dir = os.path.join(scratch_dir, opencsp_settings["opencsp_root_path"]["scratch_name"])
+        return actual_scratch_dir if project_dir == None else os.path.join(actual_scratch_dir, project_dir)
 
     if os.name == "nt":
         # Check for a scratch mirror directory on the user's computer.
         actual_scratch_dir = os.path.join(
-            opencsp_code_dir(),
-            '..',
-            opencsp_settings["opencsp_root_path"]["scratch_name"],
+            opencsp_code_dir(), '..', opencsp_settings["opencsp_root_path"]["scratch_name"]
         )
         actual_scratch_dir = (
-            actual_scratch_dir
-            if project_dir == None
-            else os.path.join(actual_scratch_dir, project_dir)
+            actual_scratch_dir if project_dir == None else os.path.join(actual_scratch_dir, project_dir)
         )
         if os.path.isdir(actual_scratch_dir):
             return actual_scratch_dir
 
         # This is a directory on windows that we should be able to write to
         actual_scratch_dir = os.path.join(
-            os.path.expandvars("%LOCALAPPDATA%"),
-            "opencsp",
-            opencsp_settings["opencsp_root_path"]["scratch_name"],
+            os.path.expandvars("%LOCALAPPDATA%"), "opencsp", opencsp_settings["opencsp_root_path"]["scratch_name"]
         )
-        return (
-            actual_scratch_dir
-            if project_dir == None
-            else os.path.join(actual_scratch_dir, project_dir)
-        )
+        return actual_scratch_dir if project_dir == None else os.path.join(actual_scratch_dir, project_dir)
     else:
         # On the cluster nodes, we should be writing to the scratch file system for multi-node programs.
         # Aka don't do this:
         # return os.path.join(os.path.expanduser('~'), ".opencsp/cache")
-        actual_scratch_dir = (
-            f"/{opencsp_settings['opencsp_root_path']['scratch_name']}/"
-        )
-        return (
-            actual_scratch_dir
-            if project_dir == None
-            else os.path.join(actual_scratch_dir, project_dir)
-        )
+        actual_scratch_dir = f"/{opencsp_settings['opencsp_root_path']['scratch_name']}/"
+        return actual_scratch_dir if project_dir == None else os.path.join(actual_scratch_dir, project_dir)
 
 
 def opencsp_cache_dir():
@@ -132,9 +108,7 @@ def _opencsp_settings_dirs():
         # ret.append(os.path.join(os.path.expandvars("%LOCALAPPDATA%"), "opencsp", "settings"))
         # ret.append(os.path.join(os.path.expandvars("%APPDATA%"), "opencsp", "settings"))
     else:
-        ret.append(
-            os.path.join(os.path.expanduser("~"), ".config", "opencsp", "settings")
-        )
+        ret.append(os.path.join(os.path.expanduser("~"), ".config", "opencsp", "settings"))
 
     if "OPENCSP_SETTINGS_DIRS" in os.environ:
         if os.environ["OPENCSP_SETTINGS_DIRS"] == "None":
@@ -150,7 +124,4 @@ def _opencsp_settings_dirs():
 
 def relative_opencsp_data_test_dir():
     """This method deprecated. For most tests you can find the data in the neighboring \"data\" directory, inside the \"test\" directory."""
-    lt.warn(
-        "Deprecation warning (relative_opencsp_data_test_dir): "
-        + relative_opencsp_data_test_dir.__doc__
-    )
+    lt.warn("Deprecation warning (relative_opencsp_data_test_dir): " + relative_opencsp_data_test_dir.__doc__)

@@ -15,12 +15,7 @@ def _file_or_alternate_existing_file(path_name_ext: str, alternates: list[str]):
     return None
 
 
-def wait_on_files(
-    files: list[str],
-    timeout: float = 1000,
-    alternates: dict[str, list[str]] = None,
-    msg: str = None,
-):
+def wait_on_files(files: list[str], timeout: float = 1000, alternates: dict[str, list[str]] = None, msg: str = None):
     """Waits up to 'timeout' seconds for all the files to exist.
 
     Note: there is no guarantee that all files exist when this function completes.

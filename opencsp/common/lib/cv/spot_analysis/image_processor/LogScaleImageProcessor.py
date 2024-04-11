@@ -2,23 +2,14 @@ import dataclasses
 import numpy as np
 
 import opencsp.common.lib.tool.image_tools as it
-from opencsp.common.lib.cv.spot_analysis.image_processor import (
-    AbstractSpotAnalysisImagesProcessor,
-)
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import (
-    SpotAnalysisOperable,
-)
+from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImagesProcessor
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class LogScaleImageProcessor(AbstractSpotAnalysisImagesProcessor):
     """Converts the input images into a log scale."""
 
-    def __init__(
-        self,
-        max_value_input=0,
-        cummulative_max_value_input=False,
-        max_value_output=65535,
-    ):
+    def __init__(self, max_value_input=0, cummulative_max_value_input=False, max_value_output=65535):
         """A video processor that adjusts the scale of input images to a log scale.
 
         Args::
@@ -46,9 +37,7 @@ class LogScaleImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.cummulative_max_value_input = cummulative_max_value_input
         self.max_value_output = max_value_output
 
-    def _execute(
-        self, operable: SpotAnalysisOperable, is_last: bool
-    ) -> list[np.ndarray]:
+    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[np.ndarray]:
         primary_image: np.ndarray = operable.primary_image.nparray
         current_max_value_input = operable.max_popf
 
@@ -58,9 +47,7 @@ class LogScaleImageProcessor(AbstractSpotAnalysisImagesProcessor):
                 if operable.population_statistics != None:
                     self.max_value_input = current_max_value_input
                 else:
-                    self.max_value_input = np.max(
-                        [self.max_value_input, current_max_value_input]
-                    )
+                    self.max_value_input = np.max([self.max_value_input, current_max_value_input])
             else:
                 self.max_value_input = current_max_value_input
 
@@ -74,9 +61,7 @@ class LogScaleImageProcessor(AbstractSpotAnalysisImagesProcessor):
         # log and rescale the image
         log_image = np.log(primary_image + 1)
         log_max = np.max(log_image)
-        target_max_val = self.max_value_output * (
-            current_max_value_input / self.max_value_input
-        )
+        target_max_val = self.max_value_output * (current_max_value_input / self.max_value_input)
         scalar = target_max_val / log_max
         processed_image = scalar * log_image
 

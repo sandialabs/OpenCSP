@@ -35,20 +35,10 @@ def define_scan_NSTTF_half_and_half(solar_field_short_name):
     solar_field_spec = {}
     solar_field_spec['name'] = 'Sandia NSTTF'
     solar_field_spec['short_name'] = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat'] = (
-        lln.LON_NSTTF_ORIGIN,
-        lln.LAT_NSTTF_ORIGIN,
-    )
-    solar_field_spec['field_origin_lon_lat'] = (
-        lln.LON_NSTTF_ORIGIN,
-        lln.LAT_NSTTF_ORIGIN,
-    )
-    solar_field_spec[
-        'field_heliostat_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
-    solar_field_spec[
-        'field_facet_centroids_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
+    solar_field_spec['field_origin_lon_lat'] = (lln.LON_NSTTF_ORIGIN, lln.LAT_NSTTF_ORIGIN)
+    solar_field_spec['field_origin_lon_lat'] = (lln.LON_NSTTF_ORIGIN, lln.LAT_NSTTF_ORIGIN)
+    solar_field_spec['field_heliostat_file'] = '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
+    solar_field_spec['field_facet_centroids_file'] = '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
 
     # Define UFACET control flags.
     ufacet_control_parameters = {}
@@ -56,15 +46,11 @@ def define_scan_NSTTF_half_and_half(solar_field_short_name):
     # Seed points.
     ufacet_curve_keys_x = np.linspace(-131.7, 131.7, 28)
     ufacet_curve_keys_y = [136.9] * len(ufacet_curve_keys_x)
-    ufacet_curve_key_xy_list = [
-        [key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)
-    ]
+    ufacet_curve_key_xy_list = [[key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)]
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
     # Half-and-Half
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 18.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = 18.0  # m.  Maximum altitude, roughly AGL, including slope effects.
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(
@@ -323,14 +309,7 @@ def define_scan_NSTTF_half_and_half(solar_field_short_name):
     up_azelhnames = None
 
     # Return.
-    return (
-        solar_field_spec,
-        ufacet_control_parameters,
-        aimpoint_xyz,
-        when_ymdhmsz,
-        synch_azelhnames,
-        up_azelhnames,
-    )
+    return (solar_field_spec, ufacet_control_parameters, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames)
 
 
 def define_scan_NSTTF_demo(solar_field_short_name):
@@ -343,20 +322,10 @@ def define_scan_NSTTF_demo(solar_field_short_name):
     solar_field_spec = {}
     solar_field_spec['name'] = 'Sandia NSTTF'
     solar_field_spec['short_name'] = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat'] = (
-        lln.LON_NSTTF_ORIGIN,
-        lln.LAT_NSTTF_ORIGIN,
-    )
-    solar_field_spec['field_origin_lon_lat'] = (
-        lln.LON_NSTTF_ORIGIN,
-        lln.LAT_NSTTF_ORIGIN,
-    )
-    solar_field_spec[
-        'field_heliostat_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
-    solar_field_spec[
-        'field_facet_centroids_file'
-    ] = '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
+    solar_field_spec['field_origin_lon_lat'] = (lln.LON_NSTTF_ORIGIN, lln.LAT_NSTTF_ORIGIN)
+    solar_field_spec['field_origin_lon_lat'] = (lln.LON_NSTTF_ORIGIN, lln.LAT_NSTTF_ORIGIN)
+    solar_field_spec['field_heliostat_file'] = '../U_Code_data/NSTTF/NSTTF_Heliostats_origin_at_torque_tube.csv'
+    solar_field_spec['field_facet_centroids_file'] = '../U_Code_data/NSTTF/NSTTF_Facet_Centroids.csv'
 
     # Define UFACET control flags.
     ufacet_control_parameters = {}
@@ -364,14 +333,10 @@ def define_scan_NSTTF_demo(solar_field_short_name):
     # Seed points.
     ufacet_curve_keys_x = np.linspace(-131.7, 131.7, 28)
     ufacet_curve_keys_y = [136.9] * len(ufacet_curve_keys_x)
-    ufacet_curve_key_xy_list = [
-        [key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)
-    ]
+    ufacet_curve_key_xy_list = [[key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)]
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(
@@ -395,11 +360,7 @@ def define_scan_NSTTF_demo(solar_field_short_name):
     # Demo.
     synch_az = np.deg2rad(205)
     synch_el = np.deg2rad(30)
-    synch_azelhnames = [
-        synch_az,
-        synch_el,
-        ['8W3', '8W4', '8W5', '7W3', '7W4', '6W5', '6W3', '6W4', '6W5'],
-    ]
+    synch_azelhnames = [synch_az, synch_el, ['8W3', '8W4', '8W5', '7W3', '7W4', '6W5', '6W3', '6W4', '6W5']]
 
     # Define upward-facing heliostat orientation.
     # Demo.
@@ -408,40 +369,23 @@ def define_scan_NSTTF_demo(solar_field_short_name):
     up_azelhnames = [up_az, up_el, ['7E6', '12W7']]
 
     # Return.
-    return (
-        solar_field_spec,
-        ufacet_control_parameters,
-        aimpoint_xyz,
-        when_ymdhmsz,
-        synch_azelhnames,
-        up_azelhnames,
-    )
+    return (solar_field_spec, ufacet_control_parameters, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames)
 
 
 def define_scan_NSTTF_full_field(solar_field_short_name):
     """
     Simple case where the full field is set to tracking a single aim point.
     """
-    basedir = os.path.join(
-        root_path.opencsp.dir(), INSERT_CORRECT_DIRECTORY_PATH_HERE
-    )  # TODO: Fill-in correct path.
+    basedir = os.path.join(root_path.opencsp.dir(), INSERT_CORRECT_DIRECTORY_PATH_HERE)  # TODO: Fill-in correct path.
 
     # Solar field spec.
     solar_field_spec = {}
     solar_field_spec['name'] = 'Sandia NSTTF'
     solar_field_spec['short_name'] = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat'] = (
-        lln.LON_NSTTF_ORIGIN,
-        lln.LAT_NSTTF_ORIGIN,
-    )
-    solar_field_spec['field_origin_lon_lat'] = (
-        lln.LON_NSTTF_ORIGIN,
-        lln.LAT_NSTTF_ORIGIN,
-    )
+    solar_field_spec['field_origin_lon_lat'] = (lln.LON_NSTTF_ORIGIN, lln.LAT_NSTTF_ORIGIN)
+    solar_field_spec['field_origin_lon_lat'] = (lln.LON_NSTTF_ORIGIN, lln.LAT_NSTTF_ORIGIN)
     solar_field_spec['field_heliostat_file'] = os.path.join(basedir, 'Solar_Field.csv')
-    solar_field_spec['field_facet_centroids_file'] = os.path.join(
-        basedir, 'Facets_Centroids.csv'
-    )
+    solar_field_spec['field_facet_centroids_file'] = os.path.join(basedir, 'Facets_Centroids.csv')
 
     # Define UFACET control flags.
     ufacet_control_parameters = {}
@@ -449,14 +393,10 @@ def define_scan_NSTTF_full_field(solar_field_short_name):
     # Seed points.
     ufacet_curve_keys_x = np.linspace(-131.7, 131.7, 28)
     ufacet_curve_keys_y = [136.9] * len(ufacet_curve_keys_x)
-    ufacet_curve_key_xy_list = [
-        [key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)
-    ]
+    ufacet_curve_key_xy_list = [[key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)]
     ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
     # Maximum altitude.
-    ufacet_control_parameters[
-        'maximum_altitude'
-    ] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters['maximum_altitude'] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
     # Gaze control.
     ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
     ufacet_control_parameters['delta_eta'] = np.deg2rad(
@@ -490,14 +430,7 @@ def define_scan_NSTTF_full_field(solar_field_short_name):
     up_azelhnames = None
 
     # Return.
-    return (
-        solar_field_spec,
-        ufacet_control_parameters,
-        aimpoint_xyz,
-        when_ymdhmsz,
-        synch_azelhnames,
-        up_azelhnames,
-    )
+    return (solar_field_spec, ufacet_control_parameters, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames)
 
 
 def define_scan_NSTTF(solar_field_short_name, nsttf_configuration):

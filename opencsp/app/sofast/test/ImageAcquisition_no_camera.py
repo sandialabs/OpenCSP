@@ -1,4 +1,7 @@
 """Representation of a notional camera for image acquisition"""
+
+from typing import Callable
+
 import numpy as np
 
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
@@ -6,6 +9,8 @@ from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionA
 
 class ImageAcquisition(ImageAcquisitionAbstract):
     def __init__(self):
+        super().__init__()
+
         # Define max saturation value
         self._max_value = 250
 
@@ -23,6 +28,10 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
         # Define exposure_time calibration values
         self._shutter_cal_values = np.arange(1, 100, 1, dtype=float)
+
+    def instance_matches(self, possible_matches: list[ImageAcquisitionAbstract]) -> bool:
+        # allow for unlimited cameras during unit tests
+        return False
 
     def get_frame(self) -> np.ndarray:
         # Return test image
@@ -69,4 +78,13 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return self._shutter_cal_values
 
     def close(self):
-        pass
+        super().close()
+
+
+class IA_No_Calibrate(ImageAcquisition):
+    def __init__(self):
+        super().__init__()
+        self.is_calibrated = False
+
+    def calibrate_exposure(self):
+        self.is_calibrated = True

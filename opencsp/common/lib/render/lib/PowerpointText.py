@@ -7,9 +7,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class PowerpointText(pps.PowerpointShape):
-    _tmp_save_path = os.path.join(
-        orp.opencsp_temporary_dir(), "PowerpointTexts", "texts", "tmp"
-    )
+    _tmp_save_path = os.path.join(orp.opencsp_temporary_dir(), "PowerpointTexts", "texts", "tmp")
 
     def __init__(
         self,
@@ -84,12 +82,7 @@ class PowerpointText(pps.PowerpointShape):
         with open(path_name_ext, "w") as fout:
             fout.write("PowerpointText\n")
             fout.write("v1\n")
-            for v in [
-                self._dims_to_str(self.dims),
-                self._dims_to_str(self.cell_dims),
-                self.is_title,
-                self.has_val(),
-            ]:
+            for v in [self._dims_to_str(self.dims), self._dims_to_str(self.cell_dims), self.is_title, self.has_val()]:
                 fout.write(f"{v}\n")
             fout.write(f"{self.get_val()}")
 
@@ -103,8 +96,7 @@ class PowerpointText(pps.PowerpointShape):
         slines = [line.strip() for line in lines]
         if len(slines) < 2:
             lt.error_and_raise(
-                RuntimeError,
-                f"Error: in PowerpointSlide.from_txt_file(), not enough lines in file {path_name_ext}",
+                RuntimeError, f"Error: in PowerpointSlide.from_txt_file(), not enough lines in file {path_name_ext}"
             )
 
         file_type = slines[0]

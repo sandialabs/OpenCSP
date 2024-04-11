@@ -15,14 +15,7 @@ class ParallelPartitioner:
     Dask.
     """
 
-    def __init__(
-        self,
-        nservers: int,
-        server_idx: int,
-        ncpus: int,
-        cpu_idx: int,
-        npartitions_ceil: int = -1,
-    ):
+    def __init__(self, nservers: int, server_idx: int, ncpus: int, cpu_idx: int, npartitions_ceil: int = -1):
         """Helps portion out data to be excecuted for a single server+cpu instance.
 
         Typical usage is to get all partitioners for all cores with the generator::
@@ -44,17 +37,13 @@ class ParallelPartitioner:
 
         if nservers > 0:
             if server_idx < 0 or server_idx >= nservers:
-                raise ValueError(
-                    f"server_idx {server_idx} is out of range for nservers={nservers}"
-                )
+                raise ValueError(f"server_idx {server_idx} is out of range for nservers={nservers}")
         if ncpus > 0:
             if cpu_idx < 0 or cpu_idx >= ncpus:
                 raise ValueError(f"cpu_idx {cpu_idx} is out of range for ncpus={ncpus}")
 
     @classmethod
-    def get_partitioners(
-        cls, nservers: int, server_idx: int, ncpus: int, npartitions_ceil: int = -1
-    ):
+    def get_partitioners(cls, nservers: int, server_idx: int, ncpus: int, npartitions_ceil: int = -1):
         """Generate partitioners to split data into even chunks for each node and cpu core.
 
         There are some cases where a task can be parallelized across many server nodes
@@ -70,17 +59,10 @@ class ParallelPartitioner:
         Returns:
             - list[ParallelPartitioner]: A list of parallel partitioners, one for each core for the given server_idx.
         """
-        return [
-            cls(nservers, server_idx, ncpus, i, npartitions_ceil) for i in range(ncpus)
-        ]
+        return [cls(nservers, server_idx, ncpus, i, npartitions_ceil) for i in range(ncpus)]
 
     def _get_portion_range(
-        self,
-        count: int,
-        nworkers: int,
-        worker_idx: int,
-        partitions_per_worker: int,
-        npartitions: int = -1,
+        self, count: int, nworkers: int, worker_idx: int, partitions_per_worker: int, npartitions: int = -1
     ):
         if npartitions < 0:
             npartitions = partitions_per_worker * nworkers
@@ -103,16 +85,9 @@ class ParallelPartitioner:
         return rstart, rend
 
     def _get_portion(
-        self,
-        data: list[T],
-        nworkers: int,
-        worker_idx: int,
-        partitions_per_worker: int,
-        npartitions: int = -1,
+        self, data: list[T], nworkers: int, worker_idx: int, partitions_per_worker: int, npartitions: int = -1
     ):
-        rstart, rend = self._get_portion_range(
-            len(data), nworkers, worker_idx, partitions_per_worker, npartitions
-        )
+        rstart, rend = self._get_portion_range(len(data), nworkers, worker_idx, partitions_per_worker, npartitions)
 
         # check range bounds
         if rstart == -1 and rend == -1:
@@ -147,9 +122,7 @@ class ParallelPartitioner:
 
         # check max partitions (server)
         if self.npartitions_ceil > 0:
-            npartitions_per_server = int(
-                max(self.npartitions_ceil / self.nservers, 1.0)
-            )
+            npartitions_per_server = int(max(self.npartitions_ceil / self.nservers, 1.0))
 
         # get the portion of data that this server should operate on
         rstart_serv, rend_serv = self._get_portion_range(
@@ -163,9 +136,7 @@ class ParallelPartitioner:
             return -1, -1
 
         # Get a subselection of the data for this cpu
-        rstart_cpu, rend_cpu = self._get_portion_range(
-            rend_serv - rstart_serv, self.ncpus, self.cpu_idx, 1
-        )
+        rstart_cpu, rend_cpu = self._get_portion_range(rend_serv - rstart_serv, self.ncpus, self.cpu_idx, 1)
         rstart_cpu += rstart_serv
         rend_cpu += rstart_serv
 

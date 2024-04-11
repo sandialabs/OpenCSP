@@ -45,9 +45,7 @@ class AbstractFiducial(ABC):
         fiducial relative to the camera."""
 
     @classmethod
-    def locate_instances(
-        self, img: np.ndarray, anticipated_unit_vector: v3.Vxyz = None
-    ) -> list["AbstractFiducial"]:
+    def locate_instances(self, img: np.ndarray, anticipated_unit_vector: v3.Vxyz = None) -> list["AbstractFiducial"]:
         """For the given input image, find and report any regions that strongly match this fiducial type.
 
         Parameters:

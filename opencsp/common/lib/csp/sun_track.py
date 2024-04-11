@@ -103,9 +103,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 def tracking_surface_normal_xyz(
     heliostat_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Heliostat origin.
     aimpoint_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Reflection aim point.
-    location_lon_lat: list
-    | np.ndarray
-    | tuple,  # (lon,lat) in rad. Solar field origin.
+    location_lon_lat: list | np.ndarray | tuple,  # (lon,lat) in rad. Solar field origin.
     when_ymdhmsz: list | np.ndarray | tuple,
 ):  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
@@ -198,9 +196,7 @@ def tracking_surface_normal_xy(
     Computes heliostat surface normal which tracks the sun to the aimpoint.
     Returns only (x,y) components of the surface normal.
     """
-    normal_xyz = tracking_surface_normal_xyz(
-        heliostat_xyz, aimpoint_xyz, location_lon_lat, when_ymdhmsz
-    )
+    normal_xyz = tracking_surface_normal_xyz(heliostat_xyz, aimpoint_xyz, location_lon_lat, when_ymdhmsz)
     return [normal_xyz[0], normal_xyz[1]]
 
 
@@ -218,9 +214,7 @@ def tracking_nu(
     nu is the angle to the projection of the surface normal onto the (x,y) plane, measured ccw from the x axis.
     """
     # Compute heliostat surface normal which tracks the sun to the aimpoint.
-    n_xy = tracking_surface_normal_xy(
-        heliostat_xyz, aimpoint_xyz, location_lon_lat, when_ymdhmsz
-    )
+    n_xy = tracking_surface_normal_xy(heliostat_xyz, aimpoint_xyz, location_lon_lat, when_ymdhmsz)
 
     # Extract surface normal coordinates.
     n_x = n_xy[0]

@@ -42,12 +42,8 @@ class AttributesManager:
 
     def __init__(self, *parsers: aap.AbstractAttributeParser):
         input_parsers = {parser.__class__: parser for parser in parsers}
-        self.specific_parsers: dict[
-            type[aap.AbstractAttributeParser], aap.AbstractAttributeParser
-        ] = input_parsers
-        self.generic_parsers: dict[
-            type[aap.AbstractAttributeParser], aap.AbstractAttributeParser
-        ] = {}
+        self.specific_parsers: dict[type[aap.AbstractAttributeParser], aap.AbstractAttributeParser] = input_parsers
+        self.generic_parsers: dict[type[aap.AbstractAttributeParser], aap.AbstractAttributeParser] = {}
 
         # add parsers whose instance's haven't been passed in yet
         for parser_class in _registered_parser_classes:
@@ -103,9 +99,7 @@ class AttributesManager:
                 return None
 
         # more than one subclass found, just return the first one
-        lt.debug(
-            f"In AttributesManager.get_parser(): found more than one parser matching parser class {parser_class}"
-        )
+        lt.debug(f"In AttributesManager.get_parser(): found more than one parser matching parser class {parser_class}")
         return subclass_parsers[0]
 
     def set_parser(self, parser: aap.AbstractAttributeParser):
@@ -133,9 +127,7 @@ class AttributesManager:
         for parser in self.parsers:
             if not parser.has_contents():
                 continue
-            contents = parser.append_contents_for_writing(
-                attributes_file_path_name_ext, contents
-            )
+            contents = parser.append_contents_for_writing(attributes_file_path_name_ext, contents)
         return contents
 
     def save(self, attributes_file_path_name_ext: str, overwrite=False):
@@ -164,8 +156,7 @@ class AttributesManager:
             if not overwrite:
                 lt.error_and_raise(
                     FileExistsError,
-                    f"Error in AttributesManager.save(): "
-                    + f"file {attributes_file_path_name_ext} already exists!",
+                    f"Error in AttributesManager.save(): " + f"file {attributes_file_path_name_ext} already exists!",
                 )
 
         # collect the contents to be saved
@@ -192,7 +183,9 @@ class AttributesManager:
         # get the raw string value of the file
         str_contents = ""
         if not ft.file_exists(attributes_file_path_name_ext):
-            errstr = f"Error in AttributesManager.load(): attributes file '{attributes_file_path_name_ext}' does not exist!"
+            errstr = (
+                f"Error in AttributesManager.load(): attributes file '{attributes_file_path_name_ext}' does not exist!"
+            )
             lt.debug(errstr)
             raise FileExistsError(errstr)
         with open(attributes_file_path_name_ext, 'r') as fin:
@@ -202,11 +195,7 @@ class AttributesManager:
         try:
             json_contents: dict[str, any] = json.loads(str_contents)
         except json.decoder.JSONDecodeError:
-            lt.info(
-                f"In AttributesManager.load(): failed to parse attributes file {attributes_file_path_name_ext}"
-            )
+            lt.info(f"In AttributesManager.load(): failed to parse attributes file {attributes_file_path_name_ext}")
             raise
         for parser in self.parsers:
-            json_contents = parser.parse_attributes_file(
-                attributes_file_path_name_ext, str_contents, json_contents
-            )
+            json_contents = parser.parse_attributes_file(attributes_file_path_name_ext, str_contents, json_contents)

@@ -1,21 +1,15 @@
 """Library of functions used to display/save the suite of standard output
 plots after measuring a CSP Mirror/FacetEnsemble.
 """
+
 from dataclasses import dataclass
-import matplotlib.pyplot as plt
 
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlLightPath import (
-    RenderControlLightPath,
-)
+from opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
-from opencsp.common.lib.render_control.RenderControlPointSeq import (
-    RenderControlPointSeq,
-)
-from opencsp.common.lib.render_control.RenderControlRayTrace import (
-    RenderControlRayTrace,
-)
+from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
 from opencsp.common.lib.csp.LightSource import LightSource
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 import opencsp.common.lib.csp.RayTrace as rt
@@ -78,53 +72,31 @@ def standard_output(
     """
     # Determine which plots to create
     plot_reference = optic_ref is not None
-    plot_ray_trace = (
-        (source is not None)
-        and (v_target_center is not None)
-        and (v_target_normal is not None)
-    )
+    plot_ray_trace = (source is not None) and (v_target_center is not None) and (v_target_normal is not None)
 
     # Perform measured optic ray trace
-    ray_trace_meas = ray_trace_scene(
-        optic_meas, source, obj_resolution=vis_options.ray_trace_optic_res
-    )
+    ray_trace_meas = ray_trace_scene(optic_meas, source, obj_resolution=vis_options.ray_trace_optic_res)
     ray_pts_meas = rt.plane_intersect(ray_trace_meas, v_target_center, v_target_normal)
     image_meas, xv_meas, yv_meas = rt.histogram_image(
-        bin_res=vis_options.hist_bin_res,
-        extent=vis_options.hist_extent,
-        pts=ray_pts_meas,
+        bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_meas
     )
-    ee_meas, ws_meas = rt.ensquared_energy(
-        ray_pts_meas, vis_options.ensquared_energy_max_semi_width
-    )
+    ee_meas, ws_meas = rt.ensquared_energy(ray_pts_meas, vis_options.ensquared_energy_max_semi_width)
 
     # Perform reference optic ray trace
     if plot_reference:
-        ray_trace_ref = ray_trace_scene(
-            optic_ref, source, obj_resolution=vis_options.ray_trace_optic_res
-        )
-        ray_pts_ref = rt.plane_intersect(
-            ray_trace_ref, v_target_center, v_target_normal
-        )
+        ray_trace_ref = ray_trace_scene(optic_ref, source, obj_resolution=vis_options.ray_trace_optic_res)
+        ray_pts_ref = rt.plane_intersect(ray_trace_ref, v_target_center, v_target_normal)
         image_ref, xv_ref, yv_ref = rt.histogram_image(
-            bin_res=vis_options.hist_bin_res,
-            extent=vis_options.hist_extent,
-            pts=ray_pts_ref,
+            bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_ref
         )
-        ee_ref, ws_ref = rt.ensquared_energy(
-            ray_pts_ref, vis_options.ensquared_energy_max_semi_width
-        )
+        ee_ref, ws_ref = rt.ensquared_energy(ray_pts_ref, vis_options.ensquared_energy_max_semi_width)
 
     # Set up figure control objects for 3d plots
     fig_control = RenderControlFigure(tile_array=(4, 2), tile_square=True)
     axis_control = rca.meters()
     point_styles = RenderControlPointSeq(linestyle='--', color='k', markersize=0)
-    mirror_control = RenderControlMirror(
-        surface_normals=True, norm_res=1, point_styles=point_styles
-    )
-    light_path_control = RenderControlLightPath(
-        current_length=vis_options.ray_trace_plot_ray_length
-    )
+    mirror_control = RenderControlMirror(surface_normals=True, norm_res=1, point_styles=point_styles)
+    light_path_control = RenderControlLightPath(current_length=vis_options.ray_trace_plot_ray_length)
     ray_trace_control = RenderControlRayTrace(light_path_control=light_path_control)
 
     # Plot measured slope maps
@@ -179,10 +151,7 @@ def standard_output(
     # Plot measured curvature maps
     fig_rec = fm.setup_figure(fig_control, axis_control, name='Curvature X')
     optic_meas.plot_orthorectified_curvature(
-        vis_options.slope_map_resolution,
-        type_='x',
-        clim=vis_options.curvature_clim,
-        axis=fig_rec.axis,
+        vis_options.slope_map_resolution, type_='x', clim=vis_options.curvature_clim, axis=fig_rec.axis
     )
     if vis_options.to_save:
         fig_rec.save(
@@ -194,10 +163,7 @@ def standard_output(
 
     fig_rec = fm.setup_figure(fig_control, axis_control, name='Curvature Y')
     optic_meas.plot_orthorectified_curvature(
-        vis_options.slope_map_resolution,
-        type_='y',
-        clim=vis_options.curvature_clim,
-        axis=fig_rec.axis,
+        vis_options.slope_map_resolution, type_='y', clim=vis_options.curvature_clim, axis=fig_rec.axis
     )
     if vis_options.to_save:
         fig_rec.save(
@@ -262,9 +228,7 @@ def standard_output(
 
     if plot_reference and plot_ray_trace:
         # Draw reference ensemble and traced rays
-        fig_rec = fm.setup_figure_for_3d_data(
-            fig_control, axis_control, name='Ray Trace'
-        )
+        fig_rec = fm.setup_figure_for_3d_data(fig_control, axis_control, name='Ray Trace')
         if len(ray_trace_ref.light_paths) < 100:  # Only plot few rays
             ray_trace_ref.draw(fig_rec.view, ray_trace_control)
         optic_ref.draw(fig_rec.view, mirror_control)
@@ -278,14 +242,8 @@ def standard_output(
             )
 
         # Draw reference optic sun image on target
-        fig_rec = fm.setup_figure(
-            fig_control, axis_control, name='Reference Ray Trace Image'
-        )
-        fig_rec.axis.imshow(
-            image_ref,
-            cmap='jet',
-            extent=(xv_ref.min(), xv_ref.max(), yv_ref.min(), yv_ref.max()),
-        )
+        fig_rec = fm.setup_figure(fig_control, axis_control, name='Reference Ray Trace Image')
+        fig_rec.axis.imshow(image_ref, cmap='jet', extent=(xv_ref.min(), xv_ref.max(), yv_ref.min(), yv_ref.max()))
         if vis_options.to_save:
             fig_rec.save(
                 vis_options.output_dir,
@@ -296,14 +254,8 @@ def standard_output(
 
     # Draw measured optic sun image on target
     if plot_ray_trace:
-        fig_rec = fm.setup_figure(
-            fig_control, axis_control, name='Measured Ray Trace Image'
-        )
-        fig_rec.axis.imshow(
-            image_meas,
-            cmap='jet',
-            extent=(xv_meas.min(), xv_meas.max(), yv_meas.min(), yv_meas.max()),
-        )
+        fig_rec = fm.setup_figure(fig_control, axis_control, name='Measured Ray Trace Image')
+        fig_rec.axis.imshow(image_meas, cmap='jet', extent=(xv_meas.min(), xv_meas.max(), yv_meas.min(), yv_meas.max()))
         if vis_options.to_save:
             fig_rec.save(
                 vis_options.output_dir,
@@ -315,9 +267,7 @@ def standard_output(
         # Draw ensquared energy plot
         fig_rec = fm.setup_figure(fig_control, name='Ensquared Energy')
         if plot_reference:
-            fig_rec.axis.plot(
-                ws_ref, ee_ref, label='Reference', color='k', linestyle='--'
-            )
+            fig_rec.axis.plot(ws_ref, ee_ref, label='Reference', color='k', linestyle='--')
         fig_rec.axis.plot(ws_meas, ee_meas, label='Measured', color='k', linestyle='-')
         fig_rec.axis.legend()
         fig_rec.axis.grid()
@@ -333,9 +283,7 @@ def standard_output(
             )
 
 
-def ray_trace_scene(
-    obj: RayTraceable, source: LightSource, obj_resolution=1
-) -> rt.RayTrace:
+def ray_trace_scene(obj: RayTraceable, source: LightSource, obj_resolution=1) -> rt.RayTrace:
     """Performs a raytrace of a simple scene with a source and an optic.
 
     Parameters

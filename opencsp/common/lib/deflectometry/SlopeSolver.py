@@ -7,14 +7,16 @@ from scipy.optimize import minimize
 from opencsp.common.lib.deflectometry.SlopeSolverDataDebug import SlopeSolverDataDebug
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 import opencsp.common.lib.deflectometry.slope_fitting_2d as sf2
-from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
-from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
+from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
 
 class SlopeSolver:
+    """Class that solves for the surface slopes of optics in deflectometry
+    systems."""
+
     def __init__(
         self,
         v_optic_cam_optic: Vxyz,
@@ -24,9 +26,9 @@ class SlopeSolver:
         v_optic_screen_optic: Vxyz,
         v_align_point_optic: Vxyz,
         dist_optic_screen: float,
-        surface_data: dict,
+        surface: Surface2DAbstract,
         debug: SlopeSolverDataDebug = SlopeSolverDataDebug(),
-    ):
+    ) -> 'SlopeSolver':
         """
         Initializes the slope solving object.
 
@@ -46,62 +48,13 @@ class SlopeSolver:
             Position of align point in optic coordinates.
         dist_optic_screen : float
             Measured optic to screen distance.
-        surface_data : dict
-            Dictionary containing surface data information to use when
-            solving slopes. The data fields depend on the surface fit being
-            performed. The following options are supported:
-
-            1) Parabolic fit
-                surface_type
-                initial_focal_lengths_xy
-                robust_least_squares
-                downsample
-            2) Plano fit
-                surface_type
-                robust_least_squares
-                downsample
-            3) Spherical fit (will raise NotImplementedError)
-                surface_type
-                radius
-                robust_least_squares
-                downsample
-
-            Data field descriptions
-            -----------------------
-                surface_type : str {'parabolic', 'plano', 'spherical'}
-                    The type of surface being characterized
-                initial_focal_lengths_xy : list[tuple(float, float)]
-                    The focal lengths to use as the starting point for the
-                    fitting algorithm.
-                robust_least_squares : bool
-                    To use robust least squares fitting, or just least squares
-                    fitting.
-                downsample : int
-                    The amount to downsample data for surface fitting
-                radius : float
-                    The initial radius to use as the starting point for the
-                    fitting algorithm.
+        surface : Surface2DAbstract
+            2D surface definition class.
         debug: SlopeSolverDataDebug
             SlopeSolverDataDebug object for debugging.
-
         """
-        # Instantiate surface fit object depending on fit type
-        surface_data_copy = surface_data.copy()
-        self.surface_type = surface_data_copy.pop('surface_type')
-        if self.surface_type == 'parabolic':
-            self.surface = Surface2DParabolic(**surface_data_copy)
-        elif self.surface_type == 'plano':
-            self.surface = Surface2DPlano(**surface_data_copy)
-        elif self.surface_type == 'spherical':
-            raise NotImplementedError(
-                'Currently, "spherical" surface type is not implemented.'
-            )
-        else:
-            raise ValueError(
-                f'Given surface_type "{self.surface_type:s}" not supported.'
-            )
-
         # Store inputs in class
+        self.surface = surface
         self.v_optic_cam_optic = v_optic_cam_optic
         self.u_active_pixel_pointing_optic = u_active_pixel_pointing_optic
         self.u_measure_pixel_pointing_optic = u_measure_pixel_pointing_optic
@@ -175,9 +128,7 @@ class SlopeSolver:
                     self._plot_debug_plots(idx1, idx2)
 
             # Calculate measure point intersection point with existing fitting function
-            v_meas_pts_surf_int_optic = self.surface.intersect(
-                u_measure_pixel_pointing_optic, v_optic_cam_optic
-            )
+            v_meas_pts_surf_int_optic = self.surface.intersect(u_measure_pixel_pointing_optic, v_optic_cam_optic)
 
             # Calculate design normal at alignment point
             n_design = self.surface.normal_design_at_align_point()
@@ -199,7 +150,7 @@ class SlopeSolver:
                 v_optic_screen_optic,
                 v_meas_pts_surf_int_optic,
             )
-            out = minimize(sf2.optic_screen_dist_error, np.array([1.0]), args=args)
+            out = minimize(sf2.dist_optic_screen_error, np.array([1.0]), args=args)
             scale = out.x[0]
             v_align_optic_step = (v_optic_cam_optic - v_align_point_optic) * (scale - 1)
 
@@ -229,38 +180,28 @@ class SlopeSolver:
         """
         # Check alignment has been completed
         if self._data.trans_alignment is None:
-            raise ValueError(
-                'Initial alignment needs to be completed before final slope fitting (self.fit_surface).'
-            )
+            raise ValueError('Initial alignment needs to be completed before final slope fitting (self.fit_surface).')
 
         # Apply alignment transforms about alignment point
         trans_shift_1 = TransformXYZ.from_V(-self.surface.v_align_point_optic)
         trans_shift_2 = TransformXYZ.from_V(self.surface.v_align_point_optic)
         trans: TransformXYZ = trans_shift_2 * self._data.trans_alignment * trans_shift_1
 
-        u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate(
-            trans.R
-        )
+        u_active_pixel_pointing_optic = self.u_active_pixel_pointing_optic.rotate(trans.R)
         v_screen_points_facet = trans.apply(self.v_screen_points_facet)
 
         # Calculate intersection points on optic surface
-        v_surf_points_facet = self.surface.intersect(
-            u_active_pixel_pointing_optic, self.surface.v_optic_cam_optic
-        )
+        v_surf_points_facet = self.surface.intersect(u_active_pixel_pointing_optic, self.surface.v_optic_cam_optic)
 
         # Calculate pixel slopes (assuming parabolic surface intersection)
-        slopes_facet_xy = sf2.calc_slopes(
-            v_surf_points_facet, self.surface.v_optic_cam_optic, v_screen_points_facet
-        )
+        slopes_facet_xy = sf2.calc_slopes(v_surf_points_facet, self.surface.v_optic_cam_optic, v_screen_points_facet)
 
         self._data.v_surf_points_facet = v_surf_points_facet
         self._data.slopes_facet_xy = slopes_facet_xy
 
     def _plot_debug_plots(self, idx1: int, idx2: int):
         # Create figure and axes
-        if self.debug.slope_solver_single_plot and isinstance(
-            self.debug.slope_solver_figures, list
-        ):
+        if self.debug.slope_solver_single_plot and isinstance(self.debug.slope_solver_figures, list):
             # Create first figure if needed
             fig = plt.figure()
             axes = fig.add_subplot(projection='3d')

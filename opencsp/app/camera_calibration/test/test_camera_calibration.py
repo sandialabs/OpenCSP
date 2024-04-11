@@ -2,6 +2,7 @@
 
 Change the boolean below to True and run to regenerate all test data
 """
+
 from glob import glob
 import os
 
@@ -10,7 +11,7 @@ import cv2
 
 import opencsp.app.camera_calibration.lib.calibration_camera as cc
 import opencsp.app.camera_calibration.lib.image_processing as ip
-import opencsp.common.lib.deflectometry.spatial_processing as sp
+import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
 
 
@@ -39,6 +40,7 @@ class TestCameraCalibration:
 
         # Find all files
         files = glob(image_pattern)
+        files.sort()
 
         # Load images and find corners
         images = []
@@ -62,18 +64,13 @@ class TestCameraCalibration:
         img_size = images[0].shape
 
         # Calibrate camera
-        (
-            camera,
-            r_cam_object,
-            v_cam_object_cam,
-            calibration_error,
-        ) = cc.calibrate_camera(p_object, p_image, img_size, cam_name)
+        (camera, r_cam_object, v_cam_object_cam, calibration_error) = cc.calibrate_camera(
+            p_object, p_image, img_size, cam_name
+        )
 
         # Calculate reprojection errors
         errors = []
-        for rot, vec, p_obj, p_img in zip(
-            r_cam_object, v_cam_object_cam, p_object, p_image
-        ):
+        for rot, vec, p_obj, p_img in zip(r_cam_object, v_cam_object_cam, p_object, p_image):
             error = sp.reprojection_error(camera, p_obj, p_img, rot, vec)
             errors.append(error)
 
@@ -159,10 +156,8 @@ class TestCameraCalibration:
     def test_calibration_error(self):
         np.testing.assert_allclose(self.calibration_error, self.calibration_error_exp)
 
-    def reprojection_errors(self):
-        np.testing.assert_allclose(
-            self.reprojection_errors, self.reprojection_errors_exp
-        )
+    def test_reprojection_errors(self):
+        np.testing.assert_allclose(self.reprojection_errors, self.reprojection_errors_exp)
 
 
 if __name__ == "__main__":

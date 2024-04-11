@@ -12,9 +12,7 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 
 
 # Set Axes Equal in 3d
-def set_3d_axes_equal(
-    ax: Axes3D, set_zmin_zero=False, box_aspect: None | tuple[int, int, int] = (1, 1, 1)
-):
+def set_3d_axes_equal(ax: Axes3D, set_zmin_zero=False, box_aspect: None | tuple[int, int, int] = (1, 1, 1)):
     '''
     Make axes of 3D plot have equal scale so that spheres appear as spheres,
     cubes as cubes, etc..  This is one possible solution to Matplotlib's
@@ -34,9 +32,7 @@ def set_3d_axes_equal(
 
     # Check input.
     if set_zmin_zero and (z_limits[0] < 0):
-        print(
-            'WARNING: Encountered negative values when attempting to set axis z limits relative to zero.'
-        )
+        print('WARNING: Encountered negative values when attempting to set axis z limits relative to zero.')
 
     # Set z interval.
     if set_zmin_zero:

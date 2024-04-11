@@ -6,7 +6,6 @@ Demonstrate Solar Field Plotting Routines
 """
 
 from datetime import datetime
-import matplotlib.pyplot as plt
 import numpy as np
 import os
 
@@ -24,9 +23,7 @@ import opencsp.common.lib.render_control.RenderControlEnsemble as rce
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import (
-    RenderControlFigureRecord,
-)
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
@@ -38,8 +35,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 class TestSolarFieldOutput(to.TestOutput):
     @classmethod
-    def setup_class(
-        self,
+    def setUpClass(
+        cls,
         source_file_body: str = 'TestSolarFieldOutput',  # Set these here, because pytest calls
         figure_prefix_root: str = 'tsfo',  # setup_class() with no arguments.
         interactive: bool = False,
@@ -61,13 +58,14 @@ class TestSolarFieldOutput(to.TestOutput):
         #     actually a code error).
         #
 
-        super(TestSolarFieldOutput, self).setup_class(
+        super(TestSolarFieldOutput, cls).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
             verify=verify,
         )
 
+    def setUp(self):
         # Note: It is tempting to put the "Reset rendering" code lines here, to avoid redundant
         # computation and keep all the plots up.  Don't do this, because the plotting system
         # will run low/out of memory, causing adverse effectes on the plots.
@@ -107,12 +105,8 @@ class TestSolarFieldOutput(to.TestOutput):
             ['13E1', hc.face_up(), rch.facet_outlines_normals(color='c')],
             ['13E2', hc.NSTTF_stow(), rch.facet_outlines_corner_normals()],
         ]
-        solar_field_csv = os.path.join(
-            self.actual_output_dir, 'test_multi_heliostat.csv'
-        )
-        solar_field = stest.load_solar_field_partition(
-            [name[0] for name in heliostat_spec_list], solar_field_csv
-        )
+        solar_field_csv = os.path.join(self.actual_output_dir, 'test_multi_heliostat.csv')
+        solar_field = stest.load_solar_field_partition([name[0] for name in heliostat_spec_list], solar_field_csv)
 
         # View setup
         title = 'Example Poses and Styles'
@@ -152,14 +146,10 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Green:   Centroid and name.")
         comments.append("Blue:    Facet outlines.")
         comments.append("Cyan:    Overall outline and overall surface normal.")
-        comments.append(
-            "Magneta: Overall outline and overall surface normal, drawn at corners."
-        )
+        comments.append("Magneta: Overall outline and overall surface normal, drawn at corners.")
         comments.append("Green:   Facet outlines and overall surface normal.")
         comments.append("Cyan:    Facet outlines and facet surface normals.")
-        comments.append(
-            "Black:   Facet outlines and facet surface normals drawn at facet corners."
-        )
+        comments.append("Black:   Facet outlines and facet surface normals drawn at facet corners.")
 
         # Output.
         self.show_save_and_check_figure(fig_record, dpi=150)
@@ -236,30 +226,11 @@ class TestSolarFieldOutput(to.TestOutput):
             '7E6',
             '7E7',
         ]
-        tracking_heliostats = [
-            '8E1',
-            '8E2',
-            '8E4',
-            '8E6',
-            '8E7',
-            '9E1',
-            '9E2',
-            '9E3',
-            '9E4',
-            '9E5',
-            '9E6',
-            '9E7',
-        ]
+        tracking_heliostats = ['8E1', '8E2', '8E4', '8E6', '8E7', '9E1', '9E2', '9E3', '9E4', '9E5', '9E6', '9E7']
 
-        solar_field_csv = os.path.join(
-            self.actual_output_dir, 'test_solar_field_subset.csv'
-        )
+        solar_field_csv = os.path.join(self.actual_output_dir, 'test_solar_field_subset.csv')
         solar_field = stest.load_solar_field_partition(
-            mirrored_heliostats
-            + up_heliostats
-            + stowed_heliostats
-            + synched_heliostats
-            + tracking_heliostats,
+            mirrored_heliostats + up_heliostats + stowed_heliostats + synched_heliostats + tracking_heliostats,
             solar_field_csv,
         )
 
@@ -280,42 +251,24 @@ class TestSolarFieldOutput(to.TestOutput):
         up_el = np.deg2rad(90)
 
         # Configuration setup
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
         solar_field.set_heliostats_configuration(stowed_heliostats, hc.NSTTF_stow())
         synch_configuration = hc.HeliostatConfiguration(az=synch_az, el=synch_el)
-        solar_field.set_heliostats_configuration(
-            synched_heliostats, synch_configuration
-        )
-        solar_field.set_heliostats_configuration(
-            mirrored_heliostats, synch_configuration
-        )
+        solar_field.set_heliostats_configuration(synched_heliostats, synch_configuration)
+        solar_field.set_heliostats_configuration(mirrored_heliostats, synch_configuration)
         up_configuration = hc.HeliostatConfiguration(az=up_az, el=up_el)
         solar_field.set_heliostats_configuration(up_heliostats, up_configuration)
 
         # Style setup
         solar_field_style = rcsf.heliostat_blanks()
-        solar_field_style.heliostat_styles.add_special_names(
-            mirrored_heliostats, rch.mirror_surfaces()
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, rch.facet_outlines(color='c')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            stowed_heliostats, rch.normal_outline(color='r')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            synched_heliostats, rch.normal_outline(color='g')
-        )
-        solar_field_style.heliostat_styles.add_special_names(
-            tracking_heliostats, rch.facet_outlines(color='b')
-        )
+        solar_field_style.heliostat_styles.add_special_names(mirrored_heliostats, rch.mirror_surfaces())
+        solar_field_style.heliostat_styles.add_special_names(up_heliostats, rch.facet_outlines(color='c'))
+        solar_field_style.heliostat_styles.add_special_names(stowed_heliostats, rch.normal_outline(color='r'))
+        solar_field_style.heliostat_styles.add_special_names(synched_heliostats, rch.normal_outline(color='g'))
+        solar_field_style.heliostat_styles.add_special_names(tracking_heliostats, rch.facet_outlines(color='b'))
 
         # Comment
-        comments.append(
-            "A subset of heliostats selected, so that plot is effectively zoomed in."
-        )
+        comments.append("A subset of heliostats selected, so that plot is effectively zoomed in.")
         comments.append("Grey heliostat shows mirrored surfaces.")
         comments.append("Blue heliostats are tracking.")
         comments.append("Cyan heliostats are face up.")
@@ -364,17 +317,13 @@ class TestSolarFieldOutput(to.TestOutput):
         aimpoint_xyz = [60.0, 8.8, 28.9]
         when_ymdhmsz = [2021, 5, 13, 13, 2, 0, -6]  # NSTTF solar noon
         # [year, month, day, hour, minute, second, zone]
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
 
         # Style setup
         solar_field_style = rcsf.heliostat_vector_field(color='b')
 
         # Comment
-        comments.append(
-            "Each heliostat's surface normal, which can be viewed as a vector field."
-        )
+        comments.append("Each heliostat's surface normal, which can be viewed as a vector field.")
 
         # Draw and produce output for xz
         fig_record = fm.setup_figure_for_3d_data(
@@ -390,9 +339,7 @@ class TestSolarFieldOutput(to.TestOutput):
             comments=comments,
             code_tag=self.code_tag,
         )
-        fig_record.view.draw_xyz(
-            aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz'
-        )
+        fig_record.view.draw_xyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record, dpi=150)
 
@@ -421,9 +368,7 @@ class TestSolarFieldOutput(to.TestOutput):
         aimpoint_xyz = [60.0, 8.8, 28.9]
         when_ymdhmsz = [2021, 5, 13, 13, 2, 0, -6]  # NSTTF solar noon
         # [year, month, day, hour, minute, second, zone]
-        solar_field.set_full_field_tracking(
-            aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz
-        )
+        solar_field.set_full_field_tracking(aimpoint_xyz=aimpoint_xyz, when_ymdhmsz=when_ymdhmsz)
 
         # Style setup
         solar_field_style = rcsf.heliostat_vector_field_outlines(color='grey')
@@ -446,25 +391,16 @@ class TestSolarFieldOutput(to.TestOutput):
             code_tag=self.code_tag,
         )
         solar_field.draw(fig_record.view, solar_field_style)
-        fig_record.view.draw_xyz(
-            aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz'
-        )
+        fig_record.view.draw_xyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
 
         # Draw dense vector field.
         grid_xy = solar_field.heliostat_field_regular_grid_xy(40, 20)
         # grid_xydxy = [[p, sunt.tracking_surface_normal_xy(p+[0], aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz)] for p in grid_xy]
         grid_xydxy = [
-            [
-                p,
-                sun_track.tracking_surface_normal_xy(
-                    p + [0], aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz
-                ),
-            ]
+            [p, sun_track.tracking_surface_normal_xy(p + [0], aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz)]
             for p in grid_xy
         ]
-        fig_record.view.draw_pqdpq_list(
-            grid_xydxy, style=rcps.vector_field(color='b', vector_scale=5.0)
-        )
+        fig_record.view.draw_pqdpq_list(grid_xydxy, style=rcps.vector_field(color='b', vector_scale=5.0))
 
         # Output.
         self.show_save_and_check_figure(fig_record, dpi=150)
@@ -480,7 +416,8 @@ if __name__ == "__main__":
     verify = True  # False
     # Setup.
     test_object = TestSolarFieldOutput()
-    test_object.setup_class(interactive=interactive, verify=verify)
+    test_object.setUpClass(interactive=interactive, verify=verify)
+    test_object.setUp()
     # Tests.
     lt.info('Beginning tests...')
     test_object.test_single_heliostat()
@@ -498,4 +435,4 @@ if __name__ == "__main__":
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    test_object.teardown_method()
+    test_object.tearDown()

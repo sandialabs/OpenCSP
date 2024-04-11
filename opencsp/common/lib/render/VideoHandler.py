@@ -78,23 +78,15 @@ class VideoHandler:
         self.dst_video_dir_name_ext = dst_video_dir_name_ext
         self.src_frames_dir = src_frames_dir
         self.dst_frames_dir = (
-            dst_frames_dir
-            if dst_frames_dir != None
-            else os.path.join(ft.default_output_path(), "output_frames")
+            dst_frames_dir if dst_frames_dir != None else os.path.join(ft.default_output_path(), "output_frames")
         )
         self.dst_example_frames_dir = (
             dst_example_frames_dir
             if dst_example_frames_dir != None
             else os.path.join(ft.default_output_path(), "example_frames")
         )
-        self.video_control = (
-            video_control if video_control != None else rcv.RenderControlVideo.default()
-        )
-        self.frame_control = (
-            frame_control
-            if frame_control != None
-            else rcvf.RenderControlVideoFrames.default()
-        )
+        self.video_control = video_control if video_control != None else rcv.RenderControlVideo.default()
+        self.frame_control = frame_control if frame_control != None else rcvf.RenderControlVideoFrames.default()
 
     @classmethod
     def VideoInspector(cls, src_video_dir_name_ext: str):
@@ -118,18 +110,13 @@ class VideoHandler:
     @classmethod
     def VideoMerger(cls, src_videos_path, src_videos_ext, dst_video_dir_name_ext):
         return cls(
-            src_video_dir_name_ext=os.path.join(
-                src_videos_path, f"NA.{src_videos_ext}"
-            ),
+            src_video_dir_name_ext=os.path.join(src_videos_path, f"NA.{src_videos_ext}"),
             dst_video_dir_name_ext=dst_video_dir_name_ext,
         )
 
     @classmethod
     def VideoTransformer(
-        cls,
-        src_video_dir_name_ext: str,
-        dst_video_dir_name_ext: str,
-        video_control: rcv.RenderControlVideo,
+        cls, src_video_dir_name_ext: str, dst_video_dir_name_ext: str, video_control: rcv.RenderControlVideo
     ):
         return cls(
             src_video_dir_name_ext=src_video_dir_name_ext,
@@ -266,9 +253,7 @@ class VideoHandler:
             if run == "output":
                 frame_dir, _, frame_ext = ft.path_components(frame_path_name_ext)
                 _, input_video_body, _ = ft.path_components(self.src_video_dir_name_ext)
-                n_frames = ft.count_items_in_directory(
-                    frame_dir, name_prefix=input_video_body, name_suffix=frame_ext
-                )
+                n_frames = ft.count_items_in_directory(frame_dir, name_prefix=input_video_body, name_suffix=frame_ext)
 
         # Return.
         return n_frames
@@ -289,15 +274,11 @@ class VideoHandler:
             frame_dir = self.dst_frames_dir
             is_example_frames = False
         _, input_video_body, _ = ft.path_components(self.src_video_dir_name_ext)
-        return self.frame_control.get_outframe_path_name_ext(
-            frame_dir, input_video_body, is_example_frames
-        )
+        return self.frame_control.get_outframe_path_name_ext(frame_dir, input_video_body, is_example_frames)
 
     # FILTERING DUPLICATE FRAMES
     #
-    def identify_duplicate_frames(
-        self, tolerance_image_size: int, tolerance_image_pixel: int
-    ):
+    def identify_duplicate_frames(self, tolerance_image_size: int, tolerance_image_pixel: int):
         """Finds all frame duplicates in self.src_frames_dir.
 
         Args:
@@ -318,27 +299,19 @@ class VideoHandler:
             )
 
         # Fetch list of all frame filenames.
-        input_frame_file_size_pair_list = ft.files_in_directory_with_associated_sizes(
-            self.src_frames_dir, sort=True
-        )
+        input_frame_file_size_pair_list = ft.files_in_directory_with_associated_sizes(self.src_frames_dir, sort=True)
         n_input_frames = len(input_frame_file_size_pair_list)
 
         # Construct the sequence of frames without duplicates, and also the list of duplicate frames omitted.
         if n_input_frames < 2:
             # Then there cannot be any duplicates.
-            non_duplicate_frame_files = [
-                ft.file_size_pair_name(pair) for pair in input_frame_file_size_pair_list
-            ]
+            non_duplicate_frame_files = [ft.file_size_pair_name(pair) for pair in input_frame_file_size_pair_list]
             duplicate_frame_files = []
         else:
             # Loop through frame files, looking for duplicates.
             previous_frame_file_size_pair = input_frame_file_size_pair_list[0]
-            non_duplicate_frame_files = [
-                ft.file_size_pair_name(previous_frame_file_size_pair)
-            ]
-            duplicate_frame_files: list[
-                str
-            ] = []  # First frame is never a duplicate of preceding.
+            non_duplicate_frame_files = [ft.file_size_pair_name(previous_frame_file_size_pair)]
+            duplicate_frame_files: list[str] = []  # First frame is never a duplicate of preceding.
             for this_frame_file_size_pair in input_frame_file_size_pair_list[1:]:
                 if self._this_frame_is_a_duplicate_of_previous(
                     previous_frame_file_size_pair,
@@ -347,19 +320,12 @@ class VideoHandler:
                     tolerance_image_pixel,
                 ):
                     # Then this frame is a  duplicate.
-                    duplicate_frame_files.append(
-                        ft.file_size_pair_name(this_frame_file_size_pair)
-                    )
+                    duplicate_frame_files.append(ft.file_size_pair_name(this_frame_file_size_pair))
                     if len(duplicate_frame_files) == 1:
-                        lt.info(
-                            "Found at least one duplicate frame: "
-                            + duplicate_frame_files[0]
-                        )
+                        lt.info("Found at least one duplicate frame: " + duplicate_frame_files[0])
                 else:
                     # This frame is not a duplicate.
-                    non_duplicate_frame_files.append(
-                        ft.file_size_pair_name(this_frame_file_size_pair)
-                    )
+                    non_duplicate_frame_files.append(ft.file_size_pair_name(this_frame_file_size_pair))
                     previous_frame_file_size_pair = this_frame_file_size_pair
 
         # Return.
@@ -399,9 +365,7 @@ class VideoHandler:
         #
         if abs(this_size - previous_size) <= tolerance_image_size:
             # Frame JPEG files are the same size.  They might be identical, so check content.
-            if self._frames_are_identical(
-                previous_file, this_file, tolerance_image_pixel
-            ):
+            if self._frames_are_identical(previous_file, this_file, tolerance_image_pixel):
                 return True
             else:
                 return False
@@ -409,9 +373,7 @@ class VideoHandler:
             # Frame JPEG files are different sizes.  We conclude they cannot be identical.
             return False
 
-    def _frames_are_identical(
-        self, previous_frame_file: str, this_frame_file: str, tolerance_image_pixel: int
-    ):
+    def _frames_are_identical(self, previous_frame_file: str, this_frame_file: str, tolerance_image_pixel: int):
         """Determine if the given frames are identical.
 
         Args:
@@ -426,17 +388,13 @@ class VideoHandler:
         previous_dir_body_ext = os.path.join(
             self.src_frames_dir, previous_frame_file
         )  # Already includes the extension.
-        this_dir_body_ext = os.path.join(
-            self.src_frames_dir, this_frame_file
-        )  # Already includes the extension.
+        this_dir_body_ext = os.path.join(self.src_frames_dir, this_frame_file)  # Already includes the extension.
         lt.debug('\nIn frames_are_identical(), loading image:', previous_dir_body_ext)
         previous_img = cv.imread(previous_dir_body_ext)
         lt.debug('In frames_are_identical(), loading image:', this_dir_body_ext)
         this_img = cv.imread(this_dir_body_ext)
         lt.debug('In frames_are_identical(), comparing images...')
-        identical = it.images_are_identical(
-            previous_img, this_img, tolerance_image_pixel
-        )
+        identical = it.images_are_identical(previous_img, this_img, tolerance_image_pixel)
         lt.debug('In frames_are_identical(), Done.  identical =', identical)
         # Return.
         return identical
@@ -445,10 +403,7 @@ class VideoHandler:
         if not do_err:
             return
         if ft.file_exists(self.dst_video_dir_name_ext):
-            lt.error_and_raise(
-                RuntimeError,
-                f"There is already an existing video file '{self.dst_video_dir_name_ext}'",
-            )
+            lt.error_and_raise(RuntimeError, f"There is already an existing video file '{self.dst_video_dir_name_ext}'")
 
     def _remove_existing_video(self, do_remove: bool = False):
         if not do_remove:
@@ -513,9 +468,7 @@ class VideoHandler:
             str_vals = []
             for src_name_ext in src_names_exts:
                 _, _, src_ext = ft.path_components(src_name_ext)
-                src_name_ext_norm = "file " + ft.path_to_cmd_line(
-                    os.path.join(src_dir, src_name_ext)
-                )
+                src_name_ext_norm = "file " + ft.path_to_cmd_line(os.path.join(src_dir, src_name_ext))
                 src_name_ext_norm = src_name_ext_norm.replace("\\", "/")
                 str_vals.append(src_name_ext_norm)
                 if not (src_ext.strip(".").lower() in self._video_extensions):
@@ -525,24 +478,16 @@ class VideoHandler:
             tmp_path_name_ext = self._str_list_to_tmp_file(str_vals, tmp_dir)
 
             # ffmpeg args
-            args, paths = self.video_control.get_ffmpeg_args(
-                widthheight_vidorimg_dir_name_ext
-            )
-            paths.update(
-                {"INDIR": tmp_path_name_ext, "DSTFILE": dst_video_dir_name_ext}
-            )
-            cmd = self._build_ffmpeg_cmd(
-                f"-f concat -safe 0 -i %INDIR% {args} %DSTFILE%", paths
-            )
+            args, paths = self.video_control.get_ffmpeg_args(widthheight_vidorimg_dir_name_ext)
+            paths.update({"INDIR": tmp_path_name_ext, "DSTFILE": dst_video_dir_name_ext})
+            cmd = self._build_ffmpeg_cmd(f"-f concat -safe 0 -i %INDIR% {args} %DSTFILE%", paths)
 
             # execute ffmpeg from the frames directory
             subt.run(cmd, cwd=src_dir)
         finally:
             ft.delete_file(tmp_path_name_ext)
 
-    def frames_to_video(
-        self, frame_names: list[str], tmp_dir: str = None, overwrite: bool = False
-    ):
+    def frames_to_video(self, frame_names: list[str], tmp_dir: str = None, overwrite: bool = False):
         """Converts specific frames in into a video (vs construct_video() which uses all available frames).
 
         This takes about ~2 minutes for 450 frames with two Xeon E5-2695 36-thread cpus.
@@ -564,10 +509,7 @@ class VideoHandler:
         try:
             # sanitize inputs
             if not ft.directory_exists(self.src_frames_dir):
-                lt.error_and_raise(
-                    RuntimeError,
-                    f"Could not find the frames directory '{self.src_frames_dir}'!",
-                )
+                lt.error_and_raise(RuntimeError, f"Could not find the frames directory '{self.src_frames_dir}'!")
             if len(frame_names) == 0:
                 return None
             frame_names_msg = f" from frames [\"{frame_names[0]}\", ...]"
@@ -577,12 +519,7 @@ class VideoHandler:
 
             # build the video
             self._files_list_to_video(
-                self.src_frames_dir,
-                frame_names,
-                self.dst_video_dir_name_ext,
-                tmp_dir,
-                overwrite,
-                img0_dir_path_ext,
+                self.src_frames_dir, frame_names, self.dst_video_dir_name_ext, tmp_dir, overwrite, img0_dir_path_ext
             )
 
             return self.dst_video_dir_name_ext
@@ -605,19 +542,12 @@ class VideoHandler:
         """
         lt.debug("In construct_video")
         ext = self.frame_control.inframe_format
-        frame_names_dict = ft.files_in_directory_by_extension(
-            self.src_frames_dir, [ext], sort=True
-        )
+        frame_names_dict = ft.files_in_directory_by_extension(self.src_frames_dir, [ext], sort=True)
         frame_names = frame_names_dict[ext]
         lt.debug(f"Found {len(frame_names)} frames to construct with ext '{ext}'")
         return self.frames_to_video(frame_names, tmp_dir, overwrite)
 
-    def merge_videos(
-        self,
-        src_video_names: list[str] = None,
-        tmp_dir: str = None,
-        overwrite: bool = False,
-    ):
+    def merge_videos(self, src_video_names: list[str] = None, tmp_dir: str = None, overwrite: bool = False):
         """Merges many videos into a single video.
         For H.265 videos, this is a very fast operation.
 
@@ -634,21 +564,14 @@ class VideoHandler:
         """
         lt.debug("In merge_videos")
         # get some values
-        src_video_dir, _, src_video_ext = ft.path_components(
-            self.src_video_dir_name_ext
-        )
+        src_video_dir, _, src_video_ext = ft.path_components(self.src_video_dir_name_ext)
         dst_video_dir, _, _ = ft.path_components(self.dst_video_dir_name_ext)
 
         # sanitize inputs
         if not ft.directory_exists(src_video_dir):
-            lt.error_and_raise(
-                RuntimeError,
-                f"Could not find the source videos directory '{src_video_dir}'!",
-            )
+            lt.error_and_raise(RuntimeError, f"Could not find the source videos directory '{src_video_dir}'!")
         if src_video_names == None:
-            src_video_names_dict = ft.files_in_directory_by_extension(
-                src_video_dir, [src_video_ext]
-            )
+            src_video_names_dict = ft.files_in_directory_by_extension(src_video_dir, [src_video_ext])
             src_video_names = src_video_names_dict[src_video_ext]
             src_video_names = listt.natural_sort(src_video_names)
         if len(src_video_names) == 0:
@@ -660,12 +583,7 @@ class VideoHandler:
         # build the video
         src_video0_dir_name_ext = os.path.join(src_video_dir, src_video_names[0])
         self._files_list_to_video(
-            src_video_dir,
-            src_video_names,
-            self.dst_video_dir_name_ext,
-            tmp_dir,
-            overwrite,
-            src_video0_dir_name_ext,
+            src_video_dir, src_video_names, self.dst_video_dir_name_ext, tmp_dir, overwrite, src_video0_dir_name_ext
         )
 
         return self.dst_video_dir_name_ext
@@ -680,9 +598,7 @@ class VideoHandler:
         """
         # validate input
         if not ft.file_exists(self.src_video_dir_name_ext):
-            lt.error_and_raise(
-                RuntimeError, f"Video '{self.src_video_dir_name_ext}' doesn't exist!"
-            )
+            lt.error_and_raise(RuntimeError, f"Video '{self.src_video_dir_name_ext}' doesn't exist!")
 
         # remove the existing video file
         self._err_if_video_exists(not overwrite)
@@ -690,12 +606,7 @@ class VideoHandler:
 
         # build the ffmpeg command
         args, paths = self.video_control.get_ffmpeg_args(self.src_video_dir_name_ext)
-        paths.update(
-            {
-                "INFILE": self.src_video_dir_name_ext,
-                "OUTFILE": self.dst_video_dir_name_ext,
-            }
-        )
+        paths.update({"INFILE": self.src_video_dir_name_ext, "OUTFILE": self.dst_video_dir_name_ext})
         cmd = self._build_ffmpeg_cmd(f"-i %INFILE% {args} %OUTFILE%", paths)
 
         # execute ffmpeg
@@ -705,9 +616,7 @@ class VideoHandler:
         return self.dst_video_dir_name_ext
 
     @classmethod
-    def transform_powerpoint(
-        cls, src_video_dir_name_ext: str, dst_dir: str = None, overwrite: bool = False
-    ):
+    def transform_powerpoint(cls, src_video_dir_name_ext: str, dst_dir: str = None, overwrite: bool = False):
         """Makes a copy of the given video as '[path_and_name]_ppt[ext]' with
         a reduced size and codec suitable for inclusion in power point.
         This takes ~3 minutes for 26,000 1080p frames with two Xeon E5-2695 18-core cpus.
@@ -734,11 +643,7 @@ class VideoHandler:
     def get_width_height(self, input_or_output="input"):
         """Returns the width and height of the source video (or image), in pixels."""
         # from https://superuser.com/questions/841235/how-do-i-use-ffmpeg-to-get-the-video-resolution
-        path = (
-            self.src_video_dir_name_ext
-            if input_or_output == "input"
-            else self.dst_video_dir_name_ext
-        )
+        path = self.src_video_dir_name_ext if input_or_output == "input" else self.dst_video_dir_name_ext
         path = ft.path_to_cmd_line(path)
         lines = subt.run(
             f"ffprobe -v error -select_streams v:0 -show_entries stream=width,height -of csv=s=x:p=0 {path}"
@@ -751,11 +656,7 @@ class VideoHandler:
     def get_duration(self, input_or_output="input"):
         """Returns the duration of the source video in seconds."""
         # from https://superuser.com/questions/650291/how-to-get-video-duration-in-seconds
-        path = (
-            self.src_video_dir_name_ext
-            if input_or_output == "input"
-            else self.dst_video_dir_name_ext
-        )
+        path = self.src_video_dir_name_ext if input_or_output == "input" else self.dst_video_dir_name_ext
         path = ft.path_to_cmd_line(path)
         lines = subt.run(
             f"ffprobe -v error -show_entries format=duration -of default=noprint_wrappers=1:nokey=1 {path}"
@@ -767,11 +668,7 @@ class VideoHandler:
     def get_num_frames(self, input_or_output="input"):
         """Returns the number of frames in the source video."""
         # from https://stackoverflow.com/questions/2017843/fetch-frame-count-with-ffmpeg
-        path = (
-            self.src_video_dir_name_ext
-            if input_or_output == "input"
-            else self.dst_video_dir_name_ext
-        )
+        path = self.src_video_dir_name_ext if input_or_output == "input" else self.dst_video_dir_name_ext
         path = ft.path_to_cmd_line(path)
         lines = subt.run(
             f"ffprobe -v error -select_streams v:0 -count_packets -show_entries stream=nb_read_packets -of csv=p=0 {path}"

@@ -15,11 +15,7 @@ import opencsp.app.ufacets.flight_planner_ufacet.U_Code.lib.UfacetScanPass as us
 
 
 def construct_ufacet_scan(
-    solar_field,
-    aimpoint_xyz,
-    when_ymdhmsz,
-    ufacet_scan_parameter_file,
-    ufacet_control_parameters,
+    solar_field, aimpoint_xyz, when_ymdhmsz, ufacet_scan_parameter_file, ufacet_control_parameters
 ):
     # Notify progress.
     print('Constructing UFACET scan...')
@@ -39,29 +35,19 @@ def construct_ufacet_scan(
     )
 
     # UFACET section analysis.
-    section_list = psusc.construct_ufacet_sections(
-        solar_field, list_of_best_fit_segment_xys, ufacet_scan_parameters
-    )
+    section_list = psusc.construct_ufacet_sections(solar_field, list_of_best_fit_segment_xys, ufacet_scan_parameters)
 
     # Construct individual UFACET scan passes.
-    scan_pass_list = usp.construct_ufacet_passes(
-        solar_field, section_list, ufacet_scan_parameters
-    )
+    scan_pass_list = usp.construct_ufacet_passes(solar_field, section_list, ufacet_scan_parameters)
 
     # Construct the scan.
-    scan = Scan.construct_scan_given_UFACET_scan_passes(
-        scan_pass_list, ufacet_scan_parameters
-    )
+    scan = Scan.construct_scan_given_UFACET_scan_passes(scan_pass_list, ufacet_scan_parameters)
 
     # Store results.
     ufacet_scan_construction = {}
-    ufacet_scan_construction['curve_key_xy_list'] = ufacet_control_parameters[
-        'curve_key_xy_list'
-    ]
+    ufacet_scan_construction['curve_key_xy_list'] = ufacet_control_parameters['curve_key_xy_list']
     ufacet_scan_construction['list_of_ideal_xy_lists'] = list_of_ideal_xy_lists
-    ufacet_scan_construction[
-        'list_of_best_fit_segment_xys'
-    ] = list_of_best_fit_segment_xys
+    ufacet_scan_construction['list_of_best_fit_segment_xys'] = list_of_best_fit_segment_xys
     ufacet_scan_construction['section_list'] = section_list
     ufacet_scan_construction['scan_pass_list'] = scan_pass_list
 

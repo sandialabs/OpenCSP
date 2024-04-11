@@ -1,7 +1,7 @@
 from pathlib import Path
 
 # Assume opencsp is in PYHTONPATH
-from opencsp.app.sofast.lib.Sofast import Sofast
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 
 # TODO: import all user-facing classes here.
 
@@ -16,9 +16,7 @@ def test_docstrings_exist_for_methods():
         method_list = [
             func
             for func in dir(class_module)
-            if callable(getattr(class_module, func))
-            and not func.startswith("__")
-            and not func.startswith("_")
+            if callable(getattr(class_module, func)) and not func.startswith("__") and not func.startswith("_")
         ]
 
         for method in method_list:

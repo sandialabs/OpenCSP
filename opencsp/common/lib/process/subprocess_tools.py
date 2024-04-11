@@ -10,7 +10,7 @@ import opencsp.common.lib.process.lib.CalledProcessError as cpe
 
 
 def get_executable_path(executable_name: str, dont_match: str = None) -> str:
-    """ Returns the first "path/name.ext" for the given executable. If
+    """Returns the first "path/name.ext" for the given executable. If
     dont_match is specified, then paths containing that string are excluded from
     the returned results.
 
@@ -30,7 +30,7 @@ def get_executable_path(executable_name: str, dont_match: str = None) -> str:
     """
     dont_match = dont_match.lower()
     search_cmd = "which"
-    if (os.name == "nt"):
+    if os.name == "nt":
         search_cmd = "where"
         if executable_name.endswith(".exe"):
             executable_name = executable_name[:-4]
@@ -44,9 +44,7 @@ def get_executable_path(executable_name: str, dont_match: str = None) -> str:
     return executable_name
 
 
-def filter_lines(
-    lines: list[pol.ProcessOutputLine], keep_stdout=True, keep_stderr=True
-):
+def filter_lines(lines: list[pol.ProcessOutputLine], keep_stdout=True, keep_stderr=True):
     ret: list[pol.ProcessOutputLine] = list(lines)
 
     if not keep_stdout:
@@ -68,11 +66,7 @@ def print_lines(lines: list[pol.ProcessOutputLine]):
 
 
 def _collect_lines(
-    lines: list[pol.ProcessOutputLine],
-    curr_lineno: int,
-    buffer: str,
-    is_error=False,
-    collect_last=False,
+    lines: list[pol.ProcessOutputLine], curr_lineno: int, buffer: str, is_error=False, collect_last=False
 ):
     lineno = curr_lineno
 
@@ -123,12 +117,7 @@ def _is_timed_out(proc: subprocess.Popen, start: float, timeout: float | None):
 
 
 def run(
-    cmd: str,
-    cwd: str = None,
-    stdout: str = None,
-    stderr: str = None,
-    ignore_return_code=False,
-    timeout: float = None,
+    cmd: str, cwd: str = None, stdout: str = None, stderr: str = None, ignore_return_code=False, timeout: float = None
 ):
     """
     Runs the given command in the given directory, prints the output to the logger, and checks the return code.
@@ -170,14 +159,7 @@ def run(
         lt.info("changing directory to " + cwd)
     lt.info("starting " + cmd)
     text_mode = True  # converts stdout/stderr to strings instead of bytes
-    proc = subprocess.Popen(
-        cmd,
-        cwd=cwd,
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-        text=text_mode,
-    )
+    proc = subprocess.Popen(cmd, cwd=cwd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=text_mode)
     start_time = time.time()
 
     new_lines: list[pol.ProcessOutputLine] = []
@@ -201,14 +183,8 @@ def run(
             # collect the read stdout/stderr bytes into lines
             if new_out == "" and new_err == "":
                 # no new lines at the moment, take this time to filter & print existing lines
-                print_lines(
-                    filter_lines(
-                        new_lines, keep_stdout=print_stdout, keep_stderr=print_stderr
-                    )
-                )
-                lines += filter_lines(
-                    new_lines, keep_stdout=collect_stdout, keep_stderr=collect_stderr
-                )
+                print_lines(filter_lines(new_lines, keep_stdout=print_stdout, keep_stderr=print_stderr))
+                lines += filter_lines(new_lines, keep_stdout=collect_stdout, keep_stderr=collect_stderr)
                 new_lines = []
 
                 # check timeout
@@ -219,46 +195,30 @@ def run(
                 time.sleep(0.1)
             else:
                 # collect the read stdout/stderr bytes
-                outbuf, lineno = _collect_lines(
-                    new_lines, lineno, outbuf + new_out, is_error=False
-                )
-                errbuf, lineno = _collect_lines(
-                    new_lines, lineno, errbuf + new_err, is_error=True
-                )
+                outbuf, lineno = _collect_lines(new_lines, lineno, outbuf + new_out, is_error=False)
+                errbuf, lineno = _collect_lines(new_lines, lineno, errbuf + new_err, is_error=True)
 
         # finish collecting from stdout and stderr
         outbuf += proc.stdout.read()
         errbuf += proc.stderr.read()
 
     # parse any unparsed output
-    outbuf, lineno = _collect_lines(
-        new_lines, lineno, outbuf, is_error=False, collect_last=True
-    )
-    errbuf, lineno = _collect_lines(
-        new_lines, lineno, errbuf, is_error=True, collect_last=True
-    )
+    outbuf, lineno = _collect_lines(new_lines, lineno, outbuf, is_error=False, collect_last=True)
+    errbuf, lineno = _collect_lines(new_lines, lineno, errbuf, is_error=True, collect_last=True)
     proc.stdout.close()
     proc.stderr.close()
 
     # print any newly collected lines
-    print_lines(
-        filter_lines(new_lines, keep_stdout=print_stdout, keep_stderr=print_stderr)
-    )
-    lines += filter_lines(
-        new_lines, keep_stdout=collect_stdout, keep_stderr=collect_stderr
-    )
+    print_lines(filter_lines(new_lines, keep_stdout=print_stdout, keep_stderr=print_stderr))
+    lines += filter_lines(new_lines, keep_stdout=collect_stdout, keep_stderr=collect_stderr)
 
     # throw an error code if the subprocess failed, or return the unprinted lines otherwise
     if proc.returncode != 0 and not ignore_return_code:
         stdout_str = None
         stderr_str = None
         try:
-            stdout_str = "\n".join(
-                [line.val for line in filter_lines(lines, True, False)]
-            )
-            stderr_str = "\n".join(
-                [line.val for line in filter_lines(lines, False, True)]
-            )
+            stdout_str = "\n".join([line.val for line in filter_lines(lines, True, False)])
+            stderr_str = "\n".join([line.val for line in filter_lines(lines, False, True)])
         except:
             pass
         raise cpe.CalledProcessError(proc.returncode, proc.args, stdout_str, stderr_str)

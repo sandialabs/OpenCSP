@@ -119,9 +119,7 @@ def centroid_name(color='k'):
 
 
 def centroid_name_outline(
-    color='k',
-    horizontalalignment='center',  # center, right, left
-    verticalalignment='center',
+    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
 ):  # center, top, bottom, baseline, center_baseline
     # Name and overall outline.
     return RenderControlDeflectometryInstrument(
@@ -134,9 +132,7 @@ def centroid_name_outline(
         draw_facets=False,
         draw_name=True,
         name_style=rctxt.RenderControlText(
-            color=color,
-            horizontalalignment=horizontalalignment,
-            verticalalignment=verticalalignment,
+            color=color, horizontalalignment=horizontalalignment, verticalalignment=verticalalignment
         ),
     )
 
@@ -155,9 +151,7 @@ def outline(color='k'):
 
 
 def name_outline(
-    color='k',
-    horizontalalignment='center',  # center, right, left
-    verticalalignment='center',
+    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
 ):  # center, top, bottom, baseline, center_baseline
     # Name and overall outline.
     return RenderControlDeflectometryInstrument(
@@ -169,9 +163,7 @@ def name_outline(
         draw_facets=False,
         draw_name=True,
         name_style=rctxt.RenderControlText(
-            color=color,
-            horizontalalignment=horizontalalignment,
-            verticalalignment=verticalalignment,
+            color=color, horizontalalignment=horizontalalignment, verticalalignment=verticalalignment
         ),
     )
 

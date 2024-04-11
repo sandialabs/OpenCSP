@@ -20,11 +20,7 @@ import opencsp.app.ufacets.flight_planner_ufacet.U_Code.lib.RenderControlTopLeve
 
 
 def generate_NSTTF_ufacet_plans(
-    solar_field_short_name,
-    nsttf_configuration,
-    elevation_offset,
-    save_flight_plan,
-    save_figures,
+    solar_field_short_name, nsttf_configuration, elevation_offset, save_flight_plan, save_figures
 ):
     # Figure layout.
     #    tile_array=(2,2)
@@ -42,9 +38,7 @@ def generate_NSTTF_ufacet_plans(
     render_control_scan_xy_analysis = drc.setup_render_control_scan_xy_analysis()
     render_control_scan_section_setup = drc.setup_render_control_scan_section_setup()
     #    render_control_scan_section_analysis = setup_render_control_scan_section_analysis()
-    render_control_scan_section_analysis = (
-        drc.setup_render_control_scan_section_analysis_section_plus_flight_4view()
-    )
+    render_control_scan_section_analysis = drc.setup_render_control_scan_section_analysis_section_plus_flight_4view()
     #    render_control_scan_section_analysis = drc.setup_render_control_scan_section_analysis_flight_4view()
 
     # Figure control.
@@ -54,9 +48,7 @@ def generate_NSTTF_ufacet_plans(
 
     # Scan control parameters.
     scan_type = 'UFACET'
-    ufacet_scan_parameter_file = (
-        solar_field_short_name  # ?? SCAFFOLDING RCB -- TEMPORARY
-    )
+    ufacet_scan_parameter_file = solar_field_short_name  # ?? SCAFFOLDING RCB -- TEMPORARY
     raster_scan_parameter_file = None
 
     # Define scan.
@@ -189,9 +181,7 @@ def generate_NSTTF_ufacet_plans(
             when_ymdhmsz_2[when_hour_idx] = trial_spec[trial_spec_hour_idx]
             when_ymdhmsz_2[when_minute_idx] = trial_spec[trial_spec_minute_idx]
             aimpoint_xyz_2[2] = trial_spec[trial_spec_z_aim_idx]
-            ufacet_control_parameters['maximum_altitude'] = trial_spec[
-                trial_spec_z_max_idx
-            ]
+            ufacet_control_parameters['maximum_altitude'] = trial_spec[trial_spec_z_max_idx]
             pars.scan_plan_trial(
                 tile_array,
                 solar_field_spec,
@@ -214,10 +204,6 @@ def generate_NSTTF_ufacet_plans(
 
 def generate_NSTTF_ufacet_plans_1(save_flight_plan, save_figures):
     elevation_offset = 0
-    generate_NSTTF_ufacet_plans(
-        'NSTTF', 'Full Field', elevation_offset, save_flight_plan, save_figures
-    )
+    generate_NSTTF_ufacet_plans('NSTTF', 'Full Field', elevation_offset, save_flight_plan, save_figures)
     # generate_NSTTF_ufacet_plans('NSTTF', 'Demo',          elevation_offset, save_flight_plan, save_figures)
-    generate_NSTTF_ufacet_plans(
-        'NSTTF', 'Half-and-Half', elevation_offset, save_flight_plan, save_figures
-    )
+    generate_NSTTF_ufacet_plans('NSTTF', 'Half-and-Half', elevation_offset, save_flight_plan, save_figures)

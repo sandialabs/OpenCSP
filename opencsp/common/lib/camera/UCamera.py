@@ -45,12 +45,8 @@ class Camera(csvi.CsvInterface):
 
         # Input parameters.
         self.name = name  #     String describing camera and lens.
-        self.sensor_x = (
-            sensor_x_mm / 1000.0
-        )  # m.  Size of sensor in horizontal direction.
-        self.sensor_y = (
-            sensor_y_mm / 1000.0
-        )  # m.  Size of sensor in vertical direction.
+        self.sensor_x = sensor_x_mm / 1000.0  # m.  Size of sensor in horizontal direction.
+        self.sensor_y = sensor_y_mm / 1000.0  # m.  Size of sensor in vertical direction.
         self.pixels_x = pixels_x  #     Number of pizels in horizontal direction for still images. Video may differ.
         self.pixels_y = pixels_y  #     Number of pizels in vertical direction for still images. Video may differ.
         self.focal_length_min = (
@@ -63,15 +59,11 @@ class Camera(csvi.CsvInterface):
         self.fov_vertical_min = 2.0 * math.atan(
             (self.sensor_y / 2.0) / self.focal_length_max
         )  # Angular field of view of the camera, in the vertical direction.
-        self.fov_vertical_max = 2.0 * math.atan(
-            (self.sensor_y / 2.0) / self.focal_length_min
-        )  #
+        self.fov_vertical_max = 2.0 * math.atan((self.sensor_y / 2.0) / self.focal_length_min)  #
         self.fov_horizontal_min = 2.0 * math.atan(
             (self.sensor_x / 2.0) / self.focal_length_max
         )  # Angular field of view of the camera, in the horizontal direction.
-        self.fov_horizontal_max = 2.0 * math.atan(
-            (self.sensor_x / 2.0) / self.focal_length_min
-        )  #
+        self.fov_horizontal_max = 2.0 * math.atan((self.sensor_x / 2.0) / self.focal_length_min)  #
 
     # ACCESS
 
@@ -143,10 +135,7 @@ def mavic_zoom():
         sensor_y_mm=4.54,  # mm.  sqrt(7.66^2 - 6.17^2)
         pixels_x=4000,  # For still images.
         pixels_y=3000,  # For still images.
-        focal_lengths_mm=[
-            4.33,
-            8.60,
-        ],  # [min, max] range, in mm.  For fixed focal length min == max.
+        focal_lengths_mm=[4.33, 8.60],  # [min, max] range, in mm.  For fixed focal length min == max.
     )
 
 
@@ -157,10 +146,7 @@ def sony_alpha_20mm_landscape():
         sensor_y_mm=24.0,  # mm.
         pixels_x=8760,  # For still images.
         pixels_y=4864,  # For still images.
-        focal_lengths_mm=[
-            20,
-            20,
-        ],  # [min, max] range, in mm.  For fixed focal length min == max.
+        focal_lengths_mm=[20, 20],  # [min, max] range, in mm.  For fixed focal length min == max.
     )
 
 
@@ -171,10 +157,7 @@ def sony_alpha_20mm_portrait():
         sensor_y_mm=35.9,  # mm.
         pixels_x=4864,  # For still images.
         pixels_y=8760,  # For still images.
-        focal_lengths_mm=[
-            20,
-            20,
-        ],  # [min, max] range, in mm.  For fixed focal length min == max.
+        focal_lengths_mm=[20, 20],  # [min, max] range, in mm.  For fixed focal length min == max.
     )
 
 
@@ -185,10 +168,7 @@ def ultra_wide_angle():
         sensor_y_mm=35.9,  # mm.
         pixels_x=4864,  # For still images.
         pixels_y=8760,  # For still images.
-        focal_lengths_mm=[
-            5,
-            5,
-        ],  # [min, max] range, in mm.  For fixed focal length min == max.
+        focal_lengths_mm=[5, 5],  # [min, max] range, in mm.  For fixed focal length min == max.
     )
 
 
@@ -243,9 +223,7 @@ class RealCamera(csvi.CsvInterface):
         self._p_2 = p_2  # Do not access directly.  Fetch via distortion_coeffs.
         # Dependent parameters.
         self.frame_box_pq = self.construct_frame_box_pq()
-        self.camera_matrix = np.array(
-            [[f_x, 0, c_x], [0, f_y, c_y], [0, 0, 1]]
-        ).reshape(3, 3)
+        self.camera_matrix = np.array([[f_x, 0, c_x], [0, f_y, c_y], [0, 0, 1]]).reshape(3, 3)
         self.distortion_coeffs = np.array([[k_1, k_2, p_1, p_2]])
 
     # CONSTRUCTION
@@ -479,12 +457,8 @@ def real_sony_alpha_20mm_video():
         f_x=4675.73,  # Pixels.
         f_y=4672.100,  # Pixels.
         # Optical center.
-        c_x=4343.252
-        / 8640
-        * 7680,  # Pixels.  Before camera calibration, assume c_x = w/2 = 3840/2
-        c_y=2883.190
-        / 5760
-        * 4320,  # Pixels.  Before camera calibration, assume c_y = h/2 = 2160/2
+        c_x=4343.252 / 8640 * 7680,  # Pixels.  Before camera calibration, assume c_x = w/2 = 3840/2
+        c_y=2883.190 / 5760 * 4320,  # Pixels.  Before camera calibration, assume c_y = h/2 = 2160/2
         # Radial distortion.
         k_1=-0.0568132871107041,  # ?? SCAFFOLDING RCB -- WHAT ARE UNITS?  ARE VALUES VALID FOR EXPECTED UNITS?
         k_2=0.0395572945993200,  # ?? SCAFFOLDING RCB -- WHAT ARE UNITS?  ARE VALUES VALID FOR EXPECTED UNITS?

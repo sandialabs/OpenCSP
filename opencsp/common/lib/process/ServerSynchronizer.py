@@ -13,12 +13,7 @@ class ServerSynchronizer:
     path = os.path.join(orp.opencsp_temporary_dir(), "synchronize_servers_by_file")
 
     def __init__(
-        self,
-        num_servers: int,
-        server_index: int,
-        propagate_errors=True,
-        timeout: int = 1000,
-        do_initial_wait=True,
+        self, num_servers: int, server_index: int, propagate_errors=True, timeout: int = 1000, do_initial_wait=True
     ):
         """Helper class to forces all servers to wait at specified synchronization points.
         This is particularly useful for scatter-gather type workflows.
@@ -84,9 +79,7 @@ class ServerSynchronizer:
         if server_index == 0:
             self._remove_all_stop_files()
         else:
-            time.sleep(
-                5
-            )  # have all other servers wait for server 0 to remove the stop and error files
+            time.sleep(5)  # have all other servers wait for server 0 to remove the stop and error files
 
         # Let the system know that this server is executing
         lt.info(f"ServerSynchronizer @{self.server_index} started")
@@ -96,19 +89,14 @@ class ServerSynchronizer:
             self._wait(check_for_stopped_servers=False)
 
     def _wait_on_files(
-        self,
-        wait_file_path_name_exts: list[str],
-        stop_file_path_name_exts: list[str] = None,
-        msg: str = None,
+        self, wait_file_path_name_exts: list[str], stop_file_path_name_exts: list[str] = None, msg: str = None
     ):
         """Wait for all of the given "wait" indicator files (or their corresponding "stop" indicator files) to exist."""
         alternates: dict[str, list[str]] = {}
         if stop_file_path_name_exts != None:
             for i in range(len(wait_file_path_name_exts)):
                 alternates[wait_file_path_name_exts[i]] = [stop_file_path_name_exts[i]]
-        pft.wait_on_files(
-            wait_file_path_name_exts, self.timeout, alternates=alternates, msg=msg
-        )
+        pft.wait_on_files(wait_file_path_name_exts, self.timeout, alternates=alternates, msg=msg)
         lt.debug(f"Server @{self.server_index}: found all files")
         # wait for all servers to see that the files exist
         time.sleep(5)
@@ -165,9 +153,7 @@ class ServerSynchronizer:
         --------
             server_idxs (list[int]): List of all the stopped server indexes."""
         ret: list[int] = []
-        all_file_path_name_exts = [
-            (i, self._get_file_stopped(i)) for i in range(self.num_servers)
-        ]
+        all_file_path_name_exts = [(i, self._get_file_stopped(i)) for i in range(self.num_servers)]
         for other_server_index, file_path_name_ext in all_file_path_name_exts:
             if ft.file_exists(file_path_name_ext):
                 ret.append(other_server_index)
@@ -180,9 +166,7 @@ class ServerSynchronizer:
         --------
             ret (list[int]): List of all the errored server indexes."""
         ret: list[tuple(int, str, str)] = []
-        all_file_path_name_exts = [
-            (i, self._get_file_error(i)) for i in range(self.num_servers)
-        ]
+        all_file_path_name_exts = [(i, self._get_file_error(i)) for i in range(self.num_servers)]
         for other_server_index, file_path_name_ext in all_file_path_name_exts:
             if ft.file_exists(file_path_name_ext):
                 try:
@@ -201,9 +185,7 @@ class ServerSynchronizer:
             error_msg (str|None): None if no errored servers, or a message indicating the type of error for the first errored server.
         """
         errored_servers = self.get_errored_servers()
-        errored_servers = list(
-            filter(lambda es: es[0] != self.server_index, errored_servers)
-        )
+        errored_servers = list(filter(lambda es: es[0] != self.server_index, errored_servers))
         if len(errored_servers) > 0:
             errored_server, err_type, err_msg = errored_servers[0]
             return f"Error: in ServerSynchronizer.{method_name}(), server {errored_server} encountered a {err_type} with the message \"{err_msg}\""
@@ -228,9 +210,7 @@ class ServerSynchronizer:
             return
 
         # create my file (1)
-        my_file_path_name_ext = self._get_file_waiting(
-            self.server_index, self._synchronization_index
-        )
+        my_file_path_name_ext = self._get_file_waiting(self.server_index, self._synchronization_index)
         if not ft.file_exists(my_file_path_name_ext):
             ft.create_file(my_file_path_name_ext)
         else:
@@ -243,9 +223,7 @@ class ServerSynchronizer:
             # Getting ready for the _next_ wait():
             # Make sure the next synchronization files don't exist.
             for i in range(self.num_servers):
-                next_file_path_name_ext = self._get_file_waiting(
-                    i, self._synchronization_index + 1
-                )
+                next_file_path_name_ext = self._get_file_waiting(i, self._synchronization_index + 1)
                 if ft.file_exists(next_file_path_name_ext):
                     lt.warn(
                         f"Warning: in ServerSynchronizer.wait(), next synchronization file {next_file_path_name_ext} "
@@ -258,21 +236,12 @@ class ServerSynchronizer:
             stop_file_path_name_exts = None
             if check_for_stopped_servers:
                 stopped_idxs = self.get_stopped_servers()
-            running_idxs = list(
-                filter(lambda i: i not in stopped_idxs, range(self.num_servers))
-            )
-            wait_file_path_name_exts = [
-                self._get_file_waiting(i, self._synchronization_index)
-                for i in running_idxs
-            ]
+            running_idxs = list(filter(lambda i: i not in stopped_idxs, range(self.num_servers)))
+            wait_file_path_name_exts = [self._get_file_waiting(i, self._synchronization_index) for i in running_idxs]
             if check_for_stopped_servers:
-                stop_file_path_name_exts = [
-                    self._get_file_stopped(i) for i in running_idxs
-                ]
+                stop_file_path_name_exts = [self._get_file_stopped(i) for i in running_idxs]
             self._wait_on_files(
-                wait_file_path_name_exts,
-                stop_file_path_name_exts,
-                msg=f"step {self._synchronization_index}",
+                wait_file_path_name_exts, stop_file_path_name_exts, msg=f"step {self._synchronization_index}"
             )
 
             # propagate errors (4)
@@ -305,9 +274,7 @@ class ServerSynchronizer:
             sum (list[str]): All server values, in order.
         """
         value_sync_index = self._synchronization_index
-        my_file_path_name_ext = self._get_file_value(
-            self.server_index, value_sync_index
-        )
+        my_file_path_name_ext = self._get_file_value(self.server_index, value_sync_index)
         my_file_path_name_ext_tmp = my_file_path_name_ext + ".tmp"
 
         # remove the stale file, if any
@@ -339,9 +306,7 @@ class ServerSynchronizer:
         self.wait()
         if self._synchronization_index == value_sync_index:
             if self.num_servers > 1:
-                lt.warn(
-                    "Huh, I expected the _synchronization_index to have incremented..."
-                )
+                lt.warn("Huh, I expected the _synchronization_index to have incremented...")
             self._synchronization_index += 1
 
         # gather the results
@@ -352,9 +317,7 @@ class ServerSynchronizer:
                 with open(other_file_path_name_ext, "r") as fin:
                     ret.append(fin.read())
             else:
-                lt.warn(
-                    f"Warning: in ServerSynchronizer.gather(), value file {other_file_path_name_ext} is missing!"
-                )
+                lt.warn(f"Warning: in ServerSynchronizer.gather(), value file {other_file_path_name_ext} is missing!")
         return ret
 
     def _remove_all_stop_files(self):
@@ -362,17 +325,12 @@ class ServerSynchronizer:
         for i in range(self.num_servers):
             stop_file_path_name_ext = self._get_file_stopped(i)
             error_file_path_name_ext = self._get_file_error(i)
-            for file_path_name_ext in [
-                stop_file_path_name_ext,
-                error_file_path_name_ext,
-            ]:
+            for file_path_name_ext in [stop_file_path_name_ext, error_file_path_name_ext]:
                 if ft.file_exists(file_path_name_ext):
                     try:
                         os.remove(file_path_name_ext)
                     except Exception as ex:
-                        if isinstance(ex, FileNotFoundError) or isinstance(
-                            ex, PermissionError
-                        ):
+                        if isinstance(ex, FileNotFoundError) or isinstance(ex, PermissionError):
                             # Probably just attempted to delete a file at the same time as another server.
                             # Randomly backoff to reduce the likelihood of this happening again.
                             time.sleep(random.randint(1, 10) / 10)

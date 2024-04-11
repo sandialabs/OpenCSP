@@ -1,4 +1,5 @@
 """Tests functions in the phogrammetry library"""
+
 import os
 from os.path import join
 
@@ -74,17 +75,13 @@ def test_reprojection_errors():
 
     # Perfect case
     points_2d = np.zeros((4, 2))
-    errors = ph.reprojection_errors(
-        rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d
-    )
+    errors = ph.reprojection_errors(rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d)
     np.testing.assert_equal(errors, np.zeros((4, 2)))
 
     # 1 pixel off in x on camera 0
     points_2d = np.zeros((4, 2))
     points_2d[:2, 0] = 1
-    errors = ph.reprojection_errors(
-        rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d
-    )
+    errors = ph.reprojection_errors(rvecs, tvecs, pts_obj, camera, camera_indices, point_indices, points_2d)
     errors_exp = np.zeros((4, 2))
     errors_exp[:2, 0] = -1
     np.testing.assert_equal(errors, errors_exp)
@@ -102,9 +99,7 @@ def test_align_points_no_scale():
 
     np.testing.assert_allclose(error, np.zeros(3), atol=1e-6, rtol=0)
     np.testing.assert_equal(scale, 1.0)
-    np.testing.assert_allclose(
-        pts_obj_aligned.data, pts_obj_optimized.data, atol=1e-6, rtol=0
-    )
+    np.testing.assert_allclose(pts_obj_aligned.data, pts_obj_optimized.data, atol=1e-6, rtol=0)
 
 
 def test_align_points_with_scale():
@@ -119,9 +114,7 @@ def test_align_points_with_scale():
 
     np.testing.assert_allclose(error, np.zeros(3), atol=1e-6, rtol=0)
     np.testing.assert_almost_equal(scale, 2.0, 6)
-    np.testing.assert_allclose(
-        pts_obj_aligned.data * 2, pts_obj_optimized.data, atol=1e-6, rtol=0
-    )
+    np.testing.assert_allclose(pts_obj_aligned.data * 2, pts_obj_optimized.data, atol=1e-6, rtol=0)
 
 
 def test_scale_points():
@@ -150,9 +143,7 @@ def test_triangulate():
     pts_img = Vxy([[0, 1], [0, 1]])
     pt, dists = ph.triangulate(cameras, rots, tvecs, pts_img)
 
-    np.testing.assert_allclose(
-        pt.data.squeeze(), np.array([0, 0, 1]), rtol=0, atol=1e-6
-    )
+    np.testing.assert_allclose(pt.data.squeeze(), np.array([0, 0, 1]), rtol=0, atol=1e-6)
     np.testing.assert_allclose(dists, np.array([0.0, 0.0]), rtol=0, atol=1e-6)
 
 
@@ -162,7 +153,5 @@ def test_nearest_ray_intersection():
 
     pt, dists = ph.nearest_ray_intersection(p_origins, u_dirs)
 
-    np.testing.assert_allclose(
-        pt.data.squeeze(), np.array([0, 0, 1]), atol=1e-6, rtol=0
-    )
+    np.testing.assert_allclose(pt.data.squeeze(), np.array([0, 0, 1]), atol=1e-6, rtol=0)
     np.testing.assert_allclose(dists, np.array([0, 0]), atol=1e-6, rtol=0)

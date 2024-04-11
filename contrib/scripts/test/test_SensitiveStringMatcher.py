@@ -131,8 +131,9 @@ class test_SensitiveStringMatcher(unittest.TestCase):
         matches = matcher.check_lines(["foo", "bar", "baz"])
         self.assertEqual(0, len(matches))
 
-        matcher = ssm.SensitiveStringMatcher("Basic Matcher", "**all_regex", "foo.?",
-                                             "**dont_match", "**next_is_regex", r"[a-z]{4}")
+        matcher = ssm.SensitiveStringMatcher(
+            "Basic Matcher", "**all_regex", "foo.?", "**dont_match", "**next_is_regex", r"[a-z]{4}"
+        )
         matches = matcher.check_lines(["foo", "bar", "baz"])
         self.assertEqual(1, len(matches))
         matches = matcher.check_lines(["foobarbaz"])

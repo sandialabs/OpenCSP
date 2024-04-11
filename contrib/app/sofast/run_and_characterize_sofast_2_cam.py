@@ -7,16 +7,17 @@
 NOTE: must be run with a computer connected to a working SOFAST system. This includes a camera,
 mirror, screen, and system layout calibration files.
 """
+
 import os
 
 import numpy as np
 
-from opencsp.common.lib.deflectometry.Display import Display
-from opencsp.common.lib.deflectometry.FacetData import FacetData
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.Sofast import Sofast
-from opencsp.app.sofast.lib.System import System
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
@@ -27,18 +28,12 @@ def main():
     # Define file locations
     data_dir = '../../sofast_2_system_calibration_files/'
 
-    file_image_projection = os.path.join(
-        data_dir, 'Image_Projection_optics_lab_landscape_rectangular.h5'
-    )
+    file_image_projection = os.path.join(data_dir, 'Image_Projection_optics_lab_landscape_rectangular.h5')
 
-    file_display_0 = os.path.join(
-        data_dir, 'Display_optics_lab_landscape_distorted2D.h5'
-    )
+    file_display_0 = os.path.join(data_dir, 'Display_optics_lab_landscape_distorted2D.h5')
     file_camera_0 = os.path.join(data_dir, 'Camera_optics_lab_landscape.h5')
 
-    file_display_1 = os.path.join(
-        data_dir, 'Display_optics_lab_landscape_distorted2D.h5'
-    )
+    file_display_1 = os.path.join(data_dir, 'Display_optics_lab_landscape_distorted2D.h5')
     file_camera_1 = os.path.join(data_dir, 'Camera_optics_lab_landscape.h5')
 
     file_facet = os.path.join(data_dir, 'Facet_NSTTF.json')
@@ -46,7 +41,7 @@ def main():
     output_file_base = None
 
     # Define measurement parameters
-    optic_screen_dist = 10.516  # meter
+    dist_optic_screen = 10.516  # meter
     optic_name = 'NSTTF Facet'
     optic_measure_point = Pxyz((0, 0, 0))  # meter
 
@@ -60,15 +55,12 @@ def main():
     displays.append(Display.load_from_hdf(file_display_1))
 
     # Load facet JSON
-    facet_data = FacetData.load_from_json(file_facet)
+    facet_data = DefinitionFacet.load_from_json(file_facet)
 
     # Define surface fitting parameters
     surface_data = [
         dict(
-            surface_type='parabolic',
-            initial_focal_lengths_xy=(100.0, 100.0),
-            robust_least_squares=False,
-            downsample=10,
+            surface_type='parabolic', initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=False, downsample=10
         )
     ]
 
@@ -97,7 +89,7 @@ def main():
     im_acqu_1.frame_rate = np.max([0.014902, 1.05 / im_acqu_1.exposure_time])
 
     # Create System
-    system = System(im_proj, [im_acqu_0, im_acqu_1])
+    system = SystemSofastFringe(im_proj, [im_acqu_0, im_acqu_1])
 
     # Calibrate camera exposure
     def func_calibrate_exposure():
@@ -107,20 +99,14 @@ def main():
     # Capture calibration data
     def func_capture_calibration_frames():
         print('Capturing display-camera response calibration data')
-        system.run_display_camera_response_calibration(
-            res=10, run_next=system.run_next_in_queue
-        )
+        system.run_display_camera_response_calibration(res=10, run_next=system.run_next_in_queue)
 
     # Process calibration data
     def func_process_calibration_data():
         print('Processing calibration data')
         calibration_images = system.get_calibration_images()
         for ims in calibration_images:
-            calibrations.append(
-                ImageCalibrationScaling.from_data(
-                    ims, system.calibration_display_values
-                )
-            )
+            calibrations.append(ImageCalibrationScaling.from_data(ims, system.calibration_display_values))
         system.run_next_in_queue()
 
     # Load fringe object
@@ -133,7 +119,7 @@ def main():
         min_disp_value = np.max(min_disp_vals)
 
         # Load fringe objects
-        system.load_fringes(fringes, min_disp_value)
+        system.set_fringes(fringes, min_disp_value)
 
         system.run_next_in_queue()
 
@@ -166,9 +152,7 @@ def main():
     print('Saving Data')
 
     # Get Measurement object
-    measurements = system.get_measurements(
-        optic_measure_point, optic_screen_dist, optic_name
-    )
+    measurements = system.get_measurements(optic_measure_point, dist_optic_screen, optic_name)
 
     # Process data
     print('Processing data')
@@ -193,7 +177,7 @@ def main():
             c.save_to_hdf()
             m.save_to_hdf(output_files[idx_meas])
         for idx_meas, s in enumerate(sofasts):
-            s.save_data_to_hdf(output_files[idx_meas])
+            s.save_to_hdf(output_files[idx_meas])
 
 
 # Start program

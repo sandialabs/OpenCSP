@@ -17,9 +17,7 @@ class TestCSPOpticsOrientation:
     are checked at different levels in the heirarchy.
     """
 
-    def _generate_optics_rotation(
-        self, r1: Rotation, r2: Rotation, r3: Rotation, r4: Rotation, r5: Rotation
-    ):
+    def _generate_optics_rotation(self, r1: Rotation, r2: Rotation, r3: Rotation, r4: Rotation, r5: Rotation):
         # Define delta movement
         dv = Vxyz((0, 0, 0))
 
@@ -47,9 +45,7 @@ class TestCSPOpticsOrientation:
         # Save objects
         return mirror, facet, heliostat
 
-    def _check_rotation(
-        self, mirror, facet, heliostat, a1: float, a2: float, a3: float, a4: float
-    ):
+    def _check_rotation(self, mirror, facet, heliostat, a1: float, a2: float, a3: float, a4: float):
         # Test
         norm_0 = mirror.surface_norm_at(Vxy((0, 0)))  # mirror base
         norm_1 = mirror.survey_of_points(1)[1][0]  # mirror parent

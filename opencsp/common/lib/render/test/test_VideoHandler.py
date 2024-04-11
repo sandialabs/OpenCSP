@@ -12,26 +12,8 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 
 
 class test_VideoHandler(unittest.TestCase):
-    dir_in = os.path.join(
-        orp.opencsp_code_dir(),
-        'common',
-        'lib',
-        'render',
-        'test',
-        'data',
-        'input',
-        'VideoHandler',
-    )
-    dir_out = os.path.join(
-        orp.opencsp_code_dir(),
-        'common',
-        'lib',
-        'render',
-        'test',
-        'data',
-        'output',
-        'VideoHandler',
-    )
+    dir_in = os.path.join(orp.opencsp_code_dir(), 'common', 'lib', 'render', 'test', 'data', 'input', 'VideoHandler')
+    dir_out = os.path.join(orp.opencsp_code_dir(), 'common', 'lib', 'render', 'test', 'data', 'output', 'VideoHandler')
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -79,9 +61,7 @@ class test_VideoHandler(unittest.TestCase):
         test_dir = os.path.join(self.dir_out, "test_extract_frames")
         ft.create_directories_if_necessary(test_dir)
 
-        handler = vh.VideoHandler.VideoExtractor(
-            src_video_dir_name_ext, test_dir, None, self.frame_control
-        )
+        handler = vh.VideoHandler.VideoExtractor(src_video_dir_name_ext, test_dir, None, self.frame_control)
         nextracted = handler.extract_frames()
 
         # verify that we extracted 25 frames from a 1 second clip at 25 fps
@@ -91,10 +71,7 @@ class test_VideoHandler(unittest.TestCase):
         for frame_idx, color_idx in [(3, 0), (11, 1), (20, 2)]:
             img_name_ext = frame_name_format % frame_idx
             img_dir_name_ext = os.path.join(test_dir, img_name_ext)
-            self.assertTrue(
-                os.path.exists(img_dir_name_ext),
-                f"Could not find image file \"{img_dir_name_ext}\"",
-            )
+            self.assertTrue(os.path.exists(img_dir_name_ext), f"Could not find image file \"{img_dir_name_ext}\"")
 
             img = cv2.imread(img_dir_name_ext)
             row_avg = np.average(img, axis=0)
@@ -108,9 +85,7 @@ class test_VideoHandler(unittest.TestCase):
         example_dir = os.path.join(out_dir, "examples")
         ft.create_directories_if_necessary(example_dir)
 
-        handler = vh.VideoHandler.VideoExtractor(
-            src_video_dir_name_ext, out_dir, example_dir, self.frame_control
-        )
+        handler = vh.VideoHandler.VideoExtractor(src_video_dir_name_ext, out_dir, example_dir, self.frame_control)
         handler.extract_frames()
 
         # verify that we extracted 1 example frame from a 1 second clip
@@ -132,9 +107,7 @@ class test_VideoHandler(unittest.TestCase):
         self.assertAlmostEqual(actual_duration, expected_duration, delta=0.01)
 
     def test_frames_to_video_duplicates(self):
-        dst_video_dir_name_ext = os.path.join(
-            self.dir_out, "test_frames_to_video_duplicates.mp4"
-        )
+        dst_video_dir_name_ext = os.path.join(self.dir_out, "test_frames_to_video_duplicates.mp4")
         handler = vh.VideoHandler.VideoCreator(
             self.dir_in, dst_video_dir_name_ext, self.video_control, self.frame_control
         )
@@ -149,9 +122,7 @@ class test_VideoHandler(unittest.TestCase):
         self.assertAlmostEqual(actual_duration, expected_duration, delta=0.01)
 
     def test_frames_to_video_exclusions(self):
-        dst_video_dir_name_ext = os.path.join(
-            self.dir_out, "test_frames_to_video_exclusions.mp4"
-        )
+        dst_video_dir_name_ext = os.path.join(self.dir_out, "test_frames_to_video_exclusions.mp4")
         handler = vh.VideoHandler.VideoCreator(
             self.dir_in, dst_video_dir_name_ext, self.video_control, self.frame_control
         )
@@ -164,10 +135,8 @@ class test_VideoHandler(unittest.TestCase):
     def test_transform_powerpoint(self):
         src_video_dir_name_ext = os.path.join(self.dir_in, "1s.mp4")
         dst_dir = os.path.join(self.dir_out, "test_transform_powerpoint")
-        dst_video_dir_name_ext = vh.VideoHandler.transform_powerpoint(
-            src_video_dir_name_ext, dst_dir, overwrite=True
-        )
         ft.create_directories_if_necessary(dst_dir)
+        dst_video_dir_name_ext = vh.VideoHandler.transform_powerpoint(src_video_dir_name_ext, dst_dir, overwrite=True)
 
         # verify the width and height
         handler = vh.VideoHandler.VideoInspector(dst_video_dir_name_ext)

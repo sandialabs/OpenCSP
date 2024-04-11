@@ -29,9 +29,7 @@ class RenderControlVideo:
         if codec not in ['undefined', 'H.264', 'H.265', 'copy']:
             raise RuntimeError(f"Unrecognized codec option '{self.codec}'")
         if low_bitrate and codec in ["undefined", "copy"]:
-            raise RuntimeError(
-                "Codec must be specified in order to use low_bitrate=True"
-            )
+            raise RuntimeError("Codec must be specified in order to use low_bitrate=True")
 
     def _get_original_video_width_height(self, video_or_image_path_name_ext: str):
         if self._original_video_width_height == None:
@@ -41,9 +39,7 @@ class RenderControlVideo:
             self._original_video_width_height = handler.get_width_height()
         return self._original_video_width_height
 
-    def get_ffmpeg_args(
-        self, video_or_image_path_name_ext: str = ""
-    ) -> tuple[str, dict[str, str]]:
+    def get_ffmpeg_args(self, video_or_image_path_name_ext: str = "") -> tuple[str, dict[str, str]]:
         """Get the arguments and directories to be passed to ffmpeg.
 
         Args:
@@ -76,14 +72,10 @@ class RenderControlVideo:
             if video_or_image_path_name_ext != "":
 
                 def owidth():
-                    return self._get_original_video_width_height(
-                        video_or_image_path_name_ext
-                    )[0]
+                    return self._get_original_video_width_height(video_or_image_path_name_ext)[0]
 
                 def oheight():
-                    return self._get_original_video_width_height(
-                        video_or_image_path_name_ext
-                    )[1]
+                    return self._get_original_video_width_height(video_or_image_path_name_ext)[1]
 
                 if self.min_scale:
                     if width != None:
@@ -120,15 +112,8 @@ class RenderControlVideo:
         return cls()
 
     @classmethod
-    def power_point(
-        cls, framerate=10, width=320, height=None, codec='H.264', low_bitrate=False
-    ):
+    def power_point(cls, framerate=10, width=320, height=None, codec='H.264', low_bitrate=False):
         """Returns a set of defaults suitable for embedding videos into powerpoint."""
         return cls(
-            framerate=framerate,
-            width=width,
-            height=height,
-            min_scale=True,
-            codec=codec,
-            low_bitrate=low_bitrate,
+            framerate=framerate, width=width, height=height, min_scale=True, codec=codec, low_bitrate=low_bitrate
         )

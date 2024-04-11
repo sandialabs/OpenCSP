@@ -1,8 +1,6 @@
 """
 Utilities for managing logs for multi-processing.
 
-
-
 """
 
 import logging as log
@@ -20,15 +18,11 @@ global_singleprocessing_logger: log.Logger = None
 global_multiprocessing_logger: log.Logger = None
 
 
-def logger(
-    log_dir_body_ext: str = None,
-    level: int = log.INFO,  # Level 10 yields lots of spurious log information.
-    delete_existing_log: bool = True,
-) -> None:
+def logger(log_dir_body_ext: str = None, level: int = log.INFO, delete_existing_log: bool = True) -> log.Logger:
     """Initialize logging for single-process programs.
 
     Creates a fresh log file, deleting the existing log file if it exists as indicated by delete_existing_log_file.
-    Once this method is called, then the info(), warn(), and error() methods will use the logger created here.
+    Once this method is called, then the debug(), info(), warn(), error(), and critical() methods will use the logger created here.
 
     Example usage::
 
@@ -61,7 +55,7 @@ def logger(
     import opencsp.common.lib.tool.time_date_tools as tdt
 
     # Default log name
-    if log_dir_body_ext == None:
+    if log_dir_body_ext is None:
         import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 
         log_body_ext = tdt.current_date_time_string_forfile() + "_log.txt"
@@ -72,7 +66,7 @@ def logger(
         ft.delete_file(log_dir_body_ext)
 
     # Initialize log.
-    logfile_dir, logfile_body, logfile_ext = ft.path_components(log_dir_body_ext)
+    logfile_dir = ft.path_components(log_dir_body_ext)[0]
     ft.create_directories_if_necessary(logfile_dir)
     log.basicConfig(filename=log_dir_body_ext, level=level)
     global_singleprocessing_logger = log.getLogger("singleprocessing")
@@ -91,7 +85,7 @@ def logger(
     return global_singleprocessing_logger
 
 
-def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO):
+def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO) -> log.Logger:
     """Create a logger for logging across many processes.
 
     For multiprocessing logs, it is recommended that the existing log is deleted by the user or a batch process script.
@@ -114,9 +108,9 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO):
     import opencsp.common.lib.tool.time_date_tools as tdt
 
     # parse the log file
-    if log_dir_body_ext != None:
+    if log_dir_body_ext is not None:
         # Extract path components.
-        log_dir, log_body, log_ext = ft.path_components(log_dir_body_ext)
+        log_dir = ft.path_components(log_dir_body_ext)[0]
         # Create output directory if necessary.
         ft.create_directories_if_necessary(log_dir)
 
@@ -131,10 +125,8 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO):
         process_name = hn_match.groups()[0] + ":" + process_name
 
     # Set formatter.
-    formatter = log.Formatter(
-        f"[%(asctime)s| %(levelname)s| {process_name}] %(message)s"
-    )
-    if log_dir_body_ext != None:
+    formatter = log.Formatter(f"[%(asctime)s| %(levelname)s| {process_name}] %(message)s")
+    if log_dir_body_ext is not None:
         handler = log.FileHandler(log_dir_body_ext)
         handler.setFormatter(formatter)
         global_multiprocessing_logger.addHandler(handler)
@@ -153,51 +145,26 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO):
     return global_multiprocessing_logger
 
 
-def _add_stream_handlers(
-    logger: log.Logger, level: int, formatter: log.Formatter = None
-):
-    """Adds the stdout and stderr streams to the given logger.
+def _add_stream_handlers(logger_: log.Logger, level: int, formatter: log.Formatter = None) -> None:
+    """Adds streams to the given logger. Prints
 
     From https://stackoverflow.com/questions/16061641/python-logging-split-between-stdout-and-stderr
     """
-    # stdout log
+    # stdout: log everything between level and warning
     h1 = log.StreamHandler(sys.stdout)
-    h1.setLevel(log.DEBUG)
-    h1.addFilter(lambda record: record.levelno <= level)
+    h1.setLevel(level)
+    h1.addFilter(lambda record: record.levelno < log.WARNING)
     h1.setFormatter(formatter)
-    logger.addHandler(h1)
+    logger_.addHandler(h1)
 
-    # stderr log
+    # stderr: log everything warning and greater (warning, error, critical)
     h2 = log.StreamHandler(sys.stderr)
     h2.setLevel(log.WARNING)
     h2.setFormatter(formatter)
-    logger.addHandler(h2)
+    logger_.addHandler(h2)
 
 
-# def close(multiprocessing=False):
-#     """ for testing with test_log_tools """
-#     global global_singleprocessing_logger
-#     global global_multiprocessing_logger
-
-#     logger: log.Logger = global_singleprocessing_logger if not multiprocessing else global_multiprocessing_logger
-
-#     # close the handlers
-#     for handler in logger.handlers:
-#         logger.removeHandler(handler)
-#         handler.flush()
-#         handler.close()
-
-#     # close the logger
-#     logger.fl
-
-#     # remove the logger
-#     if multiprocessing:
-#         global_multiprocessing_logger = None
-#     else:
-#         global_singleprocessing_logger = None
-
-
-def debug(*vargs, **kwargs):
+def debug(*vargs, **kwargs) -> int:
     """Output debugging information, both to console and log file.
 
     This is for logging detailed information, typically of interest only when
@@ -211,17 +178,17 @@ def debug(*vargs, **kwargs):
         lt.debug('In my_function(), input_file  = ' + str(input_file_dir_body_ext))
         lt.debug('In my_function(), output_file = ' + str(output_file_dir_body_ext))
     """
-    if global_multiprocessing_logger != None:
+    if global_multiprocessing_logger is not None:
         global_multiprocessing_logger.debug(*vargs, **kwargs)
     else:
-        if global_singleprocessing_logger != None:
+        if global_singleprocessing_logger is not None:
             global_singleprocessing_logger.debug(*vargs, **kwargs)
         else:
             print(*vargs, **kwargs)
     return 0
 
 
-def info(*vargs, **kwargs):
+def info(*vargs, **kwargs) -> int:
     """Report program progress, both to console and log file.
 
     Use this level to confirm that things are working as expected.
@@ -232,10 +199,10 @@ def info(*vargs, **kwargs):
         lt.logger(home_dir() + 'current.log')
         lt.info('In my_function(), writing file: ' + str(output_file_dir_body_ext) + '...')
     """
-    if global_multiprocessing_logger != None:
+    if global_multiprocessing_logger is not None:
         global_multiprocessing_logger.info(*vargs, **kwargs)
     else:
-        if global_singleprocessing_logger != None:
+        if global_singleprocessing_logger is not None:
             global_singleprocessing_logger.info(*vargs, **kwargs)
         else:
             print(*vargs, **kwargs)
@@ -243,6 +210,10 @@ def info(*vargs, **kwargs):
 
 
 def warn(*vargs, **kwargs):
+    warning(*vargs, **kwargs)
+
+
+def warning(*vargs, **kwargs):
     """Warning message, both to console and log file.
 
     Use this level as an indication that something unexpected happened, or
@@ -255,17 +226,17 @@ def warn(*vargs, **kwargs):
         lt.logger(home_dir() + 'current.log')
         lt.warn('In my_function(), Plot x label is empty.')
     """
-    if global_multiprocessing_logger != None:
-        global_multiprocessing_logger.warn(*vargs, **kwargs)
+    if global_multiprocessing_logger is not None:
+        global_multiprocessing_logger.warning(*vargs, **kwargs)
     else:
-        if global_singleprocessing_logger != None:
-            global_singleprocessing_logger.warn(*vargs, **kwargs)
+        if global_singleprocessing_logger is not None:
+            global_singleprocessing_logger.warning(*vargs, **kwargs)
         else:
             print(*vargs, **kwargs)
     return 0
 
 
-def error(*vargs, **kwargs):
+def error(*vargs, **kwargs) -> int:
     """Error message, both to console and log file.
 
     Due to a more serious problem, the software has not been able to perform some function.
@@ -278,17 +249,17 @@ def error(*vargs, **kwargs):
         # or
         lt.error('In my_function(), non-positive value x=' + str(x) + ' encountered.')
     """
-    if global_multiprocessing_logger != None:
+    if global_multiprocessing_logger is not None:
         global_multiprocessing_logger.error(*vargs, **kwargs)
     else:
-        if global_singleprocessing_logger != None:
+        if global_singleprocessing_logger is not None:
             global_singleprocessing_logger.error(*vargs, **kwargs)
         else:
             print(*vargs, **kwargs, file=sys.stderr)
     return 0
 
 
-def critical(*vargs, **kwargs):
+def critical(*vargs, **kwargs) -> int:
     """Critical error message, both to console and log file.
 
     A serious error, indicating that the program itself may be unable to continue running.
@@ -302,17 +273,17 @@ def critical(*vargs, **kwargs):
         # or
         lt.critical('In my_function(), Negative x should be impossible, but x=' + str(x) + ' encountered.')
     """
-    if global_multiprocessing_logger != None:
+    if global_multiprocessing_logger is not None:
         global_multiprocessing_logger.critical(*vargs, **kwargs)
     else:
-        if global_singleprocessing_logger != None:
+        if global_singleprocessing_logger is not None:
             global_singleprocessing_logger.critical(*vargs, **kwargs)
         else:
             print(*vargs, **kwargs, file=sys.stderr)
     return 0
 
 
-def error_and_raise(exception_class: Exception.__class__, msg: str):
+def error_and_raise(exception_class: Exception.__class__, msg: str) -> None:
     """Logs the given message at the "error" level and raises the given exception, also with this message.
 
     Args:
@@ -398,13 +369,13 @@ def error_and_raise(exception_class: Exception.__class__, msg: str):
     error(msg)
     try:
         e = exception_class(msg)
-    except Exception:
-        raise RuntimeError(msg)
+    except Exception as exc:
+        raise RuntimeError(msg) from exc
     raise e
 
 
-def critical_and_raise(exception_class: Exception.__class__, msg: str):
-    """Logs the given message at the "error" level and raises the given exception, also with this message.
+def critical_and_raise(exception_class: Exception.__class__, msg: str) -> None:
+    """Logs the given message at the "critical" level and raises the given exception, also with this message.
 
     Args:
         exception_class (Exception.__class__): An exception class. See error_and_raise() for a description of built-in exceptions.
@@ -420,11 +391,20 @@ def critical_and_raise(exception_class: Exception.__class__, msg: str):
     critical(msg)
     try:
         e = exception_class(msg)
-    except Exception:
-        raise RuntimeError(msg)
+    except Exception as exc:
+        raise RuntimeError(msg) from exc
     raise e
 
 
-def log_and_raise_value_error(local_logger, msg):
+def log_and_raise_value_error(local_logger, msg) -> None:
+    """Logs an error and raises a ValueError with given message
+
+    Parameters
+    ----------
+    local_logger : Logger
+        Unused, kept for backwards compatibility
+    msg : str
+        Error message
+    """
     error(msg)
     raise ValueError(msg)

@@ -1,6 +1,8 @@
+from abc import abstractmethod, ABC
+import os
+
 import h5py
 import numpy as np
-import os
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
@@ -48,7 +50,7 @@ def load_hdf5_datasets(datasets: list, file: str):
 
 
 def is_dataset_and_shape(object: h5py.Group | h5py.Dataset) -> tuple[bool, tuple]:
-    """ Returns whether the given object is an hdf5 dataset and, if it is, then
+    """Returns whether the given object is an hdf5 dataset and, if it is, then
     also what it's shape is.
 
     Parameters
@@ -74,7 +76,7 @@ def is_dataset_and_shape(object: h5py.Group | h5py.Dataset) -> tuple[bool, tuple
 
 
 def get_groups_and_datasets(hdf5_path_name_ext: str | h5py.File):
-    """ Get the structure of an HDF5 file, including all group and dataset names, and the dataset shapes.
+    """Get the structure of an HDF5 file, including all group and dataset names, and the dataset shapes.
 
     Parameters
     ----------
@@ -124,7 +126,7 @@ def _create_dataset_path(base_dir: str, h5_dataset_path_name: str, dataset_ext: 
 
 
 def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
-    """ Unpacks the given HDF5 file into the given destination directory.
+    """Unpacks the given HDF5 file into the given destination directory.
 
     Unpacks the given HDF5 file into the given destination directory. A new
     directory is created in the destination with the same name as the hdf5 file.
@@ -154,8 +156,7 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
 
     # Create the HDF5 output directory
     if ft.directory_exists(hdf5_dir):
-        lt.error_and_raise(
-            FileExistsError, f"Error in hdf5_tools.unzip(): output directory {hdf5_dir} already exists!")
+        lt.error_and_raise(FileExistsError, f"Error in hdf5_tools.unzip(): output directory {hdf5_dir} already exists!")
     ft.create_directories_if_necessary(hdf5_dir)
 
     # Get all of what may be strings or images from the h5 file
@@ -174,8 +175,7 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
         if isinstance(h5_val, np.ndarray) and h5_val.ndim <= 1 and isinstance(h5_val.tolist()[0], str):
             h5_val = h5_val.tolist()[0]
         if isinstance(h5_val, str):
-            dataset_path_name_ext = _create_dataset_path(
-                hdf5_dir, possible_strings[i][0], ".txt")
+            dataset_path_name_ext = _create_dataset_path(hdf5_dir, possible_strings[i][0], ".txt")
             with open(dataset_path_name_ext, "w") as fout:
                 fout.write(h5_val)
         else:
@@ -192,7 +192,6 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
 
             # we assume images have 2 or 3 dimensions
             if (len(shape) == 2) or (len(shape) == 3):
-
                 # we assume shapes are at least 10x10 pixels and have an aspect ratio of at least 10:1
                 aspect_ratio = max(shape[0], shape[1]) / min(shape[0], shape[1])
                 if (shape[0] >= 10 and shape[1] >= 10) and (aspect_ratio < 10.001):
@@ -242,3 +241,38 @@ def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
             np.savetxt(dataset_path_name + ".csv", squeezed, delimiter=",")
 
     return hdf5_dir
+
+
+class HDF5_SaveAbstract(ABC):
+    """Abstract class for saving to HDF5 format"""
+
+    @abstractmethod
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+        """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
+
+
+class HDF5_IO_Abstract(HDF5_SaveAbstract):
+    """Abstract class for loading from HDF5 format"""
+
+    @classmethod
+    @abstractmethod
+    def load_from_hdf(cls, file: str, prefix: str = ''):
+        """Loads data from given file. Assumes data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """

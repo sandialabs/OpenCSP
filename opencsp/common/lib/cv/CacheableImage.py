@@ -9,9 +9,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class CacheableImage:
-    def __init__(
-        self, array: np.ndarray = None, cache_path: str = None, source_path: str = None
-    ):
+    def __init__(self, array: np.ndarray = None, cache_path: str = None, source_path: str = None):
         """An image container that allows for caching an image when the image
         data isn't in use, or for retrieval of an image from the cached file
         when the data is in use.
@@ -38,8 +36,7 @@ class CacheableImage:
         """
         if array is None and cache_path == None and source_path == None:
             lt.error_and_raise(
-                ValueError,
-                "Error in CacheableImage.__init__(): must provide one of array, cache_path, or source_path!",
+                ValueError, "Error in CacheableImage.__init__(): must provide one of array, cache_path, or source_path!"
             )
         self.validate_cache_path(cache_path, "__init__")
         self._array = array
@@ -52,9 +49,7 @@ class CacheableImage:
         return sys.getsizeof(self._array) + sys.getsizeof(self._image)
 
     @classmethod
-    def from_single_source(
-        cls, array_or_path: Union[np.ndarray, str, 'CacheableImage']
-    ):
+    def from_single_source(cls, array_or_path: Union[np.ndarray, str, 'CacheableImage']):
         """Generates a CacheableImage from the given numpy or image file."""
         if isinstance(array_or_path, CacheableImage):
             return array_or_path
@@ -68,8 +63,7 @@ class CacheableImage:
             return cls(array=array)
         else:
             lt.error_and_raise(
-                TypeError,
-                f"Error in CacheableImage.from_single_source(): unexpected type {type(array_or_path)}",
+                TypeError, f"Error in CacheableImage.from_single_source(): unexpected type {type(array_or_path)}"
             )
 
     def validate_cache_path(self, cache_path: Optional[str], caller_name: str):

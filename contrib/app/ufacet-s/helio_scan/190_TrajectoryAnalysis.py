@@ -122,33 +122,21 @@ class TrajectoryAnalysis:
     ):
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError(
-                'In TrajectoryAnalysis.__init__(), null input_video_dir_body_ext encountered.'
-            )
+            raise ValueError('In TrajectoryAnalysis.__init__(), null input_video_dir_body_ext encountered.')
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError(
-                'In TrajectoryAnalysis.__init__(), null output_data_dir encountered.'
-            )
+            raise ValueError('In TrajectoryAnalysis.__init__(), null output_data_dir encountered.')
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError(
-                'In TrajectoryAnalysis.__init__(), null output_render_dir encountered.'
-            )
+            raise ValueError('In TrajectoryAnalysis.__init__(), null output_render_dir encountered.')
 
         # Parse input video path components.
-        input_video_dir, input_video_body, input_video_ext = ft.path_components(
-            input_video_dir_body_ext
-        )
+        input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
 
         # Store input.
         # Execution control.
         self.log_dir_body_ext = log_dir_body_ext
         self.velocity_calculation_offset_fwd_bwd = velocity_calculation_offset_fwd_bwd
-        self.delta_velocity_angle_xy_peak_threshold = (
-            delta_velocity_angle_xy_peak_threshold
-        )
-        self.delta_velocity_angle_xy_non_peak_threshold = (
-            delta_velocity_angle_xy_non_peak_threshold
-        )
+        self.delta_velocity_angle_xy_peak_threshold = delta_velocity_angle_xy_peak_threshold
+        self.delta_velocity_angle_xy_non_peak_threshold = delta_velocity_angle_xy_non_peak_threshold
         self.turn_overshoot_skip_time = turn_overshoot_skip_time
         self.scan_establish_velocity_time = scan_establish_velocity_time
         self.scan_discard_velocity_time = scan_discard_velocity_time
@@ -162,12 +150,8 @@ class TrajectoryAnalysis:
         self.minimum_gps_pass_number_of_points = minimum_gps_pass_number_of_points
         self.gps_pass_start_margin = gps_pass_start_margin
         self.gps_pass_stop_margin = gps_pass_stop_margin
-        self.maximum_camera_pass_inter_point_distance = (
-            maximum_camera_pass_inter_point_distance
-        )
-        self.minimum_camera_pass_inter_point_speed = (
-            minimum_camera_pass_inter_point_speed
-        )
+        self.maximum_camera_pass_inter_point_distance = maximum_camera_pass_inter_point_distance
+        self.minimum_camera_pass_inter_point_speed = minimum_camera_pass_inter_point_speed
         self.minimum_camera_pass_number_of_points = minimum_camera_pass_number_of_points
         self.camera_pass_start_margin = camera_pass_start_margin
         self.camera_pass_stop_margin = camera_pass_stop_margin
@@ -199,17 +183,13 @@ class TrajectoryAnalysis:
         # Other times.
         # An hour before flight.
         self.when_ymdhmsz_minus_1_hour = copy.deepcopy(self.when_ymdhmsz)
-        self.when_ymdhmsz_minus_1_hour[
-            3
-        ] -= 1  # Assume not near midnight, so don't worry about rollover.
+        self.when_ymdhmsz_minus_1_hour[3] -= 1  # Assume not near midnight, so don't worry about rollover.
         # A half-hour before flight.
         self.when_ymdhmsz_minus_30_minutes = copy.deepcopy(self.when_ymdhmsz)
         if self.when_ymdhmsz_minus_30_minutes[4] > 30:
             self.when_ymdhmsz_minus_30_minutes[4] -= 30
         else:
-            self.when_ymdhmsz_minus_30_minutes[
-                3
-            ] -= 1  # Assume not near midnight, so don't worry about rollover.
+            self.when_ymdhmsz_minus_30_minutes[3] -= 1  # Assume not near midnight, so don't worry about rollover.
             self.when_ymdhmsz_minus_30_minutes[4] += 30
 
         # Load solar field data.
@@ -223,15 +203,9 @@ class TrajectoryAnalysis:
         )  # ?? SCAFFOLDING RCB -- RENAME "_file" TO "_dir_body_ext" THROUGHOUT CODE.
 
         # Configuration setup
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
 
         # Drone GPS trajectory from flight log.
         print('In TrajectoryAnalysis.__init__(), loading GPS log...')
@@ -244,12 +218,8 @@ class TrajectoryAnalysis:
 
         # Determine GPS time corresponding to t=0 in the flight log seconds column, and store
         # in the format used by heliostat aim point calculations.
-        print(
-            'In TrajectoryAnalysis.__init__(), finding GPS time corresponding to flight log time=0...'
-        )
-        self.gps_ymdhmsz_given_flight_log_zero_seconds = (
-            self.compute_gps_ymdhmsz_given_flight_log_zero_seconds()
-        )
+        print('In TrajectoryAnalysis.__init__(), finding GPS time corresponding to flight log time=0...')
+        self.gps_ymdhmsz_given_flight_log_zero_seconds = self.compute_gps_ymdhmsz_given_flight_log_zero_seconds()
         self.print_gps_flight_log_zero_seconds()
         # Save GPS time corresponding to flight log zero time.
         self.gps_ymdhmsz_given_flight_log_zero_seconds_dir_body_ext = (
@@ -262,15 +232,11 @@ class TrajectoryAnalysis:
         self.gps_velocity_xy_change_maxima = self.find_gps_velocity_xy_change_maxima(1)
         # self.print_velocity_xy_change_points()
         # Save velocity change points.
-        self.output_gps_velocity_xy_change_minima_dir_body_ext = (
-            self.save_gps_velocity_xy_change_points(
-                self.gps_velocity_xy_change_minima, 'minima'
-            )
+        self.output_gps_velocity_xy_change_minima_dir_body_ext = self.save_gps_velocity_xy_change_points(
+            self.gps_velocity_xy_change_minima, 'minima'
         )
-        self.output_gps_velocity_xy_change_maxima_dir_body_ext = (
-            self.save_gps_velocity_xy_change_points(
-                self.gps_velocity_xy_change_maxima, 'maxima'
-            )
+        self.output_gps_velocity_xy_change_maxima_dir_body_ext = self.save_gps_velocity_xy_change_points(
+            self.gps_velocity_xy_change_maxima, 'maxima'
         )
 
         # Find scan passes.
@@ -285,25 +251,17 @@ class TrajectoryAnalysis:
         # ?? SCAFFOLDING RCB -- COMMENT:
         print('In TrajectoryAnalysis.__init__(), finding GPS scan passes...')
         # Find pairs of a qualifying local maximum followed by the nearest qualifying local minimum.
-        self.maximum_to_minimum_pass_pair_list = (
-            self.find_velocity_xy_change_maximum_to_minimum_scan_passes()
-        )
-        self.minimum_to_maximum_pass_pair_list = (
-            self.find_velocity_xy_change_minimum_to_maximum_scan_passes()
-        )
+        self.maximum_to_minimum_pass_pair_list = self.find_velocity_xy_change_maximum_to_minimum_scan_passes()
+        self.minimum_to_maximum_pass_pair_list = self.find_velocity_xy_change_minimum_to_maximum_scan_passes()
         # Refine min/max pairs to identify stable scan pass motions.
         self.gps_scan_passes = self.convert_gps_minima_maxima_passes_to_scan_passes()
         self.print_gps_scan_pass_summary()
         # Save GPS scan pass data.
-        self.maximum_to_minimum_pass_pair_list_dir_body_ext = (
-            self.save_gps_velocity_xy_change_pairs(
-                self.maximum_to_minimum_pass_pair_list, 'maximum_to_minimum'
-            )
+        self.maximum_to_minimum_pass_pair_list_dir_body_ext = self.save_gps_velocity_xy_change_pairs(
+            self.maximum_to_minimum_pass_pair_list, 'maximum_to_minimum'
         )
-        self.minimum_to_maximum_pass_pair_list_dir_body_ext = (
-            self.save_gps_velocity_xy_change_pairs(
-                self.minimum_to_maximum_pass_pair_list, 'minimum_to_maximum'
-            )
+        self.minimum_to_maximum_pass_pair_list_dir_body_ext = self.save_gps_velocity_xy_change_pairs(
+            self.minimum_to_maximum_pass_pair_list, 'minimum_to_maximum'
         )
         self.output_gps_scan_passes_dir_body_ext = self.save_gps_scan_passes()
 
@@ -315,45 +273,28 @@ class TrajectoryAnalysis:
 
         # Identify time synchronization between GPS flight log and camera frames.
         # ?? SCAFFOLDING RCB -- NOTE THAT THIS IS NOT GENERAL.  MY CURRENT THINKING IS THAT IT SHOULD PROBABLY BE REPLACED BY AN EARLIER COMPUTATION THAT SUPPORTS KEY FRAME IDENTIFICATION, FOR EXAMPLE.  SEE COMMENTS IN ROUTINE.
-        print(
-            'In TrajectoryAnalysis.__init__(), initializing GPS-frame synchronization constants...'
-        )
+        print('In TrajectoryAnalysis.__init__(), initializing GPS-frame synchronization constants...')
         self.synchronization_pair_list = self.initialize_synchronization_pair_list()
-        (
-            self.synchronization_slope,
-            self.synchronization_intercept,
-        ) = self.initialize_synchronization_constants()
+        (self.synchronization_slope, self.synchronization_intercept) = self.initialize_synchronization_constants()
         self.print_synchronization_pair_list()
-        self.synchronization_constants_dir_body_ext = (
-            self.save_synchronization_constants()
-        )
+        self.synchronization_constants_dir_body_ext = self.save_synchronization_constants()
 
         # Construct heliostat camera passes.
-        print(
-            'In TrajectoryAnalysis.__init__(), constructing heliostat camera passes...'
-        )
+        print('In TrajectoryAnalysis.__init__(), constructing heliostat camera passes...')
         self.hel_camera_passes_dict = self.construct_heliostat_camera_passes()
         self.print_hel_camera_passes_dict(max_heliostats=3)
         self.hel_camera_passes_dict_dir_body_ext = self.save_hel_camera_passes_dict()
 
         # Construct data structures for GPS-camera analysis.
-        print(
-            'In TrajectoryAnalysis.__init__(), constructing heliostat GPS-camera analysis...'
-        )
-        self.hel_gps_camera_analysis_dict = (
-            self.construct_hel_gps_camera_analysis_dict()
-        )
+        print('In TrajectoryAnalysis.__init__(), constructing heliostat GPS-camera analysis...')
+        self.hel_gps_camera_analysis_dict = self.construct_hel_gps_camera_analysis_dict()
         self.print_hel_gps_camera_analysis_dict(max_heliostats=3)
-        self.hel_gps_camera_analysis_dict_dir_body_ext = (
-            self.save_hel_gps_camera_analysis_dict()
-        )
+        self.hel_gps_camera_analysis_dict_dir_body_ext = self.save_hel_gps_camera_analysis_dict()
 
         # Figure control information.
         print('In TrajectoryAnalysis.__init__(), initializing figures...')
         fm.reset_figure_management()
-        self.figure_control = rcfg.RenderControlFigure(
-            tile_array=(2, 1), tile_square=True
-        )
+        self.figure_control = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
         self.axis_control_m = rca.meters()
 
         # Check pickle files.
@@ -377,20 +318,14 @@ class TrajectoryAnalysis:
         Adds velocity, speed, angle, and change information.
         """
         # Construct flight log (x,y,z) coordinates.
-        print(
-            'In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), adding position columns...'
-        )
-        self.flight_log_xyz_list = (
-            []
-        )  # ?? SCAFFOLDING RCB -- ELIMINATE THIS, IN FAVOR OF THE DATAFRAME.
+        print('In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), adding position columns...')
+        self.flight_log_xyz_list = []  # ?? SCAFFOLDING RCB -- ELIMINATE THIS, IN FAVOR OF THE DATAFRAME.
         empty_column = [np.nan] * len(self.flight_log_df.index)
         self.flight_log_df['x(m)'] = empty_column
         self.flight_log_df['y(m)'] = empty_column
         self.flight_log_df['z(m)'] = empty_column
         self.flight_log_df['time(sec)'] = empty_column
-        print(
-            'In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...'
-        )
+        print('In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...')
         for (
             idx
         ) in (
@@ -412,17 +347,13 @@ class TrajectoryAnalysis:
             self.flight_log_df.loc[idx, 'time(sec)'] = t_sec
 
         # Construct flight log velocity before each time instant.
-        print(
-            'In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), adding velocity before columns...'
-        )
+        print('In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), adding velocity before columns...')
         empty_column = [np.nan] * len(self.flight_log_df.index)
         self.flight_log_df['velocity_before_x(m/sec)'] = empty_column
         self.flight_log_df['velocity_before_y(m/sec)'] = empty_column
         self.flight_log_df['velocity_before_z(m/sec)'] = empty_column
         self.flight_log_df['speed_before(m/sec)'] = empty_column
-        print(
-            'In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...'
-        )
+        print('In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...')
         for (
             idx
         ) in (
@@ -433,84 +364,50 @@ class TrajectoryAnalysis:
                 y = self.flight_log_df.loc[idx, 'y(m)']
                 z = self.flight_log_df.loc[idx, 'z(m)']
                 t = self.flight_log_df.loc[idx, 'time(sec)']
-                before_x = self.flight_log_df.loc[
-                    idx - self.velocity_calculation_offset_fwd_bwd, 'x(m)'
-                ]
-                before_y = self.flight_log_df.loc[
-                    idx - self.velocity_calculation_offset_fwd_bwd, 'y(m)'
-                ]
-                before_z = self.flight_log_df.loc[
-                    idx - self.velocity_calculation_offset_fwd_bwd, 'z(m)'
-                ]
-                before_t = self.flight_log_df.loc[
-                    idx - self.velocity_calculation_offset_fwd_bwd, 'time(sec)'
-                ]
+                before_x = self.flight_log_df.loc[idx - self.velocity_calculation_offset_fwd_bwd, 'x(m)']
+                before_y = self.flight_log_df.loc[idx - self.velocity_calculation_offset_fwd_bwd, 'y(m)']
+                before_z = self.flight_log_df.loc[idx - self.velocity_calculation_offset_fwd_bwd, 'z(m)']
+                before_t = self.flight_log_df.loc[idx - self.velocity_calculation_offset_fwd_bwd, 'time(sec)']
                 delta_x = x - before_x
                 delta_y = y - before_y
                 delta_z = z - before_z
                 delta_t = t - before_t
                 d = np.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
-                self.flight_log_df.loc[idx, 'velocity_before_x(m/sec)'] = (
-                    delta_x / delta_t
-                )
-                self.flight_log_df.loc[idx, 'velocity_before_y(m/sec)'] = (
-                    delta_y / delta_t
-                )
-                self.flight_log_df.loc[idx, 'velocity_before_z(m/sec)'] = (
-                    delta_z / delta_t
-                )
+                self.flight_log_df.loc[idx, 'velocity_before_x(m/sec)'] = delta_x / delta_t
+                self.flight_log_df.loc[idx, 'velocity_before_y(m/sec)'] = delta_y / delta_t
+                self.flight_log_df.loc[idx, 'velocity_before_z(m/sec)'] = delta_z / delta_t
                 self.flight_log_df.loc[idx, 'speed_before(m/sec)'] = d / delta_t
 
         # Construct flight log velocity after each time instant.
-        print(
-            'In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), adding velocity after columns...'
-        )
+        print('In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), adding velocity after columns...')
         empty_column = [np.nan] * len(self.flight_log_df.index)
         self.flight_log_df['velocity_after_x(m/sec)'] = empty_column
         self.flight_log_df['velocity_after_y(m/sec)'] = empty_column
         self.flight_log_df['velocity_after_z(m/sec)'] = empty_column
         self.flight_log_df['speed_after(m/sec)'] = empty_column
-        print(
-            'In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...'
-        )
+        print('In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...')
         for (
             idx
         ) in (
             self.flight_log_df.index
         ):  # ?? SCAFFOLDING RCB -- THIS FOR LOOP IS VERY SLOW.  CAN WE VECTORIZE IT?  REPLACE THE .loc[] CALLS WITH SOMETHING FASTER?
-            if idx < (
-                len(self.flight_log_df.index) - self.velocity_calculation_offset_fwd_bwd
-            ):
+            if idx < (len(self.flight_log_df.index) - self.velocity_calculation_offset_fwd_bwd):
                 x = self.flight_log_df.loc[idx, 'x(m)']
                 y = self.flight_log_df.loc[idx, 'y(m)']
                 z = self.flight_log_df.loc[idx, 'z(m)']
                 t = self.flight_log_df.loc[idx, 'time(sec)']
-                after_x = self.flight_log_df.loc[
-                    idx + self.velocity_calculation_offset_fwd_bwd, 'x(m)'
-                ]
-                after_y = self.flight_log_df.loc[
-                    idx + self.velocity_calculation_offset_fwd_bwd, 'y(m)'
-                ]
-                after_z = self.flight_log_df.loc[
-                    idx + self.velocity_calculation_offset_fwd_bwd, 'z(m)'
-                ]
-                after_t = self.flight_log_df.loc[
-                    idx + self.velocity_calculation_offset_fwd_bwd, 'time(sec)'
-                ]
+                after_x = self.flight_log_df.loc[idx + self.velocity_calculation_offset_fwd_bwd, 'x(m)']
+                after_y = self.flight_log_df.loc[idx + self.velocity_calculation_offset_fwd_bwd, 'y(m)']
+                after_z = self.flight_log_df.loc[idx + self.velocity_calculation_offset_fwd_bwd, 'z(m)']
+                after_t = self.flight_log_df.loc[idx + self.velocity_calculation_offset_fwd_bwd, 'time(sec)']
                 delta_x = after_x - x
                 delta_y = after_y - y
                 delta_z = after_z - z
                 delta_t = after_t - t
                 d = np.sqrt(delta_x**2 + delta_y**2 + delta_z**2)
-                self.flight_log_df.loc[idx, 'velocity_after_x(m/sec)'] = (
-                    delta_x / delta_t
-                )
-                self.flight_log_df.loc[idx, 'velocity_after_y(m/sec)'] = (
-                    delta_y / delta_t
-                )
-                self.flight_log_df.loc[idx, 'velocity_after_z(m/sec)'] = (
-                    delta_z / delta_t
-                )
+                self.flight_log_df.loc[idx, 'velocity_after_x(m/sec)'] = delta_x / delta_t
+                self.flight_log_df.loc[idx, 'velocity_after_y(m/sec)'] = delta_y / delta_t
+                self.flight_log_df.loc[idx, 'velocity_after_z(m/sec)'] = delta_z / delta_t
                 self.flight_log_df.loc[idx, 'speed_after(m/sec)'] = d / delta_t
 
         # Construct flight log before/after average velocity for time instant, and local change in speed and direction.
@@ -528,9 +425,7 @@ class TrajectoryAnalysis:
         self.flight_log_df['velocity_angle_z(rad)'] = empty_column
         self.flight_log_df['delta_velocity_angle_xy(rad)'] = empty_column
         self.flight_log_df['delta_velocity_angle_z(rad)'] = empty_column
-        print(
-            'In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...'
-        )
+        print('In TrajectoryAnalysis.add_velocity_columns_to_flight_log_df(), added, now filling...')
         for (
             idx
         ) in (
@@ -555,23 +450,13 @@ class TrajectoryAnalysis:
                 abs_delta_speed = abs(delta_speed)
                 # Directions.
                 velocity_angle_xy = self.velocity_angle_xy(average_vx, average_vy)
-                velocity_angle_z = self.velocity_angle_z(
-                    average_vx, average_vy, average_vz
-                )
+                velocity_angle_z = self.velocity_angle_z(average_vx, average_vy, average_vz)
                 before_velocity_angle_xy = self.velocity_angle_xy(before_vx, before_vy)
-                before_velocity_angle_z = self.velocity_angle_z(
-                    before_vx, before_vy, before_vz
-                )
+                before_velocity_angle_z = self.velocity_angle_z(before_vx, before_vy, before_vz)
                 after_velocity_angle_xy = self.velocity_angle_xy(after_vx, after_vy)
-                after_velocity_angle_z = self.velocity_angle_z(
-                    after_vx, after_vy, after_vz
-                )
-                delta_velocity_angle_xy = angle.angle2_minus_angle_1(
-                    before_velocity_angle_xy, after_velocity_angle_xy
-                )
-                delta_velocity_angle_z = angle.angle2_minus_angle_1(
-                    before_velocity_angle_z, after_velocity_angle_z
-                )
+                after_velocity_angle_z = self.velocity_angle_z(after_vx, after_vy, after_vz)
+                delta_velocity_angle_xy = angle.angle2_minus_angle_1(before_velocity_angle_xy, after_velocity_angle_xy)
+                delta_velocity_angle_z = angle.angle2_minus_angle_1(before_velocity_angle_z, after_velocity_angle_z)
                 # Store results.
                 self.flight_log_df.loc[idx, 'velocity_average_x(m/sec)'] = average_vx
                 self.flight_log_df.loc[idx, 'velocity_average_y(m/sec)'] = average_vy
@@ -579,16 +464,10 @@ class TrajectoryAnalysis:
                 self.flight_log_df.loc[idx, 'speed_average(m/sec)'] = average_s
                 self.flight_log_df.loc[idx, 'delta_speed(m/sec)'] = delta_speed
                 self.flight_log_df.loc[idx, 'abs_delta_speed(m/sec)'] = abs_delta_speed
-                self.flight_log_df.loc[
-                    idx, 'velocity_angle_xy(rad)'
-                ] = velocity_angle_xy
+                self.flight_log_df.loc[idx, 'velocity_angle_xy(rad)'] = velocity_angle_xy
                 self.flight_log_df.loc[idx, 'velocity_angle_z(rad)'] = velocity_angle_z
-                self.flight_log_df.loc[
-                    idx, 'delta_velocity_angle_xy(rad)'
-                ] = delta_velocity_angle_xy
-                self.flight_log_df.loc[
-                    idx, 'delta_velocity_angle_z(rad)'
-                ] = delta_velocity_angle_z
+                self.flight_log_df.loc[idx, 'delta_velocity_angle_xy(rad)'] = delta_velocity_angle_xy
+                self.flight_log_df.loc[idx, 'delta_velocity_angle_z(rad)'] = delta_velocity_angle_z
 
     def velocity_angle_xy(self, velocity_x, velocity_y):
         """
@@ -614,9 +493,7 @@ class TrajectoryAnalysis:
                 elif velocity_z < 0:
                     return -(math.pi / 2.0)
                 else:
-                    print(
-                        'ERROR: In 190_TrajectoryAnalysis.velocity_direction_z(), unexpected situation encountered.'
-                    )
+                    print('ERROR: In 190_TrajectoryAnalysis.velocity_direction_z(), unexpected situation encountered.')
                     assert False
             else:
                 return math.atan2(velocity_z, velocity_xy)
@@ -634,9 +511,7 @@ class TrajectoryAnalysis:
         It is simply the conversion from the flight log seconds column to the
         flight log GPS time columns.
         """
-        return tdt.add_seconds_to_ymdhmsz(
-            self.gps_ymdhmsz_given_flight_log_zero_seconds, time_sec
-        )
+        return tdt.add_seconds_to_ymdhmsz(self.gps_ymdhmsz_given_flight_log_zero_seconds, time_sec)
 
     def compute_gps_ymdhmsz_given_flight_log_zero_seconds(self):
         """
@@ -663,19 +538,9 @@ class TrajectoryAnalysis:
         zone = self.when_ymdhmsz[6]
         # Assemble the GPS time in ymdhmsz format.
         # ?? SCAFFOLDING RCB -- THIS SUGGESTS MIGRATING THE YMDHMSZ FORMAT TO A STANDARD PYTHON DATE TIME FORMAT, THROUGHOUT.
-        gps_ymdhmsz = [
-            gps_year,
-            gps_month,
-            gps_day,
-            gps_hour,
-            gps_minute,
-            gps_second,
-            zone,
-        ]
+        gps_ymdhmsz = [gps_year, gps_month, gps_day, gps_hour, gps_minute, gps_second, zone]
         # Subtract the first-row time in seconds, to obtain the time corresponding to flight log seconds = 0.
-        zero_time_ymdhmsz = tdt.subtract_seconds_from_ymdhmsz(
-            gps_ymdhmsz, flight_log_first_row_time_sec
-        )
+        zero_time_ymdhmsz = tdt.subtract_seconds_from_ymdhmsz(gps_ymdhmsz, flight_log_first_row_time_sec)
         # Return.
         return zero_time_ymdhmsz
 
@@ -757,59 +622,24 @@ class TrajectoryAnalysis:
         for idx in self.flight_log_df.index:
             if (idx > 4) and (idx < (len(self.flight_log_df.index) - 5)):
                 # Fetch values.
-                prev5_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx - 5, 'delta_velocity_angle_xy(rad)']
-                )
-                prev4_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx - 4, 'delta_velocity_angle_xy(rad)']
-                )
-                prev3_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx - 3, 'delta_velocity_angle_xy(rad)']
-                )
-                prev2_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx - 2, 'delta_velocity_angle_xy(rad)']
-                )
-                prev1_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx - 1, 'delta_velocity_angle_xy(rad)']
-                )
-                this_delta_velocity_angle_xy = (
-                    sign * self.flight_log_df.loc[idx, 'delta_velocity_angle_xy(rad)']
-                )
-                next1_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx + 1, 'delta_velocity_angle_xy(rad)']
-                )
-                next2_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx + 2, 'delta_velocity_angle_xy(rad)']
-                )
-                next3_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx + 3, 'delta_velocity_angle_xy(rad)']
-                )
-                next4_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx + 4, 'delta_velocity_angle_xy(rad)']
-                )
-                next5_delta_velocity_angle_xy = (
-                    sign
-                    * self.flight_log_df.loc[idx + 5, 'delta_velocity_angle_xy(rad)']
-                )
+                prev5_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx - 5, 'delta_velocity_angle_xy(rad)']
+                prev4_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx - 4, 'delta_velocity_angle_xy(rad)']
+                prev3_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx - 3, 'delta_velocity_angle_xy(rad)']
+                prev2_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx - 2, 'delta_velocity_angle_xy(rad)']
+                prev1_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx - 1, 'delta_velocity_angle_xy(rad)']
+                this_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx, 'delta_velocity_angle_xy(rad)']
+                next1_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx + 1, 'delta_velocity_angle_xy(rad)']
+                next2_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx + 2, 'delta_velocity_angle_xy(rad)']
+                next3_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx + 3, 'delta_velocity_angle_xy(rad)']
+                next4_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx + 4, 'delta_velocity_angle_xy(rad)']
+                next5_delta_velocity_angle_xy = sign * self.flight_log_df.loc[idx + 5, 'delta_velocity_angle_xy(rad)']
                 if (
                     (prev5_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
                     and (prev4_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
                     and (prev3_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
                     and (prev2_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
                     and (prev1_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
-                    and (
-                        this_delta_velocity_angle_xy
-                        >= self.delta_velocity_angle_xy_peak_threshold
-                    )
+                    and (this_delta_velocity_angle_xy >= self.delta_velocity_angle_xy_peak_threshold)
                     and (next1_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
                     and (next2_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
                     and (next3_delta_velocity_angle_xy <= this_delta_velocity_angle_xy)
@@ -823,9 +653,7 @@ class TrajectoryAnalysis:
                     this_z = self.flight_log_df.loc[idx, 'z(m)']
                     maximum_dict = {}
                     maximum_dict['time'] = this_time
-                    maximum_dict['delta_velocity_angle_xy'] = (
-                        sign * this_delta_velocity_angle_xy
-                    )
+                    maximum_dict['delta_velocity_angle_xy'] = sign * this_delta_velocity_angle_xy
                     maximum_dict['x'] = this_x
                     maximum_dict['y'] = this_y
                     maximum_dict['z'] = this_z
@@ -839,11 +667,7 @@ class TrajectoryAnalysis:
         self,
     ):  # ?? SCAFFOLDING RCB -- THIS ROUTINE DUPLICATES ITS PAIR.  CAN THEY BE MERGED, WHILE RETAINING CORRECTNESS AND CLARITY?
         maximum_to_minimum_pass_pair_list = []
-        for (
-            maximum_dict
-        ) in (
-            self.gps_velocity_xy_change_maxima
-        ):  # Here "maximum" means "maximum_velocity_xy_change"
+        for maximum_dict in self.gps_velocity_xy_change_maxima:  # Here "maximum" means "maximum_velocity_xy_change"
             # Here is a local maximum time to work with.
             time_maximum = maximum_dict[
                 'time'
@@ -856,9 +680,7 @@ class TrajectoryAnalysis:
             # See if there is a local maximum in between.
             for alternative_maximum_dict in self.gps_velocity_xy_change_maxima:
                 alternative_time_maximum = alternative_maximum_dict['time']
-                if (alternative_time_maximum > time_maximum) and (
-                    alternative_time_maximum < time_minimum
-                ):
+                if (alternative_time_maximum > time_maximum) and (alternative_time_maximum < time_minimum):
                     maximum_dict = alternative_maximum_dict
                 if alternative_time_maximum > time_minimum:
                     break
@@ -887,12 +709,8 @@ class TrajectoryAnalysis:
                     speed_count = 0
                     for idx in self.flight_log_df.index:
                         time = self.flight_log_df.loc[idx, 'time(sec)']
-                        if (interval_start_time <= time) and (
-                            time <= interval_end_time
-                        ):
-                            speed_sum += self.flight_log_df.loc[
-                                idx, 'speed_average(m/sec)'
-                            ]
+                        if (interval_start_time <= time) and (time <= interval_end_time):
+                            speed_sum += self.flight_log_df.loc[idx, 'speed_average(m/sec)']
                             speed_count += 1
                     if speed_count <= 0:
                         print(
@@ -904,9 +722,7 @@ class TrajectoryAnalysis:
                     min_scan_speed = self.nominal_scan_speed - self.scan_speed_tolerance
                     max_scan_speed = self.nominal_scan_speed + self.scan_speed_tolerance
                     # print('In TrajectoryAnalysis.__init__(), [min_scan_speed, max_scan_speed] = [',min_scan_speed, ',',max_scan_speed,']; interval_average_speed = ', interval_average_speed)  # ?? SCAFFOLDING RCB -- TEMPORARY
-                    if (min_scan_speed <= interval_average_speed) and (
-                        interval_average_speed <= max_scan_speed
-                    ):
+                    if (min_scan_speed <= interval_average_speed) and (interval_average_speed <= max_scan_speed):
                         # Then the intervening motion speed matches the expected speed.
                         # ?? SCAFFOLDING RCB -- THIS CODE REPLICATION IS GETTING SERIOUSLY UGLY.  E.G., WRITE A ROUTINE TO FETCH AVERAGE VALUE OF ARBITRARY PARAMETER.
                         # See if the interval between the maximum and the minimum matches the scan z velocity.
@@ -915,12 +731,8 @@ class TrajectoryAnalysis:
                         velocity_z_count = 0
                         for idx in self.flight_log_df.index:
                             time = self.flight_log_df.loc[idx, 'time(sec)']
-                            if (interval_start_time <= time) and (
-                                time <= interval_end_time
-                            ):
-                                velocity_z_sum += self.flight_log_df.loc[
-                                    idx, 'velocity_average_z(m/sec)'
-                                ]
+                            if (interval_start_time <= time) and (time <= interval_end_time):
+                                velocity_z_sum += self.flight_log_df.loc[idx, 'velocity_average_z(m/sec)']
                                 velocity_z_count += 1
                         if velocity_z_count <= 0:
                             print(
@@ -929,23 +741,15 @@ class TrajectoryAnalysis:
                             )
                             assert False
                         interval_average_velocity_z = velocity_z_sum / velocity_z_count
-                        min_scan_velocity_z = (
-                            self.nominal_scan_velocity_z
-                            - self.scan_velocity_z_tolerance
-                        )
-                        max_scan_velocity_z = (
-                            self.nominal_scan_velocity_z
-                            + self.scan_velocity_z_tolerance
-                        )
+                        min_scan_velocity_z = self.nominal_scan_velocity_z - self.scan_velocity_z_tolerance
+                        max_scan_velocity_z = self.nominal_scan_velocity_z + self.scan_velocity_z_tolerance
                         # print('In TrajectoryAnalysis.__init__(), [min_scan_velocity_z, max_scan_velocity_z] = [',min_scan_velocity_z, ',',max_scan_velocity_z,']; interval_average_velocity_z = ', interval_average_velocity_z)  # ?? SCAFFOLDING RCB -- TEMPORARY
                         if (min_scan_velocity_z <= interval_average_velocity_z) and (
                             interval_average_velocity_z <= max_scan_velocity_z
                         ):
                             # Then the intervening motion velocity_z matches the expected velocity_z.
                             # The [time_maximum, time_minimum] interval passes all tests.
-                            maximum_to_minimum_pass_pair_list.append(
-                                maximum_to_minimum_pair
-                            )
+                            maximum_to_minimum_pass_pair_list.append(maximum_to_minimum_pair)
         # Return.
         return maximum_to_minimum_pass_pair_list
 
@@ -953,11 +757,7 @@ class TrajectoryAnalysis:
         self,
     ):  # ?? SCAFFOLDING RCB -- THIS ROUTINE DUPLICATES ITS PAIR.  CAN THEY BE MERGED, WHILE RETAINING CORRECTNESS AND CLARITY?
         minimum_to_maximum_pass_pair_list = []
-        for (
-            minimum_dict
-        ) in (
-            self.gps_velocity_xy_change_minima
-        ):  # Here "minimum" means "minimum_velocity_xy_change"
+        for minimum_dict in self.gps_velocity_xy_change_minima:  # Here "minimum" means "minimum_velocity_xy_change"
             # Here is a local minimum time to work with.
             time_minimum = minimum_dict[
                 'time'
@@ -970,9 +770,7 @@ class TrajectoryAnalysis:
             # See if there is a local minimum in between.
             for alternative_minimum_dict in self.gps_velocity_xy_change_minima:
                 alternative_time_minimum = alternative_minimum_dict['time']
-                if (alternative_time_minimum > time_minimum) and (
-                    alternative_time_minimum < time_maximum
-                ):
+                if (alternative_time_minimum > time_minimum) and (alternative_time_minimum < time_maximum):
                     minimum_dict = alternative_minimum_dict
                 if alternative_time_minimum > time_maximum:
                     break
@@ -1001,12 +799,8 @@ class TrajectoryAnalysis:
                     speed_count = 0
                     for idx in self.flight_log_df.index:
                         time = self.flight_log_df.loc[idx, 'time(sec)']
-                        if (interval_start_time <= time) and (
-                            time <= interval_end_time
-                        ):
-                            speed_sum += self.flight_log_df.loc[
-                                idx, 'speed_average(m/sec)'
-                            ]
+                        if (interval_start_time <= time) and (time <= interval_end_time):
+                            speed_sum += self.flight_log_df.loc[idx, 'speed_average(m/sec)']
                             speed_count += 1
                     if speed_count <= 0:
                         print(
@@ -1018,9 +812,7 @@ class TrajectoryAnalysis:
                     min_scan_speed = self.nominal_scan_speed - self.scan_speed_tolerance
                     max_scan_speed = self.nominal_scan_speed + self.scan_speed_tolerance
                     # print('In TrajectoryAnalysis.__init__(), [min_scan_speed, max_scan_speed] = [',min_scan_speed, ',',max_scan_speed,']; interval_average_speed = ', interval_average_speed)  # ?? SCAFFOLDING RCB -- TEMPORARY
-                    if (min_scan_speed <= interval_average_speed) and (
-                        interval_average_speed <= max_scan_speed
-                    ):
+                    if (min_scan_speed <= interval_average_speed) and (interval_average_speed <= max_scan_speed):
                         # Then the intervening motion speed matches the expected speed.
                         # ?? SCAFFOLDING RCB -- THIS CODE REPLICATION IS GETTING SERIOUSLY UGLY.  E.G., WRITE A ROUTINE TO FETCH AVERAGE VALUE OF ARBITRARY PARAMETER.
                         # See if the interval between the maximum and the minimum matches the scan z velocity.
@@ -1029,12 +821,8 @@ class TrajectoryAnalysis:
                         velocity_z_count = 0
                         for idx in self.flight_log_df.index:
                             time = self.flight_log_df.loc[idx, 'time(sec)']
-                            if (interval_start_time <= time) and (
-                                time <= interval_end_time
-                            ):
-                                velocity_z_sum += self.flight_log_df.loc[
-                                    idx, 'velocity_average_z(m/sec)'
-                                ]
+                            if (interval_start_time <= time) and (time <= interval_end_time):
+                                velocity_z_sum += self.flight_log_df.loc[idx, 'velocity_average_z(m/sec)']
                                 velocity_z_count += 1
                         if velocity_z_count <= 0:
                             print(
@@ -1043,23 +831,15 @@ class TrajectoryAnalysis:
                             )
                             assert False
                         interval_average_velocity_z = velocity_z_sum / velocity_z_count
-                        min_scan_velocity_z = (
-                            self.nominal_scan_velocity_z
-                            - self.scan_velocity_z_tolerance
-                        )
-                        max_scan_velocity_z = (
-                            self.nominal_scan_velocity_z
-                            + self.scan_velocity_z_tolerance
-                        )
+                        min_scan_velocity_z = self.nominal_scan_velocity_z - self.scan_velocity_z_tolerance
+                        max_scan_velocity_z = self.nominal_scan_velocity_z + self.scan_velocity_z_tolerance
                         # print('In TrajectoryAnalysis.__init__(), [min_scan_velocity_z, max_scan_velocity_z] = [',min_scan_velocity_z, ',',max_scan_velocity_z,']; interval_average_velocity_z = ', interval_average_velocity_z)  # ?? SCAFFOLDING RCB -- TEMPORARY
                         if (min_scan_velocity_z <= interval_average_velocity_z) and (
                             interval_average_velocity_z <= max_scan_velocity_z
                         ):
                             # Then the intervening motion velocity_z matches the expected velocity_z.
                             # The [time_minimum, time_maximum] interval passes all tests.
-                            minimum_to_maximum_pass_pair_list.append(
-                                minimum_to_maximum_pair
-                            )
+                            minimum_to_maximum_pass_pair_list.append(minimum_to_maximum_pair)
         # Return.
         return minimum_to_maximum_pass_pair_list
 
@@ -1125,10 +905,7 @@ class TrajectoryAnalysis:
         #                                          ]
 
         # Combine max-to-min and min-to-max pass pairs, and sort in order of increasing time.
-        start_stop_pass_pair_list = (
-            self.maximum_to_minimum_pass_pair_list
-            + self.minimum_to_maximum_pass_pair_list
-        )
+        start_stop_pass_pair_list = self.maximum_to_minimum_pass_pair_list + self.minimum_to_maximum_pass_pair_list
         start_stop_pass_pair_list.sort(key=self.start_stop_pass_pair_start_time)
 
         # start_stop_pass_pair_list = [ # ?? SCAFFOLDING RCB -- Values computed November 16 at 7:30 AM, hard-coded as a development shortcut.
@@ -1164,14 +941,10 @@ class TrajectoryAnalysis:
         gps_scan_passes = []
         for start_stop_pass_pair in start_stop_pass_pair_list:
             # Fetch trajectory points along pass.
-            xyzt_list = self.xyzt_list_given_gps_start_stop_pass_pair(
-                start_stop_pass_pair
-            )
+            xyzt_list = self.xyzt_list_given_gps_start_stop_pass_pair(start_stop_pass_pair)
             # If there is a pause, break the list up.
-            list_of_xyzt_lists_1 = (
-                self.split_xyzt_list_where_inter_point_speed_below_minimum(
-                    xyzt_list, self.minimum_gps_pass_inter_point_speed
-                )
+            list_of_xyzt_lists_1 = self.split_xyzt_list_where_inter_point_speed_below_minimum(
+                xyzt_list, self.minimum_gps_pass_inter_point_speed
             )
             # Discard lists that are too short.
             list_of_xyzt_lists_2 = self.discard_xyzt_lists_where_length_below_minimum(
@@ -1182,9 +955,7 @@ class TrajectoryAnalysis:
                 # Construct the scan pass object.
                 if len(xyzt_list) >= 2:
                     gps_scan_pass = self.scan_pass_given_xyzt_list(
-                        xyzt_list,
-                        n_start_margin=self.gps_pass_start_margin,
-                        n_stop_margin=self.gps_pass_stop_margin,
+                        xyzt_list, n_start_margin=self.gps_pass_start_margin, n_stop_margin=self.gps_pass_stop_margin
                     )
                     # Add to list.
                     gps_scan_passes.append(gps_scan_pass)
@@ -1204,14 +975,9 @@ class TrajectoryAnalysis:
         self, xyzt_list, n_start_margin, n_stop_margin
     ):  # ?? SCAFFOLDING RCB -- THIS START_MARGIN, STOP_MARGIN IS A STUB HACK.
         # Refine pass, collecting statistical variation data.
-        (
-            stable_begin_xyzt,
-            stable_end_xyzt,
-            line_3d,
-            inlier_xyzt_list,
-            distance_to_line_list,
-            rms_distance_to_line,
-        ) = self.refine_xyzt_list(xyzt_list, n_start_margin, n_stop_margin)
+        (stable_begin_xyzt, stable_end_xyzt, line_3d, inlier_xyzt_list, distance_to_line_list, rms_distance_to_line) = (
+            self.refine_xyzt_list(xyzt_list, n_start_margin, n_stop_margin)
+        )
         # Construct scan pass object.
         scan_pass = (
             {}
@@ -1242,9 +1008,7 @@ class TrajectoryAnalysis:
             )
             inlier_xyzt_list = xyzt_list
         else:
-            inlier_xyzt_list = xyzt_list[
-                n_start_margin : len(xyzt_list) - n_stop_margin
-            ]
+            inlier_xyzt_list = xyzt_list[n_start_margin : len(xyzt_list) - n_stop_margin]
         stable_begin_xyzt = inlier_xyzt_list[
             0
         ]  # ?? SCAFFOLDING RCB -- STUB HACK.  THIS SHOULD USE A FIT LINE, NOT FIRST AND LAST POINTS.
@@ -1256,9 +1020,7 @@ class TrajectoryAnalysis:
         line_3d = g3d.construct_line_3d_given_two_points(
             line_3d_xyz_1, line_3d_xyz_2
         )  # ?? SCAFFOLDING RCB -- LINE-3D SHOULD BE A CLASS.
-        distance_to_line_list = [
-            g3d.distance_to_line_3d(xyzt[0:3], line_3d) for xyzt in inlier_xyzt_list
-        ]
+        distance_to_line_list = [g3d.distance_to_line_3d(xyzt[0:3], line_3d) for xyzt in inlier_xyzt_list]
         rms_distance_to_line = mt.rms(distance_to_line_list)
         # Return.
         return (
@@ -1281,9 +1043,7 @@ class TrajectoryAnalysis:
         hel_frames_dict = {}
         for hel_name in self.solar_field.heliostat_name_list():
             if ft.directory_exists(self.input_reconstructed_heliostats_dir):
-                reconstructed_hel_dir = os.path.join(
-                    self.input_reconstructed_heliostats_dir, hel_name
-                )
+                reconstructed_hel_dir = os.path.join(self.input_reconstructed_heliostats_dir, hel_name)
                 if ft.directory_exists(reconstructed_hel_dir):
                     frame_parameters_dir_body_ext = os.path.join(
                         reconstructed_hel_dir, hel_name + '_frame_dict_parameters.csv'
@@ -1377,36 +1137,21 @@ class TrajectoryAnalysis:
         # ?? SCAFFOLDING RCB -- THIS LITERAL IS BECAUSE THIS IS A TEMPORARY PATCH, UNTIL TIME SYNCHRONIZXATION IS DONE AS PART OF RTK GPS/FRAME SYNCRHONIZATION, AND/OR KEY FRAME SELECTION(?).
         synch_camera_hel_name_list = ['5W9', '5W1', '5E3']
         synch_pair_list = []
-        for synch_gps_pass_idx, synch_camera_hel_name in zip(
-            synch_gps_pass_idx_list, synch_camera_hel_name_list
-        ):
+        for synch_gps_pass_idx, synch_camera_hel_name in zip(synch_gps_pass_idx_list, synch_camera_hel_name_list):
             # GPS spec.
             # ?? SCAFFOLDING RCB -- THIS LITERAL IS BECAUSE THIS IS A TEMPORARY PATCH, UNTIL TIME SYNCHRONIZXATION IS DONE AS PART OF RTK GPS/FRAME SYNCRHONIZATION, AND/OR KEY FRAME SELECTION(?).
             synch_gps_pass_type = 'max_to_min'
             # ?? SCAFFOLDING RCB -- THIS LITERAL IS BECAUSE THIS IS A TEMPORARY PATCH, UNTIL TIME SYNCHRONIZXATION IS DONE AS PART OF RTK GPS/FRAME SYNCRHONIZATION, AND/OR KEY FRAME SELECTION(?).
             synch_gps_start_or_stop = 'stop'
-            synch_gps_time = self.find_gps_synch_time(
-                synch_gps_pass_type, synch_gps_pass_idx, synch_gps_start_or_stop
-            )
+            synch_gps_time = self.find_gps_synch_time(synch_gps_pass_type, synch_gps_pass_idx, synch_gps_start_or_stop)
             # ?? SCAFFOLDING RCB -- THIS INFORMATION IS DEFINED IN DIFFERENT PLACES IN THE CODE, CREATING A VULNERABILITY TO POSSIBLE FURTURE BUGS DUE TO MISMATCHES.  IF THIS APPROACH SURVIVES, RESOLVE THIS.
-            synch_gps_spec = [
-                synch_gps_pass_type,
-                synch_gps_pass_idx,
-                synch_gps_start_or_stop,
-                synch_gps_time,
-            ]
+            synch_gps_spec = [synch_gps_pass_type, synch_gps_pass_idx, synch_gps_start_or_stop, synch_gps_time]
             # Camera spec.
             # Which pause to select out of heliostat camera scan trajectory fragment.  # ?? SCAFFOLDING RCB -- THIS LITERAL IS BECAUSE THIS IS A TEMPORARY PATCH, UNTIL TIME SYNCHRONIZXATION IS DONE AS PART OF RTK GPS/FRAME SYNCRHONIZATION, AND/OR KEY FRAME SELECTION(?).
             synch_camera_pause_idx = 0
-            synch_camera_frame_id = self.find_camera_synch_frame(
-                synch_camera_hel_name, synch_camera_pause_idx
-            )
+            synch_camera_frame_id = self.find_camera_synch_frame(synch_camera_hel_name, synch_camera_pause_idx)
             # ?? SCAFFOLDING RCB -- THIS INFORMATION IS DEFINED IN DIFFERENT PLACES IN THE CODE, CREATING A VULNERABILITY TO POSSIBLE FURTURE BUGS DUE TO MISMATCHES.  IF THIS APPROACH SURVIVES, RESOLVE THIS.
-            synch_camera_spec = [
-                synch_camera_hel_name,
-                synch_camera_pause_idx,
-                synch_camera_frame_id,
-            ]
+            synch_camera_spec = [synch_camera_hel_name, synch_camera_pause_idx, synch_camera_frame_id]
             # Pair.
             synch_pair = [
                 synch_gps_spec,
@@ -1416,9 +1161,7 @@ class TrajectoryAnalysis:
         # Return.
         return synch_pair_list
 
-    def find_gps_synch_time(
-        self, synch_gps_pass_type, synch_gps_pass_idx, synch_gps_start_or_stop
-    ):
+    def find_gps_synch_time(self, synch_gps_pass_type, synch_gps_pass_idx, synch_gps_start_or_stop):
         if synch_gps_pass_type == 'min_to_max':
             pass_pair_list = self.maximum_to_minimum_pass_pair_list
         elif synch_gps_pass_type == 'max_to_min':
@@ -1497,10 +1240,7 @@ class TrajectoryAnalysis:
             synch_hel_name = synch_camera_spec[0]
             if synch_hel_name == hel_name:
                 return synch_camera_spec[2]
-        print(
-            'In TrajectoryAnalysis.get_synchronization_frame_id(), did not find input hel_name =',
-            str(hel_name),
-        )
+        print('In TrajectoryAnalysis.get_synchronization_frame_id(), did not find input hel_name =', str(hel_name))
         assert False
 
     def initialize_synchronization_constants(self):
@@ -1571,33 +1311,23 @@ class TrajectoryAnalysis:
                     camera_xyzt_list.append(camera_xyzt)
             # Split the (x,y,z,t) list into contiguous segments, corresponding to separate passes.
             # ?? SCAFFOLDING RCB -- REWORK THIS, WITHOUT THE MAGIC NUMBER DISCONNECT_THRESHOLD?
-            list_of_camera_xyzt_lists_1 = (
-                self.split_xyzt_list_where_distance_exceeds_maximum(
-                    camera_xyzt_list, self.maximum_camera_pass_inter_point_distance
-                )
+            list_of_camera_xyzt_lists_1 = self.split_xyzt_list_where_distance_exceeds_maximum(
+                camera_xyzt_list, self.maximum_camera_pass_inter_point_distance
             )
             # Discard lists that are too short.
-            list_of_camera_xyzt_lists_2 = (
-                self.discard_xyzt_lists_where_length_below_minimum(
-                    list_of_camera_xyzt_lists_1,
-                    self.minimum_camera_pass_number_of_points,
-                )
+            list_of_camera_xyzt_lists_2 = self.discard_xyzt_lists_where_length_below_minimum(
+                list_of_camera_xyzt_lists_1, self.minimum_camera_pass_number_of_points
             )
             # Split the resulting (x,y,z,t) lists by speed into segments with continuous motion, thus eliminating connected sequences that include stopping and proceeding in a differnt direction.
             list_of_camera_xyzt_lists_3 = []
             for camera_xyzt_list in list_of_camera_xyzt_lists_2:
                 # If there is a pause, break the list up.
-                list_of_camera_xyzt_lists_A = (
-                    self.split_xyzt_list_where_inter_point_speed_below_minimum(
-                        camera_xyzt_list, self.minimum_camera_pass_inter_point_speed
-                    )
+                list_of_camera_xyzt_lists_A = self.split_xyzt_list_where_inter_point_speed_below_minimum(
+                    camera_xyzt_list, self.minimum_camera_pass_inter_point_speed
                 )
                 # Discard lists that are too short.
-                list_of_camera_xyzt_lists_B = (
-                    self.discard_xyzt_lists_where_length_below_minimum(
-                        list_of_camera_xyzt_lists_A,
-                        self.minimum_camera_pass_number_of_points,
-                    )
+                list_of_camera_xyzt_lists_B = self.discard_xyzt_lists_where_length_below_minimum(
+                    list_of_camera_xyzt_lists_A, self.minimum_camera_pass_number_of_points
                 )
                 # Add the result to our accumulating list.
                 list_of_camera_xyzt_lists_3 += list_of_camera_xyzt_lists_B
@@ -1624,9 +1354,7 @@ class TrajectoryAnalysis:
             return [xyz_list]
         else:
             first_xyz = xyz_list[0]
-            remainder = self.split_xyz_list_where_distance_exceeds_maximum(
-                xyz_list[1:], maximum_inter_point_distance
-            )
+            remainder = self.split_xyz_list_where_distance_exceeds_maximum(xyz_list[1:], maximum_inter_point_distance)
             first_remainder_xyz_list = remainder[0]
             first_remainder_xyz = first_remainder_xyz_list[0]
             d = np.sqrt(
@@ -1649,9 +1377,7 @@ class TrajectoryAnalysis:
             return [xyzt_list]
         else:
             first_xyzt = xyzt_list[0]
-            remainder = self.split_xyzt_list_where_distance_exceeds_maximum(
-                xyzt_list[1:], maximum_inter_point_distance
-            )
+            remainder = self.split_xyzt_list_where_distance_exceeds_maximum(xyzt_list[1:], maximum_inter_point_distance)
             first_remainder_xyzt_list = remainder[0]
             first_remainder_xyzt = first_remainder_xyzt_list[0]
             d = np.sqrt(
@@ -1665,9 +1391,7 @@ class TrajectoryAnalysis:
                 remainder[0] = [first_xyzt] + remainder[0]
                 return remainder
 
-    def split_xyzt_list_where_inter_point_speed_below_minimum(
-        self, xyzt_list, minimum_inter_point_speed
-    ):
+    def split_xyzt_list_where_inter_point_speed_below_minimum(self, xyzt_list, minimum_inter_point_speed):
         if len(xyzt_list) == 0:
             return []
         elif len(xyzt_list) == 1:
@@ -1703,9 +1427,7 @@ class TrajectoryAnalysis:
                 remainder[0] = [first_xyzt] + remainder[0]
                 return remainder
 
-    def discard_xyzt_lists_where_length_below_minimum(
-        self, list_of_xyzt_lists, minimum_list_length
-    ):
+    def discard_xyzt_lists_where_length_below_minimum(self, list_of_xyzt_lists, minimum_list_length):
         list_of_sufficiently_long_xyzt_lists = []
         for xyzt_list in list_of_xyzt_lists:
             if len(xyzt_list) >= minimum_list_length:
@@ -1750,9 +1472,7 @@ class TrajectoryAnalysis:
                 )
                 pass
             else:
-                hel_gps_camera_analysis_dict[
-                    hel_name
-                ] = list_of_gps_camera_analysis_dicts
+                hel_gps_camera_analysis_dict[hel_name] = list_of_gps_camera_analysis_dicts
         # Return.
         return hel_gps_camera_analysis_dict
 
@@ -1771,9 +1491,7 @@ class TrajectoryAnalysis:
                 3
             ]  # ?? SCAFFOLDING RCB -- HAVE THIS FETCH ORIGINAL FULL-LENGTH START AND STOP TIME INTERVAL.
             # Check for overlap.
-            if (gps_pass_begin_time <= camera_pass_end_time) and (
-                camera_pass_begin_time <= gps_pass_end_time
-            ):
+            if (gps_pass_begin_time <= camera_pass_end_time) and (camera_pass_begin_time <= gps_pass_end_time):
                 # There is temporal overlap.
                 overlap_min = max(camera_pass_begin_time, gps_pass_begin_time)
                 overlap_max = min(camera_pass_end_time, gps_pass_end_time)
@@ -1807,9 +1525,7 @@ class TrajectoryAnalysis:
         self, hel_name, gps_pass, camera_pass
     ):  # ?? SCAFFOLDING RCB -- THIS SHOULD BE A CLASS.
         # Fetch camera pass time interval.
-        time_begin = camera_pass['stable_begin_xyzt'][
-            3
-        ]  # Times correspond to the seconds column in the flight log.
+        time_begin = camera_pass['stable_begin_xyzt'][3]  # Times correspond to the seconds column in the flight log.
         time_end = camera_pass['stable_end_xyzt'][3]  #
         time_mid = (time_begin + time_end) / 2.0  #
         # Compute heliostat (azimuth, elevation) from aim point and time.
@@ -1820,16 +1536,12 @@ class TrajectoryAnalysis:
             elevation_from_model_mid,
             azimuth_from_model_end,
             elevation_from_model_end,
-        ) = self.compute_model_azimuth_elevation(
-            hel_name, time_begin, time_mid, time_end
-        )
+        ) = self.compute_model_azimuth_elevation(hel_name, time_begin, time_mid, time_end)
         # Compute heliostat (azimuth, elevation) that will bring camera pass into parallel alignment with GPS pass.
-        (
-            azimuth_from_alignment,
-            elevation_from_alignment,
-            alignment_angle_error,
-        ) = self.compute_alignment_azimuth_elevation(
-            gps_pass, camera_pass, azimuth_from_model_mid, elevation_from_model_mid
+        (azimuth_from_alignment, elevation_from_alignment, alignment_angle_error) = (
+            self.compute_alignment_azimuth_elevation(
+                gps_pass, camera_pass, azimuth_from_model_mid, elevation_from_model_mid
+            )
         )
         # # Compute heliostat (azimuth, elevation) from log.
         # azimuth_from_log_begin,          \
@@ -1847,19 +1559,14 @@ class TrajectoryAnalysis:
         # Compute camera_pass points, transformed by (azimuth,elevation).
         heliostat = self.solar_field.lookup_heliostat(hel_name)
         transform_translation = heliostat.centroid_nparray
-        transform_rotation = Heliostat.heliostat_rotation_matrix(
-            azimuth_from_alignment, elevation_from_alignment
-        )
+        transform_rotation = Heliostat.heliostat_rotation_matrix(azimuth_from_alignment, elevation_from_alignment)
         camera_xyzt_list = camera_pass['inlier_xyzt_list']
         transformed_camera_xyzt_list = []
         for camera_xyzt in camera_xyzt_list:
             camera_xyz_heliostat = camera_xyzt[0:3]
             camera_time = camera_xyzt[3]
             # ?? SCAFFOLDING RCB -- CONVERSION TO/FROM LIST AGAIN SUGGESTS CONVERTING TO NUMPY ARRAYS THROUGHOUT.
-            camera_xyz_world = list(
-                transform_translation
-                + transform_rotation.dot(np.array(camera_xyz_heliostat))
-            )
+            camera_xyz_world = list(transform_translation + transform_rotation.dot(np.array(camera_xyz_heliostat)))
             camera_xyzt_world = camera_xyz_world + [camera_time]
             transformed_camera_xyzt_list.append(camera_xyzt_world)
         per_heliostat_transformed_camera_pass = self.scan_pass_given_xyzt_list(
@@ -1873,13 +1580,9 @@ class TrajectoryAnalysis:
         camera_gps_distance_squared_count = 0
         for transformed_camera_xyzt in transformed_camera_xyzt_list:
             transformed_camera_inlier_xyz = transformed_camera_xyzt[0:3]
-            nearest_gps_xyz = g3d.closest_point_on_line_3d(
-                transformed_camera_inlier_xyz, gps_line_3d
-            )
+            nearest_gps_xyz = g3d.closest_point_on_line_3d(transformed_camera_inlier_xyz, gps_line_3d)
             camera_gps_point_pair = [transformed_camera_inlier_xyz, nearest_gps_xyz]
-            camera_gps_distance = g3d.distance_between_xyz_points(
-                transformed_camera_inlier_xyz, nearest_gps_xyz
-            )
+            camera_gps_distance = g3d.distance_between_xyz_points(transformed_camera_inlier_xyz, nearest_gps_xyz)
             camera_gps_point_pair_list.append(camera_gps_point_pair)
             camera_gps_distance_list.append(camera_gps_distance)
             camera_gps_distance_squared_sum += camera_gps_distance**2
@@ -1890,9 +1593,7 @@ class TrajectoryAnalysis:
                 'ERROR: In TrajectoryAnalysis.construct_gps_camera_analysis_dict(), encountered empty camera pass inlier xyzt list.'
             )
             assert False
-        rms_distance = np.sqrt(
-            camera_gps_distance_squared_sum / camera_gps_distance_squared_count
-        )
+        rms_distance = np.sqrt(camera_gps_distance_squared_sum / camera_gps_distance_squared_count)
         # Store results.
         gps_camera_analysis_dict = {}
         gps_camera_analysis_dict['hel_name'] = hel_name
@@ -1904,9 +1605,7 @@ class TrajectoryAnalysis:
         gps_camera_analysis_dict['time_mid'] = time_mid
         # (azimuth, elevation) from aim point and time.
         gps_camera_analysis_dict['azimuth_from_model_begin'] = azimuth_from_model_begin
-        gps_camera_analysis_dict[
-            'elevation_from_model_begin'
-        ] = elevation_from_model_begin
+        gps_camera_analysis_dict['elevation_from_model_begin'] = elevation_from_model_begin
         gps_camera_analysis_dict['azimuth_from_model_mid'] = azimuth_from_model_mid
         gps_camera_analysis_dict['elevation_from_model_mid'] = elevation_from_model_mid
         gps_camera_analysis_dict['azimuth_from_model_end'] = azimuth_from_model_end
@@ -1929,37 +1628,19 @@ class TrajectoryAnalysis:
         # gps_camera_analysis_dict['azimuth_target_from_log_end']     = azimuth_target_from_log_end
         # gps_camera_analysis_dict['elevation_target_from_log_end']   = elevation_target_from_log_end
         # Corresponding point analysis.
-        gps_camera_analysis_dict[
-            'per_heliostat_transformed_camera_pass'
-        ] = per_heliostat_transformed_camera_pass
-        gps_camera_analysis_dict[
-            'camera_gps_point_pair_list'
-        ] = camera_gps_point_pair_list
+        gps_camera_analysis_dict['per_heliostat_transformed_camera_pass'] = per_heliostat_transformed_camera_pass
+        gps_camera_analysis_dict['camera_gps_point_pair_list'] = camera_gps_point_pair_list
         gps_camera_analysis_dict['camera_gps_distance_list'] = camera_gps_distance_list
         gps_camera_analysis_dict['rms_distance'] = rms_distance
         # Return.
         return gps_camera_analysis_dict
 
     def compute_model_azimuth_elevation(self, hel_name, time_begin, time_mid, time_end):
-        (
-            azimuth_begin,
-            elevation_begin,
-        ) = self.compute_model_azimuth_elevation_given_time(hel_name, time_begin)
-        azimuth_mid, elevation_mid = self.compute_model_azimuth_elevation_given_time(
-            hel_name, time_mid
-        )
-        azimuth_end, elevation_end = self.compute_model_azimuth_elevation_given_time(
-            hel_name, time_end
-        )
+        (azimuth_begin, elevation_begin) = self.compute_model_azimuth_elevation_given_time(hel_name, time_begin)
+        azimuth_mid, elevation_mid = self.compute_model_azimuth_elevation_given_time(hel_name, time_mid)
+        azimuth_end, elevation_end = self.compute_model_azimuth_elevation_given_time(hel_name, time_end)
         # Return.
-        return (
-            azimuth_begin,
-            elevation_begin,
-            azimuth_mid,
-            elevation_mid,
-            azimuth_end,
-            elevation_end,
-        )
+        return (azimuth_begin, elevation_begin, azimuth_mid, elevation_mid, azimuth_end, elevation_end)
 
     def compute_model_azimuth_elevation_given_time(self, hel_name, time):
         heliostat = self.solar_field.lookup_heliostat(hel_name)
@@ -2045,24 +1726,15 @@ class TrajectoryAnalysis:
         return delta_uxyz
 
     def compute_log_azimuth_elevation(self, hel_name, time_begin, time_mid, time_end):
-        (
-            azimuth_begin,
-            elevation_begin,
-            azimuth_target_begin,
-            elevation_target_begin,
-        ) = self.compute_log_azimuth_elevation_given_time(hel_name, time_begin)
-        (
-            azimuth_mid,
-            elevation_mid,
-            azimuth_target_mid,
-            elevation_target_mid,
-        ) = self.compute_log_azimuth_elevation_given_time(hel_name, time_mid)
-        (
-            azimuth_end,
-            elevation_end,
-            azimuth_target_end,
-            elevation_target_end,
-        ) = self.compute_log_azimuth_elevation_given_time(hel_name, time_end)
+        (azimuth_begin, elevation_begin, azimuth_target_begin, elevation_target_begin) = (
+            self.compute_log_azimuth_elevation_given_time(hel_name, time_begin)
+        )
+        (azimuth_mid, elevation_mid, azimuth_target_mid, elevation_target_mid) = (
+            self.compute_log_azimuth_elevation_given_time(hel_name, time_mid)
+        )
+        (azimuth_end, elevation_end, azimuth_target_end, elevation_target_end) = (
+            self.compute_log_azimuth_elevation_given_time(hel_name, time_end)
+        )
         # Return.
         return (
             azimuth_begin,
@@ -2091,16 +1763,14 @@ class TrajectoryAnalysis:
             frames_dict = self.hel_frames_dict[hel_name]
             for frame_id in frames_dict.keys():
                 frame_parameters_dict = frames_dict[frame_id]
-                camera_xyz_heliostat = frame_parameters_dict[
-                    'camera_xyz_in_heliostat_coords'
-                ]
+                camera_xyz_heliostat = frame_parameters_dict['camera_xyz_in_heliostat_coords']
                 # ?? SCAFFOLDING RCB -- HERE WE COULD USE THE SPECIFIC TIME OF EACH FRAME, AND UPDATE HELIOSTAT TRACKING ANGLE TO CORRESPOND TO THAT TIME, BEFORE CALLING heliostat.transform_xyz().  HOWEVER, THIS IS NOT REQUIRED FOR SHORT FLIGHTS, SINCE THE DIFFERENCE WILL BE SMALL, AND IT IS REFINED LATER
                 camera_xyz_world = list(
                     heliostat.transform_xyz(camera_xyz_heliostat)
                 )  # transform_xyz() returns a numpy array.
-                frame_parameters_dict[
-                    'per_heliostat_estimate_of_camera_xyz_in_world_coords_overall_time'
-                ] = camera_xyz_world
+                frame_parameters_dict['per_heliostat_estimate_of_camera_xyz_in_world_coords_overall_time'] = (
+                    camera_xyz_world
+                )
         # Camera passes.
         self.hel_transformed_camera_passes_dict = {}
         for hel_name in self.hel_camera_passes_dict.keys():
@@ -2124,21 +1794,15 @@ class TrajectoryAnalysis:
                 )
                 transformed_camera_pass_list.append(transformed_camera_pass)
             # Add to result.
-            self.hel_transformed_camera_passes_dict[
-                hel_name
-            ] = transformed_camera_pass_list
+            self.hel_transformed_camera_passes_dict[hel_name] = transformed_camera_pass_list
 
     def set_per_heliosat_configurations_from_gps_camera_alignment(self):
         """
         Sets the configuration of each heliostat for which we found an (az,el) configuraiton using the alignment method.
         """
         for hel_name in self.hel_gps_camera_analysis_dict.keys():
-            list_of_gps_camera_analysis_dicts = self.hel_gps_camera_analysis_dict[
-                hel_name
-            ]
-            gps_camera_analysis_dict = list_of_gps_camera_analysis_dicts[
-                0
-            ]  # Arbitrarily choose first orientation.
+            list_of_gps_camera_analysis_dicts = self.hel_gps_camera_analysis_dict[hel_name]
+            gps_camera_analysis_dict = list_of_gps_camera_analysis_dicts[0]  # Arbitrarily choose first orientation.
             azimuth = gps_camera_analysis_dict['azimuth_from_alignment']
             elevation = gps_camera_analysis_dict['elevation_from_alignment']
             heliostat = self.solar_field.lookup_heliostat(hel_name)
@@ -2153,9 +1817,7 @@ class TrajectoryAnalysis:
     # PRINT KEY RESULTS
 
     def print_flight_log_df(self):
-        print(
-            'In TrajectoryAnalysis.print_flight_log_df(), flight_log_df, after adding columns:'
-        )
+        print('In TrajectoryAnalysis.print_flight_log_df(), flight_log_df, after adding columns:')
         print(self.flight_log_df)
 
     def print_gps_flight_log_zero_seconds(self):
@@ -2165,46 +1827,18 @@ class TrajectoryAnalysis:
         )
 
     def print_velocity_xy_change_points(self):
-        print(
-            'In TrajectoryAnalysis.print_velocity_xy_change_points(), velocity_xy_change minima:'
-        )
-        lt.print_list(
-            self.gps_velocity_xy_change_minima,
-            indent=4,
-            max_items=50,
-            max_item_length=200,
-        )
-        print(
-            'In TrajectoryAnalysis.print_velocity_xy_change_points(), velocity_xy_change maxima:'
-        )
-        lt.print_list(
-            self.gps_velocity_xy_change_maxima,
-            indent=4,
-            max_items=50,
-            max_item_length=200,
-        )
+        print('In TrajectoryAnalysis.print_velocity_xy_change_points(), velocity_xy_change minima:')
+        lt.print_list(self.gps_velocity_xy_change_minima, indent=4, max_items=50, max_item_length=200)
+        print('In TrajectoryAnalysis.print_velocity_xy_change_points(), velocity_xy_change maxima:')
+        lt.print_list(self.gps_velocity_xy_change_maxima, indent=4, max_items=50, max_item_length=200)
 
     def print_gps_scan_pass_summary(self):
         # Maximum to minimum.
-        print(
-            '\nIn TrajectoryAnalysis.print_gps_scan_pass_summary(), self.maximum_to_minimum_pass_pair_list:'
-        )
-        lt.print_list(
-            self.maximum_to_minimum_pass_pair_list,
-            indent=4,
-            max_items=50,
-            max_item_length=2000,
-        )
+        print('\nIn TrajectoryAnalysis.print_gps_scan_pass_summary(), self.maximum_to_minimum_pass_pair_list:')
+        lt.print_list(self.maximum_to_minimum_pass_pair_list, indent=4, max_items=50, max_item_length=2000)
         # Minimum to maximum.
-        print(
-            '\nIn TrajectoryAnalysis.print_gps_scan_pass_summary(), self.minimum_to_maximum_pass_pair_list:'
-        )
-        lt.print_list(
-            self.minimum_to_maximum_pass_pair_list,
-            indent=4,
-            max_items=50,
-            max_item_length=2000,
-        )
+        print('\nIn TrajectoryAnalysis.print_gps_scan_pass_summary(), self.minimum_to_maximum_pass_pair_list:')
+        lt.print_list(self.minimum_to_maximum_pass_pair_list, indent=4, max_items=50, max_item_length=2000)
         # GPS scan passes.
         print('\nIn TrajectoryAnalysis.print_gps_scan_pass_summary(), gps_scan_passes:')
         gps_scan_pass_idx = 0
@@ -2261,12 +1895,8 @@ class TrajectoryAnalysis:
         )
 
     def print_hel_camera_passes_dict(self, max_heliostats=4):
-        print(
-            '\nIn TrajectoryAnalysis.print_hel_camera_passes_dict(), heliostat camera passes:'
-        )
-        self.print_hel_camera_passes_dict_aux(
-            self.hel_camera_passes_dict, max_heliostats
-        )
+        print('\nIn TrajectoryAnalysis.print_hel_camera_passes_dict(), heliostat camera passes:')
+        self.print_hel_camera_passes_dict_aux(self.hel_camera_passes_dict, max_heliostats)
 
     def print_hel_camera_passes_dict_aux(self, hel_camera_passes_dict, max_heliostats):
         # Heliostat entries.
@@ -2291,44 +1921,31 @@ class TrajectoryAnalysis:
             print('...')
 
     def print_hel_gps_camera_analysis_dict(self, max_heliostats=4):
-        print(
-            '\nIn TrajectoryAnalysis.print_hel_gps_camera_analysis_dict(), heliostat GPS-camera analysis data:'
-        )
-        self.print_hel_gps_camera_analysis_dict_aux(
-            self.hel_gps_camera_analysis_dict, max_heliostats
-        )
+        print('\nIn TrajectoryAnalysis.print_hel_gps_camera_analysis_dict(), heliostat GPS-camera analysis data:')
+        self.print_hel_gps_camera_analysis_dict_aux(self.hel_gps_camera_analysis_dict, max_heliostats)
 
-    def print_hel_gps_camera_analysis_dict_aux(
-        self, hel_gps_camera_analysis_dict, max_heliostats
-    ):
-        print(
-            '\nIn TrajectoryAnalysis.print_hel_gps_camera_analysis_dict(), heliostat GPS-camera analysis data:'
-        )
+    def print_hel_gps_camera_analysis_dict_aux(self, hel_gps_camera_analysis_dict, max_heliostats):
+        print('\nIn TrajectoryAnalysis.print_hel_gps_camera_analysis_dict(), heliostat GPS-camera analysis data:')
         # Heliostat entries.
         hel_count = 1
         for hel_name in dt.sorted_keys(hel_gps_camera_analysis_dict):
             print(str(hel_name) + ':')
             list_of_gps_camera_analysis_dicts = hel_gps_camera_analysis_dict[hel_name]
             for gps_camera_analysis_dict in list_of_gps_camera_analysis_dicts:
-                transformed_camera_begin_xyzt = gps_camera_analysis_dict[
-                    'per_heliostat_transformed_camera_pass'
-                ]['stable_begin_xyzt']
-                transformed_camera_end_xyzt = gps_camera_analysis_dict[
-                    'per_heliostat_transformed_camera_pass'
-                ]['stable_end_xyzt']
-                gps_begin_xyzt = gps_camera_analysis_dict['gps_pass'][
+                transformed_camera_begin_xyzt = gps_camera_analysis_dict['per_heliostat_transformed_camera_pass'][
                     'stable_begin_xyzt'
                 ]
+                transformed_camera_end_xyzt = gps_camera_analysis_dict['per_heliostat_transformed_camera_pass'][
+                    'stable_end_xyzt'
+                ]
+                gps_begin_xyzt = gps_camera_analysis_dict['gps_pass']['stable_begin_xyzt']
                 gps_end_xyzt = gps_camera_analysis_dict['gps_pass']['stable_end_xyzt']
                 azimuth = gps_camera_analysis_dict['azimuth_from_alignment']
                 elevation = gps_camera_analysis_dict['elevation_from_alignment']
                 alignment_error = gps_camera_analysis_dict['alignment_angle_error']
                 rms_distance = gps_camera_analysis_dict['rms_distance']
                 print(
-                    '    Transformed camera pass:',
-                    transformed_camera_begin_xyzt,
-                    ' --> ',
-                    transformed_camera_end_xyzt,
+                    '    Transformed camera pass:', transformed_camera_begin_xyzt, ' --> ', transformed_camera_end_xyzt
                 )
                 print('      GPS pass:       ', gps_begin_xyzt, ' --> ', gps_end_xyzt)
                 print('      Azimuth:        ', azimuth, ' rad')
@@ -2354,32 +1971,20 @@ class TrajectoryAnalysis:
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
         self.solar_field_style = self.solar_field_default_style
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
 
         # Drawing styles.
-        self.flight_log_style = rcps.data_curve(
-            color='grey', linewidth=0.25, markersize=0.5
-        )
+        self.flight_log_style = rcps.data_curve(color='grey', linewidth=0.25, markersize=0.5)
         self.minimum_style = rcps.marker(color='m', markersize=0.8)
         self.maximum_style = rcps.marker(color='r', markersize=0.8)
         self.max_to_min_color = 'g'
         self.min_to_max_color = 'r'
-        self.max_to_min_scan_pass_style = rcps.outline(
-            color=self.max_to_min_color, linewidth=0.5
-        )
-        self.min_to_max_scan_pass_style = rcps.outline(
-            color=self.min_to_max_color, linewidth=0.5
-        )
+        self.max_to_min_scan_pass_style = rcps.outline(color=self.max_to_min_color, linewidth=0.5)
+        self.min_to_max_scan_pass_style = rcps.outline(color=self.min_to_max_color, linewidth=0.5)
         self.scan_pass_color = 'k'
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
-        self.trajectory_fragment_style = rcps.data_curve(
-            color='r', linewidth=0.25, markersize=0.4
-        )
+        self.trajectory_fragment_style = rcps.data_curve(color='r', linewidth=0.25, markersize=0.4)
         self.camera_pass_color_wheel = ['red', 'green', 'blue', 'magenta', 'goldenrod']
         self.trajectory_fragment_color_wheel = [
             'coral',
@@ -2389,15 +1994,11 @@ class TrajectoryAnalysis:
             'gold',
         ]  # Lighter version of each camera pass color.
         self.synchronization_point_style = rcps.marker(color='r', markersize=1)
-        self.camera_pass_style = rcps.data_curve(
-            color='r', linewidth=0.1, markersize=0.6
-        )
+        self.camera_pass_style = rcps.data_curve(color='r', linewidth=0.1, markersize=0.6)
         self.pass_connection_style = rcps.outline(color='r', linewidth=0.1)
 
         # What to include in each figure.
-        draw_control_dict = (
-            {}
-        )  # ?? SCAFFOLDING RCB -- PROBABLY REPLACE WITH A REAL RENDER CONTROL CLASS OBJECT.
+        draw_control_dict = {}  # ?? SCAFFOLDING RCB -- PROBABLY REPLACE WITH A REAL RENDER CONTROL CLASS OBJECT.
         draw_control_dict['draw_GPS_log'] = False
         draw_control_dict['draw_gps_velocity_xy_change_minima'] = False
         draw_control_dict['draw_gps_velocity_xy_change_maxima'] = False
@@ -2482,9 +2083,7 @@ class TrajectoryAnalysis:
             aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz_minus_1_hour
         )
         self.solar_field_style = rcsf.heliostat_normals_outlines(color='k')
-        aimpoint_str = '({x},{y},{z})'.format(
-            x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2]
-        )
+        aimpoint_str = '({x},{y},{z})'.format(x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2])
         date_str = '{m}/{d}/{y}'.format(
             m=self.when_ymdhmsz_minus_1_hour[1],
             d=self.when_ymdhmsz_minus_1_hour[2],
@@ -2513,13 +2112,10 @@ class TrajectoryAnalysis:
 
         # Draw the solar field nominal tracking, a half-hour before the flight.
         self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz,
-            when_ymdhmsz=self.when_ymdhmsz_minus_30_minutes,
+            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz_minus_30_minutes
         )
         self.solar_field_style = rcsf.heliostat_normals_outlines(color='k')
-        aimpoint_str = '({x},{y},{z})'.format(
-            x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2]
-        )
+        aimpoint_str = '({x},{y},{z})'.format(x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2])
         date_str = '{m}/{d}/{y}'.format(
             m=self.when_ymdhmsz_minus_30_minutes[1],
             d=self.when_ymdhmsz_minus_30_minutes[2],
@@ -2547,16 +2143,10 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field nominal tracking.
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
         self.solar_field_style = rcsf.heliostat_normals_outlines(color='k')
-        aimpoint_str = '({x},{y},{z})'.format(
-            x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2]
-        )
-        date_str = '{m}/{d}/{y}'.format(
-            m=self.when_ymdhmsz[1], d=self.when_ymdhmsz[2], y=self.when_ymdhmsz[0]
-        )
+        aimpoint_str = '({x},{y},{z})'.format(x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2])
+        date_str = '{m}/{d}/{y}'.format(m=self.when_ymdhmsz[1], d=self.when_ymdhmsz[2], y=self.when_ymdhmsz[0])
         time_str = '{h:d}:{m:02d}:{s:02d}'.format(
             h=self.when_ymdhmsz[3], m=self.when_ymdhmsz[4], s=self.when_ymdhmsz[5]
         )
@@ -2577,15 +2167,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field nominal tracking, with exceptions of the day (showing normals).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.solar_field_style = rcsf.heliostat_normals_outlines(color='grey')
         self.heliostat_up_style = rch.normal_outline(
             color='lightblue'
@@ -2593,28 +2177,15 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.normal_outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
-        aimpoint_str = '({x},{y},{z})'.format(
-            x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2]
-        )
-        date_str = '{m}/{d}/{y}'.format(
-            m=self.when_ymdhmsz[1], d=self.when_ymdhmsz[2], y=self.when_ymdhmsz[0]
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
+        aimpoint_str = '({x},{y},{z})'.format(x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2])
+        date_str = '{m}/{d}/{y}'.format(m=self.when_ymdhmsz[1], d=self.when_ymdhmsz[2], y=self.when_ymdhmsz[0])
         time_str = '{h:d}:{m:02d}:{s:02d}'.format(
             h=self.when_ymdhmsz[3], m=self.when_ymdhmsz[4], s=self.when_ymdhmsz[5]
         )
         self.draw_and_save_solar_field_trajectories(
-            'AF. Actual '
-            + self.solar_field.short_name
-            + ' Field Configuration on '
-            + date_str
-            + ' at '
-            + time_str,
+            'AF. Actual ' + self.solar_field.short_name + ' Field Configuration on ' + date_str + ' at ' + time_str,
             draw_control_dict,
             limits_3d_list=limits_3d_list,
             limits_xy_list=limits_xy_list,
@@ -2623,15 +2194,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field nominal tracking, with exceptions of the day.
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.solar_field_style = rcsf.heliostat_outlines(color='grey')
         self.heliostat_up_style = rch.outline(
             color='lightblue'
@@ -2639,28 +2204,15 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
-        aimpoint_str = '({x},{y},{z})'.format(
-            x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2]
-        )
-        date_str = '{m}/{d}/{y}'.format(
-            m=self.when_ymdhmsz[1], d=self.when_ymdhmsz[2], y=self.when_ymdhmsz[0]
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
+        aimpoint_str = '({x},{y},{z})'.format(x=self.aimpoint_xyz[0], y=self.aimpoint_xyz[1], z=self.aimpoint_xyz[2])
+        date_str = '{m}/{d}/{y}'.format(m=self.when_ymdhmsz[1], d=self.when_ymdhmsz[2], y=self.when_ymdhmsz[0])
         time_str = '{h:d}:{m:02d}:{s:02d}'.format(
             h=self.when_ymdhmsz[3], m=self.when_ymdhmsz[4], s=self.when_ymdhmsz[5]
         )
         self.draw_and_save_solar_field_trajectories(
-            'AG. Actual '
-            + self.solar_field.short_name
-            + ' Field Configuration on '
-            + date_str
-            + ' at '
-            + time_str,
+            'AG. Actual ' + self.solar_field.short_name + ' Field Configuration on ' + date_str + ' at ' + time_str,
             draw_control_dict,
             limits_3d_list=limits_3d_list,
             limits_xy_list=limits_xy_list,
@@ -2669,15 +2221,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field and GPS trajectory.
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         draw_control_dict['draw_GPS_log'] = True
         self.solar_field_style = rcsf.heliostat_outlines(color='grey')
         self.heliostat_up_style = rch.outline(
@@ -2686,12 +2232,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('b')
         self.draw_and_save_solar_field_trajectories(
             'AH. GPS Trajectory Over Solar Field',
@@ -2703,15 +2245,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with GPS trajectory, with min/max scan pass construction steps identfiied.
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         draw_control_dict['draw_GPS_log'] = True
         draw_control_dict['draw_gps_velocity_xy_change_minima'] = True
         draw_control_dict['draw_gps_velocity_xy_change_maxima'] = True
@@ -2724,12 +2260,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AI. GPS Scan Pass Min/Max Construction',
@@ -2741,15 +2273,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with GPS trajectory, with final scan passes identfiied.
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         draw_control_dict['draw_GPS_log'] = True
         draw_control_dict['draw_gps_velocity_xy_change_minima'] = False
         draw_control_dict['draw_gps_velocity_xy_change_maxima'] = False
@@ -2763,12 +2289,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AJ. Inferred GPS Scan Passes',
@@ -2794,12 +2316,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AK. Inferred GPS Scan Passes (All Heliostats Face Up)',
@@ -2825,12 +2343,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AL. Inferred GPS Scan Pass Reference Rendering (All Heliostats Face Up)',
@@ -2842,16 +2356,12 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, used for time synchronization (tracking nominal time).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_GPS_log'] = True
         draw_control_dict['draw_gps_scan_passes'] = False
         draw_control_dict['draw_trajectory_fragments'] = True
-        draw_control_dict[
-            'trajectory_fragment_selected_heliostats'
-        ] = self.synchronization_heliostat_name_list()
+        draw_control_dict['trajectory_fragment_selected_heliostats'] = self.synchronization_heliostat_name_list()
         draw_control_dict['connect_trajectory_fragments'] = True
         draw_control_dict['draw_synchronization_points'] = True
         draw_control_dict['include_points_with_missing_corners'] = True
@@ -2863,12 +2373,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         # Sub views for point synchronization plots.
         synch_limits_3d_list = None
@@ -2902,12 +2408,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AN. Trajectory Fragments for Each Heliostat Connected (Face Up)',
@@ -2936,12 +2438,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AO. Per Heliostat Scan Fragments Including Partial (Face Up)',
@@ -2962,12 +2460,8 @@ class TrajectoryAnalysis:
             new_h_config = hc.HeliostatConfiguration(az, el)
             new_h_config.az = np.radians(180.0)
             heliostat.set_configuration(new_h_config, clear_tracking=True)
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_trajectory_fragments'] = True
         draw_control_dict['connect_trajectory_fragments'] = False
@@ -2981,12 +2475,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AP. Per Heliostat Scan Fragments Including Partial (Az South, Elev Tracking Nominal Minus 1 hour)',
@@ -3001,12 +2491,8 @@ class TrajectoryAnalysis:
         self.solar_field.set_full_field_tracking(
             aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz_minus_1_hour
         )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_trajectory_fragments'] = True
         draw_control_dict['connect_trajectory_fragments'] = False
@@ -3020,12 +2506,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AQ. Per Heliostat Scan Fragments Including Partial (Tracking Nominal Minus 1 hour)',
@@ -3038,15 +2520,10 @@ class TrajectoryAnalysis:
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, including points viewing partial heliostats (tracking minus 30 minutes).
         self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz,
-            when_ymdhmsz=self.when_ymdhmsz_minus_30_minutes,
+            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz_minus_30_minutes
         )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_trajectory_fragments'] = True
         draw_control_dict['connect_trajectory_fragments'] = False
@@ -3060,12 +2537,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AR. Per Heliostat Scan Fragments Including Partial (Tracking Nominal Minus 30 Minutes)',
@@ -3077,15 +2550,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, including points viewing partial heliostats (tracking nominal time).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_trajectory_fragments'] = True
         draw_control_dict['connect_trajectory_fragments'] = False
@@ -3099,12 +2566,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AS. Per Heliostat Scan Fragments Including Partial (Tracking Nominal Time)',
@@ -3116,15 +2579,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, without points viewing partial heliostats (tracking nominal time).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_trajectory_fragments'] = True
         draw_control_dict['connect_trajectory_fragments'] = False
@@ -3138,12 +2595,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AT. Per Heliostat Scan Fragments After Discarding Partial (Tracking Nominal Time)',
@@ -3155,15 +2608,9 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, after refining (tracking nominal time).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.up_heliostats, self.up_configuration
-        )
-        self.solar_field.set_heliostats_configuration(
-            self.down_heliostats, self.down_configuration
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
+        self.solar_field.set_heliostats_configuration(self.up_heliostats, self.up_configuration)
+        self.solar_field.set_heliostats_configuration(self.down_heliostats, self.down_configuration)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_trajectory_fragments'] = True
         draw_control_dict['connect_trajectory_fragments'] = False
@@ -3177,12 +2624,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AU. Per Heliostat Scan Fragments After Discarding Partial (Tracking Nominal Time)',
@@ -3194,9 +2637,7 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, after refining and including camera scan passes (tracking nominal time).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_GPS_log'] = True
         draw_control_dict['draw_gps_scan_passes'] = True
@@ -3214,12 +2655,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AV. Per Heliostat Scan Pass Fit Lines (Tracking Nominal Time)',
@@ -3231,9 +2668,7 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, after refining and including camera scan passes and association with corresponding gps scan lines (tracking nominal time).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_GPS_log'] = True
         draw_control_dict['draw_gps_scan_passes'] = True
@@ -3252,12 +2687,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.draw_and_save_solar_field_trajectories(
             'AW. Camera Scan Associations with GPS Scan Lines, Full Trajectory Fragments (Tracking Nominal Time)',
@@ -3269,9 +2700,7 @@ class TrajectoryAnalysis:
         )
 
         # Draw the solar field with the trajectory fragments inferred from the reconstruction, after refining and including camera scan passes and association with corresponding gps scan lines (tracking nominal time).
-        self.solar_field.set_full_field_tracking(
-            aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz
-        )
+        self.solar_field.set_full_field_tracking(aimpoint_xyz=self.aimpoint_xyz, when_ymdhmsz=self.when_ymdhmsz)
         self.set_per_heliostat_estimates_of_camera_xyz_given_overall_time()
         draw_control_dict['draw_GPS_log'] = True
         draw_control_dict['draw_gps_scan_passes'] = True
@@ -3282,9 +2711,7 @@ class TrajectoryAnalysis:
         draw_control_dict['include_points_with_missing_corners'] = False
         draw_control_dict['include_non_refined_points'] = False
         draw_control_dict['draw_camera_passes'] = True
-        draw_control_dict[
-            'draw_gps_transformed_camera_pass_connections'
-        ] = True  # False #True
+        draw_control_dict['draw_gps_transformed_camera_pass_connections'] = True  # False #True
         self.solar_field_style = rcsf.heliostat_outlines(color='grey')
         self.heliostat_up_style = rch.outline(
             color='lightblue'
@@ -3292,12 +2719,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.4)
         self.draw_and_save_solar_field_trajectories(
@@ -3331,12 +2754,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
         self.draw_and_save_solar_field_trajectories(
@@ -3370,12 +2789,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
         self.draw_and_save_solar_field_trajectories(
@@ -3407,12 +2822,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
         self.draw_and_save_solar_field_trajectories(
@@ -3446,12 +2857,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
         self.draw_and_save_solar_field_trajectories(
@@ -3486,12 +2893,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
         self.draw_and_save_solar_field_trajectories(
@@ -3526,12 +2929,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
         self.draw_and_save_solar_field_trajectories(
@@ -3566,12 +2965,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.flight_log_style.set_color('grey')
         self.scan_pass_style = rcps.outline(color=self.scan_pass_color, linewidth=0.1)
         self.draw_and_save_solar_field_trajectories(
@@ -3606,12 +3001,8 @@ class TrajectoryAnalysis:
         self.heliostat_down_style = rch.outline(
             color='salmon'
         )  # Use normal_outline() to include surface normal needles, or outline() for just outlines.
-        self.solar_field_style.heliostat_styles.add_special_names(
-            up_heliostats, self.heliostat_up_style
-        )
-        self.solar_field_style.heliostat_styles.add_special_names(
-            down_heliostats, self.heliostat_down_style
-        )
+        self.solar_field_style.heliostat_styles.add_special_names(up_heliostats, self.heliostat_up_style)
+        self.solar_field_style.heliostat_styles.add_special_names(down_heliostats, self.heliostat_down_style)
         self.draw_and_save_solar_field_trajectories(
             'BF. Measured Solar Field Configuration After GPS-Camera Alignment (Per-Heliostat Tracking)',
             draw_control_dict,
@@ -3640,47 +3031,27 @@ class TrajectoryAnalysis:
             output_figure_body = ft.convert_string_to_file_body(title)
         # 3-d oblique view.
         if limits_3d_list != None:
-            view_3d = self.draw_solar_field_trajectories(
-                title, draw_control_dict, vs.view_spec_3d()
-            )
+            view_3d = self.draw_solar_field_trajectories(title, draw_control_dict, vs.view_spec_3d())
             view_3d.show_and_save_multi_axis_limits(
-                self.output_data_dir,
-                output_figure_body,
-                limits_list=limits_3d_list,
-                grid=True,
+                self.output_data_dir, output_figure_body, limits_list=limits_3d_list, grid=True
             )
         # xy view.
         if limits_xy_list != None:
-            view_xy = self.draw_solar_field_trajectories(
-                title, draw_control_dict, vs.view_spec_xy()
-            )
+            view_xy = self.draw_solar_field_trajectories(title, draw_control_dict, vs.view_spec_xy())
             view_xy.show_and_save_multi_axis_limits(
-                self.output_data_dir,
-                output_figure_body,
-                limits_list=limits_xy_list,
-                grid=False,
+                self.output_data_dir, output_figure_body, limits_list=limits_xy_list, grid=False
             )
         # xz_view.
         if limits_xz_list != None:
-            view_xz = self.draw_solar_field_trajectories(
-                title, draw_control_dict, vs.view_spec_xz()
-            )
+            view_xz = self.draw_solar_field_trajectories(title, draw_control_dict, vs.view_spec_xz())
             view_xz.show_and_save_multi_axis_limits(
-                self.output_data_dir,
-                output_figure_body,
-                limits_list=limits_xz_list,
-                grid=True,
+                self.output_data_dir, output_figure_body, limits_list=limits_xz_list, grid=True
             )
         # yz view.
         if limits_yz_list != None:
-            view_yz = self.draw_solar_field_trajectories(
-                title, draw_control_dict, vs.view_spec_yz()
-            )
+            view_yz = self.draw_solar_field_trajectories(title, draw_control_dict, vs.view_spec_yz())
             view_yz.show_and_save_multi_axis_limits(
-                self.output_data_dir,
-                output_figure_body,
-                limits_list=limits_yz_list,
-                grid=True,
+                self.output_data_dir, output_figure_body, limits_list=limits_yz_list, grid=True
             )
 
     def draw_solar_field_trajectories(
@@ -3689,20 +3060,11 @@ class TrajectoryAnalysis:
         # Solar field.
         # Required, because this creates the view.
         view = self.solar_field.draw_figure(
-            self.figure_control,
-            self.axis_control_m,
-            view_spec,
-            title,
-            self.solar_field_style,
-            grid=grid,
+            self.figure_control, self.axis_control_m, view_spec, title, self.solar_field_style, grid=grid
         )
         # GPS flight log.
         if draw_control_dict['draw_GPS_log']:
-            view.draw_xyz_list(
-                self.flight_log_xyz_list,
-                style=self.flight_log_style,
-                label='GPS Flight Log',
-            )
+            view.draw_xyz_list(self.flight_log_xyz_list, style=self.flight_log_style, label='GPS Flight Log')
         if draw_control_dict['draw_gps_velocity_xy_change_minima']:
             minima_xyz_list = []
             for minimum_dict in self.gps_velocity_xy_change_minima:
@@ -3710,9 +3072,7 @@ class TrajectoryAnalysis:
                 y = minimum_dict['y']
                 z = minimum_dict['z']
                 minima_xyz_list.append([x, y, z])
-            view.draw_xyz_list(
-                minima_xyz_list, style=self.minimum_style, label='Delta Vx Minima'
-            )
+            view.draw_xyz_list(minima_xyz_list, style=self.minimum_style, label='Delta Vx Minima')
         if draw_control_dict['draw_gps_velocity_xy_change_maxima']:
             maxima_xyz_list = []
             for maximum_dict in self.gps_velocity_xy_change_maxima:
@@ -3720,9 +3080,7 @@ class TrajectoryAnalysis:
                 y = maximum_dict['y']
                 z = maximum_dict['z']
                 maxima_xyz_list.append([x, y, z])
-            view.draw_xyz_list(
-                maxima_xyz_list, style=self.maximum_style, label='Delta Vx Maxima'
-            )
+            view.draw_xyz_list(maxima_xyz_list, style=self.maximum_style, label='Delta Vx Maxima')
         if draw_control_dict['draw_gps_max_to_min_scan_passes']:
             for max_min_pass_pair in self.maximum_to_minimum_pass_pair_list:
                 maximum_dict = max_min_pass_pair[0]
@@ -3735,9 +3093,7 @@ class TrajectoryAnalysis:
                 minimum_y = minimum_dict['y']
                 minimum_z = minimum_dict['z']
                 minimum_xyz = [minimum_x, minimum_y, minimum_z]
-                view.draw_xyz_list(
-                    [maximum_xyz, minimum_xyz], style=self.max_to_min_scan_pass_style
-                )
+                view.draw_xyz_list([maximum_xyz, minimum_xyz], style=self.max_to_min_scan_pass_style)
         if draw_control_dict['draw_gps_min_to_max_scan_passes']:
             for min_max_pass_pair in self.minimum_to_maximum_pass_pair_list:
                 minimum_dict = min_max_pass_pair[0]
@@ -3750,9 +3106,7 @@ class TrajectoryAnalysis:
                 maximum_y = maximum_dict['y']
                 maximum_z = maximum_dict['z']
                 maximum_xyz = [maximum_x, maximum_y, maximum_z]
-                view.draw_xyz_list(
-                    [minimum_xyz, maximum_xyz], style=self.min_to_max_scan_pass_style
-                )
+                view.draw_xyz_list([minimum_xyz, maximum_xyz], style=self.min_to_max_scan_pass_style)
         if draw_control_dict['draw_synchronization_points']:
             synch_time_list = self.synchronization_time_list()
             synch_xyz_list = []
@@ -3775,30 +3129,19 @@ class TrajectoryAnalysis:
         ):
             idx = 0
             for hel_name in self.hel_frames_dict.keys():
-                trajectory_fragment_color = color.color(
-                    idx, self.trajectory_fragment_color_wheel
-                )
+                trajectory_fragment_color = color.color(idx, self.trajectory_fragment_color_wheel)
                 camera_pass_color = color.color(idx, self.camera_pass_color_wheel)
                 # Draw the fragments associated with this heliostat.
                 if draw_control_dict['draw_trajectory_fragments'] and (
-                    (
-                        draw_control_dict['trajectory_fragment_selected_heliostats']
-                        == None
-                    )
-                    or (
-                        hel_name
-                        in draw_control_dict['trajectory_fragment_selected_heliostats']
-                    )
+                    (draw_control_dict['trajectory_fragment_selected_heliostats'] == None)
+                    or (hel_name in draw_control_dict['trajectory_fragment_selected_heliostats'])
                 ):
                     # Draw the trajectory fragment for this heliostat.
                     frames_dict = self.hel_frames_dict[hel_name]
                     camera_xyz_world_list = []
                     for frame_id in frames_dict.keys():
                         frame_parameters_dict = frames_dict[frame_id]
-                        if (
-                            draw_control_dict['include_points_with_missing_corners']
-                            == True
-                        ) or (
+                        if (draw_control_dict['include_points_with_missing_corners'] == True) or (
                             frame_parameters_dict['n_missing'] <= self.maximum_n_missing
                         ):
                             camera_xyz_world = frame_parameters_dict[
@@ -3810,13 +3153,8 @@ class TrajectoryAnalysis:
                     if draw_control_dict['connect_trajectory_fragments']:
                         view.draw_xyz_list(camera_xyz_world_list, style=style)
                     else:
-                        list_of_camera_xyz_lists = (
-                            self.split_xyz_list_where_distance_exceeds_maximum(
-                                camera_xyz_world_list,
-                                draw_control_dict[
-                                    'trajectory_fragment_disconnect_threshold'
-                                ],
-                            )
+                        list_of_camera_xyz_lists = self.split_xyz_list_where_distance_exceeds_maximum(
+                            camera_xyz_world_list, draw_control_dict['trajectory_fragment_disconnect_threshold']
                         )
                         for camera_xyz_list in list_of_camera_xyz_lists:
                             view.draw_xyz_list(camera_xyz_list, style=style)
@@ -3824,12 +3162,8 @@ class TrajectoryAnalysis:
                     if draw_control_dict['draw_synchronization_points']:
                         # Draw the synchronization point for this heliostat.
                         frames_dict = self.hel_frames_dict[hel_name]
-                        synchronization_frame_id = self.get_synchronization_frame_id(
-                            hel_name
-                        )
-                        synchronization_frame_parameters_dict = frames_dict[
-                            synchronization_frame_id
-                        ]
+                        synchronization_frame_id = self.get_synchronization_frame_id(hel_name)
+                        synchronization_frame_parameters_dict = frames_dict[synchronization_frame_id]
                         synchronization_camera_xyz_world = synchronization_frame_parameters_dict[
                             'per_heliostat_estimate_of_camera_xyz_in_world_coords_overall_time'
                         ]
@@ -3840,9 +3174,7 @@ class TrajectoryAnalysis:
                         view.draw_xyz(synchronization_camera_xyz_world, style=style)
                 # Draw the camera passes associated with each heliostat.
                 if draw_control_dict['draw_camera_passes']:
-                    transformed_camera_pass_list = (
-                        self.hel_transformed_camera_passes_dict[hel_name]
-                    )
+                    transformed_camera_pass_list = self.hel_transformed_camera_passes_dict[hel_name]
                     for transformed_camera_pass in transformed_camera_pass_list:
                         begin_xyz = transformed_camera_pass['stable_begin_xyzt'][0:3]
                         end_xyz = transformed_camera_pass['stable_end_xyzt'][0:3]
@@ -3852,82 +3184,52 @@ class TrajectoryAnalysis:
                         )  # Similar color, but slightly darker than trajectory fragment.
                         view.draw_xyz_list([begin_xyz, end_xyz], style=style)
                         # Draw connecting lines between the camera passes and the corresponding GPS scan lines.
-                        if draw_control_dict[
-                            'draw_gps_transformed_camera_pass_connections'
-                        ]:
+                        if draw_control_dict['draw_gps_transformed_camera_pass_connections']:
                             style = copy.deepcopy(self.pass_connection_style)
                             style.set_color(trajectory_fragment_color)
-                            gps_pass = self.find_matching_gps_pass(
-                                transformed_camera_pass
-                            )
+                            gps_pass = self.find_matching_gps_pass(transformed_camera_pass)
                             if gps_pass != None:
                                 # Compute nearest-neighbor line segments.
                                 gps_line_3d = gps_pass['line_3d']
                                 camera_gps_point_pair_list = []
-                                for transformed_camera_xyzt in transformed_camera_pass[
-                                    'inlier_xyzt_list'
-                                ]:
-                                    transformed_camera_inlier_xyz = (
-                                        transformed_camera_xyzt[0:3]
-                                    )
+                                for transformed_camera_xyzt in transformed_camera_pass['inlier_xyzt_list']:
+                                    transformed_camera_inlier_xyz = transformed_camera_xyzt[0:3]
                                     nearest_gps_xyz = g3d.closest_point_on_line_3d(
                                         transformed_camera_inlier_xyz, gps_line_3d
                                     )
-                                    view.draw_xyz_list(
-                                        [
-                                            transformed_camera_inlier_xyz,
-                                            nearest_gps_xyz,
-                                        ],
-                                        style=style,
-                                    )
+                                    view.draw_xyz_list([transformed_camera_inlier_xyz, nearest_gps_xyz], style=style)
                 idx += 1
         # GPS-camera alignment analysis.
         if draw_control_dict['draw_gps_camera_analysis']:
             idx = 0
             for hel_name in self.hel_gps_camera_analysis_dict:
-                trajectory_fragment_color = color.color(
-                    idx, self.trajectory_fragment_color_wheel
-                )
+                trajectory_fragment_color = color.color(idx, self.trajectory_fragment_color_wheel)
                 camera_pass_color = color.color(idx, self.camera_pass_color_wheel)
-                list_of_gps_camera_analysis_dicts = self.hel_gps_camera_analysis_dict[
-                    hel_name
-                ]
+                list_of_gps_camera_analysis_dicts = self.hel_gps_camera_analysis_dict[hel_name]
                 for gps_camera_analysis_dict in list_of_gps_camera_analysis_dicts:
                     per_heliostat_transformed_camera_pass = gps_camera_analysis_dict[
                         'per_heliostat_transformed_camera_pass'
                     ]
-                    if draw_control_dict[
-                        'draw_gps_transformed_camera_inlier_xyzt_points'
-                    ]:
-                        xyzt_list = per_heliostat_transformed_camera_pass[
-                            'inlier_xyzt_list'
-                        ]
+                    if draw_control_dict['draw_gps_transformed_camera_inlier_xyzt_points']:
+                        xyzt_list = per_heliostat_transformed_camera_pass['inlier_xyzt_list']
                         xyz_list = [xyzt[0:3] for xyzt in xyzt_list]
                         style = copy.deepcopy(self.trajectory_fragment_style)
                         style.set_color(trajectory_fragment_color)
                         view.draw_xyz_list(xyz_list, style=style)
                     if draw_control_dict['draw_gps_camera_pass']:
-                        begin_xyz = per_heliostat_transformed_camera_pass[
-                            'stable_begin_xyzt'
-                        ][0:3]
-                        end_xyz = per_heliostat_transformed_camera_pass[
-                            'stable_end_xyzt'
-                        ][0:3]
+                        begin_xyz = per_heliostat_transformed_camera_pass['stable_begin_xyzt'][0:3]
+                        end_xyz = per_heliostat_transformed_camera_pass['stable_end_xyzt'][0:3]
                         style = copy.deepcopy(self.camera_pass_style)
                         style.set_color(camera_pass_color)
                         view.draw_xyz_list([begin_xyz, end_xyz], style=style)
                         # Draw connecting lines between the camera passes and the corresponding GPS scan lines.
-                        if draw_control_dict[
-                            'draw_gps_transformed_camera_pass_connections'
-                        ]:
+                        if draw_control_dict['draw_gps_transformed_camera_pass_connections']:
                             style = copy.deepcopy(self.pass_connection_style)
                             style.set_color(trajectory_fragment_color)
-                            transformed_camera_gps_point_pair_list = (
-                                gps_camera_analysis_dict['camera_gps_point_pair_list']
-                            )
-                            for (
-                                camera_gps_point_pair
-                            ) in transformed_camera_gps_point_pair_list:
+                            transformed_camera_gps_point_pair_list = gps_camera_analysis_dict[
+                                'camera_gps_point_pair_list'
+                            ]
+                            for camera_gps_point_pair in transformed_camera_gps_point_pair_list:
                                 camera_xyz = camera_gps_point_pair[0]
                                 gps_xyz = camera_gps_point_pair[1]
                                 view.draw_xyz_list([camera_xyz, gps_xyz], style=style)
@@ -3945,21 +3247,9 @@ class TrajectoryAnalysis:
             title='GPS Trajectory Positions',
             x_column='time(sec)',
             y_column_label_styles=[
-                [
-                    'x(m)',
-                    'x component',
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ],
-                [
-                    'y(m)',
-                    'y component',
-                    rcps.outline(color='r', linewidth=data_linewidth),
-                ],
-                [
-                    'z(m)',
-                    'z component',
-                    rcps.outline(color='g', linewidth=data_linewidth),
-                ],
+                ['x(m)', 'x component', rcps.outline(color='b', linewidth=data_linewidth)],
+                ['y(m)', 'y component', rcps.outline(color='r', linewidth=data_linewidth)],
+                ['z(m)', 'z component', rcps.outline(color='g', linewidth=data_linewidth)],
             ],
             x_axis_label='time (sec)',
             y_axis_label='Position (m)',
@@ -3974,21 +3264,9 @@ class TrajectoryAnalysis:
             title='GPS Trajectory Velocities',
             x_column='time(sec)',
             y_column_label_styles=[
-                [
-                    'velocity_average_x(m/sec)',
-                    'x component',
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ],
-                [
-                    'velocity_average_y(m/sec)',
-                    'y component',
-                    rcps.outline(color='r', linewidth=data_linewidth),
-                ],
-                [
-                    'velocity_average_z(m/sec)',
-                    'z component',
-                    rcps.outline(color='g', linewidth=data_linewidth),
-                ],
+                ['velocity_average_x(m/sec)', 'x component', rcps.outline(color='b', linewidth=data_linewidth)],
+                ['velocity_average_y(m/sec)', 'y component', rcps.outline(color='r', linewidth=data_linewidth)],
+                ['velocity_average_z(m/sec)', 'z component', rcps.outline(color='g', linewidth=data_linewidth)],
             ],
             x_axis_label='time (sec)',
             y_axis_label='Velocity (m/sec)',
@@ -4003,11 +3281,7 @@ class TrajectoryAnalysis:
             title='GPS Trajectory Speed',
             x_column='time(sec)',
             y_column_label_styles=[
-                [
-                    'speed_average(m/sec)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ],
+                ['speed_average(m/sec)', None, rcps.outline(color='b', linewidth=data_linewidth)],
                 ['speed(mps)', None, rcps.outline(color='r', linewidth=data_linewidth)],
             ],
             x_axis_label='time (sec)',
@@ -4025,13 +3299,7 @@ class TrajectoryAnalysis:
             self.flight_log_df,
             title='GPS Trajectory Speed Change',
             x_column='time(sec)',
-            y_column_label_styles=[
-                [
-                    'delta_speed(m/sec)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
-            ],
+            y_column_label_styles=[['delta_speed(m/sec)', None, rcps.outline(color='b', linewidth=data_linewidth)]],
             x_axis_label='time (sec)',
             y_axis_label='Change in Speed (m/sec)',
             x_axis_grid=True,
@@ -4044,13 +3312,7 @@ class TrajectoryAnalysis:
             self.flight_log_df,
             title='GPS Trajectory Speed Change Magnitude',
             x_column='time(sec)',
-            y_column_label_styles=[
-                [
-                    'abs_delta_speed(m/sec)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
-            ],
+            y_column_label_styles=[['abs_delta_speed(m/sec)', None, rcps.outline(color='b', linewidth=data_linewidth)]],
             # y_column_label_styles = [ ['speed_average(m/sec)', None, rcps.data_curve(color='b', linewidth=data_linewidth, markersize=data_markersize)] ],
             x_axis_label='time (sec)',
             y_axis_label='Magnitude of Change in Speed (m/sec)',
@@ -4064,13 +3326,7 @@ class TrajectoryAnalysis:
             self.flight_log_df,
             title='GPS Trajectory Velocity XY Angle',
             x_column='time(sec)',
-            y_column_label_styles=[
-                [
-                    'velocity_angle_xy(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
-            ],
+            y_column_label_styles=[['velocity_angle_xy(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]],
             x_axis_label='time (sec)',
             y_axis_label='Velocity Angle in (x,y) Plane (rad)',
             x_axis_grid=True,
@@ -4082,13 +3338,7 @@ class TrajectoryAnalysis:
             self.flight_log_df,
             title='GPS Trajectory Velocity XY Angle Zoom 1',
             x_column='time(sec)',
-            y_column_label_styles=[
-                [
-                    'velocity_angle_xy(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
-            ],
+            y_column_label_styles=[['velocity_angle_xy(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]],
             x_axis_label='time (sec)',
             y_axis_label='Velocity Angle in (x,y) Plane (rad)',
             x_axis_grid=True,
@@ -4102,13 +3352,7 @@ class TrajectoryAnalysis:
             self.flight_log_df,
             title='GPS Trajectory Velocity XY Angle Zoom 2',
             x_column='time(sec)',
-            y_column_label_styles=[
-                [
-                    'velocity_angle_xy(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
-            ],
+            y_column_label_styles=[['velocity_angle_xy(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]],
             x_axis_label='time (sec)',
             y_axis_label='Velocity Angle in (x,y) Plane (rad)',
             x_axis_grid=True,
@@ -4123,13 +3367,7 @@ class TrajectoryAnalysis:
             self.flight_log_df,
             title='GPS Trajectory Velocity Z Angle',
             x_column='time(sec)',
-            y_column_label_styles=[
-                [
-                    'velocity_angle_z(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
-            ],
+            y_column_label_styles=[['velocity_angle_z(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]],
             x_axis_label='time (sec)',
             y_axis_label='Velocity Elevation Angle Above (x,y) Plane (rad)',
             x_axis_grid=True,
@@ -4141,13 +3379,7 @@ class TrajectoryAnalysis:
             self.flight_log_df,
             title='GPS Trajectory Velocity Z Angle Zoom',
             x_column='time(sec)',
-            y_column_label_styles=[
-                [
-                    'velocity_angle_z(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
-            ],
+            y_column_label_styles=[['velocity_angle_z(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]],
             x_axis_label='time (sec)',
             y_axis_label='Velocity Elevation Angle Above (x,y) Plane (rad)',
             x_axis_grid=True,
@@ -4163,11 +3395,7 @@ class TrajectoryAnalysis:
             title='GPS Trajectory Velocity XY Angle Change',
             x_column='time(sec)',
             y_column_label_styles=[
-                [
-                    'delta_velocity_angle_xy(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
+                ['delta_velocity_angle_xy(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]
             ],
             x_axis_label='time (sec)',
             y_axis_label='Change in Velocity Angle in (x,y) Plane (rad)',
@@ -4184,10 +3412,7 @@ class TrajectoryAnalysis:
             minimum_delta_velocity_angle_xy = minimum_dict['delta_velocity_angle_xy']
             gp.add_xy_list_to_plot(
                 figure_record,
-                [
-                    [time_maximum, maximum_delta_velocity_angle_xy],
-                    [time_minimum, minimum_delta_velocity_angle_xy],
-                ],
+                [[time_maximum, maximum_delta_velocity_angle_xy], [time_minimum, minimum_delta_velocity_angle_xy]],
                 rcps.outline(color=self.max_to_min_color),
             )
         # Indicate the minimum-to-maximum pairs.
@@ -4200,10 +3425,7 @@ class TrajectoryAnalysis:
             maximum_delta_velocity_angle_xy = maximum_dict['delta_velocity_angle_xy']
             gp.add_xy_list_to_plot(
                 figure_record,
-                [
-                    [time_minimum, minimum_delta_velocity_angle_xy],
-                    [time_maximum, maximum_delta_velocity_angle_xy],
-                ],
+                [[time_minimum, minimum_delta_velocity_angle_xy], [time_maximum, maximum_delta_velocity_angle_xy]],
                 rcps.outline(color=self.min_to_max_color),
             )
         # Indicate the local minima.
@@ -4213,10 +3435,7 @@ class TrajectoryAnalysis:
             delta_velocity_angle_xy = minimum_dict['delta_velocity_angle_xy']
             minima_tdelta_list.append([time, delta_velocity_angle_xy])
         gp.add_xy_list_to_plot(
-            figure_record,
-            minima_tdelta_list,
-            rcps.marker(color='m', markersize=data_markersize),
-            label='Minima',
+            figure_record, minima_tdelta_list, rcps.marker(color='m', markersize=data_markersize), label='Minima'
         )
         # Indicate the local maxima.
         maxima_tdelta_list = []
@@ -4225,10 +3444,7 @@ class TrajectoryAnalysis:
             delta_velocity_angle_xy = maximum_dict['delta_velocity_angle_xy']
             maxima_tdelta_list.append([time, delta_velocity_angle_xy])
         gp.add_xy_list_to_plot(
-            figure_record,
-            maxima_tdelta_list,
-            rcps.marker(color='r', markersize=data_markersize),
-            label='Maxima',
+            figure_record, maxima_tdelta_list, rcps.marker(color='r', markersize=data_markersize), label='Maxima'
         )
         figure_record.save(self.output_data_dir)
         figure_record = pp.dataframe_plot(
@@ -4237,11 +3453,7 @@ class TrajectoryAnalysis:
             title='GPS Trajectory Velocity XY Angle Change Zoom',
             x_column='time(sec)',
             y_column_label_styles=[
-                [
-                    'delta_velocity_angle_xy(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
+                ['delta_velocity_angle_xy(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]
             ],
             x_axis_label='time (sec)',
             y_axis_label='Change in Velocity Angle in (x,y) Plane (rad)',
@@ -4258,11 +3470,7 @@ class TrajectoryAnalysis:
             title='GPS Trajectory Velocity Z Angle Change',
             x_column='time(sec)',
             y_column_label_styles=[
-                [
-                    'delta_velocity_angle_z(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
+                ['delta_velocity_angle_z(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]
             ],
             x_axis_label='time (sec)',
             y_axis_label='Change in Velocity Elevation Angle Above (x,y) Plane (rad)',
@@ -4276,11 +3484,7 @@ class TrajectoryAnalysis:
             title='GPS Trajectory Velocity Z Angle Change Zoom',
             x_column='time(sec)',
             y_column_label_styles=[
-                [
-                    'delta_velocity_angle_z(rad)',
-                    None,
-                    rcps.outline(color='b', linewidth=data_linewidth),
-                ]
+                ['delta_velocity_angle_z(rad)', None, rcps.outline(color='b', linewidth=data_linewidth)]
             ],
             x_axis_label='time (sec)',
             y_axis_label='Change in Velocity Elevation Angle Above (x,y) Plane (rad)',
@@ -4467,17 +3671,11 @@ class TrajectoryAnalysis:
     def save_enhanced_flight_log(self):
         if not (os.path.exists(self.output_data_dir)):
             os.makedirs(self.output_data_dir)
-            (
-                input_flight_log_dir,
-                input_flight_log_body,
-                input_flight_log_ext,
-            ) = ft.path_components(self.input_flight_log_dir_body_ext)
-            output_flight_log_plus_body_ext = (
-                input_flight_log_body + '_plus' + input_flight_log_ext
+            (input_flight_log_dir, input_flight_log_body, input_flight_log_ext) = ft.path_components(
+                self.input_flight_log_dir_body_ext
             )
-            output_flight_log_plus_dir_body_ext = os.path.join(
-                self.output_data_dir, output_flight_log_plus_body_ext
-            )
+            output_flight_log_plus_body_ext = input_flight_log_body + '_plus' + input_flight_log_ext
+            output_flight_log_plus_dir_body_ext = os.path.join(self.output_data_dir, output_flight_log_plus_body_ext)
             print(
                 'In TrajectoryAnalysis.save_enhanced_flight_log(), saving enhanced flight log file :',
                 output_flight_log_plus_dir_body_ext,
@@ -4490,9 +3688,7 @@ class TrajectoryAnalysis:
     # SAVE GPS TIME CORRESPONDING TO FLIGHT LOG ZERO TIME
 
     def save_gps_ymdhmsz_given_flight_log_zero_seconds(self):
-        output_body = (
-            self.input_video_body + '_gps_ymdhmsz_given_flight_log_zero_seconds'
-        )
+        output_body = self.input_video_body + '_gps_ymdhmsz_given_flight_log_zero_seconds'
         explain = 'GPS time corresponding to flight log zero'
         # Convert list to dictionary, adding keys.
         output_dict = {
@@ -4516,12 +3712,8 @@ class TrajectoryAnalysis:
 
     # SAVE GPS VELOCITY XY CHANGE POINTS
 
-    def save_gps_velocity_xy_change_points(
-        self, list_of_gps_velocity_xy_change_dicts, minima_or_maxima_str
-    ):
-        output_body = (
-            self.input_video_body + '_gps_velocity_xy_change_' + minima_or_maxima_str
-        )
+    def save_gps_velocity_xy_change_points(self, list_of_gps_velocity_xy_change_dicts, minima_or_maxima_str):
+        output_body = self.input_video_body + '_gps_velocity_xy_change_' + minima_or_maxima_str
         explain = 'GPS velocity xy change ' + minima_or_maxima_str + ' file'
         return dt.save_list_of_one_level_dicts(
             list_of_gps_velocity_xy_change_dicts,
@@ -4533,26 +3725,16 @@ class TrajectoryAnalysis:
 
     # SAVE GPS SCAN ANALYSIS MINIMA/MAXIMA PAIRS
 
-    def save_gps_velocity_xy_change_pairs(
-        self, pass_pair_list, maximum_to_minimum_or_minimum_to_maximum_str
-    ):
+    def save_gps_velocity_xy_change_pairs(self, pass_pair_list, maximum_to_minimum_or_minimum_to_maximum_str):
         output_body = (
             self.input_video_body
             + '_gps_velocity_xy_change_'
             + maximum_to_minimum_or_minimum_to_maximum_str
             + '_pass_pair_list'
         )
-        explain = (
-            'GPS velocity xy change '
-            + maximum_to_minimum_or_minimum_to_maximum_str
-            + ' pass pair file'
-        )
+        explain = 'GPS velocity xy change ' + maximum_to_minimum_or_minimum_to_maximum_str + ' pass pair file'
         return dt.save_list_of_one_level_dict_pairs(
-            pass_pair_list,
-            self.output_data_dir,
-            output_body,
-            explain,
-            error_if_dir_not_exist=False,
+            pass_pair_list, self.output_data_dir, output_body, explain, error_if_dir_not_exist=False
         )
 
     # SAVE GPS SCAN PASSES
@@ -4578,17 +3760,13 @@ class TrajectoryAnalysis:
     def gps_scan_pass_heading_line(self):
         # Stable begin point.
         heading_line_str = ''
-        heading_line_str += (
-            'stable_begin_x,stable_begin_y,stable_begin_z,stable_begin_t'
-        )
+        heading_line_str += 'stable_begin_x,stable_begin_y,stable_begin_z,stable_begin_t'
         # Stable end point.
         heading_line_str += ','
         heading_line_str += 'stable_end_x,stable_end_y,stable_end_z,stable_end_t'
         # Embedding 3-d line.
         heading_line_str += ','
-        heading_line_str += (
-            'line_3d_length,line_3d_ux,line_3d_uy,line_3d_uz,line_3d_theta,line_3d_eta'
-        )
+        heading_line_str += 'line_3d_length,line_3d_ux,line_3d_uy,line_3d_uz,line_3d_theta,line_3d_eta'
         # RMS point-to-line distance.
         heading_line_str += ','
         heading_line_str += 'rms_distance_to_line'
@@ -4687,11 +3865,7 @@ class TrajectoryAnalysis:
         output_body = self.input_video_body + '_hel_frames_dict'
         explain = 'trajectory fragments file'
         return ft.write_pickle_file(
-            explain,
-            self.output_data_dir,
-            output_body,
-            self.hel_frames_dict,
-            error_if_dir_not_exist=False,
+            explain, self.output_data_dir, output_body, self.hel_frames_dict, error_if_dir_not_exist=False
         )
 
     def save_synchronization_constants(self):
@@ -4701,12 +3875,8 @@ class TrajectoryAnalysis:
         heading_line = None
         data_lines = []
         data_lines.append('synchronization_slope,' + str(self.synchronization_slope))
-        data_lines.append(
-            'synchronization_intercept,' + str(self.synchronization_intercept)
-        )
-        data_lines.append(
-            'n_synchronization_pairs,' + str(len(self.synchronization_pair_list))
-        )
+        data_lines.append('synchronization_intercept,' + str(self.synchronization_intercept))
+        data_lines.append('n_synchronization_pairs,' + str(len(self.synchronization_pair_list)))
         idx = 1
         for synch_pair in self.synchronization_pair_list:
             # Example synchronization pair:  [['max_to_min', 0, 'stop', 110.465], ['5W9', 0, 1911]]
@@ -4727,12 +3897,8 @@ class TrajectoryAnalysis:
             data_lines.append('start_or_stop_' + str(idx) + ',' + str(start_or_stop))
             data_lines.append('gps_halt_time_' + str(idx) + ',' + str(gps_halt_time))
             data_lines.append('hel_name_' + str(idx) + ',' + str(hel_name))
-            data_lines.append(
-                'camera_halt_idx_' + str(idx) + ',' + str(camera_halt_idx)
-            )
-            data_lines.append(
-                'camera_halt_frame_' + str(idx) + ',' + str(camera_halt_frame)
-            )
+            data_lines.append('camera_halt_idx_' + str(idx) + ',' + str(camera_halt_idx))
+            data_lines.append('camera_halt_frame_' + str(idx) + ',' + str(camera_halt_frame))
             idx += 1
         # Write.
         output_dir_body_ext = ft.write_csv_file(
@@ -4750,45 +3916,29 @@ class TrajectoryAnalysis:
         output_body = self.input_video_body + '_hel_camera_passes_dict'
         explain = 'heliostat camera passes file'
         return ft.write_pickle_file(
-            explain,
-            self.output_data_dir,
-            output_body,
-            self.hel_camera_passes_dict,
-            error_if_dir_not_exist=False,
+            explain, self.output_data_dir, output_body, self.hel_camera_passes_dict, error_if_dir_not_exist=False
         )
 
     def save_hel_gps_camera_analysis_dict(self):
         output_body = self.input_video_body + '_hel_gps_camera_analysis_dict'
         explain = 'heliost GPS-camera analysis file'
         return ft.write_pickle_file(
-            explain,
-            self.output_data_dir,
-            output_body,
-            self.hel_gps_camera_analysis_dict,
-            error_if_dir_not_exist=False,
+            explain, self.output_data_dir, output_body, self.hel_gps_camera_analysis_dict, error_if_dir_not_exist=False
         )
 
     def check_pickle_files(self):
         # Trajectory fragments.
         print('\nIn TrajectoryAnalysis.check_pickle_files(), loaded hel_frames_dict:')
-        self.print_hel_frames_dict_aux(
-            pickle.load(open(self.hel_frames_dict_dir_body_ext, 'rb'))
-        )
+        self.print_hel_frames_dict_aux(pickle.load(open(self.hel_frames_dict_dir_body_ext, 'rb')))
         # Camera passes.
-        print(
-            '\nIn TrajectoryAnalysis.check_pickle_files(), loaded hel_camera_passes_dict:'
-        )
+        print('\nIn TrajectoryAnalysis.check_pickle_files(), loaded hel_camera_passes_dict:')
         self.print_hel_camera_passes_dict_aux(
-            pickle.load(open(self.hel_camera_passes_dict_dir_body_ext, 'rb')),
-            max_heliostats=2,
+            pickle.load(open(self.hel_camera_passes_dict_dir_body_ext, 'rb')), max_heliostats=2
         )
         # GPS-camera analysis.
-        print(
-            '\nIn TrajectoryAnalysis.check_pickle_files(), loaded hel_gps_camera_analysis_dict:'
-        )
+        print('\nIn TrajectoryAnalysis.check_pickle_files(), loaded hel_gps_camera_analysis_dict:')
         self.print_hel_gps_camera_analysis_dict_aux(
-            pickle.load(open(self.hel_gps_camera_analysis_dict_dir_body_ext, 'rb')),
-            max_heliostats=2,
+            pickle.load(open(self.hel_gps_camera_analysis_dict_dir_body_ext, 'rb')), max_heliostats=2
         )
 
 
@@ -4847,36 +3997,38 @@ if __name__ == "__main__":
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/190_TrajectoryAnalysis/mavic_zoom/log/TrajectoryAnalysis_log.txt'
     )
-    velocity_calculation_offset_fwd_bwd = 10  # Integer number of steps to skip to fetch a value for velocity computation.  Must be at least 1.
+    velocity_calculation_offset_fwd_bwd = (
+        10  # Integer number of steps to skip to fetch a value for velocity computation.  Must be at least 1.
+    )
     delta_velocity_angle_xy_peak_threshold = 0.5  # 1.0   # radian
     delta_velocity_angle_xy_non_peak_threshold = 0.1  # radian
     turn_overshoot_skip_time = 1.0  # sec.   Time window to allow turn correction overshoot without inferring an interval varying from turn min to turn max.
     scan_establish_velocity_time = 0.5  # sec.   Time for the UAS to reach a "reasonably stable " velocity at the beginning of a scan pass.  The UAS is "establishing" its constant scan velocity.
     scan_discard_velocity_time = 0.5  # sec.   Time prior to the end point when a UAS bgeins changing velocity prior to the pass endpoint.  The UAS is "discarding" its constant scan velocity.
     minimum_scan_pass_time = 10.0  # sec.   Duration of the shortest possible scan pass, after already trimming away the times to establish and discard the scan velocity.
-    nominal_scan_speed = (
-        7.0  # m/sec. Nominal speed of UAS flight during a linear scan pass.
-    )
+    nominal_scan_speed = 7.0  # m/sec. Nominal speed of UAS flight during a linear scan pass.
     # m/sec. Tolerance to use wheen deciding that the average speed of a candidate pass is consistent with a possible scan.  Not the scan speed control tolerance; larger than that.
     scan_speed_tolerance = 0.5
-    nominal_scan_velocity_z = (
-        0.0  # m/sec. Nominal vertical speed of UAS flight during a linear scan pass.
-    )
+    nominal_scan_velocity_z = 0.0  # m/sec. Nominal vertical speed of UAS flight during a linear scan pass.
     # m/sec. Tolerance to use wheen deciding that the average vertical speed of a candidate pass is consistent with a possible scan.  Not the scan speed control tolerance; larger than that.
     scan_velocity_z_tolerance = 0.25
     maximum_n_missing = 10  # Varies with the number of heliostat corners.
-    minimum_gps_pass_inter_point_speed = 4.0  # m/sec. Minimum observed inter-point speed allowable along a contiguous GPS scan pass.
-    minimum_gps_pass_number_of_points = (
-        20  # Minmum number of points required to constitute a GPS pass.
+    minimum_gps_pass_inter_point_speed = (
+        4.0  # m/sec. Minimum observed inter-point speed allowable along a contiguous GPS scan pass.
     )
-    gps_pass_start_margin = 5  # Number of points to shrink the start of a GPS pass after filtering to remove low-velocity points.
-    gps_pass_stop_margin = 5  # Number of points to shrink the end of a GPS pass after filtering to remove low-velocity points.
+    minimum_gps_pass_number_of_points = 20  # Minmum number of points required to constitute a GPS pass.
+    gps_pass_start_margin = (
+        5  # Number of points to shrink the start of a GPS pass after filtering to remove low-velocity points.
+    )
+    gps_pass_stop_margin = (
+        5  # Number of points to shrink the end of a GPS pass after filtering to remove low-velocity points.
+    )
     # m.     Maximum distance between estimated camera trajectory points (expressed in heliostat coordiantes), to consider part of a connected trajectory.
     maximum_camera_pass_inter_point_distance = 4.0
-    minimum_camera_pass_inter_point_speed = 1.5  # m/sec. Minimum observed inter-point speed allowable along a contiguous camera pass.
-    minimum_camera_pass_number_of_points = (
-        10  # Minmum number of points required to constitute a camera pass.
+    minimum_camera_pass_inter_point_speed = (
+        1.5  # m/sec. Minimum observed inter-point speed allowable along a contiguous camera pass.
     )
+    minimum_camera_pass_number_of_points = 10  # Minmum number of points required to constitute a camera pass.
     camera_pass_start_margin = 3  # Number of points to shrink the start of a camera pass after removing points corresponding to excess missing corners.
     camera_pass_stop_margin = 3  # Number of points to shrink the end of a camera pass after removing points corresponding to excess missing corners.
     # Input/output sources.
@@ -4898,32 +4050,17 @@ if __name__ == "__main__":
     ]  # Nominal time, refined by computation.  Recommend use mid-point of flight.
     up_heliostats = ['6W5', '6E6', '6E8', '6E9', '13E10']
     up_configuration = hc.HeliostatConfiguration(az=np.deg2rad(180), el=np.deg2rad(90))
-    down_heliostats = [
-        '5W10',
-        '5W8',
-        '5E1',
-        '5E7',
-        '5E10',
-        '6E7',
-        '9W10',
-        '10W12',
-        '11W5',
-        '13W5',
-        '13W14',
-        '13E14',
-    ]
+    down_heliostats = ['5W10', '5W8', '5E1', '5E7', '5E10', '6E7', '9W10', '10W12', '11W5', '13W5', '13W14', '13E14']
     down_configuration = hc.NSTTF_stow()
     input_video_dir_body_ext = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
     )
     input_flight_log_dir_body_ext = (
         experiment_dir()
         + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/060_FlightData/data/_F08_log_2020-12-03_15-44-13_v2.csv'
     )
     input_reconstructed_heliostats_dir = (
-        experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/180_Heliostats3d/mavic_zoom/data/'
+        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/180_Heliostats3d/mavic_zoom/data/'
     )
     output_data_dir = (
         experiment_dir()

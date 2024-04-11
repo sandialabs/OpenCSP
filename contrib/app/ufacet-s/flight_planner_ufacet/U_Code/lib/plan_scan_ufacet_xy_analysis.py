@@ -16,21 +16,11 @@ def ideal_gaze_xy_list(
 ):  # Integration limits.
     # Integrate forward from the key point.
     post_x_list, post_y_list = ideal_gaze_xy_list_aux(
-        aimpoint_xyz,
-        field_origin_lon_lat,
-        when_ymdhmsz,
-        key_xy,
-        integration_step,
-        bbox_xy,
+        aimpoint_xyz, field_origin_lon_lat, when_ymdhmsz, key_xy, integration_step, bbox_xy
     )
     # Integrate backward from the key point.
     pre_x_list, pre_y_list = ideal_gaze_xy_list_aux(
-        aimpoint_xyz,
-        field_origin_lon_lat,
-        when_ymdhmsz,
-        key_xy,
-        -integration_step,  # Reverse direction
-        bbox_xy,
+        aimpoint_xyz, field_origin_lon_lat, when_ymdhmsz, key_xy, -integration_step, bbox_xy  # Reverse direction
     )
     pre_x_list.reverse()
     pre_y_list.reverse()
@@ -59,9 +49,7 @@ def ideal_gaze_xy_list_aux(
     curve_x_list = []
     curve_y_list = []
     while ((x_min <= x_c) and (x_c <= x_max)) and ((y_min <= y_c) and (y_c <= y_max)):
-        nu = sun_track.tracking_nu(
-            [x_c, y_c, 0], aimpoint_xyz, field_origin_lon_lat, when_ymdhmsz
-        )
+        nu = sun_track.tracking_nu([x_c, y_c, 0], aimpoint_xyz, field_origin_lon_lat, when_ymdhmsz)
         gamma = nu + np.pi
         x_c += integration_step * np.cos(gamma)
         y_c += integration_step * np.sin(gamma)
@@ -123,12 +111,7 @@ def ufacet_xy_analysis(solar_field, aimpoint_xyz, when_ymdhmsz, curve_key_xy_lis
     for key_xy in curve_key_xy_list:
         # Construct ideal gaze curve.
         ideal_xy_list = ideal_gaze_xy_list(
-            aimpoint_xyz,
-            field_origin_lon_lat,
-            when_ymdhmsz,
-            key_xy,
-            integration_step,
-            bbox_xy,
+            aimpoint_xyz, field_origin_lon_lat, when_ymdhmsz, key_xy, integration_step, bbox_xy
         )
         list_of_ideal_xy_lists.append(ideal_xy_list)
         # Construct segment approximating curve.
