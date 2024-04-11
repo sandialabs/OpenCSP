@@ -54,7 +54,10 @@ class SystemSofastFringe:
         # Validate input
         if image_projection is None or image_acquisition is None:
             lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
-        self.image_acquisitions = image_acquisition
+        if image_acquisition is list:
+            self._image_acquisitions = image_acquisition
+        elif image_acquisition is ImageAcquisitionAbstract:
+            self._image_acquisitions = [image_acquisition]
 
         # Save objects in class
         self.root = image_projection.root
