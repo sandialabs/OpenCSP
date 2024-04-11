@@ -54,9 +54,9 @@ class SystemSofastFringe:
         # Validate input
         if image_projection is None or image_acquisition is None:
             lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
-        if image_acquisition is list:
+        if isinstance(image_acquisition, list):
             self._image_acquisitions = image_acquisition
-        elif image_acquisition is ImageAcquisitionAbstract:
+        else:
             self._image_acquisitions = [image_acquisition]
 
         # Save objects in class
@@ -436,6 +436,11 @@ class SystemSofastFringe:
         if self.fringes is None:
             lt.error_and_raise(
                 ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): Fringes have not been loaded.'
+            )
+
+        if self._fringe_images_to_display is None:
+            lt.error_and_raise(
+                ValueError, 'Error in SystemSofastFrigne.capture_fringe_images(): Fringe images have not been created'
             )
 
         # Initialize fringe image list
