@@ -107,7 +107,7 @@ class test_sofast_common_functions(unittest.TestCase):
         # Create the calibration instance
         cal_path_name_ext = os.path.join(self.cal_dir, "cal_global.h5")
         cal = icg.ImageCalibrationGlobal.load_from_hdf(cal_path_name_ext)
-        sys.calibration = cal
+        sys._calibration = cal
 
         # No more error!
         self.assertTrue(scf.check_calibration_loaded(sys, 'test_check_calibration_loaded'))
