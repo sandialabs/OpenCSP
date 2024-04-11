@@ -154,8 +154,6 @@ class SystemSofastFringe:
 
         """
         # Reset measurement attributes to None
-        self.fringes = None
-
         self.mask_images_to_display = None
         self.mask_images_captured = None
 
