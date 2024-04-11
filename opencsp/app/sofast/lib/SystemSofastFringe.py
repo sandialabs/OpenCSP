@@ -109,6 +109,7 @@ class SystemSofastFringe:
 
     @property
     def image_acquisitions(self) -> list[ImageAcquisitionAbstract]:
+        """Loaded image acquisition instances"""
         if len(self._image_acquisitions) == 0:
             # Import here to avoide circular dependencies
             import opencsp.app.sofast.lib.sofast_common_functions as scf
