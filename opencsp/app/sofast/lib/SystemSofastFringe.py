@@ -75,7 +75,7 @@ class SystemSofastFringe:
         self._queue_funcs = []
 
         # Define variables
-        self._fringes: Fringes
+        self.fringes: Fringes = None
         self.fringe_images_to_display: list[ndarray]
         self.mask_images_captured: list[ndarray]
         self.fringe_images_captured: list[list[ndarray]]
@@ -96,10 +96,9 @@ class SystemSofastFringe:
         # Close Fringe-specific objects
         self.reset_all_measurement_data()
 
-    @property
-    def fringes(self):
-        """Get the fringes this instance uses. Note, no setter, use set_fringes() instead."""
-        return self._fringes
+    def set_fringes(self, fringes: Fringes) -> None:
+        """Sets the fringes object in the class"""
+        self.fringes = fringes
 
     @property
     def image_acquisitions(self) -> list[ImageAcquisitionAbstract]:
@@ -155,7 +154,7 @@ class SystemSofastFringe:
 
         """
         # Reset measurement attributes to None
-        self._fringes = None
+        self.fringes = None
 
         self.mask_images_to_display = None
         self.mask_images_captured = None
@@ -249,43 +248,49 @@ class SystemSofastFringe:
             # Run next operation if finished
             run_next()
 
-    def set_fringes(self, fringes: Fringes, min_display_value: int = None) -> None:
+    def set_calibration(self, calibration: ImageCalibrationAbstract) -> None:
         """
-        Loads fringe object and creates RGB fringe images to display.
-
-        Uses the global ImageProjection projector instance as the reference for scale.
+        Loads calibration object and creates RGB fringe images to display.
 
         Parameters
         ----------
-        fringes : Fringes
-            Fringe object to display.
-        min_display_value : int, None
-            Minimum display value to project. Should be based on the sensitivity of the camera in the optical system. In
-            a perfect system where the camera can tell the difference between the displayed values '0' and '1', this
-            value will be '0'. If None, then the value is retrieved from
-            self.calibration.calculate_min_display_camera_values().
-
+        calibration : ImageCalibrationAbstract
+            The image calibration object to apply to fringe image generation
         """
+        self.calibration = calibration
+
+        self.create_fringe_images_from_image_calibration()
+
+    def create_fringe_images_from_image_calibration(self):
+        """Once the system loads a new calibration object, a new min_display_value and
+        RGB fringe images must be made
+        """
+        # Check fringes are loaded
+        if self.fringes is None:
+            lt.error_and_raise(
+                ValueError,
+                'Error in SystemSofastFringe.create_fringe_images_from_image_calibration(): '
+                + 'fringes must be set using self.set_frignes() first.',
+            )
+
+        # Check calibration is loaded
+        if self.calibration is None:
+            lt.error_and_raise(
+                ValueError,
+                'Error in SystemSofastFringe.create_fringe_images_from_image_calibration'
+                + 'calibration must be set using self.set_calibration first.',
+            )
+
         image_projection = ImageProjection.instance()
 
-        # Validate input
-        if min_display_value is None:
-            if self.calibration is None:
-                lt.error_and_raise(
-                    ValueError,
-                    "Error in SystemSofastFringe.set_fringes(): "
-                    + "must provide a min_display_value, or run or provided a calibration, before setting the fringes",
-                )
-            min_display_value = self.calibration.calculate_min_display_camera_values()[0]
-
-        # Save fringes
-        self._fringes = fringes
+        # Calculate minimun display value
+        min_display_value = self.calibration.calculate_min_display_camera_values()[0]
 
         # Get fringe range
         fringe_range = (min_display_value, image_projection.display_data['projector_max_int'])
 
         # Get fringe base images
-        fringe_images_base = fringes.get_frames(
+        fringe_images_base = self.fringes.get_frames(
             image_projection.size_x,
             image_projection.size_y,
             image_projection.display_data['projector_data_type'],
@@ -338,7 +343,7 @@ class SystemSofastFringe:
         calibration_class : type[ImageCalibrationAbstract]:
             The type of calibration to use.
         calibration_hdf5_path_name_ext : str, optional
-            The callback to execute when capturing is about to start. Default is None
+            The pathname of the output HDF5 file, does not save if None. Default is None
         on_capturing : Callable, optional
             The callback to execute when capturing is about to start. Default is None
         on_captured : Callable, optional
@@ -380,6 +385,8 @@ class SystemSofastFringe:
             datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
             if calibration_hdf5_path_name_ext != None:
                 h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
+            # Update the fringe images with the new calibration object
+            self.create_fringe_images_from_image_calibration()
             # Run the "on done" callback
             if on_processed != None:
                 on_processed()
@@ -422,7 +429,7 @@ class SystemSofastFringe:
 
         """
         # Check fringes/camera have been loaded
-        if self._fringes is None:
+        if self.fringes is None:
             lt.error_and_raise(
                 ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): Fringes have not been loaded.'
             )
@@ -451,7 +458,7 @@ class SystemSofastFringe:
 
         """
         # Check fringes/camera have been loaded
-        if self._fringes is None:
+        if self.fringes is None:
             lt.error_and_raise(
                 ValueError,
                 'Error in SystemSofastFringe.capture_mask_and_fringe_images(): Fringes have not been loaded.',
@@ -485,7 +492,7 @@ class SystemSofastFringe:
                 RuntimeError,
                 "Error in SystemSofastFringe.run_measurement(): must have run or provided a calibration before starting a measurement.",
             )
-        if self._fringes is None:
+        if self.fringes is None:
             lt.error_and_raise(
                 RuntimeError,
                 "Error in SystemSofastFringe.run_measurement(): must have set fringes before starting a measurement.",
@@ -594,8 +601,8 @@ class SystemSofastFringe:
             # Create measurement object
             dist_optic_screen_measure = osd.DistanceOpticScreen(v_measure_point, dist_optic_screen)
             kwargs = dict(
-                fringe_periods_x=np.array(self._fringes.periods_x),
-                fringe_periods_y=np.array(self._fringes.periods_y),
+                fringe_periods_x=np.array(self.fringes.periods_x),
+                fringe_periods_y=np.array(self.fringes.periods_y),
                 fringe_images=np.concatenate(fringe_images, axis=2),
                 mask_images=np.concatenate(mask_images, axis=2),
                 dist_optic_screen_measure=dist_optic_screen_measure,
