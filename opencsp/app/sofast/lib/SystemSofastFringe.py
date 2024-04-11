@@ -164,8 +164,6 @@ class SystemSofastFringe:
 
         self.calibration_images = None
         self._calibration_display_values = None
-        with et.ignored(Exception):
-            self.calibration.close()
         self.calibration = None
 
     def _create_mask_images_to_display(self) -> None:
