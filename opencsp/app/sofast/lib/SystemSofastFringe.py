@@ -89,7 +89,7 @@ class SystemSofastFringe:
         """The digital numbers sent to the projector for the projector-camera response calibration"""
         self._calibration_images_captured: list[list[ndarray]]
         """List of lists of projector-camera response calibration images (one list per camera)"""
-        self.calibration: ImageCalibrationAbstract = None
+        self._calibration: ImageCalibrationAbstract = None
         """The computed ImageCalibration object"""
 
     def __del__(self):
@@ -170,7 +170,7 @@ class SystemSofastFringe:
 
         self._calibration_images_captured = None
         self._calibration_display_values = None
-        self.calibration = None
+        self._calibration = None
 
     def _create_mask_images_to_display(self) -> None:
         """
@@ -261,9 +261,14 @@ class SystemSofastFringe:
         calibration : ImageCalibrationAbstract
             The image calibration object to apply to fringe image generation
         """
-        self.calibration = calibration
+        self._calibration = calibration
 
         self.create_fringe_images_from_image_calibration()
+
+    @property
+    def calibration(self):
+        """Returns ImageCalibration object. Note: this is not a setter, use set_calibration() instead"""
+        return self._calibration
 
     def create_fringe_images_from_image_calibration(self):
         """Once the system loads a new calibration object, a new min_display_value and
@@ -278,7 +283,7 @@ class SystemSofastFringe:
             )
 
         # Check calibration is loaded
-        if self.calibration is None:
+        if self._calibration is None:
             lt.error_and_raise(
                 ValueError,
                 'Error in SystemSofastFringe.create_fringe_images_from_image_calibration'
@@ -288,7 +293,7 @@ class SystemSofastFringe:
         image_projection = ImageProjection.instance()
 
         # Calculate minimun display value
-        min_display_value = self.calibration.calculate_min_display_camera_values()[0]
+        min_display_value = self._calibration.calculate_min_display_camera_values()[0]
 
         # Get fringe range
         fringe_range = (min_display_value, image_projection.display_data['projector_max_int'])
@@ -340,7 +345,7 @@ class SystemSofastFringe:
         on_processed: Callable = None,
     ) -> None:
         """Runs the projector-camera intensity calibration and stores the results in self._calibration_images_captured and
-        self.calibration.
+        self._calibration.
 
         Params:
         -------
@@ -380,13 +385,13 @@ class SystemSofastFringe:
             # Get calibration images from System
             calibration_images = self.get_calibration_images()[0]  # only calibrating one camera
             # Load calibration object
-            self.calibration = calibration_class.from_data(calibration_images, self._calibration_display_values)
+            self._calibration = calibration_class.from_data(calibration_images, self._calibration_display_values)
             # Save calibration object
             if calibration_hdf5_path_name_ext != None:
-                self.calibration.save_to_hdf(calibration_hdf5_path_name_ext)
+                self._calibration.save_to_hdf(calibration_hdf5_path_name_ext)
             # Save calibration raw data
             if calibration_hdf5_path_name_ext != None:
-                data = [self.calibration.display_values, calibration_images]
+                data = [self._calibration.display_values, calibration_images]
                 datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
                 h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
             # Update the fringe images with the new calibration object
@@ -496,7 +501,7 @@ class SystemSofastFringe:
             Calibration hasn't been set, or fringes haven't been set
         """
         # Get minimum display value from calibration
-        if self.calibration is None:
+        if self._calibration is None:
             lt.error_and_raise(
                 RuntimeError,
                 "Error in SystemSofastFringe.run_measurement(): must have run or provided a calibration before starting a measurement.",
