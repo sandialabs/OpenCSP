@@ -77,7 +77,8 @@ class Executor:
         # tkinter thread
         if ImageProjection.instance() is None:
             lt.error_and_raise(
-                RuntimeError, "Error in Executor(): ImageProjection must exist before initializing Executor instance.")
+                RuntimeError, "Error in Executor(): ImageProjection must exist before initializing Executor instance."
+            )
         ImageProjection.instance().root.after(100, self._on_tick)
         self.tasks: queue.Queue[Callable] = queue.Queue()
 

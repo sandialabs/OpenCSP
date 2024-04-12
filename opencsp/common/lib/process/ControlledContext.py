@@ -45,8 +45,9 @@ class ControlledContext(Generic[T]):
     def __enter__(self):
         asyncio.run(self._acquire_with_timeout())
         if self.timed_out:
-            lt.error_and_raise(asyncio.TimeoutError,
-                               f"Failed to acquire lock for {self.o} within {self.timeout} seconds")
+            lt.error_and_raise(
+                asyncio.TimeoutError, f"Failed to acquire lock for {self.o} within {self.timeout} seconds"
+            )
         return self.o
 
     def __exit__(self, exc_type, exc_value, traceback):
