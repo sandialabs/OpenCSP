@@ -1,6 +1,8 @@
 import asyncio
 from typing import Generic, TypeVar
 
+import opencsp.common.lib.tool.log_tools as lt
+
 
 T = TypeVar('T')
 
@@ -31,9 +33,15 @@ class ControlledContext(Generic[T]):
         self.mutex = asyncio.Lock()
 
     def __enter__(self):
-        self.mutex.acquire()
+        asyncio.run(self.mutex.acquire())
         return self.o
 
     def __exit__(self, exc_type, exc_value, traceback):
-        self.mutex.release()
+        if self.mutex.locked():
+            self.mutex.release()
+        else:
+            lt.warn(
+                "Warning in ControlledContext.__exit__(): "
+                + f"Mutex not locked for object {self.o}. This probably means that it was free'd by a nested function!"
+            )
         return False

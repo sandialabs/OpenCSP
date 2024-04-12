@@ -36,6 +36,7 @@ class ServerState:
         self._last_measurement_fringe: sfe.FringeResults = None
         self.fixed_measurement_name: str = None
         self.fringe_measurement_name: str = None
+        self._processing_error: Exception = None
 
         # configurations
         self._mirror_measure_point: vxyz.Vxyz = None
@@ -191,6 +192,10 @@ class ServerState:
             return True
 
     @property
+    def processing_error(self) -> Exception | None:
+        return self._processing_error
+
+    @property
     def last_measurement_fringe(self) -> sfe.FringeResults:
         if not self.has_fringe_measurement:
             return None
@@ -334,6 +339,7 @@ class ServerState:
         with self._state_lock:
             self._last_measurement_fringe = None
             self._running_measurement_fringe = True
+            self._processing_error = None
 
         # Start the measurement
         self._executor.on_fringe_collected = self._on_fringe_collected
@@ -376,7 +382,7 @@ class ServerState:
             self.reference_facet,
         )
 
-    def _on_fringe_processed(self, fringe_results: sfe.FringeResults):
+    def _on_fringe_processed(self, fringe_results: sfe.FringeResults | None, ex: Exception | None):
         """
         Processes the fringe images captured during self.system_fringe.run_measurement() and stores the result to
         self._last_measurement_fringe.
@@ -384,18 +390,30 @@ class ServerState:
         This method is evaluated in the _processing_pool thread, and so certain critical sections of code are protected
         to ensure a consistent state is maintained.
         """
-        lt.debug("ServerState: finished processing fringes")
-        if not self._processing_measurement_fringe:
-            lt.error(
-                "Programmer error in server_api._process_fringes(): "
-                + "Did not expect for this method to be called while self._processing_measurement_fringe was not True!"
-            )
+        if ex is not None:
+            with self._state_lock:
+                self._processing_fringes = False
+                self._processing_error = ex
+            return
 
-        # update statuses
-        # Critical section, these statuses updates need to be thread safe
-        with self._state_lock:
-            self._processing_fringes = False
-            self._last_measurement_fringe = fringe_results
+        try:
+            lt.debug("ServerState: finished processing fringes")
+            if not self._processing_measurement_fringe:
+                lt.error(
+                    "Programmer error in server_api._process_fringes(): "
+                    + "Did not expect for this method to be called while self._processing_measurement_fringe was not True!"
+                )
+
+            # update statuses
+            # Critical section, these statuses updates need to be thread safe
+            with self._state_lock:
+                self._processing_fringes = False
+                self._last_measurement_fringe = fringe_results
+
+        except Exception as ex2:
+            with self._state_lock:
+                self._processing_fringes = False
+                self._processing_error = ex2
 
     def close_all(self):
         """Closes all cameras, projectors, and sofast systems (currently just sofast fringe)"""

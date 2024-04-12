@@ -102,14 +102,23 @@ class SofastServer(BaseHTTPRequestHandler):
             elif action == "save_measure_fringes":
                 if "saves_output_dir" in opencsp_settings and ft.directory_exists(opencsp_settings["saves_output_dir"]):
                     measurement = None
+                    processing_error = None
                     with ss.ServerState.instance() as state:
                         if state.has_fringe_measurement:
                             measurement = state.last_measurement_fringe[0]
                             file_name_ext = state.fringe_measurement_name + ".h5"
+                        else:
+                            processing_error = state.processing_error
                     if measurement is not None:
                         file_path_name_ext = os.path.join(opencsp_settings["saves_output_dir"], file_name_ext)
                         measurement.save_to_hdf(file_path_name_ext)
                         ret["file_name_ext"] = file_name_ext
+                    elif processing_error is not None:
+                        ret["error"] = (
+                            f"Unexpected {repr(processing_error)} error encountered during measurement processing"
+                        )
+                        ret["trace"] = "".join(format_exception(processing_error))
+                        response_code = 500
                     else:
                         ret["error"] = "Fringe measurement is not ready"
                         ret["trace"] = "SofastServer.get_response::save_measure_fringes"

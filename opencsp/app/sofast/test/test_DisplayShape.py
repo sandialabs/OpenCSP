@@ -13,18 +13,24 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 class TestDisplayShape(unittest.TestCase):
+    LX = 5.0  # meters
+    LY = 5.0  # meters
+    LZ = 3.0  # meters
+    grid_data_rect2D = {'screen_x': LX, 'screen_y': LY, 'screen_model': 'rectangular2D'}
+
     @classmethod
     def setUpClass(cls):
         # Define screen X and Y extent
-        LX = 5.0  # meters
-        LY = 5.0  # meters
-        LZ = 3.0  # meters
+        LX = TestDisplayShape.LX
+        LY = TestDisplayShape.LY
+        LZ = TestDisplayShape.LZ
 
         # Define test points
         cls.test_Vxy_pts = Vxy(([0, 0.5, 1, 0, 0.5, 1, 0, 0.5, 1], [0, 0, 0, 0.5, 0.5, 0.5, 1, 1, 1]))
 
         # Define rectangular input data
-        cls.grid_data_rect2D = {'screen_x': LX, 'screen_y': LY, 'screen_model': 'rectangular2D'}
+        # done in class definition
+        # cls.grid_data_rect2D = {'screen_x': LX, 'screen_y': LY, 'screen_model': 'rectangular2D'}
 
         # Define 2D input data
         cls.grid_data_2D = {

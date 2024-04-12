@@ -35,7 +35,8 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
     def get_frame(self) -> np.ndarray:
         # Return test image
-        return np.zeros(self._frame_size, dtype=np.uint8)
+        x, y = self._frame_size
+        return np.zeros((y, x), dtype=np.uint8)
 
     @property
     def gain(self) -> float:

@@ -8,12 +8,13 @@ import numpy.typing as npt
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 import opencsp.common.lib.geometry.Vxyz as vxyz
 import opencsp.common.lib.process.ControlledContext as cc
 import opencsp.common.lib.tool.exception_tools as et
@@ -30,7 +31,7 @@ class FixedResults:
 class FringeResults:
     measurement: MeasurementSofastFringe
     """The collected measurement data"""
-    sofast: Sofast
+    sofast: ProcessSofastFringe
     """The object create for processing the measurement"""
     facet: Facet
     """The facet representation"""
@@ -47,16 +48,28 @@ class FringeResults:
 
 
 class Executor:
-    """Class to handle collection and processing of sofast measurements asynchronously in the main thread (aka the
-    tkinter thread) and a separate processing thread."""
+    """Class to handle the collection and processing of Sofast measurements."""
 
-    def __init__(self):
+    def __init__(self, asynchronous_processing=True):
+        """
+        Class to handle collection and processing of sofast measurements.
+
+        Collection is handled in the main thread (aka the tkinter thread). Processing is handled either in a separate
+        processing thread, or in the calling thread.
+
+        Parameters
+        ----------
+        asynchronous : bool, optional
+            If True then processing is done in a separate thread, if False then it is done on the calling thread. By
+            default True.
+        """
         self.on_fringe_collected: Callable
-        self.on_fringe_processed: Callable[[FringeResults], None]
+        self.on_fringe_processed: Callable[[FringeResults | None, Exception | None], None]
         self.on_fixed_collected: Callable
-        self.on_fixed_processed: Callable[[FixedResults], None]
+        self.on_fixed_processed: Callable[[FixedResults | None, Exception | None], None]
 
         # processing thread
+        self.asynchronous_processing = asynchronous_processing
         self._processing_pool = ThreadPoolExecutor(max_workers=1)
 
         # don't try to close multiple times
@@ -106,40 +119,67 @@ class Executor:
             name = measurement_name
 
         def _process_fringes():
-            # Get the measurement
-            with controlled_system as system:
-                measurements = system.get_measurements(mirror_measure_point, mirror_measure_distance, name)
-                measurement = measurements[0]
+            try:
+                with controlled_system as system:
+                    # Get the measurement
+                    measurements = system.get_measurements(mirror_measure_point, mirror_measure_distance, name)
+                    measurement = measurements[0]
 
-            # Process the measurement
-            sofast = Sofast(measurements[0], orientation, camera, display)
-            sofast.process_optic_singlefacet(facet_data, surface)
-            facet: Facet = sofast.get_optic()
+                    # Apply calibration to the fringe images
+                    measurement.calibrate_fringe_images(system.calibration)
 
-            # Get the focal lengths
-            surf_coefs = sofast.data_characterization_facet[0].surf_coefs_facet
-            focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
+                # Process the measurement
+                sofast = ProcessSofastFringe(measurements[0], orientation, camera, display)
+                # sofast.params.geometry_data_debug.debug_active = True
+                sofast.process_optic_singlefacet(facet_data, surface)
+                facet: Facet = sofast.get_optic()
 
-            # Create interpolation axes
-            res = 0.1  # meters
-            left, right, bottom, top = facet.axis_aligned_bounding_box
-            x_vec = np.arange(left, right, res)  # meters
-            y_vec = np.arange(bottom, top, res)  # meters
+                # Get the focal lengths (if a parabolic mirror)
+                facet_idx = 0
+                surf_coefs = sofast.data_characterization_facet[facet_idx].surf_coefs_facet
+                if surf_coefs.size >= 6:
+                    if not isinstance(surface, Surface2DParabolic):
+                        lt.warn(
+                            "Warning in Executor.start_process_fringe(): "
+                            + "did not expect a non-parabolic mirror to have a focal point"
+                        )
+                    focal_length_x, focal_length_y = 1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]
+                else:
+                    if isinstance(surface, Surface2DParabolic):
+                        lt.warn(
+                            "Warning in Executor.start_process_fringe(): "
+                            + "expected a parabolic mirror to have a focal point"
+                        )
+                    focal_length_x, focal_length_y = None, None
 
-            # Calculate current mirror slope
-            slopes_cur = facet.orthorectified_slope_array(x_vec, y_vec)  # radians
+                # Create interpolation axes
+                res = 0.1  # meters
+                left, right, bottom, top = facet.axis_aligned_bounding_box
+                x_vec = np.arange(left, right, res)  # meters
+                y_vec = np.arange(bottom, top, res)  # meters
 
-            # Calculate slope difference (error)
-            slopes_diff: npt.NDArray[np.float_] = None
-            if reference_facet is not None:
-                slopes_ref = reference_facet.orthorectified_slope_array(x_vec, y_vec)  # radians
-                slopes_diff = slopes_cur - slopes_ref  # radians
+                # Calculate current mirror slope
+                slopes_cur = facet.orthorectified_slope_array(x_vec, y_vec)  # radians
 
-            # Call the callback
-            ret = FringeResults(measurement, sofast, facet, res, focal_lengths_xy, slopes_cur, slopes_diff)
-            self.on_fringe_processed(ret)
+                # Calculate slope difference (error)
+                slopes_diff: npt.NDArray[np.float_] = None
+                if reference_facet is not None:
+                    slopes_ref = reference_facet.orthorectified_slope_array(x_vec, y_vec)  # radians
+                    slopes_diff = slopes_cur - slopes_ref  # radians
 
-        self._processing_pool.submit(_process_fringes)
+                # Call the callback
+                ret = FringeResults(
+                    measurement, sofast, facet, res, focal_length_x, focal_length_y, slopes_cur, slopes_diff
+                )
+                self.on_fringe_processed(ret, None)
+            except Exception as ex:
+                lt.error("Error in Executor.start_process_fringe(): " + repr(ex))
+                self.on_fringe_processed(None, ex)
+
+        if self.asynchronous_processing:
+            self._processing_pool.submit(_process_fringes)
+        else:
+            _process_fringes()
 
     def close(self):
         """Closes the processing thread (may take several seconds)"""
