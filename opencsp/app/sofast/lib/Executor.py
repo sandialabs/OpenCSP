@@ -1,6 +1,7 @@
 from concurrent.futures import ThreadPoolExecutor
 import dataclasses
 from typing import Callable
+import queue
 
 import numpy as np
 import numpy.typing as npt
@@ -13,6 +14,7 @@ from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 import opencsp.common.lib.geometry.Vxyz as vxyz
@@ -72,12 +74,41 @@ class Executor:
         self.asynchronous_processing = asynchronous_processing
         self._processing_pool = ThreadPoolExecutor(max_workers=1)
 
+        # tkinter thread
+        if ImageProjection.instance() is None:
+            lt.error_and_raise(
+                RuntimeError, "Error in Executor(): ImageProjection must exist before initializing Executor instance.")
+        ImageProjection.instance().root.after(100, self._on_tick)
+        self.tasks: queue.Queue[Callable] = queue.Queue()
+
         # don't try to close multiple times
         self.is_closed = False
 
     def __del__(self):
         with et.ignored(Exception):
             self.close()
+
+    def _on_tick(self):
+        """Function that runs every 100ms in the tkinter thread."""
+        # stop evaluating if this instance is closed
+        if self.is_closed:
+            return
+
+        try:
+            # evaluate any pending tasks
+            while True:
+                task = self.tasks.get_nowait()
+                lt.error("evaluating task")
+                task()
+
+        except queue.Empty:
+            pass
+
+        finally:
+            # run again in another 100ms
+            ip = ImageProjection.instance()
+            if ip is not None:
+                ip.root.after(100, self._on_tick)
 
     def start_collect_fringe(self, controlled_system: cc.ControlledContext[SystemSofastFringe]):
         """Starts collection of fringe measurement image data.
@@ -89,9 +120,17 @@ class Executor:
         # Start the collection
         lt.debug("Executor: collecting fringes")
 
-        # Run the measurement in the main thread (aka the tkinter thread)
-        with controlled_system as system:
-            system.run_measurement(self.on_fringe_collected)
+        # The collection task:
+        def task():
+            with controlled_system as system:
+                system.run_measurement(self.on_fringe_collected)
+
+        if self.asynchronous_processing:
+            # Run the measurement in the main thread (aka the tkinter thread)
+            self.tasks.put(task)
+        else:
+            # Run the measurement in this thread
+            task()
 
     def start_process_fringe(
         self,

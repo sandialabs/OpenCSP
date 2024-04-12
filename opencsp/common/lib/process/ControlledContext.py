@@ -1,4 +1,5 @@
 import asyncio
+import threading
 from typing import Generic, TypeVar
 
 import opencsp.common.lib.tool.log_tools as lt
@@ -28,20 +29,28 @@ class ControlledContext(Generic[T]):
             print(str(tsv[0])) # will always print '0'
     """
 
-    def __init__(self, o: T):
+    def __init__(self, o: T, timeout: float = 1):
         self.o = o
-        self.mutex = asyncio.Lock()
+        self.rlock = threading.RLock()
+        self.timeout = timeout
+        self.timed_out = False
+
+    async def _acquire_with_timeout(self):
+        if self.timeout:
+            if not self.rlock.acquire(timeout=self.timeout):
+                self.timed_out = True
+        else:
+            self.rlock.acquire()
 
     def __enter__(self):
-        asyncio.run(self.mutex.acquire())
+        asyncio.run(self._acquire_with_timeout())
+        if self.timed_out:
+            lt.error_and_raise(asyncio.TimeoutError,
+                               f"Failed to acquire lock for {self.o} within {self.timeout} seconds")
         return self.o
 
     def __exit__(self, exc_type, exc_value, traceback):
-        if self.mutex.locked():
-            self.mutex.release()
-        else:
-            lt.warn(
-                "Warning in ControlledContext.__exit__(): "
-                + f"Mutex not locked for object {self.o}. This probably means that it was free'd by a nested function!"
-            )
+        self.rlock.release()
+
+        # return False to enable exceptions to be re-raised
         return False

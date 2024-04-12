@@ -212,6 +212,7 @@ class SystemSofastFringe:
         except Exception as ex:
             # make sure that whatever we are trying to do when we finish, that it happens
             if run_next is not None:
+                lt.error(f"Error in SystemSofastFringe._measure_sequence_display(): {ex}")
                 run_next()
             raise
 
@@ -232,19 +233,25 @@ class SystemSofastFringe:
             Function that is run after all images have been captured.
 
         """
-        for ims_cap, im_aq in zip(im_cap_list, self.image_acquisitions):
-            # Capture and save image
-            im = im_aq.get_frame()
+        try:
+            for ims_cap, im_aq in zip(im_cap_list, self.image_acquisitions):
+                # Capture and save image
+                im = im_aq.get_frame()
 
-            # Check for image saturation
-            self.check_saturation(im, im_aq.max_value)
+                # Check for image saturation
+                self.check_saturation(im, im_aq.max_value)
 
-            # Reshape image if necessary
-            if np.ndim(im) == 2:
-                im = im[..., np.newaxis]
+                # Reshape image if necessary
+                if np.ndim(im) == 2:
+                    im = im[..., np.newaxis]
 
-            # Save image to image list
-            ims_cap.append(im)
+                # Save image to image list
+                ims_cap.append(im)
+        except Exception as ex:
+            lt.error(f"Error in SystemSofastFringe._measure_sequence_capture(): {ex}")
+            if run_next is not None:
+                run_next()
+            raise
 
         if len(im_cap_list[0]) < len(im_disp_list):
             # Display next image if not finished

@@ -1,7 +1,10 @@
-"""Unit test suite to test ImageCalibrationGlobal class
+"""Unit test suite to test Executor class
 """
 
+from concurrent.futures import ThreadPoolExecutor
 import os
+import time
+from tkinter import Tk
 import unittest
 
 import numpy as np
@@ -29,6 +32,7 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.process.ControlledContext as cc
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
 @pytest.mark.no_xvfb
@@ -50,6 +54,9 @@ class TestExecutor(unittest.TestCase):
         self.fringe_processed = False
         self.fringe_results: executor.FringeResults = None
         self.reported_error: Exception = None
+
+        # build the default projector instance
+        ImageProjection.in_new_window(_ip.display_dict)
 
         # build the default executor instance
         self.executor = executor.Executor()
@@ -78,7 +85,6 @@ class TestExecutor(unittest.TestCase):
         # Build Fringe system for testing
         fringes = Fringes.from_num_periods()
         ianc.ImageAcquisitionWithFringes(fringes)
-        ImageProjection.in_new_window(_ip.display_dict)
         self.sys_fringe = cc.ControlledContext(SystemSofastFringe())
         projector_values = np.arange(0, 255, (255 - 0) / 9)
         camera_response = np.arange(5, 50, (50 - 5) / 9)
@@ -132,6 +138,20 @@ class TestExecutor(unittest.TestCase):
 
         # Start the collection
         ImageProjection.instance().root.mainloop()
+
+        # If we get here, then the collection should have finished and mainloop() exited
+        self.assertTrue(self.fringe_collected)
+
+    def test_collect_fringe_from_other_thread(self):
+        pool = ThreadPoolExecutor(max_workers=1)
+        result = pool.submit(self.executor.start_collect_fringe, self.sys_fringe)
+
+        # Start the collection
+        ImageProjection.instance().root.mainloop()
+
+        # Check for errors
+        if result.exception() is not None:
+            raise result.exception()
 
         # If we get here, then the collection should have finished and mainloop() exited
         self.assertTrue(self.fringe_collected)
