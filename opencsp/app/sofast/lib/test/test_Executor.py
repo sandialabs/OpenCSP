@@ -2,7 +2,6 @@
 """
 
 import os
-import time
 import unittest
 
 import numpy as np
@@ -78,7 +77,7 @@ class TestExecutor(unittest.TestCase):
     def _build_sys_fringe(self):
         # Build Fringe system for testing
         fringes = Fringes.from_num_periods()
-        _IancProduceFringes(fringes)
+        ianc.ImageAcquisitionWithFringes(fringes)
         ImageProjection.in_new_window(_ip.display_dict)
         self.sys_fringe = cc.ControlledContext(SystemSofastFringe())
         projector_values = np.arange(0, 255, (255 - 0) / 9)
@@ -195,37 +194,6 @@ class TestExecutor(unittest.TestCase):
         self.assertIsNotNone(self.fringe_results)
         self.assertIsInstance(self.fringe_results.focal_length_x, float)
         self.assertIsInstance(self.fringe_results.focal_length_y, float)
-
-
-class _IancProduceFringes(ianc.ImageAcquisition):
-    """Class for unit testing. Mimics a camera by returning first a light image for the mask, then a dark image
-    for the mask, then cycling through all fringe images."""
-
-    def __init__(self, fringes: Fringes):
-        super().__init__()
-        self.index = -2
-        self.fringes = fringes
-        self.fringe_images = None
-
-    def get_frame(self) -> np.ndarray:
-        x, y = self.frame_size
-
-        if self.index < 0:
-            # mask images
-            frame = np.zeros((y, x), "uint8")
-            if self.index == -1:
-                frame[10:-10, 10:-10] = self.max_value
-        else:
-            # fringe images
-            if self.fringe_images is None:
-                self.fringe_images = self.fringes.get_frames(x, y, "uint8", [0, self.max_value])
-            frame = self.fringe_images[:, :, self.index]
-
-        self.index += 1
-        if self.index >= self.fringes.num_images:
-            self.index = 0
-
-        return frame
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ _sofast_server_settings: dict[str, any] = {"log_output_dir": None, "saves_output
 
 _sofast_defaults_settings_key = "sofast_defaults"
 _sofast_defaults_settings: dict[str, any] = {
-    "cameras": None,
+    "camera_names_and_indexes": None,
     "projector_file": None,
     "calibration_file": None,
     "mirror_measure_point": None,
