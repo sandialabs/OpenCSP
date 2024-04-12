@@ -1,10 +1,11 @@
-import asyncio
+import threading
 
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 import opencsp.app.sofast.lib.Executor as sfe
+from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationAbstract import ImageCalibrationAbstract
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
@@ -23,7 +24,6 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class ServerState:
-    _default_io_initialized: bool = False
     _instance: cc.ControlledContext['ServerState'] = None
 
     def __init__(self):
@@ -55,8 +55,7 @@ class ServerState:
         self.facet_definitions: list[DefinitionFacet] = None
         self.ensemble_definition: DefinitionEnsemble = None
         self.surface_shape: Surface2DAbstract = None
-        if not ServerState._default_io_initialized:
-            self.init_io()
+        self.init_io()
         self.load_default_settings()
 
         # statuses
@@ -73,7 +72,7 @@ class ServerState:
 
         # assign this as the global static instance
         if ServerState._instance is None:
-            ServerState._instance = cc.ControlledContext(self)
+            ServerState._instance = cc.ControlledContext(self, 10)
         else:
             lt.error_and_raise(
                 RuntimeError,
@@ -90,8 +89,7 @@ class ServerState:
         return ServerState._instance
 
     @property
-    @staticmethod
-    def _state_lock() -> asyncio.Lock:
+    def _state_lock(self) -> threading.RLock:
         """
         Return the mutex for providing exclusive access to ServerState singleton.
 
@@ -108,7 +106,7 @@ class ServerState:
             with self._state_lock:
                 # do stuff
         """
-        return ServerState.instance().mutex
+        return ServerState.instance().rlock
 
     @property
     def system_fixed(self) -> cc.ControlledContext[SystemSofastFixed]:
@@ -123,7 +121,10 @@ class ServerState:
     @property
     def system_fringe(self) -> cc.ControlledContext[SystemSofastFringe]:
         if self._system_fringe is None:
-            self._system_fringe = cc.ControlledContext(SystemSofastFringe())
+            sys = SystemSofastFringe()
+            sys.calibration = self.calibration
+            sys.set_fringes(self.fringes)
+            self._system_fringe = cc.ControlledContext(sys, timeout=10)
         return self._system_fringe
 
     @property
@@ -163,7 +164,7 @@ class ServerState:
             return True
 
     @property
-    def last_measurement_fixed(self) -> sfe.FixedResults:
+    def last_measurement_fixed(self) -> sfe.FixedResults | None:
         if not self.has_fixed_measurement:
             return None
         return self._last_measurement_fixed
@@ -196,7 +197,7 @@ class ServerState:
         return self._processing_error
 
     @property
-    def last_measurement_fringe(self) -> sfe.FringeResults:
+    def last_measurement_fringe(self) -> sfe.FringeResults | None:
         if not self.has_fringe_measurement:
             return None
         return self._last_measurement_fringe
@@ -208,28 +209,35 @@ class ServerState:
         all available for starting a new measurement.
         """
         if self._running_measurement_fixed:
-            return False
-        elif self._running_measurement_fringe:
-            return False
-        elif self._processing_measurement_fixed:
-            return False
-        elif self._processing_measurement_fringe:
-            return False
-        else:
             return True
+        elif self._running_measurement_fringe:
+            return True
+        elif self._processing_measurement_fixed:
+            return True
+        elif self._processing_measurement_fringe:
+            return True
+        else:
+            return False
 
     def _connect_default_cameras(self):
-        camera_descriptions = opencsp_settings["sofast_defaults"]["camera_files"]
-        if camera_descriptions is not None:
+        """Connects to the cameras specified in the settings.json file. See app/sofast/__init__.py for more information."""
+        camera_names_and_indexes = opencsp_settings["sofast_defaults"]["camera_names_and_indexes"]
+        if camera_names_and_indexes is not None:
             cam_options = ImageAcquisitionAbstract.cam_options()
-            for camera_description in camera_descriptions:
-                cam_options[camera_description]()
+            for camera_name, idx in camera_names_and_indexes:
+                with et.ignored(Exception):
+                    cam_options[camera_name](idx)
 
     def _load_default_projector(self):
+        """Opens the projector specified in the settings.json file in a new window. See app/sofast/__init__.py for more information."""
         projector_file = opencsp_settings["sofast_defaults"]["projector_file"]
         if projector_file is not None:
+            params = ImageProjection.load_from_hdf(projector_file)
             if ImageProjection.instance() is not None:
-                ImageProjection.instance().close()
+                if ImageProjection.instance().display_data == params:
+                    return
+                else:
+                    ImageProjection.instance().close()
             ImageProjection.load_from_hdf_and_display(projector_file)
 
     def init_io(self):
@@ -245,9 +253,7 @@ class ServerState:
         # load default calibration
         calibration_file = sofast_default_settings["calibration_file"]
         if calibration_file is not None:
-            calibration = ImageCalibrationAbstract.load_from_hdf_guess_type(calibration_file)
-            with self.system_fringe as sys:
-                sys.calibration = calibration
+            self.calibration = ImageCalibrationAbstract.load_from_hdf_guess_type(calibration_file)
 
         # latch default mirror measure point
         self.mirror_measure_point = sofast_default_settings["mirror_measure_point"]
@@ -302,6 +308,11 @@ class ServerState:
         if surface_shape_file is not None:
             self.surface_shape = Surface2DAbstract.load_from_hdf_guess_type(surface_shape_file)
 
+        # latch default fringe periods
+        num_fringe_periods = sofast_default_settings["num_fringe_periods"]
+        if num_fringe_periods is not None:
+            self.fringes = Fringes.from_num_periods(*num_fringe_periods)
+
     def start_measure_fringes(self, name: str = None) -> bool:
         """Starts collection and processing of fringe measurement image data.
 
@@ -318,18 +329,19 @@ class ServerState:
             True if the measurement was able to be started. False if the system resources are busy.
         """
         # Check that system resources are available
-        if self._running_measurement_fringe or self._processing_measurement_fringe:
-            lt.warn(
-                "Warning in server_api.run_measurment_fringe(): "
-                + "Attempting to start another fringe measurement before the last fringe measurement has finished."
-            )
-            return False
-        if not self.projector_available:
-            lt.warn(
-                "Warning in server_api.run_measurment_fringe(): "
-                + "Attempting to start a fringe measurement while the projector is already in use."
-            )
-            return False
+        with self._state_lock:
+            if self._running_measurement_fringe or self._processing_measurement_fringe:
+                lt.warn(
+                    "Warning in server_api.run_measurment_fringe(): "
+                    + "Attempting to start another fringe measurement before the last fringe measurement has finished."
+                )
+                return False
+            if not self.projector_available:
+                lt.warn(
+                    "Warning in server_api.run_measurment_fringe(): "
+                    + "Attempting to start a fringe measurement while the projector is already in use."
+                )
+                return False
 
         # Latch the name value
         self.fringe_measurement_name = name
@@ -338,12 +350,17 @@ class ServerState:
         # Critical section, these statuses updates need to be thread safe
         with self._state_lock:
             self._last_measurement_fringe = None
-            self._running_measurement_fringe = True
             self._processing_error = None
+            self._running_measurement_fringe = True
 
         # Start the measurement
-        self._executor.on_fringe_collected = self._on_fringe_collected
-        self._executor.start_collect_fringe(self.system_fringe)
+        try:
+            self._executor.on_fringe_collected = self._on_fringe_collected
+            self._executor.start_collect_fringe(self.system_fringe)
+        except Exception:
+            with self._state_lock:
+                self._running_measurement_fringe = False
+            raise
 
         return True
 
@@ -368,19 +385,24 @@ class ServerState:
             self._running_measurement_fringe = False
 
         # Start the processing
-        self._executor.on_fringe_processed = self._on_fringe_processed
-        self._executor.start_process_fringe(
-            self.system_fringe,
-            self.mirror_measure_point,
-            self.mirror_screen_distance,
-            self.spatial_orientation,
-            self.camera_calibration,
-            self.display_shape,
-            self.facet_definitions[0],
-            self.surface_shape,
-            self.fringe_measurement_name,
-            self.reference_facet,
-        )
+        try:
+            self._executor.on_fringe_processed = self._on_fringe_processed
+            self._executor.start_process_fringe(
+                self.system_fringe,
+                self.mirror_measure_point,
+                self.mirror_screen_distance,
+                self.spatial_orientation,
+                self.camera_calibration,
+                self.display_shape,
+                self.facet_definitions[0],
+                self.surface_shape,
+                self.fringe_measurement_name,
+                self.reference_facet,
+            )
+        except Exception:
+            with self._state_lock:
+                self._processing_measurement_fringe = False
+            raise
 
     def _on_fringe_processed(self, fringe_results: sfe.FringeResults | None, ex: Exception | None):
         """
@@ -456,5 +478,6 @@ class ServerState:
 
         with et.ignored(Exception):
             lt.debug("ServerState.close_all(): Unassigning this instance as the singleton ServerState")
-            if self == ServerState._instance:
-                ServerState._instance = None
+            with ServerState._instance as state:
+                if self == state:
+                    ServerState._instance = None

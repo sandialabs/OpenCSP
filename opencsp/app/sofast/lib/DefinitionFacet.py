@@ -87,7 +87,7 @@ class DefinitionFacet:
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str) -> 'DefinitionFacet':
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'DefinitionFacet':
         """Loads DefinitionFacet object from given file.  Data is stored in PREFIX + DefinitionFacet/...
 
         Parameters
