@@ -14,6 +14,8 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysi
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser
 import opencsp.common.lib.render.VideoHandler as vh
+from opencsp.common.lib.opencsp_path import opencsp_settings
+import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
@@ -53,7 +55,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
     The features necessary to support these use cases include::
 
-        a. Null image subtraction (TODO)
+        a. NULL image subtraction (TODO)
         b. Ambient and gradient light subtraction (TODO)
         c. Lens correction (TODO)
         d. Intensity per pixel generation (TODO)
@@ -78,12 +80,20 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         w. Screen/camera plane homography (TODO)
         x. Self-PnP (TODO)
         y. Annotate power envelopes (TODO)
-        z. Orthorectify wrt. target
-        aa. Orthorectify wrt. beam
-        ab. Spot radius in mrad, at angle Beta relative to centroid
-        ac. Spot radius in mrad, at a half angle relative to the heliostat location
-        ad. Beam radius in mrad, at angle Beta relative to centroid
-        ae. Beam radius in mrad, at a half angle relative to the heliostat location
+        z. Orthorectify wrt. target (TODO)
+        aa. Orthorectify wrt. beam (TODO)
+        ab. Spot radius in mrad, at angle Beta relative to centroid (TODO)
+        ac. Spot radius in mrad, at a half angle relative to the heliostat location (TODO)
+        ad. Beam radius in mrad, at angle Beta relative to centroid (TODO)
+        ae. Beam radius in mrad, at a half angle relative to the heliostat location (TODO)
+        af. Cropping (TODO)
+        ag. Over and under exposure detection (TODO)
+        ah. Tagging images as NULL images (TODO)
+        ai. Filters (gaussian, box, etc) (TODO)
+        aj. Peak value pixel identification (TODO)
+        ak. Logorithmic scaling (LogScaleImageProcessor)
+        al. False color visualization (FalseColorImageProcessor)
+        am. Over/under exposure visualization (TODO)
 
     The inputs to support these features include::
 
@@ -381,13 +391,13 @@ if __name__ == "__main__":
 
     lt.logger()
 
-    collaborative = collaborative_dir()
-    # indir = collaborative + "/Experiments/2023-05-12_SpringEquinoxMidSummerSolstice/2_Data/BCS_data/Measure_01/20230512_071442 5W01_off/Raw Images"
-    indir = (
-        collaborative
-        + "/Experiments/2023-05-12_SpringEquinoxMidSummerSolstice/2_Data/BCS_data/Measure_01/20230512_071638 5W01_000_880_2890/Raw Images"
+    collaborative_dir = opencsp_settings["opencsp_root_path"]["collaborative_dir"]
+    experiment_dir = os.path.join(
+        collaborative_dir, "Experiments", "2023-05-12_SpringEquinoxMidSummerSolstice", "2_Data", "BCS_data"
     )
-    outdir = tmp_dir()
+    # indir = os.path.join(experiment_dir, "Measure_01", "20230512_071442 5W01_off", "Raw Images")
+    indir = os.path.join(experiment_dir, "Measure_01", "20230512_071638 5W01_000_880_2890", "Raw Images")
+    outdir = orp.opencsp_temporary_dir()
 
     image_processors = [
         PopulationStatisticsImageProcessor(min_pop_size=-1),

@@ -8,10 +8,16 @@ import sys
 import opencsp.common.lib.tool.log_tools as lt
 
 _orp_settings_key = "opencsp_root_path"
-_orp_settings_default = {"example_data_dir": None, "scratch_dir": None, "scratch_name": "scratch"}
+_orp_settings_default = {
+    "example_data_dir": None,
+    "scratch_dir": None,
+    "scratch_name": "scratch",
+    "collaborative_dir": None,
+}
 """ example_data_dir: The directory containing the opencsp example data, for examples that have very large data inputs.
 scratch_dir: The directory containing the scratch folder, for use with HPC clusters.
 scratch_name: The name of the scratch directory. Default to "scratch".
+collaborative_dir: A shared directory where experimental data is collected
 """
 
 _settings_list = [[_orp_settings_key, _orp_settings_default]]
