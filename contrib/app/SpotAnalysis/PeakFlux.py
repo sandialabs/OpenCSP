@@ -1,5 +1,5 @@
+import json
 import os
-
 
 import opencsp.common.lib.cv.SpotAnalysis as sa
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
@@ -28,13 +28,17 @@ class PeakFlux:
         - Per-heliostat peak flux identification
     """
 
-    def __init__(self, indir: str, outdir: str, experiment_name: str):
+    def __init__(self, indir: str, outdir: str, experiment_name: str, settings_path_name_ext: str):
         self.indir = indir
         self.outdir = outdir
+        self.experiment_name = experiment_name
+        self.settings_path_name_ext = settings_path_name_ext
 
-        self.image_processors: list[AbstractSpotAnalysisImagesProcessor] = [
-            # TODO
-        ]
+        with open(settings_path_name_ext, 'r') as fin:
+            settings_dict = json.load(fin)
+        self.crop_box: list[int] = settings_dict['crop_box']
+
+        self.image_processors: list[AbstractSpotAnalysisImagesProcessor] = [CroppingImageProcessor(*self.crop_box)]
         self.spot_analysis = sa.SpotAnalysis(
             experiment_name, self.image_processors, save_dir=outdir, save_overwrite=True
         )
@@ -70,6 +74,7 @@ if __name__ == "__main__":
     parser.add_argument('indir', type=str, help="Directory with images to be processed.")
     parser.add_argument('outdir', type=str, help="Directory for where to put processed images and computed results.")
     parser.add_argument('experiment_name', type=str, help="A description of the current data collection.")
+    parser.add_argument('settings_file', type=str, help="Path to the settings JSON file for this PeakFlux evaluation.")
     args = parser.parse_args()
 
     # create the output directory
@@ -83,4 +88,4 @@ if __name__ == "__main__":
     if not ft.directory_exists(args.indir):
         lt.error_and_raise(FileNotFoundError, f"Error in PeakFlux.py: input directory '{args.indir}' does not exist!")
 
-    PeakFlux(args.indir, args.outdir).run()
+    PeakFlux(args.indir, args.outdir, args.experiment_name, args.settings_file).run()
