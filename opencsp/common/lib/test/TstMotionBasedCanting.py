@@ -58,12 +58,13 @@ from opencsp.common.lib.render_control.RenderControlRayTrace import \
     RenderControlRayTrace
 
 
+
 class TestMotionBasedCanting(to.TestOutput):
 
     @classmethod
-    def setup_class(self, 
+    def setUpClass(self, 
                     source_file_body:str='TestMotionBasedCanting',  # Set these here, because pytest calls
-                    figure_prefix_root:str='tmbc',             # setup_class() with no arguments.
+                    figure_prefix_root:str='tmbc',             # setUpClass() with no arguments.
                      interactive:bool=False,
                      verify:bool=True):
         
@@ -86,7 +87,7 @@ class TestMotionBasedCanting(to.TestOutput):
 
 
 
-        super(TestMotionBasedCanting, self).setup_class(source_file_body=source_file_body,
+        super(TestMotionBasedCanting, self).setUpClass(source_file_body=source_file_body,
                                                   figure_prefix_root=figure_prefix_root,
                                                   interactive=interactive,
                                                   verify=verify)
@@ -900,6 +901,7 @@ class TestMotionBasedCanting(to.TestOutput):
         Computes facet values when given initial position not on target plane.
 
         """
+
         # Initialize test.
         self.start_test()
 
@@ -992,15 +994,11 @@ if __name__ == "__main__":
     verify = False #False
     # Setup.
     test_object = TestMotionBasedCanting()
-    test_object.setup_class(interactive=interactive, verify=verify)
+    test_object.setUpClass(interactive=interactive, verify=verify)
     # Tests.
     lt.info('Beginning tests...')
 
-    heliostat_name = ("9W1")
     tower= Tower(name='Sandia NSTTF', origin=np.array([0,0,0]), parts = ["whole tower", "target"])
-    # plane = tuple(tower.target_loc, Uxyz([0, 1, 0])) 
-    # result = test_object.proj_facet_norm_intersection_point_dist(intersection_point= [1,1,0], target_loc = tower.target_loc)
-    
     target_loc_1 = tower.target_loc
     target_plane_normal_1 = Uxyz([0,1,0])
     heliostat_name_1=("9W1")
@@ -1009,16 +1007,16 @@ if __name__ == "__main__":
     el_1 = np.deg2rad(43)
     test_tolerance =.001
 
-    # result = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1)
-    # print("next test")
-    # result = test_object.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
-    # print("next test")
+    result = test_object.projected_facet_normal_intersection_point_offset(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1)
+    print("next test")
+    result = test_object.azimuth_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    print("next test")
     result = test_object.elevation_binary_search(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
-    # print("next test")
-    # result = test_object.find_single_facet_azimuth_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)    
-    # print("next test")
-    # result = test_object.find_all_azimuth_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
-    # print("next test")
+    print("next test")
+    result = test_object.find_single_facet_azimuth_el_value(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, f_index=f_index_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)    
+    print("next test")
+    result = test_object.find_all_azimuth_el_test_values(target_loc=target_loc_1, target_plane_normal=target_plane_normal_1, heliostat_name=heliostat_name_1, az=azimuth_1, el=el_1, tolerance=test_tolerance)
+    print("next test")
     
     
     
@@ -1033,7 +1031,7 @@ if __name__ == "__main__":
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    test_object.teardown_method()
+    test_object.tearDown()
 
 
 
