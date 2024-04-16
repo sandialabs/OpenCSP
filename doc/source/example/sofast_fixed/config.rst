@@ -31,9 +31,9 @@ Create a SofastFixed Measurement File from a Captured Image
 Dot-Location Calibration
 =========================
 
-.. currentmodule:: example.sofast_fixed.example_calculate_dot_locations_from_display_shape_file
+.. currentmodule:: example.sofast_fixed.example_create_dot_pattern_from_display_shape
 
-.. automodule:: example.sofast_fixed.example_calculate_dot_locations_from_display_shape_file
+.. automodule:: example.sofast_fixed.example_create_dot_pattern_from_display_shape
    :members:
    :show-inheritance:
 
