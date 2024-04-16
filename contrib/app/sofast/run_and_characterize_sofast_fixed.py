@@ -81,14 +81,8 @@ def process(
     plt.show()
 
 
-def run(dir_save: str) -> None:
-    """Runs measurement/characterization process
-
-    Parameters
-    ----------
-    dir_save : str
-        Directory to save data
-    """
+def run() -> None:
+    """Runs measurement/characterization process"""
     # Define user inputs
     v_measure_point_facet = Vxyz((0, 0, 0))
     dist_optic_screen = 10.263  # m
@@ -97,6 +91,10 @@ def run(dir_save: str) -> None:
     width_pattern = 3  # pixels
     spacing_pattern = 6  # pixels
     dir_cal_files = join(opencsp_code_dir(), '../../sofast_calibration_files')
+    dir_save = abspath('../../')
+
+    # Start logging
+    lt.logger(join(dir_save, f'log_{tdt.current_date_time_string_forfile():s}.txt'))
 
     # Connect camera
     image_acquisition = ImageAcquisition()
@@ -151,7 +149,4 @@ def run(dir_save: str) -> None:
 
 
 if __name__ == '__main__':
-    # Start logging
-    save_dir = abspath('../../')
-    lt.logger(join(save_dir, f'log_{tdt.current_date_time_string_forfile():s}.txt'))
-    run(save_dir)
+    run()
