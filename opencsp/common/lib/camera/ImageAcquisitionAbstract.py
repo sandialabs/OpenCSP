@@ -109,7 +109,6 @@ class ImageAcquisitionAbstract(ABC):
         possible_matches: list[ImageAcquisitionAbstract]
             The other cameras to match against. Does not include cameras that have been closed.
         """
-        pass
 
     def calibrate_exposure(self):
         """
@@ -155,13 +154,13 @@ class ImageAcquisitionAbstract(ABC):
         self.exposure_time = exposure_values[0]
         im = self.get_frame()
         if _check_saturated(im):
-            raise ValueError('Minimum exposure value is too high; image still saturated.')
+            lt.error_and_raise(ValueError, 'Minimum exposure value is too high; image still saturated.')
 
         # Checks that the maximum value is over-exposed
         self.exposure_time = exposure_values[-1]
         im = self.get_frame()
         if not _check_saturated(im):
-            raise ValueError('Maximum exposure value is too low; image not saturated.')
+            lt.error_and_raise(ValueError, 'Maximum exposure value is too low; image not saturated.')
 
         # Check if exposure is set
         max_iters = int(np.ceil(np.log2(exposure_values.size)) + 1)
@@ -190,7 +189,7 @@ class ImageAcquisitionAbstract(ABC):
 
         # Check exposure was set successfully
         if not _check_exposure_set():
-            raise ValueError('Error with setting exposure.')
+            lt.error_and_raise(ValueError, 'Error with setting exposure.')
 
         # Set final exposure and log results
         exposure_value_set = exposure_values[_get_exposure_idxs()[0]]
@@ -236,15 +235,16 @@ class ImageAcquisitionAbstract(ABC):
         """
         Camera's maximum saturation value.
         Example: If camera outputs 8-bit images, max_value = 255
-
         """
 
     @property
     @abstractmethod
-    def shutter_cal_values(self):
+    def shutter_cal_values(self) -> np.ndarray:
         """
-        Returns camera exposure_time values to use when calibrating the exposure_time.
-
+        Returns camera exposure_time values to use when calibrating the exposure_time. These
+        values should be monotonically increasing from lowest shutter values to largest shutter
+        values. The values need not be evely spaced, but the camera shutter is set to one of
+        these values.
         """
 
     @abstractmethod
