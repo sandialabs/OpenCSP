@@ -11,9 +11,19 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from pathlib import Path
-import sys
+import sys, os
 
-sys.path.append(str(Path.cwd().parent.parent.resolve()))
+# Check if we're running on Read the Docs' servers
+read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
+
+if read_the_docs_build:
+    cwd = os.getcwd()
+    print(cwd)
+    opencsp_path = cwd + "/../" + "../"
+    os.listdir(Path(opencsp_path))
+    sys.path.append(str(opencsp_path))
+else:
+    sys.path.append(str(Path.cwd().parent.parent.resolve()))
 
 
 # -- Project information -----------------------------------------------------
