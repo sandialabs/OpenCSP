@@ -25,9 +25,8 @@ def example_find_blobs_in_image():
     measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
     image = measurement.image
 
-    # Load image from existing image file
+    # Or, alternatively load image from existing image file
     # image = cv2.imread(file_jpg, cv2.IMREAD_GRAYSCALE)
-    # image = imageio.imread(file_png)
 
     # Detect blobs and annotate image
     params = cv.SimpleBlobDetector_Params()
