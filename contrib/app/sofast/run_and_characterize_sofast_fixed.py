@@ -7,7 +7,6 @@ NOTE: The user must have a complete deflectometry setup in place. This includes 
 measure, and system calibration files.
 """
 
-from datetime import datetime as dt
 from os.path import join, abspath
 
 import matplotlib.pyplot as plt
@@ -30,6 +29,7 @@ import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.time_date_tools as tdt
 
 
 def calibrate_camera_exposure(image_acquisition: ImageAcquisition) -> None:
@@ -58,8 +58,10 @@ def process(
     focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
     lt.info(f'Parabolic fit focal xy lengths: ({focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}) m')
 
+    time_str = tdt.current_date_time_string_forfile()
+
     # Save data as HDF5 file
-    file_save = join(dir_save, f'sofast_fixed_data_{dt.now().isoformat().replace(":", "_"):s}.h5')
+    file_save = join(dir_save, 'sofast_fixed_data_' + time_str + '.h5')
     system_sofast_fixed.save_to_hdf(file_save)
     fixed_pattern_dot_locs.save_to_hdf(file_save)
     orientation.save_to_hdf(file_save)
@@ -75,9 +77,7 @@ def process(
     axis_control_m = rca.meters()
     fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
     mirror.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
-    fig_record.save(
-        dir_save, f'slope_magnitude_{dt.now().isoformat().replace(":", "_"):s}', 'png', close_after_save=False
-    )
+    fig_record.save(dir_save, 'slope_magnitude_' + time_str, 'png', close_after_save=False)
     plt.show()
 
 
@@ -153,5 +153,5 @@ def run(dir_save: str) -> None:
 if __name__ == '__main__':
     # Start logging
     save_dir = abspath('../../')
-    lt.logger(join(save_dir, f'log_{dt.now().isoformat().replace(":", "_"):s}.txt'))
+    lt.logger(join(save_dir, f'log_{tdt.current_date_time_string_forfile():s}.txt'))
     run(save_dir)
