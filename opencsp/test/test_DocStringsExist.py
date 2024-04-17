@@ -46,7 +46,7 @@ def test_docstrings_exist_for_methods():
         opencsp.app.camera_calibration.lib.calibration_camera,
         opencsp.app.camera_calibration.lib.image_processing,
     ]
-    scene_reconstruction_class_list = [opencsp.app.scene_reconstruction.lib.SceneReconstruction]
+    scene_reconstruction_class_list = [opencsp.app.scene_reconstruction.lib.SceneReconstruction.SceneReconstruction]
     # TODO: example_camera_calibration_list
     # TODO: example_csp_list
     # TODO: example_scene_reconstruction_list
