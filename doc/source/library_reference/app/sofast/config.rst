@@ -88,12 +88,12 @@ opencsp.app.sofast.lib.SystemSofastFringe
    :undoc-members:
    :show-inheritance:
 
-opencsp.app.sofast.lib.SystemSofastFixed
-========================================
+opencsp.app.sofast.lib.PatternSofastFixed
+=========================================
 
-.. currentmodule:: opencsp.app.sofast.lib.SystemSofastFixed
+.. currentmodule:: opencsp.app.sofast.lib.PatternSofastFixed
 
-.. automodule:: opencsp.app.sofast.lib.SystemSofastFixed
+.. automodule:: opencsp.app.sofast.lib.PatternSofastFixed
    :members:
    :undoc-members:
    :show-inheritance:

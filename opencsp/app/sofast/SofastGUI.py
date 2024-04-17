@@ -37,7 +37,7 @@ class SofastGUI:
         Instantiates GUI in new window
         """
         # Placeholder for system instances
-        fringe_sys: ssf.SystemSofastFringe = None
+        self.sys_fringe: ssf.SystemSofastFringe = None
 
         # Create tkinter object
         self.root = tkt.window()

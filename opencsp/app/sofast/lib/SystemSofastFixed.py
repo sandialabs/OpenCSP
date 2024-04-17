@@ -1,122 +1,186 @@
-from typing import Literal
+import datetime as dt
+from typing import Callable, Literal
 
-import numpy as np
-from numpy import ndarray
-from scipy.signal import convolve2d
+from numpy.typing import NDArray
+
+import opencsp.app.sofast.lib.DistanceOpticScreen as dos
+from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
+from opencsp.app.sofast.lib.PatternSofastFixed import PatternSofastFixed
+from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+import opencsp.common.lib.tool.exception_tools as et
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class SystemSofastFixed:
-    """Class that holds parameters for displaying a Fixed Pattern for use
-    in fixed pattern deflectometry.
-    """
+    """Class that orchestrates the running of a SofastFixed system"""
 
-    def __init__(self, size_x: int, size_y: int, width_pattern: int, spacing_pattern: int) -> 'SystemSofastFixed':
-        """Instantiates SystemSofastFixed class from screen geometry parameters
+    def __init__(self, image_acquisition: ImageAcquisitionAbstract) -> 'SystemSofastFixed':
+        """
+        Instantiates SystemSofastFixed class.
 
         Parameters
         ----------
-        size_x/size_y : int
-            Size of image x/y dimension
+        image_acquisition : ImageAcquisition
+            Loaded ImageAcquisition object.
+        """
+        # Import here to avoid circular dependencies
+        import opencsp.app.sofast.lib.sofast_common_functions as scf
+
+        # Get defaults
+        image_acquisition, image_projection = scf.get_default_or_global_instances(
+            image_acquisition_default=image_acquisition
+        )
+        # Validate input
+        if image_projection is None or image_acquisition is None:
+            lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
+        self.image_acquisition = image_acquisition
+
+        # Show crosshairs
+        image_projection.show_crosshairs()
+
+        # Initialize queue
+        self._queue_funcs = []
+
+        # Instantiate attributes
+        self.image_measurement: NDArray = None
+        """Measurement image, 2d numpy array"""
+        self.pattern_sofast_fixed: PatternSofastFixed = None
+        """The PatternSofastFixed object used to define the fixed pattern image"""
+        self.pattern_image: NDArray = None
+        """The fixed pattern image being projected. NxMx3 numpy array"""
+
+        self.dtype = 'uint8'
+        """The data type of the image being projected"""
+        self.max_int = 255
+        """The value that corresponds to pure white"""
+        self.dot_shape: Literal['circle', 'square'] = 'circle'
+        """The shape of the fixed pattern dots"""
+        self.image_delay = image_projection.display_data['image_delay']  # ms
+        """The delay after displaying the image to capturing an image, ms"""
+
+    def set_pattern_parameters(self, width_pattern: int, spacing_pattern: int):
+        """Sets the parameters of pattern_sofast_fixed
+
+        Upon completion, runs self.run_next_in_queue()
+
+        Parameters
+        ----------
         width_pattern : int
             Width of each Fixed Pattern marker in the image, pixels
         spacing_pattern : int
             Spacing between (not center-to-center) pattern markers, pixels
-
-        Attributes
-        ----------
-        - size_x
-        - size_y
-        - width_pattern
-        - spacing_pattern
-        - x_locs_pixel
-        - y_locs_pixel
-        - nx
-        - ny
-        - x_locs_frac
-        - y_locs_frac
-        - x_indices
-        - y_indices
         """
-        # Store data
-        self.size_x = size_x
-        self.size_y = size_y
-        self.width_pattern = width_pattern
-        self.spacing_pattern = spacing_pattern
+        lt.debug(f'SystemSofastFixed fixed pattern dot width set to {width_pattern:d} pixels')
+        lt.debug(f'SystemSofastFixed fixed pattern dot spacing set to {spacing_pattern:d} pixels')
+        image_projection = ImageProjection.instance()
+        size_x = image_projection.size_x
+        size_y = image_projection.size_y
+        self.pattern_sofast_fixed = PatternSofastFixed(size_x, size_y, width_pattern, spacing_pattern)
+        self.pattern_image = self.pattern_sofast_fixed.get_image(self.dtype, self.max_int, self.dot_shape)
 
-        # Create location vectors
-        x_locs_pixel = np.arange(0, size_x, width_pattern + spacing_pattern)
-        y_locs_pixel = np.arange(0, size_y, width_pattern + spacing_pattern)
+        self.run_next_in_queue()
 
-        # Make vectors odd
-        if x_locs_pixel.size % 2 == 0:
-            x_locs_pixel = x_locs_pixel[:-1]
-        if y_locs_pixel.size % 2 == 0:
-            y_locs_pixel = y_locs_pixel[:-1]
+    def project_pattern(self) -> None:
+        """Projects the fixed dot pattern
 
-        # Center in image
-        dx = int(float((size_x - 1) - x_locs_pixel[-1]) / 2)
-        dy = int(float((size_y - 1) - y_locs_pixel[-1]) / 2)
-        x_locs_pixel += dx
-        y_locs_pixel += dy
-
-        # Save calculations
-        self.x_locs_pixel = x_locs_pixel
-        self.y_locs_pixel = y_locs_pixel
-        self.nx = x_locs_pixel.size
-        self.ny = y_locs_pixel.size
-
-        # Calculate point indices
-        self.x_indices = np.arange(self.nx) - int(np.floor(float(self.nx) / 2))
-        self.y_indices = np.arange(self.ny) - int(np.floor(float(self.ny) / 2))
-
-        # Calculate fractional screen points
-        self.x_locs_frac = x_locs_pixel.astype(float) / float(size_x)
-        self.y_locs_frac = y_locs_pixel.astype(float) / float(size_y)
-
-    def _get_dot_image(self, dot_shape: str) -> ndarray[float]:
-        """Returns 2d image of individual pattern element. Active area is 1
-        and inactive area is 0, dtype float.
+        Upon completion, runs self.run_next_in_queue()
         """
-        if dot_shape not in ['circle', 'square']:
-            raise ValueError(f'pattern_type must be one of ["circle", "square"], not {dot_shape:s}')
+        lt.debug('SystemSofastFixed pattern projected')
 
-        if dot_shape == 'square':
-            return np.ones((self.width_pattern, self.width_pattern), dtype=float)
-        elif dot_shape == 'circle':
-            x, y = np.meshgrid(np.arange(self.width_pattern, dtype=float), np.arange(self.width_pattern, dtype=float))
-            x -= x.mean()
-            y -= y.mean()
-            r = np.sqrt(x**2 + y**2)
-            return (r < float(self.width_pattern) / 2).astype(float)
+        # Check pattern has been defined
+        if self.pattern_image is None:
+            lt.error_and_raise(
+                ValueError, 'The SofastFixed pattern has not been set. Run self.set_pattern_parameters() first.'
+            )
+            return
 
-    def get_image(self, dtype: str, max_int: int, dot_shape: Literal['circle', 'square'] = 'circle') -> ndarray:
-        """Creates a NxMx3 fixed pattern image
+        # Project pattern
+        image_projection = ImageProjection.instance()
+        image_projection.display_image_in_active_area(self.pattern_image)
+        self.run_next_in_queue()
 
-        Parameters
-        ----------
-        dtype : str
-            Output datatype of image
-        max_int : int
-            Integer value corresponding to "white." Zero corresponds to black.
-        dot_shape : str
-            'circle' or 'square'
+    def capture_image(self) -> None:
+        """Captures the measurement image
 
-        Returns
-        -------
-        ndarray
-            (size_y, size_x, 3) ndarray
+        Upon completion, runs self.run_next_in_queue()
         """
-        # Create image with point locations
-        image = np.zeros((self.size_y, self.size_x), dtype=dtype)
-        locs_x, locs_y = np.meshgrid(self.x_locs_pixel, self.y_locs_pixel)
-        image[locs_y, locs_x] = 1
+        lt.debug('SystemSofastFixed capturing camera image')
+        self.image_measurement = self.image_acquisition.get_frame()
 
-        # Add patterns (active=1)
-        pattern = self._get_dot_image(dot_shape).astype(dtype)
-        image = convolve2d(image, pattern, mode='same')
+        self.run_next_in_queue()
 
-        # Convert image to white background and black patterns
-        image = (1 - image) * max_int
+    def get_measurement(
+        self,
+        v_measure_point_facet: Vxyz,
+        dist_optic_screen: float,
+        origin: Vxy,
+        date: dt.datetime = None,
+        name: str = '',
+    ) -> MeasurementSofastFixed:
+        """Returns the SofastFixedMeasurement object"""
+        dist_optic_screen_measure = dos.DistanceOpticScreen(v_measure_point_facet, dist_optic_screen)
+        return MeasurementSofastFixed(self.image_measurement, dist_optic_screen_measure, origin, date, name)
 
-        # Add RGB channels
-        return np.concatenate([image[..., None]] * 3, axis=2)
+    def pause(self) -> None:
+        """Pause by the given amount defined by self.image_delay (in ms)
+
+        Upon completion, runs self.run_next_in_queue()
+        """
+        lt.debug(f'SystemSofastFixed pausing by {self.image_delay:.0f} ms')
+        image_projection = ImageProjection.instance()
+        image_projection.root.after(self.image_delay, self.run_next_in_queue)
+
+    def run_measurement(self) -> None:
+        """Runs the measurement sequence
+        - projects the fixed pattern image
+        - captures an image.
+
+        If the fixed pattern image is already projected, use self.capture_image() instead.
+        Upon completion, runs self.run_next_in_queue()
+        """
+        lt.debug('SystemSofastFixed starting measurement sequence')
+
+        funcs = [self.project_pattern, self.pause, self.capture_image]
+        self.prepend_to_queue(funcs)
+        self.run_next_in_queue()
+
+    def close_all(self):
+        """Closes all windows and cameras"""
+        # Close image acquisition
+        with et.ignored(Exception):
+            self.image_acquisition.close()
+
+        # Close window
+        with et.ignored(Exception):
+            image_projection = ImageProjection.instance()
+            image_projection.close()
+
+    def prepend_to_queue(self, funcs: list[Callable]) -> None:
+        """Prepends the current list of functions to the queue"""
+        self._queue_funcs = funcs + self._queue_funcs
+
+    def set_queue(self, funcs: list[Callable]) -> None:
+        """Sets the queue to given list of Callables"""
+        self._queue_funcs = funcs
+
+    def run_next_in_queue(self) -> None:
+        """Runs the next funtion in the queue and removes from queue"""
+        if len(self._queue_funcs) > 0:
+            func = self._queue_funcs.pop(0)
+
+            try:
+                func()
+            except Exception as error:
+                lt.error(repr(error))
+                self.run_next_in_queue()
+
+    def run(self) -> None:
+        """
+        Instantiates the system by starting the mainloop of the ImageProjection object.
+        """
+        self.run_next_in_queue()
+        image_projection = ImageProjection.instance()
+        image_projection.root.mainloop()

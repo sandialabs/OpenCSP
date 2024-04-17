@@ -1,6 +1,6 @@
 """Representation of a notional camera for image acquisition"""
 
-from typing import Callable
+import time
 
 import numpy as np
 
@@ -34,6 +34,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return False
 
     def get_frame(self) -> np.ndarray:
+        time.sleep(self._shutter / 1e6)
         # Return test image
         return np.zeros(self._frame_size, dtype=np.uint8)
 

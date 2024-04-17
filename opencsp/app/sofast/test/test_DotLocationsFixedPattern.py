@@ -4,7 +4,7 @@ import unittest
 import numpy as np
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
-from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
+from opencsp.app.sofast.lib.PatternSofastFixed import PatternSofastFixed
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -57,7 +57,7 @@ class TestDotLocationsFixedPattern(unittest.TestCase):
         # Load display
         file_disp = os.path.join(opencsp_code_dir(), 'test/data/sofast_common/display_distorted_3d.h5')
         display = Display.load_from_hdf(file_disp)
-        fp_proj = SystemSofastFixed(30, 30, 5, 5)
+        fp_proj = PatternSofastFixed(30, 30, 5, 5)
 
         fp = DotLocationsFixedPattern.from_projection_and_display(fp_proj, display)
 
