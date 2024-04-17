@@ -9,7 +9,8 @@ from PIL import Image, ImageTk
 
 
 class ViewAnnotatedImages:
-    """Class that controls a window used to view images with a next and previous
+    """
+    Class that controls a window used to view images with a next and previous
     button
     """
 
