@@ -9,7 +9,8 @@ from PIL import Image, ImageTk
 
 
 class ViewAnnotatedImages:
-    """Class that controls a window used to view images with a next and previous
+    """
+    Class that controls a window used to view images with a next and previous
     button
     """
 
@@ -77,6 +78,9 @@ class ViewAnnotatedImages:
         self.root.mainloop()
 
     def update_image(self):
+        """
+        Placeholder
+        """
         # Update image title
         self.var_title.set(self.image_names[self.idx_im])
 
@@ -101,6 +105,9 @@ class ViewAnnotatedImages:
         self.canvas.itemconfig(self.canvas_image, image=image_tk)
 
     def show_next(self):
+        """
+        Placeholder
+        """
         # Update index
         self.idx_im += 1
         if self.idx_im >= len(self.images):
@@ -110,6 +117,9 @@ class ViewAnnotatedImages:
         self.update_image()
 
     def show_prev(self):
+        """
+        Placeholder
+        """
         # Update index
         self.idx_im -= 1
         if self.idx_im < 0:

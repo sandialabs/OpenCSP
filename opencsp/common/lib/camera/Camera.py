@@ -16,23 +16,24 @@ from opencsp.common.lib.tool import hdf5_tools
 
 
 class Camera:
+    """
+    Calibrated machine vision camera representation.
+
+    Parameters
+    ----------
+    intrinsic_mat : np.ndarray
+    distortion_coef : np.ndarray
+        1d array, distortion coefficients.
+    image_shape_xy : tuple(int)
+        (x, y), image size in pixels.
+    name : str
+        Name of camera/lens combination.
+
+    """
+
     def __init__(
         self, intrinsic_mat: np.ndarray, distortion_coef: np.ndarray, image_shape_xy: tuple[int, int], name: str
     ):
-        """
-        Calibrated machine vision camera representation.
-
-        Parameters
-        ----------
-        intrinsic_mat : np.ndarray
-        distortion_coef : np.ndarray
-            1d array, distortion coefficients.
-        image_shape_xy : tuple(int)
-            (x, y), image size in pixels.
-        name : str
-            Name of camera/lens combination.
-
-        """
         if intrinsic_mat.shape[0] != 3 or intrinsic_mat.shape[1] != 3 or np.ndim(intrinsic_mat) != 2:
             raise ValueError('Input intrinsic_mat must be a 3x3 ndarray.')
 

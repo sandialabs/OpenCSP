@@ -49,6 +49,7 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
 
     @abstractmethod
     def apply_to_images(self, measurement) -> ndarray:
+        """Placeholder"""
         pass
 
     def _create_response_function(self) -> None:
@@ -165,7 +166,8 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         return (display_min_value, camera_min_value)
 
     def plot_gray_levels(self) -> None:
-        """Shows plot of gray levels calibration data. When the close() method of this instance is called (or this
+        """
+        Shows plot of gray levels calibration data. When the close() method of this instance is called (or this
         instance is destructed), the plot will be closed automatically."""
         title = 'Projector-Camera Calibration Curve'
 
