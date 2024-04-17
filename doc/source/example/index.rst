@@ -10,6 +10,8 @@ This section describes the OpenCSP examples.
    csp/index.rst
    mirror/index.rst
    scene_reconstruction/index.rst
-   sofast/index.rst
+   sofast_calibration/index.rst
+   sofast_fixed/index.rst
+   sofast_fringe/index.rst
    solarfield/index.rst
    targetcolor/index.rst

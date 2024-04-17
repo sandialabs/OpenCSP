@@ -18,9 +18,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_process_single_facet():
-    """Example Sofast script
+    """Performs processing of previously collected Sofast data of single facet mirror.
 
-    Performs processing of previously collected Sofast data of single facet mirror:
     1. Load saved single facet Sofast collection data
     2. Processes data with Sofast
     3. Log best-fit parabolic focal lengths

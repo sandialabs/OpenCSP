@@ -3,6 +3,7 @@ from os.path import join, dirname
 import cv2 as cv
 
 import opencsp.app.sofast.lib.image_processing as ip
+from opencsp.app.sofast.lib.DistanceOpticScreen import DistanceOpticScreen
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -14,8 +15,9 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_create_measurement_file_from_image():
-    """Example that creates a SofastFixed measurement file from an image. The image has
+    """Creates a SofastFixed measurement file from an image. The image has
     a point LED light near origin dot.
+
     1. Load image
     2. Define measurement parameters
     3. Find location of origin point
@@ -67,7 +69,8 @@ def example_create_measurement_file_from_image():
 
     # 4. Create measurement object
     # ============================
-    measurement = MeasurementSofastFixed(image, v_measure_point_facet, dist_optic_screen, origin, name=name)
+    dist_optic_screen_measure = DistanceOpticScreen(v_measure_point_facet, dist_optic_screen)
+    measurement = MeasurementSofastFixed(image, dist_optic_screen_measure, origin, name=name)
 
     # 5. Save measurement as HDF5 file
     # ================================

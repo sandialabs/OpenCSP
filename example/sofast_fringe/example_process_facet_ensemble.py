@@ -20,9 +20,9 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_process_facet_ensemble():
-    """Example Sofast script
+    """Performs processing of previously collected Sofast data
+    of multi facet mirror ensemble:
 
-    Performs processing of previously collected Sofast data of multi facet mirror ensemble:
     1. Load saved facet ensemble Sofast collection data
     2. Processes data with Sofast
     3. Log best-fit parabolic focal lengths

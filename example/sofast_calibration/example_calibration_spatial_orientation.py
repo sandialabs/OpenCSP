@@ -14,9 +14,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_camera_position_calibration():
-    """Example Sofast calibration script
+    """Calibrates the position of the Sofast camera.
 
-    Calibrates the position of the Sofast camera:
     1. Load measured calibration data
     2. Perform camera position calibration
     3. Save orientation as SpatialOrientation object

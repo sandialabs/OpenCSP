@@ -17,9 +17,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_process_undefined_shape_facet():
-    """Example SOFAST script
+    """Performs processing of previously collected Sofast data of single facet mirror:
 
-    Performs processing of previously collected Sofast data of single facet mirror:
     1. Load saved single facet Sofast collection data
     2. Processes data with Sofast (without using facet file)
     3. Log best-fit parabolic focal lengths

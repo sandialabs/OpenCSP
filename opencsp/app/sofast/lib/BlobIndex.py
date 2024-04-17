@@ -1,5 +1,4 @@
 from typing import Literal
-from warnings import warn
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -188,7 +187,7 @@ class BlobIndex:
         """
         idx, dist = self._nearest_unassigned_idx_from_xy_point(pt_origin)
         if dist > self.search_thresh:
-            warn(f'Assigning point {idx:d} to index (0, 0) resulted in {dist:.2f} pixels error.')
+            lt.warn(f'Assigning point {idx:d} to index (0, 0) resulted in {dist:.2f} pixels error.')
         self._assign(idx, 0, 0)
 
     def _find_nearest_in_direction(
@@ -257,7 +256,7 @@ class BlobIndex:
         """
         ret, idx_e = self._point_index_from_xy_index(0, 0)
         if not ret:
-            warn('Could not find 3x3 center block. Could not find point index (0, 0).')
+            lt.warn('Could not find 3x3 center block. Could not find point index (0, 0).')
         # Right
         idx_f, x, y = self._find_nearest_in_direction(idx_e, 'right')
         self._assign(idx_f, x, y)
