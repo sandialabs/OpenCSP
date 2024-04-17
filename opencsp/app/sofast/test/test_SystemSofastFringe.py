@@ -68,7 +68,10 @@ class TestSystemSofastFringe(unittest.TestCase):
         system = SystemSofastFringe(im_aq)
 
         # Load fringes
-        system.set_fringes(fringes, 0)
+        system.set_fringes(fringes)
+
+        # Load calibration
+        system.set_calibration(self.calibration_scaling)
 
         # Define functions to put in system queue
         def f1():
@@ -121,7 +124,7 @@ class TestSystemSofastFringe(unittest.TestCase):
         ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
-        sys.set_fringes(Fringes.from_num_periods(), 0)
+        sys.set_fringes(Fringes.from_num_periods())
         with self.assertRaises(RuntimeError):
             sys.run_measurement()
 
@@ -129,8 +132,8 @@ class TestSystemSofastFringe(unittest.TestCase):
         ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
-        sys.calibration = self.calibration_global
         sys.set_fringes(self.fringes)
+        sys.set_calibration(self.calibration_global)
 
         # Shouldn't raise any errors, everything set
         # Note that this doesn't actually evaluate anything because we don't have a tkinter loop running
@@ -150,8 +153,8 @@ class TestSystemSofastFringe(unittest.TestCase):
         ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
-        sys.calibration = self.calibration_global
         sys.set_fringes(self.fringes)
+        sys.set_calibration(self.calibration_global)
 
         # capture images
         self.assertFalse(is_done)
@@ -163,7 +166,7 @@ class TestSystemSofastFringe(unittest.TestCase):
 
         # Verify we have the right number of images
         nfringes = 4 * 4 * 2  # self.fringes.num_images
-        self.assertEqual(nfringes, len(sys.fringe_images_captured[0]))
+        self.assertEqual(nfringes, len(sys._fringe_images_captured[0]))
 
     def test_close_all_closes_acquisition_projections(self):
         # build system, including multiple image_acquisitions
