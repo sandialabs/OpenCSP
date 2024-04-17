@@ -104,8 +104,31 @@ class SystemSofastFringe:
         self.reset_all_measurement_data()
 
     def set_fringes(self, fringes: Fringes) -> None:
-        """Sets the fringes object in the class"""
+        """Sets the fringes object in the class
+
+        Parameters
+        ----------
+        fringes : Fringes
+            Fringe object to set to System
+        """
         self.fringes = fringes
+
+        if self._calibration is not None:
+            self.create_fringe_images_from_image_calibration()
+
+    def set_calibration(self, calibration: ImageCalibrationAbstract) -> None:
+        """
+        Loads calibration object and creates RGB fringe images to display.
+
+        Parameters
+        ----------
+        calibration : ImageCalibrationAbstract
+            The image calibration object to use during fringe image generation
+        """
+        self._calibration = calibration
+
+        if self.fringes is not None:
+            self.create_fringe_images_from_image_calibration()
 
     @property
     def image_acquisitions(self) -> list[ImageAcquisitionAbstract]:
@@ -251,19 +274,6 @@ class SystemSofastFringe:
         elif run_next is not None:
             # Run next operation if finished
             run_next()
-
-    def set_calibration(self, calibration: ImageCalibrationAbstract) -> None:
-        """
-        Loads calibration object and creates RGB fringe images to display.
-
-        Parameters
-        ----------
-        calibration : ImageCalibrationAbstract
-            The image calibration object to apply to fringe image generation
-        """
-        self._calibration = calibration
-
-        self.create_fringe_images_from_image_calibration()
 
     @property
     def calibration(self):
