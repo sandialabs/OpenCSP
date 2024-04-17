@@ -19,7 +19,7 @@ class SystemSofastFixed:
 
     def __init__(self, image_acquisition: ImageAcquisitionAbstract) -> 'SystemSofastFixed':
         """
-        Instantiates SystemSofastFringe class.
+        Instantiates SystemSofastFixed class.
 
         Parameters
         ----------
