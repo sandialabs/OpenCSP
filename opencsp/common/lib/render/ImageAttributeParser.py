@@ -9,6 +9,18 @@ import opencsp.common.lib.tool.typing_tools as tt
 
 
 class ImageAttributeParser(aap.AbstractAttributeParser):
+    """
+    Subclass of AbstractAttributeParser that adds the following extra attributes to the attributes file:
+
+        - current_image_source (str): The most recent filename (or network streamed name) that this image was loaded
+          from.
+        - original_image_source (str): The definitive filename (or network streamed name) that this image was loaded
+          from. This is usually going to be the name of the original file, such as "Nikon_2024-04-16.png".
+        - date_collected (datetime): Notes from the specific image processors about this image.
+        - experiment_name (str): The name of the measurement or experiment that this image was collected as a part of.
+        - notes (str): Extra notes about the image, typically added by the user.
+    """
+
     def __init__(
         self,
         current_image_source: str = None,

@@ -187,7 +187,7 @@ class AttributesManager:
                 f"Error in AttributesManager.load(): attributes file '{attributes_file_path_name_ext}' does not exist!"
             )
             lt.debug(errstr)
-            raise FileExistsError(errstr)
+            raise FileNotFoundError(errstr)
         with open(attributes_file_path_name_ext, 'r') as fin:
             str_contents = fin.read()
 

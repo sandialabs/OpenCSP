@@ -5,17 +5,31 @@ import opencsp.common.lib.tool.typing_tools as tt
 
 
 class SpotAnalysisOperableAttributeParser(iap.ImageAttributeParser):
+    """
+    Subclass of ImageAttributeParser that adds the following extra attributes to the attributes file:
+
+        - spot_analysis_name (str): The 'name' property of the SpotAnalaysis operation that evaluated on this image.
+        - image_processor (list[str]): The names of the image processors that were executed against on this image.
+    """
+
     def __init__(self, operable: sao.SpotAnalysisOperable = None, spot_analysis=None):
+        # declare values that will be called in set_defaults(), so that they don't cause an error when set_defaults() is
+        # called in the parent's __init__ method.
+        self.spot_analysis: str = None
+        self.image_processors: list[str] = None
+
         # get the current image source path, and initialize the parent
         current_image_source = tt.default(lambda: operable.primary_image.source_path, None)
         super().__init__(current_image_source=current_image_source)
 
-        # set values based on inputs + retrieved attributes
+        # prepare values to be assigned to this instance
         image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor] = tt.default(
             lambda: spot_analysis.image_processors, []
         )
-        self.spot_analysis: str = tt.default(lambda: spot_analysis.name, None)
-        self.image_processors: list[str] = [processor.name for processor in image_processors]
+
+        # Set values based on inputs + retrieved attributes.
+        self.spot_analysis = tt.default(lambda: spot_analysis.name, None)
+        self.image_processors = [processor.name for processor in image_processors]
 
         # retrieve any available attributes from the associated attributes file
         if self._previous_attr != None:
