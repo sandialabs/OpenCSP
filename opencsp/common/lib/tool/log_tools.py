@@ -9,6 +9,7 @@ import os
 import re
 import socket
 import sys
+from typing import Callable
 
 # Don't import any other opencsp libraries here. Log tools _must_ be able to be
 # imported before any other opencsp code. Instead, if there are other
@@ -164,6 +165,28 @@ def _add_stream_handlers(logger_: log.Logger, level: int, formatter: log.Formatt
     logger_.addHandler(h2)
 
 
+def get_log_method_for_level(level: int) -> Callable:
+    """
+    Returns one of the log methods (debug, info, warning, error, critical) based on the given level.
+
+    Parameters
+    ----------
+    level : int
+        One of log.DEBUG, log.INFO, log.WARNING, log.ERROR, or log.CRITICAL
+    """
+    if level == log.DEBUG:
+        return debug
+    if level == log.INFO:
+        return info
+    if level == log.WARNING:
+        return warning
+    if level == log.ERROR:
+        return error
+    if level == log.CRITICAL:
+        return critical
+    error_and_raise(ValueError, f"Error in log_tools.get_log_method_for_level(): unknown log level {level}")
+
+
 def debug(*vargs, **kwargs) -> int:
     """Output debugging information, both to console and log file.
 
@@ -209,10 +232,6 @@ def info(*vargs, **kwargs) -> int:
     return 0
 
 
-def warn(*vargs, **kwargs):
-    warning(*vargs, **kwargs)
-
-
 def warning(*vargs, **kwargs):
     """Warning message, both to console and log file.
 
@@ -234,6 +253,9 @@ def warning(*vargs, **kwargs):
         else:
             print(*vargs, **kwargs)
     return 0
+
+
+warn = warning
 
 
 def error(*vargs, **kwargs) -> int:
