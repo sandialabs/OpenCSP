@@ -1,4 +1,5 @@
 import inspect
+<<<<<<< HEAD
 import unittest
 
 import opencsp as opencsp
@@ -10,11 +11,18 @@ from opencsp.common.lib.cv import CacheableImage, SpotAnalysis
 from opencsp.common.lib.cv.spot_analysis import ImagesStream, SpotAnalysisImagesStream, SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor import *
 from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImageProcessor
+=======
+
+# Assume opencsp is in PYHTONPATH
+import opencsp as opencsp
+import example as example
+>>>>>>> 767739b (Check opencsp.app for doc strings)
 
 # TODO: why aren't these imported from import opencsp as opencsp above
 from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
 from opencsp.app.sofast.SofastGUI import SofastGUI
 from opencsp.app.sofast.lib import *
+from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 
 import opencsp.app.target.target_color.target_color as target_color
 
@@ -58,15 +66,55 @@ class test_Docstrings(unittest.TestCase):
             opencsp.app.sofast.lib.SystemSofastFringe.SystemSofastFringe,
             SofastGUI,
         ]
+        opencsp.app.sofast.lib.AbstractMeasurementSofast,
+        opencsp.app.sofast.lib.BlobIndex,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationDataGeometryFacet,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationDataGeometryGeneral,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationError,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationFacetEnsemble,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationImageProcessingFacet,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationImageProcessingGeneral,
+        opencsp.app.sofast.lib.CalibrateDisplayShape.CalibrateDisplayShape,
+        opencsp.app.sofast.lib.CalibrateSofastFixedDots.CalibrateSofastFixedDots,
+        opencsp.app.sofast.lib.CalibrateDisplayShape.DataCalculation,
+        opencsp.app.sofast.lib.CalibrateDisplayShape.DataInput,
+        opencsp.app.sofast.lib.DebugOpticsGeometry.DebugOpticsGeometry,
+        opencsp.app.sofast.lib.DefinitionEnsemble.DefinitionEnsemble,
+        opencsp.app.sofast.lib.DefinitionFacet.DefinitionFacet,
+        opencsp.app.sofast.lib.DisplayShape.DisplayShape,
+        opencsp.app.sofast.lib.DistanceOpticScreen.DistanceOpticScreen,
+        opencsp.app.sofast.lib.DotLocationsFixedPattern.DotLocationsFixedPattern,
+        SofastGUI,
+        visualize_setup,
+        opencsp.app.sofast.lib.Fringes.Fringes,
+        opencsp.app.sofast.lib.ImageCalibrationAbstract.ImageCalibrationAbstract,
+        opencsp.app.sofast.lib.ImageCalibrationGlobal.ImageCalibrationGlobal,
+        opencsp.app.sofast.lib.ImageCalibrationScaling.ImageCalibrationScaling,
+        opencsp.app.sofast.lib.MeasurementSofastFixed.MeasurementSofastFixed,
+        opencsp.app.sofast.lib.MeasurementSofastFringe.MeasurementSofastFringe,
+        opencsp.app.sofast.lib.ParamsMaskCalculation.ParamsMaskCalculation,
+        opencsp.app.sofast.lib.ParamsOpticGeometry.ParamsOpticGeometry,
+        opencsp.app.sofast.lib.ParamsSofastFixed.ParamsSofastFixed,
+        opencsp.app.sofast.lib.ParamsSofastFringe.ParamsSofastFringe,
+        opencsp.app.sofast.lib.PatternSofastFixed.PatternSofastFixed,
+        opencsp.app.sofast.lib.ProcessSofastFixed.ProcessSofastFixed,
+        opencsp.app.sofast.lib.ProcessSofastFringe.ProcessSofastFringe,
+        opencsp.app.sofast.lib.SofastConfiguration.SofastConfiguration,
+        opencsp.app.sofast.lib.SpatialOrientation.SpatialOrientation,
+        opencsp.app.sofast.lib.SystemSofastFixed.SystemSofastFixed,
+        opencsp.app.sofast.lib.SystemSofastFringe.SystemSofastFringe,
+        SofastGUI,
+    ]
+
     target_class_list = [
-        target_color,
-        target_color_bullseye,
+        opencsp.app.target.target_color.lib.ImageColor,
         target_color_bullseye_error,
+        target_color_bullseye,
         target_color_one_color,
         target_color_polar,
-        opencsp.app.target.target_color.lib.ImageColor,
+        target_color,
     ]
-    target_class_list = [target_color, target_color_polar, opencsp.app.target.target_color.lib.ImageColor]
+
     camera_calibration_class_list = [
         opencsp.app.camera_calibration.lib.calibration_camera,
         opencsp.app.camera_calibration.lib.image_processing,
@@ -114,8 +162,24 @@ class test_Docstrings(unittest.TestCase):
     #    ViewCrossSectionImageProcessor,
     # TODO: List all user-facing classes here.
 
+<<<<<<< HEAD
     def test_docstrings_exist_for_methods(self):
         for class_module in self.class_list:
+=======
+    for class_module in class_list:
+        print(class_module)
+        method_list = []
+        if inspect.isclass(class_module):
+            method_list = [
+                func
+                for func in class_module.__dict__
+                if callable(getattr(class_module, func))
+                and not func.startswith("__")
+                and not func.startswith("_")
+                and not hasattr(super(class_module), func)
+            ]
+        else:
+>>>>>>> 767739b (Check opencsp.app for doc strings)
             method_list = [
                 func
                 for func in dir(class_module)
