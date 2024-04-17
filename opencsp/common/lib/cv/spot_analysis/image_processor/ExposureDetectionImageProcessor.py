@@ -34,7 +34,7 @@ class ExposureDetectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
         Parameters
         ----------
         under_exposure_limit : float, optional
-            Fraction of pixels that should be below the under_exposure_threshold, by default 0.99
+            Fraction of pixels allowed to be below the under_exposure_threshold, by default 0.99
         under_exposure_threshold : int | float, optional
             If a float, then this is the fraction of the max_pixel_value that is used to determine under exposure. If an
             int, then this is the pixel value. For example, 0.95 and 243 will produce the same results when
@@ -55,12 +55,18 @@ class ExposureDetectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
         if max_pixel_value < 0:
             val_err(f"max_pixel_value should be the maximum possible value from the camera, but is {max_pixel_value=}")
 
+        # register values
         self.under_exposure_limit = under_exposure_limit
         self.under_exposure_threshold = under_exposure_threshold
         self.over_exposure_limit = over_exposure_limit
         self.max_pixel_value = max_pixel_value
         self.log_level = log_level
+
+        # internal variables
         self.log = lt.get_log_method_for_level(self.log_level)
+
+        # variables for unit tests
+        self._raise_on_error = False
 
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         image = operable.primary_image.nparray
@@ -87,6 +93,8 @@ class ExposureDetectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
             notes[1].append(
                 f"Image is under exposed. {proportion_dark_pixels*100:0.2f}% of pixels are below {under_exposure_threshold}"
             )
+            if self._raise_on_error:
+                raise RuntimeError("for unit testing: under exposed image")
 
         # check for over exposure
         over_exposure_threshold = self.max_pixel_value
@@ -101,6 +109,8 @@ class ExposureDetectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
             notes[1].append(
                 f"Image is over exposed. {proportion_light_pixels*100:0.2f}% of pixels are above {over_exposure_threshold}"
             )
+            if self._raise_on_error:
+                raise RuntimeError("for unit testing: over exposed image")
 
         operable.image_processor_notes.append(notes)
         return [operable]
