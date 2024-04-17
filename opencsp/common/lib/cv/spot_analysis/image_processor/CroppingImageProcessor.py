@@ -73,13 +73,13 @@ if __name__ == "__main__":
         + "/solar_noon/dev/2023-05-12_SpringEquinoxMidSummerSolstice/2_Data/BCS_data/Measure_01"
     )
     indir = expdir + "/raw_images"
-    outdir = expdir + "/cropped_images"
+    outdir = expdir + "/processed_images"
 
     # ft.create_directories_if_necessary(indir)
     # ft.delete_files_in_directory(indir, "*")
 
     # dirnames = ft.files_in_directory(expdir, files_only=False)
-    # dirnames = list(filter(lambda s: s not in ["raw_images", "cropped_images"], dirnames))
+    # dirnames = list(filter(lambda s: s not in ["raw_images", "processed_images"], dirnames))
     # for dirname in dirnames:
     #     fromdir = expdir + "/" + dirname + "/Raw Images"
     #     for filename in ft.files_in_directory(fromdir):

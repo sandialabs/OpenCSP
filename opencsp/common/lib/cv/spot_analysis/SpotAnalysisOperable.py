@@ -45,6 +45,9 @@ class SpotAnalysisOperable:
     or with simulations to provide a starting estimate of beam shape. """
     population_statistics: SpotAnalysisPopulationStatistics = None
     """ The population statistics, as populated by PopulationStatisticsImageProcessor. """
+    image_processor_notes: list[tuple[str, list[str]]] = field(default_factory=list)
+    """ Notes from specific image processors. These notes are generally intended for human use, but it is recommended
+    that they maintain a consistent formatting so that they can also be used programmatically. """
 
     def __post_init__(self):
         # We use this method to sanitize the inputs to the constructor.

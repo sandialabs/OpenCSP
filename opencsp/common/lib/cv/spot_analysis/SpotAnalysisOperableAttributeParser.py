@@ -10,6 +10,7 @@ class SpotAnalysisOperableAttributeParser(iap.ImageAttributeParser):
 
         - spot_analysis_name (str): The 'name' property of the SpotAnalaysis operation that evaluated on this image.
         - image_processor (list[str]): The names of the image processors that were executed against on this image.
+        - image_processor_notes (list[tuple[str, list[str]]]): Notes from the specific image processors about this image.
     """
 
     def __init__(self, operable: sao.SpotAnalysisOperable = None, spot_analysis=None):
@@ -17,6 +18,7 @@ class SpotAnalysisOperableAttributeParser(iap.ImageAttributeParser):
         # called in the parent's __init__ method.
         self.spot_analysis: str = None
         self.image_processors: list[str] = None
+        self.image_processor_notes: list[tuple[str, list[str]]] = None
 
         # get the current image source path, and initialize the parent
         current_image_source = tt.default(lambda: operable.primary_image.source_path, None)
@@ -28,8 +30,11 @@ class SpotAnalysisOperableAttributeParser(iap.ImageAttributeParser):
         )
 
         # Set values based on inputs + retrieved attributes.
+        # Note: image_processor_notes is a reference, not a copy, so that as this list is updated by image processors
+        # those updates will be reflected here.
         self.spot_analysis = tt.default(lambda: spot_analysis.name, None)
         self.image_processors = [processor.name for processor in image_processors]
+        self.image_processor_notes = tt.default(lambda: operable.image_processor_notes, None)
 
         # retrieve any available attributes from the associated attributes file
         if self._previous_attr != None:
@@ -41,6 +46,7 @@ class SpotAnalysisOperableAttributeParser(iap.ImageAttributeParser):
     def set_defaults(self, other: 'SpotAnalysisOperableAttributeParser'):
         self.spot_analysis = tt.default(self.spot_analysis, other.spot_analysis)
         self.image_processors = tt.default(self.image_processors, other.image_processors)
+        self.image_processor_notes = tt.default(self.image_processor_notes, other.image_processor_notes)
         super().set_defaults(other)
 
     def has_contents(self) -> bool:
@@ -51,10 +57,15 @@ class SpotAnalysisOperableAttributeParser(iap.ImageAttributeParser):
     def parse_my_contents(self, file_path_name_ext: str, raw_contents: str, my_contents: any):
         self.spot_analysis = my_contents['spot_analysis_name']
         self.image_processors = my_contents['image_processors']
+        self.image_processor_notes = my_contents['image_processor_notes']
         super().parse_my_contents(file_path_name_ext, raw_contents, my_contents)
 
     def my_contents_to_json(self, file_path_name_ext: str) -> any:
-        ret = {'spot_analysis_name': self.spot_analysis, 'image_processors': self.image_processors}
+        ret = {
+            'spot_analysis_name': self.spot_analysis,
+            'image_processors': self.image_processors,
+            'image_processor_notes': self.image_processor_notes,
+        }
         ret = {**ret, **super().my_contents_to_json(file_path_name_ext)}
         return ret
 
