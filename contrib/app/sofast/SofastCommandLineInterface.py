@@ -27,9 +27,7 @@ from opencsp.common.lib.tool.time_date_tools import current_date_time_string_for
 
 
 class SofastCommandLineInterface:
-    """
-    Sofast Command Line Interface class.
-    """
+    """Sofast Command Line Interface class."""
 
     def __init__(self) -> 'SofastCommandLineInterface':
         # Common sofast parameters
@@ -48,7 +46,6 @@ class SofastCommandLineInterface:
         # Sofast fringe specific
         self.system_fringe: SystemSofastFringe = None
         self.display_shape: DisplayShape = None
-        self.fringes: Fringes = None
         self.surface_fringe: Surface2DParabolic = None
 
         # Sofast fixed specific
@@ -77,6 +74,7 @@ class SofastCommandLineInterface:
     def set_common_data(
         self,
         image_acquisition: ImageAcquisition,
+        image_projection: ImageProjection,
         camera: Camera,
         facet_definition: DefinitionFacet,
         spatial_orientation: SpatialOrientation,
@@ -90,6 +88,8 @@ class SofastCommandLineInterface:
         ----------
         image_acquisition : ImageAcquisition
             ImageAcquisition object
+        image_projection : ImageProjection
+            Image projection object
         camera : Camera
             Camera calibration object
         facet_definition : DefinitionFacet
@@ -104,6 +104,7 @@ class SofastCommandLineInterface:
             Name of optic
         """
         self.image_acquisition = image_acquisition
+        self.image_projection = image_projection
         self.camera = camera
         self.facet_definition = facet_definition
         self.spatial_orientation = spatial_orientation
@@ -126,8 +127,8 @@ class SofastCommandLineInterface:
             Surface to use when processing Sofast Fringe data
         """
         self.system_fringe = SystemSofastFringe(self.image_acquisition)
+        self.system_fringe.set_fringes(fringes)
         self.display_shape = display_shape
-        self.fringes = fringes
         self.surface_fringe = surface_fringe
 
     def set_sofast_fixed_data(
@@ -154,10 +155,10 @@ class SofastCommandLineInterface:
             self.spatial_orientation, self.camera, fixed_pattern_dot_locs, self.facet_definition
         )
 
-    def func_show_crosshairs(self):
-        """Shows crosshairs"""
+    def func_show_crosshairs_fringe(self):
+        """Shows crosshairs and run next in Sofast fringe queue after a 0.2s wait"""
         self.image_projection.show_crosshairs()
-        self.func_user_input()
+        self.system_fringe.root.after(200, self.system_fringe.run_next_in_queue)
 
     def func_process_sofast_fringe_data(self):
         """Processes Sofast Fringe data"""
@@ -239,27 +240,33 @@ class SofastCommandLineInterface:
         measurement.save_to_hdf(f'{self.dir_save_fringe:s}/{timestamp():s}_measurement_fringe.h5')
         self.system_fringe.run_next_in_queue()
 
-    def func_pause(self):
-        """Pauses for 200 ms"""
-        self.system_fringe.root.after(200, self.system_fringe.run_next_in_queue)
-
     def func_load_last_sofast_fringe_image_cal(self):
         """Loads last ImageCalibration object"""
+        # Find file
         files = glob.glob(join(self.dir_save_fringe_calibration, 'image_calibration_scaling*.h5'))
         files.sort()
+
+        if len(files) == 0:
+            lt.error(f'No previous calibration files found in {self.dir_save_fringe_calibration}')
+            return
+
+        # Get latest file and set
         file = files[-1]
         image_calibration = ImageCalibrationScaling.load_from_hdf(file)
-        self.system_fringe.calibration = image_calibration
-        self.system_fringe.set_fringes(self.fringes)
+        self.system_fringe.set_calibration(image_calibration)
         lt.info(f'{timestamp()} Loaded image calibration file: {file}')
 
     def func_gray_levels_cal(self):
         """Runs gray level calibration sequence"""
-        self.system_fringe.run_display_camera_response_calibration(
-            res=10, run_next=self.system_fringe.run_next_in_queue
+        file = join(self.dir_save_fringe_calibration, f'image_calibration_scaling_{timestamp():s}.h5')
+        self.system_fringe.run_gray_levels_cal(
+            ImageCalibrationScaling,
+            file,
+            on_processed=self.func_user_input,
+            on_processing=self.func_show_crosshairs_fringe,
         )
 
-    def func_show_cam_image(self):
+    def show_cam_image(self):
         """Shows a camera image"""
         image = self.image_acquisition.get_frame()
         plt.imshow(image)
@@ -288,8 +295,7 @@ class SofastCommandLineInterface:
             lt.info(f'{timestamp()} Running Sofast Fringe measurement and processing/saving data')
             funcs = [
                 lambda: self.system_fringe.run_measurement(self.system_fringe.run_next_in_queue),
-                self.func_show_crosshairs,
-                self.func_pause,
+                self.func_show_crosshairs_fringe,
                 self.func_process_sofast_fringe_data,
                 self.func_save_measurement_fringe,
                 self.func_user_input,
@@ -300,8 +306,7 @@ class SofastCommandLineInterface:
             lt.info(f'{timestamp()} Running Sofast Fringe measurement and saving data')
             funcs = [
                 lambda: self.system_fringe.run_measurement(self.system_fringe.run_next_in_queue),
-                self.func_show_crosshairs,
-                self.func_pause,
+                self.func_show_crosshairs_fringe,
                 self.func_save_measurement_fringe,
                 self.func_user_input,
             ]
@@ -328,7 +333,7 @@ class SofastCommandLineInterface:
             self.func_user_input()
         elif retval == 'cr':
             lt.info(f'{timestamp()} Calibrating camera-projector response')
-            funcs = [self.func_gray_levels_cal, self.func_show_crosshairs, self.func_user_input]
+            funcs = [self.func_gray_levels_cal]
             self.system_fringe.set_queue(funcs)
             self.system_fringe.run()
         elif retval == 'lr':
@@ -341,7 +346,7 @@ class SofastCommandLineInterface:
             self.system_fixed.close_all()
             return
         elif retval == 'im':
-            self.func_show_cam_image()
+            self.show_cam_image()
             self.func_user_input()
         elif retval == 'cross':
             self.image_projection.show_crosshairs()
@@ -371,10 +376,6 @@ if __name__ == '__main__':
     file_image_projection = join(dir_cal, 'image_projection_optics_lab_landscape_square.h5')
     file_dot_locs = join(dir_cal, 'dot_locations_optics_lab_landscape_square_width3_space6.h5')
 
-    # Define image projection
-    image_projection = ImageProjection.load_from_hdf_and_display(file_image_projection)
-    image_projection.display_data['image_delay'] = 200
-
     # Instantiate Sofast Command Line Interface
     sofast_cli = SofastCommandLineInterface()
 
@@ -384,40 +385,44 @@ if __name__ == '__main__':
     sofast_cli.dir_save_fixed = join(dir_save, 'sofast_fixed')
 
     # Load common data
-    image_acquisition = ImageAcquisition(0)
-    image_acquisition.frame_size = (1626, 1236)
-    image_acquisition.gain = 230
+    image_acquisition_in = ImageAcquisition(0)
+    image_acquisition_in.frame_size = (1626, 1236)
+    image_acquisition_in.gain = 230
 
-    facet_definition = DefinitionFacet.load_from_json(file_facet_definition_json)
-    spatial_orientation = SpatialOrientation.load_from_hdf(file_spatial_orientation)
-    camera = Camera.load_from_hdf(file_camera)
-    name_optic = 'Test optic'
-    measure_point_optic = Vxyz((0, 0, 0))  # meters
-    dist_optic_screen = 10.263  # meters
+    image_projection_in = ImageProjection.load_from_hdf_and_display(file_image_projection)
+    image_projection_in.display_data['image_delay'] = 200
+
+    camera_in = Camera.load_from_hdf(file_camera)
+    facet_definition_in = DefinitionFacet.load_from_json(file_facet_definition_json)
+    spatial_orientation_in = SpatialOrientation.load_from_hdf(file_spatial_orientation)
+    measure_point_optic_in = Vxyz((0, 0, 0))  # meters
+    dist_optic_screen_in = 10.263  # meters
+    name_optic_in = 'Test optic'
 
     sofast_cli.set_common_data(
-        image_acquisition,
-        camera,
-        facet_definition,
-        spatial_orientation,
-        measure_point_optic,
-        dist_optic_screen,
-        name_optic,
+        image_acquisition_in,
+        image_projection_in,
+        camera_in,
+        facet_definition_in,
+        spatial_orientation_in,
+        measure_point_optic_in,
+        dist_optic_screen_in,
+        name_optic_in,
     )
 
     # Load Sofast Fringe data
-    display_shape = DisplayShape.load_from_hdf(file_display)
-    fringes = Fringes.from_num_periods(4, 4)
-    surface_fringe = Surface2DParabolic((100.0, 100.0), False, 10)
+    display_shape_in = DisplayShape.load_from_hdf(file_display)
+    fringes_in = Fringes.from_num_periods(4, 4)
+    surface_fringe_in = Surface2DParabolic((100.0, 100.0), False, 10)
 
-    sofast_cli.set_sofast_fringe_data(display_shape, fringes, surface_fringe)
+    sofast_cli.set_sofast_fringe_data(display_shape_in, fringes_in, surface_fringe_in)
 
     # Load Sofast Fixed data
-    fixed_pattern_dot_locs = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
-    origin = Vxy((993, 644))  # pixels
-    surface_fixed = Surface2DParabolic((100.0, 100.0), False, 1)
+    fixed_pattern_dot_locs_in = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
+    origin_in = Vxy((993, 644))  # pixels
+    surface_fixed_in = Surface2DParabolic((100.0, 100.0), False, 1)
 
-    sofast_cli.set_sofast_fixed_data(fixed_pattern_dot_locs, origin, surface_fixed)
+    sofast_cli.set_sofast_fixed_data(fixed_pattern_dot_locs_in, origin_in, surface_fixed_in)
 
     # Run
     sofast_cli.run()
