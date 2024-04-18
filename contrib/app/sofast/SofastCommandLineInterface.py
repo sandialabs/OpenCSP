@@ -348,6 +348,7 @@ class SofastCommandLineInterface:
                 self.system_fringe.run()
             else:
                 self.func_user_input()
+        # Run fixed measurement and process/save
         elif retval == 'mip':
             lt.info(f'{timestamp()} Running Sofast Fixed measurement and processing/saving data')
             if self._check_fixed_system_loaded():
@@ -361,6 +362,7 @@ class SofastCommandLineInterface:
                 self.system_fixed.run()
             else:
                 self.func_user_input()
+        # Run fixed measurement and save
         elif retval == 'mis':
             lt.info(f'{timestamp()} Running Sofast Fixed measurement and saving data')
             if self._check_fixed_system_loaded():
@@ -369,10 +371,12 @@ class SofastCommandLineInterface:
                 self.system_fixed.run()
             else:
                 self.func_user_input()
+        # Calibrate exposure time
         elif retval == 'ce':
             lt.info(f'{timestamp()} Calibrating camera exposure')
             self.image_acquisition.calibrate_exposure()
             self.func_user_input()
+        # Calibrate response
         elif retval == 'cr':
             lt.info(f'{timestamp()} Calibrating camera-projector response')
             if self._check_fringe_system_loaded():
@@ -381,11 +385,13 @@ class SofastCommandLineInterface:
                 self.system_fringe.run()
             else:
                 self.func_user_input()
+        # Load last fringe calibration file
         elif retval == 'lr':
             lt.info(f'{timestamp()} Loading response calibration')
             if self._check_fringe_system_loaded():
                 self.func_load_last_sofast_fringe_image_cal()
             self.func_user_input()
+        # Quit
         elif retval == 'q':
             lt.info(f'{timestamp():s} quitting')
             if self.system_fringe is not None:
@@ -393,12 +399,15 @@ class SofastCommandLineInterface:
             if self.system_fixed is not None:
                 self.system_fixed.close_all()
             return
+        # Show single camera image
         elif retval == 'im':
             self.show_cam_image()
             self.func_user_input()
+        # Show camera live view
         elif retval == 'lv':
             self.show_live_view()
             self.func_user_input()
+        # Project crosshairs
         elif retval == 'cross':
             self.image_projection.show_crosshairs()
             self.func_user_input()
