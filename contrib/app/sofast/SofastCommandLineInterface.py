@@ -264,7 +264,9 @@ class SofastCommandLineInterface:
         measurement = self.system_fringe.get_measurements(
             self.measure_point_optic, self.dist_optic_screen, self.name_optic
         )[0]
-        measurement.save_to_hdf(f'{self.dir_save_fringe:s}/{self.timestamp_fringe_measurement:s}_measurement_fringe.h5')
+        file = f'{self.dir_save_fringe:s}/{self.timestamp_fringe_measurement:s}_measurement_fringe.h5'
+        measurement.save_to_hdf(file)
+        self.system_fringe.calibration.save_to_hdf(file)
         self.system_fringe.run_next_in_queue()
 
     def func_save_measurement_fixed(self):
