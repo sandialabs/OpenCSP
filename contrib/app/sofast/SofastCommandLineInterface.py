@@ -299,59 +299,99 @@ class SofastCommandLineInterface:
 
         lt.debug(f'{timestamp():s} user input: {retval:s}')
 
+        try:
+            self._run_given_input(retval)
+        except Exception as error:
+            lt.error(repr(error))
+            self.func_user_input()
+
+    def _check_fringe_system_loaded(self) -> bool:
+        if self.system_fringe is None:
+            lt.error(f'{timestamp()} No Sofast Fringe system loaded')
+            return False
+        return True
+
+    def _check_fixed_system_loaded(self) -> bool:
+        if self.system_fixed is None:
+            lt.error(f'{timestamp()} No Sofast Fixed system loaded')
+            return False
+        return True
+
+    def _run_given_input(self, retval: str) -> None:
+        """Runs the given command"""
+        # Run fringe measurement and process/save
         if retval == 'mrp':
             lt.info(f'{timestamp()} Running Sofast Fringe measurement and processing/saving data')
-            funcs = [
-                lambda: self.system_fringe.run_measurement(self.system_fringe.run_next_in_queue),
-                self.func_show_crosshairs_fringe,
-                self.func_process_sofast_fringe_data,
-                self.func_save_measurement_fringe,
-                self.func_user_input,
-            ]
-            self.system_fringe.set_queue(funcs)
-            self.system_fringe.run()
+            if self._check_fringe_system_loaded():
+                funcs = [
+                    lambda: self.system_fringe.run_measurement(self.system_fringe.run_next_in_queue),
+                    self.func_show_crosshairs_fringe,
+                    self.func_process_sofast_fringe_data,
+                    self.func_save_measurement_fringe,
+                    self.func_user_input,
+                ]
+                self.system_fringe.set_queue(funcs)
+                self.system_fringe.run()
+            else:
+                self.func_user_input()
+        # Run fringe measurement and save
         elif retval == 'mrs':
             lt.info(f'{timestamp()} Running Sofast Fringe measurement and saving data')
-            funcs = [
-                lambda: self.system_fringe.run_measurement(self.system_fringe.run_next_in_queue),
-                self.func_show_crosshairs_fringe,
-                self.func_save_measurement_fringe,
-                self.func_user_input,
-            ]
-            self.system_fringe.set_queue(funcs)
-            self.system_fringe.run()
+            if self._check_fringe_system_loaded():
+                funcs = [
+                    lambda: self.system_fringe.run_measurement(self.system_fringe.run_next_in_queue),
+                    self.func_show_crosshairs_fringe,
+                    self.func_save_measurement_fringe,
+                    self.func_user_input,
+                ]
+                self.system_fringe.set_queue(funcs)
+                self.system_fringe.run()
+            else:
+                self.func_user_input()
         elif retval == 'mip':
             lt.info(f'{timestamp()} Running Sofast Fixed measurement and processing/saving data')
-            funcs = [
-                self.system_fixed.run_measurement,
-                self.func_process_sofast_fixed_data,
-                self.func_save_measurement_fixed,
-                self.func_user_input,
-            ]
-            self.system_fixed.set_queue(funcs)
-            self.system_fixed.run()
+            if self._check_fixed_system_loaded():
+                funcs = [
+                    self.system_fixed.run_measurement,
+                    self.func_process_sofast_fixed_data,
+                    self.func_save_measurement_fixed,
+                    self.func_user_input,
+                ]
+                self.system_fixed.set_queue(funcs)
+                self.system_fixed.run()
+            else:
+                self.func_user_input()
         elif retval == 'mis':
             lt.info(f'{timestamp()} Running Sofast Fixed measurement and saving data')
-            funcs = [self.system_fixed.run_measurement, self.func_save_measurement_fixed, self.func_user_input]
-            self.system_fixed.set_queue(funcs)
-            self.system_fixed.run()
+            if self._check_fixed_system_loaded():
+                funcs = [self.system_fixed.run_measurement, self.func_save_measurement_fixed, self.func_user_input]
+                self.system_fixed.set_queue(funcs)
+                self.system_fixed.run()
+            else:
+                self.func_user_input()
         elif retval == 'ce':
             lt.info(f'{timestamp()} Calibrating camera exposure')
             self.image_acquisition.calibrate_exposure()
             self.func_user_input()
         elif retval == 'cr':
             lt.info(f'{timestamp()} Calibrating camera-projector response')
-            funcs = [self.func_gray_levels_cal]
-            self.system_fringe.set_queue(funcs)
-            self.system_fringe.run()
+            if self._check_fringe_system_loaded():
+                funcs = [self.func_gray_levels_cal]
+                self.system_fringe.set_queue(funcs)
+                self.system_fringe.run()
+            else:
+                self.func_user_input()
         elif retval == 'lr':
             lt.info(f'{timestamp()} Loading response calibration')
-            self.func_load_last_sofast_fringe_image_cal()
+            if self._check_fringe_system_loaded():
+                self.func_load_last_sofast_fringe_image_cal()
             self.func_user_input()
         elif retval == 'q':
             lt.info(f'{timestamp():s} quitting')
-            self.system_fringe.close_all()
-            self.system_fixed.close_all()
+            if self.system_fringe is not None:
+                self.system_fringe.close_all()
+            if self.system_fixed is not None:
+                self.system_fixed.close_all()
             return
         elif retval == 'im':
             self.show_cam_image()
