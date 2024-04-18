@@ -15,6 +15,8 @@ from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition
+from opencsp.common.lib.camera.image_processing import highlight_saturation
+from opencsp.common.lib.camera.LiveView import LiveView
 from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.geometry.Vxy import Vxy
@@ -269,8 +271,13 @@ class SofastCommandLineInterface:
     def show_cam_image(self):
         """Shows a camera image"""
         image = self.image_acquisition.get_frame()
-        plt.imshow(image)
+        image_proc = highlight_saturation(image, self.image_acquisition.max_value)
+        plt.imshow(image_proc)
         plt.show()
+
+    def show_live_view(self):
+        """Shows live vieew window"""
+        LiveView(self.image_acquisition)
 
     def func_user_input(self):
         """Waits for user input"""
@@ -286,6 +293,7 @@ class SofastCommandLineInterface:
         print('lr         load most recent camera-projector response calibration file')
         print('q          quit and close all')
         print('im         show image from camera.')
+        print('lv         shows camera live view')
         print('cross      show crosshairs')
         retval = input('Input: ')
 
@@ -348,6 +356,9 @@ class SofastCommandLineInterface:
         elif retval == 'im':
             self.show_cam_image()
             self.func_user_input()
+        elif retval == 'lv':
+            self.show_live_view()
+            self.func_user_input()
         elif retval == 'cross':
             self.image_projection.show_crosshairs()
             self.func_user_input()
@@ -396,7 +407,7 @@ if __name__ == '__main__':
     facet_definition_in = DefinitionFacet.load_from_json(file_facet_definition_json)
     spatial_orientation_in = SpatialOrientation.load_from_hdf(file_spatial_orientation)
     measure_point_optic_in = Vxyz((0, 0, 0))  # meters
-    dist_optic_screen_in = 10.263  # meters
+    dist_optic_screen_in = 10.158  # meters
     name_optic_in = 'Test optic'
 
     sofast_cli.set_common_data(
@@ -419,7 +430,7 @@ if __name__ == '__main__':
 
     # Load Sofast Fixed data
     fixed_pattern_dot_locs_in = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
-    origin_in = Vxy((993, 644))  # pixels
+    origin_in = Vxy((1100, 560))  # pixels
     surface_fixed_in = Surface2DParabolic((100.0, 100.0), False, 1)
 
     sofast_cli.set_sofast_fixed_data(fixed_pattern_dot_locs_in, origin_in, surface_fixed_in)
