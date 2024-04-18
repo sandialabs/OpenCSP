@@ -61,7 +61,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
         #     actually a code error).
         #
 
-        super(ExampleSolarFieldOutput, self).setup_class(
+        super(ExampleSolarFieldOutput, self).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
@@ -912,7 +912,6 @@ def example_driver():
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    example_object.teardown_method()
 
 
 # MAIN EXECUTION
