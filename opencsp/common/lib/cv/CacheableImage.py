@@ -87,9 +87,9 @@ class CacheableImage:
             return np.array(im)
 
     def __load_image(self):
-        if not self._array is None:
+        if self._array is not None:
             return self._load_image(self._array)
-        elif self.cache_path != None and ft.file_exists(self.cache_path):
+        elif self.cache_path is not None and ft.file_exists(self.cache_path):
             self.cached = True
             return self._load_image(self.cache_path)
         elif ft.file_exists(self.source_path):

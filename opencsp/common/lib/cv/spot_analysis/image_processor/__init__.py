@@ -4,6 +4,9 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractAggregateImageP
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImagesProcessor,
 )
+from opencsp.common.lib.cv.spot_analysis.image_processor.AverageByGroupImageProcessor import (
+    AverageByGroupImageProcessor,
+)
 from opencsp.common.lib.cv.spot_analysis.image_processor.CroppingImageProcessor import CroppingImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.EchoImageProcessor import EchoImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.ExposureDetectionImageProcessor import (
@@ -19,6 +22,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.PopulationStatisticsIma
 __all__ = [
     'AbstractAggregateImageProcessor',
     'AbstractSpotAnalysisImagesProcessor',
+    'AverageByGroupImageProcessor',
     'CroppingImageProcessor',
     'EchoImageProcessor',
     'ExposureDetectionImageProcessor',
