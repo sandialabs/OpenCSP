@@ -27,8 +27,8 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
     def _execute_aggregate(
         self, group: int, operables: list[SpotAnalysisOperable], is_last: bool
     ) -> list[SpotAnalysisOperable]:
-        # initialize the image to return
-        averaged_image = np.array(operables[0].primary_image.nparray)
+        # Initialize the image to return.
+        averaged_image = np.array(operables[0].primary_image.nparray).astype(np.int64)
 
         # build the average image
         for operable in operables[1:]:
@@ -43,9 +43,14 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
             averaged_image += other_image
         averaged_image = averaged_image.astype(np.float_)
         averaged_image /= len(operables)
+        averaged_image = averaged_image.astype(operables[0].primary_image.nparray.dtype)
+
+        # collect the list of images that were averaged
+        image_names = [operable.primary_image_source_path for operable in operables]
 
         # build the return operable from the first operable
         averaged_cacheable = CacheableImage(averaged_image, source_path=operables[0].primary_image.source_path)
         ret = dataclasses.replace(operables[0], primary_image=averaged_cacheable)
+        ret.image_processor_notes.append(("AverageByGroupImageProcessor", f"averaged_images: {image_names}"))
 
         return [ret]

@@ -20,7 +20,33 @@ class _RollingWindowOperableStats:
 
 
 class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
-    def __init__(self, min_pop_size=1, target_rolling_window_size=1):
+    def __init__(self, min_pop_size=1, target_rolling_window_size=1, initial_min: int = None, initial_max: int = None):
+        """
+        Generates statistics for groups of images.
+
+        A group of images is held until enough have been seen to generate statistics off of. Once the required number of
+        images has been reached, then images will start being released one at a time with the statistics for the group
+        up until that point.
+
+        Some use cases for this class could include automatically determining the maximum pixel value during streaming
+        to select an appropriate bit depth, using the rolling average for exposure calibration, or leveling all images
+        by subtracting the gloal pixel minimum.
+
+        Parameters
+        ----------
+        min_pop_size : int, optional
+            The minimum number of images that must be seen before any images (and their statistics) are released to the
+            next image processor. -1 to wait for all images. By default 1
+        target_rolling_window_size : int, optional
+            Number of images used to determine rolling averages. The first N-1 images are not held back while waiting
+            for this target. By default 1
+        initial_min : int, optional
+            Initial value used to estimate the population minimum. If None, then the minimum of the first image seen is
+            used. By default None
+        initial_max : int, optional
+            Initial value used to estimage the population maximum. If None, then the maximum of the first image seen is
+            used. By default None
+        """
         super().__init__(self.__class__.__name__)
 
         if min_pop_size > 0:
@@ -42,6 +68,8 @@ class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.curr_stats: SpotAnalysisPopulationStatistics = None
         """ The current statistics, which get updated with each image seen. None
         if min_pop_size hasn't been met yet. """
+        self.initial_min = [initial_min] if initial_min is not None else None
+        self.initial_max = [initial_max] if initial_max is not None else None
         self.initial_operables: list[SpotAnalysisOperable] = []
         """ The initial operables gathered while waiting for min_pop_size. """
         self.rolling_window_operables: list[SpotAnalysisOperable] = []
@@ -131,7 +159,7 @@ class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
                     pass
 
             # We've reached the minimum population size (or the end of the images stream, as indicated by is_last).
-            self.curr_stats = SpotAnalysisPopulationStatistics()
+            self.curr_stats = SpotAnalysisPopulationStatistics(minf=self.initial_min, maxf=self.initial_max)
             for prior_operable in self.initial_operables:
                 self.curr_stats = self._calculate_rolling_window(
                     self.curr_stats, prior_operable, self.rolling_window_operables

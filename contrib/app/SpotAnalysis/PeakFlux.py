@@ -40,7 +40,7 @@ class PeakFlux:
         self.settings_path_name_ext = settings_path_name_ext
 
         settings_path, settings_name, settings_ext = ft.path_components(self.settings_path_name_ext)
-        settings_dict = json.load("PeakFlux settings", settings_path, settings_name+settings_ext)
+        settings_dict = ft.read_json("PeakFlux settings", settings_path, settings_name+settings_ext)
         self.crop_box: list[int] = settings_dict['crop_box']
         self.bcs_pixel: list[int] = settings_dict['bcs_pixel_location']
         self.heliostate_name_pattern = re.compile(settings_dict['heliostat_name_pattern'])
@@ -64,6 +64,8 @@ class PeakFlux:
             CroppingImageProcessor(*self.crop_box),
             AverageByGroupImageProcessor(group_assigner, group_trigger),
             EchoImageProcessor(),
+            PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
+            FalseColorImageProcessor(),
             # SupportingImagesCollectorImageProcessor(group_assigner, supporting_images_map),
             # NullImageSubtractionImageProcessor(),
             # FilterImageProcessor(filter="box", diameter=3),
@@ -73,8 +75,14 @@ class PeakFlux:
             experiment_name, self.image_processors, save_dir=outdir, save_overwrite=True
         )
 
+        filenames = ft.files_in_directory_by_extension(self.indir, [".jpg"])[".jpg"]
+        source_path_name_exts = [os.path.join(self.indir, filename) for filename in filenames]
+        self.spot_analysis.set_primary_images(source_path_name_exts)
+
     def run(self):
         # process all images from indir
+        i = iter(self.spot_analysis)
+        next(i)
         for result in self.spot_analysis:
             # save the processed image
             save_path = self.spot_analysis.save_image(
@@ -91,8 +99,6 @@ class PeakFlux:
             # Get the attributes of the processed image, to save the results we're most interested in into a single
             # condensed csv file.
             parser = saoap.SpotAnalysisOperableAttributeParser(result, self.spot_analysis)
-
-            # TODO append these results to the csv file
 
 
 # class PeakFluxOffsetImageProcessor(AbstractSpotAnalysisImagesProcessor):
@@ -119,8 +125,9 @@ class PeakFlux:
 #         for name in names_to_search:
 #             m = self.heliostat_name_pattern.search(name)
 #             if m is not None:
-#                 if len(m.groups()) > 0:
-#                     heliostat_name = "".join(m.groups())
+#                 groups = list(filter(lambda s: s is not None, m.groups()))
+#                 if len(groups) > 0:
+#                     heliostat_name = "".join(groups)
 #                     break
 
 #         if heliostat_name is None:
@@ -153,6 +160,7 @@ if __name__ == "__main__":
 
     # create the output directory
     ft.create_directories_if_necessary(args.outdir)
+    ft.delete_files_in_directory(args.outdir, "*")
 
     # create the log file
     log_path_name_ext = os.path.join(args.outdir, "PeakFlux_" + tdt.current_date_time_string_forfile() + ".log")

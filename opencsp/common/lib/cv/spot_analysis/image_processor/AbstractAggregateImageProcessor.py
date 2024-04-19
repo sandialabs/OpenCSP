@@ -120,7 +120,8 @@ class AbstractAggregateImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
                 m = name_pattern.search(name)
                 if m is None:
                     continue
-                if len(m.groups()) == 0:
+                groups = list(filter(lambda s: s is not None, m.groups()))
+                if len(groups) == 0:
                     lt.debug(
                         "In AbstractAggregateImageProcessor.group_by_name(): "
                         + f"no groups found for pattern {name_pattern} when trying to match against name {name}"
@@ -128,7 +129,7 @@ class AbstractAggregateImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
                     continue
 
                 # get the name match
-                group_str = "".join(m.groups())
+                group_str = "".join(groups)
 
                 # return the index of the existing group, or add a new group
                 if group_str in groups:

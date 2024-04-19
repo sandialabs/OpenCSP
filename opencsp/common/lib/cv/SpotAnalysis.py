@@ -249,11 +249,11 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             The processed primary image and other associated data. None if done
             processing.
         """
-        if self._results_iter == None:
+        if self._results_iter is None:
             self._results_iter = iter(self.image_processors[-1])
 
         # Release memory from the previous result
-        if self._prev_result != None:
+        if self._prev_result is not None:
             self.image_processors[-1].cache_image_to_disk_as_necessary(self._prev_result)
             self._prev_result = None
 
