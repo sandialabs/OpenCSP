@@ -65,7 +65,7 @@ class PeakFlux:
             AverageByGroupImageProcessor(group_assigner, group_trigger),
             EchoImageProcessor(),
             SupportingImagesCollectorImageProcessor(supporting_images_map),
-            # NullImageSubtractionImageProcessor(),
+            NullImageSubtractionImageProcessor(),
             # FilterImageProcessor(filter="box", diameter=3),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
