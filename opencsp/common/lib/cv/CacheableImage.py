@@ -1,7 +1,9 @@
-import numpy as np
-from PIL import Image
 import sys
 from typing import Optional, Union
+
+import numpy as np
+import numpy.typing as npt
+from PIL import Image
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
@@ -49,8 +51,8 @@ class CacheableImage:
         return sys.getsizeof(self._array) + sys.getsizeof(self._image)
 
     @classmethod
-    def from_single_source(cls, array_or_path: Union[np.ndarray, str, 'CacheableImage']):
-        """Generates a CacheableImage from the given numpy or image file."""
+    def from_single_source(cls, array_or_path: Union[np.ndarray, str, 'CacheableImage']) -> 'CacheableImage':
+        """Generates a CacheableImage from the given numpy array, numpy '.npy' file, or image file."""
         if isinstance(array_or_path, CacheableImage):
             return array_or_path
         elif isinstance(array_or_path, str):
@@ -77,7 +79,7 @@ class CacheableImage:
             )
 
     @staticmethod
-    def _load_image(im: str | np.ndarray) -> np.ndarray:
+    def _load_image(im: str | np.ndarray) -> npt.NDArray[np.int_]:
         if isinstance(im, np.ndarray):
             return im
         elif im.lower().endswith(".npy"):
@@ -86,7 +88,7 @@ class CacheableImage:
             im = Image.open(im)
             return np.array(im)
 
-    def __load_image(self):
+    def __load_image(self) -> npt.NDArray[np.int_] | None:
         if self._array is not None:
             return self._load_image(self._array)
         elif self.cache_path is not None and ft.file_exists(self.cache_path):
@@ -101,7 +103,7 @@ class CacheableImage:
             )
 
     @property
-    def nparray(self):
+    def nparray(self) -> npt.NDArray[np.int_] | None:
         self._image = None
 
         if self._array is None:
@@ -110,7 +112,7 @@ class CacheableImage:
 
         return self.__load_image()
 
-    def to_image(self):
+    def to_image(self) -> Image.Image:
         if self._image == None:
             self._image = it.numpy_to_image(self.nparray)
         return self._image
