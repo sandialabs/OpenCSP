@@ -8,13 +8,10 @@ Utilities for file_handling.
 import csv
 from datetime import datetime
 import glob
-import random
+import json
 import os
 import os.path
-
-# import pickle
 import shutil
-import string
 import tempfile
 from typing import Optional
 
@@ -1023,7 +1020,7 @@ def write_text_file(
     # Write output file.
     output_body_ext = convert_string_to_file_body(output_file_body) + '.txt'
     output_dir_body_ext = os.path.join(output_dir, output_body_ext)
-    if description != None:
+    if description is not None:
         print('Saving ' + description + ': ', output_dir_body_ext)
     with open(output_dir_body_ext, 'w') as output_stream:
         # Write strings.
@@ -1111,7 +1108,7 @@ def to_csv(
     # Write output file.
     output_body_ext = convert_string_to_file_body(output_file_body) + '.csv'
     output_dir_body_ext = os.path.join(output_dir, output_body_ext)
-    if description != None:
+    if description is not None:
         lt.info('Saving ' + description + ': ' + output_dir_body_ext)
     output_stream = open(output_dir_body_ext, 'w')
     # Write heading lines.
@@ -1143,7 +1140,7 @@ def read_csv_file(description, input_path, input_file_name, log_warning=True):
     return from_csv(description, input_path, input_file_name)
 
 
-def from_csv(description: str, input_path: str, input_file_name_ext: str):
+def from_csv(description: str | None, input_path: str, input_file_name_ext: str):
     """Reads a csv file and returns the rows, including the header row.
 
     Concise example::
@@ -1177,7 +1174,8 @@ def from_csv(description: str, input_path: str, input_file_name_ext: str):
     # However, this version works well with csv files where row lengths are irregular.
     # Consruct input file path and name.
     input_path_file = os.path.join(input_path, input_file_name_ext)
-    lt.info('Reading ' + description + ': ' + input_path_file + ' ...')
+    if description is not None:
+        lt.info('Reading ' + description + ': ' + input_path_file + ' ...')
     # Read csv file.
     data_rows: list[list[str]] = []
     with open(input_path_file) as csvfile:
@@ -1295,6 +1293,83 @@ def read_dict(input_dict_dir_body_ext):
         for input_row in reader:
             add_row_to_output_dict(input_row, output_dict)
     return output_dict
+
+
+def write_json(description: str | None, output_dir: str, output_file_body: str, output_object: any, error_if_dir_not_exist=True):
+    """
+    Like json.dump(output_object, output_file_body) but with a few more safety checks and automatic ".json" extension appending.
+
+    Parameters
+    ----------
+    description : str | None
+        A human-readable description of what this file is for, to be logged to the command line. If None, then no log is created.
+    output_dir : str
+        The destination directory for the file.
+    output_file_body : str
+        The destination name for the file. Should not include an extension. For example: "foo" is ok, but "foo.json" is not.
+    output_object : any
+        The object to be saved to the given file.
+    error_if_dir_not_exist : bool, optional
+        If True, then first check if the given output_dir exists. By default True.
+    """
+    # normalize input
+    output_name_ext = output_file_body
+    if not output_file_body.lower().endswith(".json"):
+        output_name_ext = output_name_ext + ".json"
+    output_path_name_ext = os.path.join(output_dir, output_name_ext)
+
+    # validate input
+    if error_if_dir_not_exist:
+        if not directory_exists(output_dir):
+            lt.error_and_raise(FileNotFoundError, "Error in file_tools.write_json(): " +
+                               f"the directory {output_dir} does not exist!")
+    if file_exists(output_path_name_ext):
+        lt.error_and_raise(FileExistsError, "Error in file_tools.write_json(): " +
+                           f"the file {output_path_name_ext} already exists!")
+
+    # save the file
+    if description != None:
+        print('Saving ' + description + ': ', output_path_name_ext)
+    with open(output_path_name_ext, "w") as fout:
+        json.dump(output_object, fout)
+
+
+def read_json(description: str | None, input_dir: str, input_file_body_ext: str) -> any:
+    """
+    Like json.loads(file_contents) but with more safety checks, and ignoring any lines starting with "//" as comments.
+
+    Parameters
+    ----------
+    description : str | None
+        A human-readable description of what this file is for, to be logged to the command line. If None, then doesn't log.
+    input_dir : str
+        The source directory where the file exists.
+    input_file_body_ext : str
+        The source name+ext of the file. For example "foo.json".
+
+    Returns
+    -------
+    any
+        The json-parsed contents of the file.
+    """
+    # TODO should we switch to https://pypi.org/project/pyjson5/? I'm not doing that now, because it would mean another
+    # dependency, and this is good enough for now.
+
+    # normalize input
+    input_path_name_ext = os.path.join(input_dir, input_file_body_ext)
+
+    # validate input
+    if not file_exists(input_path_name_ext):
+        lt.error_and_raise(FileNotFoundError, "Error in file_tools.read_json(): " +
+                           f"the file {input_path_name_ext} does not exist!")
+
+    # read the file
+    if description is not None:
+        lt.info('Reading ' + description + ': ' + input_path_name_ext + ' ...')
+    with open(input_path_name_ext, 'r') as fin:
+        lines = fin.readlines()
+    lines = map(lambda l: "" if l.strip().startswith("//") else l, lines)
+    return json.loads("\n".join(lines))
 
 
 # PICKLE FILES
