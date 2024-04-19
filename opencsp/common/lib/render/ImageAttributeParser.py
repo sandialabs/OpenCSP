@@ -72,7 +72,7 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
         except:
             pass
         if self._previous_attr != None:
-            prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(ImageAttributeParser)
+            prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(self.__class__)
 
             # Sanity check: are we trying to overwrite the "original_image_source" value?
             if prev_image_attr != None:
