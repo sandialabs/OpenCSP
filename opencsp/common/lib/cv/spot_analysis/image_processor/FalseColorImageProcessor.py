@@ -19,7 +19,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         ----------
         map_type : str, optional
             This determines the number of visible colors. Options are 'opencv'
-            (256), 'human' (TODO), 'large' (1530). Large has the most possible
+            (256), 'human' (1020), 'large' (1530). Large has the most possible
             colors. Human reduces the number of greens and reds, since those are
             difficult to discern. Default is 'human'.
         opencv_map : opencv map type, optional
