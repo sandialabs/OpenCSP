@@ -28,6 +28,7 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
         self, group: int, operables: list[SpotAnalysisOperable], is_last: bool
     ) -> list[SpotAnalysisOperable]:
         # Initialize the image to return.
+        lt.debug(f"In AverageByGroupImageProcessor._execute_aggregate(): averaging {len(operables)} images")
         averaged_image = np.array(operables[0].primary_image.nparray).astype(np.int64)
 
         # build the average image
