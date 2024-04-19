@@ -1295,7 +1295,9 @@ def read_dict(input_dict_dir_body_ext):
     return output_dict
 
 
-def write_json(description: str | None, output_dir: str, output_file_body: str, output_object: any, error_if_dir_not_exist=True):
+def write_json(
+    description: str | None, output_dir: str, output_file_body: str, output_object: any, error_if_dir_not_exist=True
+):
     """
     Like json.dump(output_object, output_file_body) but with a few more safety checks and automatic ".json" extension appending.
 
@@ -1321,11 +1323,13 @@ def write_json(description: str | None, output_dir: str, output_file_body: str, 
     # validate input
     if error_if_dir_not_exist:
         if not directory_exists(output_dir):
-            lt.error_and_raise(FileNotFoundError, "Error in file_tools.write_json(): " +
-                               f"the directory {output_dir} does not exist!")
+            lt.error_and_raise(
+                FileNotFoundError, "Error in file_tools.write_json(): " + f"the directory {output_dir} does not exist!"
+            )
     if file_exists(output_path_name_ext):
-        lt.error_and_raise(FileExistsError, "Error in file_tools.write_json(): " +
-                           f"the file {output_path_name_ext} already exists!")
+        lt.error_and_raise(
+            FileExistsError, "Error in file_tools.write_json(): " + f"the file {output_path_name_ext} already exists!"
+        )
 
     # save the file
     if description != None:
@@ -1360,8 +1364,9 @@ def read_json(description: str | None, input_dir: str, input_file_body_ext: str)
 
     # validate input
     if not file_exists(input_path_name_ext):
-        lt.error_and_raise(FileNotFoundError, "Error in file_tools.read_json(): " +
-                           f"the file {input_path_name_ext} does not exist!")
+        lt.error_and_raise(
+            FileNotFoundError, "Error in file_tools.read_json(): " + f"the file {input_path_name_ext} does not exist!"
+        )
 
     # read the file
     if description is not None:

@@ -40,7 +40,7 @@ class PeakFlux:
         self.settings_path_name_ext = settings_path_name_ext
 
         settings_path, settings_name, settings_ext = ft.path_components(self.settings_path_name_ext)
-        settings_dict = ft.read_json("PeakFlux settings", settings_path, settings_name+settings_ext)
+        settings_dict = ft.read_json("PeakFlux settings", settings_path, settings_name + settings_ext)
         self.crop_box: list[int] = settings_dict['crop_box']
         self.bcs_pixel: list[int] = settings_dict['bcs_pixel_location']
         self.heliostate_name_pattern = re.compile(settings_dict['heliostat_name_pattern'])
@@ -64,11 +64,11 @@ class PeakFlux:
             CroppingImageProcessor(*self.crop_box),
             AverageByGroupImageProcessor(group_assigner, group_trigger),
             EchoImageProcessor(),
-            PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
-            FalseColorImageProcessor(),
-            # SupportingImagesCollectorImageProcessor(group_assigner, supporting_images_map),
+            SupportingImagesCollectorImageProcessor(supporting_images_map),
             # NullImageSubtractionImageProcessor(),
             # FilterImageProcessor(filter="box", diameter=3),
+            PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
+            FalseColorImageProcessor(),
             # AnnotationImageProcessor(max_pixel_value_locator, bcs_locator)
         ]
         self.spot_analysis = sa.SpotAnalysis(
@@ -81,8 +81,6 @@ class PeakFlux:
 
     def run(self):
         # process all images from indir
-        i = iter(self.spot_analysis)
-        next(i)
         for result in self.spot_analysis:
             # save the processed image
             save_path = self.spot_analysis.save_image(

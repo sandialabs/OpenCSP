@@ -59,7 +59,7 @@ def __load_settings_files():
         # would use file_tools.directory_exists() except that I don't want to depend on any other part of opencsp
         if os.path.exists(settings_file_name_path_ext) and os.path.isfile(settings_file_name_path_ext):
             settings_path, settings_name, settings_ext = ft.path_components(settings_file_name_path_ext)
-            settings = ft.read_json("global settings", settings_path, settings_name+settings_ext)
+            settings = ft.read_json("global settings", settings_path, settings_name + settings_ext)
 
             # verify the types for the loaded settings
             err_msg_preamble = (

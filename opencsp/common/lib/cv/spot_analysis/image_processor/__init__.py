@@ -17,6 +17,9 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.LogScaleImageProcessor 
 from opencsp.common.lib.cv.spot_analysis.image_processor.PopulationStatisticsImageProcessor import (
     PopulationStatisticsImageProcessor,
 )
+from opencsp.common.lib.cv.spot_analysis.image_processor.SupportingImagesCollectorImageProcessor import (
+    SupportingImagesCollectorImageProcessor,
+)
 
 # Make these classes available when importing cv.spot_analysis.image_processor.*
 __all__ = [
@@ -29,4 +32,5 @@ __all__ = [
     'FalseColorImageProcessor',
     'LogScaleImageProcessor',
     'PopulationStatisticsImageProcessor',
+    'SupportingImagesCollectorImageProcessor',
 ]

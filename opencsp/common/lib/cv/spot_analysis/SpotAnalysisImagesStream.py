@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from enum import Enum
+import functools
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
@@ -8,12 +9,18 @@ import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.typing_tools as tt
 
 
+@functools.total_ordering
 class ImageType(Enum):
     PRIMARY = 1
     REFERENCE = 2
     NULL = 3
     COMPARISON = 4
     BACKGROUND_MASK = 5
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.value < other.value
+        raise NotImplementedError
 
 
 class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
