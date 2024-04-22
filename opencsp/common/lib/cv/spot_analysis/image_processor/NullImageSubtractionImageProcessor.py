@@ -18,8 +18,11 @@ class NullImageSubtractionImageProcessor(AbstractSpotAnalysisImagesProcessor):
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         # validate the input
         if (ImageType.NULL not in operable.supporting_images) or (operable.supporting_images[ImageType.NULL] is None):
-            lt.warning("Warning in NullImageSubtractionImageProcessor._execute(): " +
-                       f"skipping subtraction of null image for {operable.primary_image_source_path}. " + "Given image does not have an associated NULL supporting image.")
+            lt.warning(
+                "Warning in NullImageSubtractionImageProcessor._execute(): "
+                + f"skipping subtraction of null image for {operable.primary_image_source_path}. "
+                + "Given image does not have an associated NULL supporting image."
+            )
             return [operable]
 
         # Get the primary image with the null image subtracted.

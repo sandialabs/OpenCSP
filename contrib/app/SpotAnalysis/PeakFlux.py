@@ -66,7 +66,7 @@ class PeakFlux:
             EchoImageProcessor(),
             SupportingImagesCollectorImageProcessor(supporting_images_map),
             NullImageSubtractionImageProcessor(),
-            # FilterImageProcessor(filter="box", diameter=3),
+            ConvolutionImageProcessor(kernel="box", diameter=3),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
             # AnnotationImageProcessor(max_pixel_value_locator, bcs_locator)
