@@ -4,6 +4,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractAggregateImageP
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImagesProcessor,
 )
+from opencsp.common.lib.cv.spot_analysis.image_processor.AnnotationImageProcessor import AnnotationImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.AverageByGroupImageProcessor import (
     AverageByGroupImageProcessor,
 )
@@ -29,6 +30,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.SupportingImagesCollect
 __all__ = [
     'AbstractAggregateImageProcessor',
     'AbstractSpotAnalysisImagesProcessor',
+    'AnnotationImageProcessor',
     'AverageByGroupImageProcessor',
     'ConvolutionImageProcessor',
     'CroppingImageProcessor',

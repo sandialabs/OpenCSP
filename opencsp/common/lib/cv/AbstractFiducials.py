@@ -17,8 +17,8 @@ class AbstractFiducials(ABC):
     def __init__(self, style=None, pixels_to_meters: Callable[[p2.Pxy], v3.Vxyz] = None):
         """
         A collection of markers (such as an ArUco board) that is used to orient the camera relative to observed objects
-        in the scene. It is suggested that each implementing class be paired with a complementary FiducialLocator or
-        PredictingFiducialLocator class.
+        in the scene. It is suggested that each implementing class be paired with a complementary locator method or
+        SpotAnalysisImageProcessor.
 
         Parameters
         ----------
