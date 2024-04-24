@@ -8,6 +8,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AnnotationImageProcesso
 from opencsp.common.lib.cv.spot_analysis.image_processor.AverageByGroupImageProcessor import (
     AverageByGroupImageProcessor,
 )
+from opencsp.common.lib.cv.spot_analysis.image_processor.BcsLocatorImageProcessor import BcsLocatorImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.ConvolutionImageProcessor import ConvolutionImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.CroppingImageProcessor import CroppingImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.EchoImageProcessor import EchoImageProcessor
@@ -32,6 +33,7 @@ __all__ = [
     'AbstractSpotAnalysisImagesProcessor',
     'AnnotationImageProcessor',
     'AverageByGroupImageProcessor',
+    'BcsLocatorImageProcessor',
     'ConvolutionImageProcessor',
     'CroppingImageProcessor',
     'EchoImageProcessor',

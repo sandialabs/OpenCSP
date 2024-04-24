@@ -51,14 +51,6 @@ class PeakFlux:
             ImageType.PRIMARY: lambda operable, operables: "off" not in operable.primary_image_source_path,
             ImageType.NULL: lambda operable, operables: "off" in operable.primary_image_source_path,
         }
-        # max_pixel_value_locator = AnnotationImageProcessor.AnnotationEngine(
-        #     feature_locator=lambda operable: np.argmax(operable.primary_image.ndarray),
-        #     color='k'
-        # )
-        # bcs_locator = AnnotationImageProcessor.AnnotationEngine(
-        #     feature_locator=lambda operable: self.bcs_pixel,
-        #     color='k'
-        # )
 
         self.image_processors: list[AbstractSpotAnalysisImagesProcessor] = [
             CroppingImageProcessor(*self.crop_box),
@@ -67,9 +59,10 @@ class PeakFlux:
             SupportingImagesCollectorImageProcessor(supporting_images_map),
             NullImageSubtractionImageProcessor(),
             ConvolutionImageProcessor(kernel="box", diameter=3),
+            BcsLocatorImageProcessor(),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
-            # AnnotationImageProcessor(max_pixel_value_locator, bcs_locator)
+            AnnotationImageProcessor(),
         ]
         self.spot_analysis = sa.SpotAnalysis(
             experiment_name, self.image_processors, save_dir=outdir, save_overwrite=True
