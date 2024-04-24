@@ -1,12 +1,9 @@
-import json
 import os
 import re
 
-import numpy as np
 
 import opencsp.common.lib.cv.SpotAnalysis as sa
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
 from opencsp.common.lib.cv.spot_analysis.image_processor import *
 import opencsp.common.lib.tool.file_tools as ft
@@ -90,51 +87,6 @@ class PeakFlux:
             # Get the attributes of the processed image, to save the results we're most interested in into a single
             # condensed csv file.
             parser = saoap.SpotAnalysisOperableAttributeParser(result, self.spot_analysis)
-
-
-# class PeakFluxOffsetImageProcessor(AbstractSpotAnalysisImagesProcessor):
-#     def __init__(self, outfile_path_name_ext: str, max_pixel_value_locator: AnnotationImageProcessor.AnnotationEngine, bcs_pixel_location: tuple[int, int], heliostat_name_pattern: re.Pattern):
-#         super().__init__("PeakFluxOffsetImageProcessor")
-
-#         self.outfile_path_name_ext = outfile_path_name_ext
-#         self.max_pixel_value_locator = max_pixel_value_locator
-#         self.bcs_pixel_location = bcs_pixel_location
-#         self.heliostat_name_pattern = heliostat_name_pattern
-
-#         with open(outfile_path_name_ext, "w") as fout:
-#             fout.writelines(["Heliostat,Peak Flux Pixel,Pixels Offset"])
-
-#     def _execute(self, operable: sa.SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
-#         # get the heliostat name
-#         names_to_search = [
-#             operable.primary_image_source_path,
-#             operable.primary_image.source_path,
-#             operable.primary_image.cache_path
-#         ]
-
-#         heliostat_name = None
-#         for name in names_to_search:
-#             m = self.heliostat_name_pattern.search(name)
-#             if m is not None:
-#                 groups = list(filter(lambda s: s is not None, m.groups()))
-#                 if len(groups) > 0:
-#                     heliostat_name = "".join(groups)
-#                     break
-
-#         if heliostat_name is None:
-#             lt.error("Error in PeakFluxOffsetImageProcessor._execute(): " +
-#                      f"failed to find heliostat name in {names_to_search}")
-#             return [operable]
-
-#         # get the peak pixel location
-#         peak_flux_pixel = max_pixel_value_locator.feature_locator(operable.primary_image.nparray)[0]
-#         pixels_offset = peak_flux_pixel - np.array(self.bcs_pixel_location)
-
-#         # write the results
-#         peak_flux_pixel_str = f"{peak_flux_pixel[0]} {peak_flux_pixel[1]}"
-#         pixels_offset_str = f"{pixels_offset[0]} {pixels_offset[1]}"
-#         with open(self.outfile_path_name_ext, "a") as fout:
-#             fout.writelines([f"{heliostat_name},{peak_flux_pixel_str},{pixels_offset_str}"])
 
 
 if __name__ == "__main__":

@@ -75,16 +75,6 @@ if __name__ == "__main__":
     indir = expdir + "/raw_images"
     outdir = expdir + "/processed_images"
 
-    # ft.create_directories_if_necessary(indir)
-    # ft.delete_files_in_directory(indir, "*")
-
-    # dirnames = ft.files_in_directory(expdir, files_only=False)
-    # dirnames = list(filter(lambda s: s not in ["raw_images", "processed_images"], dirnames))
-    # for dirname in dirnames:
-    #     fromdir = expdir + "/" + dirname + "/Raw Images"
-    #     for filename in ft.files_in_directory(fromdir):
-    #         ft.copy_file(fromdir + "/" + filename, indir, filename)
-
     x1, y1, x2, y2 = 120, 29, 1526, 1158
     x1, y1 = x1 + 20, y1 + 20
     x2, y2 = x2 - 20, y2 - 20
