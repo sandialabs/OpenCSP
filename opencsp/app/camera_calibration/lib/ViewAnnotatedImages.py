@@ -77,6 +77,9 @@ class ViewAnnotatedImages:
         self.root.mainloop()
 
     def update_image(self):
+        """
+        Updates displayed image and image label
+        """
         # Update image title
         self.var_title.set(self.image_names[self.idx_im])
 
@@ -101,6 +104,9 @@ class ViewAnnotatedImages:
         self.canvas.itemconfig(self.canvas_image, image=image_tk)
 
     def show_next(self):
+        """
+        Show the next image.
+        """
         # Update index
         self.idx_im += 1
         if self.idx_im >= len(self.images):
@@ -110,6 +116,9 @@ class ViewAnnotatedImages:
         self.update_image()
 
     def show_prev(self):
+        """
+        Show the previous image.
+        """
         # Update index
         self.idx_im -= 1
         if self.idx_im < 0:
