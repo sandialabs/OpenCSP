@@ -12,6 +12,13 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class NullImageSubtractionImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Subtracts the NULL supporting image from the primary image, if there is an associated NULL image.
+
+    Suggested use is by either assigning supporting images manually, or by using the
+    SupportingImagesCollectorImageProcessor.
+    """
+
     def __init__(self):
         super().__init__(self.__class__.__name__)
 

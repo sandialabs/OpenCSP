@@ -16,6 +16,11 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 class AnnotationImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Draws annotations on top of the input image. The annotations drawn are those in operable.given_fiducials and
+    operable.found_fiducials.
+    """
+
     def __init__(self):
         super().__init__(self.__class__.__name__)
 
