@@ -17,18 +17,21 @@ from opencsp.common.lib.tool import hdf5_tools
 
 class Camera:
     """
-    Calibrated machine vision camera representation.
+    Calibrated machine vision camera representation. This represents a pinhole model of
+    a camera/lens assembly and includes lens distortion through the use of distortion
+    coefficients. This model uses the distortion model used by OpenCV; see
+    https://docs.opencv.org/4.9.0/d9/d0c/group__calib3d.html for more information.
 
     Parameters
     ----------
     intrinsic_mat : np.ndarray
+        3x3 numpy array, intrinsic camera matrix
     distortion_coef : np.ndarray
-        1d array, distortion coefficients.
+        1d array, distortion coefficients, typically length 4.
     image_shape_xy : tuple(int)
         (x, y), image size in pixels.
     name : str
         Name of camera/lens combination.
-
     """
 
     def __init__(

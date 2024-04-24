@@ -49,7 +49,19 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
 
     @abstractmethod
     def apply_to_images(self, measurement) -> ndarray:
-        """Placeholder"""
+        """
+        Performs camera-projector brightness values calibration.
+
+        Parameters
+        ----------
+        fringe_images : ndarray
+            Measurement fringe images.
+
+        Returns
+        -------
+        ndarray
+            Calibrated fringe images, float.
+        """
         pass
 
     def _create_response_function(self) -> None:

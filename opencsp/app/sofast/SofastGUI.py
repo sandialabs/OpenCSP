@@ -803,7 +803,7 @@ class SofastGUI:
 
     def close_image_acquisition(self) -> None:
         """
-        Placeholder
+        Close the single Image Acquisition object if open.
         """
         # Close the camera
         with et.ignored(Exception):

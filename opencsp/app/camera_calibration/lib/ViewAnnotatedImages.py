@@ -79,7 +79,7 @@ class ViewAnnotatedImages:
 
     def update_image(self):
         """
-        Placeholder
+        Updates displayed image and image label
         """
         # Update image title
         self.var_title.set(self.image_names[self.idx_im])
@@ -106,7 +106,7 @@ class ViewAnnotatedImages:
 
     def show_next(self):
         """
-        Placeholder
+        Show the next image.
         """
         # Update index
         self.idx_im += 1
@@ -118,7 +118,7 @@ class ViewAnnotatedImages:
 
     def show_prev(self):
         """
-        Placeholder
+        Show the previous image.
         """
         # Update index
         self.idx_im -= 1

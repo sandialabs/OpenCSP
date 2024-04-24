@@ -10,7 +10,19 @@ import math
 
 def meters_given_pixels(d_pixel, dpi):
     """
-    Placeholder
+    Returns distance in meters given a distance in pixels and a dots per inch (DPI) value
+
+    Parameters
+    ----------
+    d_pixel : float
+        Distance in pixels
+    dpi : float
+        Dots per inch of image
+
+    Returns
+    -------
+    float
+        Distance in meters
     """
     d_inch = d_pixel / dpi
     d_meter = d_inch / (1000.0 / 25.4)
