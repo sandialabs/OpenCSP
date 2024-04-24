@@ -15,10 +15,32 @@ class Vxyz:
         """
         3D vector class to represent 3D points/vectors.
 
+        To represent a single vector::
+
+            x = 1
+            y = 2
+            z = 3
+            vec = Vxyz(np.array([[x], [y], [z]])) # same as vec = Vxyz([x, y, z])
+            print(vec.x) # [1.]
+            print(vec.y) # [2.]
+            print(vec.z) # [3.]
+
+        To represent a set of vectors::
+
+            vec1 = [1, 2, 3]
+            vec2 = [4, 5, 6]
+            vec3 = [7, 8, 9]
+            zipped = list(zip(vec1, vec2, vec3))
+            vecs = Vxyz(np.array(zipped))
+            print(vec.x) # [1. 4. 7.]
+            print(vec.y) # [2. 5. 8.]
+            print(vec.z) # [3. 6. 9.]
+
         Parameters
         ----------
         data : array-like
-            The 3d point data: 3xN array, length 3 tuple, length 3 list
+            The 3d point data: 3xN array, length 3 tuple, length 3 list. If a Vxy, then the data will be padded with 0s
+            for 'z'.
         dtype : data type, optional
             Data type. The default is float.
 
@@ -30,6 +52,8 @@ class Vxyz:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
             elif np.ndim(data) == 2 and data.shape[0] != 3:
                 raise ValueError('First dimension of 2-dimensional data must be length 3 if ndarray.')
+        elif isinstance(data, Vxy):
+            data = np.pad(data.data, ((0, 1), (0, 0)))
         elif len(data) != 3:
             raise ValueError('Input data must have length 3.')
 
@@ -38,6 +62,9 @@ class Vxyz:
 
     @property
     def data(self):
+        """
+        An array with shape (3, N), where N is the number of 3D vectors in this instance.
+        """
         return self._data
 
     @property

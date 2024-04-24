@@ -5,7 +5,7 @@ import numpy.typing as npt
 import sys
 
 import opencsp.common.lib.csp.LightSource as ls
-import opencsp.common.lib.cv.AbstractFiducial as af
+import opencsp.common.lib.cv.AbstractFiducials as af
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
@@ -31,9 +31,9 @@ class SpotAnalysisOperable:
     supporting_images: dict[ImageType, CacheableImage] = field(default_factory=dict)
     """ The supporting images, if any, that were provided with the
     associated input primary image. """
-    given_fiducials: list[af.AbstractFiducial] = field(default_factory=list)
+    given_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ Any fiducials handed to us in the currently processing image. """
-    found_fiducials: list[af.AbstractFiducial] = field(default_factory=list)
+    found_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ The identified fiducials in the currently processing image. """
     camera_intrinsics_characterization: any = (
         None  # TODO figure out how to specify information here, maybe using common/lib/camera/Camera

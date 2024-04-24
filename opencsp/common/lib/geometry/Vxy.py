@@ -8,6 +8,24 @@ class Vxy:
         """
         2D vector class to represent 2D points/vectors.
 
+        To represent a single vector::
+
+            x = 1
+            y = 2
+            vec = Vxy(np.array([[x], [y])) # same as vec = Vxy([x, y])
+            print(vec.x) # [1.]
+            print(vec.y) # [2.]
+
+        To represent a set of vectors::
+
+            vec1 = [1, 2]
+            vec2 = [4, 5]
+            vec3 = [7, 8]
+            zipped = list(zip(vec1, vec2, vec3))
+            vecs = Vxy(np.array(zipped))
+            print(vec.x) # [1. 4. 7.]
+            print(vec.y) # [2. 5. 8.]
+
         Parameters
         ----------
         data : array-like
@@ -31,6 +49,9 @@ class Vxy:
 
     @property
     def data(self):
+        """
+        An array with shape (2, N), where N is the number of 2D vectors in this instance.
+        """
         return self._data
 
     @property
