@@ -1,10 +1,8 @@
 import dataclasses
-from typing import Callable
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-from opencsp.common.lib.cv.AbstractFiducials import AbstractFiducials
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.fiducials.PointFiducials import PointFiducials
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
@@ -13,10 +11,8 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisIma
 )
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
-import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.file_tools as ft
-import opencsp.common.lib.tool.log_tools as lt
 
 
 class AnnotationImageProcessor(AbstractSpotAnalysisImagesProcessor):

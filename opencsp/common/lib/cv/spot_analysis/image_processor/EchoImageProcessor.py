@@ -2,7 +2,6 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysi
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImagesProcessor,
 )
-import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 

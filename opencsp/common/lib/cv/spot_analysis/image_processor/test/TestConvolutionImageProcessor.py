@@ -2,7 +2,6 @@ import os
 import unittest
 
 import numpy as np
-import numpy.testing as nptest
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
