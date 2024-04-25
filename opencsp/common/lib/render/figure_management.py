@@ -517,7 +517,7 @@ def print_figure_summary() -> None:
         fig_record.print_comments()
 
 
-def save_all_figures(output_path: str, format: str = None, timeout: float = None, raise_on_timeout=False):
+def save_all_figures(output_path: str, format: str = None):
     """Saves all figures opened with setup_figure (since reset_figure_management) to the given directory.
 
     The purpose for timeout is to let the program fail gracefully
@@ -544,51 +544,22 @@ def save_all_figures(output_path: str, format: str = None, timeout: float = None
         - txts: list[str] The list of image descriptor text files
         - failed: list[RenderControlFigureRecord] The list of figure records that failed to save (only returned if timeout is not None)
     """
-    global fig_record_list
+    global fig_record_list # TODO: convert to class member or save_all_figures parameter
     figs: list[str] = []
     txts: list[str] = []
     failed: list[RenderControlFigureRecord] = []
 
-    if timeout == None:
+    try:
         for fig_record in fig_record_list:
-            t1, t2 = fig_record.save(output_path, format=format, close_after_save=False)
-            figs.append(t1)
-            txts.append(t2)
+            fig_file, txt_file = fig_record.save(output_path, format=format, close_after_save=False)
+            figs.append(fig_file)
+            txts.append(txt_file)
+    except RuntimeError:
+        err_msg = f"RuntimeError: figure_management.save_all_figures: failed to save figure {fig_record.figure_num} \"{fig_record.name}\""
+        lt.error(err_msg)
+        failed.append(fig_record)
 
-        return figs, txts
-    else:
-        # Save each figure with a timeout on how long to wait for the figure to be saved.
-        from threading import Thread
-
-        for fig_record in fig_record_list:
-            # start the save
-            results = []
-            t = Thread(
-                target=lambda: results.append(fig_record.save(output_path, format=format, close_after_save=False))
-            )
-            t.start()
-
-            # wait for the save to finish
-            t.join(timeout)
-            if not t.is_alive():
-                # join the thread again, in case it finished between the timeout and the is_alive()
-                t.join(0.1)
-                # done saving the figure
-                # get the results and register the success
-                t1, t2 = results[0]
-                figs.append(t1)
-                txts.append(t2)
-                break
-
-            # the figure failed to save before the timeout
-            err_msg = f"Error: figure_management.save_all_figures: failed to save figure {fig_record.figure_num} \"{fig_record.name}\""
-            if raise_on_timeout:
-                lt.error_and_raise(RuntimeError, err_msg)
-            else:
-                lt.error(err_msg)
-            failed.append(fig_record)
-
-        return figs, txts, failed
+    return figs, txts, failed
 
 
 def formatted_fig_display(block: bool = False) -> None:
