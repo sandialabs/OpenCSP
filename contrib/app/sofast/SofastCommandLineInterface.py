@@ -253,7 +253,8 @@ class SofastCommandLineInterface:
 
         # Save processed sofast data
         self.process_sofast_fixed.save_to_hdf(
-            f'{self.dir_save_fixed:s}/{self.timestamp_fixed_measurement:s}_data_sofast_fixed.h5')
+            f'{self.dir_save_fixed:s}/{self.timestamp_fixed_measurement:s}_data_sofast_fixed.h5'
+        )
         lt.debug(f'{timestamp():s} Sofast Fixed data saved to HDF5')
 
         # Continue
