@@ -531,7 +531,7 @@ def save_all_figures(output_path: str, format: str = None):
         - txts: list[str] The list of image descriptor text files
         - failed: list[RenderControlFigureRecord] The list of figure records that failed to save
     """
-    global fig_record_list # TODO: convert from global to class member or save_all_figures parameter
+    global fig_record_list  # TODO: convert from global to class member or save_all_figures parameter
     figs: list[str] = []
     txts: list[str] = []
     failed: list[RenderControlFigureRecord] = []
