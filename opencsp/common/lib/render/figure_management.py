@@ -520,31 +520,18 @@ def print_figure_summary() -> None:
 def save_all_figures(output_path: str, format: str = None):
     """Saves all figures opened with setup_figure (since reset_figure_management) to the given directory.
 
-    The purpose for timeout is to let the program fail gracefully
-    during the rare instances when matplotlib's save routine goes
-    out to lunch.
-
-    Note: if a timeout is specified, and the matplotlib save
-    routine fails to complete, the running thread may continue to
-    evaluate forever.  For this reason, for processes that are
-    expected to stop executing on their own, it is recommended that:
-        - the calling code be executed as a subprocess
-        - the subprocess is terminated when save_all returns
-
     Args:
     -----
         - output_path (str): The directory to save figures to.
         - format (str): The file format for figures. None for RenderControlFigureRecord.save default. Defaults to None.
-        - timeout (float): How many seconds to wait for the image to be saved. None to wait indefinitely. Defaults to None. FIXME make this work on windows.
-        - raise_on_timeout (bool): Whether to raise an exception if timeout elapse. Defaults to False.
 
     Returns:
     --------
         - figs: list[str] The list of image files
         - txts: list[str] The list of image descriptor text files
-        - failed: list[RenderControlFigureRecord] The list of figure records that failed to save (only returned if timeout is not None)
+        - failed: list[RenderControlFigureRecord] The list of figure records that failed to save
     """
-    global fig_record_list # TODO: convert to class member or save_all_figures parameter
+    global fig_record_list # TODO: convert from global to class member or save_all_figures parameter
     figs: list[str] = []
     txts: list[str] = []
     failed: list[RenderControlFigureRecord] = []
