@@ -541,10 +541,11 @@ def save_all_figures(output_path: str, format: str = None):
             fig_file, txt_file = fig_record.save(output_path, format=format, close_after_save=False)
             figs.append(fig_file)
             txts.append(txt_file)
-    except RuntimeError:
+    except Exception as ex:
         err_msg = f"RuntimeError: figure_management.save_all_figures: failed to save figure {fig_record.figure_num} \"{fig_record.name}\""
         lt.error(err_msg)
         failed.append(fig_record)
+        raise(ex)
 
     return figs, txts, failed
 
