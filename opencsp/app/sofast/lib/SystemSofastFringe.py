@@ -222,20 +222,28 @@ class SystemSofastFringe:
         im_cap_list : list[list[ndarray, ...], ...]
             2D images captured by camera.
         run_next : Callable
-            Function that is run after all images have been captured.
+            Function that is run after all images have been captured. Also evaluated if an exception is encountered.
 
         """
-        image_projection = ImageProjection.instance()
+        try:
+            image_projection = ImageProjection.instance()
 
-        # Display image
-        frame_idx = len(im_cap_list[0])
-        image_projection.display_image_in_active_area(im_disp_list[frame_idx])
+            # Display image
+            frame_idx = len(im_cap_list[0])
+            image_projection.display_image_in_active_area(im_disp_list[frame_idx])
 
-        # Wait, then capture image
-        self.root.after(
-            image_projection.display_data['image_delay'],
-            lambda: self._measure_sequence_capture(im_disp_list, im_cap_list, run_next),
-        )
+            # Wait, then capture image
+            self.root.after(
+                image_projection.display_data['image_delay'],
+                lambda: self._measure_sequence_capture(im_disp_list, im_cap_list, run_next),
+            )
+
+        except Exception as ex:
+            # make sure that whatever we are trying to do when we finish, that it happens
+            if run_next is not None:
+                lt.error(f"Error in SystemSofastFringe._measure_sequence_display(): {ex}")
+                run_next()
+            raise
 
     def _measure_sequence_capture(
         self, im_disp_list: list, im_cap_list: list[list], run_next: Callable | None = None
@@ -254,19 +262,25 @@ class SystemSofastFringe:
             Function that is run after all images have been captured.
 
         """
-        for ims_cap, im_aq in zip(im_cap_list, self.image_acquisitions):
-            # Capture and save image
-            im = im_aq.get_frame()
+        try:
+            for ims_cap, im_aq in zip(im_cap_list, self.image_acquisitions):
+                # Capture and save image
+                im = im_aq.get_frame()
 
-            # Check for image saturation
-            self.check_saturation(im, im_aq.max_value)
+                # Check for image saturation
+                self.check_saturation(im, im_aq.max_value)
 
-            # Reshape image if necessary
-            if np.ndim(im) == 2:
-                im = im[..., np.newaxis]
+                # Reshape image if necessary
+                if np.ndim(im) == 2:
+                    im = im[..., np.newaxis]
 
-            # Save image to image list
-            ims_cap.append(im)
+                # Save image to image list
+                ims_cap.append(im)
+        except Exception as ex:
+            lt.error(f"Error in SystemSofastFringe._measure_sequence_capture(): {ex}")
+            if run_next is not None:
+                run_next()
+            raise
 
         if len(im_cap_list[0]) < len(im_disp_list):
             # Display next image if not finished
@@ -423,8 +437,8 @@ class SystemSofastFringe:
         Parameters
         ----------
         run_next : Callable, optional
-            Function that is called after all images are captured. The default
-            is self.close_all(). TODO is this still the default?
+            Function that is called after all images are captured. The default is self.close_all(). TODO is this still
+            the default?  Also evaluated if an exception is encountered.
 
         """
         # Initialize mask image list
@@ -443,8 +457,8 @@ class SystemSofastFringe:
         Parameters
         ----------
         run_next : Callable
-            Function that is called after all images are captured. The default
-            is self.close_all(). TODO is this still the default?
+            Function that is called after all images are captured. The default is self.close_all(). TODO is this still
+            the default?  Also evaluated if an exception is encountered.
 
         """
         # Check fringes/camera have been loaded
@@ -477,8 +491,8 @@ class SystemSofastFringe:
         Parameters
         ----------
         run_next : Callable
-            Function that is called after all images are captured. The default
-            is self.close_all(). TODO is this still the default?
+            Function that is called after all images are captured. The default is self.close_all(). TODO is this still
+            the default?  Also evaluated if an exception is encountered.
 
         """
         # Check fringes/camera have been loaded
@@ -503,7 +517,8 @@ class SystemSofastFringe:
         Params
         ------
         on_done: Callable
-            The function to call when capturing fringe images has finished.
+            The function to call when capturing fringe images has finished.  Also evaluated if an exception is
+            encountered.
 
         Raises
         ------

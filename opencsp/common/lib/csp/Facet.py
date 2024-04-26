@@ -3,6 +3,7 @@
 from typing import Callable
 
 import numpy as np
+import numpy.typing as npt
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
@@ -96,7 +97,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
 
         return points, normals  # facet parent
 
-    def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
+    def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> npt.NDArray[np.float_]:
         """Returns X and Y surface slopes in ndarray format given X and Y
         sampling axes in the facet's child coordinate reference frame.
 

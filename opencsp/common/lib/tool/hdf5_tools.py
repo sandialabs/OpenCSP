@@ -9,7 +9,7 @@ import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def save_hdf5_datasets(data: list, datasets: list, file: str):
+def save_hdf5_datasets(data: list[any], datasets: list[str], file: str):
     """Saves data to HDF5 file"""
     with h5py.File(file, 'a') as f:
         # Loop through datasets
@@ -21,15 +21,35 @@ def save_hdf5_datasets(data: list, datasets: list, file: str):
             f.create_dataset(dataset, data=d)
 
 
-def load_hdf5_datasets(datasets: list, file: str):
-    """Loads datasets from HDF5 file"""
+def load_hdf5_datasets(datasets_path_names: list[str], file: str) -> dict[str, str | h5py.Dataset]:
+    """Loads datasets from HDF5 file.
+
+    Note, since the return value uses just the name for each dataset as the key, it is possible that fewer values are
+    returned than are requested. For example, if datasets_path_names=["foo/baz", "bar/baz"], only a single value for
+    "baz" will be present in the returned dictionary.
+
+    Parameters
+    ----------
+    datasets_path_names: list[str]
+        The list of datasets to load from the HDF5 file. Each entry should contain the group (path) and name of the
+        dataset, with the path seperator character '/'. For example 'foo/bar/baz'.
+    file: str
+        The "path/name.ext" of the HDF5 to load the datasets from.
+
+    Returns
+    -------
+    datasets: dict[str, str|Dataset]
+        The names and values of the given datasets_path_names. The "name" portion (the part after the last path
+        seperator '/') of each given dataset_path_name is used as the key. The value is the loaded value from the HDF5
+        file, with string values already decoded from bytes into a python string.
+    """
     with h5py.File(file, 'r') as f:
         kwargs: dict[str, str | h5py.Dataset] = {}
         # Loop through fields to retreive
-        for dataset in datasets:
+        for dataset_path_name in datasets_path_names:
             # Get data and get dataset name
-            data = f[dataset]
-            name = dataset.split('/')[-1]
+            data = f[dataset_path_name]
+            name = dataset_path_name.split('/')[-1]
 
             # Format data shape
             if np.ndim(data) == 0 and np.size(data) == 1:

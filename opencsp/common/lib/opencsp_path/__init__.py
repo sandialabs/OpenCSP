@@ -15,7 +15,7 @@ scratch_name: The name of the scratch directory. Default to "scratch".
 """
 
 _settings_list = [[_orp_settings_key, _orp_settings_default]]
-_opencsp_settings_packages = ["common.lib.tool"]
+_opencsp_settings_packages = ["common.lib.tool", "app.sofast"]
 _opencsp_code_settings_packages = ["contrib.scripts"]
 
 opencsp_settings = {}

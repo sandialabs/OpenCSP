@@ -4,6 +4,7 @@ import time
 
 import numpy as np
 
+from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 
 
@@ -36,7 +37,8 @@ class ImageAcquisition(ImageAcquisitionAbstract):
     def get_frame(self) -> np.ndarray:
         time.sleep(self._shutter / 1e6)
         # Return test image
-        return np.zeros(self._frame_size, dtype=np.uint8)
+        x, y = self._frame_size
+        return np.zeros((y, x), dtype=np.uint8)
 
     @property
     def gain(self) -> float:
@@ -89,3 +91,34 @@ class IA_No_Calibrate(ImageAcquisition):
 
     def calibrate_exposure(self):
         self.is_calibrated = True
+
+
+class ImageAcquisitionWithFringes(ImageAcquisition):
+    """Class for unit testing. Mimics a camera by returning first a light image for the mask, then a dark image
+    for the mask, then cycling through all fringe images."""
+
+    def __init__(self, fringes: Fringes):
+        super().__init__()
+        self.index = -2
+        self.fringes = fringes
+        self.fringe_images = None
+
+    def get_frame(self) -> np.ndarray:
+        x, y = self.frame_size
+
+        if self.index < 0:
+            # mask images
+            frame = np.zeros((y, x), "uint8")
+            if self.index == -1:
+                frame[10:-10, 10:-10] = self.max_value
+        else:
+            # fringe images
+            if self.fringe_images is None:
+                self.fringe_images = self.fringes.get_frames(x, y, "uint8", [0, self.max_value])
+            frame = self.fringe_images[:, :, self.index]
+
+        self.index += 1
+        if self.index >= self.fringes.num_images:
+            self.index = 0
+
+        return frame
