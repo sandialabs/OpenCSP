@@ -762,7 +762,12 @@ class View3d(aph.AbstractPlotHandler):
 
     # TODO tjlarki: only implemented for 3d views, should extend
     def _draw_xyz_surface_customshape(
-        self, x_mesh: np.ndarray, y_mesh: np.ndarray, z_mesh: np.ndarray, surface_style: RenderControlSurface = None, **kwargs
+        self,
+        x_mesh: np.ndarray,
+        y_mesh: np.ndarray,
+        z_mesh: np.ndarray,
+        surface_style: RenderControlSurface = None,
+        **kwargs,
     ):
         if surface_style is None:
             surface_style = RenderControlSurface()
@@ -827,7 +832,12 @@ class View3d(aph.AbstractPlotHandler):
                     axis.set_title(self.parent.title)
 
     def draw_xyz_surface_customshape(
-        self, x_mesh: np.ndarray, y_mesh: np.ndarray, z_mesh: np.ndarray, surface_style: RenderControlSurface = None, **kwargs
+        self,
+        x_mesh: np.ndarray,
+        y_mesh: np.ndarray,
+        z_mesh: np.ndarray,
+        surface_style: RenderControlSurface = None,
+        **kwargs,
     ):
         draw_callback = lambda: self._draw_xyz_surface_customshape(x_mesh, y_mesh, z_mesh, surface_style, **kwargs)
         self.register_event_handler('key_release_event', lambda event: self.on_key_press(event, draw_callback))
@@ -916,7 +926,16 @@ class View3d(aph.AbstractPlotHandler):
 
     # TODO tjlarki: currently unused
     # TODO tjlarki: might want to remove, this is a very slow function
-    def quiver(self, X: np.ndarray, Y: np.ndarray, Z: np.ndarray, U: np.ndarray, V: np.ndarray, W: np.ndarray, length: float = 0) -> None:
+    def quiver(
+        self,
+        X: np.ndarray,
+        Y: np.ndarray,
+        Z: np.ndarray,
+        U: np.ndarray,
+        V: np.ndarray,
+        W: np.ndarray,
+        length: float = 0,
+    ) -> None:
         self.axis.quiver(X, Y, Z, U, V, W, length=0)
 
     # PQ PLOTTING
