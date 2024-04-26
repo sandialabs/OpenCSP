@@ -22,12 +22,14 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class BcsLocatorImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Locates the BCS by identifying a circle in the image.
+
+    It is recommended this this processor be used after ConvolutionImageProcessor(kernel='gaussian').
+    """
+
     def __init__(self, min_radius_px=30, max_radius_px=150):
         """
-        Locates the BCS by identifying a circle in the image.
-
-        It is recommended this this processor be used after ConvolutionImageProcessor(kernel='gaussian').
-
         Parameters
         ----------
         min_radius_px : int, optional

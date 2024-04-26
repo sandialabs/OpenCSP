@@ -26,6 +26,11 @@ class Vxy:
             print(vec.x) # [1. 4. 7.]
             print(vec.y) # [2. 5. 8.]
 
+            # or this equivalent method
+            xs = [1, 4 ,7]
+            ys = [2, 5, 8]
+            vecs = Vxy((xs, ys))
+
         Parameters
         ----------
         data : array-like

@@ -11,10 +11,11 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class CroppingImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Crops all input images to the given shape. If the input image is too small, then an error will be thrown.
+    """
     def __init__(self, x1: int, x2: int, y1: int, y2: int):
         """
-        Crops all input images to the given shape. If the input image is too small, then an error will be thrown.
-
         Parameters
         ----------
         x1 : int

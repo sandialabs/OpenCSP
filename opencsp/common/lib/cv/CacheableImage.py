@@ -11,22 +11,25 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class CacheableImage:
+    """
+    An image container that allows for caching an image when the image
+    data isn't in use, or for retrieval of an image from the cached file
+    when the data is in use.
+
+    Only one of the inputs (image, cache_path, source_path) are required.
+    However, if the image doesn't exist as a cache file (.npy) but does
+    exists as an image file (.png), then both the cache_path and source_path
+    can be provided. In this case the image will be loaded from the
+    source_path and when cached will be saved to the cache_path.
+
+    The intended use for this class is to reduce memory usage by caching
+    images to disk while not in use. Therefore, there is an inherent
+    priority order for the data that is returned from various methods:
+    (1) in-memory array, (2) numpy cache file, (3) image source file.
+    """
+
     def __init__(self, array: np.ndarray = None, cache_path: str = None, source_path: str = None):
-        """An image container that allows for caching an image when the image
-        data isn't in use, or for retrieval of an image from the cached file
-        when the data is in use.
-
-        Only one of the inputs (image, cache_path, source_path) are required.
-        However, if the image doesn't exist as a cache file (.npy) but does
-        exists as an image file (.png), then both the cache_path and source_path
-        can be provided. In this case the image will be loaded from the
-        source_path and when cached will be saved to the cache_path.
-
-        The intended use for this class is to reduce memory usage by caching
-        images to disk while not in use. Therefore, there is an inherent
-        priority order for the data that is returned from various methods:
-        (1) in-memory array, (2) numpy cache file, (3) image source file.
-
+        """
         Parameters
         ----------
         array: np.ndarray, optional

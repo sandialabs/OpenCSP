@@ -12,6 +12,12 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
+    """
+    Averages the values from groups of images into a single image. All images must have the same shape.
+
+    See AbstractAggregateImageProcessor for more information
+    """
+
     def __init__(
         self,
         images_group_assigner: Callable[[SpotAnalysisOperable], int],
@@ -19,9 +25,6 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
         *vargs,
         **kwargs,
     ):
-        """
-        Averages the values from groups of images into a single image. All images must have the same shape.
-        """
         super().__init__(images_group_assigner, group_execution_trigger, *vargs, **kwargs)
 
     def _execute_aggregate(

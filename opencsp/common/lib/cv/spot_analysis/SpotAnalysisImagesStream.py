@@ -24,18 +24,19 @@ class ImageType(Enum):
 
 
 class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
-    tt.strict_types
+    """
+    This class combines the image streams for several ImageTypes into
+    one convenient package. This helps to guarantee that images that are
+    supposed to be processed together stay together for the entirety of the
+    SpotAnalysis pipeline.
+    """
 
     def __init__(
         self,
         primary_iterator: ImagesIterable | ImagesStream,
         other_iterators: dict[ImageType, ImagesIterable | ImagesStream] = None,
     ):
-        """This class combines the image streams for several ImageTypes into
-        one convenient package. This helps to guarantee that images that are
-        supposed to be processed together stay together for the entirety of the
-        SpotAnalysis pipeline.
-
+        """
         Parameters
         ----------
         primary_iterator : ImagesIterable | ImagesStream

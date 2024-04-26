@@ -111,9 +111,18 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         - multiple primary images, or a primary video (u,x) (TODO)
         - fiducial definition and location (v) (TODO)
         - manual 3D point identification from 2D images (w) (TODO)
+    """
 
-    Parameters
-    ----------
+    def __init__(
+        self,
+        name: str,
+        image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor],
+        save_dir: str = None,
+        save_overwrite=False,
+    ):
+        """
+        Parameters
+        ----------
         name: str
             The name of this instance. For example, this could be one of the use
             cases listed above.
@@ -126,15 +135,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         save_overwrite: bool
             If True, then overwrite any existing images in the save_dir with the
             new output. Defaults to False.
-    """
-
-    def __init__(
-        self,
-        name: str,
-        image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor],
-        save_dir: str = None,
-        save_overwrite=False,
-    ):
+        """
         self.name = name
         """ The name of this instance. For example, this could be one of the use
         cases listed above. """

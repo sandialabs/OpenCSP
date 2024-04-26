@@ -10,6 +10,17 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class ExposureDetectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Detects over and under exposure in images and adds the relavent tag to the image.
+
+    Over or under exposure is determined by the proportion of pixels that are at near the max_pixel_value threshold.
+    If more pixels than the over exposure limit is at the maximum level, then the image is considered over exposed. If
+    more pixels than the under exposure limit is below the under_exposure_threshold, then the image is considered under
+    exposed.
+
+    For color images, the proportion of pixels across all color channels is used.
+    """
+
     def __init__(
         self,
         under_exposure_limit=0.99,
@@ -19,15 +30,6 @@ class ExposureDetectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
         log_level=lt.log.WARN,
     ):
         """
-        Detects over and under exposure in images and adds the relavent tag to the image.
-
-        Over or under exposure is determined by the proportion of pixels that are at near the max_pixel_value threshold.
-        If more pixels than the over exposure limit is at the maximum level, then the image is considered over exposed. If
-        more pixels than the under exposure limit is below the under_exposure_threshold, then the image is considered under
-        exposed.
-
-        For color images, the proportion of pixels across all color channels is used.
-
         Parameters
         ----------
         under_exposure_limit : float, optional

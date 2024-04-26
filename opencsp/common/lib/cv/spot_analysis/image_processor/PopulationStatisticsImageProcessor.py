@@ -18,18 +18,20 @@ class _RollingWindowOperableStats:
 
 
 class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Generates statistics for groups of images.
+
+    A group of images is held until enough have been seen to generate statistics off of. Once the required number of
+    images has been reached, then images will start being released one at a time with the statistics for the group
+    up until that point.
+
+    Some use cases for this class could include automatically determining the maximum pixel value during streaming
+    to select an appropriate bit depth, using the rolling average for exposure calibration, or leveling all images
+    by subtracting the gloal pixel minimum.
+    """
+
     def __init__(self, min_pop_size=1, target_rolling_window_size=1, initial_min: int = None, initial_max: int = None):
         """
-        Generates statistics for groups of images.
-
-        A group of images is held until enough have been seen to generate statistics off of. Once the required number of
-        images has been reached, then images will start being released one at a time with the statistics for the group
-        up until that point.
-
-        Some use cases for this class could include automatically determining the maximum pixel value during streaming
-        to select an appropriate bit depth, using the rolling average for exposure calibration, or leveling all images
-        by subtracting the gloal pixel minimum.
-
         Parameters
         ----------
         min_pop_size : int, optional

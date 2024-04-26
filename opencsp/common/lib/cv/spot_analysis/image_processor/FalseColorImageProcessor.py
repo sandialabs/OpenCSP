@@ -11,10 +11,13 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
-    def __init__(self, map_type='human', opencv_map=cv2.COLORMAP_JET):
-        """Image processor to produce color gradient images from grayscale
-        images, for better contrast and legibility by humans.
+    """
+    Image processor to produce color gradient images from grayscale
+    images, for better contrast and legibility by humans.
+    """
 
+    def __init__(self, map_type='human', opencv_map=cv2.COLORMAP_JET):
+        """
         Parameters
         ----------
         map_type : str, optional

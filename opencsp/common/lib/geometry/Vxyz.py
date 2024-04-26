@@ -36,6 +36,12 @@ class Vxyz:
             print(vec.y) # [2. 5. 8.]
             print(vec.z) # [3. 6. 9.]
 
+            # or this equivalent method
+            xs = [1, 4 ,7]
+            ys = [2, 5, 8]
+            zs = [3, 6, 9]
+            vecs = Vxyz((xs, ys, zs))
+
         Parameters
         ----------
         data : array-like

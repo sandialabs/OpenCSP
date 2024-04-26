@@ -12,6 +12,22 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class AbstractAggregateImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
+    """
+    Detects and collects images that are part of the same group, so that they can be acted upon all at the same time.
+
+    Each operator is assigned to an image group. Groups are determined by the images_group_assigner function. Any
+    function with the correct signature can be used, or one of the builtin methods can be assigned. The builtin
+    methods for this include AbstractAggregateImageProcessor.*, where "*" is one of:
+
+        - group_by_brightness: groups are determined by the brightest pixel in the image
+        - group_by_name: all images with the same name match are included as part of the same group
+
+    When the assigned group number for the current operator is different than for the previous operator, the group
+    execution is triggered. _execute_aggregate() will be called for the entire group, and afterwards the group's
+    list will be cleared. The trigger behavior can be changed by providing a value for the group_execution_trigger
+    parameter.
+    """
+
     def __init__(
         self,
         images_group_assigner: Callable[[SpotAnalysisOperable], int],
@@ -20,20 +36,6 @@ class AbstractAggregateImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
         **kwargs,
     ):
         """
-        Detects and collects images that are part of the same group, so that they can be acted upon all at the same time.
-
-        Each operator is assigned to an image group. Groups are determined by the images_group_assigner function. Any
-        function with the correct signature can be used, or one of the builtin methods can be assigned. The builtin
-        methods for this include AbstractAggregateImageProcessor.*, where "*" is one of:
-
-            - group_by_brightness: groups are determined by the brightest pixel in the image
-            - group_by_name: all images with the same name match are included as part of the same group
-
-        When the assigned group number for the current operator is different than for the previous operator, the group
-        execution is triggered. _execute_aggregate() will be called for the entire group, and afterwards the group's
-        list will be cleared. The trigger behavior can be changed by providing a value for the group_execution_trigger
-        parameter.
-
         Parameters
         ----------
         images_group_assigner : Callable[[SpotAnalysisOperable], int]

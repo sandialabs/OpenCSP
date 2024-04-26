@@ -15,12 +15,14 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class ConvolutionImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Convolves an image by the given kernel
+
+    Example use cases include reducing the effects of noise, and finding the average value for a larger area.
+    """
+
     def __init__(self, kernel="gaussian", diameter=3):
         """
-        Convolves an image by the given kernel
-
-        Example use cases include reducing the effects of noise, and finding the average value for a larger area.
-
         Parameters
         ----------
         kernel : str, optional

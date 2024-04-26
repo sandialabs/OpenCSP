@@ -14,19 +14,23 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class AbstractFiducials(ABC):
+    """
+    A collection of markers (such as an ArUco board) that is used to orient the camera relative to observed objects
+    in the scene. It is suggested that each implementing class be paired with a complementary locator method or
+    SpotAnalysisImageProcessor.
+    """
+
     def __init__(self, style=None, pixels_to_meters: Callable[[p2.Pxy], v3.Vxyz] = None):
         """
-        A collection of markers (such as an ArUco board) that is used to orient the camera relative to observed objects
-        in the scene. It is suggested that each implementing class be paired with a complementary locator method or
-        SpotAnalysisImageProcessor.
-
         Parameters
         ----------
         style : RenderControlPointSeq, optional
             How to render this fiducial when using the defaul render_to_plot() method. By default rcps.default().
         pixels_to_meters : Callable[[p2.Pxy], v3.Vxyz], optional
             Conversion function to get the physical point in space for the given x/y position information. Used in the
-            default self.scale implementation. Defaults to 1 meter per pixel.
+            default self.scale implementation. A good implementation of this function will correct for many factors such
+            as relative camera position and camera distortion. For extreme accuracy, this will also account for
+            non-uniformity in the target surface. Defaults to a simple 1 meter per pixel model.
         """
         self.style = style if style is not None else rcps.default()
         self.pixels_to_meters = pixels_to_meters

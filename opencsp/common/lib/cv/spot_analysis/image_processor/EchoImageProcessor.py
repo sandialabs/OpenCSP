@@ -6,6 +6,10 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class EchoImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Prints the image names to the console as they are encountered.
+    """
+
     def __init__(self, log_level=lt.log.INFO, prefix=""):
         super().__init__(self.__class__.__name__)
 

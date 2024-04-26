@@ -16,6 +16,19 @@ class NoPrimaryImageException(Exception):
 
 
 class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Collects primary and supporting images together from a stream of mixed images.
+
+    The basic algorithm is pretty simple:
+
+        1. catagorize images based on the given supporting_images_map
+        2. if the image type isn't already in the internal list, then add it and go back to step 1
+        3. collect all images in the internal list together as a single operable
+        4. clear the internal list
+        5. start a new internal list with the current image
+        6. return the new operable, go back to step 1
+    """
+
     def __init__(
         self,
         supporting_images_map: dict[
@@ -23,16 +36,13 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
         ],
     ):
         """
-        Collects primary and supporting images together from a stream of mixed images.
-
-        The basic algorithm is pretty simple:
-
-            1. catagorize images based on the given supporting_images_map
-            2. if the image type isn't already in the internal list, then add it and go back to step 1
-            3. collect all images in the internal list together as a single operable
-            4. clear the internal list
-            5. start a new internal list with the current image
-            6. return the new operable, go back to step 1
+        Parameters
+        ----------
+        supporting_images_map : dict[ ImageType, Callable[[SpotAnalysisOperable, dict[ImageType, SpotAnalysisOperable]], bool] ]
+            How to categorize images. If
+            `supporting_images_map[ImageType.PRIMARY](operable, curr_mapped_images) == True`
+            then the image will be assigned as a primary image. Otherwise it will be grouped with another primary image
+            as a supporting image.
         """
         super().__init__(self.__class__.__name__)
 

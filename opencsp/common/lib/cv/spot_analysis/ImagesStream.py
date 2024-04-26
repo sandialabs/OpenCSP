@@ -18,6 +18,21 @@ class _StrToCacheableImagesIterator(Iterator[CacheableImage]):
 
 
 class ImagesStream(Iterator[CacheableImage]):
+    """
+    A one-time iterator over a list of images.
+
+    Iterates over the given images. The next() method returns the next item
+    from the input list.
+
+    Note that calling iter() on this instance DOES NOT restart iteration.
+    This is to maintain the interface for streamable image sources, such as
+    webcams or networked cameras, which have no replay ability.
+
+    Note that this does NOT build on the python asyncio stream library for
+    networking. Such a class might be implemented later and will likely be
+    called "ImagesStreamOverIP".
+    """
+
     def __init__(
         self,
         images: (
@@ -27,19 +42,7 @@ class ImagesStream(Iterator[CacheableImage]):
             | Iterator[str | CacheableImage]
         ),
     ):
-        """A one-time iterator over a list of images.
-
-        Iterates over the given images. The next() method returns the next item
-        from the input list.
-
-        Note that calling iter() on this instance DOES NOT restart iteration.
-        This is to maintain the interface for streamable image sources, such as
-        webcams or networked cameras, which have no replay ability.
-
-        Note that this does NOT build on the python asyncio stream library for
-        networking. Such a class might be implemented later and will likely be
-        called "ImagesStreamOverIP".
-
+        """
         Parameters
         ----------
         images : Callable[[int],CacheableImage] | list[str|CacheableImage] | vh.VideoHandler | Iterator[str|CacheableImage]
