@@ -16,10 +16,10 @@ Setting up your development environment
 2. Install Python 3.10+ and add it to your PATH. Please see: https://www.python.org/downloads/ and https://docs.python.org/3/using/windows.html#installation-steps.
 3. Install visual studio code. Please see: https://code.visualstudio.com/.
 4. Install ffmpeg. Please see:  https://www.ffmpeg.org/download.html.
-5. Add ffmpeg to your path. Please see: https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)#to-add-a-path-to-the-path-environment-variable.
+5. Add ffmpeg to your path. Please see: `<https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)#to-add-a-path-to-the-path-environment-variable>`_.
 6. Clone the repository. For help on cloning, please see https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository.
 7. Setup a python virtual environment to manage OpenCSP's dependencies. For information about python's virtual environments, please see https://docs.python.org/3/library/venv.html.
-8. Add OpenCSP to your pythonpath. Please see https://learn.microsoft.com/en-us/windows/python/faqs#what-is-pythonpath-.
+8. Add OpenCSP to your pythonpath. Please see `<https://learn.microsoft.com/en-us/windows/python/faqs#what-is-pythonpath->`_.
 
 How to install OpenCSP's dependencies
 +++++++++++++++++++++++++++++++++++++
