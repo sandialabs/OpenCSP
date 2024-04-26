@@ -1,4 +1,5 @@
 import numpy as np
+import scipy.spatial
 
 from opencsp.common.lib.cv.AbstractFiducials import AbstractFiducials
 import opencsp.common.lib.geometry.Vxyz as v3
@@ -23,9 +24,8 @@ class PointFiducials(AbstractFiducials):
         return self.points
 
     @property
-    def orientation(self) -> v3.Vxyz:
-        # TODO untested
-        return np.zeros((3, self.points.x.size))
+    def orientation(self) -> scipy.spatial.transform.Rotation:
+        raise NotImplementedError("Orientation is not yet implemented for PointFiducials")
 
     @property
     def size(self) -> list[float]:

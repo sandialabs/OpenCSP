@@ -1,5 +1,6 @@
 import matplotlib.axes
 import matplotlib.patches
+import scipy.spatial
 
 from opencsp.common.lib.cv.AbstractFiducials import AbstractFiducials
 import opencsp.common.lib.geometry.LoopXY as loop
@@ -42,8 +43,8 @@ class BcsFiducial(AbstractFiducials):
         return self.origin_px
 
     @property
-    def orientation(self) -> v3.Vxyz:
-        return v3.Vxyz([0, 0, 0])
+    def orientation(self) -> scipy.spatial.transform.Rotation:
+        raise NotImplementedError("Orientation is not yet implemented for PointFiducials")
 
     @property
     def size(self) -> list[float]:

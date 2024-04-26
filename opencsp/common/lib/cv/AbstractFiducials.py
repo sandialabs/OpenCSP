@@ -4,6 +4,7 @@ from typing import Callable
 import matplotlib.axes
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy.spatial
 
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.geometry.RegionXY as reg
@@ -46,10 +47,29 @@ class AbstractFiducials(ABC):
 
     @property
     @abstractmethod
-    def orientation(self) -> v3.Vxyz:
-        """The orientation(s) of this instance, in radians. This is relative to
-        the source image, where x is positive to the right, y is positive down,
-        and z is positive in (away from the camera)."""
+    def orientation(self) -> scipy.spatial.transform.Rotation:
+        """
+        The orientation of the normal vector(s) of this instance.
+        This is relative to the orthorectified source image, where x is positive
+        to the right, y is positive down, and z is positive in (away from the
+        camera).
+
+        This can be used to describe the forward transformation from the
+        camera's perspective. For example, an aruco marker whose origin is in
+        the center of the image and is facing towards the camera could have the
+        orientation::
+
+            Rotation.from_euler('y', np.pi)
+
+        If that same aruco marker was also placed upside down, then it's
+        orientation could be::
+
+            Rotation.from_euler(
+                'yz',
+                [ [np.pi, 0],
+                  [0,     np.pi] ]
+            )
+        """
 
     @property
     @abstractmethod
