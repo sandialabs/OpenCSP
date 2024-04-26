@@ -76,7 +76,7 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
             )
         self.prev_image_types = image_types
 
-        # 3.2. We have a primary, create the new operable
+        # 3.3. We have a primary, turn the collection into a new operable
         lt.debug(
             "In SupportingImagesCollectorImageProcessor._update_collection(): "
             + f"collecting images {sorted(list(self.collection.keys()))}"
@@ -102,9 +102,38 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
                 + f"unable to determine image type for operable {curr_operable.primary_image_source_path} ({curr_operable})",
             )
 
-        # Handle is_last edge case
-        if is_last:
-            # add this operable to the collection, but first check if there's room in the collection
+        if not is_last:
+            # 2. If this image type isn't already in the collection, then add it and go back to step 1.
+            if curr_image_type not in self.collection:
+                self.collection[curr_image_type] = curr_operable
+                return []
+
+            # Otherwise there is a duplicate.
+            else:
+                # 3. Collect all images together into a new operable
+                try:
+                    new_operable = self._update_collection()
+                except NoPrimaryImageException as ex:
+                    lt.warning(repr(ex))
+                    lt.warning(
+                        "Warning in SupportingImagesCollectorImageProcessor._update_collection(): "
+                        + "no PRIMARY image is available, so we can't create new a new operable. "
+                        + f"Removing {curr_image_type} '{self.collection[curr_image_type].primary_image_source_path}' and replacing it with '{curr_operable.primary_image_source_path}'"
+                    )
+                    self.collection[curr_image_type] = curr_operable
+                    return []
+
+                # 4. Clear the collection
+                self.collection.clear()
+
+                # 5. Start a new collection with the current operable
+                self.collection[curr_image_type] = curr_operable
+
+                # 6. Return the new operable
+                return [new_operable]
+
+        else:  # Handle is_last edge case
+            # 2. add this operable to the collection, but first check if there's room in the collection
             if curr_image_type in self.collection:
                 lt.warning(
                     "Warning in SupportingImagesCollectorImageProcessor._update_collection(): "
@@ -113,7 +142,7 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
                 )
             self.collection[curr_image_type] = curr_operable
 
-            # update the collection
+            # 3. Collect all images together into a new operable
             try:
                 new_operable = self._update_collection()
             except NoPrimaryImageException as ex:
@@ -122,34 +151,6 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
                     "Warning in SupportingImagesCollectorImageProcessor._update_collection(): "
                     + f"discarding {len(self.collection)} operables that don't have a matching primary image."
                 )
-
-            # 6. Return the new operable
-            return [new_operable]
-
-        # 2. If this image type isn't already in the collection, then add it and continue.
-        elif curr_image_type not in self.collection:
-            self.collection[curr_image_type] = curr_operable
-            return []
-
-        # Otherwise there is a duplicate.
-        else:
-            try:
-                new_operable = self._update_collection()
-            except NoPrimaryImageException as ex:
-                lt.warning(repr(ex))
-                lt.warning(
-                    "Warning in SupportingImagesCollectorImageProcessor._update_collection(): "
-                    + "no PRIMARY image is available, so we can't create new a new operable. "
-                    + f"Removing {curr_image_type} '{self.collection[curr_image_type].primary_image_source_path}' and replacing it with '{curr_operable.primary_image_source_path}'"
-                )
-                self.collection[curr_image_type] = curr_operable
-                return []
-
-            # 4. Clear the collection
-            self.collection.clear()
-
-            # 5. Start a new collection with the current operable
-            self.collection[curr_image_type] = curr_operable
 
             # 6. Return the new operable
             return [new_operable]
