@@ -77,12 +77,42 @@ reviewing the functional changes less error prone.
 Coding Standards
 ----------------
 
-We follow and enforce adherence to the PEP8 coding standard.
+We follow and enforce adherence to the PEP8 coding standard with the exception of
+a maximum line length of 120 characters.
+
+Online OpenCSP documentation is generated using Sphinx. For API documentation, we use
+NumPy-style docstrings with bulleted lists. We require NumPy compliant docstrings for 
+Models, Public Classes, and Public Functions. For more internal and development-facing 
+documentation please use hash tags.
 
 We highly recommend using Visual Studio Code for development. If using VS Code,
-please install the **"autopep8"** plugin. This will auto format code to PEP8 standards
-upon saving a file in progress. We also recommend installing the **Pylint** plugin for
-cleaner and more uniform code style.
+please install the following plugins:
+
+1. **Black Formatter** This will auto format code to be Black compliant as you type. The following settings will need to be added to your VS Code settings JSON:
+
+    .. code-block:: json
+
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "black-formatter.args": [
+            "--line-length", "120",  // Sets line length to 120 characters
+            "-C",  // Do not add magic trailing commas
+            "-S"  // Do not change single quotes to double quotes
+        ]
+
+2. **Pylint** This plugin highlights code that could be improved. The following settings will need to be added to your VS Code settings JSON:
+
+    .. code-block:: json
+
+        "pylint.args": [
+            "--disable=C0301" // Ignore line too long
+        ]
+
+3. **autoDocstring - Python Docstring Generator** This automatically generates boilerplate docstring text. The following settings will need to be added to your VS Code setings JSON:
+
+    .. code-block:: json
+
+        "autoDocstring.docstringFormat": "numpy"
 
 Before opening a pull request, please ensure your code formatting is pep8 compliant. 
 Continuous integration (CI) testing will fail if the changes are not pep8 compliant:
@@ -109,11 +139,6 @@ commits:
    done
    
    
-Online OpenCSP documentation is generated using Sphinx. For API documentation, we use
-NumPy-style docstrings with bulleted lists. We require NumPy compliant docstrings for 
-Models, Public Classes, and Public Functions. For more internal and development-facing 
-documentation please use hash tags.
-
 Testing
 +++++++
 
