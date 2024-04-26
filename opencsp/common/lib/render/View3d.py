@@ -1,15 +1,14 @@
-"""
+import os
+import time
+from typing import Callable
 
-
-"""
-
-import numpy as np
+import matplotlib.backend_bases as backb
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
 from matplotlib.figure import Figure
-from numpy import ndarray
-import os
+from mpl_toolkits.mplot3d.axes3d import Axes3D
+import numpy as np
 from PIL import Image
 
 from opencsp.common.lib.geometry.Pxyz import Pxyz
@@ -18,7 +17,6 @@ import opencsp.common.lib.render.axis_3d as ax3d
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
-import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.render.lib.AbstractPlotHandler as aph
 from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
@@ -57,6 +55,10 @@ class View3d(aph.AbstractPlotHandler):
             equal = equal if equal != None else parent.equal
         equal = equal if equal != None else True
 
+        # interactive graphing values
+        self._callbacks: dict[str, int] = {}
+
+        # other values
         self._figure = figure
         self.axis = axis
         self.view_spec = view_spec
@@ -74,6 +76,17 @@ class View3d(aph.AbstractPlotHandler):
     def view(self, val: Figure):
         self._figure = val
         self._register_plot(val)
+
+    # CLEAR
+
+    def clear(self):
+        """
+        Clears the old plot data without deleting the window, listeners, or orientation. Useful for updating a plot
+        interactively.
+        """
+        # Clear the previous data
+        # self.fig_record.figure.clear(keep_observers=True) <-- not doing this, clears everything except window
+        self.axis.clear()
 
     # ACCESS
 
@@ -202,6 +215,23 @@ class View3d(aph.AbstractPlotHandler):
             self.axis.legend()
         # Draw.
         plt.show(block=block)
+
+    # INTERACTION
+
+    def register_event_handler(self, event_type: str, callback: Callable[[backb.Event], None]):
+        # deregister the previous callback
+        if event_type in self._callbacks:
+            self.view.figure.canvas.mpl_disconnect(self._callbacks[event_type])
+            del self._callbacks[event_type]
+
+        # register the new callback
+        self._callbacks[event_type] = self.view.figure.canvas.mpl_connect(event_type, callback)
+
+    def on_key_press(self, event: backb.KeyEvent, draw_func: Callable):
+        if event.key == 'f5':
+            lt.info(time.time())
+            self.clear()
+            draw_func()
 
     # WRITE
 
@@ -731,24 +761,153 @@ class View3d(aph.AbstractPlotHandler):
         self.draw_xyz_list(V.data.T, close, style, label)
 
     # TODO tjlarki: only implemented for 3d views, should extend
-    def draw_xyz_surface(
-        self,
-        x_mesh: ndarray,
-        y_mesh: ndarray,
-        z_mesh: ndarray,
-        surface_style: RenderControlSurface = RenderControlSurface(),
+    def _draw_xyz_surface_customshape(
+        self, x_mesh: np.ndarray, y_mesh: np.ndarray, z_mesh: np.ndarray, surface_style: RenderControlSurface = None, **kwargs
     ):
+        if surface_style is None:
+            surface_style = RenderControlSurface()
+
         if self.view_spec['type'] == '3d':
-            self.axis.plot_surface(
-                x_mesh.flatten(),
-                y_mesh.flatten(),
-                z_mesh.flatten(),
+            axis: Axes3D = self.axis
+
+            # Draw the surface
+            axis.plot_surface(
+                x_mesh,
+                y_mesh,
+                z_mesh,
                 color=surface_style.color,
+                cmap=surface_style.color_map,
+                edgecolor=surface_style.edgecolor,
+                linewidth=surface_style.linewidth,
                 alpha=surface_style.alpha,
+                antialiased=surface_style.antialiased,
+                **kwargs,
             )
 
+            # Draw the contour plots
+            if surface_style.contour:
+                for ax, mesh in [('x', x_mesh), ('y', y_mesh), ('z', z_mesh)]:
+                    if surface_style.contours[ax]:
+                        mmin, mmax = np.min(mesh), np.max(mesh)
+                        height = mmax - mmin
+
+                        # placement is determined by graph's orientation
+                        lower_offset = mmin - np.max([height / 3, 1])
+                        upper_offset = mmax + np.max([height / 3, 1])
+                        offset = lower_offset
+                        elev, azim = axis.elev, axis.azim  # angle 0-360
+                        if ax == 'z':
+                            if elev < 0 or elev > 180:
+                                offset = upper_offset
+                        elif ax == 'x':
+                            if azim > 90 and azim < 270:
+                                offset = upper_offset
+                        elif ax == 'y':
+                            if azim < 0 or azim > 180:
+                                offset = upper_offset
+
+                        # axis-specific arguments
+                        contourf_kwargs = {}
+                        if ax != 'z':
+                            contourf_kwargs = {'zdir': ax}
+
+                        axis.contourf(
+                            x_mesh,
+                            y_mesh,
+                            z_mesh,
+                            offset=offset,
+                            cmap=surface_style.contour_color_map,
+                            alpha=surface_style.contour_alpha,
+                            **contourf_kwargs,
+                        )
+
+            # Draw the title
+            if surface_style.draw_title:
+                if self.parent is not None:
+                    axis.set_title(self.parent.title)
+
+    def draw_xyz_surface_customshape(
+        self, x_mesh: np.ndarray, y_mesh: np.ndarray, z_mesh: np.ndarray, surface_style: RenderControlSurface = None, **kwargs
+    ):
+        draw_callback = lambda: self._draw_xyz_surface_customshape(x_mesh, y_mesh, z_mesh, surface_style, **kwargs)
+        self.register_event_handler('key_release_event', lambda event: self.on_key_press(event, draw_callback))
+        draw_callback()
+
+    def draw_xyz_surface(self, surface: np.ndarray, surface_style: RenderControlSurface = None, **kwargs):
+        """
+        Draw a 3D plot for the given z_mesh surface.
+
+        Example from https://matplotlib.org/stable/plot_types/3D/surface3d_simple.html#sphx-glr-plot-types-3d-surface3d-simple-py
+
+            # Make data
+            X = np.arange(-5, 5)
+            Y = np.arange(-5, 5)
+            X_mesh, Y_mesh = np.meshgrid(X, Y)
+            R = np.sqrt(X_mesh**2 + Y_mesh**2)
+            Z = np.sin(R)
+
+            print(X)
+            # array([[-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4],
+            #        [-5, -4, -3, -2, -1,  0,  1,  2,  3,  4]])
+            print(np.round(Z, 2))
+            # array([[ 0.71,  0.12, -0.44, -0.78, -0.93, -0.96, -0.93, -0.78, -0.44,  0.12],
+            #        [ 0.12, -0.59, -0.96, -0.97, -0.83, -0.76, -0.83, -0.97, -0.96, -0.59],
+            #        [-0.44, -0.96, -0.89, -0.45, -0.02,  0.14, -0.02, -0.45, -0.89, -0.96],
+            #        [-0.78, -0.97, -0.45,  0.31,  0.79,  0.91,  0.79,  0.31, -0.45, -0.97],
+            #        [-0.93, -0.83, -0.02,  0.79,  0.99,  0.84,  0.99,  0.79, -0.02, -0.83],
+            #        [-0.96, -0.76,  0.14,  0.91,  0.84,     0,  0.84,  0.91,  0.14, -0.76],
+            #        [-0.93, -0.83, -0.02,  0.79,  0.99,  0.84,  0.99,  0.79, -0.02, -0.83],
+            #        [-0.78, -0.97, -0.45,  0.31,  0.79,  0.91,  0.79,  0.31, -0.45, -0.97],
+            #        [-0.44, -0.96, -0.89, -0.45, -0.02,  0.14, -0.02, -0.45, -0.89, -0.96],
+            #        [ 0.12, -0.59, -0.96, -0.97, -0.83, -0.76, -0.83, -0.97, -0.96, -0.59]])
+
+            # Plot the surface
+            rc_fig = rcf.RenderControlFigure(tile=False)
+            rc_axis = rca.RenderControlAxis(z_label='Light Intensity')
+            rc_surf = rcs.RenderControlSurface()
+            fig_record = fm.setup_figure_for_3d_data(rc_fig, rc_axis, equal=False, name='Light Intensity', code_tag=f"{__file__}")
+            view = fig_record.view
+            view.draw_xyz_surface(Z)
+            plt.show()
+
+        Parameters
+        ----------
+        surface : ndarray
+            2D array of surface values.
+        surface_style : RenderControlSurface, optional
+            How to style the surface, by default  RenderControlSurface()
+        """
+        # validate the inputs
+        conformed_surface = surface
+        if conformed_surface.ndim > 2:
+            conformed_surface = np.squeeze(conformed_surface)
+        if conformed_surface.ndim != 2:
+            lt.error_and_raise(
+                ValueError,
+                "Error in View3d.draw_xyz_surface(): "
+                + f"given surface should have 2 dimensions, but shape is {conformed_surface.shape}",
+            )
+
+        # generate the x_mesh and y_mesh
+        width = conformed_surface.shape[1]
+        height = conformed_surface.shape[0]
+        x_arr = np.arange(0, width)
+        y_arr = np.arange(0, height)
+        x_mesh, y_mesh = np.meshgrid(x_arr, y_arr)
+
+        # draw!
+        self.draw_xyz_surface_customshape(x_mesh, y_mesh, conformed_surface, surface_style, **kwargs)
+
     def draw_xyz_trisurface(
-        self, x: ndarray, y: ndarray, z: ndarray, surface_style: RenderControlSurface = None, **kwargs
+        self, x: np.ndarray, y: np.ndarray, z: np.ndarray, surface_style: RenderControlSurface = None, **kwargs
     ):
         if surface_style == None:
             surface_style = RenderControlSurface()
@@ -757,7 +916,7 @@ class View3d(aph.AbstractPlotHandler):
 
     # TODO tjlarki: currently unused
     # TODO tjlarki: might want to remove, this is a very slow function
-    def quiver(self, X: ndarray, Y: ndarray, Z: ndarray, U: ndarray, V: ndarray, W: ndarray, length: float = 0) -> None:
+    def quiver(self, X: np.ndarray, Y: np.ndarray, Z: np.ndarray, U: np.ndarray, V: np.ndarray, W: np.ndarray, length: float = 0) -> None:
         self.axis.quiver(X, Y, Z, U, V, W, length=0)
 
     # PQ PLOTTING

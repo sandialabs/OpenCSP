@@ -1,7 +1,6 @@
 import os
 import re
 
-
 import opencsp.common.lib.cv.SpotAnalysis as sa
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
@@ -57,6 +56,7 @@ class PeakFlux:
             NullImageSubtractionImageProcessor(),
             ConvolutionImageProcessor(kernel="box", diameter=3),
             BcsLocatorImageProcessor(),
+            View3dImageProcessor(crop_to_threshold=20, max_dims=(30, 30)),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
             AnnotationImageProcessor(),
