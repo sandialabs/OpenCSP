@@ -11,7 +11,6 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AverageByGroupImageProc
 from opencsp.common.lib.cv.spot_analysis.image_processor.BcsLocatorImageProcessor import BcsLocatorImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.ConvolutionImageProcessor import ConvolutionImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.CroppingImageProcessor import CroppingImageProcessor
-from opencsp.common.lib.cv.spot_analysis.image_processor.View3dImageProcessor import View3dImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.EchoImageProcessor import EchoImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.ExposureDetectionImageProcessor import (
     ExposureDetectionImageProcessor,
@@ -27,6 +26,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.PopulationStatisticsIma
 from opencsp.common.lib.cv.spot_analysis.image_processor.SupportingImagesCollectorImageProcessor import (
     SupportingImagesCollectorImageProcessor,
 )
+from opencsp.common.lib.cv.spot_analysis.image_processor.View3dImageProcessor import View3dImageProcessor
 
 # Make these classes available when importing cv.spot_analysis.image_processor.*
 __all__ = [

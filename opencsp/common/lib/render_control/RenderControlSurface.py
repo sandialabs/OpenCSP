@@ -10,7 +10,7 @@ class RenderControlSurface:
         color_map: str | None = "viridis",
         alpha: float = 1.0,
         edgecolor='black',
-        linewidth=0.3,
+        linewidth=0.05,
         contour: None | bool | str = True,
         contour_color_map: str | None = None,
     ) -> None:

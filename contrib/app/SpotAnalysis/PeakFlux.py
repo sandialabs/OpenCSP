@@ -56,7 +56,7 @@ class PeakFlux:
             NullImageSubtractionImageProcessor(),
             ConvolutionImageProcessor(kernel="box", diameter=3),
             BcsLocatorImageProcessor(),
-            View3dImageProcessor(crop_to_threshold=20, max_dims=(30, 30)),
+            View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100), interactive=True),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
             AnnotationImageProcessor(),
