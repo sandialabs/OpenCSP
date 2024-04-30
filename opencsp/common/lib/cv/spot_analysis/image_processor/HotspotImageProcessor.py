@@ -1,6 +1,8 @@
 import copy
 import dataclasses
+from typing import Callable
 
+import cv2 as cv
 import numpy as np
 
 from opencsp.common.lib.cv.fiducials.HotspotFiducial import HotspotFiducial
@@ -21,12 +23,12 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
-    starting_max_factor: float = 2.5
+    starting_max_factor: float = 2
     """ The factor to multiple desired_shape by to start the search """
     iteration_reduction_px: int = 10  # must be even
     """ The amount to subtract from the previous search shape by for each iteration """
 
-    def __init__(self, desired_shape: int | tuple = 39, style: rcps.RenderControlPointSeq = None, draw_debug_view=False):
+    def __init__(self, desired_shape: int | tuple = 39, style: rcps.RenderControlPointSeq = None, draw_debug_view: bool | Callable[[SpotAnalysisOperable], bool] = False):
         """
         """
         super().__init__(self.__class__.__name__)
@@ -56,8 +58,8 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             iter_sub = np.max([iter_sub-1, 1])
 
         # internal variables
-        self.has_warned_about_imports = False
         self.iter_sub = iter_sub
+        self.has_scikit_image = None
 
         # build the shapes that we're planning on iterating through
         if isinstance(desired_shape, tuple):
@@ -127,27 +129,22 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
         #
         # 1. apply the filter for the current window size
         # 2. find the hottest pixel(s)
-        # 3. verify that the hottest regions are continuous
-        # 4. get the new window size
+        # 3. get the new window size
+        # 4. verify that the hottest regions are continuous
         # 5. reduce the image size to fit the new window size, reduce the window size, go to either step 1 or 6
         # 6. label the most central hottest pixel as the hotspot
         image = operable.primary_image.nparray
-        _, image_name, _ = ft.path_components(operable.primary_image_source_path)
+        _, image_name, image_ext = ft.path_components(operable.primary_image_source_path)
         total_start_y = 0
         total_start_x = 0
 
         # prepare the debug view
-        if self.draw_debug_view:
+        draw_debug_view = self.draw_debug_view if isinstance(
+            self.draw_debug_view, bool) else self.draw_debug_view(operable)
+        if draw_debug_view:
             axis_control = rca.image(grid=False)
             fig_control = rcfg.RenderControlFigure(tile=True, tile_array=(4, 2), grid=False)
             view_spec = vs.view_spec_im()
-
-            def imshow(img_to_show: np.ndarray, title: str):
-                fig_rec = fm.setup_figure(fig_control, axis_control, view_spec, equal=False,
-                                          name=image_name, title=title, code_tag=f"{__file__}._execute()")
-                view = fig_rec.view
-                view.imshow(reshapers.false_color_reshaper(img_to_show, 255))
-                return view
 
         for shape_idx, shape in enumerate(self.internal_shapes):
             # 1. apply the current window size
@@ -157,23 +154,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             maxval = np.max(filtered_image)
             match_idxs = np.argwhere(filtered_image == maxval)
 
-            # 3. verify that the hottest regions are continuous
-            # TODO do we want to include scikit-image in the requirements?
-            try:
-                import skimage.morphology
-                continuity_image = np.zeros(image.shape, 'uint8')
-                continuity_image[filtered_image == maxval] = 2
-                flooded_image = skimage.morphology.flood_fill(continuity_image, tuple(match_idxs[0]), 1)
-                if np.max(flooded_image) > 1:
-                    lt.error_and_raise("Error in PercentileFilterImageProcessor._execute(): " +
-                                       f"There are at least 2 regions in {image_name} that share the hottest pixel value.")
-            except ImportError as ex:
-                if not self.has_warned_about_imports:
-                    lt.debug("In PercentileFilterImageProcessor._execute(): " +
-                             f"can't import scikit-image ({repr(ex)}), and so can't determine if the matching region is continuous")
-                    self.has_warned_about_imports = True
-
-            # 4. get the new window size
+            # 3. get the new window size
             start_y, end_y = match_idxs[0][0], match_idxs[-1][0] + 1
             start_x, end_x = match_idxs[0][1], match_idxs[-1][1] + 1
             if isinstance(shape, tuple):
@@ -184,19 +165,47 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             end_y = np.min([image.shape[0], end_y + height])
             start_x = np.max([0, start_x - width])
             end_x = np.min([image.shape[1], end_x + width])
-
-            # 5. reduce the image size to fit the new window size
-            # This is both key to the algorithm and also an optimization
-            image = image[start_y:end_y, start_x:end_x]
             total_start_y += start_y
             total_start_x += start_x
 
             # draw the debug view
-            if self.draw_debug_view:
+            if draw_debug_view:
                 if shape_idx == 0:
-                    view = imshow(image, "original")
-                filtered_image_part = filtered_image[start_y:end_y, start_x:end_x]
-                imshow(filtered_image_part, str(shape))
+                    fig_rec = fm.setup_figure(fig_control, axis_control, view_spec, equal=False,
+                                              name=image_name+image_ext, title="original", code_tag=f"{__file__}._execute()")
+                    fig_rec.view.imshow(reshapers.false_color_reshaper(image, 255))
+                red = (255, 0, 0)  # RGB
+                filtered_image_show = reshapers.false_color_reshaper(filtered_image, 255)
+                filtered_image_show = cv.rectangle(filtered_image_show, (start_x, start_y), (end_x, end_y), red, 1)
+                fig_rec = fm.setup_figure(fig_control, axis_control, view_spec, equal=False,
+                                          name=image_name+image_ext, title=str(shape), code_tag=f"{__file__}._execute()")
+                fig_rec.view.imshow(filtered_image_show)
+
+            # 4. verify that the hottest regions are continuous
+            # TODO do we want to include scikit-image in requirements.txt?
+            if self.has_scikit_image is None:
+                try:
+                    import skimage.morphology
+                    self.has_scikit_image = True
+
+                    continuity_image = np.zeros(image.shape, 'uint8')
+                    continuity_image[filtered_image == maxval] = 2
+                    flooded_image = skimage.morphology.flood_fill(continuity_image, tuple(match_idxs[0]), 1)
+                    if np.max(flooded_image) > 1:
+                        lt.warning("Warning in PercentileFilterImageProcessor._execute(): " +
+                                   f"There are at least 2 regions in '{image_name}{image_ext}', " +
+                                   f"area [{total_start_y}:{total_start_y+end_y}, {total_start_x}:{total_start_x+end_x}] " +
+                                   "that share the hottest pixel value.")
+
+                except ImportError as ex:
+                    self.has_scikit_image = False
+
+                    lt.debug("In PercentileFilterImageProcessor._execute(): " +
+                             f"can't import scikit-image ({repr(ex)}), and so can't determine if the matching region is continuous")
+
+            # 5. reduce the image size to fit the new window size
+            # This is both key to the algorithm and also an optimization
+            image = image[start_y:end_y, start_x:end_x]
 
         # 6. label the most central hottest pixel as the hotspot
         maxval = np.max(filtered_image)
@@ -215,8 +224,8 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
         hotspot = HotspotFiducial(self.style, central_match)
 
         # wait for the interactive session
-        if self.draw_debug_view:
-            view.show(block=True)
+        if draw_debug_view:
+            fig_rec.view.show(block=True)
 
         # return
         found_fiducials = copy.copy(operable.found_fiducials)

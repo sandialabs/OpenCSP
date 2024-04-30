@@ -57,7 +57,7 @@ class PeakFlux:
             ConvolutionImageProcessor(kernel="box", diameter=3),
             BcsLocatorImageProcessor(),
             # View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100), interactive=True),
-            HotspotImageProcessor(desired_shape=21, draw_debug_view=True),
+            HotspotImageProcessor(desired_shape=21, draw_debug_view=False),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
             AnnotationImageProcessor(),

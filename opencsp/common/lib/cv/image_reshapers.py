@@ -98,7 +98,7 @@ def false_color_reshaper(from_image: np.ndarray, input_max_value: int = 255, map
     -------
     to_image: np.ndarray
         An image with the same width and height as the input image, but with a
-        third dimension for color.
+        third dimension for color. The dtype will be from_image.dtype.
     """
     # rescale to the number of representable colors
     # black_to_blue = 255
@@ -127,7 +127,7 @@ def false_color_reshaper(from_image: np.ndarray, input_max_value: int = 255, map
     color_image[:, :, 0] = new_image >> 16
     color_image[:, :, 1] = (new_image >> 8) & 255
     color_image[:, :, 2] = new_image & 255
-    ret = color_image
+    ret = color_image.astype(from_image.dtype)
 
     # Other methods I've tried:
     # new_image = np.vectorize(_map_jet_large_rgb)(new_image)
