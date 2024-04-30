@@ -1,3 +1,13 @@
+"""
+A collection of functions that operate on images to facilitate computer vision.
+Each filter accepts at least one image, and returns at least one image, where
+the input and output image have the same shape and data type. In addition,
+filters may accept or return additional argument or values.
+
+For reshapers that filter images without any guarantee of maintaining shape or
+type, see image_reshapers.py.
+"""
+
 import numpy as np
 import scipy.ndimage
 
