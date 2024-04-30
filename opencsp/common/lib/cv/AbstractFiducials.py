@@ -21,7 +21,7 @@ class AbstractFiducials(ABC):
     SpotAnalysisImageProcessor.
     """
 
-    def __init__(self, style=None, pixels_to_meters: Callable[[p2.Pxy], v3.Vxyz] = None):
+    def __init__(self, style: rcps.RenderControlPointSeq = None, pixels_to_meters: Callable[[p2.Pxy], v3.Vxyz] = None):
         """
         Parameters
         ----------
