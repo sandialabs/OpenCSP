@@ -73,15 +73,15 @@ def percentile_filter(image: np.ndarray, percentile: int = 50, filter_shape: int
         if len(filter_shape) != image.ndim:
             lt.error_and_raise(
                 ValueError,
-                "Error in image_filters.percentile_filter(): " +
-                f"window shape should have the same number of dimensions as the image, but {filter_shape=} and {image.ndim=}",
+                "Error in image_filters.percentile_filter(): "
+                + f"window shape should have the same number of dimensions as the image, but {filter_shape=} and {image.ndim=}",
             )
     else:
         if filter_shape < 0 or filter_shape % 2 == 0:
             lt.error_and_raise(
                 ValueError,
-                "Error in image_filters.percentile_filter(): " +
-                f"window size should be positive and odd, but is {filter_shape}",
+                "Error in image_filters.percentile_filter(): "
+                + f"window size should be positive and odd, but is {filter_shape}",
             )
 
     # normalize input

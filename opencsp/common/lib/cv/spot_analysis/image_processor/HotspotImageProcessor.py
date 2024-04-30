@@ -42,7 +42,12 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
     iteration_reduction_px: int = 10  # must be even
     """ The amount to subtract from the previous search shape by for each iteration """
 
-    def __init__(self, desired_shape: int | tuple, style: rcps.RenderControlPointSeq = None, draw_debug_view: bool | Callable[[SpotAnalysisOperable], bool] = False):
+    def __init__(
+        self,
+        desired_shape: int | tuple,
+        style: rcps.RenderControlPointSeq = None,
+        draw_debug_view: bool | Callable[[SpotAnalysisOperable], bool] = False,
+    ):
         """
         Parameters
         ----------
@@ -82,7 +87,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
         desired_shape_iter = int(np.round(desired_shape_min / 3))
         iter_sub = np.min([self.iteration_reduction_px, desired_shape_iter])
         if iter_sub % 2 == 1:
-            iter_sub = np.max([iter_sub-1, 1])
+            iter_sub = np.max([iter_sub - 1, 1])
 
         # internal variables
         self.iter_sub = iter_sub
@@ -112,7 +117,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             # reduce each dimension by iter_sub
             reduced_shape: list[int] = []
             for i, v in enumerate(curr_shape):
-                v = np.max([v-self.iter_sub, desired_shape[i]])
+                v = np.max([v - self.iter_sub, desired_shape[i]])
                 reduced_shape.append(int(v))
 
             # prepare for next iteration
@@ -166,8 +171,9 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
         total_start_x = 0
 
         # prepare the debug view
-        draw_debug_view = self.draw_debug_view if isinstance(
-            self.draw_debug_view, bool) else self.draw_debug_view(operable)
+        draw_debug_view = (
+            self.draw_debug_view if isinstance(self.draw_debug_view, bool) else self.draw_debug_view(operable)
+        )
         if draw_debug_view:
             axis_control = rca.image(grid=False)
             fig_control = rcfg.RenderControlFigure(tile=True, tile_array=(4, 2), grid=False)
@@ -198,14 +204,28 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             # draw the debug view
             if draw_debug_view:
                 if shape_idx == 0:
-                    fig_rec = fm.setup_figure(fig_control, axis_control, view_spec, equal=False,
-                                              name=image_name+image_ext, title="original", code_tag=f"{__file__}._execute()")
+                    fig_rec = fm.setup_figure(
+                        fig_control,
+                        axis_control,
+                        view_spec,
+                        equal=False,
+                        name=image_name + image_ext,
+                        title="original",
+                        code_tag=f"{__file__}._execute()",
+                    )
                     fig_rec.view.imshow(reshapers.false_color_reshaper(image, 255))
                 red = (255, 0, 0)  # RGB
                 filtered_image_show = reshapers.false_color_reshaper(filtered_image, 255)
                 filtered_image_show = cv.rectangle(filtered_image_show, (start_x, start_y), (end_x, end_y), red, 1)
-                fig_rec = fm.setup_figure(fig_control, axis_control, view_spec, equal=False,
-                                          name=image_name+image_ext, title=str(shape), code_tag=f"{__file__}._execute()")
+                fig_rec = fm.setup_figure(
+                    fig_control,
+                    axis_control,
+                    view_spec,
+                    equal=False,
+                    name=image_name + image_ext,
+                    title=str(shape),
+                    code_tag=f"{__file__}._execute()",
+                )
                 fig_rec.view.imshow(filtered_image_show)
 
             # 4. verify that the hottest regions are continuous
@@ -213,22 +233,27 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             if self.has_scikit_image is None:
                 try:
                     import skimage.morphology
+
                     self.has_scikit_image = True
 
                     continuity_image = np.zeros(image.shape, 'uint8')
                     continuity_image[filtered_image == maxval] = 2
                     flooded_image = skimage.morphology.flood_fill(continuity_image, tuple(match_idxs[0]), 1)
                     if np.max(flooded_image) > 1:
-                        lt.warning("Warning in PercentileFilterImageProcessor._execute(): " +
-                                   f"There are at least 2 regions in '{image_name}{image_ext}', " +
-                                   f"area [{total_start_y}:{total_start_y+end_y}, {total_start_x}:{total_start_x+end_x}] " +
-                                   "that share the hottest pixel value.")
+                        lt.warning(
+                            "Warning in PercentileFilterImageProcessor._execute(): "
+                            + f"There are at least 2 regions in '{image_name}{image_ext}', "
+                            + f"area [{total_start_y}:{total_start_y+end_y}, {total_start_x}:{total_start_x+end_x}] "
+                            + "that share the hottest pixel value."
+                        )
 
                 except ImportError as ex:
                     self.has_scikit_image = False
 
-                    lt.debug("In PercentileFilterImageProcessor._execute(): " +
-                             f"can't import scikit-image ({repr(ex)}), and so can't determine if the matching region is continuous")
+                    lt.debug(
+                        "In PercentileFilterImageProcessor._execute(): "
+                        + f"can't import scikit-image ({repr(ex)}), and so can't determine if the matching region is continuous"
+                    )
 
             # 5. reduce the image size to fit the new window size
             # This is both key to the algorithm and also an optimization
@@ -237,7 +262,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
         # 6. label the most central hottest pixel as the hotspot
         maxval = np.max(filtered_image)
         match_idxs = np.argwhere(filtered_image == maxval)
-        center = p2.Pxy([int(image.shape[0]/2), int(image.shape[1]/2)])
+        center = p2.Pxy([int(image.shape[0] / 2), int(image.shape[1] / 2)])
         min_dist = 10e6
         central_match = None
         for i in range(match_idxs.shape[0]):

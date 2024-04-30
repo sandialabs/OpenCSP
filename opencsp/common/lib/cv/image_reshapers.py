@@ -74,7 +74,12 @@ def _map_jet_human_rgb(input_color: int):
     return (ret[0] << 16) + (ret[1] << 8) + ret[2]
 
 
-def false_color_reshaper(from_image: np.ndarray, input_max_value: int = 255, map_name: str = 'jet', map_type: Literal['large'] | Literal['human'] = 'human') -> np.ndarray:
+def false_color_reshaper(
+    from_image: np.ndarray,
+    input_max_value: int = 255,
+    map_name: str = 'jet',
+    map_type: Literal['large'] | Literal['human'] = 'human',
+) -> np.ndarray:
     """Updates the primary image to use the jet color map plus black and
     white (black->blue->cyan->green->yellow->red->white).
 
