@@ -23,13 +23,40 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Adds an annotation/fiducial marker to images to indicate at which pixel the
+    brightest part of the image is.
+
+    We want to be able to determine the point of peak intensity within an image,
+    within a certain window size. The window size is chosen manually and should
+    reflect the level of uncertainty in heliostat pointing. A local minimum
+    filter is applied to find the overall hottest part of the image. The filter
+    starts large and gradually shrinks until it fits the desired window size.
+
+    Note: this is NOT the same as the brightest pixel, which can be trivially
+    found with np.max(image).
+    """
+
     starting_max_factor: float = 2
     """ The factor to multiple desired_shape by to start the search """
     iteration_reduction_px: int = 10  # must be even
     """ The amount to subtract from the previous search shape by for each iteration """
 
-    def __init__(self, desired_shape: int | tuple = 39, style: rcps.RenderControlPointSeq = None, draw_debug_view: bool | Callable[[SpotAnalysisOperable], bool] = False):
+    def __init__(self, desired_shape: int | tuple, style: rcps.RenderControlPointSeq = None, draw_debug_view: bool | Callable[[SpotAnalysisOperable], bool] = False):
         """
+        Parameters
+        ----------
+        desired_shape : int | tuple, optional
+            The window size used to determine the brightest area, in pixels. If
+            an integer, then the same value is used for all dimensions. If a
+            tuple, then it must have the same number of values as dimensions in
+            the image. Must be odd.
+        style : rcps.RenderControlPointSeq, optional
+            The style used to render the hotspot point in
+            AnnotationImageProcessor, by default ('x', red).
+        draw_debug_view : bool | Callable[[SpotAnalysisOperable], bool], optional
+            True to show the iterative process used to converge on the hotspot.
+            By default False.
         """
         super().__init__(self.__class__.__name__)
 
