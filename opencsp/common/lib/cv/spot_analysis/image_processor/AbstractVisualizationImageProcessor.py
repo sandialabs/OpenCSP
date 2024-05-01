@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
-from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import AbstractSpotAnalysisImagesProcessor
+from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
+    AbstractSpotAnalysisImagesProcessor,
+)
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 
 
@@ -9,6 +11,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, A
     def __init__(self, name: str):
         # import here to avoid circular dependencies
         from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
+
         super().__init__(name)
 
         self.visualization_coordinator: VisualizationCoordinator = None

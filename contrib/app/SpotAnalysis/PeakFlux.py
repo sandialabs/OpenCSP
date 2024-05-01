@@ -63,8 +63,9 @@ class PeakFlux:
             BcsLocatorImageProcessor(),
             View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100), interactive=False),
             HotspotImageProcessor(desired_shape=21, draw_debug_view=False),
-            ViewCrossSectionImageProcessor(self.get_bcs_origin, 'BCS', single_plot=False,
-                                           crop_to_threshold=20, interactive=True),
+            ViewCrossSectionImageProcessor(
+                self.get_bcs_origin, 'BCS', single_plot=False, crop_to_threshold=20, interactive=True
+            ),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
             AnnotationImageProcessor(),

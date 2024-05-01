@@ -10,6 +10,7 @@ class VisualizationCoordinator:
     Coordinates visualizations across many image processors, so that the same
     image is seen from each processor at the same time.
     """
+
     max_tiles_x = 4
     """ How many tiles we can have in the horizontal direction """
     max_tiles_y = 2
@@ -62,11 +63,21 @@ class VisualizationCoordinator:
         for processor in self.visualization_processors:
             processor._init_figure_records(self.render_control_fig)
 
-    def is_visualize(self, visualization_processor: AbstractVisualizationImageProcessor, operable: SpotAnalysisOperable, is_last: bool) -> bool:
+    def is_visualize(
+        self,
+        visualization_processor: AbstractVisualizationImageProcessor,
+        operable: SpotAnalysisOperable,
+        is_last: bool,
+    ) -> bool:
         if visualization_processor == self.visualization_processors[-1]:
             return True
         return False
 
-    def visualize(self, visualization_processor: AbstractVisualizationImageProcessor, operable: SpotAnalysisOperable, is_last: bool):
+    def visualize(
+        self,
+        visualization_processor: AbstractVisualizationImageProcessor,
+        operable: SpotAnalysisOperable,
+        is_last: bool,
+    ):
         for processor in self.visualization_processors:
             processor._visualize_operable(operable, is_last)

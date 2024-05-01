@@ -120,7 +120,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
                 view_spec,
                 equal=False,
                 number_in_name=False,
-                name=self.label+name_suffix,
+                name=self.label + name_suffix,
                 title="",
                 code_tag=f"{__file__}.__init__()",
             )
@@ -201,9 +201,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         h_view = self.views[0]
         if not self.single_plot:
             h_view = self.views[1]
-        v_view.draw_pq_list(
-            zip(v_p_list, v_cross_section), style=self.vertical_style, label="Vertical Cross Section"
-        )
+        v_view.draw_pq_list(zip(v_p_list, v_cross_section), style=self.vertical_style, label="Vertical Cross Section")
         h_view.draw_pq_list(
             zip(h_p_list, h_cross_section), style=self.horizontal_style, label="Horizontal Cross Section"
         )
