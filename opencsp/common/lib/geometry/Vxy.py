@@ -1,6 +1,10 @@
+import numbers
+
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
+
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class Vxy:
@@ -349,3 +353,11 @@ class Vxy:
 
         data = np.concatenate([v_i.data for v_i in v_list], 1)
         return cls(data)
+
+    def astuple(self) -> tuple[numbers.Number, numbers.Number]:
+        if len(self) > 1:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in Vxy.astuple(): " + f"can't convert a Vxy with {len(self)} sets of values to a single tuple",
+            )
+        return self.x[0], self.y[0]

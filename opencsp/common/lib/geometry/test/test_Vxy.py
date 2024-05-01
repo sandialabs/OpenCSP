@@ -1,18 +1,27 @@
+import os
+import unittest
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.geometry.Vxy import Vxy
 import opencsp.common.lib.render.figure_management as fm
+import opencsp.common.lib.tool.file_tools as ft
 
 
-class TestVxy:
-    @classmethod
-    def setup_class(cls):
-        cls.V1 = Vxy((2, 2))
-        cls.V1_array = np.array([[2], [2]])
+class TestVxy(unittest.TestCase):
+    def setUp(self) -> None:
+        path, _, _ = ft.path_components(__file__)
+        self.data_dir = os.path.join(path, "data", "input", "Vxy")
+        self.out_dir = os.path.join(path, "data", "output", "Vxy")
+        ft.create_directories_if_necessary(self.data_dir)
+        ft.create_directories_if_necessary(self.out_dir)
 
-        cls.V2 = Vxy((1, 2))
-        cls.V2_array = np.array([[1], [2]])
+        self.V1 = Vxy((2, 2))
+        self.V1_array = np.array([[2], [2]])
+
+        self.V2 = Vxy((1, 2))
+        self.V2_array = np.array([[1], [2]])
 
     def test_Vxy_length_1(self):
         # From tuple
@@ -267,3 +276,19 @@ class TestVxy:
         ax = plt.gca()
         self.V1.draw(ax)
         plt.close(fig)
+
+    def test_astuple(self):
+        # Length 1
+        a = Vxy((2, 3))
+        ax, ay = a.astuple()
+        self.assertEqual(ax, 2)
+        self.assertEqual(ay, 3)
+
+        # Length 2
+        b = Vxy(np.array([[2, 4], [3, 5]]))
+        with self.assertRaises(Exception):
+            b.astuple()
+
+
+if __name__ == '__main__':
+    unittest.main()
