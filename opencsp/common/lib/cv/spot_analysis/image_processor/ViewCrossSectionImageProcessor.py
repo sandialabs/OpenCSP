@@ -219,4 +219,4 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
             while True:
                 if self.enter_pressed or self.closed:
                     break
-                self.fig_records[0].figure.waitforbuttonpress(0.1)
+                self.fig_records[-1].figure.waitforbuttonpress(0.1)
