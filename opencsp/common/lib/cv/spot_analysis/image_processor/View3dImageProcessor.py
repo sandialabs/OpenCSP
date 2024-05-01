@@ -1,6 +1,7 @@
 from typing import Callable
 
 import cv2 as cv
+import matplotlib.axes
 import matplotlib.backend_bases
 import numpy as np
 
@@ -9,8 +10,10 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractVisualizationIm
     AbstractVisualizationImageProcessor,
 )
 import opencsp.common.lib.render.figure_management as fm
+import opencsp.common.lib.render.View3d as v3d
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlSurface as rcs
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
@@ -45,23 +48,30 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
         super().__init__(self.__class__.__name__)
 
         self.interactive = interactive
-        self.enter_pressed = False
-        self.closed = False
         self.max_resolution = max_resolution
         self.crop_to_threshold = crop_to_threshold
 
-        self.rcf = rcf.RenderControlFigure(tile=False)
+        # intialize certain visualization values
         if isinstance(label, str):
             self.rca = rca.RenderControlAxis(z_label=label)
         else:
             self.rca = label
         self.rcs = rcs.RenderControlSurface(alpha=1.0, color=None, contour='xyz')
+        self.enter_pressed = False
+        self.closed = False
 
-        self._init_figure_record()
+        # declare future values
+        self.fig_record: rcfr.RenderControlFigureRecord
+        self.view: v3d.View3d
+        self.axes: matplotlib.axes.Axes
 
-    def _init_figure_record(self):
+    @property
+    def num_figures(self) -> int:
+        return 1
+
+    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure):
         self.fig_record = fm.setup_figure_for_3d_data(
-            self.rcf,
+            render_control_fig,
             self.rca,
             equal=False,
             number_in_name=False,

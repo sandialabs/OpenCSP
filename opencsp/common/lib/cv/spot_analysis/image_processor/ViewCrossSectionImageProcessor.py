@@ -66,22 +66,35 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         self.closed = False
         self.crop_to_threshold = crop_to_threshold
 
-        self.rcf = rcf.RenderControlFigure(tile=not single_plot, tile_array=(2, 1))
+        # initialize certain visualization values
         self.horizontal_style = rcps.RenderControlPointSeq(color='red', marker='None')
         self.vertical_style = rcps.RenderControlPointSeq(color='blue', marker='None')
 
-        self._init_figure_record()
+        # declare future values
+        self.view_specs: list[dict]
+        self.rc_axises: list[rca.RenderControlAxis]
+        self.fig_records: list[rcfr.RenderControlFigureRecord]
+        self.views: list[v3d.View3d]
+        self.axes: list[matplotlib.axes.Axes]
+        self.plot_titles: list[str]
 
-    def _init_figure_record(self):
+    @property
+    def num_figures(self) -> int:
+        if self.single_plot:
+            return 1
+        else:
+            return 2
+
+    def _init_figure_records(self, render_control_figure: rcf.RenderControlFigure):
         self.enter_pressed = False
         self.closed = False
 
-        self.view_specs: list[dict] = []
-        self.rc_axises: list[rca.RenderControlAxis] = []
-        self.fig_records: list[rcfr.RenderControlFigureRecord] = []
-        self.views: list[v3d.View3d] = []
-        self.axes: list[matplotlib.axes.Axes] = []
-        self.plot_titles: list[str] = []
+        self.view_specs = []
+        self.rc_axises = []
+        self.fig_records = []
+        self.views = []
+        self.axes = []
+        self.plot_titles = []
 
         if self.single_plot:
             plot_titles = [""]
@@ -102,7 +115,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
             view_spec = vs.view_spec_xy()
             fig_record = fm.setup_figure(
-                self.rcf,
+                render_control_figure,
                 rc_axis,
                 view_spec,
                 equal=False,
