@@ -5,8 +5,8 @@ import matplotlib.backend_bases
 import numpy as np
 
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
-from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractVisualizationImageProcessor import (
+    AbstractVisualizationImageProcessor,
 )
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
@@ -17,7 +17,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
 
 
-class ViewCrossSectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
     """
     Interprets the current image as a 2D cross section and either displays it,
     or if interactive it displays the plot and waits on the next press of the
@@ -87,14 +87,14 @@ class ViewCrossSectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
     def on_close(self, event: matplotlib.backend_bases.CloseEvent):
         self.closed = True
 
-    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
+    def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool):
         image = operable.primary_image.nparray
 
         # check if the view has been closed
         if self.closed:
             # UI design decision: it feels more natural to me (Ben) for the plot to not be shown again when it has
             # been closed instead of being reinitialized and popping back up.
-            return [operable]
+            return
             # self._init_figure_record()
 
         # get the cross section pixel location
@@ -152,5 +152,3 @@ class ViewCrossSectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
                 if self.enter_pressed or self.closed:
                     break
                 self.fig_record.figure.waitforbuttonpress(0.1)
-
-        return [operable]
