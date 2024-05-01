@@ -28,6 +28,9 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.SupportingImagesCollect
     SupportingImagesCollectorImageProcessor,
 )
 from opencsp.common.lib.cv.spot_analysis.image_processor.View3dImageProcessor import View3dImageProcessor
+from opencsp.common.lib.cv.spot_analysis.image_processor.ViewCrossSectionImageProcessor import (
+    ViewCrossSectionImageProcessor,
+)
 
 # Make these classes available when importing cv.spot_analysis.image_processor.*
 __all__ = [
@@ -47,4 +50,5 @@ __all__ = [
     'PopulationStatisticsImageProcessor',
     'SupportingImagesCollectorImageProcessor',
     'View3dImageProcessor',
+    'ViewCrossSectionImageProcessor',
 ]

@@ -12,6 +12,7 @@ from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
 @dataclass(frozen=True)
@@ -197,3 +198,14 @@ class SpotAnalysisOperable:
             return self.population_statistics.minf
         else:
             return np.min(self.primary_image.nparray)
+
+    def get_fiducials_by_type(self, fiducial_type: type[af.AbstractFiducials]):
+        matching_given_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.given_fiducials)
+        matching_found_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.found_fiducials)
+        ret = list(matching_given_fiducials) + list(matching_found_fiducials)
+        if len(ret) == 0:
+            lt.debug(
+                "In SpotAnalysisOperable.get_fiducials_by_type(): "
+                + f"found 0 fiducials matching type {fiducial_type.__name__} for image {self.best_primary_pathnameext}"
+            )
+        return ret

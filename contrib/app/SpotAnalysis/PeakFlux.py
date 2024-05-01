@@ -1,8 +1,13 @@
 import os
 import re
 
+import numpy as np
+
+from opencsp.common.lib.cv.AbstractFiducials import AbstractFiducials
 import opencsp.common.lib.cv.SpotAnalysis as sa
+from opencsp.common.lib.cv.fiducials.BcsFiducial import BcsFiducial
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
 from opencsp.common.lib.cv.spot_analysis.image_processor import *
 import opencsp.common.lib.tool.file_tools as ft
@@ -56,8 +61,9 @@ class PeakFlux:
             NullImageSubtractionImageProcessor(),
             ConvolutionImageProcessor(kernel="box", diameter=3),
             BcsLocatorImageProcessor(),
-            # View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100), interactive=True),
+            View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100), interactive=False),
             HotspotImageProcessor(desired_shape=21, draw_debug_view=False),
+            ViewCrossSectionImageProcessor(self.get_bcs_origin, 'BCS', crop_to_threshold=20, interactive=True),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
             AnnotationImageProcessor(),
@@ -88,6 +94,13 @@ class PeakFlux:
             # Get the attributes of the processed image, to save the results we're most interested in into a single
             # condensed csv file.
             parser = saoap.SpotAnalysisOperableAttributeParser(result, self.spot_analysis)
+
+    def get_bcs_origin(self, operable: SpotAnalysisOperable):
+        fiducials = operable.get_fiducials_by_type(BcsFiducial)
+        fiducial = fiducials[0]
+        origin_fx, origin_fy = fiducial.origin.astuple()
+        origin_ix, origin_iy = int(np.round(origin_fx)), int(np.round(origin_fy))
+        return origin_ix, origin_iy
 
 
 if __name__ == "__main__":
