@@ -13,6 +13,7 @@ import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlSurface as rcs
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.image_tools as it
 
 
 class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
@@ -82,41 +83,6 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
     def on_close(self, event: matplotlib.backend_bases.CloseEvent):
         self.closed = True
 
-    def _get_range_for_threshold(self, image: np.ndarray, threshold: int, axis: int) -> tuple[int, int]:
-        """
-        Get the start (inclusive) and end (exclusive) range for which the given image is >= the given threshold.
-
-        Parameters
-        ----------
-        image : np.ndarray
-            The 2d numpy array to be searched.
-        threshold : int
-            The cutoff value that the returned region should have pixels greater than.
-        axis : int
-            0 for rows (y), 1 for columns (x)
-
-        Returns
-        -------
-        start, end: tuple[int, int]
-            The start (inclusive) and end (exclusive) matching range. Returns the full image size if there are no
-            matching pixels.
-        """
-        # If we want the maximum value for all rows, then we need to accumulate across columns.
-        # If we want the maximum value for all columns, then we need to accumulate across rows.
-        perpendicular_axis = 0 if axis == 1 else 1
-
-        # find matches
-        img_matching = np.max(image, perpendicular_axis) >= self.crop_to_threshold
-        match_idxs = np.argwhere(img_matching)
-
-        # find the range
-        if match_idxs.size > 0:
-            start, end = match_idxs[0][0], match_idxs[-1][0] + 1
-        else:
-            start, end = 0, image.shape[axis]
-
-        return start, end
-
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         image = operable.primary_image.nparray
 
@@ -130,8 +96,7 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
         # reduce data based on threshold
         y_start, y_end, x_start, x_end = 0, image.shape[0], 0, image.shape[1]
         if self.crop_to_threshold is not None:
-            x_start, x_end = self._get_range_for_threshold(image, self.crop_to_threshold, 1)
-            y_start, y_end = self._get_range_for_threshold(image, self.crop_to_threshold, 0)
+            y_start, y_end, x_start, x_end = it.range_for_threshold(image, self.crop_to_threshold)
             image = image[y_start:y_end, x_start:x_end]
 
         # reduce data based on max_resolution

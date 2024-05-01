@@ -176,3 +176,43 @@ def min_max_colors(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
                 + f"Returned value should have shape=(3), but is instead {max_colors.shape=}",
             )
         return min_colors, max_colors
+
+
+def range_for_threshold(image: np.ndarray, threshold: int) -> tuple[int, int, int, int]:
+    """
+    Get the start (inclusive) and end (exclusive) range for which the given image is >= the given threshold.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        The 2d numpy array to be searched, row major (y axis 0, x axis 1).
+    threshold : int
+        The cutoff value that the returned region should have pixels greater than.
+
+    Returns
+    -------
+    start_y, end_y, start_x, end_x: tuple[int, int, int, int]
+        The start (inclusive) and end (exclusive) matching range. Returns the full image size if there are no
+        matching pixels.
+    """
+    ret: list[int] = []
+
+    for axis in [0, 1]:
+        # If we want the maximum value for all rows, then we need to accumulate across columns.
+        # If we want the maximum value for all columns, then we need to accumulate across rows.
+        perpendicular_axis = 0 if axis == 1 else 1
+
+        # find matches
+        img_matching = np.max(image, perpendicular_axis) >= threshold
+        match_idxs = np.argwhere(img_matching)
+
+        # find the range
+        if match_idxs.size > 0:
+            start, end = match_idxs[0][0], match_idxs[-1][0] + 1
+        else:
+            start, end = 0, image.shape[axis]
+
+        ret.append(start)
+        ret.append(end)
+
+    return tuple(ret)
