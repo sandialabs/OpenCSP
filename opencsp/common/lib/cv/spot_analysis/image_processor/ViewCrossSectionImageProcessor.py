@@ -103,14 +103,14 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         for plot_title in plot_titles:
             if self.single_plot:
-                rc_axis = rca.RenderControlAxis()
+                rc_axis = rca.RenderControlAxis(x_label='index', y_label='value')
                 name_suffix = ""
             else:
                 if "Horizontal" in plot_title:
-                    rc_axis = rca.RenderControlAxis(x_label='x', y_label='y')
+                    rc_axis = rca.RenderControlAxis(x_label='x', y_label='value')
                     name_suffix = " (Horizontal)"
                 else:
-                    rc_axis = rca.RenderControlAxis(x_label='y', y_label='x')
+                    rc_axis = rca.RenderControlAxis(x_label='y', y_label='value')
                     name_suffix = " (Vertical)"
 
             view_spec = vs.view_spec_xy()
@@ -160,6 +160,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
             cs_loc_x, cs_loc_y = self.cross_section_location(operable)
 
         # subselect a piece of the image based on the crop threshold
+        y_start, y_end, x_start, x_end = 0, image.shape[0], 0, image.shape[1]
         if self.crop_to_threshold is not None:
             y_start, y_end, x_start, x_end = it.range_for_threshold(image, self.crop_to_threshold)
 
@@ -185,8 +186,8 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
                 h_p_list = [i + diff for i in h_p_list]
         else:
             # Translate the cross sections plots to their actual locations
-            v_p_list = [i + cs_loc_y for i in v_p_list]
-            h_p_list = [i + cs_loc_x for i in h_p_list]
+            v_p_list = [i + y_start for i in v_p_list]
+            h_p_list = [i + x_start for i in h_p_list]
 
         # Clear the previous plot
         for fig_record in self.fig_records:
@@ -200,7 +201,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         v_view = self.views[0]
         h_view = self.views[0]
         if not self.single_plot:
-            h_view = self.views[1]
+            v_view = self.views[1]
         v_view.draw_pq_list(zip(v_p_list, v_cross_section), style=self.vertical_style, label="Vertical Cross Section")
         h_view.draw_pq_list(
             zip(h_p_list, h_cross_section), style=self.horizontal_style, label="Horizontal Cross Section"
@@ -208,7 +209,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         # draw
         for view in self.views:
-            view.show(block=False)
+            view.show(block=False, legend=self.single_plot)
 
         # wait for the user to press enter
         wait_for_enter_key = self.interactive if isinstance(self.interactive, bool) else self.interactive(operable)
@@ -218,3 +219,21 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
                 if self.enter_pressed or self.closed:
                     break
                 self.fig_records[-1].figure.waitforbuttonpress(0.1)
+
+
+if __name__ == "__main__":
+    from opencsp.common.lib.cv.CacheableImage import CacheableImage
+
+    row = np.arange(100)
+    rows = np.repeat(row, 100, axis=0).reshape(100, 100)
+    # array([[ 0,  0,  0, ...,  0,  0,  0],
+    #        [ 1,  1,  1, ...,  1,  1,  1],
+    #        [ 2,  2,  2, ...,  2,  2,  2],
+    #        ...,
+    #        [97, 97, 97, ..., 97, 97, 97],
+    #        [98, 98, 98, ..., 98, 98, 98],
+    #        [99, 99, 99, ..., 99, 99, 99]])
+    cacheable_rows = CacheableImage(rows, source_path=__file__)
+
+    processor = ViewCrossSectionImageProcessor((50, 50), single_plot=False, interactive=True, crop_to_threshold=20)
+    processor.process_image(SpotAnalysisOperable(cacheable_rows))
