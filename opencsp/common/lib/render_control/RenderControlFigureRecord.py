@@ -44,7 +44,7 @@ class RenderControlFigureRecord:
 
         # Initialization.
         self.name = name
-        self.title = title
+        self._title = title
         self.caption = caption
         self.figure_num = figure_num
         self.figure = figure
@@ -58,6 +58,15 @@ class RenderControlFigureRecord:
         self.x_limits = None  # X-axis limits (optional).     Set later.
         self.y_limits = None  # Y-axis limits (optional).     Set later.
         self.z_limits = None  # Z-axis limits (optional).     Set later.
+
+    @property
+    def title(self) -> str:
+        return self._title
+
+    @title.setter
+    def title(self, new_title: str):
+        self._title = new_title
+        self.axis.set_title(new_title)
 
     def close(self):
         """Closes any matplotlib window opened with this instance's view"""

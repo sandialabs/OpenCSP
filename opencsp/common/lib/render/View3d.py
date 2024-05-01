@@ -1,6 +1,6 @@
 import os
 import time
-from typing import Callable
+from typing import Callable, Iterable
 
 import matplotlib.backend_bases as backb
 import matplotlib.image as mpimg
@@ -84,9 +84,17 @@ class View3d(aph.AbstractPlotHandler):
         Clears the old plot data without deleting the window, listeners, or orientation. Useful for updating a plot
         interactively.
         """
-        # Clear the previous data
         # self.fig_record.figure.clear(keep_observers=True) <-- not doing this, clears everything except window
+
+        # Clear the previous graph
         self.axis.clear()
+
+        # Clear the previous title
+        if self.axis.title is not None:
+            try:
+                self.axis.title.remove()
+            except Exception:
+                pass
 
     # ACCESS
 
@@ -1026,6 +1034,9 @@ class View3d(aph.AbstractPlotHandler):
         style=rcps.default(),
         label=None,
     ):
+        if isinstance(input_pq_list, Iterable):
+            if not isinstance(input_pq_list, list):
+                input_pq_list = list(input_pq_list)
         if len(input_pq_list) > 0:
             # Construct the point list to draw, including closing the polygon if desired.
             if close and (len(input_pq_list) > 2):
@@ -1034,20 +1045,8 @@ class View3d(aph.AbstractPlotHandler):
             else:
                 pq_list = input_pq_list
             # Draw the point list.
-            if self.view_spec['type'] == '3d':
-                lt.error(
-                    "ERROR: In View3d.draw_pq_list(), incompatible view_spec['type'] = '"
-                    + str(self.view_spec['type'])
-                    + "' encountered."
-                )
-                assert False
-            elif (
-                (self.view_spec['type'] == 'xy')
-                or (self.view_spec['type'] == 'xz')
-                or (self.view_spec['type'] == 'yz')
-                or (self.view_spec['type'] == 'vplane')
-                or (self.view_spec['type'] == 'camera')
-            ):
+            allowed_vs_types = ['xy', 'xz', 'yz', 'vplane', 'camera']
+            if self.view_spec['type'] in allowed_vs_types:
                 self.axis.plot(
                     [pq[0] for pq in pq_list],
                     [pq[1] for pq in pq_list],
@@ -1064,9 +1063,9 @@ class View3d(aph.AbstractPlotHandler):
             else:
                 lt.error_and_raise(
                     RuntimeError,
-                    "ERROR: In View3d.draw_pq_list(), unrecognized view_spec['type'] = '"
-                    + str(self.view_spec['type'])
-                    + "' encountered.",
+                    "ERROR: In View3d.draw_pq_list(), "
+                    + f"unrecognized view_spec['type'] = '{self.view_spec['type']}' encountered. "
+                    + f"Should be one of {allowed_vs_types}.",
                 )
 
     # VECTOR FIELD PLOTTING
