@@ -190,7 +190,6 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
         # 5. reduce the image size to fit the new window size, reduce the window size, go to either step 1 or 6
         # 6. label the most central hottest pixel as the hotspot
         image = operable.primary_image.nparray
-        _, image_name, image_ext = ft.path_components(operable.primary_image_source_path)
         total_start_y = 0
         total_start_x = 0
 
@@ -233,7 +232,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
                         axis_control,
                         view_spec,
                         equal=False,
-                        name=image_name + image_ext,
+                        name=operable.best_primary_nameext,
                         title="original",
                         code_tag=f"{__file__}._execute()",
                     )
@@ -246,7 +245,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
                     axis_control,
                     view_spec,
                     equal=False,
-                    name=image_name + image_ext,
+                    name=operable.best_primary_nameext,
                     title=str(shape),
                     code_tag=f"{__file__}._execute()",
                 )
@@ -266,7 +265,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
                     if np.max(flooded_image) > 1:
                         lt.warning(
                             "Warning in PercentileFilterImageProcessor._execute(): "
-                            + f"There are at least 2 regions in '{image_name}{image_ext}', "
+                            + f"There are at least 2 regions in '{operable.best_primary_nameext}', "
                             + f"area [{total_start_y}:{total_start_y+end_y}, {total_start_x}:{total_start_x+end_x}] "
                             + "that share the hottest pixel value."
                         )

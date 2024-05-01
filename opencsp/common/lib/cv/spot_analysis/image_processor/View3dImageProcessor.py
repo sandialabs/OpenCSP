@@ -119,11 +119,6 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
 
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         image = operable.primary_image.nparray
-        image_path = (
-            operable.primary_image_source_path
-            or operable.primary_image.source_path
-            or operable.primary_image.cache_path
-        )
 
         # check if the view has been closed
         if self.closed:
@@ -149,8 +144,7 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.fig_record.view.clear()
 
         # Update the title
-        _, image_name, _ = ft.path_components(image_path)
-        self.fig_record.title = image_name
+        self.fig_record.title = operable.best_primary_nameext
 
         # Draw the new data
         if self.crop_to_threshold is None and self.max_resolution is None:

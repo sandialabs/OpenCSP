@@ -19,6 +19,6 @@ class EchoImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.logger = lt.get_log_method_for_level(self.log_level)
 
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
-        self.logger(f"{self.prefix}Processing image {operable.primary_image_name_for_logs}")
+        self.logger(f"{self.prefix}Processing image {operable.best_primary_nameext}")
 
         return [operable]

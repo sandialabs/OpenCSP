@@ -2,6 +2,7 @@ import copy
 from dataclasses import dataclass, field, replace
 import numpy as np
 import numpy.typing as npt
+import os
 import sys
 
 import opencsp.common.lib.csp.LightSource as ls
@@ -154,17 +155,30 @@ class SpotAnalysisOperable:
 
         return ret
 
-    @property
-    def primary_image_name_for_logs(self):
-        image_name = self.primary_image.source_path
+    def get_primary_path_nameext(self) -> tuple[str, str]:
+        for image_name in [
+            self.primary_image_source_path,
+            self.primary_image.source_path,
+            self.primary_image.cache_path,
+        ]:
+            if image_name is not None and image_name != "":
+                break
 
         if image_name == None or image_name == "":
-            image_name = "unknown image"
+            ret_path, ret_name_ext = "unknown_path", "unknown_image"
         else:
-            path, name, ext = ft.path_components(image_name)
-            image_name = name + ext
+            ret_path, name, ext = ft.path_components(image_name)
+            ret_name_ext = name + ext
 
-        return image_name
+        return ret_path, ret_name_ext
+
+    @property
+    def best_primary_nameext(self) -> str:
+        return self.get_primary_path_nameext()[1]
+
+    @property
+    def best_primary_pathnameext(self) -> str:
+        return os.path.join(*self.get_primary_path_nameext())
 
     @property
     def max_popf(self) -> npt.NDArray[np.float_]:

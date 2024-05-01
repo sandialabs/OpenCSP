@@ -58,7 +58,7 @@ class CroppingImageProcessor(AbstractSpotAnalysisImagesProcessor):
             lt.error_and_raise(
                 ValueError,
                 "Error in CroppingImageProcessor._execute(): "
-                + f"given image '{operable.primary_image_source_path}' is smaller than the cropped size {self.cropped_size_str}",
+                + f"given image '{operable.best_primary_pathnameext}' is smaller than the cropped size {self.cropped_size_str}",
             )
 
         # create the cropped image
