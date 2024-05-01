@@ -847,7 +847,7 @@ class View3d(aph.AbstractPlotHandler):
         """
         Draw a 3D plot for the given z_mesh surface.
 
-        Example from https://matplotlib.org/stable/plot_types/3D/surface3d_simple.html#sphx-glr-plot-types-3d-surface3d-simple-py
+        Example from https://matplotlib.org/stable/plot_types/3D/surface3d_simple.html#sphx-glr-plot-types-3d-surface3d-simple-py::
 
             # Make data
             X = np.arange(-5, 5)

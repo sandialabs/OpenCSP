@@ -131,6 +131,7 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
             # self._init_figure_record()
 
         # reduce data based on threshold
+        y_start, y_end, x_start, x_end = 0, image.shape[0], 0, image.shape[1]
         if self.crop_to_threshold is not None:
             x_start, x_end = self._get_range_for_threshold(image, self.crop_to_threshold, 1)
             y_start, y_end = self._get_range_for_threshold(image, self.crop_to_threshold, 0)
@@ -138,8 +139,8 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
 
         # reduce data based on max_resolution
         if self.max_resolution is not None:
-            width = np.min([image.shape[1], self.max_resolution[0]])
-            height = np.min([image.shape[0], self.max_resolution[1]])
+            width = np.min([x_end - x_start, self.max_resolution[0]])
+            height = np.min([y_end - y_start, self.max_resolution[1]])
             image = cv.resize(image, (height, width), interpolation=cv.INTER_AREA)
 
         # Clear the previous data
@@ -150,7 +151,15 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.fig_record.title = image_name
 
         # Draw the new data
-        self.view.draw_xyz_surface(image, self.rcs)
+        if self.crop_to_threshold is None and self.max_resolution is None:
+            self.view.draw_xyz_surface(image, self.rcs)
+        else:
+            width = image.shape[1]
+            height = image.shape[0]
+            x_arr = (np.arange(0, width) * (x_end - x_start) / width) + x_start
+            y_arr = (np.arange(0, height) * (y_end - y_start) / height) + y_start
+            x_mesh, y_mesh = np.meshgrid(x_arr, y_arr)
+            self.view.draw_xyz_surface_customshape(x_mesh, y_mesh, image, self.rcs)
 
         # draw
         self.view.show(block=False)
