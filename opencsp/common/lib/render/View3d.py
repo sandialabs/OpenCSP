@@ -77,25 +77,6 @@ class View3d(aph.AbstractPlotHandler):
         self._figure = val
         self._register_plot(val)
 
-    # CLEAR
-
-    def clear(self):
-        """
-        Clears the old plot data without deleting the window, listeners, or orientation. Useful for updating a plot
-        interactively.
-        """
-        # self.fig_record.figure.clear(keep_observers=True) <-- not doing this, clears everything except window
-
-        # Clear the previous graph
-        self.axis.clear()
-
-        # Clear the previous title
-        if self.axis.title is not None:
-            try:
-                self.axis.title.remove()
-            except Exception:
-                pass
-
     # ACCESS
 
     def is_3d(self) -> bool:

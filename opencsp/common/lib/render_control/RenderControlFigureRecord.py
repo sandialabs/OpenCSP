@@ -73,6 +73,35 @@ class RenderControlFigureRecord:
         if self.view != None:
             self.view.close()
 
+    def clear(self):
+        """
+        Clears the old plot data without deleting the window, listeners, or orientation. Useful for updating a plot
+        interactively.
+        """
+        # self.fig_record.figure.clear(keep_observers=True) <-- not doing this, clears everything except window
+
+        # Register data to be re-assigned
+        xlabel = self.axis.get_xlabel()
+        ylabel = self.axis.get_ylabel()
+        if hasattr(self.axis, 'get_zlabel'):
+            zlabel = self.axis.get_zlabel()
+
+        # Clear the previous graph
+        self.axis.clear()
+
+        # Clear the previous title
+        if self.axis.title is not None:
+            try:
+                self.axis.title.remove()
+            except Exception:
+                pass
+
+        # Re-assign necessary data
+        self.axis.set_xlabel(xlabel)
+        self.axis.set_ylabel(ylabel)
+        if hasattr(self.axis, 'get_zlabel'):
+            self.axis.set_zlabel(zlabel)
+
     def add_metadata_line(self, metadata_line: str) -> None:
         self.metadata.append(metadata_line)
 

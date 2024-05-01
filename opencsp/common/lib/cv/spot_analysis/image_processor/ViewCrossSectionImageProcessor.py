@@ -177,6 +177,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         # Clear the previous plot
         for fig_record in self.fig_records:
+            fig_record.clear()
 
         # Update the title
         for plot_title_prefix, fig_record in zip(self.plot_titles, self.fig_records):

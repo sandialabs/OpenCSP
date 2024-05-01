@@ -106,7 +106,7 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
             image = cv.resize(image, (height, width), interpolation=cv.INTER_AREA)
 
         # Clear the previous data
-        self.fig_record.view.clear()
+        self.fig_record.clear()
 
         # Update the title
         self.fig_record.title = operable.best_primary_nameext
