@@ -202,7 +202,8 @@ class SpotAnalysisOperable:
     def get_fiducials_by_type(self, fiducial_type: type[af.AbstractFiducials]):
         matching_given_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.given_fiducials)
         matching_found_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.found_fiducials)
-        ret = list(matching_given_fiducials) + list(matching_found_fiducials)
+        matching_annotations = filter(lambda f: isinstance(f, fiducial_type), self.annotations)
+        ret = list(matching_given_fiducials) + list(matching_found_fiducials) + list(matching_annotations)
         if len(ret) == 0:
             lt.debug(
                 "In SpotAnalysisOperable.get_fiducials_by_type(): "

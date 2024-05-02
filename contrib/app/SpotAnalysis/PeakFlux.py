@@ -3,10 +3,9 @@ import re
 
 import numpy as np
 
-from opencsp.common.lib.cv.AbstractFiducials import AbstractFiducials
 import opencsp.common.lib.cv.SpotAnalysis as sa
+from opencsp.common.lib.cv.annotations.HotspotAnnotation import HotspotAnnotation
 from opencsp.common.lib.cv.fiducials.BcsFiducial import BcsFiducial
-from opencsp.common.lib.cv.fiducials.HotspotFiducial import HotspotFiducial
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
@@ -109,7 +108,7 @@ class PeakFlux:
         return origin_ix, origin_iy
 
     def get_peak_origin(self, operable: SpotAnalysisOperable):
-        fiducials = operable.get_fiducials_by_type(HotspotFiducial)
+        fiducials = operable.get_fiducials_by_type(HotspotAnnotation)
         fiducial = fiducials[0]
         origin_fx, origin_fy = fiducial.origin.astuple()
         origin_ix, origin_iy = int(np.round(origin_fx)), int(np.round(origin_fy))
