@@ -59,7 +59,7 @@ class View3d(aph.AbstractPlotHandler):
         self._callbacks: dict[str, int] = {}
 
         # other values
-        self._figure = figure
+        self.view = figure
         self.axis = axis
         self.view_spec = view_spec
         self.equal = equal
