@@ -100,6 +100,20 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             self.internal_shapes = self._build_windows_int(desired_shape)
 
     def _build_windows_tuple(self, desired_shape: tuple[int, int]) -> list[tuple[int, int]]:
+        """
+        Constructs the list of window sizes to iterate through while isolating the hot spot.
+
+        The window sizes will be in order from largest to smallest, with the
+        intention that each successive (smaller) window will search over the
+        matched area from the previous (larger) window.
+
+        This method works with non-square window tuples.
+
+        Parameters
+        ----------
+        desired_shape: tuple[int, int]
+            The final shape for the window with the desired size in the x and y axes, in pixels.
+        """
         ret: list[tuple[int, int]] = []
 
         # determine the starting shape
@@ -132,6 +146,16 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
         return ret
 
     def _build_windows_int(self, desired_shape: int) -> list[int]:
+        """
+        See _build_windows_tuple() for a full description.
+
+        This method works with square windows.
+
+        Parameters
+        ----------
+        desired_shape: int
+            The final shape for the window with the desired size both axes, in pixels.
+        """
         ret: list[int] = []
 
         # determine the starting shape
