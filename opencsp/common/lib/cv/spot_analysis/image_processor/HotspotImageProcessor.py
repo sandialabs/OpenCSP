@@ -5,7 +5,7 @@ from typing import Callable
 import cv2 as cv
 import numpy as np
 
-from opencsp.common.lib.cv.fiducials.HotspotFiducial import HotspotFiducial
+from opencsp.common.lib.cv.annotations.HotspotAnnotation import HotspotAnnotation
 import opencsp.common.lib.cv.image_filters as filters
 import opencsp.common.lib.cv.image_reshapers as reshapers
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
@@ -24,7 +24,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
     """
-    Adds an annotation/fiducial marker to images to indicate at which pixel the
+    Adds an annotation marker to images to indicate at which pixel the
     brightest part of the image is.
 
     We want to be able to determine the point of peak intensity within an image,
@@ -297,14 +297,14 @@ class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
             if dist < min_dist:
                 min_dist = dist
                 central_match = p2.Pxy([x + total_start_x, y + total_start_y])
-        hotspot = HotspotFiducial(self.style, central_match)
+        hotspot = HotspotAnnotation(self.style, central_match)
 
         # wait for the interactive session
         if draw_debug_view:
             fig_rec.view.show(block=True)
 
         # return
-        found_fiducials = copy.copy(operable.found_fiducials)
-        found_fiducials.append(hotspot)
-        new_operable = dataclasses.replace(operable, found_fiducials=found_fiducials)
+        annotations = copy.copy(operable.annotations)
+        annotations.append(hotspot)
+        new_operable = dataclasses.replace(operable, annotations=annotations)
         return [new_operable]

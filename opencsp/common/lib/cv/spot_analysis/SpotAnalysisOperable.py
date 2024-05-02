@@ -5,7 +5,8 @@ import numpy.typing as npt
 import sys
 
 import opencsp.common.lib.csp.LightSource as ls
-import opencsp.common.lib.cv.AbstractFiducials as af
+import opencsp.common.lib.cv.annotations.AbstractAnnotations as aa
+import opencsp.common.lib.cv.fiducials.AbstractFiducials as af
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
@@ -35,6 +36,8 @@ class SpotAnalysisOperable:
     """ Any fiducials handed to us in the currently processing image. """
     found_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ The identified fiducials in the currently processing image. """
+    annotations: list[aa.AbstractAnnotations] = field(default_factory=list)
+    """ The identified annotations in the currently processing image. """
     camera_intrinsics_characterization: any = (
         None  # TODO figure out how to specify information here, maybe using common/lib/camera/Camera
     )
@@ -102,6 +105,7 @@ class SpotAnalysisOperable:
                 supporting_images,
                 self.given_fiducials,
                 self.found_fiducials,
+                self.annotations,
                 self.camera_intrinsics_characterization,
                 self.light_sources,
                 self.population_statistics,
@@ -128,6 +132,7 @@ class SpotAnalysisOperable:
         if data != None:
             given_fiducials = data.given_fiducials if len(self.given_fiducials) == 0 else self.given_fiducials
             found_fiducials = data.found_fiducials if len(self.found_fiducials) == 0 else self.found_fiducials
+            annotations = data.annotations if len(self.annotations) == 0 else self.annotations
             camera_intrinsics_characterization = (
                 data.camera_intrinsics_characterization
                 if self.camera_intrinsics_characterization is None
@@ -138,6 +143,7 @@ class SpotAnalysisOperable:
                 ret,
                 given_fiducials=given_fiducials,
                 found_fiducials=found_fiducials,
+                annotations=annotations,
                 camera_intrinsics_characterization=camera_intrinsics_characterization,
                 light_sources=light_sources,
             )

@@ -1,6 +1,6 @@
 import scipy.spatial
 
-from opencsp.common.lib.cv.AbstractFiducials import AbstractFiducials
+from opencsp.common.lib.cv.fiducials.AbstractFiducials import AbstractFiducials
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.geometry.RegionXY as reg
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps

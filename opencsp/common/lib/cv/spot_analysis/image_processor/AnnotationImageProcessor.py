@@ -32,6 +32,8 @@ class AnnotationImageProcessor(AbstractSpotAnalysisImagesProcessor):
             new_image = fiducials.render_to_image(new_image)
         for fiducials in operable.found_fiducials:
             new_image = fiducials.render_to_image(new_image)
+        for annotations in operable.annotations:
+            new_image = annotations.render_to_image(new_image)
 
         cacheable_image = CacheableImage(new_image, source_path=operable.primary_image.source_path)
         ret = dataclasses.replace(operable, primary_image=cacheable_image)
