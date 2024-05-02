@@ -305,6 +305,6 @@ class VisualizationCoordinator:
                     # the plot to not be shown again when it has been closed
                     # instead of being reinitialized and popping back up.
                     for processor in self.visualization_processors:
-                        processor._close_figures()
+                        processor.close_figures()
 
                 first_iteration = False

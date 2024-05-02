@@ -63,11 +63,11 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, A
         pass
 
     @abstractmethod
-    def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool) -> None:
+    def visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool) -> None:
         pass
 
     @abstractmethod
-    def _close_figures(self):
+    def close_figures(self):
         pass
 
     @property
@@ -88,6 +88,6 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, A
         else:
             if not self.initialized_figure_records:
                 self.init_figure_records(rcf.RenderControlFigure(tile=False))
-            self._visualize_operable(operable, is_last)
+            self.visualize_operable(operable, is_last)
 
         return [operable]

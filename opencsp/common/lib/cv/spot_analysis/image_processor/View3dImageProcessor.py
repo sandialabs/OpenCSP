@@ -80,7 +80,7 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
 
         return [self.fig_record]
 
-    def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool):
+    def visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool):
         image = operable.primary_image.nparray
 
         # reduce data based on threshold
@@ -115,7 +115,7 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
         # draw
         self.view.show(block=False)
 
-    def _close_figures(self):
+    def close_figures(self):
         with et.ignored(Exception):
             self.view.close()
 
