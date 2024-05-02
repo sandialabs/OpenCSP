@@ -25,6 +25,9 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
     Interprets the current image as a 2D cross section and either displays it,
     or if interactive it displays the plot and waits on the next press of the
     "enter" key.
+
+    This visualization uses either one or two windows to display the cross
+    sections, depending on the initialization parameters.
     """
 
     def __init__(

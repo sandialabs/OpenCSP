@@ -10,6 +10,36 @@ import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 
 
 class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
+    """
+    An AbstractSpotAnalysisImagesProcessor that is used to generate visualizations.
+
+    The visualizations that these processors create can be used either for
+    debugging or monitoring, depending on the value of the "interactive"
+    initialization parameter.
+
+    VisualizationCoordinator
+    ------------------------
+    Certain elements of the visualization are handled by the
+    VisualizationCoordinator, including at least:
+
+        - tiled layout of visualization windows
+        - user interaction that is common to all visualization windows
+
+    The life cycle for this class is::
+
+        - __init__()
+        - register_visualization_coordinator()*
+        - num_figures()*
+        - init_figure_records()*
+        - process()
+        -     _execute()
+        -     visualize_operable()*
+        - close_figures()*
+
+    In the above list, one star "*" indicates that this method is called by the
+    coordinator.
+    """
+
     def __init__(self, name: str, interactive: bool | Callable[[SpotAnalysisOperable], bool]):
         # import here to avoid circular dependencies
         from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator

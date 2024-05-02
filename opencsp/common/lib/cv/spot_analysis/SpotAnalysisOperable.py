@@ -199,7 +199,11 @@ class SpotAnalysisOperable:
         else:
             return np.min(self.primary_image.nparray)
 
-    def get_fiducials_by_type(self, fiducial_type: type[af.AbstractFiducials]):
+    def get_fiducials_by_type(self, fiducial_type: type[af.AbstractFiducials]) -> list[aa.AbstractAnnotations | af.AbstractFiducials]:
+        """
+        Returns all fiducials from self.given_fiducials, self.found_fiducials,
+        and self.annotations that match the given type.
+        """
         matching_given_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.given_fiducials)
         matching_found_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.found_fiducials)
         matching_annotations = filter(lambda f: isinstance(f, fiducial_type), self.annotations)
