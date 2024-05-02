@@ -1,6 +1,5 @@
 from typing import Callable
 
-import cv2 as cv
 import matplotlib.axes
 import matplotlib.backend_bases
 import numpy as np
@@ -16,7 +15,7 @@ import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
-import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.image_tools as it
 
 
@@ -196,7 +195,8 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
     def _close_figures(self):
         for view in self.views:
-            view.close()
+            with et.ignored(Exception):
+                view.close()
 
         self.view_specs.clear()
         self.rc_axises.clear()

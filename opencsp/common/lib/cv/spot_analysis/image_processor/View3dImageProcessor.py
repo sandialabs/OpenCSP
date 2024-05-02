@@ -15,7 +15,7 @@ import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlSurface as rcs
-import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.image_tools as it
 
 
@@ -116,7 +116,8 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
         self.view.show(block=False)
 
     def _close_figures(self):
-        self.view.close()
+        with et.ignored(Exception):
+            self.view.close()
 
         self.fig_record = None
         self.view = None

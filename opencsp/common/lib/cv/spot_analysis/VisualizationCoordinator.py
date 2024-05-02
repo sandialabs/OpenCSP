@@ -97,10 +97,10 @@ class VisualizationCoordinator:
             key = key.replace("shift+", "")
 
         if key == "enter" or key == "return":
+            self.enter_pressed = True
             if shift_down:
-                self.enter_shift_pressed = True
-            else:
-                self.enter_pressed = True
+                self.enter_shift_pressed = not self.enter_shift_pressed
+                lt.info("Interactive mode: " + ("Disabled" if self.enter_shift_pressed else "Enabled"))
         elif key == "shift":
             self.shift_down = False
 
@@ -280,6 +280,10 @@ class VisualizationCoordinator:
             while True:
                 # if shift+enter was ever pressed, that will disable interactive mode
                 if self.enter_shift_pressed:
+                    break
+
+                # if any plot is closed, then every plot was closed, and we can just continue
+                if self.closed:
                     break
 
                 # wait for up to total_wait_time for the user to interact with the visualizations
