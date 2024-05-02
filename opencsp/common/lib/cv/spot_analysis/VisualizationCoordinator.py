@@ -145,24 +145,25 @@ class VisualizationCoordinator:
                 self.visualization_processors.append(visualization_processor)
 
         # determine the tiling arangement
-        num_figures = 0
+        num_figures_dict: dict[AbstractVisualizationImageProcessor, int] = {}
         for processor in self.visualization_processors:
-            num_figures += processor.num_figures
-        if num_figures <= 1:
+            num_figures_dict[processor] = processor.num_figures
+        num_figures_total = sum(num_figures_dict.values())
+        if num_figures_total <= 1:
             tiles_x = 1
             tiles_y = 1
-        elif num_figures <= 2:
+        elif num_figures_total <= 2:
             tiles_x = 2
             tiles_y = 1
-        elif num_figures <= 8:
-            tiles_x = int(np.ceil(num_figures / 2))
+        elif num_figures_total <= 8:
+            tiles_x = int(np.ceil(num_figures_total / 2))
             tiles_y = 2
-        elif num_figures <= 12:
-            tiles_x = int(np.ceil(num_figures / 3))
+        elif num_figures_total <= 12:
+            tiles_x = int(np.ceil(num_figures_total / 3))
             tiles_y = 3
         else:
-            tiles_y = int(np.floor(np.sqrt(num_figures)))
-            tiles_x = int(np.ceil(num_figures / tiles_y))
+            tiles_y = int(np.floor(np.sqrt(num_figures_total)))
+            tiles_x = int(np.ceil(num_figures_total / tiles_y))
         tiles_x = np.min([tiles_x, self.max_tiles_x])
         tiles_y = np.min([tiles_y, self.max_tiles_y])
 
@@ -174,7 +175,10 @@ class VisualizationCoordinator:
 
         # initialize the visualizers
         for processor in self.visualization_processors:
-            processor_figures = processor._init_figure_records(self.render_control_fig)
+            processor_figures = processor.init_figure_records(self.render_control_fig)
+            if len(processor_figures) != num_figures_dict[processor]:
+                lt.warning("Warning in VisualizationCoordinator.register_visualization_processors(): " +
+                           f"Unexpected number of visualization windows for processor {processor.name}. " + f" Expected {num_figures_dict[processor]} but received {len(processor_figures)}!")
             for fig_record in processor_figures:
                 fig_record.figure.canvas.mpl_connect('close_event', self.on_close)
                 fig_record.figure.canvas.mpl_connect('key_release_event', self.on_key_release)
