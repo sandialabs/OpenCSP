@@ -6,6 +6,7 @@ import numpy as np
 from opencsp.common.lib.cv.AbstractFiducials import AbstractFiducials
 import opencsp.common.lib.cv.SpotAnalysis as sa
 from opencsp.common.lib.cv.fiducials.BcsFiducial import BcsFiducial
+from opencsp.common.lib.cv.fiducials.HotspotFiducial import HotspotFiducial
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
@@ -66,6 +67,9 @@ class PeakFlux:
             ViewCrossSectionImageProcessor(
                 self.get_bcs_origin, 'BCS', single_plot=False, crop_to_threshold=20, interactive=True
             ),
+            ViewCrossSectionImageProcessor(
+                self.get_peak_origin, 'Hotspot', single_plot=False, crop_to_threshold=20, interactive=True
+            ),
             PopulationStatisticsImageProcessor(initial_min=0, initial_max=255),
             FalseColorImageProcessor(),
             AnnotationImageProcessor(),
@@ -99,6 +103,13 @@ class PeakFlux:
 
     def get_bcs_origin(self, operable: SpotAnalysisOperable):
         fiducials = operable.get_fiducials_by_type(BcsFiducial)
+        fiducial = fiducials[0]
+        origin_fx, origin_fy = fiducial.origin.astuple()
+        origin_ix, origin_iy = int(np.round(origin_fx)), int(np.round(origin_fy))
+        return origin_ix, origin_iy
+
+    def get_peak_origin(self, operable: SpotAnalysisOperable):
+        fiducials = operable.get_fiducials_by_type(HotspotFiducial)
         fiducial = fiducials[0]
         origin_fx, origin_fy = fiducial.origin.astuple()
         origin_ix, origin_iy = int(np.round(origin_fx)), int(np.round(origin_fy))

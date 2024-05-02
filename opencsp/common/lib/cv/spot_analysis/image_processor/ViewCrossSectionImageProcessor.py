@@ -56,14 +56,11 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
             inspect hot spots on images with very concentrated values. By
             default None.
         """
-        super().__init__(self.__class__.__name__)
+        super().__init__(self.__class__.__name__, interactive)
 
         self.cross_section_location = cross_section_location
         self.label = label
         self.single_plot = single_plot
-        self.interactive = interactive
-        self.enter_pressed = False
-        self.closed = False
         self.crop_to_threshold = crop_to_threshold
 
         # initialize certain visualization values
@@ -85,10 +82,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         else:
             return 2
 
-    def _init_figure_records(self, render_control_figure: rcf.RenderControlFigure):
-        self.enter_pressed = False
-        self.closed = False
-
+    def _init_figure_records(self, render_control_figure: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
         self.view_specs = []
         self.rc_axises = []
         self.fig_records = []
@@ -126,8 +120,6 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
             )
             view = fig_record.view
             axes = fig_record.figure.gca()
-            fig_record.figure.canvas.mpl_connect('close_event', self.on_close)
-            fig_record.figure.canvas.mpl_connect('key_release_event', self.on_key_release)
 
             self.view_specs.append(view_spec)
             self.rc_axises.append(rc_axis)
@@ -136,22 +128,10 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
             self.axes.append(axes)
             self.plot_titles.append(plot_title)
 
-    def on_key_release(self, event: matplotlib.backend_bases.KeyEvent):
-        if event.key == "enter" or event.key == "return":
-            self.enter_pressed = True
-
-    def on_close(self, event: matplotlib.backend_bases.CloseEvent):
-        self.closed = True
+        return self.fig_records
 
     def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool):
         image = operable.primary_image.nparray
-
-        # check if the view has been closed
-        if self.closed:
-            # UI design decision: it feels more natural to me (Ben) for the plot to not be shown again when it has
-            # been closed instead of being reinitialized and popping back up.
-            return
-            # self._init_figure_record()
 
         # get the cross section pixel location
         if isinstance(self.cross_section_location, tuple):
@@ -211,14 +191,16 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         for view in self.views:
             view.show(block=False, legend=self.single_plot)
 
-        # wait for the user to press enter
-        wait_for_enter_key = self.interactive if isinstance(self.interactive, bool) else self.interactive(operable)
-        if wait_for_enter_key:
-            self.enter_pressed = False
-            while True:
-                if self.enter_pressed or self.closed:
-                    break
-                self.fig_records[-1].figure.waitforbuttonpress(0.1)
+    def _close_figures(self):
+        for view in self.views:
+            view.close()
+
+        self.view_specs.clear()
+        self.rc_axises.clear()
+        self.fig_records.clear()
+        self.views.clear()
+        self.axes.clear()
+        self.plot_titles.clear()
 
 
 if __name__ == "__main__":

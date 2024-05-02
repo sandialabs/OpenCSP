@@ -45,9 +45,8 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
             Crops the image on the x and y axis to the first/last value >= the given threshold. None to not crop the
             image. Useful when trying to inspect hot spots on images with very concentrated values. By default None.
         """
-        super().__init__(self.__class__.__name__)
+        super().__init__(self.__class__.__name__, interactive)
 
-        self.interactive = interactive
         self.max_resolution = max_resolution
         self.crop_to_threshold = crop_to_threshold
 
@@ -57,8 +56,6 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
         else:
             self.rca = label
         self.rcs = rcs.RenderControlSurface(alpha=1.0, color=None, contour='xyz')
-        self.enter_pressed = False
-        self.closed = False
 
         # declare future values
         self.fig_record: rcfr.RenderControlFigureRecord
@@ -69,7 +66,7 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
     def num_figures(self) -> int:
         return 1
 
-    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure):
+    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
         self.fig_record = fm.setup_figure_for_3d_data(
             render_control_fig,
             self.rca,
@@ -81,27 +78,10 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
         self.view = self.fig_record.view
         self.axes = self.fig_record.figure.gca()
 
-        self.enter_pressed = False
-        self.closed = False
-        self.fig_record.figure.canvas.mpl_connect('close_event', self.on_close)
-        self.fig_record.figure.canvas.mpl_connect('key_release_event', self.on_key_release)
-
-    def on_key_release(self, event: matplotlib.backend_bases.KeyEvent):
-        if event.key == "enter" or event.key == "return":
-            self.enter_pressed = True
-
-    def on_close(self, event: matplotlib.backend_bases.CloseEvent):
-        self.closed = True
+        return [self.fig_record]
 
     def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool):
         image = operable.primary_image.nparray
-
-        # check if the view has been closed
-        if self.closed:
-            # UI design decision: it feels more natural to me (Ben) for the plot to not be shown again when it has
-            # been closed instead of being reinitialized and popping back up.
-            return
-            # self._init_figure_record()
 
         # reduce data based on threshold
         y_start, y_end, x_start, x_end = 0, image.shape[0], 0, image.shape[1]
@@ -135,11 +115,9 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
         # draw
         self.view.show(block=False)
 
-        # wait for the user to press enter
-        wait_for_enter_key = self.interactive if isinstance(self.interactive, bool) else self.interactive(operable)
-        if wait_for_enter_key:
-            self.enter_pressed = False
-            while True:
-                if self.enter_pressed or self.closed:
-                    break
-                self.fig_record.figure.waitforbuttonpress(0.1)
+    def _close_figures(self):
+        self.view.close()
+
+        self.fig_record = None
+        self.view = None
+        self.axes = None

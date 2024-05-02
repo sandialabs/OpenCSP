@@ -1,19 +1,25 @@
 from abc import ABC, abstractmethod
+from typing import Callable
 
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImagesProcessor,
 )
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 
 
 class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
-    def __init__(self, name: str):
+    def __init__(self, name: str, interactive: bool | Callable[[SpotAnalysisOperable], bool]):
         # import here to avoid circular dependencies
         from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
 
         super().__init__(name)
 
+        # register arguments
+        self.interactive = interactive
+
+        # internal values
         self.visualization_coordinator: VisualizationCoordinator = None
         self.initialized_figure_records = False
 
@@ -23,11 +29,15 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, A
         pass
 
     @abstractmethod
-    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> None:
+    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
         pass
 
     @abstractmethod
     def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool) -> None:
+        pass
+
+    @abstractmethod
+    def _close_figures(self):
         pass
 
     @property
