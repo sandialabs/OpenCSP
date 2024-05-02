@@ -73,7 +73,7 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
             equal=False,
             number_in_name=False,
             name=self.rca.z_label,
-            code_tag=f"{__file__}.__init__()",
+            code_tag=f"{__file__}._init_figure_records()",
         )
         self.view = self.fig_record.view
         self.axes = self.fig_record.figure.gca()

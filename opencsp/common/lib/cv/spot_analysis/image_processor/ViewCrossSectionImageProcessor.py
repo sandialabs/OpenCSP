@@ -118,7 +118,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
                 number_in_name=False,
                 name=self.label + name_suffix,
                 title="",
-                code_tag=f"{__file__}.__init__()",
+                code_tag=f"{__file__}._init_figure_records()",
             )
             view = fig_record.view
             axes = fig_record.figure.gca()
