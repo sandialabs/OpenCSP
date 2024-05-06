@@ -501,10 +501,8 @@ class SofastGUI:
 
         # Check measurement images have been captured
         sys = self.sys_fringe
-        if sys.fringe_images_captured is None or sys.mask_images_captured is None:
-            raise ValueError('Measurement data has not been captured.')
-        elif sys.calibration is None:
-            raise ValueError('Calibration data has not been processed.')
+        if sys.calibration is None:
+            raise ValueError('Image Calibration data has not been processed.')
 
         # Check save name is valid
         if file == '':
