@@ -202,7 +202,7 @@ class ImageProjectionGUI:
         self.update_window_size()
 
         # Create a new Toplevel window
-        projector_root = tkt.window(self.root, Toplevel=True)
+        projector_root = tkt.window(self.root, TopLevel=True)
         self.projector = ImageProjection(projector_root, self.display_data)
 
         # Activate buttons
