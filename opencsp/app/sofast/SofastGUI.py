@@ -699,7 +699,7 @@ class SofastGUI:
 
         # Load the calibration
         try:
-            self.sys_fringe.calibration = ImageCalibrationAbstract.load_from_hdf_guess_type(file)
+            self.sys_fringe.set_calibration(ImageCalibrationAbstract.load_from_hdf_guess_type(file))
         except Exception as ex:
             messagebox.showerror('Error', repr(ex))
 
