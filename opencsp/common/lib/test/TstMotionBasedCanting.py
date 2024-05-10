@@ -14,7 +14,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import sys as sys
 
-import opencsp.common.lib.geometry.IntersectionBinarySearch as intersection
+import opencsp.common.lib.geometry.plane_lines_intersection as intersection
 import opencsp.common.lib.csp.ufacet.Heliostat as Heliostat
 import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
 import opencsp.common.lib.csp.RayTrace as rt
@@ -215,7 +215,7 @@ class TestMotionBasedCanting(to.TestOutput):
         facet_origin = Pxyz(np.array(facet.origin).T)
         facet_normal = Vxyz(np.array(facet.surface_normal).T)
         is_intersect = self.check_heliostat_intersection_point_on_plane(target_plane_normal, facet_normal)
-        intersection_point = intersection.plane_intersec_vec_maddie((facet_origin, facet_normal), (target_loc, target_plane_normal))
+        intersection_point = intersection.plane_lines_intersection((facet_origin, facet_normal), (target_loc, target_plane_normal))
 
 
         offset_x = intersection_point.x- target_loc.x
@@ -549,7 +549,7 @@ class TestMotionBasedCanting(to.TestOutput):
         facet_origins = Pxyz(np.array(facet_origins).T)
         facet_normals = Vxyz(np.array(facet_normals).T)
 
-        intersection_points = intersection.plane_intersec_vec_maddie((facet_origins, facet_normals), (tower.target_loc, Uxyz([0, 1, 0])))
+        intersection_points = intersection.plane_lines_intersection((facet_origins, facet_normals), (tower.target_loc, Uxyz([0, 1, 0])))
 
         # Style setup
         surface_normal_facet_style = rch.facet_outlines_normals(color='b')

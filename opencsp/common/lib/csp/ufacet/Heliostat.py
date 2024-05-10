@@ -18,6 +18,7 @@ import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
 import opencsp.common.lib.csp.sun_track as st
 import opencsp.common.lib.geometry.transform_3d as t3d
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
+import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.math_tools as mt
 from opencsp.common.lib.csp.ufacet.Facet import Facet
 from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
@@ -76,10 +77,13 @@ class Heliostat(RayTraceable):
         # if len(facets) != len(relative_facet_positions):
         #     raise ValueError(f"number of facets must equal the number of facet positions. "
         #                      f"{len(facets)} facets wer given and {len(relative_facet_positions)} facet positions")
+        origin = np.squeeze(origin)
+        if origin.shape != (3,):
+            lt.error_and_raise(ValueError, "Error in Heliostat(): origin must be a numpy of size 3 with shape (3), but the shape is instead " + str(origin.shape))
 
         # setting class variables
         self.name = name
-        self.origin = np.array([origin[0], origin[1], origin[2]])  # Origin is at torque tube center.
+        self.origin = np.array(origin)  # Origin is at torque tube center.
         # self.num_rows = num_rows
         # self.num_cols = num_cols
         self.num_facets = num_facets
@@ -570,14 +574,14 @@ class Heliostat(RayTraceable):
         #
         hel_rotation = rotation_from_az_el(az, el)
 
-            # heliostat.origin is at torque tube center.
-            # center_facet_origin is at center of facet 13 (NSTTF heliostat only).
-            # This calculation requires the following assumptions: 
-            #    - azimuth and elevation axes intersect
-            #    - they intersect at the kinematic origin
-            #    - a vector from the kinematic origin through the mirror origin is perpindicular to the mirror
-            # TODO This is a simplified model of NSTTF heliostats, it needs to be made more general.
-            #
+        # heliostat.origin is at torque tube center.
+        # center_facet_origin is at center of facet 13 (NSTTF heliostat only).
+        # This calculation requires the following assumptions: 
+        #    - azimuth and elevation axes intersect
+        #    - they intersect at the kinematic origin
+        #    - a vector from the kinematic origin through the mirror origin is perpindicular to the mirror
+        # TODO This is a simplified model of NSTTF heliostats, it needs to be made more general.
+        
         vector = np.array([0, 0, self.pivot_offset])    #TODO vector should be a Vxyz
         vector_offset = hel_rotation.apply(vector)
 
