@@ -45,6 +45,19 @@ class TransformXYZ:
         return cls(np.eye(4))
 
     @classmethod
+    def identity(cls):
+        """
+        Returns the identity tranformation. 
+        Alias for TransformXYZ.from_zero_zero().
+
+        Returns
+        -------
+        TransformXYZ.
+
+        """
+        return cls(np.eye(4))
+
+    @classmethod
     def from_R_V(cls, R: Rotation, V: Vxyz):
         """
         TransformXYZ from a 3D rotation and a 3D translation.
