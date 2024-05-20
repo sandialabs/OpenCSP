@@ -1,5 +1,5 @@
 """
-
+Copyright (c) 2021 Sandia National Laboratories.
 
 """
 
@@ -14,30 +14,32 @@ DEFAULT_SURFACE_NORMAL_LENGTH = 2  # m
 DEFAULT_CORNER_NORMAL_LENGTH = 1  # m
 
 
-class RenderControlFacet:
+class RenderControlFacet():
     """
     Render control for heliostat facets.
     """
 
-    def __init__(
-        self,
-        draw_centroid=True,
-        centroid_style=rcps.marker(),
-        draw_outline=True,
-        outline_style=rcps.outline(),
-        draw_surface_normal=True,
-        surface_normal_length=4,
-        surface_normal_style=rcps.outline(),
-        surface_normal_base_style=rcps.marker(),
-        draw_surface_normal_at_corners=True,
-        corner_normal_length=2,
-        corner_normal_style=rcps.outline(),
-        corner_normal_base_style=rcps.marker(),
-        draw_name=True,
-        name_style=rctxt.default(color='k'),
-        draw_mirror_curvature=False,
-        mirror_styles=rcm.RenderControlMirror(),
-    ):
+    def __init__(self,
+                 draw_centroid=False,
+                 centroid_style=rcps.marker(),
+                 draw_outline=True,
+                 outline_style=rcps.outline(),
+                 draw_surface_normal=False,
+                 surface_normal_length=4,
+                 surface_normal_style=rcps.outline(),
+                 surface_normal_base_style=rcps.marker(),
+                 draw_surface_normal_at_corners=False,
+                 corner_normal_length=2,
+                 corner_normal_style=rcps.outline(),
+                 corner_normal_base_style=rcps.marker(),
+                 draw_name=False,
+                 name_style=rctxt.default(color='k'),
+
+                 # defaults to only drawing the outline to save on time
+                 draw_mirror_curvature=False,
+                 mirror_styles=rcm.RenderControlMirror()
+                 ):
+
         super(RenderControlFacet, self).__init__()
 
         self.draw_centroid = draw_centroid
@@ -63,113 +65,83 @@ class RenderControlFacet:
 
 # COMMON CASES
 
-
 def default():
     return RenderControlFacet()
 
 
 def outline(color='k'):
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=True,
-        outline_style=rcps.outline(color=color),
-        draw_surface_normal=False,
-        draw_surface_normal_at_corners=False,
-        draw_name=False,
-    )
+    return RenderControlFacet(draw_centroid=False,
+                              draw_outline=True,
+                              outline_style=rcps.outline(color=color),
+                              draw_surface_normal=False,
+                              draw_surface_normal_at_corners=False,
+                              draw_name=False)
 
 
 def outline_name(color='k'):
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=True,
-        outline_style=rcps.outline(color=color),
-        draw_surface_normal=False,
-        draw_surface_normal_at_corners=False,
-        draw_name=True,
-        name_style=rctxt.default(color=color),
-    )
+    return RenderControlFacet(draw_centroid=False,
+                              draw_outline=True,
+                              outline_style=rcps.outline(color=color),
+                              draw_surface_normal=False,
+                              draw_surface_normal_at_corners=False,
+                              draw_name=True,
+                              name_style=rctxt.default(color=color))
 
 
 def normal_mirror_surface(color='k'):
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=False,
-        outline_style=rcps.outline(color=color),
-        draw_surface_normal=False,
-        draw_surface_normal_at_corners=False,
-        draw_name=False,
-        name_style=rctxt.default(color=color),
-        draw_mirror_curvature=True,
-        mirror_styles=rcm.normal_mirror(),
-    )
+    return RenderControlFacet(draw_centroid=False,
+                              draw_outline=False,
+                              outline_style=rcps.outline(color=color),
+                              draw_surface_normal=False,
+                              draw_surface_normal_at_corners=False,
+                              draw_name=False,
+                              name_style=rctxt.default(color=color),
+                              draw_mirror_curvature=True,
+                              mirror_styles=rcm.normal_mirror())
 
 
 def normal_outline(color='k'):
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=True,
-        outline_style=rcps.outline(color=color),
-        draw_surface_normal=True,
-        surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGTH,
-        surface_normal_style=rcps.outline(color=color),
-        surface_normal_base_style=rcps.marker(color=color),
-        draw_surface_normal_at_corners=False,
-        draw_name=False,
-    )
-
-
-def normal_outline_long(color='k'):
-    """Like normal_outline, but for drawing normals that intersect with the tower."""
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=True,
-        outline_style=rcps.outline(color=color),
-        draw_surface_normal=True,
-        surface_normal_length=300,
-        surface_normal_style=rcps.outline(color=color),
-        surface_normal_base_style=rcps.marker(color=color),
-        draw_surface_normal_at_corners=False,
-        draw_name=False,
-    )
+    return RenderControlFacet(draw_centroid=False,
+                              draw_outline=True,
+                              outline_style=rcps.outline(color=color),
+                              draw_surface_normal=True,
+                              surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGTH,
+                              surface_normal_style=rcps.outline(color=color),
+                              surface_normal_base_style=rcps.marker(color=color),
+                              draw_surface_normal_at_corners=False,
+                              draw_name=False)
 
 
 def corner_normals_outline(color='k'):
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=True,
-        outline_style=rcps.outline(color=color),
-        draw_surface_normal=False,
-        draw_surface_normal_at_corners=True,
-        corner_normal_length=DEFAULT_CORNER_NORMAL_LENGTH,
-        corner_normal_style=rcps.outline(color=color),
-        corner_normal_base_style=rcps.marker(color=color),
-        draw_name=False,
-    )
+    return RenderControlFacet(draw_centroid=False,
+                              draw_outline=True,
+                              outline_style=rcps.outline(color=color),
+                              draw_surface_normal=False,
+                              draw_surface_normal_at_corners=True,
+                              corner_normal_length=DEFAULT_CORNER_NORMAL_LENGTH,
+                              corner_normal_style=rcps.outline(color=color),
+                              corner_normal_base_style=rcps.marker(color=color),
+                              draw_name=False)
 
 
 def corner_normals_outline_name(color='k'):
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=True,
-        outline_style=rcps.outline(color=color),
-        draw_surface_normal=False,
-        draw_surface_normal_at_corners=True,
-        corner_normal_length=DEFAULT_CORNER_NORMAL_LENGTH,
-        corner_normal_style=rcps.outline(color=color),
-        corner_normal_base_style=rcps.marker(color=color),
-        draw_name=True,
-        name_style=rctxt.default(color=color),
-    )
+    return RenderControlFacet(draw_centroid=False,
+                              draw_outline=True,
+                              outline_style=rcps.outline(color=color),
+                              draw_surface_normal=False,
+                              draw_surface_normal_at_corners=True,
+                              corner_normal_length=DEFAULT_CORNER_NORMAL_LENGTH,
+                              corner_normal_style=rcps.outline(color=color),
+                              corner_normal_base_style=rcps.marker(color=color),
+                              draw_name=True,
+                              name_style=rctxt.default(color=color))
 
 
 def highlight(color='b'):
-    return RenderControlFacet(
-        centroid_style=rcps.marker(color=color),
-        outline_style=rcps.outline(color=color),
-        surface_normal_style=rcps.outline(color=color),
-        surface_normal_base_style=rcps.marker(color=color),
-        corner_normal_style=rcps.outline(color=color),
-        corner_normal_base_style=rcps.marker(color=color),
-        name_style=rctxt.default(color=color),
-    )
+    return RenderControlFacet(centroid_style=rcps.marker(color=color),
+                              outline_style=rcps.outline(color=color),
+                              surface_normal_style=rcps.outline(color=color),
+                              surface_normal_base_style=rcps.marker(color=color),
+                              corner_normal_style=rcps.outline(color=color),
+                              corner_normal_base_style=rcps.marker(color=color),
+                              name_style=rctxt.default(color=color))
