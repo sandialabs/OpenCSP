@@ -1,13 +1,12 @@
 """Unit test to test the MirrorPoint class"""
-
 import numpy as np
 
-from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
-from opencsp.common.lib.geometry.RegionXY import RegionXY
-from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.Vxy import Vxy
-from opencsp.common.lib.geometry.Uxyz import Uxyz
-from opencsp.common.lib.geometry.Vxyz import Vxyz
+from   opencsp.common.lib.csp.MirrorPoint import MirrorPoint
+from   opencsp.common.lib.geometry.RegionXY import RegionXY
+from   opencsp.common.lib.geometry.Pxyz import Pxyz
+from   opencsp.common.lib.geometry.Vxy import Vxy
+from   opencsp.common.lib.geometry.Uxyz import Uxyz
+from   opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class TestMirrorPoint:

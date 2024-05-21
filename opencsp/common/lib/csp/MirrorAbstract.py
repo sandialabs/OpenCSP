@@ -1,14 +1,14 @@
 """Abstract mirror representing a single reflective surface
 """
-
 from abc import ABC, abstractmethod
 
 from matplotlib.tri import Triangulation
 import numpy as np
 from scipy.spatial.transform import Rotation
 
-from opencsp.common.lib.csp.OpticOrientation import OpticOrientation
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
+from opencsp.common.lib.geometry.RegionXY import Resolution
+
 from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import VisualizeOrthorectifiedSlopeAbstract
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.Pxyz import Pxyz
@@ -17,19 +17,22 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
+from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbstract
 
 
-class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
+class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
     """
     Abstract class inherited by all mirror classes
     """
 
     def __init__(self, shape: RegionXY) -> None:
-        super().__init__()
-        self.ori = OpticOrientation(no_child=True)
+        # super().__init__()
+        OpticOrientationAbstract.__init__(self)
 
         self.region = shape
         self.comments = ["Mirror Comments:"]
+
+        # self._set_optic_children()
 
     @property
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
@@ -43,6 +46,15 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
             reference frame.
         """
         return self.region.axis_aligned_bounding_box()
+
+    # override from OpticOrientationAbstract
+    @property
+    def children(self) -> list[OpticOrientationAbstract]:
+        return None
+
+    # # override from OpticOrientationAbstract
+    def _add_child_helper(self, new_child: OpticOrientationAbstract):
+        raise ValueError("Mirror does not accept new children.")
 
     def in_bounds(self, p: Pxy) -> np.ndarray[bool]:
         """
@@ -100,7 +112,7 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
             reference frame.
         """
         n = self.surface_norm_at(p)
-        return n.rotate(self.ori.transform_base_to_parent.R)
+        return n.rotate(self._self_to_parent_transform.R)
 
     @abstractmethod
     def surface_displacement_at(self, p: Pxy) -> np.ndarray[float]:
@@ -123,7 +135,7 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
     def location_at(self, p: Pxy) -> Pxyz:
         """Given an XY sample point in the mirror base reference frame,
         returns the XYZ point on the mirror's surface in the mirror's
-        base reference frame.
+        base reference frame. 
 
         Parameters
         ----------
@@ -157,7 +169,7 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         """
         z = self.surface_displacement_at(p)
         og_point = Pxyz((p.x, p.y, z))
-        return self.ori.transform_base_to_parent.apply(og_point)
+        return self._self_to_parent_transform.apply(og_point)
 
     def point_and_normal_in_space(self, p: Pxy) -> tuple[Pxyz, Vxyz]:
         """Given an XY sample point in the mirror's base reference frame,
@@ -179,21 +191,22 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         normal = self.surface_normal_in_space(p)
         return (point, normal)
 
-    def survey_of_points(
-        self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None
-    ) -> tuple[Pxyz, Vxyz]:
-        # Get points that will be on the mirror when lifted from the XY plane
-        filtered_points = self.region.points_sample(
-            resolution=resolution, resolution_type=resolution_type, random_seed=random_seed
-        )
-        # Return lifted points and normal vectors in "facet mirror mount" coordinate reference frame
-        points = self.location_in_space(filtered_points)
-        norms = self.surface_normal_in_space(filtered_points)
+    def survey_of_points(self, resolution: Resolution) -> tuple[Pxyz, Vxyz]:
+        resolution.resolve_in_place(self.region)
+        return self._survey_of_points_helper(resolution, TransformXYZ.identity())
+
+    def _survey_of_points_helper(self, given_resolution: Resolution, frame_transform: TransformXYZ) -> tuple[Pxyz, Vxyz]:
+        resolution = given_resolution.change_frame_and_copy(frame_transform)
+        resolution.resolve_in_place(self.region)
+        # resolution = resolution.resolve_and_copy(self.region)
+
+        # transformation_to_caller_frame = resolution.composite_transformation
+        points = self.self_to_global_tranformation.apply(self.location_at(resolution.points))
+        norms = self.surface_norm_at(resolution.points).rotate(self.self_to_global_tranformation.R)
         return points, norms
 
-    def survey_of_points_local(
-        self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None
-    ) -> tuple[Pxyz, Vxyz]:
+    # TODO this should use the Resolution class not an int and a string
+    def survey_of_points_local(self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None) -> tuple[Pxyz, Vxyz]:
         """Returns a set of points sampled from inside the optic region in
         the mirror's base coordinate reference frame.
 
@@ -205,14 +218,13 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         the object's base coordinate reference frame.
         """
         # Get points that will be on the mirror when lifted from the XY plane
-        filtered_points = self.region.points_sample(
-            resolution=resolution, resolution_type=resolution_type, random_seed=random_seed
-        )
+        filtered_points = self.region.points_sample(Resolution.pixelX(resolution))
         # Return lifted points and normal vectors in local coordinates
         points = self.location_at(filtered_points)
         norms = self.surface_norm_at(filtered_points)
         return points, norms
 
+    # override from VisualizeOrthorectifiedSlopeAbstract
     def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
         """Returns X and Y surface slopes in ndarray format given X and Y
         sampling axes in the mirror's base coordinate reference frame.
@@ -247,14 +259,14 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         slopes = -normals[:2] / normals[2:3]  # normalize z coordinate
         return slopes.reshape((2, y_vec.size, x_vec.size))  # 2 x M x N
 
-    def draw(self, view: View3d, mirror_style: RenderControlMirror, transform: TransformXYZ | None = None) -> None:
+    def draw(self, view: View3d, mirror_style: RenderControlMirror = None, transform: TransformXYZ | None = None) -> None:
         """
         Draws a mirror onto a View3d object.
 
         Parameters:
         -----------
         view : View3d
-            A view 3d object that holds the figure.
+            A view 3d object that holds the figure. 
         mirror_styles : RenderControlMirror
             Holds attibutes about the 3d graph.
         transform : TransformXYZ
@@ -262,13 +274,17 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
             reference frame in space. If None, defaults to position points
             in the mirror's parent coordinate reference frame.
         """
+
+        if mirror_style is None:
+            mirror_style = RenderControlMirror()
+
         resolution = mirror_style.resolution
         if transform is None:
-            transform = self.ori.transform_base_to_parent
+            transform = self.self_to_global_tranformation
 
         # Sample points within and on edge of region
-        edge_values = self.region.edge_sample(resolution)  # 2d, mirror coordinates
-        inner_values = self.region.points_sample(resolution, 'pixelX')  # 2d, mirror coordinates
+        inner_values = self.region.points_sample(resolution)  # 2d, mirror coordinates
+        edge_values = self.region.edge_sample(mirror_style.number_of_edge_points)  # 2d, mirror coordinates
         domain = edge_values.concatenate(inner_values)  # 2d, mirror coordinates
 
         points_surf = self.location_at(domain)  # 3d, mirror coordinates
@@ -298,19 +314,6 @@ class MirrorAbstract(ABC, RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
             # Draw on plot
             view.draw_xyzdxyz_list(xyzdxyz, close=False, style=mirror_style.norm_base_style)
 
-    def set_position_in_space(self, translation: Pxyz, rotation: Rotation) -> None:
-        # Check input type
-        if not issubclass(
-            type(translation), Vxyz
-        ):  # TODO tjlarki: ensure the facet origin is a Vxyz so this check becomes redundant
-            translation = Pxyz(translation)
-        # Set pose
-        self.ori.transform_base_to_parent = TransformXYZ.from_R_V(rotation, translation)
-
     # override function from RayTraceable
     def most_basic_ray_tracable_objects(self) -> list[RayTraceable]:
         return [self]  # any mirror is in the set of most basic ray traceable objects
-
-    # TODO tjlarki: experimental feature, Auto Comenting
-    def add_comment(self, comment: str):
-        self.comments.append(f"\t{comment}")

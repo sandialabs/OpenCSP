@@ -12,6 +12,7 @@ import os
 
 # from   opencsp.common.lib.csp.ufacet.Heliostat import Heliostat
 # import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
+from opencsp.common.lib.csp.HeliostatConfiguration import HeliostatConfiguration
 import opencsp.common.lib.csp.SolarField as sf
 from   opencsp.common.lib.csp.SolarField import SolarField
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
@@ -436,7 +437,7 @@ class TestSolarFieldOutput(to.TestOutput):
             solar_field.lookup_heliostat(h_name).set_orientation_from_pointing_vector(STOW)
         for h_name in synched_heliostats:
             h: HeliostatAzEl = solar_field.lookup_heliostat(h_name)
-            h.set_orientation(synch_az, synch_el)  # Az El heliostat orientation defined by tuple (az, el)
+            h.set_orientation_from_az_el(synch_az, synch_el)  # Az El heliostat orientation defined by tuple (az, el)
         for h_name in up_heliostats:
             solar_field.lookup_heliostat(h_name).set_orientation_from_pointing_vector(UP)
 
@@ -509,7 +510,8 @@ class TestSolarFieldOutput(to.TestOutput):
         for h_name in stowed_heliostats:
             solar_field.lookup_heliostat(h_name).set_orientation_from_pointing_vector(STOW)
         for h_name in (synched_heliostats + mirrored_heliostats):
-            solar_field.lookup_heliostat(h_name).set_orientation(synch_az, synch_el)
+            config = HeliostatConfiguration('az-el',az=synch_az, el=synch_el)
+            solar_field.lookup_heliostat(h_name).set_orientation(config)
         # for h_name in tracking_heliostats:
         #     solar_field.lookup_heliostat(h_name).set_tracking_configuration(aimpoint_xyz,
         #                                                                     solar_field.origin_lon_lat,

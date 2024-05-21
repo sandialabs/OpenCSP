@@ -357,7 +357,6 @@ class TestRayTraceOutput(to.TestOutput):
         trace2.draw(view2_yz, trace_control)
         self.show_save_and_check_figure(fig_record)
 
-        # fm.save_all_figures("C:/Users/tjlarki/Desktop/fig_save/ray_trace_visual_proofs/single_heliostat")
         return
 
     def test_changing_time_of_day(self) -> None:
