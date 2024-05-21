@@ -129,7 +129,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
             h_reader = csv.reader(h_csv)
             h_headers = next(h_reader)
             heliostat_attributes = {row[0]: {h_headers[i]: float(attribute)
-                                             for i, attribute in enumerate(row[1:], start=1)}
+                                             for i, attribute in enumerate(row[1:-1], start=1)}
                                     for row in h_reader}
 
         with open(facet_attributes_csv) as f_csv:

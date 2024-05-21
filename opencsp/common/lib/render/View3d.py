@@ -728,7 +728,7 @@ class View3d(aph.AbstractPlotHandler):
 
     def draw_Vxyz(self, V: Vxyz, close=False, style=None, label=None) -> None:
         """Alternative to View3d.drawxyz_list that used the Vxyz class instead"""
-        self.draw_xyz_list(V.data.T, close, style, label)
+        self.draw_xyz_list(list(V.data.T), close, style, label)
 
     # TODO tjlarki: only implemented for 3d views, should extend
     def draw_xyz_surface(

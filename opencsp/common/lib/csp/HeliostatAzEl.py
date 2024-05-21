@@ -16,6 +16,7 @@ from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.typing_tools import strict_types
+import pandas as pd
 
 EAST = Vxyz([1, 0, 0])
 WEST = -EAST
@@ -88,9 +89,6 @@ class HeliostatAzEl(HeliostatAbstract):
             raise ValueError("number_of_facets and length of facet_positions must match")
         if ((facet_names is not None) and
                 (len(facet_names) != number_of_facets)):
-            # print("debug", len(facet_names))
-            # print("debug", (facet_names))
-            # print("debug", number_of_facets)
             raise ValueError("number_of_facets and length of facet_names must match")
         if facet_names is None:
             facet_names = [None for _ in range(number_of_facets)]
@@ -137,7 +135,7 @@ class HeliostatAzEl(HeliostatAbstract):
             h_reader = csv.reader(h_csv)
             h_headers = next(h_reader)
             heliostat_attributes = {row[0]: {h_headers[i]: float(attribute)
-                                             for i, attribute in enumerate(row[1:], start=1)}
+                                             for i, attribute in enumerate(row[1:-1], start=1)}
                                     for row in h_reader}
             # heliostat_attributes = {}
             # for row in h_reader:
