@@ -22,7 +22,7 @@ class FunctionXYContinuous(FunctionXYAbstract):
     ----------
     funcXY_string: str
         String that contains the function that is supposed to be represented. \n
-        `Note:` The function must use "x" and "y" as the vareiables.
+        `Note:` The function must use "x" and "y" as the vareiables. 
     """
 
     def __init__(self, funcXY_string: str, domain: list[RegionXY] = None) -> None:
@@ -41,6 +41,9 @@ class FunctionXYContinuous(FunctionXYAbstract):
 
     # def interpolate() -> FunctionXYAnalytic:
     #     ...
+
+    def __repr__(self) -> str:
+        return self.func_string
 
     # override
     def value_at(self, x: float, y: float) -> float:

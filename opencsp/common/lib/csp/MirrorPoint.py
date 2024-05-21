@@ -1,7 +1,6 @@
 """Mirror class representing mirrors with scattered surface point
 locations.
 """
-
 from typing import Literal
 from warnings import warn
 
@@ -22,13 +21,11 @@ from opencsp.common.lib.render_control.RenderControlMirror import RenderControlM
 
 
 class MirrorPoint(MirrorAbstract):
-    def __init__(
-        self,
-        surface_points: Pxyz,
-        normal_vectors: Uxyz,
-        shape: RegionXY,
-        interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest',
-    ) -> None:
+    def __init__(self,
+                 surface_points: Pxyz,
+                 normal_vectors: Uxyz,
+                 shape: RegionXY,
+                 interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest') -> None:
         """Class representing a mirror defined by discrete, scattered points
         and corresponding normal vectors.
 
@@ -45,7 +42,7 @@ class MirrorPoint(MirrorAbstract):
                 - 'clough_tocher' - Clough-Tocher interpolation
                 - 'nearest' - nearest neighbor interpolation
         shape : RegionXY
-            XY outline of mirror
+            XY outline of mirror 
 
         Raises
         ------
@@ -66,9 +63,7 @@ class MirrorPoint(MirrorAbstract):
         # Define interpolation type
         self._define_interpolation(interpolation_type)
 
-    def _define_interpolation(
-        self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest']
-    ) -> None:
+    def _define_interpolation(self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest']) -> None:
         """Defines the interpolation type to use
 
         Parameters
@@ -112,15 +107,10 @@ class MirrorPoint(MirrorAbstract):
             self.normals_function = interp.NearestNDInterpolator(points_xy, Z_N)
         elif interpolation_type == 'given':
             # Z coordinate lookup function
-            points_lookup = {
-                (x, y): z for x, y, z in zip(self.surface_points.x, self.surface_points.y, self.surface_points.z)
-            }
+            points_lookup = {(x, y): z for x, y, z in zip(self.surface_points.x, self.surface_points.y, self.surface_points.z)}
             self.surface_function = FXYD(points_lookup)
             # Normal vector lookup function
-            normals_lookup = {
-                (x, y): normal
-                for x, y, normal in zip(self.surface_points.x, self.surface_points.y, self.normal_vectors.data.T)
-            }
+            normals_lookup = {(x, y): normal for x, y, normal in zip(self.surface_points.x, self.surface_points.y, self.normal_vectors.data.T)}
             self.normals_function = FXYD(normals_lookup)
             # Assert that there are no duplicate (x,y) pairs
             if len(points_lookup) != len(self.surface_points):
@@ -145,15 +135,11 @@ class MirrorPoint(MirrorAbstract):
         self._check_in_bounds(p)
         return self.surface_function(p.x, p.y)
 
-    def survey_of_points(
-        self, resolution: int = 1, resolution_type: str = "pixelX", random_seed: int | None = None
-    ) -> tuple[Pxyz, Vxyz]:
+    def survey_of_points(self, resolution: int = 1, resolution_type: str = "pixelX", random_seed: int | None = None) -> tuple[Pxyz, Vxyz]:
         # If using "given" type samping
         if self.interpolation_type == 'given':
             if resolution_type != "given":
-                warn(
-                    "Resolution type becomes 'given' when using type 'given' interpolation.", UserWarning, stacklevel=2
-                )
+                warn("Resolution type becomes 'given' when using type 'given' interpolation.", UserWarning, stacklevel=2)
             given_points_xy = self.surface_points.projXY()
             points = self.location_in_space(given_points_xy)
             normals = self.surface_normal_in_space(given_points_xy)
