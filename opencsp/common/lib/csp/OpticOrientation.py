@@ -4,7 +4,7 @@ from warnings import warn
 
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
-warn("OpTicOrientation should not be used. Instead, extend an optic object "
+warn("OpticOrientation should not be used. Instead, extend an optic object "
      "by OpticOrientationAbstract and implement thae abstract methods. ", 
      DeprecationWarning)
 
