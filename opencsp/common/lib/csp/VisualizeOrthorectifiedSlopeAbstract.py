@@ -242,6 +242,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         type_: Literal['x', 'y', 'combined'] = 'combined',
         clim: float | None = None,
         axis: plt.Axes | None = None,
+        processing: list[Literal['log', 'smooth']] = None,
         smooth_kernel_width: int = 1,
     ):
         """Plots orthorectified curvature (1st derivative of slope) image
@@ -258,13 +259,19 @@ class VisualizeOrthorectifiedSlopeAbstract:
             and [0, clim] for type 'combined.' Units in mrad. None to use default.
         axis : plt.Axes | None
             Axes to plot on. Default is None. If None, uses plt.gca().
+        processing : list[str]
+            Apply processing steps to curvature plot.
+            -Log: shows log of absolute value of image
+            -Smooth: Smooths the image with a rectangular kernel of given width.
         smooth_kernel_width : int
             Dimension of kernel used to smooth slope image before creating curvature plot.
-            By default, 1, which does not smooth data.
+            By default, 1.
         """
         # Check inputs
         if type_ not in ['x', 'y', 'combined']:
             raise ValueError(f'Given type_ {type_} not supported.')
+        if processing is None:
+            processing = []
 
         # Get axes
         if axis is None:
@@ -277,12 +284,6 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Calculate slope image
         slopes = self.orthorectified_slope_array(x_vec, y_vec)  # slope
-
-        # Smooth slope images
-        if smooth_kernel_width > 1:
-            ker = np.ones((smooth_kernel_width, smooth_kernel_width)) / smooth_kernel_width**2
-            slopes[0] = convolve2d(slopes[0], ker, mode='same', boundary='symm')
-            slopes[1] = convolve2d(slopes[1], ker, mode='same', boundary='symm')
 
         # Calculate curvature image
         x_del_vec = np.diff(x_vec)  # meter
@@ -313,6 +314,18 @@ class VisualizeOrthorectifiedSlopeAbstract:
             image = (image_x[1:, :] + image_y[:, 1:]) / 2  # mrad / meter
             title = 'Combined Curvature'
             extent = (left, right, bottom, top)
+
+        # Apply processing steps
+        for proc in processing:
+            if proc == 'log':
+                # Take log of image
+                image = np.abs(image)
+                image[image == 0] = np.nan
+                image = np.log10(image)
+            elif proc == 'smooth':
+                # Smooth images
+                ker = np.ones((smooth_kernel_width, smooth_kernel_width)) / smooth_kernel_width**2
+                image = convolve2d(image, ker, mode='same', boundary='symm')
 
         # Plot image on axes
         plot_orthorectified_image(image, axis, 'seismic', extent, clims, 'mrad/meter')
