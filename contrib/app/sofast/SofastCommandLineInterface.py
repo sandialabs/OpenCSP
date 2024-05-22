@@ -356,7 +356,12 @@ class SofastCommandLineInterface:
     def _run_given_input(self, retval: str) -> None:
         """Runs the given command"""
         # Run fringe measurement and process/save
-        if retval == 'mrp':
+        if retval[:3] == 'cex':
+            exp = int(retval[3:])
+            self.image_acquisition.exposure_time = exp
+            lt.info(f'{timestamp():s} Camera exposure set to {exp:d}')
+            self.func_user_input()
+        elif retval == 'mrp':
             lt.info(f'{timestamp()} Running Sofast Fringe measurement and processing/saving data')
             if self._check_fringe_system_loaded():
                 funcs = [
@@ -470,7 +475,8 @@ if __name__ == '__main__':
     file_display = join(dir_cal, 'display_shape_optics_lab_landscape_square_distorted_3d_100x100.h5')
     file_camera = join(dir_cal, 'camera_sofast_optics_lab_landscape.h5')
     file_image_projection = join(dir_cal, 'image_projection_optics_lab_landscape_square.h5')
-    file_dot_locs = join(dir_cal, 'dot_locations_optics_lab_landscape_square_width3_space6.h5')
+    # file_dot_locs = join(dir_cal, 'dot_locations_optics_lab_landscape_square_width3_space6.h5')
+    file_dot_locs = join(dir_cal, 'dot_locations_2x_4x8_printed_dots.h5')
 
     # Instantiate Sofast Command Line Interface
     sofast_cli = SofastCommandLineInterface()
@@ -483,7 +489,8 @@ if __name__ == '__main__':
     # Load common data
     image_acquisition_in = ImageAcquisition(0)
     image_acquisition_in.frame_size = (1626, 1236)
-    image_acquisition_in.gain = 230
+    # image_acquisition_in.gain = 230
+    # image_acquisition_in.exposure_time = 70000
 
     image_projection_in = ImageProjection.load_from_hdf(file_image_projection)
     image_projection_in.display_data.image_delay_ms = 200
@@ -491,9 +498,13 @@ if __name__ == '__main__':
     camera_in = Camera.load_from_hdf(file_camera)
     facet_definition_in = DefinitionFacet.load_from_json(file_facet_definition_json)
     spatial_orientation_in = SpatialOrientation.load_from_hdf(file_spatial_orientation)
+
+    # User inputs
     measure_point_optic_in = Vxyz((0, 0, 0))  # meters
     dist_optic_screen_in = 10.158  # meters
     name_optic_in = 'Test optic'
+    origin_in = Vxy((1104, 593))  # pixels
+    sofast_cli.colorbar_limit = 2
 
     sofast_cli.set_common_data(
         image_acquisition_in,
@@ -506,8 +517,6 @@ if __name__ == '__main__':
         name_optic_in,
     )
 
-    sofast_cli.colorbar_limit = 2
-
     # Load Sofast Fringe data
     display_shape_in = DisplayShape.load_from_hdf(file_display)
     fringes_in = Fringes.from_num_periods(4, 4)
@@ -517,10 +526,22 @@ if __name__ == '__main__':
 
     # Load Sofast Fixed data
     fixed_pattern_dot_locs_in = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
-    origin_in = Vxy((1100, 560))  # pixels
     surface_fixed_in = Surface2DParabolic((100.0, 100.0), False, 1)
 
     sofast_cli.set_sofast_fixed_data(fixed_pattern_dot_locs_in, origin_in, surface_fixed_in)
+
+    # Define Sofast fixed blob detection parameters
+    sofast_cli.process_sofast_fixed.blob_detector.minDistBetweenBlobs = 9
+    sofast_cli.process_sofast_fixed.blob_detector.minThreshold = 85
+    sofast_cli.process_sofast_fixed.blob_detector.maxThreshold = 250
+    sofast_cli.process_sofast_fixed.blob_detector.thresholdStep = 5
+    sofast_cli.process_sofast_fixed.blob_detector.filterByArea = True
+    sofast_cli.process_sofast_fixed.blob_detector.minArea = 10
+    sofast_cli.process_sofast_fixed.blob_detector.maxArea = 30
+    sofast_cli.process_sofast_fixed.blob_detector.filterByCircularity = True
+    sofast_cli.process_sofast_fixed.blob_detector.minCircularity = 0.7
+    sofast_cli.process_sofast_fixed.blob_detector.filterByConvexity = False
+    sofast_cli.process_sofast_fixed.blob_detector.filterByInertia = False
 
     # Run
     sofast_cli.run()
