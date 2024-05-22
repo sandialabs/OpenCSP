@@ -34,6 +34,7 @@ def load_ideal_facet_ensemble_from_hdf(file: str, focal_length: float) -> FacetE
         Ideal representation of FacetEnsemble made of MirrorParametric objects.
         Defined as "rotation_defined."
     """
+    raise NotImplementedError('"load_ideal_facet_ensemble_from_hdf" is not yet implemented.')
     # Load ensemble definition data
     data_ensemble = load_hdf5_datasets(
         [
@@ -90,6 +91,7 @@ def load_facet_ensemble_from_hdf(file: str) -> FacetEnsemble:
         Measured data contained in OpenCSP optics class. Defined as a
         "rotation_defined" Ensemble.
     """
+    raise NotImplementedError('"load_facet_ensemble_from_hdf" is not yet implemented.')
     # Get number of facets
     data_ensemble = load_hdf5_datasets(['DataSofastInput/optic_definition/ensemble/v_facet_locations'], file)
     num_facets = data_ensemble['v_facet_locations'].shape[1]
@@ -134,7 +136,7 @@ def load_facet_ensemble_from_hdf(file: str) -> FacetEnsemble:
     return FacetEnsemble.generate_rotation_defined(facets)
 
 
-def load_ideal_facet_from_hdf(file: str, focal_length: float) -> Facet:
+def load_ideal_mirror_from_hdf(file: str, focal_length: float) -> MirrorParametric:
     """Uses the "OpticDefinition" in the given SOFAST HDF file and given
     focal length to create a reference Facet
 
@@ -151,18 +153,15 @@ def load_ideal_facet_from_hdf(file: str, focal_length: float) -> Facet:
         Reference facet representation. Defined as "rotation_defined."
     """
     # Load facet corners
-    data = load_hdf5_datasets(['DataSofastInput/optic_definition/facet_000/v_facet_corners'], file)
+    data = load_hdf5_datasets(['DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners'], file)
 
     # Create mirror
     v_facet_corners = Vxy(data['v_facet_corners'][:2])
     region_facet = RegionXY.from_vertices(v_facet_corners)
-    mirror = MirrorParametric.generate_symmetric_paraboloid(focal_length, region_facet)
-
-    # Create facet
-    return Facet.generate_rotation_defined(mirror)
+    return MirrorParametric.generate_symmetric_paraboloid(focal_length, region_facet)
 
 
-def load_facet_from_hdf(file: str) -> Facet:
+def load_mirror_from_hdf(file: str) -> MirrorPoint:
     """Loads Sofast data of a single facet data collection into
     a Facet object.
 
@@ -178,9 +177,9 @@ def load_facet_from_hdf(file: str) -> Facet:
     """
     data = load_hdf5_datasets(
         [
-            'DataSofastInput/optic_definition/facet_000/v_facet_corners',
-            'DataSofastCalculation/facet/facet_000/slopes_facet_xy',
-            'DataSofastCalculation/facet/facet_000/v_surf_points_facet',
+            'DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners',
+            'DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy',
+            'DataSofastCalculation/facet/facet_000/SlopeSolverData/v_surf_points_facet',
         ],
         file,
     )
@@ -198,7 +197,4 @@ def load_facet_from_hdf(file: str) -> Facet:
     surface_normals = Uxyz(surface_normals)
 
     # Define mirror
-    mirror = MirrorPoint(surface_points, surface_normals, region_facet, 'nearest')
-
-    # Define facet
-    return Facet.generate_rotation_defined(mirror)
+    return MirrorPoint(surface_points, surface_normals, region_facet, 'nearest')
