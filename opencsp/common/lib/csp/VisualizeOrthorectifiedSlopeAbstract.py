@@ -291,7 +291,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Define clims
         if clim is not None:
-            clims = [-clim, clim]
+            if isinstance(clim, (list, tuple)):
+                clims = clim
+            else:
+                clims = [-clim, clim]
         else:
             clims = clim
 
@@ -321,7 +324,8 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 # Take log of image
                 image = np.abs(image)
                 image[image == 0] = np.nan
-                image = np.log10(image)
+                image = np.log(image)
+                image[np.isinf(image)] = np.nan
             elif proc == 'smooth':
                 # Smooth images
                 ker = np.ones((smooth_kernel_width, smooth_kernel_width)) / smooth_kernel_width**2
