@@ -40,6 +40,7 @@ class SensitiveStringsSearcher:
         self.sensitive_strings_csv = sensitive_strings_csv
         self.allowed_binary_files_csv = allowed_binary_files_csv
         self.cache_file_csv = cache_file_csv
+        self.verbose = False
         self._interactive = False
         self.verify_all_on_behalf_of_user = False
         self.remove_unfound_binaries = False
@@ -106,6 +107,8 @@ class SensitiveStringsSearcher:
         # check if a binary file
         _, _, ext = ft.path_components(file_name_ext)
         ext = ext.lower()
+        if ext == ".ipynb":
+            is_binary_file = True
         if self._is_img_ext(ext):
             if ext in self._text_file_extensions:
                 is_binary_file = False
@@ -435,6 +438,8 @@ class SensitiveStringsSearcher:
         # Search for sensitive strings in files
         matches: dict[str, list[ssm.Match]] = {}
         for file_path_name_ext in files:
+            if self.verbose:
+                lt.info(f"Searching file {file_path_name_ext}")
             file_path, file_name, file_ext = ft.path_components(file_path_name_ext)
             file_name_ext = file_name + file_ext
             if self._is_file_in_cleared_cache(file_path, file_name_ext):
@@ -479,6 +484,8 @@ class SensitiveStringsSearcher:
         if len(self.unknown_binary_files) > 0:
             unknowns_copy = copy.copy(self.unknown_binary_files)
             for file_ff in unknowns_copy:
+                if self.verbose:
+                    lt.info(f"Searching binary file {file_ff.relpath_name_ext}")
                 lt.info("")
                 lt.info(os.path.join(file_ff.relative_path, file_ff.name_ext))
                 num_signed_binary_files = 0
@@ -594,10 +601,17 @@ if __name__ == "__main__":
         help="Don't fail because of unfound expected binary files. Instead remove the expected files from the list of allowed binaries. "
         + "This can be useful when you're confident that the only changes have been that the binary files have moved but not changed.",
     )
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        dest="verbose",
+        help="Print more information while running",
+    )
     args = parser.parse_args()
     not_interactive: bool = args.ninteractive
     accept_all: bool = args.acceptall
     remove_unfound_binaries: bool = args.acceptunfound
+    verbose: bool = args.verbose
 
     ss_log_dir = ft.norm_path(opencsp_settings['sensitive_strings']['sensitive_strings_dir'])
     log_path = ft.norm_path(os.path.join(ss_log_dir, "sensitive_strings_log.txt"))
@@ -616,6 +630,7 @@ if __name__ == "__main__":
     searcher.interactive = not not_interactive
     searcher.verify_all_on_behalf_of_user = accept_all
     searcher.remove_unfound_binaries = remove_unfound_binaries
+    searcher.verbose = verbose
     searcher.date_time_str = date_time_str
     num_errors = searcher.search_files()
 
