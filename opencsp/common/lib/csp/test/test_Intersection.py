@@ -17,45 +17,45 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.csp.RayTrace as rt
 
 
-
 class TestIntersection:
     """Test class for testing Intersection class. MirrorParametric and RayTrac must also be working."""
 
     def test_rays_intersect_properly(self):
-        """two different intersection planes should 
-        should prduce the same intersection point for a single ray 
+        """two different intersection planes should
+        should prduce the same intersection point for a single ray
         that passes through an intersection point on the plane."""
 
-        UP = Vxyz([0,0,1])
-        WEST = Vxyz([-1,0,0])
+        UP = Vxyz([0, 0, 1])
+        WEST = Vxyz([-1, 0, 0])
         plane1 = (Pxyz.origin(), UP)
         plane2 = (Pxyz.origin(), WEST)
 
         light_ray = LightPathEnsemble.from_parts(
             init_directions=Vxyz([1, 0, 1]).normalize(),
-            points=[Pxyz([-1, 0, -1])], 
+            points=[Pxyz([-1, 0, -1])],
             curr_directions=Vxyz([1, 0, 1]).normalize(),
         )
 
         raytrace = RayTrace()
-        raytrace.light_paths_ensemble=light_ray
+        raytrace.light_paths_ensemble = light_ray
 
         intersection1 = Intersection.plane_intersect_from_ray_trace(raytrace, plane1)
         intersection2 = Intersection.plane_intersect_from_ray_trace(raytrace, plane2)
 
         # Test
-        np.testing.assert_array_almost_equal(intersection1.intersection_points.data, 
-                                             intersection2.intersection_points.data)
+        np.testing.assert_array_almost_equal(
+            intersection1.intersection_points.data, intersection2.intersection_points.data
+        )
 
     def test_parallel_reflection(self):
-        """Test to see if the intersection properly finds rays that 
+        """Test to see if the intersection properly finds rays that
         should be parallel."""
 
         # Define mirror
-        mirror = MirrorParametricRectangular.from_focal_length(2, (1,1))
+        mirror = MirrorParametricRectangular.from_focal_length(2, (1, 1))
 
         # Define plane
-        plane = (Pxyz([0,0,2]), Vxyz([0,0,-1]))
+        plane = (Pxyz([0, 0, 2]), Vxyz([0, 0, -1]))
 
         # Make scene and light
         light = LightSourcePoint(Pxyz([0, 0, 2]))
@@ -67,8 +67,7 @@ class TestIntersection:
         # Trace
         resolution = Resolution.separation(0.5)
 
-        trace = rt.trace_scene(scene, 
-                       obj_resolution=resolution)
+        trace = rt.trace_scene(scene, obj_resolution=resolution)
         intersection = Intersection.plane_intersect_from_ray_trace(trace, plane)
 
         # Define Expectation
@@ -76,24 +75,21 @@ class TestIntersection:
         expected_points, expected_directions = mirror.survey_of_points(resolution)
 
         # Test
-        np.testing.assert_array_almost_equal(intersection.intersection_points.x, 
-                                             expected_points.x)
-        np.testing.assert_array_almost_equal(intersection.intersection_points.y, 
-                                             expected_points.y)
-
+        np.testing.assert_array_almost_equal(intersection.intersection_points.x, expected_points.x)
+        np.testing.assert_array_almost_equal(intersection.intersection_points.y, expected_points.y)
 
     def test_converging_reflection(self):
-        """Test to see if the intersection properly finds rays that 
+        """Test to see if the intersection properly finds rays that
         should be converge to a point."""
 
         # Define mirror
-        mirror = MirrorParametricRectangular.from_focal_length(2, (1,1))
+        mirror = MirrorParametricRectangular.from_focal_length(2, (1, 1))
 
         # Define plane
-        plane = (Pxyz([0,0,2]), Vxyz([0,0,-1]))
+        plane = (Pxyz([0, 0, 2]), Vxyz([0, 0, -1]))
 
         # Make scene and light
-        light = LightSourceSun.from_given_sun_position(Vxyz([0,0,-1]), 1)
+        light = LightSourceSun.from_given_sun_position(Vxyz([0, 0, -1]), 1)
 
         scene = Scene()
         scene.add_object(mirror)
@@ -102,20 +98,15 @@ class TestIntersection:
         # Trace
         resolution = Resolution.separation(0.5)
 
-        trace = rt.trace_scene(scene, 
-                       obj_resolution=resolution)
+        trace = rt.trace_scene(scene, obj_resolution=resolution)
         intersection = Intersection.plane_intersect_from_ray_trace(trace, plane)
 
         # Define Expectation
         # we expect all points to converge at (0,0,2)
-        expected_points = Pxyz([[0,0,0,0],
-                               [0,0,0,0],
-                               [2,2,2,2]])
+        expected_points = Pxyz([[0, 0, 0, 0], [0, 0, 0, 0], [2, 2, 2, 2]])
 
         # Test
-        np.testing.assert_array_almost_equal(intersection.intersection_points._data, 
-                                             expected_points.data)
-
+        np.testing.assert_array_almost_equal(intersection.intersection_points._data, expected_points.data)
 
 
 if __name__ == '__main__':
