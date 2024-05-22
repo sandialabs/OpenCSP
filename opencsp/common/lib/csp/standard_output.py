@@ -1,8 +1,10 @@
-"""Library of functions used to display/save the suite of standard output
+"""Class used to display/save the suite of standard output
 plots after measuring a CSP Mirror/FacetEnsemble.
 """
 
 from dataclasses import dataclass
+
+import numpy as np
 
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
@@ -10,7 +12,7 @@ from opencsp.common.lib.render_control.RenderControlLightPath import RenderContr
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
 from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
 from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
-from opencsp.common.lib.csp.LightSource import LightSource
+from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 import opencsp.common.lib.csp.RayTrace as rt
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
@@ -22,318 +24,427 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 @dataclass
-class VisualizationOptions:
-    """Provides defaults for CSP optic visualization"""
+class _OptionsSlopeVis:
+    resolution: float = 0.01
+    clim: float = 5
+    quiver_density: float = 0.1
+    error_clim: float = 5
 
+
+@dataclass
+class _OptionsCurvatureVis:
+    resolution: float = 0.01
+    clim: float = 50
+
+
+@dataclass
+class _OptionsRayTraceVis:
+    to_ray_trace: bool = False
     ray_trace_optic_res: int = 20
     hist_bin_res: float = 0.07
     hist_extent: float = 3
     ensquared_energy_max_semi_width: float = 2
-    curvature_clim: float = 50
-    slope_map_quiver_density: float = 0.1
-    slope_map_resolution: float = 0.01
-    slope_clim: float = 5
-    slope_error_clim: float = 5
-    save_dpi: int = 200
-    save_format: str = 'png'
-    mirror_plot_normals_res: int = 1
     ray_trace_plot_ray_length: float = 80
-    close_after_save: bool = False
+
+
+@dataclass
+class _OptionsFileOutput:
     to_save: bool = False
     output_dir: str = ''
+    save_dpi: int = 200
+    save_format: str = 'png'
+    close_after_save: bool = False
 
 
-def standard_output(
-    optic_meas: MirrorAbstract,
-    optic_ref: MirrorAbstract | None = None,
-    source: LightSource | None = None,
-    v_target_center: Vxyz | None = None,
-    v_target_normal: Uxyz | None = None,
-    vis_options=VisualizationOptions(),
-):
-    """Plots the OpenCSP standard ouptut plot suite given a measured
-    CSP optic, a reference CSP optic, and scenario data for ray tracing.
-    If no reference or scenario data exists, those plots will not be
-    created.
+@dataclass
+class _RayTraceParameters:
+    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=20)
+    v_target_center = Vxyz((0, 0, 50))
+    v_target_normal = Vxyz((0, 1, 0))
 
-    - Plots created when given optic_meas
-        - Measured slope x
-        - Measured slope y
-        - Measured slope magnitude
-        - Measured
-    - Plots created when given optic_ref
-    - Plots created
 
-    Parameters
-    ----------
-    optic_meas : MirrorAbstract
-        Measured optic representation
-    optic_ref : MirrorAbstract | None, optional
-        Reference optic representation, by default None
-    source : LightSource | None, optional
-        Light source representation, by default None
-    v_target_center : Vxyz | None, optional
-        Target center in space, by default None
-    v_target_normal : Uxyz | None, optional
-        Target normal orientation in space, by default None
-    vis_options : VisualizationOptions
-        Data class of visualization options. By default, defualt class values.
-    """
-    # Determine which plots to create
-    to_plot_reference = optic_ref is not None
-    lt.info(f'Plotting reference optic set to: {to_plot_reference}')
-    to_ray_trace = (source is not None) and (v_target_center is not None) and (v_target_normal is not None)
-    lt.info(f'Plotting ray traces set to: {to_ray_trace}')
+@dataclass
+class _RayTraceOutput:
+    ray_trace: rt.RayTrace
+    histogram: np.ndarray
+    histogram_x: np.ndarray
+    histogram_y: np.ndarray
+    ensquared_energy_values: np.ndarray
+    ensquared_energy_widths: np.ndarray
 
-    # Perform measured optic ray trace
-    if to_ray_trace:
-        ray_trace_meas = ray_trace_scene(optic_meas, source, obj_resolution=vis_options.ray_trace_optic_res)
-        ray_pts_meas = rt.plane_intersect(ray_trace_meas, v_target_center, v_target_normal)
-        image_meas, xv_meas, yv_meas = rt.histogram_image(
-            bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_meas
+
+class StandardOutput:
+    """Used to orchestrate the plotting and saving of the standard output plot suite of CSP mirrors"""
+
+    def __init__(self):
+        self.options_slope_vis = _OptionsSlopeVis()
+        """Slope visualization options"""
+        self.options_curvature_vis = _OptionsCurvatureVis()
+        """Curvature visualization options"""
+        self.options_ray_trace_vis = _OptionsRayTraceVis()
+        """Ray trace visualization options"""
+        self.options_file_output = _OptionsFileOutput()
+        """File output options"""
+
+        self.params_ray_trace = _RayTraceParameters()
+        """Parameters to perform ray trace"""
+
+        self.optic_measured: MirrorAbstract = None
+        """Measured optic object"""
+        self.optic_reference: MirrorAbstract = None
+        """Reference optic object"""
+
+        # Set up figure control objects for plots
+        self.fig_control = RenderControlFigure(tile_array=(4, 2), tile_square=True)
+        self.axis_control = rca.meters()
+        self.point_styles = RenderControlPointSeq(linestyle='--', color='k', markersize=0)
+        self.mirror_control = RenderControlMirror(surface_normals=True, norm_res=1, point_styles=self.point_styles)
+        self.light_path_control = RenderControlLightPath(
+            current_length=self.options_ray_trace_vis.ray_trace_plot_ray_length
         )
-        ee_meas, ws_meas = rt.ensquared_energy(ray_pts_meas, vis_options.ensquared_energy_max_semi_width)
+        self.ray_trace_control = RenderControlRayTrace(light_path_control=self.light_path_control)
 
-    # Set up figure control objects for 3d plots
-    fig_control = RenderControlFigure(tile_array=(4, 2), tile_square=True)
-    axis_control = rca.meters()
-    point_styles = RenderControlPointSeq(linestyle='--', color='k', markersize=0)
-    mirror_control = RenderControlMirror(surface_normals=True, norm_res=1, point_styles=point_styles)
-    light_path_control = RenderControlLightPath(current_length=vis_options.ray_trace_plot_ray_length)
-    ray_trace_control = RenderControlRayTrace(light_path_control=light_path_control)
+        # Define output data storage classes
+        self._ray_trace_output_measured: _RayTraceOutput = None
+        self._ray_trace_output_reference: _RayTraceOutput = None
 
-    # Plot measured slope maps
-    fig_rec = fm.setup_figure(fig_control, axis_control, name="Measured Slope")
-    optic_meas.plot_orthorectified_slope(
-        vis_options.slope_map_resolution,
-        type_='magnitude',
-        quiver_density=vis_options.slope_map_quiver_density,
-        clim=vis_options.slope_clim,
-        axis=fig_rec.axis,
-    )
-    if vis_options.to_save:
-        fig_rec.save(
-            vis_options.output_dir,
-            dpi=vis_options.save_dpi,
-            format='png',
-            close_after_save=vis_options.close_after_save,
-        )
+    @property
+    def _is_reference_optic(self) -> bool:
+        """To make reference optic plots"""
+        return self.optic_reference is not None
 
-    fig_rec = fm.setup_figure(fig_control, axis_control, name="Measured X Slope")
-    optic_meas.plot_orthorectified_slope(
-        vis_options.slope_map_resolution,
-        type_='x',
-        quiver_density=vis_options.slope_map_quiver_density,
-        clim=vis_options.slope_clim,
-        axis=fig_rec.axis,
-    )
-    if vis_options.to_save:
-        fig_rec.save(
-            vis_options.output_dir,
-            dpi=vis_options.save_dpi,
-            format='png',
-            close_after_save=vis_options.close_after_save,
-        )
+    @property
+    def _to_save(self) -> bool:
+        """To save plots or not"""
+        return self.options_file_output.to_save
 
-    fig_rec = fm.setup_figure(fig_control, axis_control, name="Measured Y Slope")
-    optic_meas.plot_orthorectified_slope(
-        vis_options.slope_map_resolution,
-        type_='y',
-        quiver_density=vis_options.slope_map_quiver_density,
-        clim=vis_options.slope_clim,
-        axis=fig_rec.axis,
-    )
-    if vis_options.to_save:
-        fig_rec.save(
-            vis_options.output_dir,
-            dpi=vis_options.save_dpi,
-            format='png',
-            close_after_save=vis_options.close_after_save,
-        )
+    def plot(self):
+        """Creates standard output plot suite"""
+        # Plot slope/curvature, if able
+        self.plot_slope_curvature_measured_optic()
+        self.plot_slope_curvature_reference_optic()
+        self.plot_slope_deviation()
 
-    # Plot measured curvature maps
-    fig_rec = fm.setup_figure(fig_control, axis_control, name='Curvature X')
-    optic_meas.plot_orthorectified_curvature(
-        vis_options.slope_map_resolution, type_='x', clim=vis_options.curvature_clim, axis=fig_rec.axis
-    )
-    if vis_options.to_save:
-        fig_rec.save(
-            vis_options.output_dir,
-            dpi=vis_options.save_dpi,
-            format='png',
-            close_after_save=vis_options.close_after_save,
-        )
-
-    fig_rec = fm.setup_figure(fig_control, axis_control, name='Curvature Y')
-    optic_meas.plot_orthorectified_curvature(
-        vis_options.slope_map_resolution, type_='y', clim=vis_options.curvature_clim, axis=fig_rec.axis
-    )
-    if vis_options.to_save:
-        fig_rec.save(
-            vis_options.output_dir,
-            dpi=vis_options.save_dpi,
-            format='png',
-            close_after_save=vis_options.close_after_save,
-        )
-
-    fig_rec = fm.setup_figure(fig_control, axis_control, name='Curvature Combined')
-    optic_meas.plot_orthorectified_curvature(
-        vis_options.slope_map_resolution, type_='combined', clim=vis_options.curvature_clim, axis=fig_rec.axis
-    )
-    if vis_options.to_save:
-        fig_rec.save(
-            vis_options.output_dir,
-            dpi=vis_options.save_dpi,
-            format='png',
-            close_after_save=vis_options.close_after_save,
-        )
-
-    if to_plot_reference:
-        fig_rec = fm.setup_figure(fig_control, axis_control, name="Slope Deviation Magnitude")
-        optic_meas.plot_orthorectified_slope_error(
-            optic_ref,
-            vis_options.slope_map_resolution,
-            type_='magnitude',
-            quiver_density=vis_options.slope_map_quiver_density,
-            clim=vis_options.slope_error_clim,
-            axis=fig_rec.axis,
-        )
-        if vis_options.to_save:
-            fig_rec.save(
-                vis_options.output_dir,
-                dpi=vis_options.save_dpi,
-                format='png',
-                close_after_save=vis_options.close_after_save,
+        if self.options_ray_trace_vis.to_ray_trace:
+            # Perform ray tracing, if set
+            self._perform_ray_trace_optic_measured()
+            self._perform_ray_trace_optic_reference()
+            # Plot ray trace data
+            self.plot_ray_trace_image_measured_optic()
+            self.plot_ray_trace_image_reference_optic()
+            self.plot_enclosed_energy()
+        else:
+            lt.info(
+                'Ray tracing turned off in self.options_ray_trace_vis.to_ray_trace; skipping all ray tracing plots.'
             )
 
-        fig_rec = fm.setup_figure(fig_control, axis_control, name="Slope Deviation X ")
-        optic_meas.plot_orthorectified_slope_error(
-            optic_ref,
-            vis_options.slope_map_resolution,
-            type_='x',
-            quiver_density=vis_options.slope_map_quiver_density,
-            clim=vis_options.slope_error_clim,
-            axis=fig_rec.axis,
-        )
-        if vis_options.to_save:
-            fig_rec.save(
-                vis_options.output_dir,
-                dpi=vis_options.save_dpi,
-                format='png',
-                close_after_save=vis_options.close_after_save,
+    def plot_slope_curvature_measured_optic(self):
+        """Plots optic slope/curvature plots for measured optic"""
+        if self.optic_measured is not None:
+            self._plot_slope_curvature(self.optic_measured, 'measured')
+        else:
+            lt.info('No measured optic; skipping measured optic slope/curvature plots.')
+
+    def plot_slope_curvature_reference_optic(self):
+        """Plots optic slope/curvature plots for reference optic"""
+        if self.optic_reference is not None:
+            self._plot_slope_curvature(self.optic_reference, 'reference')
+        else:
+            lt.info('No reference optic; skipping reference optic slope/curvature plots.')
+
+    def plot_slope_deviation(self):
+        """Plots slope deviation"""
+        if (self.optic_measured is not None) and (self.optic_reference is not None):
+            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation Magnitude")
+            self.optic_measured.plot_orthorectified_slope_error(
+                self.optic_reference,
+                self.options_slope_vis.resolution,
+                type_='magnitude',
+                quiver_density=self.options_slope_vis.quiver_density,
+                clim=self.options_slope_vis.clim,
+                axis=fig_rec.axis,
             )
+            if self._to_save:
+                fig_rec.save(
+                    output_dir=self.options_file_output.output_dir,
+                    dpi=self.options_file_output.save_dpi,
+                    format='png',
+                    close_after_save=self.options_file_output.close_after_save,
+                )
 
-        fig_rec = fm.setup_figure(fig_control, axis_control, name="Slope Deviation Y ")
-        optic_meas.plot_orthorectified_slope_error(
-            optic_ref,
-            vis_options.slope_map_resolution,
-            type_='y',
-            quiver_density=vis_options.slope_map_quiver_density,
-            clim=vis_options.slope_error_clim,
-            axis=fig_rec.axis,
-        )
-        if vis_options.to_save:
-            fig_rec.save(
-                vis_options.output_dir,
-                dpi=vis_options.save_dpi,
-                format='png',
-                close_after_save=vis_options.close_after_save,
+            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation X ")
+            self.optic_measured.plot_orthorectified_slope_error(
+                self.optic_reference,
+                self.options_slope_vis.resolution,
+                type_='x',
+                quiver_density=self.options_slope_vis.quiver_density,
+                clim=self.options_slope_vis.clim,
+                axis=fig_rec.axis,
             )
+            if self._to_save:
+                fig_rec.save(
+                    output_dir=self.options_file_output.output_dir,
+                    dpi=self.options_file_output.save_dpi,
+                    format='png',
+                    close_after_save=self.options_file_output.close_after_save,
+                )
 
-    if to_plot_reference and to_ray_trace:
-        # Perform ray trace of reference optic
-        ray_trace_ref = ray_trace_scene(optic_ref, source, obj_resolution=vis_options.ray_trace_optic_res)
-        ray_pts_ref = rt.plane_intersect(ray_trace_ref, v_target_center, v_target_normal)
-
-        # Create ensquared energy chart for reference optic
-        image_ref, xv_ref, yv_ref = rt.histogram_image(
-            bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_ref
-        )
-        ee_ref, ws_ref = rt.ensquared_energy(ray_pts_ref, vis_options.ensquared_energy_max_semi_width)
-
-        # Draw reference ensemble and traced rays
-        fig_rec = fm.setup_figure_for_3d_data(fig_control, axis_control, name='Ray Trace')
-        if len(ray_trace_ref.light_paths) < 100:  # Only plot few rays
-            ray_trace_ref.draw(fig_rec.view, ray_trace_control)
-        optic_ref.draw(fig_rec.view, mirror_control)
-        fig_rec.axis.axis('equal')
-        if vis_options.to_save:
-            fig_rec.save(
-                vis_options.output_dir,
-                dpi=vis_options.save_dpi,
-                format='png',
-                close_after_save=vis_options.close_after_save,
+            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation Y ")
+            self.optic_measured.plot_orthorectified_slope_error(
+                self.optic_reference,
+                self.options_slope_vis.resolution,
+                type_='y',
+                quiver_density=self.options_slope_vis.quiver_density,
+                clim=self.options_slope_vis.clim,
+                axis=fig_rec.axis,
             )
+            if self._to_save:
+                fig_rec.save(
+                    output_dir=self.options_file_output.output_dir,
+                    dpi=self.options_file_output.save_dpi,
+                    format='png',
+                    close_after_save=self.options_file_output.close_after_save,
+                )
+        else:
+            lt.info('Do not have both measured and reference optic; skipping slope deviation plots.')
 
-        # Draw reference optic sun image on target
-        fig_rec = fm.setup_figure(fig_control, axis_control, name='Reference Ray Trace Image')
-        fig_rec.axis.imshow(image_ref, cmap='jet', extent=(xv_ref.min(), xv_ref.max(), yv_ref.min(), yv_ref.max()))
-        if vis_options.to_save:
-            fig_rec.save(
-                vis_options.output_dir,
-                dpi=vis_options.save_dpi,
-                format='png',
-                close_after_save=vis_options.close_after_save,
+    def plot_ray_trace_image_measured_optic(self):
+        """Plot ray trace image for measured optic"""
+        if self._ray_trace_output_measured is not None:
+            self._plot_ray_trace_image(self._ray_trace_output_measured, 'measured')
+
+    def plot_ray_trace_image_reference_optic(self):
+        """Plot ray trace image for reference optic"""
+        if self._ray_trace_output_reference is not None:
+            self._plot_ray_trace_image(self._ray_trace_output_reference, 'reference')
+
+    def plot_enclosed_energy(self):
+        """Makes measured and/or reference enclosed energy plots"""
+        fig_rec = fm.setup_figure(self.fig_control, name='Ensquared Energy')
+
+        # Dray reference if available
+        if self._ray_trace_output_reference is not None:
+            fig_rec.axis.plot(
+                self._ray_trace_output_reference.ensquared_energy_values,
+                self._ray_trace_output_reference.ensquared_energy_widths,
+                label='Reference',
+                color='k',
+                linestyle='--',
             )
+        else:
+            lt.info('Reference ray trace data not available, skipping reference enclosed energy curve.')
 
-    if to_ray_trace:
-        # Draw measured optic sun image on target
-        fig_rec = fm.setup_figure(fig_control, axis_control, name='Measured Ray Trace Image')
-        fig_rec.axis.imshow(image_meas, cmap='jet', extent=(xv_meas.min(), xv_meas.max(), yv_meas.min(), yv_meas.max()))
-        if vis_options.to_save:
-            fig_rec.save(
-                vis_options.output_dir,
-                dpi=vis_options.save_dpi,
-                format='png',
-                close_after_save=vis_options.close_after_save,
+        # Draw measured if available
+        if self._ray_trace_output_measured is not None:
+            fig_rec.axis.plot(
+                self._ray_trace_output_measured.ensquared_energy_values,
+                self._ray_trace_output_measured.ensquared_energy_widths,
+                label='Measured',
+                color='k',
+                linestyle='-',
             )
+        else:
+            lt.info('Measured ray trace data not available, skipping measured enclosed energy curve.')
 
-        # Draw ensquared energy plot
-        fig_rec = fm.setup_figure(fig_control, name='Ensquared Energy')
-        if to_plot_reference:
-            fig_rec.axis.plot(ws_ref, ee_ref, label='Reference', color='k', linestyle='--')
-        fig_rec.axis.plot(ws_meas, ee_meas, label='Measured', color='k', linestyle='-')
+        # Format plot
         fig_rec.axis.legend()
         fig_rec.axis.grid()
         fig_rec.axis.set_xlabel('Semi-width (meters)')
         fig_rec.axis.set_ylabel('Ensquared Energy')
         fig_rec.axis.set_title('Ensquared Energy')
-        if vis_options.to_save:
+        if self._to_save:
             fig_rec.save(
-                vis_options.output_dir,
-                dpi=vis_options.save_dpi,
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
                 format='png',
-                close_after_save=vis_options.close_after_save,
+                close_after_save=self.options_file_output.close_after_save,
             )
 
+    def _plot_slope_curvature(self, optic: MirrorAbstract, suffix: str):
+        # Plot slope maps
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Measured Slope " + suffix)
+        optic.plot_orthorectified_slope(
+            self.options_slope_vis.resolution,
+            type_='magnitude',
+            quiver_density=self.options_slope_vis.quiver_density,
+            clim=self.options_slope_vis.clim,
+            axis=fig_rec.axis,
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
 
-def ray_trace_scene(obj: RayTraceable, source: LightSource, obj_resolution=1) -> rt.RayTrace:
-    """Performs a raytrace of a simple scene with a source and an optic.
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Measured X Slope " + suffix)
+        optic.plot_orthorectified_slope(
+            self.options_slope_vis.resolution,
+            type_='x',
+            quiver_density=self.options_slope_vis.quiver_density,
+            clim=self.options_slope_vis.clim,
+            axis=fig_rec.axis,
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
 
-    Parameters
-    ----------
-    obj : RayTraceable
-        Optic
-    source : LightSource
-        Source
-    obj_resolution : int, optional
-        Mirror ray resolution, by default 1
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Measured Y Slope " + suffix)
+        optic.plot_orthorectified_slope(
+            self.options_slope_vis.resolution,
+            type_='y',
+            quiver_density=self.options_slope_vis.quiver_density,
+            clim=self.options_slope_vis.clim,
+            axis=fig_rec.axis,
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
 
-    Returns
-    -------
-    RayTrace
-        Output raytrace object
-    """
-    # Create scene with source and optic
-    scene = Scene()
-    scene.add_light_source(source)
-    scene.add_object(obj)
+        # Plot curvature maps
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature X ' + suffix)
+        optic.plot_orthorectified_curvature(
+            self.options_curvature_vis.resolution, type_='x', clim=self.options_curvature_vis.clim, axis=fig_rec.axis
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
 
-    # Trace scene
-    trace = rt.trace_scene(scene, obj_resolution=obj_resolution)
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Y ' + suffix)
+        optic.plot_orthorectified_curvature(
+            self.options_curvature_vis.resolution, type_='y', clim=self.options_curvature_vis.clim, axis=fig_rec.axis
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
 
-    # Calculate intersection with plane
-    ray_trace = rt.RayTrace(scene)
-    ray_trace.add_many_light_paths(trace.light_paths)
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Combined ' + suffix)
+        optic.plot_orthorectified_curvature(
+            self.options_curvature_vis.resolution,
+            type_='combined',
+            clim=self.options_curvature_vis.clim,
+            axis=fig_rec.axis,
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
 
-    return ray_trace
+    def _plot_ray_trace_image(self, ray_trace_data: _RayTraceOutput, suffix: str):
+        # Draw sun image on target
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Ray Trace Image ' + suffix)
+        fig_rec.axis.imshow(
+            ray_trace_data.histogram,
+            cmap='jet',
+            extent=(
+                ray_trace_data.histogram_x.min(),
+                ray_trace_data.histogram_x.max(),
+                ray_trace_data.histogram_y.min(),
+                ray_trace_data.histogram_y.max(),
+            ),
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
+
+    def _perform_ray_trace_optic_measured(self):
+        """Performs ray trace on measured optic"""
+        if self._ray_trace_output_measured is not None:
+            # Perfom ray trace and intersection
+            ray_trace = self._ray_trace_scene(self.optic_measured)
+            ray_pts_meas = rt.plane_intersect(
+                ray_trace, self.params_ray_trace.v_target_center, self.params_ray_trace.v_target_normal
+            )
+
+            # Create image
+            image, xv, yv = rt.histogram_image(
+                bin_res=self.options_ray_trace_vis.hist_bin_res,
+                extent=self.options_ray_trace_vis.hist_extent,
+                pts=ray_pts_meas,
+            )
+
+            # Create ensquared energy curve
+            ee, ws = rt.ensquared_energy(ray_pts_meas, self.options_ray_trace_vis.ensquared_energy_max_semi_width)
+
+            # Save
+            self._ray_trace_output_measured = _RayTraceOutput(ray_trace, image, xv, yv, ee, ws)
+        else:
+            lt.info('No measured optic; skipping measured optic ray trace.')
+
+    def _perform_ray_trace_optic_reference(self):
+        if self._ray_trace_output_reference is not None:
+            # Perform ray trace and intersection
+            ray_trace = self._ray_trace_scene(self.optic_reference)
+            ray_pts = rt.plane_intersect(
+                ray_trace, self.params_ray_trace.v_target_center, self.params_ray_trace.v_target_normal
+            )
+
+            # Create image
+            image, xv, yv = rt.histogram_image(
+                bin_res=self.options_ray_trace_vis.hist_bin_res,
+                extent=self.options_ray_trace_vis.hist_extent,
+                pts=ray_pts,
+            )
+
+            # Create ensquared energy curve
+            ee, ws = rt.ensquared_energy(ray_pts, self.options_ray_trace_vis.ensquared_energy_max_semi_width)
+
+            # Save data
+            self._ray_trace_output_reference = _RayTraceOutput(ray_trace, image, xv, yv, ee, ws)
+        else:
+            lt.info('No reference optic; skipping reference optic ray trace.')
+
+    def _ray_trace_scene(self, obj: RayTraceable) -> rt.RayTrace:
+        """Performs a raytrace of a simple scene with a source and an optic.
+
+        Parameters
+        ----------
+        obj : RayTraceable
+            Optic
+        source : LightSource
+            Source
+        obj_resolution : int, optional
+            Mirror ray resolution, by default 1
+
+        Returns
+        -------
+        RayTrace
+            Output raytrace object
+        """
+        # Create scene with source and optic
+        scene = Scene()
+        scene.add_light_source(self.params_ray_trace.source)
+        scene.add_object(obj)
+
+        # Trace scene
+        trace = rt.trace_scene(scene, obj_resolution=self.options_ray_trace_vis.ray_trace_optic_res)
+
+        # Calculate intersection with plane
+        ray_trace = rt.RayTrace(scene)
+        ray_trace.add_many_light_paths(trace.light_paths)
+
+        return ray_trace
