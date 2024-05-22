@@ -216,7 +216,7 @@ class Heliostat(RayTraceable):
             # Compute heliostat configuration.
             return hc.heliostat_configuration_given_surface_normal_xyz(n_xyz)
 
-    @strict_types
+    # @strict_types
     def compute_tracking_configuration_from_sun_vector(
         self, aimpoint_xyz: list | np.ndarray, sun_vector: Vxyz
     ) -> hc.HeliostatConfiguration:
@@ -355,7 +355,7 @@ class Heliostat(RayTraceable):
             self.set_position_in_space(self.origin, self.rotation)
 
     # TODO tjlarki: currently basis location off helisotat origin
-    @strict_types
+    # @strict_types
     def set_on_axis_canting(self, aimpoint: Pxyz):
         focal_length = (aimpoint - Pxyz(self.origin)).magnitude()[0]
         fn = mt.lambda_symmetric_paraboloid(focal_length)
@@ -492,7 +492,7 @@ class Heliostat(RayTraceable):
         # fn = FunctionXYContinuous
         self.set_canting_from_equation(fn)
 
-    @strict_types
+    # @strict_types
     def set_canting_from_list(self, canting_rotations: list[Rotation]) -> None:
         # TODO: THIS SHOULD BE EITHER IMPLEMENTED, OR DISCARDED.
         for facet, canting in zip(self.facets, canting_rotations):
@@ -503,7 +503,7 @@ class Heliostat(RayTraceable):
 
     # MODIFICATION
 
-    @strict_types
+    # @strict_types
     def set_center_facet(self, facet: Facet | str):
         """Sets the self.center_facet attribute.
         takes a string for the name of the facet, or a facet object."""
@@ -522,7 +522,7 @@ class Heliostat(RayTraceable):
         h_config = self.compute_tracking_configuration(aimpoint_xyz, location_lon_lat, when_ymdhmsz)
         self.set_configuration(h_config, clear_tracking=False)
 
-    @strict_types
+    # @strict_types
     def set_tracking_from_sun_vector(self, aimpoint_xyz, sun_vector: Vxyz):
         sun_vector = sun_vector.normalize()
         # Save tracking command.
@@ -602,7 +602,7 @@ class Heliostat(RayTraceable):
         return transformed_xyz
 
     # override from RayTracable
-    @strict_types
+    # @strict_types
     def set_position_in_space(self, location: np.ndarray, rotation: Rotation) -> None:
         self.origin = location  # + self.pivot_offset
         self.rotation = rotation

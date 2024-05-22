@@ -73,7 +73,7 @@ class RayTrace:
             lp = self.light_paths_ensemble[int(i)]
             lp.draw(view, trace_style.light_path_control)
 
-    @strict_types
+    # @strict_types
     def add_many_light_paths(self, new_paths: list[LightPath]):
         self.light_paths_ensemble.concatenate_in_place(LightPathEnsemble(new_paths))
 
@@ -225,7 +225,7 @@ def trace_scene_unvec(
 
 
 # TODO TJL:FIX ISSUES, only trace_scene_parallel is up-to-date
-# @strict_types
+# # @strict_types
 def trace_scene(
     scene: scn.Scene,
     obj_resolution: Resolution,
@@ -258,7 +258,7 @@ def trace_scene(
     total_lpe = LightPathEnsemble([])
     batch = int(0)
 
-    # @strict_types
+    # # @strict_types
     def trace_for_single_object(obj: RayTraceable) -> LightPathEnsemble:
 
         total_lpe: LightPathEnsemble = LightPathEnsemble([])
@@ -347,7 +347,7 @@ def trace_scene(
 
 
 # Helper for trace_scene_parallel
-# @strict_types
+# # @strict_types
 def _trace_object(
     process: int,
     obj: RayTraceable,

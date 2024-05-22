@@ -290,7 +290,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
     # MODIFICATION
 
-    @strict_types
+    # @strict_types
     def set_full_field_tracking(self, aimpoint_xyz: Pxyz, when_ymdhmsz: tuple):
         # Save tracking command.
         self._aimpoint_xyz = aimpoint_xyz

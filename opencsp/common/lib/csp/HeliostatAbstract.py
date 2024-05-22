@@ -203,7 +203,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         configuration = self.from_pointing_vector_to_configuration(pointing_vector)
         self.set_orientation(configuration)
 
-    @strict_types
+    # @strict_types
     def set_tracking_configuration(self, aimpoint: Pxyz, location_lon_lat: Iterable, when_ymdhmsz: tuple):
         """
         Orients the facet ensemble to point at the aimpoint given a location and time.

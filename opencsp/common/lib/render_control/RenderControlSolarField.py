@@ -58,7 +58,7 @@ class RenderControlSolarField:
             style = self.special_styles[heliostat_name]
         return style
 
-    @strict_types
+    # @strict_types
     def add_special_names(self, heliostat_names: str | list, heliostat_style: rch.RenderControlHeliostat):
         if type(heliostat_names) is list and isinstance(heliostat_names[0], str):
             for name in heliostat_names:

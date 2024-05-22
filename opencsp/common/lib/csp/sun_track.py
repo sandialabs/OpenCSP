@@ -101,7 +101,7 @@ from typing import Iterable
 #     return nu
 
 
-@strict_types
+# @strict_types
 def tracking_surface_normal_xyz(
     heliostat_origin: Pxyz,  # (x,y,z) in m.     Heliostat origin.
     aimpoint: Pxyz,  # (x,y,z) in m.     Reflection aim point.
@@ -151,7 +151,7 @@ def tracking_surface_normal_xyz(
     return h_sn
 
 
-@strict_types
+# @strict_types
 def tracking_surface_normal_xyz_given_sun_vector(
     heliostat_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Heliostat origin.
     aimpoint_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Reflection aim point.

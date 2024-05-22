@@ -69,7 +69,7 @@ class RenderControlFacetEnsemble:
             style = self.special_styles[facet_name]
         return style
 
-    @strict_types
+    # @strict_types
     def add_special_style(self, facet_name: str | list, facet_style: rcf.RenderControlFacet):
         if type(facet_name) is list and isinstance(facet_name[0], str):
             for name in facet_name:

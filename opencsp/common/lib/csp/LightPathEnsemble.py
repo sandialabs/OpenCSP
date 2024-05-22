@@ -39,7 +39,7 @@ class LightPathEnsemble:
         lpe.colors = colors
         return lpe
 
-    # @strict_types
+    # # @strict_types
     def add_steps(self, points: Pxyz, new_current_directions: Uxyz):
         if len(points) != len(new_current_directions):
             raise ValueError(
