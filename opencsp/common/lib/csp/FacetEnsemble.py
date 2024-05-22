@@ -232,7 +232,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
     # FUNCITONS BELOW THIS HAVE NOT BEEN TESTED !!!
 
-    def define_pointing_function(self, func: Callable[..., TransformXYZ]) -> None:
+    def define_pointing_function_UNVERIFIED(self, func: Callable[..., TransformXYZ]) -> None:
         """Sets the canting function to use. I.e., defines the
         "set_pointing" function.
 
@@ -243,7 +243,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         """
         self.pointing_function = func
 
-    def set_pointing(self, *args) -> None:
+    def set_pointing_UNVERIFIED(self, *args) -> None:
         """Sets current facet ensemble canting (i.e. sets
         self.ori.transform_child_to_base using the given arguments.
         """
@@ -254,7 +254,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         self._self_to_parent_transform = self.pointing_function(*args)
 
     @classmethod
-    def generate_az_el(cls, facets: list[Facet]) -> 'FacetEnsemble':
+    def generate_az_el_UNVERIFIED(cls, facets: list[Facet]) -> 'FacetEnsemble':
         """Generates HeliostatCantable object defined by a simple azimuth then elevation
         canting strategy. The "pointing_function" accessed by self.set_pointing
         has the following inputs
@@ -273,7 +273,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         return heliostat
 
     @classmethod
-    def generate_rotation_defined(cls, facets: list[Facet]) -> 'FacetEnsemble':
+    def generate_rotation_defined_UNVERIFIED(cls, facets: list[Facet]) -> 'FacetEnsemble':
         """Generates HeliostatCantable object defined by a given scipy Rotation object.
         The "pointing_function" accessed by self.set_pointing has the following input
             - rotation - scipy.spatial.transform.Rotation

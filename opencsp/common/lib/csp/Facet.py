@@ -215,7 +215,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
     #           a facet mounts the mirror it contains. Defining some function might
     #           be the way to do this, but that is a task for the future.
 
-    def define_pointing_function(self, func: Callable[..., TransformXYZ]) -> None:
+    def define_pointing_function_UNVERIFIED(self, func: Callable[..., TransformXYZ]) -> None:
         """Sets the canting function to use. I.e., defines the
         "set_pointing" function.
 
@@ -226,7 +226,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         """
         self.pointing_function = func
 
-    def set_pointing(self, *args) -> None:
+    def set_pointing_UNVERIFIED(self, *args) -> None:
         """Sets current facet canting (i.e. sets
         self.ori.transform_child_to_base using the given arguments.
         """
@@ -237,7 +237,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         self.mirror._self_to_parent_transform = self.pointing_function(*args)
 
     @classmethod
-    def generate_az_el(cls, mirror: MirrorAbstract) -> 'Facet':
+    def generate_az_el_UNVERIFIED(cls, mirror: MirrorAbstract) -> 'Facet':
         """Generates Facet object defined by a simple azimuth then elevation
         canting strategy. The "pointing_function" accessed by self.set_pointing
         has the following inputs
@@ -256,7 +256,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         return facet
 
     @classmethod
-    def generate_rotation_defined(cls, mirror: MirrorAbstract) -> 'Facet':
+    def generate_rotation_defined_UNVERIFIED(cls, mirror: MirrorAbstract) -> 'Facet':
         """Generates FacetCantable object defined by a given scipy Rotation object.
         The "pointing_function" accessed by self.set_pointing has the following input
             - rotation - scipy.spatial.transform.Rotation - rotation object

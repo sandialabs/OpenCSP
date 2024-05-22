@@ -470,7 +470,6 @@ def trace_scene_parallel(
     trace_name: str = "RayTrace",
     verbose: bool = False,
 ) -> RayTrace:
-
     ################# argument validity checks ####################
     # if not save_in_file and save_file_name != None:
     #     warn("Saving file was specified, but 'save_in_file' flag is set to False. Trace will not be saved.",
@@ -572,23 +571,8 @@ def trace_scene_parallel(
 def plane_intersect_OLD(
     ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm: Uxyz, epsilon: float = 1e-6, verbose=False
 ) -> Vxy:
-    """Finds all the intersections that occur at a plane from the light paths
-    in the raytrace. Output points are transformed from the global (i.e. solar field)
-    reference frame to the local plane reference frame. (3d points are transformed
-    so the XY plane is perpendicular to the target normal.)
-
-    Parameters:
-    -----------
-    ray_trace (RayTrace): the trace that contains the light paths
-    v_plane_center (Pxyz): plane center
-    u_plane_norm (Uxyz): the plane's normal vector
-    epsilon (float, optional): the threshhold for error when determining if a
-        ray is parallel to the plane. Defaults to 1e-6.
-    verbose (bool): to print execution status
-
-    Returns:
-    --------
-    Vxy: intersection points in local plane XY reference frame.
+    """
+    TODO This was the old way of doing plane intersections. Can probably be removed safely.
     """
     if verbose:
         tot = len(ray_trace.light_paths)
@@ -637,7 +621,24 @@ def plane_intersect(
     save_name: str = None,
     max_ram_in_use_percent: float = 95.0,
 ):
-    """Vectorized plane intersection algorithm"""
+    """Finds all the intersections that occur at a plane from the light paths
+    in the raytrace. Output points are transformed from the global (i.e. solar field)
+    reference frame to the local plane reference frame. (3d points are transformed
+    so the XY plane is perpendicular to the target normal.)
+
+    Parameters:
+    -----------
+    ray_trace (RayTrace): the trace that contains the light paths
+    v_plane_center (Pxyz): plane center
+    u_plane_norm (Uxyz): the plane's normal vector
+    epsilon (float, optional): the threshhold for error when determining if a
+        ray is parallel to the plane. Defaults to 1e-6.
+    verbose (bool): to print execution status
+
+    Returns:
+    --------
+    Vxy: intersection points in local plane XY reference frame.
+    """
 
     # Unpack plane
 

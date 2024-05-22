@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Sandia National Laboratories.
+
 
 """
 

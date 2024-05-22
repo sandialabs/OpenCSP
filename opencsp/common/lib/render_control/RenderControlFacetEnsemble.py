@@ -1,5 +1,5 @@
 """
-Copyright (c) 2021 Sandia National Laboratories.
+
 
 """
 
@@ -29,10 +29,10 @@ class RenderControlFacetEnsemble:
         draw_facets=True,
         special_styles: dict[str, rcf.RenderControlFacet] = None,
         draw_centroid=False,
-        draw_normal_vector=False,  # unimplmeneted
-        normal_vector_length=4.0,  # unimplmeneted
-        normal_vector_style=rcps.outline(),  # unimplmeneted
-        normal_vector_base_style=rcps.marker(),  # unimplmeneted
+        draw_normal_vector=False, 
+        normal_vector_length=4.0, 
+        normal_vector_style=rcps.outline(), 
+        normal_vector_base_style=rcps.marker(), 
         draw_outline=False,
         outline_style=rcps.outline(),
         draw_surface_normal_at_corners=False,  # unimplmeneted

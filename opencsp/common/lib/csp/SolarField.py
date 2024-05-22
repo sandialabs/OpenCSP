@@ -11,6 +11,7 @@ import numpy as np
 import pandas
 from scipy.spatial.transform import Rotation
 
+import opencsp.common.lib.csp.HeliostatConfiguration as hc
 import opencsp.common.lib.geometry.geometry_2d as g2d
 import opencsp.common.lib.geometry.geometry_3d as g3d
 import opencsp.common.lib.render.figure_management as fm
@@ -70,30 +71,12 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
         # self.set_position_in_space(self.origin, self.rotation)
 
-    # @classmethod
-    # def from_csv_files(heliostat_names: list[str],
-    #                    heliostat_csv: str,
-    #                    facet_csv: str,
-    #                    lat_lon,
-    #                    sf_name: str = None,
-    #                    ):
-    #     """Creates solar field based on the heliostat names and providede CSV files. All
-    #     heliostats start off canted for on-axis canting and have flat mirrors."""
-    #     m_flat
-    #     helisotats, locations = list(zip(*[HeliostatAzEl.from_csv_files(name, heliostat_csv, facet_csv, m_flat)
-    #                                        for name in heliostat_names]))
-    #     helisotats: list[HeliostatAzEl]
-    #     locations: list[Pxyz]
-
-    #     sf = SolarField(heliostats)
-
-    # required for RayTracable object but currently has no use
-    # def set_position_in_space(self, translation: np.ndarray, rotation: Rotation) -> None:
-    #     for h in self.heliostats:
-    #         h.set_position_in_space(translation + h.origin, rotation)
-    #     return None
 
     def set_heliostat_positions(self, positions: list[Pxyz]):
+        """
+        Places the heliostats at the points provided. The Pxyzs should appear in the same order
+        as the heliostats in `self.heliostats`.
+        """
         for heliostat, point in zip(self.heliostats, positions):
             heliostat_position_transform = TransformXYZ.from_V(point)
             heliostat._self_to_parent_transform = heliostat_position_transform
@@ -216,13 +199,13 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         # Return.
         return first_matching
 
-    def heliostat_plane_z(self, x: float, y: float) -> float:
+    def heliostat_plane_z_UNVERIFIED(self, x: float, y: float) -> float:
         A = self.heliostat_origin_fit_plane[0]
         B = self.heliostat_origin_fit_plane[1]
         C = self.heliostat_origin_fit_plane[2]
         return (A * x) + (B * y) + C
 
-    def heliostat_bounding_box_xyz(self):
+    def heliostat_bounding_box_xyz_UNVERIFIED(self):
         heliostat_xyz_list = self.heliostat_origin_xyz_list
         x_min = min([xyz[0] for xyz in heliostat_xyz_list])
         x_max = max([xyz[0] for xyz in heliostat_xyz_list])
@@ -234,7 +217,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         xyz_max: list[float] = [x_max, y_max, z_max]
         return [xyz_min, xyz_max]
 
-    def heliostat_bounding_box_xy(self):
+    def heliostat_bounding_box_xy_UNVERIFIED(self):
         """Returns an axis alligned bounding box that only
         takes into account the heliostat origins"""
         heliostat_origins = Pxyz.merge([h._self_to_parent_transform.apply(Pxyz.origin()) for h in self.heliostats])
@@ -246,7 +229,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         xy_max: list[float] = [x_max, y_max]
         return [xy_min, xy_max]
 
-    def heliostat_field_regular_grid_xy(self, n_x: int, n_y: int):
+    def heliostat_field_regular_grid_xy_UNVERIFIED(self, n_x: int, n_y: int):
         bbox_xy = self.heliostat_bounding_box_xy()
         xy_min = bbox_xy[0]
         x_min = xy_min[0]
@@ -260,7 +243,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
                 grid_xy.append([x, y])
         return grid_xy
 
-    def situation_abbrev(self):
+    def situation_abbrev_UNVERIFIED(self):
         year = self.when_ymdhmsz()[0]
         month = self.when_ymdhmsz()[1]
         day = self.when_ymdhmsz()[2]
@@ -274,7 +257,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         # ?? SCAFFOLDING RCB -- MAKE THIS CONTROLLABLE, DEPENDING ON USER PREFERENCE.
         return date_time + '_' + self.short_name
 
-    def situation_str(self):
+    def situation_str_UNVERIFIED(self):
         year = self.when_ymdhmsz()[0]
         month = self.when_ymdhmsz()[1]
         day = self.when_ymdhmsz()[2]
@@ -301,22 +284,22 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
     def set_full_field_stow(self):
         for heliostat in self.heliostats:
-            heliostat.set_stow()
+            heliostat.set_orientation(hc.NSTTF_stow())
 
     def set_full_field_face_up(self):
         for heliostat in self.heliostats:
-            heliostat.set_face_up()
+            heliostat.set_orientation(hc.face_up())
 
-    # def set_heliostats_configuration(self, heliostat_name_list_to_set: list[str], h_config: HeliostatConfiguration) -> None:
-    #     # If all heliostats are reset, then clear tracking command.
-    #     all_heliostats = set(list(self.heliostat_dict.keys()))
-    #     set_heliostats = set(heliostat_name_list_to_set)
-    #     if len(all_heliostats - set_heliostats) == 0:
-    #         self._aimpoint_xyz = None
-    #         self._when_ymdhmsz = None
-    #     for heliostat_name in heliostat_name_list_to_set:
-    #         heliostat = self.lookup_heliostat(heliostat_name)
-    #         heliostat.set_configuration(h_config)
+    def set_heliostats_configuration_UNVERIFIED(self, heliostat_name_list_to_set: list[str], h_config: hc.HeliostatConfiguration) -> None:
+        # If all heliostats are reset, then clear tracking command.
+        all_heliostats = set(list(self.heliostat_dict.keys()))
+        set_heliostats = set(heliostat_name_list_to_set)
+        if len(all_heliostats - set_heliostats) == 0:
+            self._aimpoint_xyz = None
+            self._when_ymdhmsz = None
+        for heliostat_name in heliostat_name_list_to_set:
+            heliostat = self.lookup_heliostat(heliostat_name)
+            heliostat.set_configuration(h_config)
 
     # RENDERING
 
@@ -347,7 +330,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         if solar_field_style.draw_name:
             view.draw_xyz_text(origin.data.T[0], self.name)
 
-    def draw_figure(self, figure_control, axis_control_m, view_spec, title, solar_field_style, grid=True):
+    def draw_figure_UNVERIFIED(self, figure_control, axis_control_m, view_spec, title, solar_field_style, grid=True):
         # Setup view
         fig_record: rcfr.RenderControlFigureRecord = fm.setup_figure_for_3d_data(
             figure_control, axis_control_m, view_spec, grid=grid, title=title
@@ -404,7 +387,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 #
 
 
-def setup_solar_field(solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames) -> SolarField:
+def setup_solar_field_UNVERIFIED(solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames) -> SolarField:
     # Notify progress.
     logt.info('Setting up solar field...')
 
@@ -448,7 +431,7 @@ def setup_solar_field(solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhn
 #
 
 
-def draw_solar_field(figure_control, solar_field, solar_field_style, view_spec, name_suffix='', axis_equal=True):
+def draw_solar_field_UNVERIFIED(figure_control, solar_field, solar_field_style, view_spec, name_suffix='', axis_equal=True):
     # Assumes that solar field is already set up with heliostat configurations, etc.
     # Select name and title.
     if (solar_field.short_name == None) or (len(solar_field.short_name) == 0):
@@ -482,7 +465,7 @@ def draw_solar_field(figure_control, solar_field, solar_field_style, view_spec, 
 #
 
 
-def construct_solar_field_heliostat_survey_scan(solar_field, raster_scan_parameters):
+def construct_solar_field_heliostat_survey_scan_UNVERIFIED(solar_field, raster_scan_parameters):
     # Fetch control parameters.
     n_horizontal = raster_scan_parameters['n_horizontal']
     n_vertical = raster_scan_parameters['n_vertical']
@@ -539,7 +522,7 @@ def construct_solar_field_heliostat_survey_scan(solar_field, raster_scan_paramet
 #
 
 
-def construct_solar_field_vanity_scan(solar_field, vanity_scan_parameters):
+def construct_solar_field_vanity_scan_UNVERIFIED(solar_field, vanity_scan_parameters):
     # Fetch control parameters.
     vanity_heliostat_name = vanity_scan_parameters['vanity_heliostat_name']
     n_horizontal = vanity_scan_parameters['n_horizontal']
