@@ -121,38 +121,38 @@ class StandardPlotOutput:
     def plot(self):
         """Creates standard output plot suite"""
         # Plot slope/curvature, if able
-        self.plot_slope_curvature_measured_optic()
-        self.plot_slope_curvature_reference_optic()
-        self.plot_slope_deviation()
+        self._plot_slope_curvature_measured_optic()
+        self._plot_slope_curvature_reference_optic()
+        self._plot_slope_deviation()
 
         if self.options_ray_trace_vis.to_ray_trace:
             # Perform ray tracing, if set
             self._perform_ray_trace_optic_measured()
             self._perform_ray_trace_optic_reference()
             # Plot ray trace data
-            self.plot_ray_trace_image_measured_optic()
-            self.plot_ray_trace_image_reference_optic()
-            self.plot_enclosed_energy()
+            self._plot_ray_trace_image_measured_optic()
+            self._plot_ray_trace_image_reference_optic()
+            self._plot_enclosed_energy()
         else:
             lt.info(
                 'Ray tracing turned off in self.options_ray_trace_vis.to_ray_trace; skipping all ray tracing plots.'
             )
 
-    def plot_slope_curvature_measured_optic(self):
+    def _plot_slope_curvature_measured_optic(self):
         """Plots optic slope/curvature plots for measured optic"""
         if self.optic_measured is not None:
             self._plot_slope_curvature(self.optic_measured, 'measured')
         else:
             lt.info('No measured optic; skipping measured optic slope/curvature plots.')
 
-    def plot_slope_curvature_reference_optic(self):
+    def _plot_slope_curvature_reference_optic(self):
         """Plots optic slope/curvature plots for reference optic"""
         if self.optic_reference is not None:
             self._plot_slope_curvature(self.optic_reference, 'reference')
         else:
             lt.info('No reference optic; skipping reference optic slope/curvature plots.')
 
-    def plot_slope_deviation(self):
+    def _plot_slope_deviation(self):
         """Plots slope deviation"""
         if (self.optic_measured is not None) and (self.optic_reference is not None):
             fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation Magnitude")
@@ -208,17 +208,17 @@ class StandardPlotOutput:
         else:
             lt.info('Do not have both measured and reference optic; skipping slope deviation plots.')
 
-    def plot_ray_trace_image_measured_optic(self):
+    def _plot_ray_trace_image_measured_optic(self):
         """Plot ray trace image for measured optic"""
         if self._ray_trace_output_measured is not None:
             self._plot_ray_trace_image(self._ray_trace_output_measured, 'measured')
 
-    def plot_ray_trace_image_reference_optic(self):
+    def _plot_ray_trace_image_reference_optic(self):
         """Plot ray trace image for reference optic"""
         if self._ray_trace_output_reference is not None:
             self._plot_ray_trace_image(self._ray_trace_output_reference, 'reference')
 
-    def plot_enclosed_energy(self):
+    def _plot_enclosed_energy(self):
         """Makes measured and/or reference enclosed energy plots"""
         fig_rec = fm.setup_figure(self.fig_control, name='Ensquared Energy')
 
