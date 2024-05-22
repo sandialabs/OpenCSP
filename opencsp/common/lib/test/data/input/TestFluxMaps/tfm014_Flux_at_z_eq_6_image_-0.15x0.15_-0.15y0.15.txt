@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 3
+Name: tfm014_Flux at z= 6
+Title: Flux at z= 6
+Code tag: TestFluxMaps.test_parabolic_mirror_flux_map()
+View spec: image
+
+Title:
+Flux at z= 6
+
+Caption:
+Flux at z= 6
+
+Comments:
+Corresponds to the scene shown in tfm001_Mirror_Facing_Up_3d_3d.png
+

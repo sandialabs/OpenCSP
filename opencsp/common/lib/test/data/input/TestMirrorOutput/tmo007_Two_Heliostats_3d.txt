@@ -12,8 +12,9 @@ Caption:
 Two 4-facet heliostats, tracking.
 
 Comments:
-Heliostat 1 oriented initially face west.
-Heliostat 2 oriented initially face south.
-Heliostats set to track to [60.0, 8.8, 28.9] at ymdhmsz =[2021, 5, 13, 13, 2, 0, -6]
+Heliostats set to track to 3D Point:
+array([[60. ],
+       [ 8.8],
+       [28.9]]) at ymdhmsz =(2021, 5, 13, 13, 0, 0, -6)
 Render mirror surfaces, facet centroids, and heliostat outline and surface normal.
 

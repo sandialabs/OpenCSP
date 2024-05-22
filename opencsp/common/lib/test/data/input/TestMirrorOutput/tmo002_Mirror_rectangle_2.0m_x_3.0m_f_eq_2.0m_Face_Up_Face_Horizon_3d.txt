@@ -12,6 +12,6 @@ Caption:
 A single mirror of shape (rectangle 2.0m x 3.0m), analytically defined with focal length f=2.0m, facing the horizon.
 
 Comments:
-Oriented face horizon.
+Oriented face 45 deg up from level.
 Render surface only.
 

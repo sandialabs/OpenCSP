@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 1
+Name: tmo017_NSTTF Heliostat 5W01 (long normals)
+Title: NSTTF Heliostat 5W01 (long normals)
+Code tag: TestMirrorOutput.test_heliostat_05W01_and_14W01()
+View spec: xy
+
+Title:
+NSTTF Heliostat 5W01 (long normals)
+
+Caption:
+5W01 modeled as a symmetric paraboloid with focal length f=55m.
+
+Comments:
+Render mirror surfaces and normals, facet outlines, and heliostat centroid.
+

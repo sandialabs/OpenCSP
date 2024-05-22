@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 5
+Name: tmo023_NSTTF Heliostat 14W01 (exaggerated z)
+Title: NSTTF Heliostat 14W01 (exaggerated z)
+Code tag: TestMirrorOutput.test_heliostat_05W01_and_14W01()
+View spec: yz
+
+Title:
+NSTTF Heliostat 14W01 (exaggerated z)
+
+Caption:
+14W01 modeled as a symmetric paraboloid with focal length f=186.8m.
+
+Comments:
+Render mirror surfaces and normals, facet outlines, and heliostat centroid.
+

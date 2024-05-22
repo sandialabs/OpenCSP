@@ -63,7 +63,7 @@ STOW = Vxyz([-1, 0, -11.4]).normalize()  # !!!!!
 class TestFluxMaps(to.TestOutput):
 
     @classmethod
-    def setup_class(
+    def setUpClass(
         self,
         source_file_body: str = 'TestFluxMaps',  # Set these here, because pytest calls
         figure_prefix_root: str = 'tfm',  # setup_class() with no arguments.
@@ -87,7 +87,7 @@ class TestFluxMaps(to.TestOutput):
         #     actually a code error).
         #
 
-        super(TestFluxMaps, self).setup_class(
+        super(TestFluxMaps, self).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
@@ -98,6 +98,7 @@ class TestFluxMaps(to.TestOutput):
         # computation and keep all the plots up.  Don't do this, because the plotting system
         # will run low/out of memory, causing adverse effectes on the plots.
 
+    def setUp(self):
         # Load solar field data.
         self.solar_field: SolarField = sf.SolarField.from_csv_files(
             lln.NSTTF_ORIGIN,
@@ -105,74 +106,6 @@ class TestFluxMaps(to.TestOutput):
             dpft.sandia_nsttf_test_facet_centroidsfile(),
             'Sandia NSTTF',
         )
-
-    def old_template_stuff(self) -> None:
-        """
-        Draws one heliostat.
-        """
-        # Initialize test.
-        self.start_test()
-
-        # Heliostat selection
-        heliostat_name = '5E10'
-
-        # View setup
-        title = 'Heliostat ' + heliostat_name + ', Face West'
-        caption = 'A single Sandia NSTTF heliostat ' + heliostat_name + '.'
-        comments = []
-
-        # Configuration setup
-        heliostat = self.solar_field.lookup_heliostat(heliostat_name)
-        heliostat.set_orientation_from_pointing_vector(WEST)
-
-        facet_control = rcf.RenderControlFacet(
-            draw_mirror_curvature=True,
-            draw_outline=True,
-            outline_style=rcps.outline(color='g'),
-            draw_surface_normal_at_corners=False,
-            draw_name=False,
-            draw_centroid=False,
-            draw_surface_normal=False,
-        )
-        fe_control = rcfe.RenderControlFacetEnsemble(
-            default_style=facet_control,
-            draw_normal_vector=True,
-            normal_vector_style=rcps.outline(color='g'),
-            draw_centroid=True,
-        )
-        heliostat_style = rch.RenderControlHeliostat(facet_ensemble_style=fe_control)
-        # heliostat_style = (rch.normal_facet_outlines(color='g'))
-
-        # Setup render control.
-        # Style setup
-        # heliostat_control = rce.RenderControlEnsemble(rch.mirror_surfaces(color='b'))
-        # heliostat_styles = rce.RenderControlEnsemble(heliostat_style)
-
-        # comments\
-        comments.append("Demonstration of heliostat drawing.")
-        comments.append("Facet outlines shown, with facet names and overall heliostat surface normal.")
-        comments.append('Render mirror surfaces only.')
-        comments.append("Green:   Facet outlines and overall surface normal.")
-
-        # Draw.
-        fig_record = fm.setup_figure_for_3d_data(
-            self.figure_control,
-            self.axis_control_m,
-            vs.view_spec_3d(),
-            number_in_name=False,
-            input_prefix=self.figure_prefix(
-                1
-            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-            title=title,
-            caption=caption,
-            comments=comments,
-            code_tag=self.code_tag,
-        )
-        heliostat.draw(fig_record.view, heliostat_style)
-        # heliostat.draw(fig_record.view, heliostat_style)
-
-        # Output.
-        self.show_save_and_check_figure(fig_record)
 
     def test_parabolic_mirror_bullet(self) -> None:
         """
@@ -223,10 +156,7 @@ class TestFluxMaps(to.TestOutput):
             )
 
         # comments\
-        comments.append("...")
-        comments.append("...")
-        comments.append("...")
-        comments.append("...")
+        comments.append("Corresponds to the scene shown in tfm001_Mirror_Facing_Up_3d.png")
 
         # Draw 3D
         fig_record = fm.setup_figure_for_3d_data(
@@ -320,8 +250,6 @@ class TestFluxMaps(to.TestOutput):
         MIRROR_DIM = (1.2, 1.2)  # meters
 
         # View setup
-        title = 'Mirror Facing Up'
-        caption = f'A mirror with focal length {FOCAL_LENGTH} facing up for a ray trace.'
         comments = []
 
         # Configuration setup
@@ -334,58 +262,23 @@ class TestFluxMaps(to.TestOutput):
         scene.add_light_source(sun)
 
         # Ray Trace Scene
-        trace = rt.trace_scene(scene, obj_resolution=Resolution.separation(0.05), verbose=True)
+        trace = rt.trace_scene(scene, obj_resolution=Resolution.separation(0.1))
 
         # bullet map z=4
         z4 = Pxyz([0, 0, 4])
         z5 = Pxyz([0, 0, 5])
         z6 = Pxyz([0, 0, 6])
 
-        flux4 = Intersection.plane_intersect_from_ray_trace(trace, (z4, DOWN)).to_flux_mapXY(20)
-        flux5 = Intersection.plane_intersect_from_ray_trace(trace, (z5, DOWN)).to_flux_mapXY(20)
-        flux6 = Intersection.plane_intersect_from_ray_trace(trace, (z6, DOWN)).to_flux_mapXY(20)
+        flux4 = Intersection.plane_intersect_from_ray_trace(trace, (z4, DOWN)).to_flux_mapXY(15)
+        flux5 = Intersection.plane_intersect_from_ray_trace(trace, (z5, DOWN)).to_flux_mapXY(15)
+        flux6 = Intersection.plane_intersect_from_ray_trace(trace, (z6, DOWN)).to_flux_mapXY(15)
 
         sqaure_half_side = 0.15  # half of the side length of a sqaure
 
-        def square(z: float):
-            return Vxyz(
-                [
-                    [sqaure_half_side, sqaure_half_side, -sqaure_half_side, -sqaure_half_side],
-                    [sqaure_half_side, -sqaure_half_side, -sqaure_half_side, sqaure_half_side],
-                    [z, z, z, z],
-                ]
-            )
-
         # comments\
-        comments.append("...")
-        comments.append("...")
-        comments.append("...")
-        comments.append("...")
+        comments.append("Corresponds to the scene shown in tfm001_Mirror_Facing_Up_3d_3d.png")
 
-        # Draw 3D
-        fig_record = fm.setup_figure_for_3d_data(
-            self.figure_control,
-            self.axis_control_m,
-            vs.view_spec_3d(),
-            number_in_name=False,
-            input_prefix=self.figure_prefix(
-                11
-            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-            title=title,
-            caption=caption,
-            comments=comments,
-            code_tag=self.code_tag,
-        )
-        mirror_style = rcm.RenderControlMirror()
-        mirror.draw(fig_record.view, mirror_style)
-        trace_style = rcrt.init_current_lengths(current_len=6)
-        trace.draw_subset(fig_record.view, count=30, trace_style=trace_style)
-        fig_record.view.draw_Vxyz(square(4), close=True, style=rcps.RenderControlPointSeq(color='b', marker=','))
-        fig_record.view.draw_Vxyz(square(5), close=True, style=rcps.RenderControlPointSeq(color='g', marker=','))
-        fig_record.view.draw_Vxyz(square(6), close=True, style=rcps.RenderControlPointSeq(color='r', marker=','))
-        self.show_save_and_check_figure(fig_record)
-
-        flux_style = RenderControlFunctionXY(colorbar=True)
+        flux_style = RenderControlFunctionXY(colorbar=True, cmap="OrRd")
 
         # Draw z=4
         fig_record = fm.setup_figure(
@@ -397,7 +290,7 @@ class TestFluxMaps(to.TestOutput):
                 12
             ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             title=f"Flux at z= 4",
-            caption=caption,
+            caption=f"Flux at z= 4",
             comments=comments,
             code_tag=self.code_tag,
         )
@@ -416,7 +309,7 @@ class TestFluxMaps(to.TestOutput):
                 13
             ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             title=f"Flux at z= 5",
-            caption=caption,
+            caption=f"Flux at z= 5",
             comments=comments,
             code_tag=self.code_tag,
         )
@@ -435,7 +328,7 @@ class TestFluxMaps(to.TestOutput):
                 14
             ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             title=f"Flux at z= 6",
-            caption=caption,
+            caption=f"Flux at z= 6",
             comments=comments,
             code_tag=self.code_tag,
         )
@@ -444,9 +337,9 @@ class TestFluxMaps(to.TestOutput):
         flux6.draw(fig_record.view, flux_style)
         self.show_save_and_check_figure(fig_record)
 
-    def test_heliostat_flux(self) -> None:
+    def future_heliostat_flux(self) -> None:
         """
-        Builds a heliostat that is on-axis canted towards the aimpoint.
+        TODO should be added
         """
         # Initialize test.
         self.start_test()
@@ -463,13 +356,13 @@ if __name__ == "__main__":
     verify = False  # False
     # Setup.
     test_object = TestFluxMaps()
-    test_object.setup_class(interactive=interactive, verify=verify)
+    test_object.setUpClass(interactive=interactive, verify=verify)
     # Tests.
     lt.info('Beginning tests...')
-    # test_object.test_parabolic_mirror_bullet()
+    test_object.test_parabolic_mirror_bullet()
     test_object.test_parabolic_mirror_flux_map()
     lt.info('All tests complete.')
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    test_object.teardown_method()
+    test_object.tearDown()

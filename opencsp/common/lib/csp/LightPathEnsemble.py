@@ -31,7 +31,6 @@ class LightPathEnsemble:
         return self.concatenate_in_place(lpe)
 
     @classmethod
-    @strict_types
     def from_parts(cls, init_directions: Uxyz, points: list[Pxyz], curr_directions: Uxyz, colors=[]):
         lpe = LightPathEnsemble([])
         lpe.current_directions = curr_directions
