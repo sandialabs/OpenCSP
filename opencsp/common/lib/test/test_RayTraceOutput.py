@@ -40,8 +40,7 @@ from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 from opencsp.common.lib.csp.LightPath import LightPath
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from opencsp.common.lib.csp.MirrorParametricRectangular import \
-    MirrorParametricRectangular
+from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Pxyz import Pxyz
@@ -50,20 +49,13 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlAxis import \
-    RenderControlAxis
-from opencsp.common.lib.render_control.RenderControlEnsemble import \
-    RenderControlEnsemble
-from opencsp.common.lib.render_control.RenderControlFigure import \
-    RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import \
-    RenderControlFigureRecord
-from opencsp.common.lib.render_control.RenderControlLightPath import \
-    RenderControlLightPath
-from opencsp.common.lib.render_control.RenderControlRayTrace import \
-    RenderControlRayTrace
-from opencsp.common.lib.render_control.RenderControlSurface import \
-    RenderControlSurface
+from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
+from opencsp.common.lib.render_control.RenderControlEnsemble import RenderControlEnsemble
+from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
+from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
 
 
 class TestRayTraceOutput(to.TestOutput):

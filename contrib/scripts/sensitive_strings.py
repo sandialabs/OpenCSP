@@ -601,12 +601,7 @@ if __name__ == "__main__":
         help="Don't fail because of unfound expected binary files. Instead remove the expected files from the list of allowed binaries. "
         + "This can be useful when you're confident that the only changes have been that the binary files have moved but not changed.",
     )
-    parser.add_argument(
-        '--verbose',
-        action='store_true',
-        dest="verbose",
-        help="Print more information while running",
-    )
+    parser.add_argument('--verbose', action='store_true', dest="verbose", help="Print more information while running")
     args = parser.parse_args()
     not_interactive: bool = args.ninteractive
     accept_all: bool = args.acceptall

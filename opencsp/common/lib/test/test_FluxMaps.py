@@ -36,8 +36,7 @@ import opencsp.common.lib.tool.log_tools as lt
 from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 from opencsp.common.lib.csp.LightSourcePoint import LightSourcePoint
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from opencsp.common.lib.csp.MirrorParametricRectangular import \
-    MirrorParametricRectangular
+from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Intersection import Intersection
@@ -45,14 +44,10 @@ from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.render_control.RenderControlAxis import \
-    RenderControlAxis
-from opencsp.common.lib.render_control.RenderControlFigure import \
-    RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import \
-    RenderControlFigureRecord
-from opencsp.common.lib.render_control.RenderControlFunctionXY import \
-    RenderControlFunctionXY
+from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
+from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlFunctionXY import RenderControlFunctionXY
 
 UP = Vxyz([0, 0, 1])
 DOWN = -UP

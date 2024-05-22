@@ -31,17 +31,13 @@ import opencsp.common.lib.test.TestOutput as to
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
-from opencsp.common.lib.csp.HeliostatConfiguration import \
-    HeliostatConfiguration
+from opencsp.common.lib.csp.HeliostatConfiguration import HeliostatConfiguration
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.render_control.RenderControlAxis import \
-    RenderControlAxis
-from opencsp.common.lib.render_control.RenderControlFigure import \
-    RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import \
-    RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
+from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 
 UP = Vxyz([0, 0, 1])
 NORTH = Vxyz([0, 1, 0])
