@@ -18,6 +18,7 @@ from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
+import opencsp.common.lib.tool.log_tools as lt
 
 
 @dataclass
@@ -55,6 +56,14 @@ def standard_output(
     If no reference or scenario data exists, those plots will not be
     created.
 
+    - Plots created when given optic_meas
+        - Measured slope x
+        - Measured slope y
+        - Measured slope magnitude
+        - Measured
+    - Plots created when given optic_ref
+    - Plots created
+
     Parameters
     ----------
     optic_meas : MirrorAbstract
@@ -71,25 +80,19 @@ def standard_output(
         Data class of visualization options. By default, defualt class values.
     """
     # Determine which plots to create
-    plot_reference = optic_ref is not None
-    plot_ray_trace = (source is not None) and (v_target_center is not None) and (v_target_normal is not None)
+    to_plot_reference = optic_ref is not None
+    lt.info(f'Plotting reference optic set to: {to_plot_reference}')
+    to_ray_trace = (source is not None) and (v_target_center is not None) and (v_target_normal is not None)
+    lt.info(f'Plotting ray traces set to: {to_ray_trace}')
 
     # Perform measured optic ray trace
-    ray_trace_meas = ray_trace_scene(optic_meas, source, obj_resolution=vis_options.ray_trace_optic_res)
-    ray_pts_meas = rt.plane_intersect(ray_trace_meas, v_target_center, v_target_normal)
-    image_meas, xv_meas, yv_meas = rt.histogram_image(
-        bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_meas
-    )
-    ee_meas, ws_meas = rt.ensquared_energy(ray_pts_meas, vis_options.ensquared_energy_max_semi_width)
-
-    # Perform reference optic ray trace
-    if plot_reference:
-        ray_trace_ref = ray_trace_scene(optic_ref, source, obj_resolution=vis_options.ray_trace_optic_res)
-        ray_pts_ref = rt.plane_intersect(ray_trace_ref, v_target_center, v_target_normal)
-        image_ref, xv_ref, yv_ref = rt.histogram_image(
-            bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_ref
+    if to_ray_trace:
+        ray_trace_meas = ray_trace_scene(optic_meas, source, obj_resolution=vis_options.ray_trace_optic_res)
+        ray_pts_meas = rt.plane_intersect(ray_trace_meas, v_target_center, v_target_normal)
+        image_meas, xv_meas, yv_meas = rt.histogram_image(
+            bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_meas
         )
-        ee_ref, ws_ref = rt.ensquared_energy(ray_pts_ref, vis_options.ensquared_energy_max_semi_width)
+        ee_meas, ws_meas = rt.ensquared_energy(ray_pts_meas, vis_options.ensquared_energy_max_semi_width)
 
     # Set up figure control objects for 3d plots
     fig_control = RenderControlFigure(tile_array=(4, 2), tile_square=True)
@@ -173,9 +176,20 @@ def standard_output(
             close_after_save=vis_options.close_after_save,
         )
 
-    # Plot slope error (requires reference optic)
-    if plot_reference:
-        fig_rec = fm.setup_figure(fig_control, axis_control, name="Slope Error")
+    fig_rec = fm.setup_figure(fig_control, axis_control, name='Curvature Combined')
+    optic_meas.plot_orthorectified_curvature(
+        vis_options.slope_map_resolution, type_='combined', clim=vis_options.curvature_clim, axis=fig_rec.axis
+    )
+    if vis_options.to_save:
+        fig_rec.save(
+            vis_options.output_dir,
+            dpi=vis_options.save_dpi,
+            format='png',
+            close_after_save=vis_options.close_after_save,
+        )
+
+    if to_plot_reference:
+        fig_rec = fm.setup_figure(fig_control, axis_control, name="Slope Deviation Magnitude")
         optic_meas.plot_orthorectified_slope_error(
             optic_ref,
             vis_options.slope_map_resolution,
@@ -192,7 +206,7 @@ def standard_output(
                 close_after_save=vis_options.close_after_save,
             )
 
-        fig_rec = fm.setup_figure(fig_control, axis_control, name="X Slope Error")
+        fig_rec = fm.setup_figure(fig_control, axis_control, name="Slope Deviation X ")
         optic_meas.plot_orthorectified_slope_error(
             optic_ref,
             vis_options.slope_map_resolution,
@@ -209,7 +223,7 @@ def standard_output(
                 close_after_save=vis_options.close_after_save,
             )
 
-        fig_rec = fm.setup_figure(fig_control, axis_control, name="Y Slope Error")
+        fig_rec = fm.setup_figure(fig_control, axis_control, name="Slope Deviation Y ")
         optic_meas.plot_orthorectified_slope_error(
             optic_ref,
             vis_options.slope_map_resolution,
@@ -226,7 +240,17 @@ def standard_output(
                 close_after_save=vis_options.close_after_save,
             )
 
-    if plot_reference and plot_ray_trace:
+    if to_plot_reference and to_ray_trace:
+        # Perform ray trace of reference optic
+        ray_trace_ref = ray_trace_scene(optic_ref, source, obj_resolution=vis_options.ray_trace_optic_res)
+        ray_pts_ref = rt.plane_intersect(ray_trace_ref, v_target_center, v_target_normal)
+
+        # Create ensquared energy chart for reference optic
+        image_ref, xv_ref, yv_ref = rt.histogram_image(
+            bin_res=vis_options.hist_bin_res, extent=vis_options.hist_extent, pts=ray_pts_ref
+        )
+        ee_ref, ws_ref = rt.ensquared_energy(ray_pts_ref, vis_options.ensquared_energy_max_semi_width)
+
         # Draw reference ensemble and traced rays
         fig_rec = fm.setup_figure_for_3d_data(fig_control, axis_control, name='Ray Trace')
         if len(ray_trace_ref.light_paths) < 100:  # Only plot few rays
@@ -252,8 +276,8 @@ def standard_output(
                 close_after_save=vis_options.close_after_save,
             )
 
-    # Draw measured optic sun image on target
-    if plot_ray_trace:
+    if to_ray_trace:
+        # Draw measured optic sun image on target
         fig_rec = fm.setup_figure(fig_control, axis_control, name='Measured Ray Trace Image')
         fig_rec.axis.imshow(image_meas, cmap='jet', extent=(xv_meas.min(), xv_meas.max(), yv_meas.min(), yv_meas.max()))
         if vis_options.to_save:
@@ -266,7 +290,7 @@ def standard_output(
 
         # Draw ensquared energy plot
         fig_rec = fm.setup_figure(fig_control, name='Ensquared Energy')
-        if plot_reference:
+        if to_plot_reference:
             fig_rec.axis.plot(ws_ref, ee_ref, label='Reference', color='k', linestyle='--')
         fig_rec.axis.plot(ws_meas, ee_meas, label='Measured', color='k', linestyle='-')
         fig_rec.axis.legend()
