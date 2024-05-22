@@ -7,6 +7,7 @@ from typing import Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
+from scipy.signal import convolve2d
 
 from opencsp.common.lib.csp.visualize_orthorectified_image import add_quivers, plot_orthorectified_image
 
@@ -241,6 +242,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         type_: Literal['x', 'y', 'combined'] = 'combined',
         clim: float | None = None,
         axis: plt.Axes | None = None,
+        smooth_kernel_width: int = 1,
     ):
         """Plots orthorectified curvature (1st derivative of slope) image
         on axes.
@@ -256,6 +258,9 @@ class VisualizeOrthorectifiedSlopeAbstract:
             and [0, clim] for type 'combined.' Units in mrad. None to use default.
         axis : plt.Axes | None
             Axes to plot on. Default is None. If None, uses plt.gca().
+        smooth_kernel_width : int
+            Dimension of kernel used to smooth slope image before creating curvature plot.
+            By default, 1, which does not smooth data.
         """
         # Check inputs
         if type_ not in ['x', 'y', 'combined']:
@@ -272,6 +277,12 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Calculate slope image
         slopes = self.orthorectified_slope_array(x_vec, y_vec)  # slope
+
+        # Smooth slope images
+        if smooth_kernel_width > 1:
+            ker = np.ones((smooth_kernel_width, smooth_kernel_width)) / smooth_kernel_width**2
+            slopes[0] = convolve2d(slopes[0], ker, mode='same', boundary='symm')
+            slopes[1] = convolve2d(slopes[1], ker, mode='same', boundary='symm')
 
         # Calculate curvature image
         x_del_vec = np.diff(x_vec)  # meter
