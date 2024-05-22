@@ -73,7 +73,7 @@ class _RayTraceOutput:
     ensquared_energy_widths: np.ndarray
 
 
-class StandardOutput:
+class StandardPlotOutput:
     """Used to orchestrate the plotting and saving of the standard output plot suite of CSP mirrors"""
 
     def __init__(self):
