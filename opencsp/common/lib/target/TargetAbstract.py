@@ -141,8 +141,7 @@ class TargetAbstract(ABC):
     #     """
     #     # Sets facet's position given heliostat configuration.
     #     # self.origin = np.array(fac_origin) + fac_rotation.dot(fac_origin)
-    #     if not issubclass(type(fac_origin), Vxyz): 
+    #     if not issubclass(type(fac_origin), Vxyz):
     #         fac_origin = Pxyz(fac_origin)
     #     self.origin = fac_origin
     #     self.rotation = fac_rotation
-

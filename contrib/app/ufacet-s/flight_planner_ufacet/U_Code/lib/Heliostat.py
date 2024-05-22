@@ -10,8 +10,8 @@ import matplotlib.pyplot as plt
 import math
 import numpy as np
 
-from opencsp.common.lib.csp.ufacet.Facet import Facet
-import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
+from opencsp.common.lib.csp.Facet import Facet
+import opencsp.common.lib.csp.HeliostatConfiguration as hc
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
 import opencsp.common.lib.geometry.transform_3d as t3d
 

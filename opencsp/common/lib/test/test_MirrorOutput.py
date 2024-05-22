@@ -17,8 +17,6 @@ from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
 from opencsp.common.lib.geometry.Pxy import Pxy
 
-# import opencsp.common.lib.csp.ufacet.Heliostat as helio
-# import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft

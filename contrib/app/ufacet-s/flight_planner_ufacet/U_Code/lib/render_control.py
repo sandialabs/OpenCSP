@@ -14,7 +14,7 @@ Features include:
 
 """
 
-from opencsp.common.lib.csp.ufacet.Facet import Facet
+from opencsp.common.lib.csp.Facet import Facet
 
 
 class RenderControlFigure:

@@ -5,37 +5,42 @@ Heliostat Class
 
 """
 
-from abc import ABC, abstractmethod
 import copy
 import csv
+from abc import ABC, abstractmethod
 from typing import Callable, Iterable
 
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation
 from sympy import Symbol, diff
-from opencsp.common.lib.csp.HeliostatConfiguration import HeliostatConfiguration
-from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbstract
 
 import opencsp.common.lib.csp.sun_track as st
-from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
-from opencsp.common.lib.geometry.Pxy import Pxy
-from opencsp.common.lib.geometry.RegionXY import Resolution
-from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 import opencsp.common.lib.geometry.transform_3d as t3d
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.tool.math_tools as mt
-from opencsp.common.lib.csp.ufacet.Facet import Facet
-from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
+from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
+from opencsp.common.lib.csp.HeliostatConfiguration import \
+    HeliostatConfiguration
+from opencsp.common.lib.csp.MirrorParametricRectangular import \
+    MirrorParametricRectangular
+from opencsp.common.lib.csp.OpticOrientationAbstract import \
+    OpticOrientationAbstract
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
+from opencsp.common.lib.geometry.FunctionXYContinuous import \
+    FunctionXYContinuous
+from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlEnsemble import RenderControlEnsemble
-from opencsp.common.lib.render_control.RenderControlHeliostat import RenderControlHeliostat
+from opencsp.common.lib.render_control.RenderControlEnsemble import \
+    RenderControlEnsemble
+from opencsp.common.lib.render_control.RenderControlHeliostat import \
+    RenderControlHeliostat
 from opencsp.common.lib.tool.typing_tools import strict_types
-from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 
 UP = Vxyz([0, 0, 1])
 

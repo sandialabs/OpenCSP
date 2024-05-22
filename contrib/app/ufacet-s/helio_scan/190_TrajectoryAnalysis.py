@@ -21,8 +21,8 @@ import pandas as pd
 import pickle
 import subprocess
 
-import opencsp.common.lib.csp.ufacet.Heliostat as Heliostat
-import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
+import opencsp.common.lib.csp.Heliostat as Heliostat
+import opencsp.common.lib.csp.HeliostatConfiguration as hc
 import opencsp.common.lib.csp.SolarField as sf
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
 import opencsp.common.lib.geo.lon_lat_nsttf as lln

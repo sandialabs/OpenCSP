@@ -15,10 +15,9 @@ import numpy as np
 from matplotlib.colors import LightSource
 from scipy.spatial.transform import Rotation
 
-import opencsp.common.lib.csp.ufacet.Heliostat as helio
-import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
 import opencsp.common.lib.csp.RayTrace as rt
 import opencsp.common.lib.csp.SolarField as sf
+import opencsp.common.lib.csp.sun_track as st
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
 import opencsp.common.lib.render.figure_management as fm
@@ -26,6 +25,7 @@ import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlEnsemble as rce
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
+import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
@@ -35,33 +35,35 @@ import opencsp.common.lib.test.support_test as stest
 import opencsp.common.lib.test.TestOutput as to
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
-import opencsp.common.lib.tool.string_tools as st
-
-# from opencsp.common.lib.csp.ufacet.Facet import Facet
-# from opencsp.common.lib.csp.ufacet.Heliostat import Heliostat
 from opencsp.common.lib.csp.Facet import Facet
-from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
+from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 from opencsp.common.lib.csp.LightPath import LightPath
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
+from opencsp.common.lib.csp.MirrorParametricRectangular import \
+    MirrorParametricRectangular
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
-from opencsp.common.lib.render_control.RenderControlEnsemble import RenderControlEnsemble
-from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
-from opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
-from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
-from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
-from opencsp.common.lib.geometry.RegionXY import Resolution
-import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
-import opencsp.common.lib.csp.sun_track as st
+from opencsp.common.lib.render_control.RenderControlAxis import \
+    RenderControlAxis
+from opencsp.common.lib.render_control.RenderControlEnsemble import \
+    RenderControlEnsemble
+from opencsp.common.lib.render_control.RenderControlFigure import \
+    RenderControlFigure
+from opencsp.common.lib.render_control.RenderControlFigureRecord import \
+    RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlLightPath import \
+    RenderControlLightPath
+from opencsp.common.lib.render_control.RenderControlRayTrace import \
+    RenderControlRayTrace
+from opencsp.common.lib.render_control.RenderControlSurface import \
+    RenderControlSurface
 
 
 class TestRayTraceOutput(to.TestOutput):
