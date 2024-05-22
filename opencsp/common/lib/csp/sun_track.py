@@ -101,7 +101,6 @@ from typing import Iterable
 #     return nu
 
 
-# @strict_types
 def tracking_surface_normal_xyz(
     heliostat_origin: Pxyz,  # (x,y,z) in m.     Heliostat origin.
     aimpoint: Pxyz,  # (x,y,z) in m.     Reflection aim point.

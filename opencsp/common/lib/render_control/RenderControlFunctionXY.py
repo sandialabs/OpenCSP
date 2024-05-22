@@ -6,7 +6,7 @@ class RenderControlFunctionXY:
         cmap: str = "jet",
         colorbar: bool = False,
         colorbar_min_max: tuple[float, float] = None,
-        bounds: tuple[float, float, float, float] = None, # unverified
+        bounds: tuple[float, float, float, float] = None,  # unverified
     ) -> None:
         self.draw_heatmap = draw_heatmap
         self.draw_contours = draw_contours

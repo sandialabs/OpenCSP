@@ -324,7 +324,6 @@ class TestRayTraceOutput(to.TestOutput):
             draw_mirror_curvature=True,
             mirror_styles=mirror_control,
             draw_outline=True,
-            draw_surface_normal_at_corners=False,
             draw_name=False,
             draw_centroid=False,
             draw_surface_normal=False,

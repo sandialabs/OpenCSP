@@ -730,7 +730,7 @@ class View3d(aph.AbstractPlotHandler):
         """Alternative to View3d.drawxyz_list that used the Vxyz class instead"""
         self.draw_xyz_list(list(V.data.T), close, style, label)
 
-    # TODO tjlarki: only implemented for 3d views, should extend
+    # TODO TJL: only implemented for 3d views, should extend
     def draw_xyz_surface(
         self,
         x_mesh: ndarray,
@@ -755,8 +755,8 @@ class View3d(aph.AbstractPlotHandler):
         if self.view_spec['type'] == '3d':
             self.axis.plot_trisurf(x, y, z, color=surface_style.color, alpha=surface_style.alpha, **kwargs)
 
-    # TODO tjlarki: currently unused
-    # TODO tjlarki: might want to remove, this is a very slow function
+    # TODO TJL: currently unused
+    # TODO TJL: might want to remove, this is a very slow function
     def quiver(self, X: ndarray, Y: ndarray, Z: ndarray, U: ndarray, V: ndarray, W: ndarray, length: float = 0) -> None:
         self.axis.quiver(X, Y, Z, U, V, W, length=0)
 

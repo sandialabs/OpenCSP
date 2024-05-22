@@ -175,32 +175,6 @@ class TestMirrorOutput(to.TestOutput):
         a = 1.0 / (4 * focal_length)
         return lambda x, y: a * (x**2 + y**2)
 
-    # def test_mirror(self) -> None:
-    #     """
-    #     Draws the surface of a mirror facing up.
-    #     """
-    #     # Initialize test.
-    #     self.start_test()
-    #     local_comments = self.m1_comments.copy()
-
-    #     # Position in space.
-    #     local_comments.append('Oriented face up.')
-
-    #     # Setup render control.
-    #     mirror_control = rcm.RenderControlMirror()
-    #     local_comments.append('Render surface only.')
-
-    #     # Draw.
-    #     fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(),
-    #                                              # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-    #                                              number_in_name=False, input_prefix=self.figure_prefix(1),
-    #                                              title=self.m1_title + ', Face Up', caption=st.add_to_last_sentence(self.m1_caption, ', face up'),
-    #                                              comments=local_comments, code_tag=self.code_tag)
-    #     self.m1.draw(fig_record.view, mirror_control)
-
-    #     # Output.
-    #     self.show_save_and_check_figure(fig_record)
-
     def test_mirror_halfpi_rotation(self) -> None:
         """
         Draws a pentagonal mirror that is rotated 90 deg in space. Should look like a mirror with its normal parallel in the xy plane.
@@ -265,7 +239,7 @@ class TestMirrorOutput(to.TestOutput):
             mirror_styles=mirror_control,
             draw_outline=True,
             draw_surface_normal=False,
-            draw_surface_normal_at_corners=True,
+            # draw_surface_normal_at_corners=True,
         )
         local_comments.append('Render mirror surface with normals, facet outline with corner normals.')
 
@@ -286,47 +260,6 @@ class TestMirrorOutput(to.TestOutput):
 
         # Output.
         self.show_save_and_check_figure(fig_record)
-
-    # def test_heliostat_surface_normals(self) -> None:
-    #     """
-    #     Displays the surface normal on the heliostat.
-    #     """
-    #     # Initialize test.
-    #     self.start_test()
-    #     local_comments = self.h2x2_comments.copy()
-
-    #     # Set configuration.
-    #     self.h2x2.set_orientation_from_az_el(-90 * DEG2RAD, 0)
-    #     local_comments.append('Oriented face west.')
-
-    #     # Setup render control.
-    #     mirror_control = rcm.RenderControlMirror(surface_normals=True,
-    #                                              norm_len=1)
-    #     facet_control = rcf.RenderControlFacet(draw_mirror_curvature=True,
-    #                                            mirror_styles=mirror_control,
-    #                                            draw_outline=False,
-    #                                            draw_surface_normal=True,
-    #                                            draw_surface_normal_at_corners=False)
-    #     facet_ensemble_control = rcfe.RenderControlFacetEnsemble(default_style=facet_control)
-    #     heliostat_control = rch.RenderControlHeliostat(draw_centroid=True,
-    #                                                    draw_outline=True,
-    #                                                    draw_surface_normal=False,
-    #                                                    draw_surface_normal_at_corners=False,
-    #                                                    facet_ensemble_style=facet_ensemble_control,
-    #                                                    draw_facets=True)
-    #     local_comments.append('Render mirror surfaces and surface normals, facet normals, and heliostat outline.')
-
-    #     # Draw.
-    #     fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(),
-    #                                              # Figure numbers needed because titles may be identical.
-    #                                              # Hard-code number because test order is unpredictable.
-    #                                              number_in_name=False, input_prefix=self.figure_prefix(6),
-    #                                              title=self.h2x2_title, caption=self.h2x2_caption,
-    #                                              comments=local_comments, code_tag=self.code_tag)
-    #     self.h2x2.draw(fig_record.view, heliostat_control)
-
-    #     # Output.
-    #     self.show_save_and_check_figure(fig_record)
 
     def test_solar_field(self) -> None:
         """
@@ -356,7 +289,6 @@ class TestMirrorOutput(to.TestOutput):
             mirror_styles=mirror_control,
             draw_outline=False,
             draw_surface_normal=False,
-            draw_surface_normal_at_corners=False,
             draw_name=False,
             draw_centroid=True,
         )
@@ -515,7 +447,6 @@ class TestMirrorOutput(to.TestOutput):
             mirror_styles=mirror_control_long,
             draw_outline=True,
             draw_surface_normal=False,
-            draw_surface_normal_at_corners=False,
             draw_name=False,
             draw_centroid=False,
         )
@@ -586,7 +517,6 @@ class TestMirrorOutput(to.TestOutput):
             mirror_styles=mirror_control_very_long,
             draw_outline=True,
             draw_surface_normal=False,
-            draw_surface_normal_at_corners=False,
             draw_name=False,
             draw_centroid=False,
         )
@@ -634,7 +564,6 @@ class TestMirrorOutput(to.TestOutput):
             mirror_styles=mirror_control_exaggerated_z,
             draw_outline=True,
             draw_surface_normal=False,
-            draw_surface_normal_at_corners=False,
             draw_name=False,
             draw_centroid=True,
         )
@@ -758,7 +687,6 @@ class TestMirrorOutput(to.TestOutput):
             mirror_styles=mirror_control,
             draw_outline=True,
             draw_surface_normal=False,
-            draw_surface_normal_at_corners=False,
             draw_name=False,
             draw_centroid=False,
         )
@@ -847,11 +775,10 @@ if __name__ == "__main__":
     test_object = TestMirrorOutput()
     test_object.setUpClass(interactive=interactive, verify=verify)
     test_object.setUp()  # Tests.
+
     lt.info('Beginning tests...')
-    # test_object.test_mirror()
     test_object.test_mirror_halfpi_rotation()
     test_object.test_facet()
-    # test_object.test_heliostat_surface_normals()
     test_object.test_solar_field()
     test_object.test_heliostat_05W01_and_14W01()
     test_object.test_heliostat_stages()

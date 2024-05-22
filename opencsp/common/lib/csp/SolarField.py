@@ -71,7 +71,6 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
         # self.set_position_in_space(self.origin, self.rotation)
 
-
     def set_heliostat_positions(self, positions: list[Pxyz]):
         """
         Places the heliostats at the points provided. The Pxyzs should appear in the same order
@@ -217,7 +216,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         xyz_max: list[float] = [x_max, y_max, z_max]
         return [xyz_min, xyz_max]
 
-    def heliostat_bounding_box_xy_UNVERIFIED(self):
+    def heliostat_bounding_box_xy(self):
         """Returns an axis alligned bounding box that only
         takes into account the heliostat origins"""
         heliostat_origins = Pxyz.merge([h._self_to_parent_transform.apply(Pxyz.origin()) for h in self.heliostats])
@@ -229,7 +228,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         xy_max: list[float] = [x_max, y_max]
         return [xy_min, xy_max]
 
-    def heliostat_field_regular_grid_xy_UNVERIFIED(self, n_x: int, n_y: int):
+    def heliostat_field_regular_grid_xy(self, n_x: int, n_y: int):
         bbox_xy = self.heliostat_bounding_box_xy()
         xy_min = bbox_xy[0]
         x_min = xy_min[0]
@@ -290,7 +289,9 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         for heliostat in self.heliostats:
             heliostat.set_orientation(hc.face_up())
 
-    def set_heliostats_configuration_UNVERIFIED(self, heliostat_name_list_to_set: list[str], h_config: hc.HeliostatConfiguration) -> None:
+    def set_heliostats_configuration_UNVERIFIED(
+        self, heliostat_name_list_to_set: list[str], h_config: hc.HeliostatConfiguration
+    ) -> None:
         # If all heliostats are reset, then clear tracking command.
         all_heliostats = set(list(self.heliostat_dict.keys()))
         set_heliostats = set(heliostat_name_list_to_set)
@@ -387,7 +388,9 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 #
 
 
-def setup_solar_field_UNVERIFIED(solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames) -> SolarField:
+def setup_solar_field_UNVERIFIED(
+    solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames
+) -> SolarField:
     # Notify progress.
     logt.info('Setting up solar field...')
 
@@ -431,7 +434,9 @@ def setup_solar_field_UNVERIFIED(solar_field_spec, aimpoint_xyz, when_ymdhmsz, s
 #
 
 
-def draw_solar_field_UNVERIFIED(figure_control, solar_field, solar_field_style, view_spec, name_suffix='', axis_equal=True):
+def draw_solar_field_UNVERIFIED(
+    figure_control, solar_field, solar_field_style, view_spec, name_suffix='', axis_equal=True
+):
     # Assumes that solar field is already set up with heliostat configurations, etc.
     # Select name and title.
     if (solar_field.short_name == None) or (len(solar_field.short_name) == 0):

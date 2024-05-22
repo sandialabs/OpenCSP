@@ -124,7 +124,6 @@ class TestSolarFieldOutput(to.TestOutput):
             draw_mirror_curvature=True,
             draw_outline=True,
             outline_style=rcps.outline(color='g'),
-            draw_surface_normal_at_corners=False,
             draw_name=False,
             draw_centroid=False,
             draw_surface_normal=False,

@@ -34,7 +34,7 @@ class RenderControlFacet:
         # corner_normal_base_style=rcps.marker(), # Unimplemented
         draw_name=False,
         name_style=rctxt.default(color='k'),
-        draw_mirror_curvature=False, 
+        draw_mirror_curvature=False,
         mirror_styles=rcm.RenderControlMirror(),
     ):
 
@@ -95,7 +95,6 @@ def normal_mirror_surface(color='k'):
         draw_outline=False,
         outline_style=rcps.outline(color=color),
         draw_surface_normal=False,
-        draw_surface_normal_at_corners=False,
         draw_name=False,
         name_style=rctxt.default(color=color),
         draw_mirror_curvature=True,
