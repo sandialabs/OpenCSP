@@ -21,10 +21,14 @@ import numpy as np
 import opencsp.common.lib.geometry.geometry_3d as g3d
 
 
-def sun_position_aux(location_lon_lat: tuple[float, float],  # radians.  (longitude, lattiude) pair.
-                     when_ymdhmsz: tuple[float, float, float, float, float, float, float],      # (year, month, day, hour, minute, second, timezone) tuple.
-                     #  Example: (2022, 7, 4, 11, 20, 0, -6) => July 4, 2022 at 11:20 am MDT (-6 hours)
-                     refraction=True) -> tuple[float, float]:  # Boolean.  If True, apply refraction correction.
+def sun_position_aux(
+    location_lon_lat: tuple[float, float],  # radians.  (longitude, lattiude) pair.
+    when_ymdhmsz: tuple[
+        float, float, float, float, float, float, float
+    ],  # (year, month, day, hour, minute, second, timezone) tuple.
+    #  Example: (2022, 7, 4, 11, 20, 0, -6) => July 4, 2022 at 11:20 am MDT (-6 hours)
+    refraction=True,
+) -> tuple[float, float]:  # Boolean.  If True, apply refraction correction.
     """
     John Clark Craig's code.
     https://levelup.gitconnected.com/python-sun-position-for-solar-energy-and-research-7a4ead801777
@@ -42,20 +46,13 @@ def sun_position_aux(location_lon_lat: tuple[float, float],  # radians.  (longit
     # Decimal hour of the day at Greenwich
     greenwichtime = hour - timezone + minute / 60 + second / 3600
     # Days from J2000, accurate from 1901 to 2099
-    daynum = (367 * year
-              - 7 * (year + (month + 9) // 12) // 4
-              + 275 * month // 9
-              + day
-              - 730531.5
-              + greenwichtime / 24)
+    daynum = 367 * year - 7 * (year + (month + 9) // 12) // 4 + 275 * month // 9 + day - 730531.5 + greenwichtime / 24
     # Mean longitude of the sun
     mean_long = daynum * 0.01720279239 + 4.894967873
     # Mean anomaly of the Sun
     mean_anom = daynum * 0.01720197034 + 6.240040768
     # Ecliptic longitude of the sun
-    eclip_long = (mean_long
-                  + 0.03342305518 * sin(mean_anom)
-                  + 0.0003490658504 * sin(2 * mean_anom))
+    eclip_long = mean_long + 0.03342305518 * sin(mean_anom) + 0.0003490658504 * sin(2 * mean_anom)
     # Obliquity of the ecliptic
     obliquity = 0.4090877234 - 0.000000006981317008 * daynum
     # Right ascension of the sun
@@ -69,8 +66,7 @@ def sun_position_aux(location_lon_lat: tuple[float, float],  # radians.  (longit
     # Local elevation of the sun
     elevation = asin(sin(decl) * sin(rlat) + cos(decl) * cos(rlat) * cos(hour_ang))
     # Local azimuth of the sun
-    azimuth = atan2(-cos(decl) * cos(rlat) * sin(hour_ang),
-                    sin(decl) - sin(rlat) * sin(elevation))
+    azimuth = atan2(-cos(decl) * cos(rlat) * sin(hour_ang), sin(decl) - sin(rlat) * sin(elevation))
     # Convert azimuth and elevation to degrees
     azimuth = into_range(deg(azimuth), 0, 360)
     elevation = into_range(deg(elevation), -180, 180)
@@ -79,7 +75,7 @@ def sun_position_aux(location_lon_lat: tuple[float, float],  # radians.  (longit
         targ = rad((elevation + (10.3 / (elevation + 5.11))))
         elevation += (1.02 / tan(targ)) / 60
     # Return azimuth and elevation in degrees
-#    return (round(azimuth, 2), round(elevation, 2))  # ?? TODO RCB -- ORIGINAL CODE
+    #    return (round(azimuth, 2), round(elevation, 2))  # ?? TODO RCB -- ORIGINAL CODE
     return (azimuth, elevation)
 
 
@@ -93,8 +89,9 @@ def into_range(x, range_min, range_max):
     return (((shiftedx % delta) + delta) % delta) + range_min
 
 
-def sun_position(location_lon_lat: tuple[float, float],  # radians.  (longitude, lattiude) pair.
-                 when_ymdhmsz: tuple) -> np.ndarray:     # (year, month, day, hour, minute, second, timezone) tuple.
+def sun_position(
+    location_lon_lat: tuple[float, float], when_ymdhmsz: tuple  # radians.  (longitude, lattiude) pair.
+) -> np.ndarray:  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6) => July 4, 2022 at 11:20 am MDT (-6 hours)
     # Get the Sun's apparent location in the sky
     azimuth_deg, elevation_deg = sun_position_aux(location_lon_lat, when_ymdhmsz, True)  # John Clark Craig's version.

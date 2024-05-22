@@ -4,18 +4,19 @@ from opencsp.common.lib.render_control.RenderControlSurface import RenderControl
 from opencsp.common.lib.geometry.RegionXY import Resolution
 
 
-class RenderControlMirror():
-    def __init__(self,
-                 centroid: bool = False,
-                 surface_normals: bool = False,
-                 resolution: Resolution = None,
-                 norm_len: float = 1,
-                 norm_res: int = 5,
-                 norm_base_style: RenderControlPointSeq = rcps.marker(markersize=2),
-                 surface_style: RenderControlSurface = RenderControlSurface(),
-                 point_styles: RenderControlPointSeq = None,
-                 number_of_edge_points: int = 20,
-                 ) -> None:
+class RenderControlMirror:
+    def __init__(
+        self,
+        centroid: bool = False,
+        surface_normals: bool = False,
+        resolution: Resolution = None,
+        norm_len: float = 1,
+        norm_res: int = 5,
+        norm_base_style: RenderControlPointSeq = rcps.marker(markersize=2),
+        surface_style: RenderControlSurface = RenderControlSurface(),
+        point_styles: RenderControlPointSeq = None,
+        number_of_edge_points: int = 20,
+    ) -> None:
         if point_styles == None:
             self.point_styles = rcps.marker(markersize=2)
         if resolution is None:
@@ -29,6 +30,7 @@ class RenderControlMirror():
         self.norm_base_style = norm_base_style
         self.surface_style = surface_style
         self.point_styles = point_styles
+
 
 # Common Configurations
 

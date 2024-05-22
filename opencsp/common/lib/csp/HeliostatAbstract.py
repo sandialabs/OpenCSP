@@ -4,6 +4,7 @@ Heliostat Class
 
 
 """
+
 from abc import ABC, abstractmethod
 import copy
 import csv
@@ -25,17 +26,14 @@ import opencsp.common.lib.geometry.transform_3d as t3d
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.tool.math_tools as mt
 from opencsp.common.lib.csp.ufacet.Facet import Facet
-from opencsp.common.lib.csp.MirrorParametricRectangular import \
-    MirrorParametricRectangular
+from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlEnsemble import \
-    RenderControlEnsemble
-from opencsp.common.lib.render_control.RenderControlHeliostat import \
-    RenderControlHeliostat
+from opencsp.common.lib.render_control.RenderControlEnsemble import RenderControlEnsemble
+from opencsp.common.lib.render_control.RenderControlHeliostat import RenderControlHeliostat
 from opencsp.common.lib.tool.typing_tools import strict_types
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 
@@ -44,7 +42,7 @@ UP = Vxyz([0, 0, 1])
 
 class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
     """
-    Heliostat representation. 
+    Heliostat representation.
     Parameters:
         -----------
         facet_ensemble: FacetEnsemble
@@ -52,12 +50,13 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
             The facet names should be their position in the list (1-indexed).
     """
 
-    def __init__(self,
-                 facet_ensemble: FacetEnsemble,
-                 name: str = None,
-                 #  center_facet: Facet | str = None,
-                 #  use_center_facet_for_aiming: bool = False
-                 ) -> None:
+    def __init__(
+        self,
+        facet_ensemble: FacetEnsemble,
+        name: str = None,
+        #  center_facet: Facet | str = None,
+        #  use_center_facet_for_aiming: bool = False
+    ) -> None:
 
         self.name = name
         self.facet_ensemble = facet_ensemble
@@ -96,6 +95,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
         # Find bounding box
         return xyz.x.min(), xyz.x.max(), xyz.y.min(), xyz.y.max()  # facet frame
+
     # override OpticOrientationAbstract
 
     @property
@@ -109,18 +109,18 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
     # POSITIONING
 
     @abstractmethod
-    def movement_transform(self, config:HeliostatConfiguration) -> TransformXYZ:
+    def movement_transform(self, config: HeliostatConfiguration) -> TransformXYZ:
         """
-        Instantiable classes that inheret HeliostatAbstract are required 
-        to have a functiont that takes in input and returns a TransformationXYZ 
-        object. This function can be called by another function that better 
-        describes the motion, but this one needs to exist to make sure the 
-        child class is a proper heliostat. 
+        Instantiable classes that inheret HeliostatAbstract are required
+        to have a functiont that takes in input and returns a TransformationXYZ
+        object. This function can be called by another function that better
+        describes the motion, but this one needs to exist to make sure the
+        child class is a proper heliostat.
 
         Parameters
         ----------
         config: HeliostatConfiguration
-            The arguments required by the Heliostat instance. 
+            The arguments required by the Heliostat instance.
             Should be the same type as `self.current_configuration`.
 
         Returns
@@ -133,7 +133,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         ```python
         # override movement_transform in HeliostatAbstract
         def movement_transform(self, az_angle: float, el_angle: float):
-            '''possible movement_transform for an oversimplified 
+            '''possible movement_transform for an oversimplified
             azimuth and elevation based heliostat.'''
             az_rotation = Rotation.from_euler('z', az_angle)
             transform_az = TransformXYZ.from_R(az_rotation)
@@ -149,9 +149,9 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
     @abstractmethod
     def current_configuration(self) -> HeliostatConfiguration:
         """
-        A tuple of the values that define the current state of the heliostat. 
+        A tuple of the values that define the current state of the heliostat.
 
-        Must adhere to the following property: 
+        Must adhere to the following property:
         ```python
         heliostat: HeliostatAbstract  # in some state
         current = helistat.current_configuration
@@ -162,15 +162,14 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
     @current_configuration.setter
     @abstractmethod
-    def current_configuration(self, new_current_configuration:HeliostatConfiguration) -> None:
-        """Updates the value of current_configuration.
-        """
+    def current_configuration(self, new_current_configuration: HeliostatConfiguration) -> None:
+        """Updates the value of current_configuration."""
         ...
 
     @abstractmethod
     def from_pointing_vector_to_configuration(self, pointing_vector: Vxyz) -> HeliostatConfiguration:
         """
-        Gets the configuration for the heliostat that would move the heliostat 
+        Gets the configuration for the heliostat that would move the heliostat
         so it is facing the given direction.
 
         Parameter
@@ -181,15 +180,15 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         Returns
         -------
         tuple
-            The configuration that contains values that would move the heliostat 
-            to point on the direction of `pointing_vector` if they were used as arguments 
-            in `set_orientation`. 
+            The configuration that contains values that would move the heliostat
+            to point on the direction of `pointing_vector` if they were used as arguments
+            in `set_orientation`.
         """
         ...
 
-    def set_orientation(self, config:HeliostatConfiguration) -> None:
+    def set_orientation(self, config: HeliostatConfiguration) -> None:
         """
-        Uses the `movement_transform(self, *args)` function to 
+        Uses the `movement_transform(self, *args)` function to
         set the `_self_to_parent_transform` transformation of the FacetEnsemble in heliostat.
         """
         current_position = TransformXYZ.from_V(self.facet_ensemble._self_to_parent_transform.V)
@@ -198,19 +197,16 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
     def set_orientation_from_pointing_vector(self, pointing_vector: Vxyz) -> None:
         """
-        Sets the pointing direction of the Heliostat to be the direction given. 
+        Sets the pointing direction of the Heliostat to be the direction given.
         Note that this function depends on the individual implmentation of each heliostat.
         """
         configuration = self.from_pointing_vector_to_configuration(pointing_vector)
         self.set_orientation(configuration)
 
     @strict_types
-    def set_tracking_configuration(self,
-                                   aimpoint: Pxyz,
-                                   location_lon_lat: Iterable,
-                                   when_ymdhmsz: tuple):
+    def set_tracking_configuration(self, aimpoint: Pxyz, location_lon_lat: Iterable, when_ymdhmsz: tuple):
         """
-        Orients the facet ensemble to point at the aimpoint given a location and time. 
+        Orients the facet ensemble to point at the aimpoint given a location and time.
         """
         # Heliostat centroid coordinates.
         # Coordinates are (x,z) center, z=0 is at torque tube height.
@@ -238,9 +234,9 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         Parameters:
         -----------
         func: FunctionXYContinuous
-            The function that is used to set the canting angles. 
-            The function is of the form z = f(x, y) and the surface normal at 
-            (x0, y0) is the direction that a facet at (x0, y0) will point. 
+            The function that is used to set the canting angles.
+            The function is of the form z = f(x, y) and the surface normal at
+            (x0, y0) is the direction that a facet at (x0, y0) will point.
 
         """
         # equation for canting angles
@@ -266,13 +262,13 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
             dfdx_n = dfdx.subs([(x_s, x), (y_s, y)])
             dfdy_n = dfdy.subs([(x_s, x), (y_s, y)])
 
-            if ((dfdx_n == 0.) and (dfdy_n == 0.)):
+            if (dfdx_n == 0.0) and (dfdy_n == 0.0):
                 # Then the surface normal is vertical, and there is no rotation.
                 canting = Rotation.identity()
 
             else:
                 # gradient of the surface
-                surf_normal = -Uxyz([dfdx_n, dfdy_n, -1.])
+                surf_normal = -Uxyz([dfdx_n, dfdy_n, -1.0])
                 UP = Uxyz([0, 0, 1])
                 canting = UP.align_to(surf_normal)
 
@@ -289,10 +285,10 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         Parameters:
         -----------
         view : View3d
-            A View3d object that holds the figure. 
+            A View3d object that holds the figure.
         heliostat_style : RenderControlHeliostat
-            Holds information on how to draw the heliostat 
-            and the objects that make up the heliostat. 
+            Holds information on how to draw the heliostat
+            and the objects that make up the heliostat.
         transform : TransformXYZ | None
             List of 3d transforms for each facet in ensemble.
             Used to position points in the Heliostat's base coordinate
@@ -344,7 +340,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         if heliostat_style.post != 0:
             DOWN = Vxyz([0, 0, -heliostat_style.post])
             direction = transform.apply(DOWN)
-            view.draw_Vxyz(Vxyz.merge([origin + DOWN, origin,]))
+            view.draw_Vxyz(Vxyz.merge([origin + DOWN, origin]))
 
         # Name.
         if heliostat_style.draw_name:
@@ -406,13 +402,14 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         resolution.resolve_in_place(self.axis_aligned_bounding_box)
         return self._survey_of_points_helper(resolution, TransformXYZ.identity())
 
-    def _survey_of_points_helper(self, given_resolution: Resolution, frame_transform: TransformXYZ) -> tuple[Pxyz, Vxyz]:
+    def _survey_of_points_helper(
+        self, given_resolution: Resolution, frame_transform: TransformXYZ
+    ) -> tuple[Pxyz, Vxyz]:
         resolution = given_resolution.change_frame_and_copy(frame_transform)
         resolution.resolve_in_place(self.axis_aligned_bounding_box)
         points, normals = [], []
         facet_points, facet_normals = self.facet_ensemble._survey_of_points_helper(
-            resolution,
-            self.facet_ensemble._self_to_parent_transform.inv()
+            resolution, self.facet_ensemble._self_to_parent_transform.inv()
         )
         return (facet_points, facet_normals)
 

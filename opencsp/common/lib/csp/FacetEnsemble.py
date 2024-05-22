@@ -1,4 +1,5 @@
 """Rigid ensemble of facets"""
+
 import copy
 from typing import Callable
 from warnings import warn
@@ -23,9 +24,7 @@ from opencsp.common.lib.render_control.RenderControlPointSeq import RenderContro
 
 
 class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
-    """Ensemble of facets that holds Facet objects.
-
-    """
+    """Ensemble of facets that holds Facet objects."""
 
     def __init__(self, facets: list[Facet]):
         """Instantiates FacetEnsemble class
@@ -45,17 +44,15 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
     def facet_positions(self) -> Pxyz:
         """
         Finds the locations of the facets relative to the `FacetEnsemble` origin.
-        If the ensemble was only modified using the `set_facet_positions` and 
-        `set_facet_canting` functions then this essentially just ignored the 
-        rotations. 
+        If the ensemble was only modified using the `set_facet_positions` and
+        `set_facet_canting` functions then this essentially just ignored the
+        rotations.
         """
-        return Pxyz.merge([facet._self_to_parent_transform.apply(Pxyz.origin()) 
-                           for facet in self.facets])
+        return Pxyz.merge([facet._self_to_parent_transform.apply(Pxyz.origin()) for facet in self.facets])
 
     @property
     def transform_mirror_to_self(self):
-        return [facet.mirror.get_transform_relative_to(self)
-                for facet in self.facets]
+        return [facet.mirror.get_transform_relative_to(self) for facet in self.facets]
 
     # override from VisualizeOrthorectifiedSlopeAbstract
     @property
@@ -107,16 +104,16 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         resolution.resolve_in_place(self.axis_aligned_bounding_box)
         return self._survey_of_points_helper(resolution, TransformXYZ.identity())
 
-    def _survey_of_points_helper(self, 
-                                 given_resolution: Resolution, 
-                                 frame_transform: TransformXYZ) -> tuple[Pxyz, Vxyz]:
+    def _survey_of_points_helper(
+        self, given_resolution: Resolution, frame_transform: TransformXYZ
+    ) -> tuple[Pxyz, Vxyz]:
         resolution = given_resolution.change_frame_and_copy(frame_transform)
         resolution.resolve_in_place(self.axis_aligned_bounding_box)
         points, normals = [], []
         for facet in self.facets:
             facet_points, facet_normals = facet._survey_of_points_helper(
-                resolution,
-                facet._self_to_parent_transform.inv())
+                resolution, facet._self_to_parent_transform.inv()
+            )
             points.append(facet_points)
             normals.append(facet_normals)
 
@@ -147,19 +144,19 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         slope_data = np.reshape(slope_data, (2, y_vec.size, x_vec.size))  # ensemble child
         return slope_data  # ensemble child
 
-    def draw(self, view: View3d,
-             facet_ensemble_style: RenderControlFacetEnsemble = None,
-             transform: TransformXYZ = None) -> None:
+    def draw(
+        self, view: View3d, facet_ensemble_style: RenderControlFacetEnsemble = None, transform: TransformXYZ = None
+    ) -> None:
         """
         Draws facet ensemble onto a View3d object.
 
         Parameters:
         -----------
         view : View3d
-            A View3d object that holds the figure. 
+            A View3d object that holds the figure.
         facet_styles : RenderControlFacetEnsemble
-            Holds information on how to draw each facet, inclusing 
-            information on how to draw specific facets. 
+            Holds information on how to draw each facet, inclusing
+            information on how to draw specific facets.
         transform : TransformXYZ | None
             List of 3d transforms for each facet in ensemble.
             Used to position points in the FacetEnsemble's base coordinate
@@ -189,14 +186,11 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
         # pointing vector of the facet ensemble
         if facet_ensemble_style.draw_normal_vector:
-            view.draw_Vxyz(Vxyz.merge([origin, normal_vector]),
-                           style=facet_ensemble_style.normal_vector_style)
+            view.draw_Vxyz(Vxyz.merge([origin, normal_vector]), style=facet_ensemble_style.normal_vector_style)
 
         if facet_ensemble_style.draw_outline:
             left, right, top, bottom = self.axis_aligned_bounding_box
-            corners = Pxyz([[left, left, right, right],
-                           [top, bottom, bottom, top],
-                           [0, 0, 0, 0]])
+            corners = Pxyz([[left, left, right, right], [top, bottom, bottom, top], [0, 0, 0, 0]])
             corners_moved = transform.apply(corners)
             view.draw_Vxyz(corners_moved, close=True, style=facet_ensemble_style.outline_style)
 
@@ -212,26 +206,29 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
     def set_facet_positions(self, positions: Pxyz):
         """
         The function for setting the positions of the facets relative to one another.
-        
+
         """
         if len(positions) != len(self.facets):
-            raise ValueError(f"This FacetEnsemble contains {len(self.facets)} and"
-                             f" the argument only gave {len(positions)} positions.")
+            raise ValueError(
+                f"This FacetEnsemble contains {len(self.facets)} and"
+                f" the argument only gave {len(positions)} positions."
+            )
         for pos, facet in zip(positions, self.facets):
-            facet:Facet
-            pos:Pxyz
+            facet: Facet
+            pos: Pxyz
             facet._self_to_parent_transform = TransformXYZ.from_V(pos)
 
     def set_facet_canting(self, canting_rotations: list[Rotation]):
         if len(canting_rotations) != len(self.facets):
-            raise ValueError(f"This FacetEnsemble contains {len(self.facets)} and" 
-                             f" the argument only gave {len(canting_rotations)} rotations.")
+            raise ValueError(
+                f"This FacetEnsemble contains {len(self.facets)} and"
+                f" the argument only gave {len(canting_rotations)} rotations."
+            )
         for facet, pos, canting in zip(self.facets, self.facet_positions, canting_rotations):
-            facet:Facet
-            pos:Pxyz
-            canting:Rotation
+            facet: Facet
+            pos: Pxyz
+            canting: Rotation
             facet._self_to_parent_transform = TransformXYZ.from_R_V(canting, pos)
-
 
     # FUNCITONS BELOW THIS HAVE NOT BEEN TESTED !!!
 
@@ -264,6 +261,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             - az - float - azimuth angle (rotation about z axis) in radians
             - el - float - elevation angle (rotation about x axis) in radians
         """
+
         def pointing_function(az: float, el: float) -> TransformXYZ:
             r = Rotation.from_euler('zx', [az, el], degrees=False)
             return TransformXYZ.from_R(r)
@@ -280,6 +278,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         The "pointing_function" accessed by self.set_pointing has the following input
             - rotation - scipy.spatial.transform.Rotation
         """
+
         def pointing_function(rotation: Rotation) -> TransformXYZ:
             return TransformXYZ.from_R(rotation)
 

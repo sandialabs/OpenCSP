@@ -37,7 +37,7 @@ class FunctionXYGrid(FunctionXYAbstract):
         self.x_count = len(values[0]) + 0.0
         self.y_count = len(values) + 0.0
         if limits == None:  # default is to treat the array just as an array
-            limits = (0., self.x_count, 0., self.y_count)
+            limits = (0.0, self.x_count, 0.0, self.y_count)
         # if we know the first and last x & y values in the domain
         # and we assume all values are equispaced, this gives all
         # the information needed
@@ -58,7 +58,8 @@ class FunctionXYGrid(FunctionXYAbstract):
         if isinstance(x, Iterable) or isinstance(y, Iterable):
             if len(x) != len(y):
                 raise ValueError(
-                    f"The length of x and y must be the same. x length {len(x)} does not match y length {len(y)}")
+                    f"The length of x and y must be the same. x length {len(x)} does not match y length {len(y)}"
+                )
             return np.array([self.value_at(xi, yi) for xi, yi in zip(x, y)])
         # scalar case
         if self.in_domain(x, y):
@@ -114,21 +115,24 @@ class FunctionXYGrid(FunctionXYAbstract):
 
         # draw
         if functionXY_style.draw_heatmap:
-            view.imshow(self.values,
-                        colorbar=functionXY_style.colorbar,
-                        vmin=vmin,
-                        vmax=vmax,
-                        cmap=functionXY_style.cmap,
-                        extent=extent,
-                        # norm=colors.LogNorm()
-                        )
+            view.imshow(
+                self.values,
+                colorbar=functionXY_style.colorbar,
+                vmin=vmin,
+                vmax=vmax,
+                cmap=functionXY_style.cmap,
+                extent=extent,
+                # norm=colors.LogNorm()
+            )
 
         if functionXY_style.draw_contours:
-            view.contour(np.flipud(self.values),
-                         colorbar=functionXY_style.colorbar,
-                         vmin=vmin,
-                         levels=3,  # TODO TJL:add to render control
-                         vmax=vmax,
-                         colors="black",  # TODO TJL:add to render control
-                         #  cmap=functionXY_style.cmap,
-                         extent=extent,)
+            view.contour(
+                np.flipud(self.values),
+                colorbar=functionXY_style.colorbar,
+                vmin=vmin,
+                levels=3,  # TODO TJL:add to render control
+                vmax=vmax,
+                colors="black",  # TODO TJL:add to render control
+                #  cmap=functionXY_style.cmap,
+                extent=extent,
+            )

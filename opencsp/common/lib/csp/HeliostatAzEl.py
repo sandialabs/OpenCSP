@@ -29,10 +29,10 @@ DEG2RAD = np.pi / 180
 
 class HeliostatAzEl(HeliostatAbstract):
     """
-    Child class of HeliostatAbstract. HeliostatAzEl instances have motion characterized by 
-    a motor that rotates the heliostat in the azumuth direction (an angle measured 
-    clockwise from North in UNE cooridinates or from y in XYZ coordinates) and a motor that 
-    rotates up from the East-North plane (XY plane).  
+    Child class of HeliostatAbstract. HeliostatAzEl instances have motion characterized by
+    a motor that rotates the heliostat in the azumuth direction (an angle measured
+    clockwise from North in UNE cooridinates or from y in XYZ coordinates) and a motor that
+    rotates up from the East-North plane (XY plane).
     """
 
     def __init__(self, facet_ensemble: FacetEnsemble, name: str = None) -> None:
@@ -73,22 +73,22 @@ class HeliostatAzEl(HeliostatAbstract):
         self.set_orientation_from_az_el(self._az, self._el)
 
     @classmethod
-    def from_attributes(cls,
-                        number_of_facets: int,
-                        facet_positions: Pxyz,
-                        mirror_template: MirrorAbstract,
-                        name: str = None,
-                        facet_names: list[str] = None,
-                        pivot: float = 0,
-                        ) -> 'HeliostatAzEl':
+    def from_attributes(
+        cls,
+        number_of_facets: int,
+        facet_positions: Pxyz,
+        mirror_template: MirrorAbstract,
+        name: str = None,
+        facet_names: list[str] = None,
+        pivot: float = 0,
+    ) -> 'HeliostatAzEl':
         """
         Creates a Heliostat of identical mirrors as given by the facet_template.
         Positions the facets as given by the attributes
         """
         if len(facet_positions) != number_of_facets:
             raise ValueError("number_of_facets and length of facet_positions must match")
-        if ((facet_names is not None) and
-                (len(facet_names) != number_of_facets)):
+        if (facet_names is not None) and (len(facet_names) != number_of_facets):
             raise ValueError("number_of_facets and length of facet_names must match")
         if facet_names is None:
             facet_names = [None for _ in range(number_of_facets)]
@@ -102,11 +102,13 @@ class HeliostatAzEl(HeliostatAbstract):
         return heliostat
 
     @classmethod
-    def from_csv_files(cls,
-                       heliostat_name: str,
-                       heliostat_attributes_csv: str,
-                       facet_attributes_csv: str,
-                       mirror_template: MirrorAbstract) -> tuple['HeliostatAzEl', Pxyz]:
+    def from_csv_files(
+        cls,
+        heliostat_name: str,
+        heliostat_attributes_csv: str,
+        facet_attributes_csv: str,
+        mirror_template: MirrorAbstract,
+    ) -> tuple['HeliostatAzEl', Pxyz]:
         """returns the heliostat that is requested based on the given information
 
         Paramters
@@ -134,9 +136,10 @@ class HeliostatAzEl(HeliostatAbstract):
         with open(heliostat_attributes_csv) as h_csv:
             h_reader = csv.reader(h_csv)
             h_headers = next(h_reader)
-            heliostat_attributes = {row[0]: {h_headers[i]: float(attribute)
-                                             for i, attribute in enumerate(row[1:-1], start=1)}
-                                    for row in h_reader}
+            heliostat_attributes = {
+                row[0]: {h_headers[i]: float(attribute) for i, attribute in enumerate(row[1:-1], start=1)}
+                for row in h_reader
+            }
             # heliostat_attributes = {}
             # for row in h_reader:
             #     heliostat_attributes[row[0]] = {}
@@ -145,9 +148,7 @@ class HeliostatAzEl(HeliostatAbstract):
             #         heliostat_attributes[row[0]][h_headers[i]] = float(attribute)
 
         if heliostat_name not in heliostat_attributes:
-            raise ValueError(f"{heliostat_name} is not a valid heliostat "
-
-                             f"name in {heliostat_attributes_csv}")
+            raise ValueError(f"{heliostat_name} is not a valid heliostat " f"name in {heliostat_attributes_csv}")
         with open(facet_attributes_csv) as f_csv:
             f_reader = csv.reader(f_csv)
             f_headers = next(f_reader)
@@ -165,11 +166,9 @@ class HeliostatAzEl(HeliostatAbstract):
             this_heliostat_attributes["Pivot Offset"],
         )
 
-        heliostat_location = Pxyz([
-            this_heliostat_attributes["X"],
-            this_heliostat_attributes["Y"],
-            this_heliostat_attributes["Z"],
-        ])
+        heliostat_location = Pxyz(
+            [this_heliostat_attributes["X"], this_heliostat_attributes["Y"], this_heliostat_attributes["Z"]]
+        )
         return (heliostat, heliostat_location)
 
     # override from HelistatAbstract
@@ -194,7 +193,7 @@ class HeliostatAzEl(HeliostatAbstract):
         return HeliostatConfiguration('az-el', az, el)
 
     # override from HelistatAbstract
-    def movement_transform(self, config:HeliostatConfiguration):
+    def movement_transform(self, config: HeliostatConfiguration):
         az_angle, el_angle = config.get_values()
         return self.transform_from_az_el(az_angle, el_angle)
 
@@ -211,8 +210,7 @@ class HeliostatAzEl(HeliostatAbstract):
         self._el = el
 
     def transform_from_az_el(self, az_angle: float, el_angle: float):
-        """movement_transform for an azimuth and elevation based heliostat.
-        """
+        """movement_transform for an azimuth and elevation based heliostat."""
         rotation_about_x = (np.pi / 2) - el_angle
         rotation_about_z = np.pi - az_angle
         pivot_transform = TransformXYZ.from_V(UP * self.pivot)
@@ -231,10 +229,13 @@ class HeliostatAzEl(HeliostatAbstract):
         # el_rotation = Rotation.from_rotvec(el_angle * el_rotation_axis, degrees=degrees)
         # transform_el = TransformXYZ.from_R(el_rotation)
 
-        composite_transform = (transform_az *
-                               transform_el *
-                               #    reorient_from_default_direction *
-                               pivot_transform)
+        composite_transform = (
+            transform_az
+            * transform_el
+            *
+            #    reorient_from_default_direction *
+            pivot_transform
+        )
         return composite_transform
 
     def set_orientation_from_az_el(self, az_angle: float, el_angle: float):

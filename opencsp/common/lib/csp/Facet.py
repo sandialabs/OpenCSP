@@ -1,4 +1,5 @@
 """Facet class inherited by all facet classes"""
+
 from typing import Callable
 from warnings import warn
 
@@ -24,9 +25,7 @@ UP = Vxyz([0, 0, 1])
 
 
 class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
-    """Facet representation that contains a MirrorAbstract object.
-
-    """
+    """Facet representation that contains a MirrorAbstract object."""
 
     def __init__(self, mirror: MirrorAbstract, name: str = None) -> 'Facet':
         """Instantiates Facet class
@@ -85,13 +84,13 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         resolution.resolve_in_place(self.axis_aligned_bounding_box)
         return self._survey_of_points_helper(resolution, TransformXYZ.identity())
 
-    def _survey_of_points_helper(self, given_resolution: Resolution, frame_transform: TransformXYZ) -> tuple[Pxyz, Vxyz]:
+    def _survey_of_points_helper(
+        self, given_resolution: Resolution, frame_transform: TransformXYZ
+    ) -> tuple[Pxyz, Vxyz]:
         resolution = given_resolution.change_frame_and_copy(frame_transform)
         resolution.resolve_in_place(self.axis_aligned_bounding_box)
 
-        return self.mirror._survey_of_points_helper(
-            resolution,
-            self.mirror._self_to_parent_transform.inv())
+        return self.mirror._survey_of_points_helper(resolution, self.mirror._self_to_parent_transform.inv())
 
     # override from VisualizeOrthorectifiedSlopeAbstract
     def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
@@ -140,7 +139,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         Parameters:
         -----------
         view : View3d
-            A view 3d object that holds the figure. 
+            A view 3d object that holds the figure.
         mirror_styles : RenderControlMirror
             Holds attibutes about the 3d graph.
         transform : TransformXYZ
@@ -169,11 +168,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
             #            self.bottom_left_corner]
             # view.draw_xyz_list(corners, close=True, style=facet_style.outline_style)
             left, right, bottom, top = self.axis_aligned_bounding_box
-            border = Pxyz([
-                [left, left, right, right],
-                [top, bottom, bottom, top],
-                [0, 0, 0, 0]
-            ])
+            border = Pxyz([[left, left, right, right], [top, bottom, bottom, top], [0, 0, 0, 0]])
             view.draw_Vxyz(transform.apply(border), close=True, style=facet_style.outline_style)
 
         # Surface normal.
@@ -181,10 +176,8 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
             # Construct ray.
             surface_normal_ray = transform.apply(UP * facet_style.surface_normal_length)
             # Draw ray and its base.
-            view.draw_single_Pxyz(origin,
-                                  style=facet_style.surface_normal_base_style)
-            view.draw_Vxyz(Vxyz.merge([origin, surface_normal_ray]),
-                           style=facet_style.surface_normal_style)
+            view.draw_single_Pxyz(origin, style=facet_style.surface_normal_base_style)
+            view.draw_Vxyz(Vxyz.merge([origin, surface_normal_ray]), style=facet_style.surface_normal_style)
 
         # # Surface normal drawn at corners.
         # # (Not the surface normal at the corner.  Facet curvature is not shown.)
@@ -220,8 +213,8 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
     # TODO TJL: Pointing Function methods are not tested with the updated base classes.
     #           There will need to be an addition to `Facet` that allows users to specify the ways
     #           a facet mounts the mirror it contains. Defining some function might
-    #           be the way to do this, but that is a task for the future. 
-            
+    #           be the way to do this, but that is a task for the future.
+
     def define_pointing_function(self, func: Callable[..., TransformXYZ]) -> None:
         """Sets the canting function to use. I.e., defines the
         "set_pointing" function.
@@ -251,6 +244,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
             - az - float - azimuth angle (rotation about z axis) in radians
             - el - float - elevation angle (rotation about x axis) in radians
         """
+
         def pointing_function(az: float, el: float) -> TransformXYZ:
             r = Rotation.from_euler('zx', [az, el], degrees=False)
             return TransformXYZ.from_R(r)
@@ -267,6 +261,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         The "pointing_function" accessed by self.set_pointing has the following input
             - rotation - scipy.spatial.transform.Rotation - rotation object
         """
+
         def pointing_function(rotation: Rotation) -> TransformXYZ:
             return TransformXYZ.from_R(rotation)
 

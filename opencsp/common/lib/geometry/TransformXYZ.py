@@ -47,7 +47,7 @@ class TransformXYZ:
     @classmethod
     def identity(cls):
         """
-        Returns the identity tranformation. 
+        Returns the identity tranformation.
         Alias for TransformXYZ.from_zero_zero().
 
         Returns

@@ -100,11 +100,14 @@ from typing import Iterable
 #     # Return.
 #     return nu
 
+
 @strict_types
-def tracking_surface_normal_xyz(heliostat_origin: Pxyz,     # (x,y,z) in m.     Heliostat origin.
-                                aimpoint: Pxyz,      # (x,y,z) in m.     Reflection aim point.
-                                location_lon_lat: Iterable,  # (lon,lat) in rad. Solar field origin.
-                                when_ymdhmsz: tuple):     # (year, month, day, hour, minute, second, timezone) tuple.
+def tracking_surface_normal_xyz(
+    heliostat_origin: Pxyz,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint: Pxyz,  # (x,y,z) in m.     Reflection aim point.
+    location_lon_lat: Iterable,  # (lon,lat) in rad. Solar field origin.
+    when_ymdhmsz: tuple,
+):  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
     #              => July 4, 2022 at 11:20 am MDT (-6 hours)
     """
@@ -149,9 +152,11 @@ def tracking_surface_normal_xyz(heliostat_origin: Pxyz,     # (x,y,z) in m.     
 
 
 @strict_types
-def tracking_surface_normal_xyz_given_sun_vector(heliostat_xyz: list | np.ndarray | tuple,     # (x,y,z) in m.     Heliostat origin.
-                                                 aimpoint_xyz: list | np.ndarray | tuple,      # (x,y,z) in m.     Reflection aim point.
-                                                 sun_vector: Vxyz):     # Current direction of the sun
+def tracking_surface_normal_xyz_given_sun_vector(
+    heliostat_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Reflection aim point.
+    sun_vector: Vxyz,
+):  # Current direction of the sun
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
     #              => July 4, 2022 at 11:20 am MDT (-6 hours)
     """
@@ -181,10 +186,12 @@ def tracking_surface_normal_xyz_given_sun_vector(heliostat_xyz: list | np.ndarra
     return [n_x, n_y, n_z]
 
 
-def tracking_surface_normal_xy(heliostat_xyz: Pxyz,    # (x,y,z) in m.     Heliostat origin.
-                               aimpoint_xyz: Pxyz,     # (x,y,z) in m.     Reflection aim point.
-                               location_lon_lat: Iterable,  # (lon,lat) in rad. Solar field origin.
-                               when_ymdhmsz: tuple):    # (year, month, day, hour, minute, second, timezone) tuple.
+def tracking_surface_normal_xy(
+    heliostat_xyz: Pxyz,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint_xyz: Pxyz,  # (x,y,z) in m.     Reflection aim point.
+    location_lon_lat: Iterable,  # (lon,lat) in rad. Solar field origin.
+    when_ymdhmsz: tuple,
+):  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
     #              => July 4, 2022 at 11:20 am MDT (-6 hours)
     """
@@ -195,10 +202,12 @@ def tracking_surface_normal_xy(heliostat_xyz: Pxyz,    # (x,y,z) in m.     Helio
     return [normal_xyz.x[0], normal_xyz.y[0]]
 
 
-def tracking_nu(heliostat_xyz,    # (x,y,z) in m.     Heliostat origin.
-                aimpoint_xyz,     # (x,y,z) in m.     Reflection aim point.
-                location_lon_lat,  # (lon,lat) in rad. Solar field origin.
-                when_ymdhmsz):    # (year, month, day, hour, minute, second, timezone) tuple.
+def tracking_nu(
+    heliostat_xyz,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint_xyz,  # (x,y,z) in m.     Reflection aim point.
+    location_lon_lat,  # (lon,lat) in rad. Solar field origin.
+    when_ymdhmsz,
+):  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
     #              => July 4, 2022 at 11:20 am MDT (-6 hours)
     """

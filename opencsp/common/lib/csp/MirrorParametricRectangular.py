@@ -1,6 +1,7 @@
 """Parametric rectangular mirror wtih origin in center of rectangular region
 representing a single reflective surface defined by an algebraic function.
 """
+
 from typing import Callable
 
 from opencsp.common.lib.geometry.RegionXY import RegionXY

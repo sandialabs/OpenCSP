@@ -1,5 +1,6 @@
 """Abstract mirror representing a single reflective surface
 """
+
 from abc import ABC, abstractmethod
 
 from matplotlib.tri import Triangulation
@@ -135,7 +136,7 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
     def location_at(self, p: Pxy) -> Pxyz:
         """Given an XY sample point in the mirror base reference frame,
         returns the XYZ point on the mirror's surface in the mirror's
-        base reference frame. 
+        base reference frame.
 
         Parameters
         ----------
@@ -195,7 +196,9 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
         resolution.resolve_in_place(self.region)
         return self._survey_of_points_helper(resolution, TransformXYZ.identity())
 
-    def _survey_of_points_helper(self, given_resolution: Resolution, frame_transform: TransformXYZ) -> tuple[Pxyz, Vxyz]:
+    def _survey_of_points_helper(
+        self, given_resolution: Resolution, frame_transform: TransformXYZ
+    ) -> tuple[Pxyz, Vxyz]:
         resolution = given_resolution.change_frame_and_copy(frame_transform)
         resolution.resolve_in_place(self.region)
         # resolution = resolution.resolve_and_copy(self.region)
@@ -206,7 +209,9 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
         return points, norms
 
     # TODO this should use the Resolution class not an int and a string
-    def survey_of_points_local(self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None) -> tuple[Pxyz, Vxyz]:
+    def survey_of_points_local(
+        self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None
+    ) -> tuple[Pxyz, Vxyz]:
         """Returns a set of points sampled from inside the optic region in
         the mirror's base coordinate reference frame.
 
@@ -259,14 +264,16 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
         slopes = -normals[:2] / normals[2:3]  # normalize z coordinate
         return slopes.reshape((2, y_vec.size, x_vec.size))  # 2 x M x N
 
-    def draw(self, view: View3d, mirror_style: RenderControlMirror = None, transform: TransformXYZ | None = None) -> None:
+    def draw(
+        self, view: View3d, mirror_style: RenderControlMirror = None, transform: TransformXYZ | None = None
+    ) -> None:
         """
         Draws a mirror onto a View3d object.
 
         Parameters:
         -----------
         view : View3d
-            A view 3d object that holds the figure. 
+            A view 3d object that holds the figure.
         mirror_styles : RenderControlMirror
             Holds attibutes about the 3d graph.
         transform : TransformXYZ

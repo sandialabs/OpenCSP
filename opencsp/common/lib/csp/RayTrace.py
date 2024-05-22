@@ -24,10 +24,8 @@ from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlRayTrace import \
-    RenderControlRayTrace
-from opencsp.common.lib.tool.hdf5_tools import (load_hdf5_datasets,
-                                                save_hdf5_datasets)
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
 from opencsp.common.lib.tool.typing_tools import strict_types
 
 
@@ -51,10 +49,10 @@ class RayTrace:
     def __add__(self, trace: 'RayTrace'):
         sum_trace = RayTrace()
 
-        for light_source in (self.scene.light_sources + trace.scene.light_sources):
+        for light_source in self.scene.light_sources + trace.scene.light_sources:
             sum_trace.scene.add_light_source(light_source)
 
-        for obj in (self.scene.objects + trace.scene.objects):
+        for obj in self.scene.objects + trace.scene.objects:
             sum_trace.scene.add_object(obj)
 
         sum_trace.light_paths_ensemble = self.light_paths_ensemble + trace.light_paths_ensemble
@@ -88,11 +86,7 @@ class RayTrace:
         lpe = LightPathEnsemble([])
         for batch in batch_names:
             prefix = f"RayTrace_{trace_name}/Batches/{batch}/"
-            subgroups = [
-                prefix + 'CurrentDirections',
-                prefix + 'InitialDirections',
-                prefix + 'Points',
-            ]
+            subgroups = [prefix + 'CurrentDirections', prefix + 'InitialDirections', prefix + 'Points']
             curr_directions, init_directions, points = list(load_hdf5_datasets(subgroups, filename).values())
             curr_directions = Uxyz(curr_directions)
             init_directions = Uxyz(init_directions)
@@ -156,15 +150,22 @@ def process_vector(vec: np.ndarray, norm: bool = False) -> np.ndarray:
     return vec
 
 
-def trace_scene_unvec(scene: scn.Scene,
-                      obj_resolution: int, random_dist: bool = False,
-                      store_in_ram: bool = True, save_in_file: bool = False,
-                      save_name: str = f"ray_trace_{time.asctime().replace(' ','_').replace(':','_')}",
-                      verbose: bool = False) -> RayTrace:
+def trace_scene_unvec(
+    scene: scn.Scene,
+    obj_resolution: int,
+    random_dist: bool = False,
+    store_in_ram: bool = True,
+    save_in_file: bool = False,
+    save_name: str = f"ray_trace_{time.asctime().replace(' ','_').replace(':','_')}",
+    verbose: bool = False,
+) -> RayTrace:
     """DEPRICATED \n
     TODO TJL:trace_scene_vec is PROBABLY BROKEN!"""
-    warn("RayTrace.trace_scene is vectorized and will be faster. This function will be phased out.",
-         DeprecationWarning, stacklevel=2)
+    warn(
+        "RayTrace.trace_scene is vectorized and will be faster. This function will be phased out.",
+        DeprecationWarning,
+        stacklevel=2,
+    )
 
     ray_trace = RayTrace(scene)
     for obj in scene.objects:
@@ -207,8 +208,7 @@ def trace_scene_unvec(scene: scn.Scene,
             for ls in scene.light_sources:  # loop through light sources
                 # get the rays from the light source for the current point
                 for incoming_light in ls.get_incident_rays(p):
-                    vector_from_path = lp.normalize(
-                        incoming_light.current_direction)
+                    vector_from_path = lp.normalize(incoming_light.current_direction)
                     ref_vec = calc_reflected_ray(n_v, vector_from_path)
                     ray = LightPath([], vector_from_path)
                     ray.add_step(p, ref_vec[:, 0])
@@ -226,18 +226,23 @@ def trace_scene_unvec(scene: scn.Scene,
 
 # TODO TJL:FIX ISSUES, only trace_scene_parallel is up-to-date
 # @strict_types
-def trace_scene(scene: scn.Scene,
-                obj_resolution: Resolution,
-                store_in_ram: bool = True,
-                save_in_file: bool = False,
-                save_name: str = None,
-                trace_name: str = "Default",
-                max_ram_in_use_percent: float = 99,
-                verbose: bool = False) -> RayTrace:
+def trace_scene(
+    scene: scn.Scene,
+    obj_resolution: Resolution,
+    store_in_ram: bool = True,
+    save_in_file: bool = False,
+    save_name: str = None,
+    trace_name: str = "Default",
+    max_ram_in_use_percent: float = 99,
+    verbose: bool = False,
+) -> RayTrace:
     # argument validity checks
     if not save_in_file and save_name != None:
-        warn("Saving file was specified, but 'save_in_file' flag is set to False. Trace will not be saved.",
-             UserWarning, stacklevel=2)
+        warn(
+            "Saving file was specified, but 'save_in_file' flag is set to False. Trace will not be saved.",
+            UserWarning,
+            stacklevel=2,
+        )
     if save_in_file and save_name == None:
         raise ValueError("save_in_file flag was True, but no file was specified to dave in.")
     if save_in_file and max_ram_in_use_percent < psutil.virtual_memory().percent:
@@ -269,8 +274,7 @@ def trace_scene(scene: scn.Scene,
 
         if verbose:
             number_of_rays = len(points)
-            checkpoints = [int(np.ceil(number_of_rays * n / 10))
-                           for n in range(1, 10)]
+            checkpoints = [int(np.ceil(number_of_rays * n / 10)) for n in range(1, 10)]
             print("Beginning Ray Trace...")
 
         # Loop through points and perform trace calculations
@@ -279,15 +283,11 @@ def trace_scene(scene: scn.Scene,
             ################# TODO TJL:draft for saving traces ######################
             if save_in_file and max_ram_in_use_percent < psutil.virtual_memory().percent:
                 prefix = f"RayTrace_{trace_name}/Batches/Batch{batch:03}/"
-                datasets = [
-                    prefix + "InitialDirections",
-                    prefix + "Points",
-                    prefix + "CurrentDirections",
-                ]
+                datasets = [prefix + "InitialDirections", prefix + "Points", prefix + "CurrentDirections"]
                 data = [
                     total_lpe.init_directions.data,
                     np.array([points.data for points in total_lpe.points_lists]),
-                    total_lpe.current_directions.data
+                    total_lpe.current_directions.data,
                 ]
                 if verbose:
                     print("saving...")
@@ -318,7 +318,9 @@ def trace_scene(scene: scn.Scene,
             total_lpe.concatenate_in_place(lpe)
 
             if verbose and i in checkpoints:  # TODO TJL:make sure this check does not slow down the program
-                print(f"{i/number_of_rays:.2%} through tracing. Using {psutil.virtual_memory().percent}% of system RAM.")
+                print(
+                    f"{i/number_of_rays:.2%} through tracing. Using {psutil.virtual_memory().percent}% of system RAM."
+                )
 
         # if the user wants to store the result in ran add to this RayTrace object
         if store_in_ram:
@@ -332,15 +334,11 @@ def trace_scene(scene: scn.Scene,
     # Save Last Batch
     if save_in_file:
         prefix = f"RayTrace/Batches/Batch{batch:08}/"
-        datasets = [
-            prefix + "InitialDirections",
-            prefix + "Points",
-            prefix + "CurrentDirections",
-        ]
+        datasets = [prefix + "InitialDirections", prefix + "Points", prefix + "CurrentDirections"]
         data = [
             total_lpe.init_directions.data,
             np.array([points.data for points in total_lpe.points_lists]),
-            total_lpe.current_directions.data
+            total_lpe.current_directions.data,
         ]
         print("saving...")
         save_hdf5_datasets(data, datasets, save_name)
@@ -350,16 +348,17 @@ def trace_scene(scene: scn.Scene,
 
 # Helper for trace_scene_parallel
 # @strict_types
-def _trace_object(process: int,
-                  obj: RayTraceable,
-                  obj_resolution: Resolution,
-                  resolution_type: str,
-                  verbose: bool,
-                  light_sources: list[LightSource],
-                  #   store_in_ram: bool = True,
-                  #   hdf_filename: str = None,  # None means it will not save
-                  #   trace_name: str = "Default",
-                  ) -> tuple[int, LightPathEnsemble]:
+def _trace_object(
+    process: int,
+    obj: RayTraceable,
+    obj_resolution: Resolution,
+    resolution_type: str,
+    verbose: bool,
+    light_sources: list[LightSource],
+    #   store_in_ram: bool = True,
+    #   hdf_filename: str = None,  # None means it will not save
+    #   trace_name: str = "Default",
+) -> tuple[int, LightPathEnsemble]:
 
     total_lpe: LightPathEnsemble = LightPathEnsemble([])
     batch = 0
@@ -373,8 +372,7 @@ def _trace_object(process: int,
 
     if verbose:
         number_of_rays = len(points)
-        checkpoints = [int(np.ceil(number_of_rays * n / 10))
-                       for n in range(1, 10)]
+        checkpoints = [int(np.ceil(number_of_rays * n / 10)) for n in range(1, 10)]
         print(f"Process #{process:03}: Batch #{batch:03} Beginning Ray Trace...")
 
     # Loop through points and perform trace calculations
@@ -411,9 +409,9 @@ def _trace_object(process: int,
         lpe = LightPathEnsemble(lps)
 
         ############################# Ray Trace Algorithm #############################
-        V0 = lpe.current_directions.data                        # incoming vectors
-        N = np.array(n_v.data).T                                # normal vector
-        results = V0 - 2 * np.matmul(N.T, np.matmul(N, V0))     # trace vectorized
+        V0 = lpe.current_directions.data  # incoming vectors
+        N = np.array(n_v.data).T  # normal vector
+        results = V0 - 2 * np.matmul(N.T, np.matmul(N, V0))  # trace vectorized
         ###############################################################################
 
         # add to the LightPathEnsemble
@@ -424,7 +422,9 @@ def _trace_object(process: int,
         # if the user wants to store the result in ran add to this RayTrace object
 
     if verbose:
-        print(f"Process #{process:03}: Batch #{batch:03} finished. Using {psutil.virtual_memory().percent}% of system RAM.")
+        print(
+            f"Process #{process:03}: Batch #{batch:03} finished. Using {psutil.virtual_memory().percent}% of system RAM."
+        )
 
     # ################################# Save in hdf5 file #################################
     # if hdf_filename != None:
@@ -458,17 +458,18 @@ def _trace_object(process: int,
     return (process, total_lpe)
 
 
-def trace_scene_parallel(scene: scn.Scene,
-                         obj_resolution: Resolution,
-                         processor_count: int,
-                         resolution_type: str = 'pixelX',
-                         store_in_ram=True,
-                         max_ram_in_use_percent: float = 99.0,
-                         save_in_file=False,
-                         save_file_name: str = None,
-                         trace_name: str = "RayTrace",
-                         verbose: bool = False,
-                         ) -> RayTrace:
+def trace_scene_parallel(
+    scene: scn.Scene,
+    obj_resolution: Resolution,
+    processor_count: int,
+    resolution_type: str = 'pixelX',
+    store_in_ram=True,
+    max_ram_in_use_percent: float = 99.0,
+    save_in_file=False,
+    save_file_name: str = None,
+    trace_name: str = "RayTrace",
+    verbose: bool = False,
+) -> RayTrace:
 
     ################# argument validity checks ####################
     # if not save_in_file and save_file_name != None:
@@ -480,9 +481,11 @@ def trace_scene_parallel(scene: scn.Scene,
     #     raise MemoryError("Maximum memory allocated to ray trace was reached before the trace has begun")
     num_of_cpu_available = os.cpu_count()
     if processor_count > num_of_cpu_available:
-        warn(f"too many processors were allocated for ray trace. There were {processor_count} "
-             f"processors allocated, but only {num_of_cpu_available} available. "
-             f"Trace will use maximum number available")
+        warn(
+            f"too many processors were allocated for ray trace. There were {processor_count} "
+            f"processors allocated, but only {num_of_cpu_available} available. "
+            f"Trace will use maximum number available"
+        )
         processor_count = num_of_cpu_available
     ###############################################################
 
@@ -517,17 +520,20 @@ def trace_scene_parallel(scene: scn.Scene,
         # q = queue.Queue()
         # q_thread = threading.Thread(target=_threaded_saving_queue, args=(q, save_file_name, trace_name, verbose))
 
-        trace_map = pool.starmap(_trace_object,
-                                 zip(range(count),                      # process number
-                                     basic_objects,                     # objects to trace
-                                     [obj_resolution] * count,          # object relsolution (all the same)
-                                     [resolution_type] * count,         # resolution_type (all the same)
-                                     [verbose] * count,                 # verbosity (all the same)
-                                     [scene.light_sources] * count,     # light sources (all the same)
-                                     #  [store_in_ram] * count,            # store_in_ram (all the same)
-                                     #  [save_file_name] * count,          # save_file_name (all the same)
-                                     #  [trace_name] * count,              # trace_name (all the same)
-                                     ))
+        trace_map = pool.starmap(
+            _trace_object,
+            zip(
+                range(count),  # process number
+                basic_objects,  # objects to trace
+                [obj_resolution] * count,  # object relsolution (all the same)
+                [resolution_type] * count,  # resolution_type (all the same)
+                [verbose] * count,  # verbosity (all the same)
+                [scene.light_sources] * count,  # light sources (all the same)
+                #  [store_in_ram] * count,            # store_in_ram (all the same)
+                #  [save_file_name] * count,          # save_file_name (all the same)
+                #  [trace_name] * count,              # trace_name (all the same)
+            ),
+        )
 
     # finalize results
     final_lpe = LightPathEnsemble([])
@@ -535,15 +541,11 @@ def trace_scene_parallel(scene: scn.Scene,
         ################################# Save in hdf5 file #################################
         if save_file_name != None:
             prefix = f"RayTrace_{trace_name}/Batches/Batch_{process:03}_{batch:03}/"
-            dataset_names = [
-                prefix + "InitialDirections",
-                prefix + "Points",
-                prefix + "CurrentDirections",
-            ]
+            dataset_names = [prefix + "InitialDirections", prefix + "Points", prefix + "CurrentDirections"]
             ray_trace_data = [
                 process_lpe.init_directions.data,
                 np.array([points.data for points in process_lpe.points_lists]),
-                process_lpe.current_directions.data
+                process_lpe.current_directions.data,
             ]
             save_hdf5_datasets(ray_trace_data, dataset_names, save_file_name)
             # while True:
@@ -567,7 +569,9 @@ def trace_scene_parallel(scene: scn.Scene,
     return ray_trace
 
 
-def plane_intersect_OLD(ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm: Uxyz, epsilon: float = 1e-6, verbose=False) -> Vxy:
+def plane_intersect_OLD(
+    ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm: Uxyz, epsilon: float = 1e-6, verbose=False
+) -> Vxy:
     """Finds all the intersections that occur at a plane from the light paths
     in the raytrace. Output points are transformed from the global (i.e. solar field)
     reference frame to the local plane reference frame. (3d points are transformed
@@ -578,7 +582,7 @@ def plane_intersect_OLD(ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm:
     ray_trace (RayTrace): the trace that contains the light paths
     v_plane_center (Pxyz): plane center
     u_plane_norm (Uxyz): the plane's normal vector
-    epsilon (float, optional): the threshhold for error when determining if a 
+    epsilon (float, optional): the threshhold for error when determining if a
         ray is parallel to the plane. Defaults to 1e-6.
     verbose (bool): to print execution status
 
@@ -623,15 +627,16 @@ def plane_intersect_OLD(ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm:
     return intersection_points.projXY()
 
 
-def plane_intersect(ray_trace: RayTrace,
-                    v_plane_center: Vxyz,
-                    u_plane_norm: Uxyz,
-                    epsilon: float = 1e-6,
-                    verbose: bool = False,
-                    save_in_file: bool = False,
-                    save_name: str = None,
-                    max_ram_in_use_percent: float = 95.0,
-                    ):
+def plane_intersect(
+    ray_trace: RayTrace,
+    v_plane_center: Vxyz,
+    u_plane_norm: Uxyz,
+    epsilon: float = 1e-6,
+    verbose: bool = False,
+    save_in_file: bool = False,
+    save_name: str = None,
+    max_ram_in_use_percent: float = 95.0,
+):
     """Vectorized plane intersection algorithm"""
 
     # Unpack plane
@@ -658,32 +663,31 @@ def plane_intersect(ray_trace: RayTrace,
 
     u_plane_norm = u_plane_norm.normalize()
     plane_vectorV = u_plane_norm.data  # column vector
-    v_plane_centerV = v_plane_center.data           # column vector
+    v_plane_centerV = v_plane_center.data  # column vector
 
     # most recent points in light path ensemble
     if verbose:
         print("setting up values...")
     P = Pxyz.merge(list(map(lambda xs: xs[-1], lpe.points_lists))).data
-    V = lpe.current_directions.data                                      # current vectors
+    V = lpe.current_directions.data  # current vectors
 
     if verbose:
         print("finding intersections...")
 
     ########## Intersection Algorithm ###########
     # .op means to do the 'op' element wise
-    d = np.matmul(plane_vectorV.T, V)           # (1 x N) <- (1 x 3)(3 x N)
-    W = P - v_plane_centerV                        # (3 x N) <- (3 x N) -[broadcast] (3 x 1)
-    f = -np.matmul(plane_vectorV.T, W) / d      # (1 x N) <- (1 x 3)(3 x N) ./ (1 x N)
-    F = f * V                                   # (3 x N) <- (1 x N) .* (3 x N)
-    intersection_matrix = P + F                 # (3 x N) <- (3 x N) .- (3 x N)
+    d = np.matmul(plane_vectorV.T, V)  # (1 x N) <- (1 x 3)(3 x N)
+    W = P - v_plane_centerV  # (3 x N) <- (3 x N) -[broadcast] (3 x 1)
+    f = -np.matmul(plane_vectorV.T, W) / d  # (1 x N) <- (1 x 3)(3 x N) ./ (1 x N)
+    F = f * V  # (3 x N) <- (1 x N) .* (3 x N)
+    intersection_matrix = P + F  # (3 x N) <- (3 x N) .- (3 x N)
     #############################################
     intersection_points = Pxyz(intersection_matrix)
 
     # filter out points that miss the plane
     if verbose:
         print("filtering out missed vectors")
-    filtered_intersec_points = Pxyz.merge(list(filter(lambda vec: not vec.hasnan(),
-                                                      intersection_points)))
+    filtered_intersec_points = Pxyz.merge(list(filter(lambda vec: not vec.hasnan(), intersection_points)))
 
     if verbose:
         print("Rotating.")

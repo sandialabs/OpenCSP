@@ -1,12 +1,16 @@
 """Class to handle relative orientations of heirarchical optics.
 """
+
 from warnings import warn
 
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
-warn("OpticOrientation should not be used. Instead, extend an optic object "
-     "by OpticOrientationAbstract and implement thae abstract methods. ", 
-     DeprecationWarning)
+warn(
+    "OpticOrientation should not be used. Instead, extend an optic object "
+    "by OpticOrientationAbstract and implement thae abstract methods. ",
+    DeprecationWarning,
+)
+
 
 class OpticOrientation:
     """Object holding orientation parameters relating the following reference frames:
@@ -63,8 +67,7 @@ class OpticOrientation:
 
     @property
     def transform_child_to_base(self) -> TransformXYZ:
-        """Transform coordinates from child mount to base mount
-        """
+        """Transform coordinates from child mount to base mount"""
         if self.no_child:
             raise ValueError('Optic does not have child mount.')
         return self._transform_child_to_base
@@ -79,8 +82,7 @@ class OpticOrientation:
 
     @property
     def transform_base_to_parent(self) -> TransformXYZ:
-        """Transform coordinates from base mount to parent mount
-        """
+        """Transform coordinates from base mount to parent mount"""
         if self.no_parent:
             raise ValueError('Optic does not have parent mount.')
         return self._transform_base_to_parent
@@ -95,8 +97,7 @@ class OpticOrientation:
 
     @property
     def transform_child_to_parent(self) -> TransformXYZ:
-        """Transform coordinatges from child mount to parent mount
-        """
+        """Transform coordinatges from child mount to parent mount"""
         if self.no_child or self.no_parent:
             raise ValueError('Optic does not have both a child and parent platform.')
         return self._transform_base_to_parent * self._transform_child_to_base

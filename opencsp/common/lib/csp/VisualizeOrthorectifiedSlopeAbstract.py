@@ -1,6 +1,7 @@
 """Abstract class used for visualizing orthorectified slope looking
 down from +z axis
 """
+
 from abc import abstractmethod
 from typing import Literal
 
@@ -12,6 +13,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
     """Abstract class inherited by all objects which can have orthorectified slope
     visualization.
     """
+
     @abstractmethod
     def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
         pass
@@ -21,15 +23,17 @@ class VisualizeOrthorectifiedSlopeAbstract:
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
         pass
 
-    def plot_orthorectified_slope_error(self,
-                                        reference: 'VisualizeOrthorectifiedSlopeAbstract',
-                                        res: float = 0.1,
-                                        type_: Literal['x', 'y', 'magnitude'] = 'magnitude',
-                                        clim: float | None = None,
-                                        axis: plt.Axes | None = None,
-                                        quiver_density: float | None = None,
-                                        quiver_scale: float | None = 10,
-                                        quiver_color: str = 'white') -> None:
+    def plot_orthorectified_slope_error(
+        self,
+        reference: 'VisualizeOrthorectifiedSlopeAbstract',
+        res: float = 0.1,
+        type_: Literal['x', 'y', 'magnitude'] = 'magnitude',
+        clim: float | None = None,
+        axis: plt.Axes | None = None,
+        quiver_density: float | None = None,
+        quiver_scale: float | None = 10,
+        quiver_color: str = 'white',
+    ) -> None:
         """Plots slope difference with respect to a reference
         mirror on axes. Error defined as (self - reference).
 
@@ -101,7 +105,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         elif type_ == 'magnitude':
             x_image = slopes_diff[0] * 1000  # mrad
             y_image = slopes_diff[1] * 1000  # mrad
-            image = np.sqrt((x_image ** 2 + y_image ** 2) / 2)  # mrad
+            image = np.sqrt((x_image**2 + y_image**2) / 2)  # mrad
             if clim is not None:
                 clims = [0, clim]
             else:
@@ -115,26 +119,21 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Add quiver arrows
         if quiver_density is not None:
-            self._add_quivers(x_image,
-                              y_image,
-                              x_vec,
-                              y_vec,
-                              quiver_density,
-                              axis,
-                              quiver_scale,
-                              quiver_color)
+            self._add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
 
         # Label axes
         axis.set_title(title)
 
-    def plot_orthorectified_slope(self,
-                                  res: float = 0.1,
-                                  type_: Literal['x', 'y', 'magnitude'] = 'magnitude',
-                                  clim: float | None = None,
-                                  axis: plt.Axes | None = None,
-                                  quiver_density: float | None = None,
-                                  quiver_scale: float | None = 50,
-                                  quiver_color: str = 'white') -> None:
+    def plot_orthorectified_slope(
+        self,
+        res: float = 0.1,
+        type_: Literal['x', 'y', 'magnitude'] = 'magnitude',
+        clim: float | None = None,
+        axis: plt.Axes | None = None,
+        quiver_density: float | None = None,
+        quiver_scale: float | None = 50,
+        quiver_color: str = 'white',
+    ) -> None:
         """Plots orthorectified image of mirror slope
 
         Parameters
@@ -195,7 +194,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         elif type_ == 'magnitude':
             x_image = slopes[0] * 1000  # mrad
             y_image = slopes[1] * 1000  # mrad
-            image = np.sqrt(x_image ** 2 + y_image ** 2)  # mrad
+            image = np.sqrt(x_image**2 + y_image**2)  # mrad
             if clim is not None:
                 clims = [0, clim]
             else:
@@ -208,23 +207,18 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Add quiver arrows
         if quiver_density is not None:
-            self._add_quivers(x_image,
-                              y_image,
-                              x_vec,
-                              y_vec,
-                              quiver_density,
-                              axis,
-                              quiver_scale,
-                              quiver_color)
+            self._add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
 
         # Label axes
         axis.set_title(title)
 
-    def plot_orthorectified_curvature(self,
-                                      res: float = 0.1,
-                                      type_: Literal['x', 'y', 'combined'] = 'combined',
-                                      clim: float | None = None,
-                                      axis: plt.Axes | None = None):
+    def plot_orthorectified_curvature(
+        self,
+        res: float = 0.1,
+        type_: Literal['x', 'y', 'combined'] = 'combined',
+        clim: float | None = None,
+        axis: plt.Axes | None = None,
+    ):
         """Plots orthorectified curvature (1st derivative of slope) image
         on axes.
 
@@ -292,15 +286,17 @@ class VisualizeOrthorectifiedSlopeAbstract:
         # Label axes
         axis.set_title(title)
 
-    def _add_quivers(self,
-                     im_x: np.ndarray,
-                     im_y: np.ndarray,
-                     x_vec: np.ndarray,
-                     y_vec: np.ndarray,
-                     quiver_density: float,
-                     axis: plt.Axes | None = None,
-                     scale: float | None = None,
-                     color: str = 'white') -> None:
+    def _add_quivers(
+        self,
+        im_x: np.ndarray,
+        im_y: np.ndarray,
+        x_vec: np.ndarray,
+        y_vec: np.ndarray,
+        quiver_density: float,
+        axis: plt.Axes | None = None,
+        scale: float | None = None,
+        color: str = 'white',
+    ) -> None:
         """
         Adds quiver arrows to data plot.
 
@@ -338,15 +334,16 @@ class VisualizeOrthorectifiedSlopeAbstract:
         # Add quiver arrows to axes
         axis.quiver(x_locs, y_locs, u_dirs, v_dirs, color=color, scale=scale, scale_units='x')
 
-    def _plot_orthorectified_image(self,
-                                   image: np.ndarray,
-                                   axis: plt.Axes,
-                                   cmap: str,
-                                   extent: tuple[float, float, float, float],
-                                   clims: tuple[float, float],
-                                   cmap_title: str):
-        """Plots orthorectified image on axes
-        """
+    def _plot_orthorectified_image(
+        self,
+        image: np.ndarray,
+        axis: plt.Axes,
+        cmap: str,
+        extent: tuple[float, float, float, float],
+        clims: tuple[float, float],
+        cmap_title: str,
+    ):
+        """Plots orthorectified image on axes"""
         plt_im = axis.imshow(image, cmap, origin='lower', extent=extent)
         plt_im.set_clim(clims)
         plt_cmap = plt.colorbar(plt_im, ax=axis)

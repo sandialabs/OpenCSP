@@ -11,21 +11,22 @@ import opencsp.common.lib.render_control.RenderControlText as rctxt
 from opencsp.common.lib.tool.typing_tools import strict_types
 
 
-class RenderControlSolarField():
+class RenderControlSolarField:
     """
     Render control for solar fields.
     """
 
-    def __init__(self,
-                 #  draw_outline=True, # unimplemented
-                 #  outline_style=rcps.outline(), # umimplemented
-                 draw_origin=False,
-                 draw_heliostats=True,
-                 heliostat_styles=rch.RenderControlHeliostat(),
-                 draw_name=False,
-                 name_style=rctxt.default(color='k'),
-                 special_styles: dict[str, rch.RenderControlHeliostat] = None
-                 ):
+    def __init__(
+        self,
+        #  draw_outline=True, # unimplemented
+        #  outline_style=rcps.outline(), # umimplemented
+        draw_origin=False,
+        draw_heliostats=True,
+        heliostat_styles=rch.RenderControlHeliostat(),
+        draw_name=False,
+        name_style=rctxt.default(color='k'),
+        special_styles: dict[str, rch.RenderControlHeliostat] = None,
+    ):
 
         super(RenderControlSolarField, self).__init__()
 
@@ -70,82 +71,79 @@ class RenderControlSolarField():
 
 # COMMON CASES
 
+
 def default():
     return RenderControlSolarField()
 
 
 def outline(color='k'):
     # Overall field outline only.
-    return RenderControlSolarField(draw_outline=True,
-                                   outline_style=rcps.outline(color=color),
-                                   draw_heliostats=False,
-                                   draw_name=False)
+    return RenderControlSolarField(
+        draw_outline=True, outline_style=rcps.outline(color=color), draw_heliostats=False, draw_name=False
+    )
 
 
 def heliostat_blanks(color='k'):
     # Draw nothing.  Heliostats will be added as special rendering categories.
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.blank()),
-                                   draw_name=False)
+    return RenderControlSolarField(draw_heliostats=True, heliostat_styles=(rch.blank()), draw_name=False)
 
 
 def heliostat_names(color='k'):
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=rch.name(color=color),
-                                   draw_name=False)
+    return RenderControlSolarField(draw_heliostats=True, heliostat_styles=rch.name(color=color), draw_name=False)
 
 
 def heliostat_centroids(color='k'):
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.centroid(color=color)),
-                                   draw_name=False)
+    return RenderControlSolarField(draw_heliostats=True, heliostat_styles=(rch.centroid(color=color)), draw_name=False)
 
 
 def heliostat_centroids_names(color='k'):
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.centroid_name(color=color)),
-                                   draw_name=False)
+    return RenderControlSolarField(
+        draw_heliostats=True, heliostat_styles=(rch.centroid_name(color=color)), draw_name=False
+    )
 
 
 def heliostat_outlines(color='k'):
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.outline(color=color)),
-                                   draw_name=False)
+    return RenderControlSolarField(draw_heliostats=True, heliostat_styles=(rch.outline(color=color)), draw_name=False)
 
 
 def heliostat_normals_outlines(color='k'):
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.normal_outline(color=color)),
-                                   draw_name=False)
+    return RenderControlSolarField(
+        draw_heliostats=True, heliostat_styles=(rch.normal_outline(color=color)), draw_name=False
+    )
 
 
 def heliostat_outlines_names(color='k'):
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.name_outline(color=color)),
-                                   draw_name=False)
+    return RenderControlSolarField(
+        draw_heliostats=True, heliostat_styles=(rch.name_outline(color=color)), draw_name=False
+    )
 
 
-def heliostat_centroids_outlines_names(color='k',
-                                       horizontalalignment='center',  # center, right, left
-                                       verticalalignment='center'):   # center, top, bottom, baseline, center_baseline
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.centroid_name_outline(color=color,
-                                                                               horizontalalignment=horizontalalignment,
-                                                                               verticalalignment=verticalalignment)),
-                                   draw_name=False)
+def heliostat_centroids_outlines_names(
+    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
+):  # center, top, bottom, baseline, center_baseline
+    return RenderControlSolarField(
+        draw_heliostats=True,
+        heliostat_styles=(
+            rch.centroid_name_outline(
+                color=color, horizontalalignment=horizontalalignment, verticalalignment=verticalalignment
+            )
+        ),
+        draw_name=False,
+    )
 
 
 def heliostat_vector_field(color='k', vector_length=9):
-    return RenderControlSolarField(draw_heliostats=True,
-                                   heliostat_styles=(rch.normal(color=color,
-                                                                normal_vector_length=vector_length)),
-                                   draw_name=False)
+    return RenderControlSolarField(
+        draw_heliostats=True,
+        heliostat_styles=(rch.normal(color=color, normal_vector_length=vector_length)),
+        draw_name=False,
+    )
 
 
 def heliostat_vector_field_outlines(color='k', vector_length=9):
     return RenderControlSolarField(
         # outline_style=rcps.outline(color=color),
         draw_heliostats=True,
-        heliostat_styles=(rch.normal_outline(color=color,
-                                             normal_vector_length=vector_length)),
-        draw_name=False)
+        heliostat_styles=(rch.normal_outline(color=color, normal_vector_length=vector_length)),
+        draw_name=False,
+    )

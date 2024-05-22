@@ -8,6 +8,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 class RayTraceable:
     """Abstract class inherited by objects that can be raytraced"""
+
     @abstractmethod
     def survey_of_points(self, resolution: Resolution) -> tuple[Pxyz, Vxyz]:
         """Returns a set of points sampled from inside the optic region in the optic's
@@ -16,17 +17,16 @@ class RayTraceable:
         Parameters
         ----------
         resolution : Resolution
-            container of the list of points to survey over. If the Resolution is unresolved 
-            then it will be resolved in the bounding box of self. 
+            container of the list of points to survey over. If the Resolution is unresolved
+            then it will be resolved in the bounding box of self.
 
         Returns
         -------
         A tuple of the points (Pxyz) and normals at the respective points (Vxyz) in
-        the object's global coordinate reference frame. 
+        the object's global coordinate reference frame.
         """
 
     @abstractmethod
     def most_basic_ray_tracable_objects(self) -> list['RayTraceable']:
-        """Return the list of the smallest Ray Traceable that makes up the larger object.
-        """
+        """Return the list of the smallest Ray Traceable that makes up the larger object."""
         pass

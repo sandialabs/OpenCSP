@@ -1,6 +1,7 @@
 """Parametric mirror representing a single reflective surface defined
 by an algebraic function.
 """
+
 import inspect
 from typing import Callable
 
@@ -19,10 +20,12 @@ from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuou
 
 class MirrorParametric(MirrorAbstract):
     """
-    Mirror implementation defined by a parametric function and a 2d region. 
+    Mirror implementation defined by a parametric function and a 2d region.
     """
 
-    def __init__(self, surface_function: Callable[[np.ndarray, np.ndarray], np.ndarray], shape: RegionXY) -> 'MirrorParametric':
+    def __init__(
+        self, surface_function: Callable[[np.ndarray, np.ndarray], np.ndarray], shape: RegionXY
+    ) -> 'MirrorParametric':
         """Instantiates MirrorParametric class
 
         Parameters
@@ -45,7 +48,9 @@ class MirrorParametric(MirrorAbstract):
     def __repr__(self) -> str:
         if isinstance(self._surface_function, FunctionXYContinuous):
             return f"Parametricly defined mirror defined by the function {self._surface_function}"
-        return f"Parametricly defined mirror defined by the function {inspect.getsourcelines(self._surface_function)[0]}"
+        return (
+            f"Parametricly defined mirror defined by the function {inspect.getsourcelines(self._surface_function)[0]}"
+        )
 
     def _define_normals_function(self, surface_function: Callable[[float, float], float]) -> Callable:
         """Returns a normal vector generating function given a surface z coordinate
@@ -133,7 +138,9 @@ class MirrorParametric(MirrorAbstract):
         """
         # Create surface function
         a = 1.0 / (4 * focal_length)
-        def surface_function(x, y): return a * (x ** 2 + y ** 2)
+
+        def surface_function(x, y):
+            return a * (x**2 + y**2)
 
         return cls(surface_function, shape)
 
@@ -150,7 +157,9 @@ class MirrorParametric(MirrorAbstract):
         -------
         MirrorParametric
         """
+
         # Create a surface function
-        def surface_function(x, y): return x * y * 0
+        def surface_function(x, y):
+            return x * y * 0
 
         return cls(surface_function, shape)

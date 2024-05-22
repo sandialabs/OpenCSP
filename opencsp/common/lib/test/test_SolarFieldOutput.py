@@ -5,7 +5,7 @@ Demonstrate Solar Field Plotting Routines
 
 """
 
-from   datetime import datetime
+from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -14,7 +14,7 @@ import os
 # import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
 from opencsp.common.lib.csp.HeliostatConfiguration import HeliostatConfiguration
 import opencsp.common.lib.csp.SolarField as sf
-from   opencsp.common.lib.csp.SolarField import SolarField
+from opencsp.common.lib.csp.SolarField import SolarField
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
 from opencsp.common.lib.geometry.Pxyz import Pxyz
@@ -24,12 +24,12 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlAxis as rca
-from   opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
+from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
 import opencsp.common.lib.render_control.RenderControlEnsemble as rce
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-from   opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from   opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
@@ -52,11 +52,13 @@ STOW = Vxyz([-1, 0, -11.4]).normalize()  # !!!!!
 class TestSolarFieldOutput(to.TestOutput):
 
     @classmethod
-    def setUpClass(self,
-                    source_file_body: str = 'TestSolarFieldOutput',  # Set these here, because pytest calls
-                    figure_prefix_root: str = 'tsfo',             # setup_class() with no arguments.
-                    interactive: bool = False,
-                    verify: bool = True):
+    def setUpClass(
+        self,
+        source_file_body: str = 'TestSolarFieldOutput',  # Set these here, because pytest calls
+        figure_prefix_root: str = 'tsfo',  # setup_class() with no arguments.
+        interactive: bool = False,
+        verify: bool = True,
+    ):
 
         # Save input.
         # Interactive mode flag.
@@ -73,13 +75,15 @@ class TestSolarFieldOutput(to.TestOutput):
         #     might erroneously fail (meaning they might report an error which is not
         #     actually a code error).
         #
-        # Functions names `old_...` used to be tests and are just kept  
+        # Functions names `old_...` used to be tests and are just kept
         #   as possible examples.
 
-        super(TestSolarFieldOutput, self).setUpClass(source_file_body=source_file_body,
-                                                      figure_prefix_root=figure_prefix_root,
-                                                      interactive=interactive,
-                                                      verify=verify)
+        super(TestSolarFieldOutput, self).setUpClass(
+            source_file_body=source_file_body,
+            figure_prefix_root=figure_prefix_root,
+            interactive=interactive,
+            verify=verify,
+        )
 
         # Note: It is tempting to put the "Reset rendering" code lines here, to avoid redundant
         # computation and keep all the plots up.  Don't do this, because the plotting system
@@ -90,10 +94,12 @@ class TestSolarFieldOutput(to.TestOutput):
         # computation and keep all the plots up.  Don't do this, because the plotting system
         # will run low/out of memory, causing adverse effectes on the plots.
         # Load solar field data.
-        self.solar_field: SolarField = sf.SolarField.from_csv_files(lln.NSTTF_ORIGIN,
-                                                                    dpft.sandia_nsttf_test_heliostats_origin_file(),
-                                                                    dpft.sandia_nsttf_test_facet_centroidsfile(),
-                                                                    'Sandia NSTTF')
+        self.solar_field: SolarField = sf.SolarField.from_csv_files(
+            lln.NSTTF_ORIGIN,
+            dpft.sandia_nsttf_test_heliostats_origin_file(),
+            dpft.sandia_nsttf_test_facet_centroidsfile(),
+            'Sandia NSTTF',
+        )
 
     def old_single_heliostat(self) -> None:
         """
@@ -114,18 +120,21 @@ class TestSolarFieldOutput(to.TestOutput):
         heliostat = self.solar_field.lookup_heliostat(heliostat_name)
         heliostat.set_orientation_from_pointing_vector(WEST)
 
-        facet_control = rcf.RenderControlFacet(draw_mirror_curvature=True,
-                                               draw_outline=True,
-                                               outline_style=rcps.outline(color='g'),
-                                               draw_surface_normal_at_corners=False,
-                                               draw_name=False,
-                                               draw_centroid=False,
-                                               draw_surface_normal=False)
-        fe_control = rcfe.RenderControlFacetEnsemble(default_style=facet_control,
-                                                     draw_normal_vector=True,
-                                                     normal_vector_style=rcps.outline(color='g'),
-                                                     draw_centroid=True,
-                                                     )
+        facet_control = rcf.RenderControlFacet(
+            draw_mirror_curvature=True,
+            draw_outline=True,
+            outline_style=rcps.outline(color='g'),
+            draw_surface_normal_at_corners=False,
+            draw_name=False,
+            draw_centroid=False,
+            draw_surface_normal=False,
+        )
+        fe_control = rcfe.RenderControlFacetEnsemble(
+            default_style=facet_control,
+            draw_normal_vector=True,
+            normal_vector_style=rcps.outline(color='g'),
+            draw_centroid=True,
+        )
         heliostat_style = rch.RenderControlHeliostat(facet_ensemble_style=fe_control)
         # heliostat_style = (rch.normal_facet_outlines(color='g'))
 
@@ -141,9 +150,19 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Green:   Facet outlines and overall surface normal.")
 
         # Draw.
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(1),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                1
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         heliostat.draw(fig_record.view, heliostat_style)
         # heliostat.draw(fig_record.view, heliostat_style)
 
@@ -170,14 +189,14 @@ class TestSolarFieldOutput(to.TestOutput):
         # [year, month, day, hour, minute, second, zone]
         when_ymdhmsz = (2021, 5, 13, 13, 2, 0, -6)  # NSTTF solar noon
         heliostat = self.solar_field.lookup_heliostat(heliostat_name)
-        heliostat.set_tracking_configuration(aimpoint_xyz,
-                                             self.solar_field.origin_lon_lat,
-                                             when_ymdhmsz)
+        heliostat.set_tracking_configuration(aimpoint_xyz, self.solar_field.origin_lon_lat, when_ymdhmsz)
 
         # Style setup
         default_heliostat_style = rch.normal_facet_outlines()
         default_heliostat_style.facet_ensemble_style.add_special_style('16', rcf.corner_normals_outline_name(color='c'))
-        default_heliostat_style.facet_ensemble_style.add_special_style(['1', '4', '7', '24', '25'], rcf.normal_outline(color='r'))
+        default_heliostat_style.facet_ensemble_style.add_special_style(
+            ['1', '4', '7', '24', '25'], rcf.normal_outline(color='r')
+        )
         heliostat_styles = default_heliostat_style
 
         # Comment
@@ -188,9 +207,19 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Cyan:    Highlighted facet with facet name and facet surface normal drawn at corners.")
 
         # Draw
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(2),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                2
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         heliostat.draw(fig_record.view, heliostat_styles)
 
         # Output.
@@ -205,18 +234,20 @@ class TestSolarFieldOutput(to.TestOutput):
 
         # Heliostat selection
         heliostat_spec_list: list[tuple[str, Vxyz, rch.RenderControlHeliostat]]
-        heliostat_spec_list = [['11W1', UP, rch.name()],
-                               ['11E1', UP, rch.centroid(color='r')],
-                               ['11E2', UP, rch.centroid_name(color='g')],
-                               #    ['12W1', NORTH, rch.facet_outlines(color='b')],
-                               ['12W1', NORTH, rch.facet_outlines(color='b')],
-                               ['12E1', SOUTH, rch.normal_outline(color='c')],
-                               #    ['12E2', EAST, rch.corner_normals_outline(color='m')],
-                               ['12E2', EAST, rch.normal_outline(color='m')],
-                               ['13W1', WEST, rch.normal_facet_outlines(color='g')],
-                               ['13E1', UP, rch.facet_outlines_normals(color='c')],
-                               #    ['13E2', STOW, rch.facet_outlines_corner_normals()]]
-                               ['13E2', STOW, rch.facet_outlines_normals()]]
+        heliostat_spec_list = [
+            ['11W1', UP, rch.name()],
+            ['11E1', UP, rch.centroid(color='r')],
+            ['11E2', UP, rch.centroid_name(color='g')],
+            #    ['12W1', NORTH, rch.facet_outlines(color='b')],
+            ['12W1', NORTH, rch.facet_outlines(color='b')],
+            ['12E1', SOUTH, rch.normal_outline(color='c')],
+            #    ['12E2', EAST, rch.corner_normals_outline(color='m')],
+            ['12E2', EAST, rch.normal_outline(color='m')],
+            ['13W1', WEST, rch.normal_facet_outlines(color='g')],
+            ['13E1', UP, rch.facet_outlines_normals(color='c')],
+            #    ['13E2', STOW, rch.facet_outlines_corner_normals()]]
+            ['13E2', STOW, rch.facet_outlines_normals()],
+        ]
 
         # View setup
         title = 'Example Poses and Styles'
@@ -224,9 +255,19 @@ class TestSolarFieldOutput(to.TestOutput):
         comments = []
 
         # Draw
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(3),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                3
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
 
         # Style setup and draw
         for heliostat_spec in heliostat_spec_list:
@@ -276,9 +317,19 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("At NSTTF, centroids appear to be at the midpoint of the torque tube.")
 
         # Draw
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control_large, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(4),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control_large,
+            self.axis_control_m,
+            vs.view_spec_xy(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                4
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
 
         # Output.
@@ -306,30 +357,70 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Heliostat centroids, which at NSTTF appear to be at the midpoint of the torque tube.")
 
         # Draw and output in 3d
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(5),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                5
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
         # Draw and output in xy
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(6),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_xy(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                6
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
         # Draw and output in xz
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_xz(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(7),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_xz(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                7
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
         # Draw and output in yz
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_yz(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(8),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_yz(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                8
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
@@ -355,9 +446,19 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Heliostat names and labels drawn together.")
 
         # Draw
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control_large, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(9),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control_large,
+            self.axis_control_m,
+            vs.view_spec_xy(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                9
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
 
         # Output.
@@ -390,9 +491,19 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("A simple way of rendering a solar field.")
 
         # Draw
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(10),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                10
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
         fig_record.view.draw_Vxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
 
@@ -409,14 +520,35 @@ class TestSolarFieldOutput(to.TestOutput):
         # Heliostat selection
         up_heliostats = ['6E3', '8E3']
         stowed_heliostats = ['9W1', '12E14']
-        synched_heliostats = ['5E1', '5E2', '5E3', '5E4', '5E5', '5E6', '5E7',
-                              '6E1', '6E2', '6E4', '6E5', '6E6', '6E7',
-                              '7E1', '7E2', '7E3', '7E4', '7E5', '7E6', '7E7',]
+        synched_heliostats = [
+            '5E1',
+            '5E2',
+            '5E3',
+            '5E4',
+            '5E5',
+            '5E6',
+            '5E7',
+            '6E1',
+            '6E2',
+            '6E4',
+            '6E5',
+            '6E6',
+            '6E7',
+            '7E1',
+            '7E2',
+            '7E3',
+            '7E4',
+            '7E5',
+            '7E6',
+            '7E7',
+        ]
 
         # View setup
         title = 'Solar Field Situation'
-        caption = 'Rendering of a complex solar field situation, with some heliostats tracking, some face up, and some in stow.  ' \
+        caption = (
+            'Rendering of a complex solar field situation, with some heliostats tracking, some face up, and some in stow.  '
             + 'Demonstrates rendering options applied to each.'
+        )
         comments = []
 
         # Define tracking time
@@ -457,12 +589,26 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Blue heliostats are tracking.")
         comments.append("Cyan heliostats are face up.")
         comments.append("Red heliostats are in stow (out of service).")
-        comments.append("Green heliostats are in a fixed configuration (az={0:.1f} deg, el={1:.1f} deg).".format(np.rad2deg(synch_az), np.rad2deg(synch_el)))
+        comments.append(
+            "Green heliostats are in a fixed configuration (az={0:.1f} deg, el={1:.1f} deg).".format(
+                np.rad2deg(synch_az), np.rad2deg(synch_el)
+            )
+        )
 
         # Draw
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(11),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                11
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
 
         # Output.
@@ -479,11 +625,27 @@ class TestSolarFieldOutput(to.TestOutput):
         mirrored_heliostats = ['7E4']
         up_heliostats = ['6E3', '8E3']
         stowed_heliostats = ['6E2', '8E5']
-        synched_heliostats = ['5E1', '5E2', '5E3', '5E4', '5E5', '5E6', '5E7',
-                              '6E1', '6E4', '6E5', '6E6', '6E7',
-                              '7E1', '7E2', '7E3', '7E5', '7E6', '7E7',]
-        tracking_heliostats = ['8E1', '8E2', '8E4', '8E6', '8E7',
-                               '9E1', '9E2', '9E3', '9E4', '9E5', '9E6', '9E7',]
+        synched_heliostats = [
+            '5E1',
+            '5E2',
+            '5E3',
+            '5E4',
+            '5E5',
+            '5E6',
+            '5E7',
+            '6E1',
+            '6E4',
+            '6E5',
+            '6E6',
+            '6E7',
+            '7E1',
+            '7E2',
+            '7E3',
+            '7E5',
+            '7E6',
+            '7E7',
+        ]
+        tracking_heliostats = ['8E1', '8E2', '8E4', '8E6', '8E7', '9E1', '9E2', '9E3', '9E4', '9E5', '9E6', '9E7']
 
         # View setup
         title = 'Selected Heliostats'
@@ -509,8 +671,8 @@ class TestSolarFieldOutput(to.TestOutput):
             solar_field.lookup_heliostat(h_name).set_orientation_from_pointing_vector(UP)
         for h_name in stowed_heliostats:
             solar_field.lookup_heliostat(h_name).set_orientation_from_pointing_vector(STOW)
-        for h_name in (synched_heliostats + mirrored_heliostats):
-            config = HeliostatConfiguration('az-el',az=synch_az, el=synch_el)
+        for h_name in synched_heliostats + mirrored_heliostats:
+            config = HeliostatConfiguration('az-el', az=synch_az, el=synch_el)
             solar_field.lookup_heliostat(h_name).set_orientation(config)
         # for h_name in tracking_heliostats:
         #     solar_field.lookup_heliostat(h_name).set_tracking_configuration(aimpoint_xyz,
@@ -538,12 +700,26 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Blue heliostats are tracking.")
         comments.append("Cyan heliostats are face up.")
         comments.append("Red heliostats are in stow (out of service).")
-        comments.append("Green heliostats are in a fixed configuration (az={0:.1f} deg, el={1:.1f} deg).".format(np.rad2deg(synch_az), np.rad2deg(synch_el)))
+        comments.append(
+            "Green heliostats are in a fixed configuration (az={0:.1f} deg, el={1:.1f} deg).".format(
+                np.rad2deg(synch_az), np.rad2deg(synch_el)
+            )
+        )
 
         # Draw
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(12),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                12
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
 
         # Output.
@@ -592,9 +768,19 @@ class TestSolarFieldOutput(to.TestOutput):
         # self.show_save_and_check_figure(fig_record)
 
         # Draw and produce output for xz
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_xz(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(15),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_xz(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                15
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         fig_record.view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
@@ -616,11 +802,13 @@ class TestSolarFieldOutput(to.TestOutput):
 
         # View setup (xy only)
         title = 'Dense Tracking Vector Field'
-        caption = 'Grey shows heliostat outlines and surface normals for heliostats tracking to a given aim point.  '    \
-                  'Blue shows a dense field of hypothetical heliostat origins, with the surface normal that would '      \
-                  'result from tracking to the same aim point.  Both the actual heliostat surface normals and the '      \
-                  'hypothetical heliostat surface normals may be thought of as concrete instances within a continuous '  \
-                  'vector field defined by the tracking aim point.'
+        caption = (
+            'Grey shows heliostat outlines and surface normals for heliostats tracking to a given aim point.  '
+            'Blue shows a dense field of hypothetical heliostat origins, with the surface normal that would '
+            'result from tracking to the same aim point.  Both the actual heliostat surface normals and the '
+            'hypothetical heliostat surface normals may be thought of as concrete instances within a continuous '
+            'vector field defined by the tracking aim point.'
+        )
         comments = []
 
         # Tracking setup
@@ -638,20 +826,34 @@ class TestSolarFieldOutput(to.TestOutput):
         comments.append("Dense vector field of tracking surface normals.")
 
         # Draw solar field and aim point.
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(17),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_xy(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                17
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         solar_field.draw(fig_record.view, solar_field_style)
         fig_record.view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
 
         # Draw dense vector field.
         grid_xy = solar_field.heliostat_field_regular_grid_xy(40, 20)
         # grid_xydxy = [[p, sunt.tracking_surface_normal_xy(p+[0], aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz)] for p in grid_xy]
-        grid_xydxy = [[p, sun_track.tracking_surface_normal_xy(Pxyz(p + [0]),
-                                                               aimpoint_xyz,
-                                                               solar_field.origin_lon_lat,
-                                                               when_ymdhmsz)]
-                      for p in grid_xy]
+        grid_xydxy = [
+            [
+                p,
+                sun_track.tracking_surface_normal_xy(
+                    Pxyz(p + [0]), aimpoint_xyz, solar_field.origin_lon_lat, when_ymdhmsz
+                ),
+            ]
+            for p in grid_xy
+        ]
         fig_record.view.draw_pqdpq_list(grid_xydxy, style=rcps.vector_field(color='b', vector_scale=5.0))
 
         # Output.

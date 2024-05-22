@@ -1,6 +1,7 @@
 import copy
 import matplotlib.pyplot as plt
 import numpy as np
+
 # import opencsp.common.lib.geometry.Resolution as Resolution
 
 from opencsp.common.lib.geometry.LoopXY import LoopXY
@@ -10,8 +11,7 @@ from opencsp.common.lib.geometry.Pxy import Pxy
 
 
 class RegionXY:
-    """Representation of a 2D region
-    """
+    """Representation of a 2D region"""
 
     def __init__(self, loop: LoopXY):
         """
@@ -38,8 +38,7 @@ class RegionXY:
             Loop to append to the region.
 
         """
-        raise NotImplementedError(
-            'Cannot add more than one loop to a region currently.')
+        raise NotImplementedError('Cannot add more than one loop to a region currently.')
 
     def as_mask(self, vx: np.ndarray, vy: np.ndarray):
         """
@@ -152,7 +151,7 @@ class RegionXY:
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
         """
         Gives the minnimum bounding envelope for the region. The minnimum
-        bounding envelope is the smallest rectangle that can fit the RegionXY 
+        bounding envelope is the smallest rectangle that can fit the RegionXY
         in question where all sides of the rectangle are parrallel to either the X or Y axes.
 
         Returns
@@ -163,8 +162,7 @@ class RegionXY:
         if len(self.loops) == 1:
             return self.loops[0].axis_aligned_bounding_box()
         else:
-            raise NotImplementedError(
-                'RegionXY.axis_aligned_bounding_box is only implemented for single loop regions.')
+            raise NotImplementedError('RegionXY.axis_aligned_bounding_box is only implemented for single loop regions.')
 
     # alias for easy use axis_aligned_bounding_box()
     aabbox = axis_aligned_bounding_box
@@ -192,14 +190,12 @@ class RegionXY:
             width = size[0]
             height = size[1]
         else:
-            raise ValueError(
-                "size must be either a scalar or a 2 element list-like.")
+            raise ValueError("size must be either a scalar or a 2 element list-like.")
 
         x = width / 2
         y = height / 2
 
-        vertices = Pxy([[-x, -x, x, x],
-                        [y, -y, -y, y]])
+        vertices = Pxy([[-x, -x, x, x], [y, -y, -y, y]])
 
         loop = LoopXY.from_vertices(vertices)
         return RegionXY(loop)
@@ -213,18 +209,18 @@ class RegionXY:
 
 class Resolution:
     """
-    Allows options for defining a set of points needed. To choose a type of 
-    Resolution use a class method with keeps the type of unresolved resolution 
-    stored until the bouning box containing the resolution is known. 
+    Allows options for defining a set of points needed. To choose a type of
+    Resolution use a class method with keeps the type of unresolved resolution
+    stored until the bouning box containing the resolution is known.
 
     Attributes
     ----------
     self.points: Pxy
-        The points that the resolution cares about. These are the xy points 
+        The points that the resolution cares about. These are the xy points
         that will be used in whatever the resolution is for.
     self.unresolved: tuple[str, ...]
-        The description of the properties the resolution should have once 
-        it is given a bounding box to axt on. 
+        The description of the properties the resolution should have once
+        it is given a bounding box to axt on.
     """
 
     def __init__(self, points: Pxy) -> None:
@@ -241,7 +237,7 @@ class Resolution:
 
     @classmethod
     def pixelX(cls, points_along_x: int) -> 'Resolution':
-        """Will have `points_along_x` points along x and 
+        """Will have `points_along_x` points along x and
         equispaced points along y."""
         res = Resolution(None)
         res.unresolved = ("pixelX", points_along_x)
@@ -249,17 +245,17 @@ class Resolution:
 
     @classmethod
     def random(cls, number_of_points: int, seed: int = None) -> 'Resolution':
-        """There will be `number_of_points` uniformly randomly in the region. 
+        """There will be `number_of_points` uniformly randomly in the region.
         Can choose to add a seed."""
         res = Resolution(None)
         res.unresolved = ("random", number_of_points, seed)
         return res
 
     @classmethod
-    def center(cls, ) -> 'Resolution':
+    def center(cls) -> 'Resolution':
         """Gives the center point of a bounding box.
-        This resolution cannot be 'resolved' since there is not a set of points that can 
-        represent what it is trying to do. """
+        This resolution cannot be 'resolved' since there is not a set of points that can
+        represent what it is trying to do."""
         res = Resolution(None)
         res.unresolved = ("center",)
         return res
@@ -287,8 +283,8 @@ class Resolution:
 
     def resolve_in_place(self, bounding_box: tuple[float, float, float, float] | RegionXY):
         """RegionXY
-        If the Resolution object is "unresolved" this is the function that resolves it to a 
-        set of points in xy space (Pxy). If there is no unresolved tag, this function 
+        If the Resolution object is "unresolved" this is the function that resolves it to a
+        set of points in xy space (Pxy). If there is no unresolved tag, this function
         just filters out points that do not fall in bounding box. Acts in place.
         """
         # if a RegionXY is given:
@@ -300,8 +296,7 @@ class Resolution:
         left, right, bottom, top = bounding_box
 
         if self.is_resolved():  # add `and region is None` if this is too slow
-            self._points = Pxy.merge([p for p in self.points
-                                     if left <= p.x[0] <= right and bottom <= p.y[0] <= top])
+            self._points = Pxy.merge([p for p in self.points if left <= p.x[0] <= right and bottom <= p.y[0] <= top])
         elif self.is_unresolved():  # self is unresolved
             width = right - left
             height = top - bottom
@@ -335,9 +330,7 @@ class Resolution:
 
                 case "random":
                     number_of_points = int(self.unresolved[1])
-                    random_seed = (int(self.unresolved[2])
-                                   if self.unresolved[2] is not None
-                                   else None)
+                    random_seed = int(self.unresolved[2]) if self.unresolved[2] is not None else None
 
                     rng = np.random.default_rng(random_seed)
                     xs = rng.uniform(left, right, number_of_points)
@@ -359,8 +352,8 @@ class Resolution:
 
     def resolve_and_copy(self, bounding_box: tuple[float, float, float, float] | RegionXY) -> 'Resolution':
         """
-        If the Resolution object is "unresolved" this is the function that resolves it to a 
-        set of points in xy space (Pxy). If there is no unresolved tag, this function 
+        If the Resolution object is "unresolved" this is the function that resolves it to a
+        set of points in xy space (Pxy). If there is no unresolved tag, this function
         just filters out points that do not fall in bounding box. Produces a new Resolution object.
         """
         new_res = copy.deepcopy(self)

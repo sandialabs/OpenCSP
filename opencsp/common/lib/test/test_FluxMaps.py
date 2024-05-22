@@ -5,7 +5,7 @@ Demonstrate Solar Field Plotting Routines
 
 """
 
-from   datetime import datetime
+from datetime import datetime
 import matplotlib.pyplot as plt
 import numpy as np
 import os
@@ -17,7 +17,7 @@ from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 import opencsp.common.lib.csp.SolarField as sf
-from   opencsp.common.lib.csp.SolarField import SolarField
+from opencsp.common.lib.csp.SolarField import SolarField
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
 from opencsp.common.lib.geometry.Intersection import Intersection
@@ -30,14 +30,14 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlAxis as rca
-from   opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
+from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
 from opencsp.common.lib.render_control.RenderControlFunctionXY import RenderControlFunctionXY
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
 import opencsp.common.lib.render_control.RenderControlEnsemble as rce
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-from   opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from   opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
+from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
@@ -63,11 +63,13 @@ STOW = Vxyz([-1, 0, -11.4]).normalize()  # !!!!!
 class TestFluxMaps(to.TestOutput):
 
     @classmethod
-    def setup_class(self,
-                    source_file_body: str = 'TestFluxMaps',  # Set these here, because pytest calls
-                    figure_prefix_root: str = 'tfm',             # setup_class() with no arguments.
-                    interactive: bool = False,
-                    verify: bool = True):
+    def setup_class(
+        self,
+        source_file_body: str = 'TestFluxMaps',  # Set these here, because pytest calls
+        figure_prefix_root: str = 'tfm',  # setup_class() with no arguments.
+        interactive: bool = False,
+        verify: bool = True,
+    ):
 
         # Save input.
         # Interactive mode flag.
@@ -85,20 +87,24 @@ class TestFluxMaps(to.TestOutput):
         #     actually a code error).
         #
 
-        super(TestFluxMaps, self).setup_class(source_file_body=source_file_body,
-                                              figure_prefix_root=figure_prefix_root,
-                                              interactive=interactive,
-                                              verify=verify)
+        super(TestFluxMaps, self).setup_class(
+            source_file_body=source_file_body,
+            figure_prefix_root=figure_prefix_root,
+            interactive=interactive,
+            verify=verify,
+        )
 
         # Note: It is tempting to put the "Reset rendering" code lines here, to avoid redundant
         # computation and keep all the plots up.  Don't do this, because the plotting system
         # will run low/out of memory, causing adverse effectes on the plots.
 
         # Load solar field data.
-        self.solar_field: SolarField = sf.SolarField.from_csv_files(lln.NSTTF_ORIGIN,
-                                                                    dpft.sandia_nsttf_test_heliostats_origin_file(),
-                                                                    dpft.sandia_nsttf_test_facet_centroidsfile(),
-                                                                    'Sandia NSTTF')
+        self.solar_field: SolarField = sf.SolarField.from_csv_files(
+            lln.NSTTF_ORIGIN,
+            dpft.sandia_nsttf_test_heliostats_origin_file(),
+            dpft.sandia_nsttf_test_facet_centroidsfile(),
+            'Sandia NSTTF',
+        )
 
     def old_template_stuff(self) -> None:
         """
@@ -119,18 +125,21 @@ class TestFluxMaps(to.TestOutput):
         heliostat = self.solar_field.lookup_heliostat(heliostat_name)
         heliostat.set_orientation_from_pointing_vector(WEST)
 
-        facet_control = rcf.RenderControlFacet(draw_mirror_curvature=True,
-                                               draw_outline=True,
-                                               outline_style=rcps.outline(color='g'),
-                                               draw_surface_normal_at_corners=False,
-                                               draw_name=False,
-                                               draw_centroid=False,
-                                               draw_surface_normal=False)
-        fe_control = rcfe.RenderControlFacetEnsemble(default_style=facet_control,
-                                                     draw_normal_vector=True,
-                                                     normal_vector_style=rcps.outline(color='g'),
-                                                     draw_centroid=True,
-                                                     )
+        facet_control = rcf.RenderControlFacet(
+            draw_mirror_curvature=True,
+            draw_outline=True,
+            outline_style=rcps.outline(color='g'),
+            draw_surface_normal_at_corners=False,
+            draw_name=False,
+            draw_centroid=False,
+            draw_surface_normal=False,
+        )
+        fe_control = rcfe.RenderControlFacetEnsemble(
+            default_style=facet_control,
+            draw_normal_vector=True,
+            normal_vector_style=rcps.outline(color='g'),
+            draw_centroid=True,
+        )
         heliostat_style = rch.RenderControlHeliostat(facet_ensemble_style=fe_control)
         # heliostat_style = (rch.normal_facet_outlines(color='g'))
 
@@ -146,9 +155,19 @@ class TestFluxMaps(to.TestOutput):
         comments.append("Green:   Facet outlines and overall surface normal.")
 
         # Draw.
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(1),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                1
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         heliostat.draw(fig_record.view, heliostat_style)
         # heliostat.draw(fig_record.view, heliostat_style)
 
@@ -195,9 +214,13 @@ class TestFluxMaps(to.TestOutput):
         sqaure_half_side = 0.15  # half of the side length of a sqaure
 
         def square(z: float):
-            return Vxyz([[sqaure_half_side, sqaure_half_side, -sqaure_half_side, -sqaure_half_side],
-                         [sqaure_half_side, -sqaure_half_side, -sqaure_half_side, sqaure_half_side],
-                         [z, z, z, z]])
+            return Vxyz(
+                [
+                    [sqaure_half_side, sqaure_half_side, -sqaure_half_side, -sqaure_half_side],
+                    [sqaure_half_side, -sqaure_half_side, -sqaure_half_side, sqaure_half_side],
+                    [z, z, z, z],
+                ]
+            )
 
         # comments\
         comments.append("...")
@@ -206,9 +229,19 @@ class TestFluxMaps(to.TestOutput):
         comments.append("...")
 
         # Draw 3D
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(1),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                1
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         mirror_style = rcm.RenderControlMirror()
         mirror.draw(fig_record.view, mirror_style)
         trace_style = rcrt.init_current_lengths(current_len=6)
@@ -219,29 +252,59 @@ class TestFluxMaps(to.TestOutput):
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=4
-        fig_record = fm.setup_figure(self.figure_control, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
-                                     input_prefix=self.figure_prefix(2),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                     title=f"Intersections at z=4", caption=caption, comments=comments, code_tag=self.code_tag)
-        fig_record.x_limits = ((-sqaure_half_side, sqaure_half_side))
-        fig_record.y_limits = ((-sqaure_half_side, sqaure_half_side))
+        fig_record = fm.setup_figure(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_xy(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                2
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=f"Intersections at z=4",
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
+        fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
+        fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
         bullet4.draw(fig_record.view, rcps.RenderControlPointSeq(color='b'))
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=5
-        fig_record = fm.setup_figure(self.figure_control, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
-                                     input_prefix=self.figure_prefix(3),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                     title=f"Intersections at z=5", caption=caption, comments=comments, code_tag=self.code_tag)
-        fig_record.x_limits = ((-sqaure_half_side, sqaure_half_side))
-        fig_record.y_limits = ((-sqaure_half_side, sqaure_half_side))
+        fig_record = fm.setup_figure(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_xy(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                3
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=f"Intersections at z=5",
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
+        fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
+        fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
         bullet5.draw(fig_record.view, rcps.RenderControlPointSeq(color='g'))
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=6
-        fig_record = fm.setup_figure(self.figure_control, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
-                                     input_prefix=self.figure_prefix(4),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                     title=f"Intersections at z=6", caption=caption, comments=comments, code_tag=self.code_tag)
-        fig_record.x_limits = ((-sqaure_half_side, sqaure_half_side))
-        fig_record.y_limits = ((-sqaure_half_side, sqaure_half_side))
+        fig_record = fm.setup_figure(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_xy(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                4
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=f"Intersections at z=6",
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
+        fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
+        fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
         bullet6.draw(fig_record.view, rcps.RenderControlPointSeq(color='r'))
         self.show_save_and_check_figure(fig_record)
 
@@ -285,9 +348,13 @@ class TestFluxMaps(to.TestOutput):
         sqaure_half_side = 0.15  # half of the side length of a sqaure
 
         def square(z: float):
-            return Vxyz([[sqaure_half_side, sqaure_half_side, -sqaure_half_side, -sqaure_half_side],
-                         [sqaure_half_side, -sqaure_half_side, -sqaure_half_side, sqaure_half_side],
-                         [z, z, z, z]])
+            return Vxyz(
+                [
+                    [sqaure_half_side, sqaure_half_side, -sqaure_half_side, -sqaure_half_side],
+                    [sqaure_half_side, -sqaure_half_side, -sqaure_half_side, sqaure_half_side],
+                    [z, z, z, z],
+                ]
+            )
 
         # comments\
         comments.append("...")
@@ -296,9 +363,19 @@ class TestFluxMaps(to.TestOutput):
         comments.append("...")
 
         # Draw 3D
-        fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
-                                                 input_prefix=self.figure_prefix(11),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                                 title=title, caption=caption, comments=comments, code_tag=self.code_tag)
+        fig_record = fm.setup_figure_for_3d_data(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_3d(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                11
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=title,
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
         mirror_style = rcm.RenderControlMirror()
         mirror.draw(fig_record.view, mirror_style)
         trace_style = rcrt.init_current_lengths(current_len=6)
@@ -311,35 +388,65 @@ class TestFluxMaps(to.TestOutput):
         flux_style = RenderControlFunctionXY(colorbar=True)
 
         # Draw z=4
-        fig_record = fm.setup_figure(self.figure_control, self.axis_control_m, vs.view_spec_im(), number_in_name=False,
-                                     input_prefix=self.figure_prefix(12),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                     title=f"Flux at z= 4", caption=caption, comments=comments, code_tag=self.code_tag)
-        fig_record.x_limits = ((-sqaure_half_side, sqaure_half_side))
-        fig_record.y_limits = ((-sqaure_half_side, sqaure_half_side))
+        fig_record = fm.setup_figure(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_im(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                12
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=f"Flux at z= 4",
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
+        fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
+        fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
         flux4.draw(fig_record.view, flux_style)
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=5
-        fig_record = fm.setup_figure(self.figure_control, self.axis_control_m, vs.view_spec_im(), number_in_name=False,
-                                     input_prefix=self.figure_prefix(13),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                     title=f"Flux at z= 5", caption=caption, comments=comments, code_tag=self.code_tag)
-        fig_record.x_limits = ((-sqaure_half_side, sqaure_half_side))
-        fig_record.y_limits = ((-sqaure_half_side, sqaure_half_side))
+        fig_record = fm.setup_figure(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_im(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                13
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=f"Flux at z= 5",
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
+        fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
+        fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
         flux5.draw(fig_record.view, flux_style)
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=6
-        fig_record = fm.setup_figure(self.figure_control, self.axis_control_m, vs.view_spec_im(), number_in_name=False,
-                                     input_prefix=self.figure_prefix(14),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-                                     title=f"Flux at z= 6", caption=caption, comments=comments, code_tag=self.code_tag)
-        fig_record.x_limits = ((-sqaure_half_side, sqaure_half_side))
-        fig_record.y_limits = ((-sqaure_half_side, sqaure_half_side))
+        fig_record = fm.setup_figure(
+            self.figure_control,
+            self.axis_control_m,
+            vs.view_spec_im(),
+            number_in_name=False,
+            input_prefix=self.figure_prefix(
+                14
+            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            title=f"Flux at z= 6",
+            caption=caption,
+            comments=comments,
+            code_tag=self.code_tag,
+        )
+        fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
+        fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
         flux6.draw(fig_record.view, flux_style)
         self.show_save_and_check_figure(fig_record)
 
     def test_heliostat_flux(self) -> None:
         """
-        Builds a heliostat that is on-axis canted towards the aimpoint. 
+        Builds a heliostat that is on-axis canted towards the aimpoint.
         """
         # Initialize test.
         self.start_test()

@@ -22,18 +22,15 @@ import opencsp.common.lib.uas.Scan as Scan
 from opencsp.common.lib.csp.HeliostatAbstract import HeliostatAbstract
 from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
-from opencsp.common.lib.csp.OpticOrientationAbstract import \
-    OpticOrientationAbstract
+from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbstract
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
-from opencsp.common.lib.geometry.FunctionXYContinuous import \
-    FunctionXYContinuous
+from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlSolarField import \
-    RenderControlSolarField
+from opencsp.common.lib.render_control.RenderControlSolarField import RenderControlSolarField
 from opencsp.common.lib.tool.typing_tools import strict_types
 
 
@@ -44,12 +41,13 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
     # CONSTRUCTION
 
-    def __init__(self,
-                 heliostats: list[HeliostatAbstract],
-                 origin_lon_lat: list[float] | tuple[float, float] = None,
-                 name: str = None,
-                 short_name: str = None,
-                 ) -> None:
+    def __init__(
+        self,
+        heliostats: list[HeliostatAbstract],
+        origin_lon_lat: list[float] | tuple[float, float] = None,
+        name: str = None,
+        short_name: str = None,
+    ) -> None:
 
         # assert isinstance(heliostats[0], HeliostatAbstract)
 
@@ -101,17 +99,19 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
             heliostat._self_to_parent_transform = heliostat_position_transform
 
     @classmethod
-    def from_csv_files(cls,
-                       long_lat: list[float] | tuple[float, float],
-                       heliostat_attributes_csv: str,
-                       facet_attributes_csv: str,
-                       name=None):
+    def from_csv_files(
+        cls,
+        long_lat: list[float] | tuple[float, float],
+        heliostat_attributes_csv: str,
+        facet_attributes_csv: str,
+        name=None,
+    ):
         """returns the solar field that is requested based on the given information
 
         Paramters
         ---------
         long_lat: list[float] | tuple[float, float]
-            the (longitude, latitude) pair that defined the location of 
+            the (longitude, latitude) pair that defined the location of
             the solar fields real world location
         heliostat_attribute_csv: str
             filepath to the csv file that contains information about the desired heliostats.
@@ -128,9 +128,10 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         with open(heliostat_attributes_csv) as h_csv:
             h_reader = csv.reader(h_csv)
             h_headers = next(h_reader)
-            heliostat_attributes = {row[0]: {h_headers[i]: float(attribute)
-                                             for i, attribute in enumerate(row[1:-1], start=1)}
-                                    for row in h_reader}
+            heliostat_attributes = {
+                row[0]: {h_headers[i]: float(attribute) for i, attribute in enumerate(row[1:-1], start=1)}
+                for row in h_reader
+            }
 
         with open(facet_attributes_csv) as f_csv:
             f_reader = csv.reader(f_csv)
@@ -152,11 +153,9 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
             height = this_heliostat_attributes["Facet Height"]
             mirror_template = MirrorParametricRectangular(flat_function, (width, height))
 
-            heliostat_location = Pxyz([
-                this_heliostat_attributes["X"],
-                this_heliostat_attributes["Y"],
-                this_heliostat_attributes["Z"],
-            ])
+            heliostat_location = Pxyz(
+                [this_heliostat_attributes["X"], this_heliostat_attributes["Y"], this_heliostat_attributes["Z"]]
+            )
 
             heliostat = HeliostatAzEl.from_attributes(
                 int(this_heliostat_attributes["Num. Facets"]),
@@ -189,7 +188,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
     # ACCESS
 
     def heliostat_name_list(self) -> list[str]:
-        """Returns a list of all the names of heliostats in the 
+        """Returns a list of all the names of heliostats in the
         solar field. The order is the same as the order the heliostats are stored."""
         name_list = [h.name for h in self.heliostats]
         return name_list
@@ -236,7 +235,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         return [xyz_min, xyz_max]
 
     def heliostat_bounding_box_xy(self):
-        """Returns an axis alligned bounding box that only 
+        """Returns an axis alligned bounding box that only
         takes into account the heliostat origins"""
         heliostat_origins = Pxyz.merge([h._self_to_parent_transform.apply(Pxyz.origin()) for h in self.heliostats])
         x_min = min(heliostat_origins.x)
@@ -269,11 +268,11 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         minute = self.when_ymdhmsz()[4]
         date_time = '{0:d}-{1:02d}-{2:02d}-{3:02d}{4:02d}'.format(year, month, day, hour, minute)
         aim_Z = 'aimZ=' + str(self.aimpoint_xyz()[2])
-# ?? SCAFFOLDING RCB -- MAKE THIS CONTROLLABLE: ON FOR NSTTF, OFF OTHERWISE.
-#        return self.short_name + '_' + date_time + '_' + aim_Z
-#        return self.short_name + '_' + date_time
-# ?? SCAFFOLDING RCB -- MAKE THIS CONTROLLABLE, DEPENDING ON USER PREFERENCE.
-        return (date_time + '_' + self.short_name)
+        # ?? SCAFFOLDING RCB -- MAKE THIS CONTROLLABLE: ON FOR NSTTF, OFF OTHERWISE.
+        #        return self.short_name + '_' + date_time + '_' + aim_Z
+        #        return self.short_name + '_' + date_time
+        # ?? SCAFFOLDING RCB -- MAKE THIS CONTROLLABLE, DEPENDING ON USER PREFERENCE.
+        return date_time + '_' + self.short_name
 
     def situation_str(self):
         year = self.when_ymdhmsz()[0]
@@ -282,9 +281,11 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         hour = self.when_ymdhmsz()[3]
         minute = self.when_ymdhmsz()[4]
         date_time = '{0:d}-{1:d}-{2:d} at {3:02d}{4:02d}'.format(year, month, day, hour, minute)
-        aim_pt = 'Aim=({0:.1f}, {1:.1f}, {2:.1f})'.format(self.aimpoint_xyz()[0], self.aimpoint_xyz()[1], self.aimpoint_xyz()[2])
+        aim_pt = 'Aim=({0:.1f}, {1:.1f}, {2:.1f})'.format(
+            self.aimpoint_xyz()[0], self.aimpoint_xyz()[1], self.aimpoint_xyz()[2]
+        )
         # ?? SCAFFOLDING RCB -- MAKE THIS CONTROLLABLE: ON FOR NSTTF, OFF OTHERWISE.
-#        return self.name + ', ' + date_time + ', ' + aim_pt
+        #        return self.name + ', ' + date_time + ', ' + aim_pt
         return self.name + ', ' + date_time
 
     # MODIFICATION
@@ -319,9 +320,12 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
     # RENDERING
 
-    def draw(self, view: View3d,
-             solar_field_style: RenderControlSolarField = RenderControlSolarField(),
-             transform: TransformXYZ = None) -> None:
+    def draw(
+        self,
+        view: View3d,
+        solar_field_style: RenderControlSolarField = RenderControlSolarField(),
+        transform: TransformXYZ = None,
+    ) -> None:
 
         if transform is None:
             transform = self.self_to_global_tranformation
@@ -341,43 +345,39 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
         # Name.
         if solar_field_style.draw_name:
-            view.draw_xyz_text(origin.data.T[0], self.name,)
+            view.draw_xyz_text(origin.data.T[0], self.name)
 
-    def draw_figure(self,
-                    figure_control,
-                    axis_control_m,
-                    view_spec,
-                    title,
-                    solar_field_style,
-                    grid=True):
+    def draw_figure(self, figure_control, axis_control_m, view_spec, title, solar_field_style, grid=True):
         # Setup view
-        fig_record: rcfr.RenderControlFigureRecord = fm.setup_figure_for_3d_data(figure_control, axis_control_m, view_spec, grid=grid, title=title)
+        fig_record: rcfr.RenderControlFigureRecord = fm.setup_figure_for_3d_data(
+            figure_control, axis_control_m, view_spec, grid=grid, title=title
+        )
         view = fig_record.view
         # Draw
         self.draw(view, solar_field_style)
         # Return
         return view
 
-    # def survey_of_points(self, resolution: Resolution) -> tuple[Pxyz, Vxyz]:
-    #     """
-    #     Returns a grid of equispaced points and the normal vectors at those points.
+        # def survey_of_points(self, resolution: Resolution) -> tuple[Pxyz, Vxyz]:
+        #     """
+        #     Returns a grid of equispaced points and the normal vectors at those points.
 
-    #     Parameters
-    #     ----------
-    #     resolution:
-    #         the rectangular resolution of the points gathered (add other forms later, like triangular or polar survey).
+        #     Parameters
+        #     ----------
+        #     resolution:
+        #         the rectangular resolution of the points gathered (add other forms later, like triangular or polar survey).
 
-    #     Returns
-    #     -------
-    #         a tuple of the points (np.ndarray) and normals at the respective points (np.ndarray).
+        #     Returns
+        #     -------
+        #         a tuple of the points (np.ndarray) and normals at the respective points (np.ndarray).
 
-    #     """
-    #     points = Pxyz([[], [], []])
-    #     normals = Vxyz([[], [], []])
-    #     for heliostat in self.heliostats:
-    #         additional_points, additional_normals = heliostat.survey_of_points(resolution, random_dist)
-    #         points = points.concatenate(additional_points)
-    #         normals = normals.concatenate(additional_normals)
+        #     """
+        #     points = Pxyz([[], [], []])
+        #     normals = Vxyz([[], [], []])
+        #     for heliostat in self.heliostats:
+        #         additional_points, additional_normals = heliostat.survey_of_points(resolution, random_dist)
+        #         points = points.concatenate(additional_points)
+        #         normals = normals.concatenate(additional_normals)
 
         return (points, normals)
 
@@ -385,15 +385,14 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         # Get sample point locations (z=0 plane in "child" reference frame)
         return self._survey_of_points_helper(resolution, TransformXYZ.identity())
 
-    def _survey_of_points_helper(self,
-                                 given_resolution: Resolution,
-                                 frame_transform: TransformXYZ
-                                 ) -> tuple[Pxyz, Vxyz]:
+    def _survey_of_points_helper(
+        self, given_resolution: Resolution, frame_transform: TransformXYZ
+    ) -> tuple[Pxyz, Vxyz]:
         points, normals = [], []
         for heliostat in self.heliostats:
             heliostat_points, heliostat_normals = heliostat._survey_of_points_helper(
-                copy.deepcopy(given_resolution),
-                heliostat._self_to_parent_transform.inv())
+                copy.deepcopy(given_resolution), heliostat._self_to_parent_transform.inv()
+            )
             points.append(heliostat_points)
             normals.append(heliostat_normals)
 
@@ -405,20 +404,18 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 #
 
 
-def setup_solar_field(solar_field_spec,
-                      aimpoint_xyz,
-                      when_ymdhmsz,
-                      synch_azelhnames,
-                      up_azelhnames) -> SolarField:
+def setup_solar_field(solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames) -> SolarField:
     # Notify progress.
     logt.info('Setting up solar field...')
 
     # Load solar field data.
-    solar_field = sf_from_csv_files(solar_field_spec['name'],
-                                    solar_field_spec['short_name'],
-                                    solar_field_spec['field_origin_lon_lat'],
-                                    solar_field_spec['field_heliostat_file'],
-                                    solar_field_spec['field_facet_centroids_file'])
+    solar_field = sf_from_csv_files(
+        solar_field_spec['name'],
+        solar_field_spec['short_name'],
+        solar_field_spec['field_origin_lon_lat'],
+        solar_field_spec['field_heliostat_file'],
+        solar_field_spec['field_facet_centroids_file'],
+    )
 
     # Set heliostat configurations.
     solar_field.set_full_field_tracking(aimpoint_xyz, when_ymdhmsz)
@@ -450,12 +447,8 @@ def setup_solar_field(solar_field_spec,
 # TOP-LEVEL RENDERING ROUTINES
 #
 
-def draw_solar_field(figure_control,
-                     solar_field,
-                     solar_field_style,
-                     view_spec,
-                     name_suffix='',
-                     axis_equal=True):
+
+def draw_solar_field(figure_control, solar_field, solar_field_style, view_spec, name_suffix='', axis_equal=True):
     # Assumes that solar field is already set up with heliostat configurations, etc.
     # Select name and title.
     if (solar_field.short_name == None) or (len(solar_field.short_name) == 0):
@@ -470,10 +463,9 @@ def draw_solar_field(figure_control,
         figure_name += '_' + name_suffix
         figure_title += ' (' + name_suffix + ')'
     # Setup figure.
-    fig_record = fm.setup_figure_for_3d_data(figure_control, rca.meters(), view_spec,
-                                             name=figure_name,
-                                             title=figure_title,
-                                             equal=axis_equal)
+    fig_record = fm.setup_figure_for_3d_data(
+        figure_control, rca.meters(), view_spec, name=figure_name, title=figure_title, equal=axis_equal
+    )
     view = fig_record.view
     # Comment.
     fig_record.comment.append("Solar field.")
@@ -488,6 +480,7 @@ def draw_solar_field(figure_control,
 # -------------------------------------------------------------------------------------------------------
 # RASTER SURVEY SCANS
 #
+
 
 def construct_solar_field_heliostat_survey_scan(solar_field, raster_scan_parameters):
     # Fetch control parameters.
@@ -545,6 +538,7 @@ def construct_solar_field_heliostat_survey_scan(solar_field, raster_scan_paramet
 # VANITY SCANS
 #
 
+
 def construct_solar_field_vanity_scan(solar_field, vanity_scan_parameters):
     # Fetch control parameters.
     vanity_heliostat_name = vanity_scan_parameters['vanity_heliostat_name']
@@ -553,21 +547,21 @@ def construct_solar_field_vanity_scan(solar_field, vanity_scan_parameters):
     facet_array_width = vanity_scan_parameters['facet_array_width']
     facet_array_height = vanity_scan_parameters['facet_array_height']
 
-# # Construct segments spanning the region of interest.
-# box_xy = solar_field.heliostat_bounding_box_xy()
-# xy_min = box_xy[0]
-# x_min = xy_min[0]
-# y_min = xy_min[1]
-# xy_max = box_xy[1]
-# x_max = xy_max[0]
-# y_max = xy_max[1]
+    # # Construct segments spanning the region of interest.
+    # box_xy = solar_field.heliostat_bounding_box_xy()
+    # xy_min = box_xy[0]
+    # x_min = xy_min[0]
+    # y_min = xy_min[1]
+    # xy_max = box_xy[1]
+    # x_max = xy_max[0]
+    # y_max = xy_max[1]
 
     # Fetch the heliostat of interest.
     vanity_heliostat = solar_field.lookup_heliostat(vanity_heliostat_name)
 
     # Construct segments spanning the region of interest.
-# x_origin = -200  # m.  # ?? SCAFFOLDING RCB -- TEMPORARY
-# y_origin =  700  # m.
+    # x_origin = -200  # m.  # ?? SCAFFOLDING RCB -- TEMPORARY
+    # y_origin =  700  # m.
     x_origin = vanity_heliostat.origin[0]
     y_origin = vanity_heliostat.origin[1]
     half_width = facet_array_width / 2.0
@@ -626,6 +620,7 @@ def construct_solar_field_vanity_scan(solar_field, vanity_scan_parameters):
 
     # Return.
     return scan
+
 
 # GENERATORS
 

@@ -16,31 +16,28 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 class TestCSPOpticsOrientation:
     """Tests that roations applied to CSP Optics add as expected. The optic heirarchy
-    is defined as Mirror -> Facet -> FacetEnsemble -> Heliostat -> SolarField. 
+    is defined as Mirror -> Facet -> FacetEnsemble -> Heliostat -> SolarField.
     Any of these could be placed into a scene instead of a larger object. Optics are created with spatial
     transformations at different levels in their heirarchy. Orientation of the mirror
     are checked at different levels in the heirarchy.
 
-    These tests all set the relative rotations between some of these objects and then look at how 
-    they affect the overall transformations. Rotation `r5` is not used anymore. 
+    These tests all set the relative rotations between some of these objects and then look at how
+    they affect the overall transformations. Rotation `r5` is not used anymore.
     """
 
-    def _generate_optics_rotation(self, r1: Rotation, 
-                                  r2: Rotation, r3: Rotation, 
-                                  r4: Rotation, r5: Rotation):
+    def _generate_optics_rotation(self, r1: Rotation, r2: Rotation, r3: Rotation, r4: Rotation, r5: Rotation):
         # Define delta movement
         dv = Vxyz((0, 0, 0))
 
         # Define pointing function
         def child_to_parent(r):
             return TransformXYZ.from_R_V(r, dv)
-        
+
         t1 = child_to_parent(r1)
         t2 = child_to_parent(r2)
         t3 = child_to_parent(r3)
         t4 = child_to_parent(r4)
         t5 = child_to_parent(r5)
-
 
         # define optics
         shape = RegionXY.rectangle((2, 4))
@@ -55,25 +52,28 @@ class TestCSPOpticsOrientation:
         scene = Scene()
         scene.add_object(heliostat)
 
-
         # Position optics
         mirror._self_to_parent_transform = t1
         facet._self_to_parent_transform = t2
         ensemble._self_to_parent_transform = t3
         heliostat._self_to_parent_transform = t4
 
-
         # return object references
         return mirror, facet, ensemble, heliostat
 
-    def _check_rotation(self, 
-                        mirror: MirrorAbstract,
-                        facet: Facet, 
-                        ensemble: FacetEnsemble,
-                        heliostat: HeliostatAzEl,
-                        a1: float, a2: float, a3: float, a4: float):
+    def _check_rotation(
+        self,
+        mirror: MirrorAbstract,
+        facet: Facet,
+        ensemble: FacetEnsemble,
+        heliostat: HeliostatAzEl,
+        a1: float,
+        a2: float,
+        a3: float,
+        a4: float,
+    ):
         # Test
-        UP = Vxyz([0,0,1])
+        UP = Vxyz([0, 0, 1])
         resolution = Resolution.pixelX(1)
         norm_0 = mirror.self_to_global_tranformation.apply(UP)  # facet
         norm_1 = facet.self_to_global_tranformation.apply(UP)  # ensemble

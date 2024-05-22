@@ -7,42 +7,39 @@ import math
 import numpy as np
 
 
-class HeliostatConfiguration():
+class HeliostatConfiguration:
     """
     Container for the variables defining the heliostat configuration.
     User must provide the type of heliostat in the format in `valid_heliostat_types.
 
     """
 
-    def __init__(self,
-                 heliostat_type: str,
-                 az: float = None,
-                 el: float = None,
-
-                 ) -> None:
+    def __init__(self, heliostat_type: str, az: float = None, el: float = None) -> None:
 
         self.valid_heliostat_types = ['az-el']
         self.heliostat_type = heliostat_type
 
         if heliostat_type not in self.valid_heliostat_types:
-            raise ValueError(f'Invalid type of heliostat. {self.heliostat_type} is '
-                             f'not one of: {self.valid_heliostat_types}.')
+            raise ValueError(
+                f'Invalid type of heliostat. {self.heliostat_type} is ' f'not one of: {self.valid_heliostat_types}.'
+            )
 
         if heliostat_type == 'az-el':
             if (az is None) or (el is None):
-                raise ValueError(f"Cannot have a HeliostatAzEl configuration"
-                                 f" without az and el arguments")
+                raise ValueError(f"Cannot have a HeliostatAzEl configuration" f" without az and el arguments")
             self.az = az
             self.el = el
 
     def get_values(self):
         if self.heliostat_type == 'az-el':
             return self.az, self.el
-        raise ValueError(f'Invalid type of heliostat. {self.heliostat_type} is '
-                         f'not one of: {self.valid_heliostat_types}.')
+        raise ValueError(
+            f'Invalid type of heliostat. {self.heliostat_type} is ' f'not one of: {self.valid_heliostat_types}.'
+        )
 
 
 # CONFIGURATION CONSTRUCTION
+
 
 def heliostat_configuration_given_surface_normal_xyz(n_xyz) -> HeliostatConfiguration:
     # Extract surface normal coordinates.
@@ -68,6 +65,7 @@ def heliostat_configuration_given_surface_normal_xyz(n_xyz) -> HeliostatConfigur
 
 
 # COMMON CONFIGURATIONS
+
 
 def face_north() -> HeliostatConfiguration:
     return HeliostatConfiguration('az-el', az=np.deg2rad(0), el=np.deg2rad(0))

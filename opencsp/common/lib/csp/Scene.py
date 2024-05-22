@@ -18,8 +18,7 @@ class Scene(OpticOrientationAbstract):
     def add_light_source(self, new_light_source: LightSource) -> None:
         self.light_sources.append(new_light_source)
 
-    def set_position_in_space(self, child: OpticOrientationAbstract,
-                              transform: TransformXYZ) -> None:
+    def set_position_in_space(self, child: OpticOrientationAbstract, transform: TransformXYZ) -> None:
         """
         Allows for the spacial placement of children inside the scene.
         """
@@ -40,17 +39,17 @@ class Scene(OpticOrientationAbstract):
 
     def draw_objects(self, view: View3d, render_controls: dict = None):
         """
-        Will draw every `OpticOrientationAbstract` object in the scene. 
-        It determines the render control by taking the type of the object and 
+        Will draw every `OpticOrientationAbstract` object in the scene.
+        It determines the render control by taking the type of the object and
         looking for that type in the dictionary of render controls.
 
         Parameters
         ----------
         view: View3d
             - the view to draw the objects inside
-        
+
         render_controls: dict[type, RenderControl]
-            - The render control objects that correspond to specific types 
+            - The render control objects that correspond to specific types
             - TODO this can be improved
         """
         if render_controls is None:
