@@ -75,6 +75,8 @@ class ProcessSofastFixed:
         self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet]
         self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet]
         self.data_error: cdc.CalculationError
+        self.blob_index: BlobIndex
+        self.slope_solver: SlopeSolver
 
     def find_blobs(self) -> BlobIndex:
         """Finds blobs in image"""
@@ -208,23 +210,23 @@ class ProcessSofastFixed:
             Surface 2d class
         """
         # Find blobs
-        blob_index = self.find_blobs()
+        self.blob_index = self.find_blobs()
 
         # Calculate mask
         mask_raw = self.calculate_mask()
         mask_raw = ip.keep_largest_mask_area(mask_raw)
 
         # Generate geometry and slope solver inputs
-        kwargs = self.generate_geometry(blob_index, mask_raw)
+        kwargs = self.generate_geometry(self.blob_index, mask_raw)
 
         # Add surface fitting parameters
         kwargs.update({'surface': surface})
 
         # Calculate slope
-        slope_solver = SlopeSolver(**kwargs)
-        slope_solver.fit_surface()
-        slope_solver.solve_slopes()
-        self.data_slope_solver = slope_solver.get_data()
+        self.slope_solver = SlopeSolver(**kwargs)
+        self.slope_solver.fit_surface()
+        self.slope_solver.solve_slopes()
+        self.data_slope_solver = self.slope_solver.get_data()
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
