@@ -24,7 +24,7 @@ class PointFiducials(AbstractFiducials):
         return self.points
 
     @property
-    def orientation(self) -> scipy.spatial.transform.Rotation:
+    def rotation(self) -> scipy.spatial.transform.Rotation:
         raise NotImplementedError("Orientation is not yet implemented for PointFiducials")
 
     @property

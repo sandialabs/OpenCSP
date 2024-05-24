@@ -47,28 +47,31 @@ class AbstractFiducials(ABC):
 
     @property
     @abstractmethod
-    def orientation(self) -> scipy.spatial.transform.Rotation:
+    def rotation(self) -> scipy.spatial.transform.Rotation:
         """
-        The orientation of the normal vector(s) of this instance.
-        This is relative to the orthorectified source image, where x is positive
+        The pointing of the normal vector(s) of this instance.
+        This is relative to the camera's reference frame, where x is positive
         to the right, y is positive down, and z is positive in (away from the
         camera).
 
         This can be used to describe the forward transformation from the
         camera's perspective. For example, an aruco marker whose origin is in
         the center of the image and is facing towards the camera could have the
-        orientation::
+        rotation::
 
             Rotation.from_euler('y', np.pi)
 
         If that same aruco marker was also placed upside down, then it's
-        orientation could be::
+        rotation could be::
 
             Rotation.from_euler(
                 'yz',
                 [ [np.pi, 0],
                   [0,     np.pi] ]
             )
+
+        Not that this just describes rotation, and not the translation. We call
+        the rotation and translation together the orientation.
         """
 
     @property
@@ -83,7 +86,7 @@ class AbstractFiducials(ABC):
     def scale(self) -> list[float]:
         """
         The scale(s) of this fiducial, in meters, relative to its longest axis.
-        This can be used to determine the distance and orientation of the
+        This can be used to determine the distance and rotation of the
         fiducial relative to the camera.
         """
         ret = []

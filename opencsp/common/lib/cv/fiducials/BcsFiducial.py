@@ -43,8 +43,8 @@ class BcsFiducial(AbstractFiducials):
         return self.origin_px
 
     @property
-    def orientation(self) -> scipy.spatial.transform.Rotation:
-        raise NotImplementedError("Orientation is not yet implemented for PointFiducials")
+    def rotation(self) -> scipy.spatial.transform.Rotation:
+        raise NotImplementedError("rotation is not yet implemented for PointFiducials")
 
     @property
     def size(self) -> list[float]:
