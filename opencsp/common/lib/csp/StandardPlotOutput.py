@@ -160,7 +160,7 @@ class StandardPlotOutput:
         if isinstance(value, (tuple, list)):
             if len(value) == 3:
                 return value
-            elif len(value) == 1:
+            elif len(value) in [0, 1]:
                 return [value] * 3
             else:
                 lt.error_and_raise(ValueError, f'Plot option must be length 3 or 1, not length {len(value):d}')
