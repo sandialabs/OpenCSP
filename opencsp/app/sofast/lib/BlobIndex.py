@@ -502,10 +502,10 @@ class BlobIndex:
 
         Returns
         -------
-        points : Vxy
-            Lenght N vector, located points xy locations, pixels
-        indices_xy : Vxy
-            Length N vector, located points xy blob indices, int
+        points : NxMx2 ndarray
+            located points xy locations, pixels
+        indices_xy : NxMx2 ndarray
+            located points xy blob indices, int
         """
         # Get indices as vectors
         idx_x_mat = self._idx_x_mat
