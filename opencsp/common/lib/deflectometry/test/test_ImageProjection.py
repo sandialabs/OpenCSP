@@ -16,11 +16,14 @@ class test_ImageProjection(unittest.TestCase):
         path, _, _ = ft.path_components(__file__)
         self.data_dir = os.path.join(path, "data", "input", "ImageProjection")
         self.out_dir = os.path.join(path, "data", "output", "ImageProjection")
+        ft.create_directories_if_necessary(self.data_dir)
+        ft.create_directories_if_necessary(self.out_dir)
+
+        # Load display data
         self.file_image_projection_input = os.path.join(
             opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
         )
-        ft.create_directories_if_necessary(self.data_dir)
-        ft.create_directories_if_necessary(self.out_dir)
+        self.image_projection_data = ip.ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
     def tearDown(self):
         with et.ignored(Exception):
@@ -31,7 +34,7 @@ class test_ImageProjection(unittest.TestCase):
         self.assertIsNone(ip.ImageProjection.instance())
 
         # Create a mock ImageProjection object
-        image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
 
         # Test that the instance was set
         self.assertEqual(image_projection, ip.ImageProjection.instance())
@@ -50,27 +53,27 @@ class test_ImageProjection(unittest.TestCase):
             close_count += 1
 
         # Create a mock ImageProjection object with single on_close callback
-        image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
         image_projection.on_close.append(close_count_inc)
         image_projection.close()
         self.assertEqual(close_count, 1)
 
         # Create a mock ImageProjection object with multiple on_close callback
-        image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
         image_projection.on_close.append(close_count_inc)
         image_projection.on_close.append(close_count_inc)
         image_projection.close()
         self.assertEqual(close_count, 3)
 
         # Create a mock ImageProjection object without an on_close callback
-        image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
         image_projection.close()
         self.assertEqual(close_count, 3)
 
     def test_zeros(self):
         """Tests the shape of the 'zeros' array to fill active area"""
         # Create a mock ImageProjection object
-        image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
         image_projection_data = ip.ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
         # Get the zeros array and verify its shape and values
@@ -103,7 +106,7 @@ class test_ImageProjection(unittest.TestCase):
     def test_run_wait_close(self):
         """Loads, waits, closes ImageProjection window"""
         # Load from HDF
-        image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
         image_projection.root.after(500, image_projection.close)
         image_projection.run()
 
