@@ -16,6 +16,9 @@ class test_ImageProjection(unittest.TestCase):
         path, _, _ = ft.path_components(__file__)
         self.data_dir = os.path.join(path, "data", "input", "ImageProjection")
         self.out_dir = os.path.join(path, "data", "output", "ImageProjection")
+        self.file_image_projection_input = os.path.join(
+            opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
+        )
         ft.create_directories_if_necessary(self.data_dir)
         ft.create_directories_if_necessary(self.out_dir)
 
