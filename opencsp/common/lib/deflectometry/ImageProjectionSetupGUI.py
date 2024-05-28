@@ -120,18 +120,18 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         self.btn_axes.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Show calibration image button
-        self.btn_calib = tkinter.Button(
+        self.btn_calib_fid = tkinter.Button(
             self.root, text='Show calibration fiducial image', command=self.show_calibration_fiducial_image
         )
         r += 1
-        self.btn_calib.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_calib_fid.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Show calibration image button
-        self.btn_calib = tkinter.Button(
+        self.btn_calib_mkr = tkinter.Button(
             self.root, text='Show calibration marker image', command=self.show_calibration_marker_image
         )
         r += 1
-        self.btn_calib.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_calib_mkr.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Save as button
         self.btn_save = tkinter.Button(self.root, text='Save as HDF...', command=self.save_as)
@@ -174,7 +174,8 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         self.btn_close_proj['state'] = active_projector
         self.btn_axes['state'] = active_projector
         self.btn_crosshairs['state'] = active_projector
-        self.btn_calib['state'] = active_projector
+        self.btn_calib_fid['state'] = active_projector
+        self.btn_calib_mkr['state'] = active_projector
 
     def show_projection_window(self):
         """Opens the ImageProjection window."""
