@@ -1,8 +1,8 @@
 import os
+import unittest
 
 import numpy as np
 import pytest
-import unittest
 
 import opencsp.app.sofast.lib.Fringes as fr
 import opencsp.app.sofast.lib.ImageCalibrationGlobal as icg
@@ -11,7 +11,7 @@ import opencsp.app.sofast.lib.sofast_common_functions as scf
 import opencsp.app.sofast.lib.SystemSofastFringe as ssf
 import opencsp.app.sofast.test.ImageAcquisition_no_camera as ianc
 import opencsp.common.lib.deflectometry.ImageProjection as ip
-import opencsp.common.lib.deflectometry.test.test_ImageProjection as test_ip
+from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.file_tools as ft
 
@@ -24,6 +24,12 @@ class test_sofast_common_functions(unittest.TestCase):
         self.out_dir = os.path.join(path, "data", "output", "sofast_common_functions")
         ft.create_directories_if_necessary(self.data_dir)
         ft.create_directories_if_necessary(self.out_dir)
+
+        # Load ImageProjectionData
+        self.file_image_projection_input = os.path.join(
+            opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
+        )
+        self.image_projection_data = ip.ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
         # Create fringe object
         periods_x = [4**idx for idx in range(4)]
@@ -51,7 +57,7 @@ class test_sofast_common_functions(unittest.TestCase):
             scf.check_projector_loaded('test_check_projector_loaded')
 
         # Create a mock ImageProjection object
-        image_projection = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
 
         # No more error!
         self.assertTrue(scf.check_projector_loaded('test_check_projector_loaded'))
@@ -74,7 +80,7 @@ class test_sofast_common_functions(unittest.TestCase):
             scf.check_system_fringe_loaded(None, 'test_check_projector_loaded')
 
         # Create the prerequisites
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        im_proj = ip.ImageProjection.in_new_window(self.image_projection_data)
         ia = ianc.ImageAcquisition()
 
         # Still no instance loaded, should throw an error
@@ -88,7 +94,7 @@ class test_sofast_common_functions(unittest.TestCase):
         self.assertTrue(scf.check_system_fringe_loaded(sys, 'test_check_projector_loaded'))
 
         # Release the prerequisites, should throw an error again
-        ip.close()
+        im_proj.close()
         ia.close()
         with self.assertRaises(RuntimeError):
             scf.check_system_fringe_loaded(None, 'test_check_projector_loaded')
@@ -100,7 +106,7 @@ class test_sofast_common_functions(unittest.TestCase):
             scf.check_calibration_loaded(None, 'test_check_calibration_loaded')
 
         # Create the prerequisites and system instance
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        im_proj = ip.ImageProjection.in_new_window(self.image_projection_data)
         ia = ianc.ImageAcquisition()
         sys = ssf.SystemSofastFringe()
 
@@ -116,7 +122,7 @@ class test_sofast_common_functions(unittest.TestCase):
         global sys
 
         # Create the prerequisites and system instance
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        im_proj = ip.ImageProjection.in_new_window(self.image_projection_data)
         ia = ianc.IA_No_Calibrate()
         sys = ssf.SystemSofastFringe()
 

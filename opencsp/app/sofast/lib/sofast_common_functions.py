@@ -186,7 +186,9 @@ def run_exposure_cal(
             if on_done is not None:
                 on_done()
 
-        white_image = np.array(image_projection.get_black_array_active_area()) + image_projection.max_int
+        white_image = (
+            np.array(image_projection.get_black_array_active_area()) + image_projection.display_data.projector_max_int
+        )
         image_projection.display_image_in_active_area(white_image)
         image_projection.root.after(100, run_cal)
 
