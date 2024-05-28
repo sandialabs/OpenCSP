@@ -46,7 +46,7 @@ class SofastGUI:
         self.root.title('SOFAST')
 
         # Set size of GUI
-        self.root.geometry('600x640+200+100')
+        self.root.geometry('600x680+200+100')
 
         # Add all buttons/widgets to window
         self._create_layout()
@@ -136,6 +136,7 @@ class SofastGUI:
 
     @functools.cached_property
     def cam_options(self):
+        """Returns all camera (ImageAcquisition) options that are compatible with Sofast"""
         all_cam_options = ImageAcquisitionAbstract.cam_options()
 
         ret: dict[str, type[ImageAcquisitionAbstract]] = {}
@@ -187,10 +188,17 @@ class SofastGUI:
         # =============== First Column - Projection controls ===============
         r = 0
         self.btn_show_cal_image = tkinter.Button(
-            label_frame_projector, text='Show Calibration Image', command=self.show_calibration_image
+            label_frame_projector, text='Show Cal Fiducial Image', command=self.show_calibration_fiducial_image
         )
         self.btn_show_cal_image.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
-        tkt.TkToolTip(self.btn_show_cal_image, 'Shows calibration image on projection window.')
+        tkt.TkToolTip(self.btn_show_cal_image, 'Shows calibration fiducial image on projection window.')
+        r += 1
+
+        self.btn_show_cal_image = tkinter.Button(
+            label_frame_projector, text='Show Cal Marker Image', command=self.show_calibration_marker_image
+        )
+        self.btn_show_cal_image.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        tkt.TkToolTip(self.btn_show_cal_image, 'Shows calibration marker image on projection window.')
         r += 1
 
         self.btn_show_axes = tkinter.Button(label_frame_projector, text='Show Screen Axes', command=self.show_axes)
@@ -565,13 +573,21 @@ class SofastGUI:
 
             lt.info(f'ImageProjection loaded:\n    {file}')
 
-    def show_calibration_image(self) -> None:
-        """Shows calibration image"""
+    def show_calibration_fiducial_image(self) -> None:
+        """Shows calibration image with fiducials"""
         # Check that we have a projector
-        if not self._check_projector_loaded('show_calibration_image'):
+        if not self._check_projector_loaded('show_calibration_fiducial_image'):
             return
 
-        ImageProjection.instance().show_calibration_image()
+        ImageProjection.instance().show_calibration_fiducial_image()
+
+    def show_calibration_marker_image(self) -> None:
+        """Shows calibration image with Aruco markers"""
+        # Check that we have a projector
+        if not self._check_projector_loaded('show_calibration_marker_image'):
+            return
+
+        ImageProjection.instance().show_calibration_marker_image()
 
     def show_crosshairs(self) -> None:
         """Shows crosshairs"""
@@ -800,6 +816,7 @@ class SofastGUI:
         self._camera_closed(None)
 
     def close_image_acquisition(self) -> None:
+        """Closes image acquisition"""
         # Close the camera
         with et.ignored(Exception):
             ImageAcquisitionAbstract.instance().close()
