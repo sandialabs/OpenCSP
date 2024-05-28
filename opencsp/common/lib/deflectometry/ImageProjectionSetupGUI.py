@@ -51,7 +51,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
             'Blue Shift X',
             'Blue Shift Y',
         ]
-        self.data_types = [str, int, int, int, int, int, int, int, int, str, int, int, int, int, int, int, int]
+        self.data_types = [str, int, int, int, int, int, int, int, int, str, int, int, int, int, int, int]
 
         # Declare variables
         self.projector: ImageProjection
@@ -270,7 +270,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
 
         # Gets data from user input boxes and saves in class
         data = {}
-        for dtype, name, entry in zip(self.data_types, self.data_names, self.data_cells):
+        for dtype, name, entry in zip(self.data_types, self.data_names, self.data_cells, strict=True):
             data.update({name: dtype(entry.get())})
         self.display_data = ImageProjectionData(**data)
 
@@ -285,7 +285,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
 
         """
         # Checks inputs are correct
-        for name, dtype, entry in zip(self.data_labels, self.data_types, self.data_cells):
+        for name, dtype, entry in zip(self.data_labels, self.data_types, self.data_cells, strict=True):
             try:
                 dtype(entry.get())
             except ValueError:
