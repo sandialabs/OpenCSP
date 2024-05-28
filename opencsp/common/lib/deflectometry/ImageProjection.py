@@ -337,8 +337,8 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         # Display image
         self.display_image_in_active_area(array)
 
-    def show_calibration_image(self):
-        """Shows a calibration image with N fiducials. Fiducials are black dots
+    def show_calibration_fiducial_image(self):
+        """Shows a calibration image with N fiducials. Fiducials are green dots
         on a white background. Fiducial locations measured from center of dots.
         """
         # Create base image to show
@@ -370,6 +370,12 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
 
         # Display with black border
         self.display_image_in_active_area(array)
+
+    def show_calibration_marker_image(self):
+        """Shows a calibration image with N Aruco markers. Markers are black
+        on a white background.
+        """
+        print('Test: show calibration marker image')
 
     def get_black_array_active_area(self) -> np.ndarray:
         """
