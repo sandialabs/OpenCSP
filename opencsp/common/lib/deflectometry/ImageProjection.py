@@ -377,7 +377,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         on a white background. Fiducial locations measured from center of dots.
         """
         # Create base image to show
-        array = np.ones(
+        array = np.zeros(
             (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3),
             dtype=self.display_data.projector_data_type,
         )
