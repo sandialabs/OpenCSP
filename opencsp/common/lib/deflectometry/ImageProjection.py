@@ -60,6 +60,8 @@ class CalParams:
         self.y_screen: np.ndarray[float] = y_mat_screen.flatten()
         # Point index
         self.index: np.ndarray[int] = np.arange(self.x_pixel.size, dtype=int)
+        # Width of Aruco markers
+        self.marker_width: int = int(min(size_x, size_y) * 0.2)
 
 
 @dataclass
@@ -153,6 +155,9 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         self.canvas = tkinter.Canvas(self.root)
         self.canvas.pack()
         self.canvas.configure(background='black', highlightthickness=0)
+
+        # Save aruco marker dictionary for calibration image generation
+        self.aruco_dictionary = cv.aruco.Dictionary_get(cv.aruco.DICT_4X4_1000)
 
         # Save active area data
         self._x_active_1: int
@@ -373,31 +378,44 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         on a white background.
         """
         # Create base image to show
-        array = np.ones(
-            (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3),
-            dtype=self.display_data.projector_data_type,
+        array = (
+            np.ones(
+                (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3),
+                dtype=self.display_data.projector_data_type,
+            )
+            * self.display_data.projector_max_int
         )
 
         # Get calibration pattern parameters
         pattern_params = CalParams(self.display_data.active_area_size_x, self.display_data.active_area_size_y)
+        w = pattern_params.marker_width
 
         # Add markers
         for x_loc, y_loc, idx in zip(pattern_params.x_pixel, pattern_params.y_pixel, pattern_params.index):
-            # Place fiducial
-            array[y_loc, x_loc, 1] = self.display_data.projector_max_int
-            # Place label (offset so label is in view)
+            # Make marker
+            img_mkr = self._make_aruco_marker(w, idx)
+            # Place marker and label
             x_pt_to_center = float(self.display_data.active_area_size_x) / 2 - x_loc
             y_pt_to_center = float(self.display_data.active_area_size_y) / 2 - y_loc
-            if x_pt_to_center >= 0:
-                dx = 15
-            else:
-                dx = -35
-            if y_pt_to_center >= 0:
-                dy = 20
-            else:
-                dy = -10
+
+            if (x_pt_to_center >= 0) and (y_pt_to_center >= 0):  # upper left quadrant
+                array[y_loc : y_loc + w, x_loc : x_loc + w, :] = img_mkr
+                dy = int(w / 2)
+                dx = w + 5
+            elif x_pt_to_center >= 0:  # lower left quadrant
+                array[y_loc - w : y_loc, x_loc : x_loc + w, :] = np.rot90(img_mkr, 1)
+                dy = -int(w / 2)
+                dx = w + 5
+            elif y_pt_to_center >= 0:  # top right quadrant
+                array[y_loc : y_loc + w, x_loc - w : x_loc, :] = np.rot90(img_mkr, 3)
+                dy = int(w / 2)
+                dx = -w - 15
+            else:  # bottom right quadrant
+                array[y_loc - w : y_loc, x_loc - w : x_loc, :] = np.rot90(img_mkr, 2)
+                dy = -int(w / 2)
+                dx = -w - 15
             # Draw text
-            cv.putText(array, f'{idx:d}', (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            cv.putText(array, f'{idx:d}', (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
 
         # Display with black border
         self.display_image_in_active_area(array)
@@ -570,3 +588,12 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
 
         with et.ignored(Exception):
             self.root.destroy()
+
+    def _make_aruco_marker(self, width: int, id_: int) -> np.ndarray:
+        """Returns NxMx3 aruco marker array"""
+        # Define marker image
+        img_2d = np.ones((width, width), dtype='uint8') * self.display_data.projector_max_int
+
+        # Create marker image
+        cv.aruco.drawMarker(self.aruco_dictionary, id_, width, img_2d)
+        return np.concatenate([img_2d[:, :, None]] * 3, axis=2)
