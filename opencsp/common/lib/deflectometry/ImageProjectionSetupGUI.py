@@ -143,7 +143,9 @@ class ImageProjectionGUI:
         self.btn_axes.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Show calibration image button
-        self.btn_calib = tkinter.Button(self.root, text='Show calibration image', command=self.show_calibration_image)
+        self.btn_calib = tkinter.Button(
+            self.root, text='Show calibration image', command=self.show_calibration_fiducial_image
+        )
         r += 1
         self.btn_calib.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
@@ -234,13 +236,21 @@ class ImageProjectionGUI:
         # Show X/Y axes
         self.projector.show_axes()
 
-    def show_calibration_image(self):
+    def show_calibration_fiducial_image(self):
         """Shows calibration image"""
         # Update active area of projector
         self.update_windows()
 
         # Show cal image
-        self.projector.show_calibration_image()
+        self.projector.show_calibration_fiducial_image()
+
+    def show_calibration_marker_image(self):
+        """Shows calibration Aruco marker image"""
+        # Update active area of projection
+        self.update_windows()
+
+        # Show cal image
+        self.projector.show_calibration_marker_image()
 
     def close_projector(self):
         """
