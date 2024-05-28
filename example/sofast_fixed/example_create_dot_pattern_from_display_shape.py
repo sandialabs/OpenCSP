@@ -2,8 +2,8 @@ from os.path import join, dirname
 
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape
-from opencsp.app.sofast.lib.SystemSofastFixed import SystemSofastFixed
-from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.app.sofast.lib.PatternSofastFixed import PatternSofastFixed
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjectionData
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
@@ -33,7 +33,7 @@ def example_calculate_dot_locations_from_display_shape():
 
     # Load data
     display = DisplayShape.load_from_hdf(file_display)
-    im_proj_params = ImageProjection.load_from_hdf(file_image_projection)
+    im_proj_params = ImageProjectionData.load_from_hdf(file_image_projection)
 
     # 2. Define dot projection object
     # ===============================
@@ -41,7 +41,9 @@ def example_calculate_dot_locations_from_display_shape():
     spacing_dot = 6  # pixels
 
     # Create fixed pattern projection object
-    projection = SystemSofastFixed(im_proj_params['size_x'], im_proj_params['size_y'], width_dot, spacing_dot)
+    projection = PatternSofastFixed(
+        im_proj_params.active_area_size_x, im_proj_params.active_area_size_y, width_dot, spacing_dot
+    )
 
     # 3. Define DotLocationsFixedPattern object
     # =========================================
