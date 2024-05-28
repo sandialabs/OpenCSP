@@ -82,7 +82,6 @@ class ImageProjectionData(hdf5_tools.HDF5_IO_Abstract):
     shift_red_y: int
     shift_blue_x: int
     shift_blue_y: int
-    ui_position_x: int
 
     def save_to_hdf(self, file: str, prefix: str = '') -> None:
         datasets = []
@@ -114,7 +113,6 @@ class ImageProjectionData(hdf5_tools.HDF5_IO_Abstract):
             'ImageProjection/shift_red_y',
             'ImageProjection/shift_blue_x',
             'ImageProjection/shift_blue_y',
-            'ImageProjection/ui_position_x',
         ]
         for dataset in datasets:
             dataset = prefix + dataset

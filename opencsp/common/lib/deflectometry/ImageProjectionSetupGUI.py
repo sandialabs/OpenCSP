@@ -32,7 +32,6 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
             'shift_red_y',
             'shift_blue_x',
             'shift_blue_y',
-            'ui_position_x',
         ]
         self.data_labels = [
             'Name',
@@ -51,7 +50,6 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
             'Red Shift Y',
             'Blue Shift X',
             'Blue Shift Y',
-            'GUI X Position',
         ]
         self.data_types = [str, int, int, int, int, int, int, int, int, str, int, int, int, int, int, int, int]
 
