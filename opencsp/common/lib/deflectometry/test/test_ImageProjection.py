@@ -27,6 +27,7 @@ class test_ImageProjection(unittest.TestCase):
             ip.ImageProjection.instance().close()
 
     def test_set_image_projection(self):
+        """Test setting/unsetting ImageProjection instances"""
         self.assertIsNone(ip.ImageProjection.instance())
 
         # Create a mock ImageProjection object
@@ -40,6 +41,7 @@ class test_ImageProjection(unittest.TestCase):
         self.assertIsNone(ip.ImageProjection.instance())
 
     def test_on_close(self):
+        """Tests closing callback"""
         global close_count
         close_count = 0
 
@@ -66,6 +68,7 @@ class test_ImageProjection(unittest.TestCase):
         self.assertEqual(close_count, 3)
 
     def test_zeros(self):
+        """Tests the shape of the 'zeros' array to fill active area"""
         # Create a mock ImageProjection object
         image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
         image_projection_data = ip.ImageProjectionData.load_from_hdf(self.file_image_projection_input)
@@ -81,6 +84,7 @@ class test_ImageProjection(unittest.TestCase):
         )
 
     def test_to_from_hdf(self):
+        """Loads and saves from/to HDF5 files"""
         # Load from HDF
         image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
 
@@ -95,6 +99,13 @@ class test_ImageProjection(unittest.TestCase):
 
         # Close, so that we don't have multiple windows open at a time
         image_projection.close()
+
+    def test_run_wait_close(self):
+        """Loads, waits, closes ImageProjection window"""
+        # Load from HDF
+        image_projection = ip.ImageProjection.load_from_hdf(self.file_image_projection_input)
+        image_projection.root.after(500, image_projection.close)
+        image_projection.run()
 
 
 if __name__ == '__main__':
