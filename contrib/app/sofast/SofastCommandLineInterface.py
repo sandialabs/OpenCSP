@@ -485,8 +485,8 @@ if __name__ == '__main__':
     image_acquisition_in.frame_size = (1626, 1236)
     image_acquisition_in.gain = 230
 
-    image_projection_in = ImageProjection.load_from_hdf_and_display(file_image_projection)
-    image_projection_in.display_data['image_delay'] = 200
+    image_projection_in = ImageProjection.load_from_hdf(file_image_projection)
+    image_projection_in.display_data.image_delay_ms = 200
 
     camera_in = Camera.load_from_hdf(file_camera)
     facet_definition_in = DefinitionFacet.load_from_json(file_facet_definition_json)
