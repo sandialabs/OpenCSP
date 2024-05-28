@@ -20,7 +20,7 @@ class TestSystemSofastFixed(unittest.TestCase):
         file_im_proj = join(opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5')
 
         # Instantiate image projection class
-        im_proj = ImageProjection.load_from_hdf_and_display(file_im_proj)
+        im_proj = ImageProjection.load_from_hdf(file_im_proj)
 
         # Instantiate image acquisition class
         im_aq = ImageAcquisition()
