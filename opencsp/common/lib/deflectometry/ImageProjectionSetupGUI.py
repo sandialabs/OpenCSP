@@ -1,54 +1,33 @@
-"""Graphical User Interface (GUI) used for setting up the physical layout
-of a computer display (ImageProjection class). To run GUI, use the following:
-```python ImageProjectionGUI.py```
-
-"""
-
 import tkinter
 from tkinter import messagebox
 from tkinter.filedialog import askopenfilename
 from tkinter.filedialog import asksaveasfilename
 
-from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection, ImageProjectionData
 import opencsp.common.lib.tool.tk_tools as tkt
+from opencsp.common.lib.tool.hdf5_tools import HDF5_IO_Abstract
 
 
-class ImageProjectionGUI:
-    """
-    GUI for setting the physical layout parameters:
-        'name'
-        'win_size_x'
-        'win_size_y'
-        'win_position_x'
-        'win_position_y'
-        'size_x'
-        'size_y'
-        'position_x'
-        'position_y'
-        'projector_data_type'
-        'projector_max_int'
-        'shift_red_x'
-        'shift_red_y'
-        'shift_blue_x'
-        'shift_blue_y'
+class ImageProjectionGUI(HDF5_IO_Abstract):
+    """Graphical User Interface (GUI) used for setting up the physical layout
+    of a computer display (ImageProjection class). To run GUI, run `python ImageProjectionGUI.py`
     """
 
     def __init__(self):
-        """Instantiates a new instance of the ImageProjection setup GUI in a new window"""
         # Define data names
         self.data_names = [
             'name',
-            'win_size_x',
-            'win_size_y',
-            'win_position_x',
-            'win_position_y',
-            'size_x',
-            'size_y',
-            'position_x',
-            'position_y',
+            'main_window_size_x',
+            'main_window_size_y',
+            'main_window_position_x',
+            'main_window_position_y',
+            'active_area_size_x',
+            'active_area_size_y',
+            'active_area_position_x',
+            'active_area_position_y',
             'projector_data_type',
             'projector_max_int',
-            'image_delay',
+            'image_delay_ms',
             'shift_red_x',
             'shift_red_y',
             'shift_blue_x',
@@ -78,7 +57,7 @@ class ImageProjectionGUI:
 
         # Declare variables
         self.projector: ImageProjection
-        self.display_data: dict
+        self.display_data: ImageProjectionData
 
         # Create tkinter object
         self.root = tkt.window()
@@ -104,7 +83,7 @@ class ImageProjectionGUI:
     def update_window_size(self):
         """Updates the window size to current set value"""
         # Set size and position of window
-        self.root.geometry(f'500x650+{self.display_data["ui_position_x"]:d}+100')
+        self.root.geometry(f'500x650+{self.display_data.ui_position_x:d}+100')
 
     def create_layout(self):
         """Creates GUI widgets"""
@@ -220,7 +199,8 @@ class ImageProjectionGUI:
         self.get_user_data()
 
         # Update size of window
-        self.projector.upate_window(self.display_data)
+        self.projector.display_data = self.display_data
+        self.projector.update_window()
 
         # Show crosshairs
         self.projector.show_crosshairs()
@@ -289,8 +269,7 @@ class ImageProjectionGUI:
 
     def get_user_data(self):
         """
-        Reads user input data and saves in dictionary.
-
+        Reads user input data and saves in ImageProjectionData class (`self.display_data`).
         """
         # Check inputs format
         if not self.check_inputs():
@@ -300,7 +279,7 @@ class ImageProjectionGUI:
         data = {}
         for dtype, name, entry in zip(self.data_types, self.data_names, self.data_cells):
             data.update({name: dtype(entry.get())})
-        self.display_data = data
+        self.display_data = ImageProjectionData(**data)
 
     def check_inputs(self) -> bool:
         """
@@ -322,71 +301,48 @@ class ImageProjectionGUI:
         return True
 
     def set_user_data(self):
-        """
-        Sets the loaded user data in the user input boxes
-
-        """
+        """Sets the loaded user data in the user input boxes"""
         for name, entry in zip(self.data_names, self.data_cells):
             entry.delete(0, tkinter.END)
-            entry.insert(0, self.display_data[name])
+            entry.insert(0, self.display_data.__dict__[name])
 
     def load_defaults(self):
-        """
-        Sets default values.
-
-        """
-        self.display_data = {
+        """Sets default values."""
+        kwargs = {
             'name': 'Default Image Projection',
-            'win_size_x': 800,
-            'win_size_y': 500,
-            'win_position_x': 0,
-            'win_position_y': 0,
-            'size_x': 700,
-            'size_y': 400,
-            'position_x': 50,
-            'position_y': 50,
+            'main_window_size_x': 800,
+            'main_window_size_y': 500,
+            'main_window_position_x': 0,
+            'main_window_position_y': 0,
+            'active_area_size_x': 700,
+            'active_area_size_y': 400,
+            'active_area_position_x': 50,
+            'active_area_position_y': 50,
             'projector_data_type': 'uint8',
             'projector_max_int': 255,
-            'image_delay': 400,
+            'image_delay_ms': 400,
             'shift_red_x': 0,
             'shift_red_y': 0,
             'shift_blue_x': 0,
             'shift_blue_y': 0,
             'ui_position_x': 100,
         }
+        self.display_data = ImageProjectionData(**kwargs)
         self.set_user_data()
 
-    def load_from_hdf(self, file: str):
-        """
-        Loads saved user data from HDF file
-
-        Parameters
-        ----------
-        file : str
-            File to load.
-
-        """
+    def load_from_hdf(self, file: str, prefix: str = ''):
         # Load data
-        self.display_data = ImageProjection.load_from_hdf(file)
+        self.display_data = ImageProjectionData.load_from_hdf(file, prefix)
 
         # Set data in input fields
         self.set_user_data()
 
-    def save_to_hdf(self, file: str):
-        """
-        Saves user data to HDF file.
-
-        Parameters
-        ----------
-        file : str
-            File to save to.
-
-        """
+    def save_to_hdf(self, file: str, prefix: str = ''):
         # Load user data
         self.get_user_data()
 
         # Save as HDF file
-        ImageProjection.save_params_to_hdf(self.display_data, file)
+        self.display_data.save_to_hdf(file, prefix)
 
     def close(self):
         """
