@@ -1,6 +1,3 @@
-"""Class for controlling displaying Sofast patterns and capturing images
-"""
-
 import copy
 import datetime as dt
 from typing import Callable
@@ -21,6 +18,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class SystemSofastFringe:
+    """Class for controlling/displaying Sofast patterns and capturing images"""
+
     def __init__(
         self, image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract] = None
     ) -> 'SystemSofastFringe':
@@ -40,7 +39,6 @@ class SystemSofastFringe:
             Either the image_acquisition or the image_projection has not been loaded.
         TypeError:
             The image_acquisition is not the correct type.
-
         """
         # Import here to avoid circular dependencies
         import opencsp.app.sofast.lib.sofast_common_functions as scf
