@@ -81,7 +81,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
     def set_window_size(self):
         """Updates the window size to current set value"""
         # Set size and position of window
-        self.root.geometry(f'500x670+{self.display_data.ui_position_x:d}+100')
+        self.root.geometry('500x670+100+100')
 
     def create_layout(self):
         """Creates GUI widgets"""
@@ -317,7 +317,6 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
             'shift_red_y': 0,
             'shift_blue_x': 0,
             'shift_blue_y': 0,
-            'ui_position_x': 100,
         }
         self.display_data = ImageProjectionData(**kwargs)
         self.set_user_data()
