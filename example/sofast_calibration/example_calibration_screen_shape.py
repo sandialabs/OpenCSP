@@ -6,7 +6,7 @@ import numpy as np
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.CalibrateDisplayShape import CalibrateDisplayShape, DataInput
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjectionData
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
@@ -61,7 +61,7 @@ def example_screen_shape_calibration():
 
     # Load input data
     camera = Camera.load_from_hdf(file_camera_distortion)
-    image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
+    image_projection_data = ImageProjectionData.load_from_hdf(file_image_projection)
     screen_cal_point_pairs = np.loadtxt(file_screen_cal_point_pairs, delimiter=',', skiprows=1, dtype=int)
 
     # Store input data in data class
