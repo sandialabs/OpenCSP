@@ -20,7 +20,7 @@ import opencsp.app.sofast.lib.SystemSofastFringe as ssf
 from opencsp.common.lib.camera.ImageAcquisitionAbstract import ImageAcquisitionAbstract
 from opencsp.common.lib.camera.image_processing import highlight_saturation
 from opencsp.common.lib.camera.LiveView import LiveView
-from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection, ImageProjectionData
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.exception_tools as et
@@ -317,7 +317,10 @@ class SofastGUI:
         # Camera type dropdown
         self.var_cam_select = tkinter.StringVar(value=list(self.cam_options.keys())[0])
         lbl_camera_type = tkinter.Label(label_frame_settings, text='Select camera:', font=('calibre', 10, 'bold'))
-        drop_camera_type = tkinter.OptionMenu(label_frame_settings, self.var_cam_select, *list(self.cam_options.keys()))
+        cam_options = list(self.cam_options.keys())
+        drop_camera_type = tkinter.OptionMenu(
+            label_frame_settings, self.var_cam_select, cam_options[0], *cam_options[1:]
+        )
         tkt.TkToolTip(drop_camera_type, 'Select type of camera object to load.')
 
         lbl_camera_type.grid(row=r, column=1, pady=2, padx=2, sticky='nse')
@@ -555,13 +558,13 @@ class SofastGUI:
 
         # Load file and display
         if file != '':
-            # Load data
-            image_projection_data = ImageProjection.load_from_hdf(file)
             # Close the previous projector instance
             with et.ignored(Exception):
                 ImageProjection.instance().close()
             # Create new window
             projector_root = tkt.window(self.root, TopLevel=True)
+            # Load data
+            image_projection_data = ImageProjectionData.load_from_hdf(file)
             # Show window
             ImageProjection(projector_root, image_projection_data)
             # Build system instance
