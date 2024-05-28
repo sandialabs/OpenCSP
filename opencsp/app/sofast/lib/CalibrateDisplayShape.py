@@ -17,7 +17,7 @@ from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.ImageProjection import CalParams
+from opencsp.common.lib.deflectometry.ImageProjection import CalParams, ImageProjectionData
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.photogrammetry.photogrammetry as ph
@@ -41,7 +41,7 @@ class DataInput:
         Aruco marker corners, meters
     camera : Camera
         Camera object used to capture screen distortion data
-    image_projection_data : dict
+    image_projection_data : ImageProjectionData
         Image projection parameters
     measurements_screen : list[MeasurementSofastFringe]
         Screen shape Sofast measurement objects
@@ -56,7 +56,7 @@ class DataInput:
     resolution_xy: tuple[int, int]
     pts_xyz_marker: Vxyz
     camera: Camera
-    image_projection_data: dict
+    image_projection_data: ImageProjectionData
     measurements_screen: list[MeasurementSofastFringe]
     assume_located_points: bool = True
     ray_intersection_threshold: float = 0.001
@@ -113,7 +113,8 @@ class CalibrateDisplayShape:
 
         # Load cal params
         cal_pattern_params = CalParams(
-            self.data_input.image_projection_data['size_x'], self.data_input.image_projection_data['size_y']
+            self.data_input.image_projection_data.active_area_size_x,
+            self.data_input.image_projection_data.active_area_size_y,
         )
 
         # Initialize calculation data structure
