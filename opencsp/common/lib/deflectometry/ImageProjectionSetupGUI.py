@@ -75,15 +75,15 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         self.load_defaults()
 
         # Place window
-        self.update_window_size()
+        self.set_window_size()
 
         # Run window infinitely
         self.root.mainloop()
 
-    def update_window_size(self):
+    def set_window_size(self):
         """Updates the window size to current set value"""
         # Set size and position of window
-        self.root.geometry(f'500x650+{self.display_data.ui_position_x:d}+100')
+        self.root.geometry(f'500x670+{self.display_data.ui_position_x:d}+100')
 
     def create_layout(self):
         """Creates GUI widgets"""
@@ -97,12 +97,12 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
             self.data_cells.append(e)
 
         # Show projector button
-        self.btn_show_proj = tkinter.Button(self.root, text='Show Display', command=self.show_projector)
+        self.btn_show_proj = tkinter.Button(self.root, text='Show Display', command=self.show_projection_window)
         r += 1
         self.btn_show_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Update projector button
-        self.btn_update_proj = tkinter.Button(self.root, text='Update All', command=self.update_windows)
+        self.btn_update_proj = tkinter.Button(self.root, text='Update All', command=self.update_projection_window)
         r += 1
         self.btn_update_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
@@ -112,7 +112,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         self.btn_close_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
         # Show crosshairs
-        self.btn_crosshairs = tkinter.Button(self.root, text='Show Crosshairs', command=self.update_windows)
+        self.btn_crosshairs = tkinter.Button(self.root, text='Show Crosshairs', command=self.update_projection_window)
         r += 1
         self.btn_crosshairs.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
 
@@ -123,7 +123,14 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
 
         # Show calibration image button
         self.btn_calib = tkinter.Button(
-            self.root, text='Show calibration image', command=self.show_calibration_fiducial_image
+            self.root, text='Show calibration fiducial image', command=self.show_calibration_fiducial_image
+        )
+        r += 1
+        self.btn_calib.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+
+        # Show calibration image button
+        self.btn_calib = tkinter.Button(
+            self.root, text='Show calibration marker image', command=self.show_calibration_marker_image
         )
         r += 1
         self.btn_calib.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
@@ -171,16 +178,10 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         self.btn_crosshairs['state'] = active_projector
         self.btn_calib['state'] = active_projector
 
-    def show_projector(self):
-        """
-        Opens the projector window.
-
-        """
+    def show_projection_window(self):
+        """Opens the ImageProjection window."""
         # Get user data
         self.get_user_data()
-
-        # Update GUI size
-        self.update_window_size()
 
         # Create a new Toplevel window
         projector_root = tkt.window(self.root, TopLevel=True)
@@ -189,12 +190,8 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         # Activate buttons
         self.activate_btns(True)
 
-    def update_windows(self):
-        """
-        Updates the projector active area data, updates the window size, and
-        shows crosshairs.
-
-        """
+    def update_projection_window(self):
+        """Updates the projector active area data, updates the window size, and shows crosshairs."""
         # Read data from entry cells
         self.get_user_data()
 
@@ -205,13 +202,10 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         # Show crosshairs
         self.projector.show_crosshairs()
 
-        # Update position of UI window
-        self.update_window_size()
-
     def show_axes(self):
         """Shows axis labels."""
         # Update active area of projector
-        self.update_windows()
+        self.update_projection_window()
 
         # Show X/Y axes
         self.projector.show_axes()
@@ -219,7 +213,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
     def show_calibration_fiducial_image(self):
         """Shows calibration image"""
         # Update active area of projector
-        self.update_windows()
+        self.update_projection_window()
 
         # Show cal image
         self.projector.show_calibration_fiducial_image()
@@ -227,7 +221,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
     def show_calibration_marker_image(self):
         """Shows calibration Aruco marker image"""
         # Update active area of projection
-        self.update_windows()
+        self.update_projection_window()
 
         # Show cal image
         self.projector.show_calibration_marker_image()
