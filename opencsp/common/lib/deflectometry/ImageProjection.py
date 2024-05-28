@@ -12,7 +12,6 @@ from PIL import Image, ImageTk
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 import opencsp.common.lib.tool.tk_tools as tkt
-from opencsp.common.lib.tool.hdf5_tools import HDF5_IO_Abstract
 
 
 class CalParams:
@@ -64,7 +63,7 @@ class CalParams:
 
 
 @dataclass
-class ImageProjectionData(HDF5_IO_Abstract):
+class ImageProjectionData(hdf5_tools.HDF5_IO_Abstract):
     """Dataclass containting ImageProjection parameters. All position/size units are screen pixels"""
 
     name: str
@@ -125,12 +124,12 @@ class ImageProjectionData(HDF5_IO_Abstract):
         return cls(**kwargs)
 
 
-class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
+class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
     """Controls projecting an image on a computer display (projector, monitor, etc.)"""
 
     _instance: 'ImageProjection' = None
 
-    def __init__(self, root: tkinter.Tk, display_data: ImageProjectionData):
+    def __init__(self, root: tkinter.Tk, display_data: ImageProjectionData) -> 'ImageProjection':
         """Instantiates class
 
         Parameters
@@ -165,7 +164,7 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         self._x_active_mid: int
         self._y_active_mid: int
 
-        self._display_data = display_data
+        self.display_data = display_data
         self.update_window()
 
         # Make window frameless
@@ -180,8 +179,8 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         # Create black image
         image = self._format_image(
             np.zeros(
-                (self._display_data.main_window_size_y, self._display_data.main_window_size_x, 3),
-                dtype=self._display_data.projector_data_type,
+                (self.display_data.main_window_size_y, self.display_data.main_window_size_x, 3),
+                dtype=self.display_data.projector_data_type,
             )
         )
         self.canvas_image = self.canvas.create_image(0, 0, image=image, anchor='nw')
@@ -229,23 +228,23 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
     def update_window(self) -> None:
         """Updates window display data."""
         # Calculate active area extents
-        self._x_active_1 = self._display_data.active_area_position_x
-        self._x_active_2 = self._display_data.active_area_position_x + self._display_data.active_area_size_x
-        self._y_active_1 = self._display_data.active_area_position_y
-        self._y_active_2 = self._display_data.active_area_position_y + self._display_data.active_area_size_y
+        self._x_active_1 = self.display_data.active_area_position_x
+        self._x_active_2 = self.display_data.active_area_position_x + self.display_data.active_area_size_x
+        self._y_active_1 = self.display_data.active_area_position_y
+        self._y_active_2 = self.display_data.active_area_position_y + self.display_data.active_area_size_y
 
         # Calculate center of active area
-        self._x_active_mid = int(self._display_data.active_area_size_x / 2)
-        self._y_active_mid = int(self._display_data.active_area_size_y / 2)
+        self._x_active_mid = int(self.display_data.active_area_size_x / 2)
+        self._y_active_mid = int(self.display_data.active_area_size_y / 2)
 
         # Resize window
         self.root.geometry(
-            f'{self._display_data.main_window_size_x:d}x{self._display_data.main_window_size_y:d}'
-            + f'+{self._display_data.main_window_position_x:d}+{self._display_data.main_window_position_y:d}'
+            f'{self.display_data.main_window_size_x:d}x{self.display_data.main_window_size_y:d}'
+            + f'+{self.display_data.main_window_position_x:d}+{self.display_data.main_window_position_y:d}'
         )
 
         # Resize canvas size
-        self.canvas.configure(width=self._display_data.main_window_size_x, height=self._display_data.main_window_size_y)
+        self.canvas.configure(width=self.display_data.main_window_size_x, height=self.display_data.main_window_size_y)
 
     def show_crosshairs(self) -> None:
         """
@@ -255,10 +254,10 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         # Add white active region
         array = (
             np.ones(
-                (self._display_data.active_area_size_y, self._display_data.active_area_size_x, 3),
-                dtype=self._display_data.projector_data_type,
+                (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3),
+                dtype=self.display_data.projector_data_type,
             )
-            * self._display_data.projector_max_int
+            * self.display_data.projector_max_int
         )
 
         # Add crosshairs vertical
@@ -266,7 +265,7 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         array[self._y_active_mid, :, :] = 0
 
         # Add crosshairs diagonal
-        width = np.min([self._display_data.active_area_size_x, self._display_data.active_area_size_y])
+        width = np.min([self.display_data.active_area_size_x, self.display_data.active_area_size_y])
         xd1 = int(self._x_active_mid - width / 4)
         xd2 = int(self._x_active_mid + width / 4)
         yd1 = int(self._y_active_mid - width / 4)
@@ -287,26 +286,26 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         # Add white active region
         array = (
             np.ones(
-                (self._display_data.active_area_size_y, self._display_data.active_area_size_x, 3),
-                dtype=self._display_data.projector_data_type,
+                (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3),
+                dtype=self.display_data.projector_data_type,
             )
-            * self._display_data.projector_max_int
+            * self.display_data.projector_max_int
         )
 
         # Add arrows
-        width = int(np.min([self._display_data.active_area_size_x, self._display_data.active_area_size_y]) / 4)
+        width = int(np.min([self.display_data.active_area_size_x, self.display_data.active_area_size_y]) / 4)
         thickness = 5
 
         # Add green X axis arrow
         start_point = (self._x_active_mid, self._y_active_mid)
         end_point = (self._x_active_mid - width, self._y_active_mid)
-        color = (int(self._display_data.projector_max_int), 0, 0)  # RGB
+        color = (int(self.display_data.projector_max_int), 0, 0)  # RGB
         array = cv.arrowedLine(array, start_point, end_point, color, thickness)
 
         # Add red Y axis arrow
         start_point = (self._x_active_mid, self._y_active_mid)
         end_point = (self._x_active_mid, self._y_active_mid + width)
-        color = (0, int(self._display_data.projector_max_int), 0)  # RGB
+        color = (0, int(self.display_data.projector_max_int), 0)  # RGB
         array = cv.arrowedLine(array, start_point, end_point, color, thickness)
 
         # Add X text
@@ -317,7 +316,7 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
             (self._x_active_mid - width - 20, self._y_active_mid + 20),
             font,
             6,
-            (int(self._display_data.projector_max_int), 0, 0),
+            (int(self.display_data.projector_max_int), 0, 0),
             2,
             bottomLeftOrigin=True,
         )
@@ -330,7 +329,7 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
             (self._x_active_mid + 20, self._y_active_mid + width + 20),
             font,
             6,
-            (0, int(self._display_data.projector_max_int), 0),
+            (0, int(self.display_data.projector_max_int), 0),
             2,
         )
 
@@ -343,20 +342,20 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         """
         # Create base image to show
         array = np.ones(
-            (self._display_data.active_area_size_y, self._display_data.active_area_size_x, 3),
-            dtype=self._display_data.projector_data_type,
+            (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3),
+            dtype=self.display_data.projector_data_type,
         )
 
         # Get calibration pattern parameters
-        pattern_params = CalParams(self._display_data.active_area_size_x, self._display_data.active_area_size_y)
+        pattern_params = CalParams(self.display_data.active_area_size_x, self.display_data.active_area_size_y)
 
         # Add fiducials
         for x_loc, y_loc, idx in zip(pattern_params.x_pixel, pattern_params.y_pixel, pattern_params.index):
             # Place fiducial
-            array[y_loc, x_loc, 1] = self._display_data.projector_max_int
+            array[y_loc, x_loc, 1] = self.display_data.projector_max_int
             # Place label (offset so label is in view)
-            x_pt_to_center = float(self._display_data.active_area_size_x) / 2 - x_loc
-            y_pt_to_center = float(self._display_data.active_area_size_y) / 2 - y_loc
+            x_pt_to_center = float(self.display_data.active_area_size_x) / 2 - x_loc
+            y_pt_to_center = float(self.display_data.active_area_size_y) / 2 - y_loc
             if x_pt_to_center >= 0:
                 dx = 15
             else:
@@ -379,17 +378,17 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
 
     def get_black_array_active_area(self) -> np.ndarray:
         """
-        Creates a black image to fill the active area of self._display_data.active_area_size_y by self._display_data.active_area_size_x pixels.
+        Creates a black image to fill the active area of self.display_data.active_area_size_y by self.display_data.active_area_size_x pixels.
 
         Returns:
         --------
         image : np.ndarray
-            A 2D image with shape (self._display_data.active_area_size_y, self._display_data.active_area_size_x, 3), filled with zeros
+            A 2D image with shape (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3), filled with zeros
         """
         # Create black image
         black_image = np.zeros(
-            (self._display_data.active_area_size_y, self._display_data.active_area_size_x, 3),
-            dtype=self._display_data.projector_data_type,
+            (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3),
+            dtype=self.display_data.projector_data_type,
         )
 
         return black_image
@@ -401,7 +400,7 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
         Parameters
         ----------
         array : ndarray
-            NxMx3 image array. Data must be int ranging from 0 to self._display_data.projector_max_int.
+            NxMx3 image array. Data must be int ranging from 0 to self.display_data.projector_max_int.
             Array XY shape must match window size in pixels.
 
         """
@@ -411,13 +410,13 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
 
         # Check array is correct xy shape
         if (
-            array.shape[0] != self._display_data.main_window_size_y
-            or array.shape[1] != self._display_data.main_window_size_x
+            array.shape[0] != self.display_data.main_window_size_y
+            or array.shape[1] != self.display_data.main_window_size_x
         ):
             raise ValueError(
                 f'Input image incorrect size. Input image size is {array.shape[:2]:d},'
-                + f' but frame size is {self._display_data.main_window_size_y:d}x'
-                + f'{self._display_data.main_window_size_x:d}.'
+                + f' but frame size is {self.display_data.main_window_size_y:d}x'
+                + f'{self.display_data.main_window_size_x:d}.'
             )
 
         # Format image
@@ -429,13 +428,13 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
 
     def display_image_in_active_area(self, array: np.ndarray) -> None:
         """Formats and displays input numpy array in active area only. Input
-        array must have size (self._display_data.active_area_size_y, self._display_data.active_area_size_x, 3) and is displayed
+        array must have size (self.display_data.active_area_size_y, self.display_data.active_area_size_x, 3) and is displayed
         with a black border to fill entire window area.
 
         Parameters
         ----------
         array : ndarray
-            NxMx3 image array. Data must be int ranging from 0 to self._display_data.projector_max_int.
+            NxMx3 image array. Data must be int ranging from 0 to self.display_data.projector_max_int.
             Array XY shape must match active window area size in pixels.
 
         """
@@ -445,19 +444,19 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
 
         # Check array is correct xy shape
         if (
-            array.shape[0] != self._display_data.active_area_size_y
-            or array.shape[1] != self._display_data.active_area_size_x
+            array.shape[0] != self.display_data.active_area_size_y
+            or array.shape[1] != self.display_data.active_area_size_x
         ):
             raise ValueError(
                 f'Input image incorrect size. Input image size is {array.shape[:2]:d},'
-                + f' but frame size is {self._display_data.active_area_size_y:d}x'
-                + f'{self._display_data.active_area_size_x:d}.'
+                + f' but frame size is {self.display_data.active_area_size_y:d}x'
+                + f'{self.display_data.active_area_size_x:d}.'
             )
 
         # Create black image and place array in correct position
         array_out = np.zeros(
-            (self._display_data.main_window_size_y, self._display_data.main_window_size_x, 3),
-            dtype=self._display_data.projector_data_type,
+            (self.display_data.main_window_size_y, self.display_data.main_window_size_x, 3),
+            dtype=self.display_data.projector_data_type,
         )
         array_out[self._y_active_1 : self._y_active_2, self._x_active_1 : self._x_active_2, :] = array
 
@@ -480,12 +479,12 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
 
         """
         # Shift red channel
-        array[..., 0] = np.roll(array[..., 0], self._display_data.shift_red_x, 1)
-        array[..., 0] = np.roll(array[..., 0], self._display_data.shift_red_y, 0)
+        array[..., 0] = np.roll(array[..., 0], self.display_data.shift_red_x, 1)
+        array[..., 0] = np.roll(array[..., 0], self.display_data.shift_red_y, 0)
 
         # Shift blue channel
-        array[..., 2] = np.roll(array[..., 2], self._display_data.shift_blue_x, 1)
-        array[..., 2] = np.roll(array[..., 2], self._display_data.shift_blue_y, 0)
+        array[..., 2] = np.roll(array[..., 2], self.display_data.shift_blue_x, 1)
+        array[..., 2] = np.roll(array[..., 2], self.display_data.shift_blue_y, 0)
 
         # Format array into tkinter format
         image = Image.fromarray(array, 'RGB')
@@ -525,7 +524,7 @@ class ImageProjection(hdf5_tools.HDF5_SaveAbstract):
             Prefix to append to folder path within HDF file (folders must be separated by "/").
             Default is empty string ''.
         """
-        self._display_data.save_to_hdf(file, prefix)
+        self.display_data.save_to_hdf(file, prefix)
 
     def close(self):
         """Closes all windows"""
