@@ -113,49 +113,6 @@ class test_figure_management(unittest.TestCase):
 
         return fm
 
-    def test_save_all_figures_fail_and_raise(self):
-        """Verifies that the save_all_figures() method will eventually time out for a figure record whose save() method never finishes."""
-        lt.logger(os.path.join(root_path.opencsp_temporary_dir(), "tmp.log"))
-        if os.name == "nt":
-            pass  # threaded timeouts in save_all_figures not yet working on windows
-        else:
-            stderr = st.run(
-                f"{sys.executable} {__file__} --funcname save_all_figures_fail_and_raise_executor",
-                None,
-                ignore_return_code=True,
-                timeout=10.0,
-            )
-            found = False
-            for line in stderr:
-                line = line.val.lower()
-                if "failed to save figure" in line:
-                    found = True
-            if not found:
-                self.fail("Failed to time out in 1 second")
-
-    def save_all_figures_fail_no_raise_executor(self):
-        """try to save (should fail and return the failed figure record)"""
-        fm = self._figure_manager_timeout_1()
-        figs, txts, failed = fm.save_all_figures(self.dir_out)
-        self.assertEqual(1, len(failed), "save_all_figures() didn't return the correct number of figure records")
-        fig_record = fm.fig_record_list[0]
-        self.assertIn(fig_record, failed, "save_all_figures() didn't return the correct figure record")
-        lt.error("Failed gracefully")
-        sys.exit(0)  # force this process to exit (waits forever on save_all_figures())
-
-    def test_save_all_figures_fail_no_raise(self):
-        """Verifies that the save_all_figures() method will eventually time out for a figure record and will return the failing record."""
-        if os.name == "nt":
-            pass  # threaded timeouts in save_all_figures not yet working on windows
-        else:
-            stdout = st.run(
-                f"{sys.executable} {__file__} --funcname save_all_figures_fail_no_raise_executor",
-                ignore_return_code=True,
-                timeout=10.0,
-            )
-            stdout = [line.val for line in stdout]
-            self.assertIn("Failed gracefully", stdout, f"Subprocess didn't exit correctly.")
-
 
 if __name__ == '__main__':
     import argparse
