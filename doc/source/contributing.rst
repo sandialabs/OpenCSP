@@ -97,7 +97,7 @@ please install the following plugins:
         "black-formatter.args": [
             "--line-length", "120",  // Sets line length to 120 characters
             "-C",  // Do not add magic trailing commas
-            "-S"  // Do not change single quotes to double quotes
+            "-S"  // Do not change quotes from single to double
         ]
 
 2. **Pylint** This plugin highlights code that could be improved. The following settings will need to be added to your VS Code settings JSON:
