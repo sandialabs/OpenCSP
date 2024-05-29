@@ -545,7 +545,7 @@ def save_all_figures(output_path: str, format: str = None):
         err_msg = f"RuntimeError: figure_management.save_all_figures: failed to save figure {fig_record.figure_num} \"{fig_record.name}\""
         lt.error(err_msg)
         failed.append(fig_record)
-        raise(ex)
+        raise (ex)
 
     return figs, txts, failed
 
