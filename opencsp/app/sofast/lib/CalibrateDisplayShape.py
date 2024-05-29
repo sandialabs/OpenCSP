@@ -109,6 +109,7 @@ class CalibrateDisplayShape:
         """
         self.data_input = data_input
         self.make_figures = False
+        self.xyz_screen_map_clim_mm = 3
 
         # Load cal params
         cal_pattern_params = CalParams(
@@ -427,7 +428,7 @@ class CalibrateDisplayShape:
         ax.legend(loc=2, bbox_to_anchor=(1, 1))
         fig.tight_layout()
 
-    def visualize_xyz_screen_maps(self, z_clim: float = 3) -> None:
+    def visualize_xyz_screen_maps(self) -> None:
         """Visualizes screen xyz coordinates as images"""
         x = self.data_calculation.pts_xyz_screen_aligned.x
         y = self.data_calculation.pts_xyz_screen_aligned.y
@@ -463,7 +464,7 @@ class CalibrateDisplayShape:
         ax = fig.gca()
         im = ax.imshow(self.data_calculation.im_z_screen_pts * 1000, extent=extent, cmap='jet')
         format_image(ax, im)
-        im.set_clim(-z_clim, z_clim)
+        im.set_clim(-self.xyz_screen_map_clim_mm, self.xyz_screen_map_clim_mm)
         ax.set_title('Z (mm)')
 
     def run_calibration(self) -> None:
