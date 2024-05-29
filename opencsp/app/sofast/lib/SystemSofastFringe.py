@@ -394,8 +394,8 @@ class SystemSofastFringe:
 
             # Get calibration images from System
             calibration_images = self.get_calibration_images()[0]  # only calibrating one camera
-            # Load calibration object
-            self._calibration = calibration_class.from_data(calibration_images, self._calibration_display_values)
+            # Set calibration object
+            self.set_calibration(calibration_class.from_data(calibration_images, self._calibration_display_values))
             # Save calibration object
             if calibration_hdf5_path_name_ext != None:
                 self._calibration.save_to_hdf(calibration_hdf5_path_name_ext)
@@ -404,8 +404,6 @@ class SystemSofastFringe:
                 data = [self._calibration.display_values, calibration_images]
                 datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
                 h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
-            # Update the fringe images with the new calibration object
-            self.create_fringe_images_from_image_calibration()
             # Run the "on done" callback
             if on_processed != None:
                 on_processed()
