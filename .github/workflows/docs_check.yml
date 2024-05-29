@@ -2,10 +2,6 @@ name: github-DOCS
 
 on:
   pull_request:
-    paths-ignore:
-    - '**/*.rst'
-    - '**/*.md'
-    - 'doc/**'
     types: [ opened, reopened, synchronize ]
 
 permissions:

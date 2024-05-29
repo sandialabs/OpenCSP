@@ -16,10 +16,10 @@ Setting up your development environment
 2. Install Python 3.10+ and add it to your PATH. Please see: https://www.python.org/downloads/ and https://docs.python.org/3/using/windows.html#installation-steps.
 3. Install visual studio code. Please see: https://code.visualstudio.com/.
 4. Install ffmpeg. Please see:  https://www.ffmpeg.org/download.html.
-5. Add ffmpeg to your path. Please see: https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)#to-add-a-path-to-the-path-environment-variable.
+5. Add ffmpeg to your path. Please see: `<https://learn.microsoft.com/en-us/previous-versions/office/developer/sharepoint-2010/ee537574(v=office.14)#to-add-a-path-to-the-path-environment-variable>`_.
 6. Clone the repository. For help on cloning, please see https://docs.github.com/en/repositories/creating-and-managing-repositories/cloning-a-repository.
 7. Setup a python virtual environment to manage OpenCSP's dependencies. For information about python's virtual environments, please see https://docs.python.org/3/library/venv.html.
-8. Add OpenCSP to your pythonpath. Please see https://learn.microsoft.com/en-us/windows/python/faqs#what-is-pythonpath-.
+8. Add OpenCSP to your pythonpath. Please see `<https://learn.microsoft.com/en-us/windows/python/faqs#what-is-pythonpath->`_.
 
 How to install OpenCSP's dependencies
 +++++++++++++++++++++++++++++++++++++
@@ -77,12 +77,42 @@ reviewing the functional changes less error prone.
 Coding Standards
 ----------------
 
-We follow and enforce adherence to the PEP8 coding standard.
+We follow and enforce adherence to the PEP8 coding standard with the exception of
+a maximum line length of 120 characters.
+
+Online OpenCSP documentation is generated using Sphinx. For API documentation, we use
+NumPy-style docstrings with bulleted lists. We require NumPy compliant docstrings for 
+Models, Public Classes, and Public Functions. For more internal and development-facing 
+documentation please use hash tags.
 
 We highly recommend using Visual Studio Code for development. If using VS Code,
-please install the **"autopep8"** plugin. This will auto format code to PEP8 standards
-upon saving a file in progress. We also recommend installing the **Pylint** plugin for
-cleaner and more uniform code style.
+please install the following plugins:
+
+1. **Black Formatter** This will auto format code to be Black compliant as you type. The following settings will need to be added to your VS Code settings JSON:
+
+    .. code-block:: json
+
+        "editor.formatOnSave": true,
+        "editor.defaultFormatter": "ms-python.black-formatter",
+        "black-formatter.args": [
+            "--line-length", "120",  // Sets line length to 120 characters
+            "-C",  // Do not add magic trailing commas
+            "-S"  // Do not change quotes from single to double
+        ]
+
+2. **Pylint** This plugin highlights code that could be improved. The following settings will need to be added to your VS Code settings JSON:
+
+    .. code-block:: json
+
+        "pylint.args": [
+            "--disable=C0301" // Ignore line too long
+        ]
+
+3. **autoDocstring - Python Docstring Generator** This automatically generates boilerplate docstring text. The following settings will need to be added to your VS Code setings JSON:
+
+    .. code-block:: json
+
+        "autoDocstring.docstringFormat": "numpy"
 
 Before opening a pull request, please ensure your code formatting is pep8 compliant. 
 Continuous integration (CI) testing will fail if the changes are not pep8 compliant:
@@ -109,11 +139,6 @@ commits:
    done
    
    
-Online OpenCSP documentation is generated using Sphinx. For API documentation, we use
-NumPy-style docstrings with bulleted lists. We require NumPy compliant docstrings for 
-Models, Public Classes, and Public Functions. For more internal and development-facing 
-documentation please use hash tags.
-
 Testing
 +++++++
 
