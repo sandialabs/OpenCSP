@@ -24,7 +24,7 @@ class ExampleTargetColor(to.TestOutput):
         verify: bool = True,
     ):
         # Generic setup.
-        super(ExampleTargetColor, self).setup_class(
+        super(ExampleTargetColor, self).setUpClass(
             source_file_body=source_file_body,
             figure_prefix_root=figure_prefix_root,
             interactive=interactive,
@@ -521,7 +521,6 @@ def example_driver():
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    example_object.teardown_method()
 
 
 if __name__ == "__main__":
