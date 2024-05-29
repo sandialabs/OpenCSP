@@ -1,5 +1,6 @@
 from collections.abc import Iterator
 from enum import Enum
+import functools
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
@@ -8,27 +9,39 @@ import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.typing_tools as tt
 
 
+@functools.total_ordering
 class ImageType(Enum):
     PRIMARY = 1
+    """ The image we are trying to analyze. """
     REFERENCE = 2
+    """ Contains a pattern to be compared or matched with in the PRIMARY image. """
     NULL = 3
+    """ The same as the PRIMARY image, but without a beam on target. Likely this will be used to subtract out the background. """
     COMPARISON = 4
+    """ For multi-image comparison, such as for re-alignment to a previous position, motion characterization, or measuring wind effect. """
     BACKGROUND_MASK = 5
+    """ A boolean image that indicates which pixels should be included in a computation (True to include, False to exclude). """
+
+    def __lt__(self, other):
+        if isinstance(other, self.__class__):
+            return self.value < other.value
+        raise NotImplementedError
 
 
 class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
-    tt.strict_types
+    """
+    This class combines the image streams for several ImageTypes into
+    one convenient package. This helps to guarantee that images that are
+    supposed to be processed together stay together for the entirety of the
+    SpotAnalysis pipeline.
+    """
 
     def __init__(
         self,
         primary_iterator: ImagesIterable | ImagesStream,
         other_iterators: dict[ImageType, ImagesIterable | ImagesStream] = None,
     ):
-        """This class combines the image streams for several ImageTypes into
-        one convenient package. This helps to guarantee that images that are
-        supposed to be processed together stay together for the entirety of the
-        SpotAnalysis pipeline.
-
+        """
         Parameters
         ----------
         primary_iterator : ImagesIterable | ImagesStream

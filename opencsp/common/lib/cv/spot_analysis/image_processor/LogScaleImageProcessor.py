@@ -1,7 +1,6 @@
 import dataclasses
 import numpy as np
 
-import opencsp.common.lib.tool.image_tools as it
 from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImagesProcessor
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 

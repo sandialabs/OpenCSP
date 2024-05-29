@@ -5,7 +5,7 @@ import numpy.typing as npt
 import sys
 
 import opencsp.common.lib.csp.LightSource as ls
-import opencsp.common.lib.cv.AbstractFiducial as af
+import opencsp.common.lib.cv.AbstractFiducials as af
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
@@ -31,9 +31,9 @@ class SpotAnalysisOperable:
     supporting_images: dict[ImageType, CacheableImage] = field(default_factory=dict)
     """ The supporting images, if any, that were provided with the
     associated input primary image. """
-    given_fiducials: list[af.AbstractFiducial] = field(default_factory=list)
+    given_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ Any fiducials handed to us in the currently processing image. """
-    found_fiducials: list[af.AbstractFiducial] = field(default_factory=list)
+    found_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ The identified fiducials in the currently processing image. """
     camera_intrinsics_characterization: any = (
         None  # TODO figure out how to specify information here, maybe using common/lib/camera/Camera
@@ -45,6 +45,9 @@ class SpotAnalysisOperable:
     or with simulations to provide a starting estimate of beam shape. """
     population_statistics: SpotAnalysisPopulationStatistics = None
     """ The population statistics, as populated by PopulationStatisticsImageProcessor. """
+    image_processor_notes: list[tuple[str, list[str]]] = field(default_factory=list)
+    """ Notes from specific image processors. These notes are generally intended for human use, but it is recommended
+    that they maintain a consistent formatting so that they can also be used programmatically. """
 
     def __post_init__(self):
         # We use this method to sanitize the inputs to the constructor.
@@ -94,7 +97,15 @@ class SpotAnalysisOperable:
         if requires_update:
             # use __init__ to update frozen values
             self.__init__(
-                primary_image, primary_image_source_path=primary_image_source_path, supporting_images=supporting_images
+                primary_image,
+                primary_image_source_path,
+                supporting_images,
+                self.given_fiducials,
+                self.found_fiducials,
+                self.camera_intrinsics_characterization,
+                self.light_sources,
+                self.population_statistics,
+                self.image_processor_notes,
             )
 
     def __sizeof__(self) -> int:
@@ -115,14 +126,14 @@ class SpotAnalysisOperable:
             ret = replace(ret, supporting_images=supporting_images)
 
         if data != None:
-            given_fiducials = data.given_fiducials if self.given_fiducials == None else self.given_fiducials
-            found_fiducials = data.found_fiducials if self.found_fiducials == None else self.found_fiducials
+            given_fiducials = data.given_fiducials if len(self.given_fiducials) == 0 else self.given_fiducials
+            found_fiducials = data.found_fiducials if len(self.found_fiducials) == 0 else self.found_fiducials
             camera_intrinsics_characterization = (
                 data.camera_intrinsics_characterization
-                if self.camera_intrinsics_characterization == None
+                if self.camera_intrinsics_characterization is None
                 else self.camera_intrinsics_characterization
             )
-            light_sources = data.light_sources if self.light_sources == None else self.light_sources
+            light_sources = data.light_sources if len(self.light_sources) == 0 else self.light_sources
             ret = replace(
                 ret,
                 given_fiducials=given_fiducials,

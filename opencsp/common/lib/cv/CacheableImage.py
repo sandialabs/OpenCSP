@@ -1,7 +1,9 @@
-import numpy as np
-from PIL import Image
 import sys
 from typing import Optional, Union
+
+import numpy as np
+import numpy.typing as npt
+from PIL import Image
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
@@ -9,22 +11,25 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class CacheableImage:
+    """
+    An image container that allows for caching an image when the image
+    data isn't in use, or for retrieval of an image from the cached file
+    when the data is in use.
+
+    Only one of the inputs (image, cache_path, source_path) are required.
+    However, if the image doesn't exist as a cache file (.npy) but does
+    exists as an image file (.png), then both the cache_path and source_path
+    can be provided. In this case the image will be loaded from the
+    source_path and when cached will be saved to the cache_path.
+
+    The intended use for this class is to reduce memory usage by caching
+    images to disk while not in use. Therefore, there is an inherent
+    priority order for the data that is returned from various methods:
+    (1) in-memory array, (2) numpy cache file, (3) image source file.
+    """
+
     def __init__(self, array: np.ndarray = None, cache_path: str = None, source_path: str = None):
-        """An image container that allows for caching an image when the image
-        data isn't in use, or for retrieval of an image from the cached file
-        when the data is in use.
-
-        Only one of the inputs (image, cache_path, source_path) are required.
-        However, if the image doesn't exist as a cache file (.npy) but does
-        exists as an image file (.png), then both the cache_path and source_path
-        can be provided. In this case the image will be loaded from the
-        source_path and when cached will be saved to the cache_path.
-
-        The intended use for this class is to reduce memory usage by caching
-        images to disk while not in use. Therefore, there is an inherent
-        priority order for the data that is returned from various methods:
-        (1) in-memory array, (2) numpy cache file, (3) image source file.
-
+        """
         Parameters
         ----------
         array: np.ndarray, optional
@@ -49,8 +54,8 @@ class CacheableImage:
         return sys.getsizeof(self._array) + sys.getsizeof(self._image)
 
     @classmethod
-    def from_single_source(cls, array_or_path: Union[np.ndarray, str, 'CacheableImage']):
-        """Generates a CacheableImage from the given numpy or image file."""
+    def from_single_source(cls, array_or_path: Union[np.ndarray, str, 'CacheableImage']) -> 'CacheableImage':
+        """Generates a CacheableImage from the given numpy array, numpy '.npy' file, or image file."""
         if isinstance(array_or_path, CacheableImage):
             return array_or_path
         elif isinstance(array_or_path, str):
@@ -77,7 +82,7 @@ class CacheableImage:
             )
 
     @staticmethod
-    def _load_image(im: str | np.ndarray) -> np.ndarray:
+    def _load_image(im: str | np.ndarray) -> npt.NDArray[np.int_]:
         if isinstance(im, np.ndarray):
             return im
         elif im.lower().endswith(".npy"):
@@ -86,10 +91,10 @@ class CacheableImage:
             im = Image.open(im)
             return np.array(im)
 
-    def __load_image(self):
-        if not self._array is None:
+    def __load_image(self) -> npt.NDArray[np.int_] | None:
+        if self._array is not None:
             return self._load_image(self._array)
-        elif self.cache_path != None and ft.file_exists(self.cache_path):
+        elif self.cache_path is not None and ft.file_exists(self.cache_path):
             self.cached = True
             return self._load_image(self.cache_path)
         elif ft.file_exists(self.source_path):
@@ -101,7 +106,7 @@ class CacheableImage:
             )
 
     @property
-    def nparray(self):
+    def nparray(self) -> npt.NDArray[np.int_] | None:
         self._image = None
 
         if self._array is None:
@@ -110,7 +115,7 @@ class CacheableImage:
 
         return self.__load_image()
 
-    def to_image(self):
+    def to_image(self) -> Image.Image:
         if self._image == None:
             self._image = it.numpy_to_image(self.nparray)
         return self._image

@@ -8,10 +8,16 @@ import sys
 import opencsp.common.lib.tool.log_tools as lt
 
 _orp_settings_key = "opencsp_root_path"
-_orp_settings_default = {"example_data_dir": None, "scratch_dir": None, "scratch_name": "scratch"}
+_orp_settings_default = {
+    "example_data_dir": None,
+    "scratch_dir": None,
+    "scratch_name": "scratch",
+    "collaborative_dir": None,
+}
 """ example_data_dir: The directory containing the opencsp example data, for examples that have very large data inputs.
 scratch_dir: The directory containing the scratch folder, for use with HPC clusters.
 scratch_name: The name of the scratch directory. Default to "scratch".
+collaborative_dir: A shared directory where experimental data is collected
 """
 
 _settings_list = [[_orp_settings_key, _orp_settings_default]]
@@ -41,8 +47,8 @@ def __load_settings_files():
         The third key, then, is the setting's name.
     """
     import os
-    import json
     from opencsp.common.lib.opencsp_path.opencsp_root_path import _opencsp_settings_dirs
+    import opencsp.common.lib.tool.file_tools as ft
 
     ret: dict[str, dict[str, dict[str, any]]] = {}
 
@@ -52,10 +58,8 @@ def __load_settings_files():
 
         # would use file_tools.directory_exists() except that I don't want to depend on any other part of opencsp
         if os.path.exists(settings_file_name_path_ext) and os.path.isfile(settings_file_name_path_ext):
-            with open(settings_file_name_path_ext, 'r') as fin:
-                lines = fin.readlines()
-            lines = map(lambda l: "" if l.strip().startswith("//") else l, lines)
-            settings = json.loads("\n".join(lines))
+            settings_path, settings_name, settings_ext = ft.path_components(settings_file_name_path_ext)
+            settings = ft.read_json("global settings", settings_path, settings_name + settings_ext)
 
             # verify the types for the loaded settings
             err_msg_preamble = (
