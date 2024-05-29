@@ -11,18 +11,19 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class Vxyz:
+    """
+    3D vector class to represent 3D points/vectors.
+
+    Parameters
+    ----------
+    data : array-like
+        The 3d point data: 3xN array, length 3 tuple, length 3 list
+    dtype : data type, optional
+        Data type. The default is float.
+
+    """
+
     def __init__(self, data, dtype=float):
-        """
-        3D vector class to represent 3D points/vectors.
-
-        Parameters
-        ----------
-        data : array-like
-            The 3d point data: 3xN array, length 3 tuple, length 3 list
-        dtype : data type, optional
-            Data type. The default is float.
-
-        """
         # Check input shape
         if isinstance(data, np.ndarray):
             data = data.squeeze()
