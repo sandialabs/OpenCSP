@@ -10,7 +10,7 @@ import numpy as np
 from PIL import Image, ImageTk
 
 import opencsp.common.lib.tool.exception_tools as et
-import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
+from opencsp.common.lib.tool import hdf5_tools
 import opencsp.common.lib.tool.tk_tools as tkt
 
 
@@ -66,24 +66,57 @@ class CalParams:
 
 @dataclass
 class ImageProjectionData(hdf5_tools.HDF5_IO_Abstract):
-    """Dataclass containting ImageProjection parameters. All position/size units are screen pixels"""
+    """Dataclass containting ImageProjection parameters used to define the image/screen
+    geometry when projecting an image on a display.
+    * All position/size/shift units are screen pixels.
+    * The *active_area* is the region which is actively used to project images, as opposed to the
+      black background.
+    * The *main_window* is the tkinter window which holds the *active_area* region. Typically, the
+      main_window is the size of the screen being projected onto. Any area of the main_window
+      that is not filled by the active_area is filled with black. This is useful with reducing
+      light.
+    * When defining window positions, the reference point is the upper-left corner of the
+      window/screen.
+    """
 
     name: str
+    """The name of the ImageProjection configuration"""
     main_window_size_x: int
+    """The width of the main window. (For more information on main_window, see class docstring)"""
     main_window_size_y: int
+    """The height of the main window. (For more information on main_window, see class docstring)"""
     main_window_position_x: int
+    """The x position of the upper-left corner of the main window relative to the upper-left corner
+    of the projection screen. Right is positive. (For more information on main_window, see class docstring)"""
     main_window_position_y: int
+    """The y position of the upper-left corner of the main window relative to the upper-left corner
+    of the projection screen. Down is positive. (For more information on main_window, see class docstring)"""
     active_area_size_x: int
+    """The width of the active area within the main window. (For more information on active_area, see class docstring)"""
     active_area_size_y: int
+    """The height of the active area within the main window. (For more information on active_area, see class docstring)"""
     active_area_position_x: int
+    """The x position of the upper-left corner of the active area relative to the upper-left corner
+    of the main window. Right is positive (For more information on main_window and active_area, see class docstring)"""
     active_area_position_y: int
+    """The y position of the upper-left corner of the active area relative to the upper-left corner
+    of the main window. Down is positive. (For more information on main_window and active_area, see class docstring)"""
     projector_data_type: str
+    """The data type string to be sent to the projector. In most cases, this will be an unsigned 8-bit integer ('uint8')"""
     projector_max_int: int
+    """The integer value that corresponds to a perfectly white image on the screen. In most cases
+    this will be 255."""
     image_delay_ms: float
+    """The delay between the display being sent an image to display, and when the camera should start recording. This
+    is specific to each display/camera/computer setup."""
     shift_red_x: int
+    """The red channel x shift in an RGB display relative to green in pixels. Right is positive."""
     shift_red_y: int
+    """The red channel y shift in an RGB display relative to green in pixels. Down is positive."""
     shift_blue_x: int
+    """The blue channel x shift in an RGB display relative to green in pixels. Right is positive."""
     shift_blue_y: int
+    """The blue channel y shift in an RGB display relative to green in pixels. Down is positive."""
 
     def save_to_hdf(self, file: str, prefix: str = '') -> None:
         datasets = []
