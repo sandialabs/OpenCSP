@@ -1,10 +1,10 @@
 """Unit test suite to test the System class
 """
 
-import numpy as np
 import os
 import unittest
 
+import numpy as np
 import pytest
 
 import opencsp.app.sofast.lib.ImageCalibrationGlobal as icg
@@ -12,8 +12,7 @@ import opencsp.app.sofast.lib.ImageCalibrationScaling as ics
 from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.SystemSofastFringe import SystemSofastFringe
 from opencsp.app.sofast.test.ImageAcquisition_no_camera import ImageAcquisition
-from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
-import opencsp.common.lib.deflectometry.test.test_ImageProjection as test_ip
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection, ImageProjectionData
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.file_tools as ft
@@ -30,6 +29,12 @@ class TestSystemSofastFringe(unittest.TestCase):
 
         # Create fringe object
         self.fringes = Fringes.from_num_periods()
+
+        # Load ImageProjectionData
+        self.file_image_projection_input = os.path.join(
+            opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
+        )
+        self.image_projection_data = ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
         # Create calibration objects
         projector_values = np.arange(0, 255, (255 - 0) / 9)
@@ -53,7 +58,7 @@ class TestSystemSofastFringe(unittest.TestCase):
         fringes = Fringes(periods_x, periods_y)
 
         # Instantiate image projection class
-        im_proj = ImageProjection.load_from_hdf_and_display(file_im_proj)
+        im_proj = ImageProjection.in_new_window(self.image_projection_data)
 
         # Instantiate image acquisition class
         im_aq = ImageAcquisition()
@@ -88,7 +93,7 @@ class TestSystemSofastFringe(unittest.TestCase):
 
     def test_system_all_prereqs(self):
         # Create mock ImageProjection and ImageAcquisition objects
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        ip = ImageProjection.in_new_window(self.image_projection_data)
         ia = ImageAcquisition()
 
         # Create the system instance
@@ -96,7 +101,7 @@ class TestSystemSofastFringe(unittest.TestCase):
 
     def test_system_some_prereqs(self):
         # With just a projector
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        ip = ImageProjection.in_new_window(self.image_projection_data)
         with self.assertRaises(RuntimeError):
             sys = SystemSofastFringe()
         ip.close()
@@ -113,7 +118,7 @@ class TestSystemSofastFringe(unittest.TestCase):
             sys = SystemSofastFringe()
 
         # More interesting case, things are set and then unset
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        ip = ImageProjection.in_new_window(self.image_projection_data)
         ia = ImageAcquisition()
         ip.close()
         ia.close()
@@ -121,7 +126,7 @@ class TestSystemSofastFringe(unittest.TestCase):
             sys = SystemSofastFringe()
 
     def test_run_measurement_no_calibration(self):
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        ip = ImageProjection.in_new_window(self.image_projection_data)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
         sys.set_fringes(Fringes.from_num_periods())
@@ -129,7 +134,7 @@ class TestSystemSofastFringe(unittest.TestCase):
             sys.run_measurement()
 
     def test_run_measurement_without_on_done(self):
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        ip = ImageProjection.in_new_window(self.image_projection_data)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
         sys.set_fringes(self.fringes)
@@ -150,7 +155,7 @@ class TestSystemSofastFringe(unittest.TestCase):
             sys.close_all()
 
         # create the prerequisites and the system
-        ip = test_ip._ImageProjection.in_new_window(test_ip._ImageProjection.display_dict)
+        ip = ImageProjection.in_new_window(self.image_projection_data)
         ia = ImageAcquisition()
         sys = SystemSofastFringe(ia)
         sys.set_fringes(self.fringes)
@@ -170,9 +175,7 @@ class TestSystemSofastFringe(unittest.TestCase):
 
     def test_close_all_closes_acquisition_projections(self):
         # build system, including multiple image_acquisitions
-        d = test_ip._ImageProjection.display_dict
-        d['win_position_x'] = -640
-        ip = test_ip._ImageProjection.in_new_window(d)
+        ip = ImageProjection.in_new_window(self.image_projection_data)
         ia1 = ImageAcquisition()
         ia2 = ImageAcquisition()
         sys = SystemSofastFringe([ia1, ia2])

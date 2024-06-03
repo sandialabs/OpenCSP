@@ -13,7 +13,7 @@ import pytest
 from opencsp.app.sofast.lib.CalibrateDisplayShape import CalibrateDisplayShape, DataInput
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.deflectometry.ImageProjection import ImageProjection
+from opencsp.common.lib.deflectometry.ImageProjection import ImageProjectionData
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
@@ -47,7 +47,7 @@ class TestCalibrateDisplayShape(unittest.TestCase):
         corner_ids = pts_marker_data[:, 1]
         screen_cal_point_pairs = np.loadtxt(file_screen_cal_point_pairs, delimiter=',', skiprows=1).astype(int)
         camera = Camera.load_from_hdf(file_camera_distortion)
-        image_projection_data = ImageProjection.load_from_hdf(file_image_projection)
+        image_projection_data = ImageProjectionData.load_from_hdf(file_image_projection)
 
         # Store input data in data class
         data_input = DataInput(

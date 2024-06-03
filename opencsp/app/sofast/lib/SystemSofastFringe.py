@@ -1,6 +1,3 @@
-"""Class for controlling displaying Sofast patterns and capturing images
-"""
-
 import copy
 import datetime as dt
 from typing import Callable
@@ -21,6 +18,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class SystemSofastFringe:
+    """Class for controlling/displaying Sofast patterns and capturing images"""
+
     def __init__(
         self, image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract] = None
     ) -> 'SystemSofastFringe':
@@ -40,7 +39,6 @@ class SystemSofastFringe:
             Either the image_acquisition or the image_projection has not been loaded.
         TypeError:
             The image_acquisition is not the correct type.
-
         """
         # Import here to avoid circular dependencies
         import opencsp.app.sofast.lib.sofast_common_functions as scf
@@ -206,7 +204,9 @@ class SystemSofastFringe:
         array = np.array(image_projection.get_black_array_active_area())
         self._mask_images_to_display.append(array)
         # Create white image
-        array = np.array(image_projection.get_black_array_active_area()) + image_projection.max_int
+        array = (
+            np.array(image_projection.get_black_array_active_area()) + image_projection.display_data.projector_max_int
+        )
         self._mask_images_to_display.append(array)
 
     def _measure_sequence_display(
@@ -233,7 +233,7 @@ class SystemSofastFringe:
 
         # Wait, then capture image
         self.root.after(
-            image_projection.display_data['image_delay'],
+            image_projection.display_data.image_delay_ms,
             lambda: self._measure_sequence_capture(im_disp_list, im_cap_list, run_next),
         )
 
@@ -306,13 +306,13 @@ class SystemSofastFringe:
         min_display_value = self._calibration.calculate_min_display_camera_values()[0]
 
         # Get fringe range
-        fringe_range = (min_display_value, image_projection.display_data['projector_max_int'])
+        fringe_range = (min_display_value, image_projection.display_data.projector_max_int)
 
         # Get fringe base images
         fringe_images_base = self.fringes.get_frames(
-            image_projection.size_x,
-            image_projection.size_y,
-            image_projection.display_data['projector_data_type'],
+            image_projection.display_data.active_area_size_x,
+            image_projection.display_data.active_area_size_y,
+            image_projection.display_data.projector_data_type,
             fringe_range,
         )
 
@@ -541,11 +541,14 @@ class SystemSofastFringe:
 
         # Generate grayscale values
         self._calibration_display_values = np.arange(
-            0, image_projection.max_int + 1, res, dtype=image_projection.display_data['projector_data_type']
+            0,
+            image_projection.display_data.projector_max_int + 1,
+            res,
+            dtype=image_projection.display_data.projector_data_type,
         )
-        if self._calibration_display_values[-1] != image_projection.max_int:
+        if self._calibration_display_values[-1] != image_projection.display_data.projector_max_int:
             self._calibration_display_values = np.concatenate(
-                (self._calibration_display_values, [image_projection.max_int])
+                (self._calibration_display_values, [image_projection.display_data.projector_max_int])
             )
 
         # Generate grayscale images
@@ -554,8 +557,12 @@ class SystemSofastFringe:
             # Create image
             array = (
                 np.zeros(
-                    (image_projection.size_y, image_projection.size_x, 3),
-                    dtype=image_projection.display_data['projector_data_type'],
+                    (
+                        image_projection.display_data.active_area_size_y,
+                        image_projection.display_data.active_area_size_x,
+                        3,
+                    ),
+                    dtype=image_projection.display_data.projector_data_type,
                 )
                 + dn
             )

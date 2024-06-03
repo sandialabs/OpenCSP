@@ -58,7 +58,7 @@ class SystemSofastFixed:
         """The value that corresponds to pure white"""
         self.dot_shape: Literal['circle', 'square'] = 'circle'
         """The shape of the fixed pattern dots"""
-        self.image_delay = image_projection.display_data['image_delay']  # ms
+        self.image_delay = image_projection.display_data.image_delay_ms  # ms
         """The delay after displaying the image to capturing an image, ms"""
 
     def set_pattern_parameters(self, width_pattern: int, spacing_pattern: int):
@@ -76,8 +76,8 @@ class SystemSofastFixed:
         lt.debug(f'SystemSofastFixed fixed pattern dot width set to {width_pattern:d} pixels')
         lt.debug(f'SystemSofastFixed fixed pattern dot spacing set to {spacing_pattern:d} pixels')
         image_projection = ImageProjection.instance()
-        size_x = image_projection.size_x
-        size_y = image_projection.size_y
+        size_x = image_projection.display_data.active_area_size_x
+        size_y = image_projection.display_data.active_area_size_y
         self.pattern_sofast_fixed = PatternSofastFixed(size_x, size_y, width_pattern, spacing_pattern)
         self.pattern_image = self.pattern_sofast_fixed.get_image(self.dtype, self.max_int, self.dot_shape)
 
