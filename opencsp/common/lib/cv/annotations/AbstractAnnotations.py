@@ -12,4 +12,5 @@ class AbstractAnnotations(af.AbstractFiducials):
 
     This class has all the same properties as Fiducials.
     """
+
     pass
