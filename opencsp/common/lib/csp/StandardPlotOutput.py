@@ -1,5 +1,4 @@
-"""Class used to display/save the suite of standard output
-plots after measuring a CSP Mirror/FacetEnsemble.
+"""Class used to display/save the suite of standard output plots after measuring a CSP Mirror/FacetEnsemble.
 """
 
 from dataclasses import dataclass, field
@@ -43,7 +42,7 @@ class _OptionsCurvatureVis:
 
 @dataclass
 class _OptionsRayTraceVis:
-    to_ray_trace: bool = False
+    to_ray_trace: bool = True
     ray_trace_optic_res: int = 20
     hist_bin_res: float = 0.07
     hist_extent: float = 3
@@ -255,8 +254,8 @@ class StandardPlotOutput:
         # Dray reference if available
         if self._ray_trace_output_reference is not None:
             fig_rec.axis.plot(
-                self._ray_trace_output_reference.ensquared_energy_values,
                 self._ray_trace_output_reference.ensquared_energy_widths,
+                self._ray_trace_output_reference.ensquared_energy_values,
                 label='Reference',
                 color='k',
                 linestyle='--',
@@ -267,8 +266,8 @@ class StandardPlotOutput:
         # Draw measured if available
         if self._ray_trace_output_measured is not None:
             fig_rec.axis.plot(
-                self._ray_trace_output_measured.ensquared_energy_values,
                 self._ray_trace_output_measured.ensquared_energy_widths,
+                self._ray_trace_output_measured.ensquared_energy_values,
                 label='Measured',
                 color='k',
                 linestyle='-',
@@ -432,7 +431,7 @@ class StandardPlotOutput:
 
     def _perform_ray_trace_optic_measured(self):
         """Performs ray trace on measured optic"""
-        if self._ray_trace_output_measured is not None:
+        if self.optic_measured is not None:
             # Perfom ray trace and intersection
             ray_trace = self._ray_trace_scene(self.optic_measured)
             ray_pts_meas = rt.plane_intersect(
@@ -455,7 +454,7 @@ class StandardPlotOutput:
             lt.info('No measured optic; skipping measured optic ray trace.')
 
     def _perform_ray_trace_optic_reference(self):
-        if self._ray_trace_output_reference is not None:
+        if self.optic_reference is not None:
             # Perform ray trace and intersection
             ray_trace = self._ray_trace_scene(self.optic_reference)
             ray_pts = rt.plane_intersect(
