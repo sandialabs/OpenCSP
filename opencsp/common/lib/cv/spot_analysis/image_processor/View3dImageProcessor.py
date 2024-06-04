@@ -16,6 +16,11 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
+    """
+    Interprets the current image as a 3D surface plot and either displays it, or if interactive it displays the surface
+    and waits on the next press of the "enter" key.
+    """
+
     def __init__(
         self,
         label: str | rca.RenderControlAxis = 'Light Intensity',
@@ -24,9 +29,6 @@ class View3dImageProcessor(AbstractSpotAnalysisImagesProcessor):
         crop_to_threshold: int | None = None,
     ):
         """
-        Interprets the current image as a 3D surface plot and either displays it, or if interactive it displays the
-        surface and waits on the next press of the "enter" key.
-
         Parameters
         ----------
         label : str | rca.RenderControlAxis, optional

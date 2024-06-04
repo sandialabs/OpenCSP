@@ -16,6 +16,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.ExposureDetectionImageP
     ExposureDetectionImageProcessor,
 )
 from opencsp.common.lib.cv.spot_analysis.image_processor.FalseColorImageProcessor import FalseColorImageProcessor
+from opencsp.common.lib.cv.spot_analysis.image_processor.HotspotImageProcessor import HotspotImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.LogScaleImageProcessor import LogScaleImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.NullImageSubtractionImageProcessor import (
     NullImageSubtractionImageProcessor,
@@ -40,6 +41,7 @@ __all__ = [
     'EchoImageProcessor',
     'ExposureDetectionImageProcessor',
     'FalseColorImageProcessor',
+    'HotspotImageProcessor',
     'LogScaleImageProcessor',
     'NullImageSubtractionImageProcessor',
     'PopulationStatisticsImageProcessor',
