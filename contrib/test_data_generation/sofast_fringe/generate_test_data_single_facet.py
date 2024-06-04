@@ -8,12 +8,15 @@ from typing import Literal
 import matplotlib.pyplot as plt
 import numpy as np
 
-from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
-from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
+from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe as Measurement
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
+from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
+from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
 
@@ -22,6 +25,7 @@ def generate_dataset(
     file_camera: str,
     file_display: str,
     file_calibration: str,
+    file_orientation: str,
     file_facet: str,
     surface_type: Literal['parabolic', 'plano'],
     robust_ls: bool,
@@ -37,27 +41,25 @@ def generate_dataset(
     display = Display.load_from_hdf(file_display)
     measurement = Measurement.load_from_hdf(file_measurement)
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
+    orientation = SpatialOrientation.load_from_hdf(file_orientation)
     facet_data = DefinitionFacet.load_from_json(file_facet)
 
     # Calibrate fringes
     measurement.calibrate_fringe_images(calibration)
 
     # Creates sofast object
-    sofast = Sofast(measurement, camera, display)
+    sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
     # Update mask calculation options
     sofast.params.mask_keep_largest_area = True
 
     # Define surface data
     if surface_type == 'parabolic':
-        surface_data = dict(
-            surface_type=surface_type,
-            initial_focal_lengths_xy=(100.0, 100.0),
-            robust_least_squares=robust_ls,
-            downsample=10,
+        surface_data = Surface2DParabolic(
+            initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=robust_ls, downsample=10
         )
     elif surface_type == 'plano':
-        surface_data = dict(surface_type=surface_type, robust_least_squares=robust_ls, downsample=10)
+        surface_data = Surface2DPlano(robust_least_squares=robust_ls, downsample=10)
 
     # Process optic data
     sofast.process_optic_singlefacet(facet_data, surface_data)
@@ -66,6 +68,7 @@ def generate_dataset(
     sofast.save_to_hdf(file_dataset_out)
     display.save_to_hdf(file_dataset_out)
     camera.save_to_hdf(file_dataset_out)
+    orientation.save_to_hdf(file_dataset_out)
     calibration.save_to_hdf(file_dataset_out)
     print(f'All data saved to: {file_dataset_out:s}')
 
@@ -82,64 +85,69 @@ def generate_dataset(
 
 if __name__ == '__main__':
     # Generate measurement set 1 data
-    base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+    base_dir = join(opencsp_code_dir(), 'test/data')
 
     # Nominal
     generate_dataset(
-        file_measurement=join(base_dir, 'measurement_facet.h5'),
-        file_camera=join(base_dir, 'camera.h5'),
-        file_display=join(base_dir, 'display_distorted_2d.h5'),
-        file_calibration=join(base_dir, 'image_calibration.h5'),
-        file_facet=join(base_dir, 'Facet_NSTTF.json'),
+        file_measurement=join(base_dir, 'sofast_fringe/data_measurement/measurement_facet.h5'),
+        file_camera=join(base_dir, 'sofast_common/camera_sofast_downsampled.h5'),
+        file_display=join(base_dir, 'sofast_common/display_distorted_2d.h5'),
+        file_calibration=join(base_dir, 'sofast_fringe/data_measurement/image_calibration.h5'),
+        file_orientation=join(base_dir, 'sofast_common/spatial_orientation.h5'),
+        file_facet=join(base_dir, 'sofast_common/Facet_NSTTF.json'),
         surface_type='parabolic',
         robust_ls=True,
-        file_dataset_out=join(base_dir, 'calculations_facet/data.h5'),
+        file_dataset_out=join(base_dir, 'sofast_fringe/data_expected_facet/data.h5'),
     )
 
     # Rectangular display
     generate_dataset(
-        file_measurement=join(base_dir, 'measurement_facet.h5'),
-        file_camera=join(base_dir, 'camera.h5'),
-        file_display=join(base_dir, 'display_rectangular.h5'),
-        file_calibration=join(base_dir, 'image_calibration.h5'),
-        file_facet=join(base_dir, 'Facet_NSTTF.json'),
+        file_measurement=join(base_dir, 'sofast_fringe/data_measurement/measurement_facet.h5'),
+        file_camera=join(base_dir, 'sofast_common/camera_sofast_downsampled.h5'),
+        file_display=join(base_dir, 'sofast_common/display_rectangular.h5'),
+        file_calibration=join(base_dir, 'sofast_fringe/data_measurement/image_calibration.h5'),
+        file_orientation=join(base_dir, 'sofast_common/spatial_orientation.h5'),
+        file_facet=join(base_dir, 'sofast_common/Facet_NSTTF.json'),
         surface_type='parabolic',
         robust_ls=True,
-        file_dataset_out=join(base_dir, 'calculations_facet/data_rectangular.h5'),
+        file_dataset_out=join(base_dir, 'sofast_fringe/data_expected_facet/data_rectangular.h5'),
     )
 
     # 3D distorted display
     generate_dataset(
-        file_measurement=join(base_dir, 'measurement_facet.h5'),
-        file_camera=join(base_dir, 'camera.h5'),
-        file_display=join(base_dir, 'display_distorted_3d.h5'),
-        file_calibration=join(base_dir, 'image_calibration.h5'),
-        file_facet=join(base_dir, 'Facet_NSTTF.json'),
+        file_measurement=join(base_dir, 'sofast_fringe/data_measurement/measurement_facet.h5'),
+        file_camera=join(base_dir, 'sofast_common/camera_sofast_downsampled.h5'),
+        file_display=join(base_dir, 'sofast_common/display_distorted_3d.h5'),
+        file_calibration=join(base_dir, 'sofast_fringe/data_measurement/image_calibration.h5'),
+        file_orientation=join(base_dir, 'sofast_common/spatial_orientation.h5'),
+        file_facet=join(base_dir, 'sofast_common/Facet_NSTTF.json'),
         surface_type='parabolic',
         robust_ls=True,
-        file_dataset_out=join(base_dir, 'calculations_facet/data_distorted_3d.h5'),
+        file_dataset_out=join(base_dir, 'sofast_fringe/data_expected_facet/data_distorted_3d.h5'),
     )
 
     # No robust least squares
     generate_dataset(
-        file_measurement=join(base_dir, 'measurement_facet.h5'),
-        file_camera=join(base_dir, 'camera.h5'),
-        file_display=join(base_dir, 'display_distorted_2d.h5'),
-        file_calibration=join(base_dir, 'image_calibration.h5'),
-        file_facet=join(base_dir, 'Facet_NSTTF.json'),
+        file_measurement=join(base_dir, 'sofast_fringe/data_measurement/measurement_facet.h5'),
+        file_camera=join(base_dir, 'sofast_common/camera_sofast_downsampled.h5'),
+        file_display=join(base_dir, 'sofast_common/display_distorted_2d.h5'),
+        file_calibration=join(base_dir, 'sofast_fringe/data_measurement/image_calibration.h5'),
+        file_orientation=join(base_dir, 'sofast_common/spatial_orientation.h5'),
+        file_facet=join(base_dir, 'sofast_common/Facet_NSTTF.json'),
         surface_type='parabolic',
         robust_ls=False,
-        file_dataset_out=join(base_dir, 'calculations_facet/data_no_ls.h5'),
+        file_dataset_out=join(base_dir, 'sofast_fringe/data_expected_facet/data_no_ls.h5'),
     )
 
     # Plano optic
     generate_dataset(
-        file_measurement=join(base_dir, 'measurement_facet.h5'),
-        file_camera=join(base_dir, 'camera.h5'),
-        file_display=join(base_dir, 'display_distorted_2d.h5'),
-        file_calibration=join(base_dir, 'image_calibration.h5'),
-        file_facet=join(base_dir, 'Facet_NSTTF.json'),
+        file_measurement=join(base_dir, 'sofast_fringe/data_measurement/measurement_facet.h5'),
+        file_camera=join(base_dir, 'sofast_common/camera_sofast_downsampled.h5'),
+        file_display=join(base_dir, 'sofast_common/display_distorted_2d.h5'),
+        file_calibration=join(base_dir, 'sofast_fringe/data_measurement/image_calibration.h5'),
+        file_orientation=join(base_dir, 'sofast_common/spatial_orientation.h5'),
+        file_facet=join(base_dir, 'sofast_common/Facet_NSTTF.json'),
         surface_type='plano',
         robust_ls=True,
-        file_dataset_out=join(base_dir, 'calculations_facet/data_plano.h5'),
+        file_dataset_out=join(base_dir, 'sofast_fringe/data_expected_facet/data_plano.h5'),
     )
