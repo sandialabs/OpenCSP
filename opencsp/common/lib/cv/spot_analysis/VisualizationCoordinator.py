@@ -132,8 +132,10 @@ class VisualizationCoordinator:
         """
         # this method is not safe to be called multiple times
         if self.has_registered_visualization_processors:
-            lt.warning("Warning in VisualizationCoordinator.register_visualization_processors(): " +
-                       "attempting to register processors again without calling 'clear()' first.")
+            lt.warning(
+                "Warning in VisualizationCoordinator.register_visualization_processors(): "
+                + "attempting to register processors again without calling 'clear()' first."
+            )
             return
         self.has_registered_visualization_processors = True
 
@@ -177,8 +179,11 @@ class VisualizationCoordinator:
         for processor in self.visualization_processors:
             processor_figures = processor.init_figure_records(self.render_control_fig)
             if len(processor_figures) != num_figures_dict[processor]:
-                lt.warning("Warning in VisualizationCoordinator.register_visualization_processors(): " +
-                           f"Unexpected number of visualization windows for processor {processor.name}. " + f" Expected {num_figures_dict[processor]} but received {len(processor_figures)}!")
+                lt.warning(
+                    "Warning in VisualizationCoordinator.register_visualization_processors(): "
+                    + f"Unexpected number of visualization windows for processor {processor.name}. "
+                    + f" Expected {num_figures_dict[processor]} but received {len(processor_figures)}!"
+                )
             for fig_record in processor_figures:
                 fig_record.figure.canvas.mpl_connect('close_event', self.on_close)
                 fig_record.figure.canvas.mpl_connect('key_release_event', self.on_key_release)
