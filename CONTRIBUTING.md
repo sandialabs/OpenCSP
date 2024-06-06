@@ -5,7 +5,7 @@ Online Documentation
 --------------------
 
 Detailed contribution guidelines may be found in our [online documentation](
-https://github.com/sandialabs/OpenCSP/blob/main/doc/source/contributing.rst).
+https://opencsp.readthedocs.io/en/main/contributing.html).
 
 Legal Disclaimer
 ----------------
