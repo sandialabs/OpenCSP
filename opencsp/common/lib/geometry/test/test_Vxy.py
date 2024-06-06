@@ -20,8 +20,10 @@ class TestVxy(unittest.TestCase):
         self.V1 = Vxy((2, 2))
         self.V1_array = np.array([[2], [2]])
 
-        self.V2 = Vxy((1, 2))
-        self.V2_array = np.array([[1], [2]])
+        v2_1 = np.random.rand()
+        v2_2 = np.random.rand()
+        self.V2 = Vxy((v2_1, v2_2))
+        self.V2_array = np.array([[v2_1], [v2_2]])
 
     def test_Vxy_length_1(self):
         # From tuple

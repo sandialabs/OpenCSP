@@ -10,8 +10,11 @@ class TestVxyz:
         cls.V1 = Vxyz((2, 2, 2))
         cls.V1_array = np.array([[2], [2], [2]])
 
-        cls.V2 = Vxyz((1, 2, 3))
-        cls.V2_array = np.array([[1], [2], [3]])
+        v2_1 = np.random.rand()
+        v2_2 = np.random.rand()
+        v2_3 = np.random.rand()
+        cls.V2 = Vxyz((v2_1, v2_2, v2_3))
+        cls.V2_array = np.array([[v2_1], [v2_2], [v2_3]])
 
     def test_Vxyz_length_1(self):
         # From tuple
