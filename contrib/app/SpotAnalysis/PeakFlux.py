@@ -100,14 +100,43 @@ class PeakFlux:
             # condensed csv file.
             parser = saoap.SpotAnalysisOperableAttributeParser(result, self.spot_analysis)
 
-    def get_bcs_origin(self, operable: SpotAnalysisOperable):
+    def get_bcs_origin(self, operable: SpotAnalysisOperable) -> tuple[int, int]:
+        """
+        Returns the origin pixel location of the BCS fiducial assigned to this operable.
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            An operable that has resulted from a BcsLocatorImageProcessor and
+            has an assigned BCS fiducial.
+
+        Returns
+        -------
+        bcs_origin: tuple[int, int]
+            The origin of the BCS fiducial. For circular BCS systems, this will
+            be the center point of the circle.
+        """
         fiducials = operable.get_fiducials_by_type(BcsFiducial)
         fiducial = fiducials[0]
         origin_fx, origin_fy = fiducial.origin.astuple()
         origin_ix, origin_iy = int(np.round(origin_fx)), int(np.round(origin_fy))
         return origin_ix, origin_iy
 
-    def get_peak_origin(self, operable: SpotAnalysisOperable):
+    def get_peak_origin(self, operable: SpotAnalysisOperable) -> tuple[int, int]:
+        """
+        Get the peak pixel location of the hotspot for the given operable.
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            An operable that has resulted from a HotspotImageProcessor and has
+            an assigned hotspot annotation.
+
+        Returns
+        -------
+        peak_origin: tuple[int, int]
+            The origin of the hotspot annotation.
+        """
         fiducials = operable.get_fiducials_by_type(HotspotAnnotation)
         fiducial = fiducials[0]
         origin_fx, origin_fy = fiducial.origin.astuple()

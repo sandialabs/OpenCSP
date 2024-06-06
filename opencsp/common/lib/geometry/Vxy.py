@@ -355,6 +355,13 @@ class Vxy:
         return cls(data)
 
     def astuple(self) -> tuple[numbers.Number, numbers.Number]:
+        """Get this instance as a tuple (x, y). Only works for single-value vectors.
+
+        Raises:
+        -------
+        RuntimeError:
+            This vector has more than one value.
+        """
         if len(self) > 1:
             lt.error_and_raise(
                 RuntimeError,

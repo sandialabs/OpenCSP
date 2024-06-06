@@ -157,9 +157,24 @@ class SpotAnalysisOperable:
         return ret
 
     def get_primary_path_nameext(self) -> tuple[str, str]:
+        """
+        Finds the best source path/name.ext for the primary image of this operable.
+
+        The source path is chosen from among the primary_image's .source_path,
+        the primary_image_source_path, and the primary_image's .cache_path.
+
+        Returns
+        -------
+        source_path: str
+            The path component of the source of the primary_image.
+            "unknown_path" if there isn't an associated source.
+        source_name_ext: str
+            The name.ext component of the source of the primary_image.
+            "unknown_image" if there isn't an associated source.
+        """
         for image_name in [
-            self.primary_image_source_path,
             self.primary_image.source_path,
+            self.primary_image_source_path,
             self.primary_image.cache_path,
         ]:
             if image_name is not None and image_name != "":
@@ -175,10 +190,12 @@ class SpotAnalysisOperable:
 
     @property
     def best_primary_nameext(self) -> str:
+        """The name.ext of the source of the primary_image."""
         return self.get_primary_path_nameext()[1]
 
     @property
     def best_primary_pathnameext(self) -> str:
+        """The path/name.ext of the source of the primary_image."""
         return os.path.join(*self.get_primary_path_nameext())
 
     @property
