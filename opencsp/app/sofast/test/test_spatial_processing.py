@@ -32,8 +32,8 @@ class TestSpatialProcessing(unittest.TestCase):
 
     def test_t_from_distance(self):
         datasets = [
-            'DataSofastCalculation/image_processing/general/v_mask_centroid_image',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_exp',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_mask_centroid_image',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_exp',
         ]
 
         # Load test data
@@ -53,8 +53,8 @@ class TestSpatialProcessing(unittest.TestCase):
 
     def test_r_from_position(self):
         datasets = [
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_exp',
-            'DataSofastCalculation/geometry/general/r_optic_cam_exp',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_exp',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_exp',
         ]
 
         # Load test data
@@ -70,12 +70,12 @@ class TestSpatialProcessing(unittest.TestCase):
 
     def test_calc_rt_from_img_pts(self):
         datasets = [
-            'DataSofastCalculation/geometry/general/r_optic_cam_exp',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_exp',
-            'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_1',
-            'DataSofastCalculation/image_processing/facet_000/loop_facet_image_refine',
-            'DataSofastInput/optic_definition/facet_000/v_facet_corners',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_exp',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_exp',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_1',
+            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/loop_facet_image_refine',
+            'DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners',
         ]
 
         # Load test data
@@ -94,8 +94,8 @@ class TestSpatialProcessing(unittest.TestCase):
 
     def test_distance_error(self):
         datasets = [
-            'DataSofastCalculation/error/error_optic_screen_dist_2',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
+            'DataSofastCalculation/general/CalculationError/error_dist_optic_screen_2',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2',
         ]
 
         # Load test data
@@ -108,15 +108,15 @@ class TestSpatialProcessing(unittest.TestCase):
         )
 
         # Test
-        np.testing.assert_allclose(data['error_optic_screen_dist_2'], error_optic_screen_dist_2)
+        np.testing.assert_allclose(data['error_dist_optic_screen_2'], error_optic_screen_dist_2)
 
     def test_reprojection_error(self):
         datasets = [
-            'DataSofastCalculation/error/error_reprojection_2',
-            'DataSofastCalculation/image_processing/facet_000/loop_facet_image_refine',
-            'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
-            'DataSofastInput/optic_definition/facet_000/v_facet_corners',
+            'DataSofastCalculation/general/CalculationError/error_reprojection_2',
+            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/loop_facet_image_refine',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2',
+            'DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners',
         ]
 
         # Load test data
@@ -136,9 +136,9 @@ class TestSpatialProcessing(unittest.TestCase):
 
     def test_refine_v_distance(self):
         datasets = [
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_1',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
-            'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_1',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
         ]
 
         # Load test data
