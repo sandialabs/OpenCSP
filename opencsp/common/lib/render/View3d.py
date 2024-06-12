@@ -926,7 +926,16 @@ class View3d(aph.AbstractPlotHandler):
 
     # TODO TJL: currently unused
     # TODO TJL: might want to remove, this is a very slow function
-    def quiver(self, X: np.ndarray, Y: np.ndarray, Z: np.ndarray, U: np.ndarray, V: np.ndarray, W: np.ndarray, length: float = 0) -> None:
+    def quiver(
+        self,
+        X: np.ndarray,
+        Y: np.ndarray,
+        Z: np.ndarray,
+        U: np.ndarray,
+        V: np.ndarray,
+        W: np.ndarray,
+        length: float = 0,
+    ) -> None:
         self.axis.quiver(X, Y, Z, U, V, W, length=0)
 
     # PQ PLOTTING
