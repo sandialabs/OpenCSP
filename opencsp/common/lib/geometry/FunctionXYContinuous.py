@@ -42,6 +42,9 @@ class FunctionXYContinuous(FunctionXYAbstract):
     # def interpolate() -> FunctionXYAnalytic:
     #     ...
 
+    def __repr__(self) -> str:
+        return self.func_string
+
     # override
     def value_at(self, x: float, y: float) -> float:
         return self.func(x, y)

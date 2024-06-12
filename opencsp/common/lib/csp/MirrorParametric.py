@@ -15,6 +15,7 @@ from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
 
 
 class MirrorParametric(MirrorAbstract):
@@ -45,6 +46,8 @@ class MirrorParametric(MirrorAbstract):
         self._normals_function = self._define_normals_function(surface_function)
 
     def __repr__(self) -> str:
+        if isinstance(self._surface_function, FunctionXYContinuous):
+            return f"Parametricly defined mirror defined by the function {self._surface_function}"
         return (
             f"Parametricly defined mirror defined by the function {inspect.getsourcelines(self._surface_function)[0]}"
         )

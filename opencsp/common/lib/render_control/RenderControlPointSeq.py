@@ -80,6 +80,7 @@ class RenderControlPointSeq:
         vector_linewidth=1,  # Used if points are in a vector field.
         vector_scale=1.0,  # Facter to grow/srhink vector length, for points in a vector field.
     ):
+
         super(RenderControlPointSeq, self).__init__()
 
         # Set defaults.

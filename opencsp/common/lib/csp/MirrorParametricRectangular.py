@@ -6,6 +6,7 @@ from typing import Callable
 
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
+from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
 
 
 class MirrorParametricRectangular(MirrorParametric):
@@ -37,3 +38,8 @@ class MirrorParametricRectangular(MirrorParametric):
         left, right, bottom, top = self.region.axis_aligned_bounding_box()
         self.width = right - left
         self.height = top - bottom
+
+    @classmethod
+    def from_focal_length(cls, focal_length: float, size: tuple[float, float]):
+        func = FunctionXYContinuous(f"(x**2 + y**2)/(4*{focal_length})")
+        return MirrorParametricRectangular(func, size)

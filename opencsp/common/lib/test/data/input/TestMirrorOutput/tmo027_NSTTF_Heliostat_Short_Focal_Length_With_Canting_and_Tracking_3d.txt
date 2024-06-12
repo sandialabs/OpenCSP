@@ -12,5 +12,8 @@ Caption:
 Hypothetical short-focal length NSTTF heliostat modeled as a symmetric paraboloid with focal length f=5m with canting and tracking.
 
 Comments:
-Heliostats set to track to [60.0, 8.8, 28.9] at ymdhmsz =[2021, 5, 13, 13, 2, 0, -6]
+Heliostats set to track to 3D Point:
+array([[60. ],
+       [ 8.8],
+       [28.9]]) at ymdhmsz =(2021, 5, 13, 13, 2, 0, -6)
 

@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import os
 
-import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
+import opencsp.common.lib.csp.HeliostatConfiguration as hc
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
 import opencsp.common.lib.render_control.RenderControlAxis as rca

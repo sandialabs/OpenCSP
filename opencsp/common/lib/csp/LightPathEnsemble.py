@@ -7,9 +7,10 @@ from opencsp.common.lib.tool.typing_tools import strict_types
 
 
 class LightPathEnsemble:
+
     def __init__(self, lps: list[LightPath]) -> None:
-        self.current_directions = Uxyz.merge([lp.current_direction for lp in lps])
-        self.init_directions = Uxyz.merge([lp.init_direction for lp in lps])
+        self.current_directions = Vxyz.merge([lp.current_direction for lp in lps])
+        self.init_directions = Vxyz.merge([lp.init_direction for lp in lps])
         self.points_lists = [lp.points_list for lp in lps]
         self.colors = [lp.color for lp in lps]
 
@@ -30,7 +31,6 @@ class LightPathEnsemble:
         return self.concatenate_in_place(lpe)
 
     @classmethod
-    @strict_types
     def from_parts(cls, init_directions: Uxyz, points: list[Pxyz], curr_directions: Uxyz, colors=[]):
         lpe = LightPathEnsemble([])
         lpe.current_directions = curr_directions
@@ -39,7 +39,7 @@ class LightPathEnsemble:
         lpe.colors = colors
         return lpe
 
-    # @strict_types
+    # # @strict_types
     def add_steps(self, points: Pxyz, new_current_directions: Uxyz):
         if len(points) != len(new_current_directions):
             raise ValueError(

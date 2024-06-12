@@ -16,6 +16,7 @@ from opencsp.common.lib.csp.LightPath import LightPath
 from opencsp.common.lib.csp.LightPathEnsemble import LightPathEnsemble
 from opencsp.common.lib.csp.LightSource import LightSource
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
+from opencsp.common.lib.geometry.RegionXY import Resolution
 import opencsp.common.lib.csp.Scene as scn
 from opencsp.common.lib.geometry.FunctionXYGrid import FunctionXYGrid
 from opencsp.common.lib.geometry.Pxyz import Pxyz
@@ -72,7 +73,7 @@ class RayTrace:
             lp = self.light_paths_ensemble[int(i)]
             lp.draw(view, trace_style.light_path_control)
 
-    @strict_types
+    # @strict_types
     def add_many_light_paths(self, new_paths: list[LightPath]):
         self.light_paths_ensemble.concatenate_in_place(LightPathEnsemble(new_paths))
 
@@ -159,7 +160,7 @@ def trace_scene_unvec(
     verbose: bool = False,
 ) -> RayTrace:
     """DEPRICATED \n
-    # TODO tjlarki: trace_scene_vec is PROBABLY BROKEN!"""
+    TODO TJL:trace_scene_vec is PROBABLY BROKEN!"""
     warn(
         "RayTrace.trace_scene is vectorized and will be faster. This function will be phased out.",
         DeprecationWarning,
@@ -169,14 +170,14 @@ def trace_scene_unvec(
     ray_trace = RayTrace(scene)
     for obj in scene.objects:
         # get the points on the mirror to reflect off of
-        points_and_normals = obj.survey_of_points(obj_resolution, random_dist=random_dist)
+        points_and_normals = obj.survey_of_points(obj_resolution)
         # from tutorial https://www.geeksforgeeks.org/python-unzip-a-list-of-tuples/
         unzipped_p_and_n = list(zip(*points_and_normals))
         just_points = unzipped_p_and_n[0]
         just_normals = unzipped_p_and_n[1]
 
-        # TODO tjlarki: vectorized version of the raytrace algorithm, we should look at upsides before implemting.
-        # for num, (p, n_v) in enumerate(points_and_normals): # point, normal vector # TODO tjlarki: verify output is correct
+        # TODO TJL:vectorized version of the raytrace algorithm, we should look at upsides before implemting.
+        # for num, (p, n_v) in enumerate(points_and_normals): # point, normal vector # TODO TJL:verify output is correct
         #     rays = LightPath.many_rays_from_many_vectors([], np.transpose(incoming_vectors)) # make rays from points and vectors
         #     normal_vector = n_v
         #     ref_vec = calc_reflected_ray(normal_vector, incoming_vectors)
@@ -184,7 +185,7 @@ def trace_scene_unvec(
         #         ray.add_step(p, ref_vec[:, i])
         #     print(f"{num}/{tot} through tracing")
 
-        # TODO tjlarki: unvectorized version, this could be optimal with parallelization or we might need to finish the vectorized version above.
+        # TODO TJL:unvectorized version, this could be optimal with parallelization or we might need to finish the vectorized version above.
         tot = len(points_and_normals)
 
         if verbose:
@@ -200,7 +201,7 @@ def trace_scene_unvec(
         #     ray = LightPath.many_rays_from_many_vectors([p for _ in range()], )
         #     ray.add_step(p, ref_vec[:, 0])
         #     ray_trace.add_light_path(ray)
-        #     if verbose and i in checkpoints: # TODO tjlarki: make sure this check does not slow down the program
+        #     if verbose and i in checkpoints: # TODO TJL:make sure this check does not slow down the program
         #         print(f"{i/tot*100}% through tracing.")
 
         for i, (p, n_v) in enumerate(points_and_normals):  # loop through points
@@ -212,7 +213,7 @@ def trace_scene_unvec(
                     ray = LightPath([], vector_from_path)
                     ray.add_step(p, ref_vec[:, 0])
                     ray_trace.add_light_path(ray)
-            if verbose and i in checkpoints:  # TODO tjlarki: make sure this check does not slow down the program
+            if verbose and i in checkpoints:  # TODO TJL:make sure this check does not slow down the program
                 print(f"{i/tot:.2%} through tracing.")
 
         # if save_in_file:
@@ -223,11 +224,11 @@ def trace_scene_unvec(
     return ray_trace
 
 
-# TODO tjlarki: FIX ISSUES, only trace_scene_parallel is up-to-date
+# TODO TJL:FIX ISSUES, only trace_scene_parallel is up-to-date
+# # @strict_types
 def trace_scene(
     scene: scn.Scene,
-    obj_resolution: int,
-    resolution_type: str = 'pixelX',
+    obj_resolution: Resolution,
     store_in_ram: bool = True,
     save_in_file: bool = False,
     save_name: str = None,
@@ -257,15 +258,16 @@ def trace_scene(
     total_lpe = LightPathEnsemble([])
     batch = int(0)
 
-    @strict_types
+    # # @strict_types
     def trace_for_single_object(obj: RayTraceable) -> LightPathEnsemble:
+
         total_lpe: LightPathEnsemble = LightPathEnsemble([])
 
         if verbose:
             print("getting survey...")
 
         # Get the points on the mirror to reflect off
-        points, normals = obj.survey_of_points(obj_resolution, resolution_type)
+        points, normals = obj.survey_of_points(obj_resolution)
 
         if verbose:
             print("...got survey")
@@ -277,7 +279,8 @@ def trace_scene(
 
         # Loop through points and perform trace calculations
         for i, (p, n_v) in enumerate(zip(points, normals)):
-            ################# TODO Tjlarki: draft for saving traces ######################
+
+            ################# TODO TJL:draft for saving traces ######################
             if save_in_file and max_ram_in_use_percent < psutil.virtual_memory().percent:
                 prefix = f"RayTrace_{trace_name}/Batches/Batch{batch:03}/"
                 datasets = [prefix + "InitialDirections", prefix + "Points", prefix + "CurrentDirections"]
@@ -314,7 +317,7 @@ def trace_scene(
             lpe.add_steps(Pxyz(P), Uxyz(results))
             total_lpe.concatenate_in_place(lpe)
 
-            if verbose and i in checkpoints:  # TODO tjlarki: make sure this check does not slow down the program
+            if verbose and i in checkpoints:  # TODO TJL:make sure this check does not slow down the program
                 print(
                     f"{i/number_of_rays:.2%} through tracing. Using {psutil.virtual_memory().percent}% of system RAM."
                 )
@@ -344,11 +347,11 @@ def trace_scene(
 
 
 # Helper for trace_scene_parallel
-# @strict_types
+# # @strict_types
 def _trace_object(
     process: int,
     obj: RayTraceable,
-    obj_resolution: int,
+    obj_resolution: Resolution,
     resolution_type: str,
     verbose: bool,
     light_sources: list[LightSource],
@@ -356,13 +359,14 @@ def _trace_object(
     #   hdf_filename: str = None,  # None means it will not save
     #   trace_name: str = "Default",
 ) -> tuple[int, LightPathEnsemble]:
+
     total_lpe: LightPathEnsemble = LightPathEnsemble([])
     batch = 0
 
     # Get the points on the mirror to reflect off
     if verbose:
         print(f"Process #{process:03}: batch {batch:03} getting survey...")  # TODO
-    points, normals = obj.survey_of_points(obj_resolution, resolution_type)
+    points, normals = obj.survey_of_points(obj_resolution)
     if verbose:
         print(f"Process #{process:03}: ...batch {batch:03} got survey")  # TODO
 
@@ -373,7 +377,8 @@ def _trace_object(
 
     # Loop through points and perform trace calculations
     for i, (p, n_v) in enumerate(zip(points, normals)):
-        # ###################### TODO Tjlarki: draft for saving traces ######################
+
+        # ###################### TODO TJL:draft for saving traces ######################
         # if save_in_file and max_ram_in_use_percent < psutil.virtual_memory().percent:
         #     prefix = f"RayTrace/Batches/Batch{batch:08}/"
         #     datasets = [
@@ -440,7 +445,7 @@ def _trace_object(
     #     #         save_hdf5_datasets(ray_trace_data, dataset_names, hdf_filename)
     #     #         break
     #     #     except OSError:
-    #     #         if verbose:  # TODO tjlarki: make sure this is not too slow
+    #     #         if verbose:  # TODO TJL:make sure this is not too slow
     #     #             print(f"Process #{process:03}: Failed to save Batch #{batch:03}. Trying again...")
     #     #         time.sleep(0.01)
     #     if verbose:
@@ -455,7 +460,7 @@ def _trace_object(
 
 def trace_scene_parallel(
     scene: scn.Scene,
-    obj_resolution: int,
+    obj_resolution: Resolution,
     processor_count: int,
     resolution_type: str = 'pixelX',
     store_in_ram=True,
@@ -547,7 +552,7 @@ def trace_scene_parallel(
             #         save_hdf5_datasets(ray_trace_data, dataset_names, save_file_name)
             #         break
             #     except OSError:
-            #         if verbose:  # TODO tjlarki: make sure this is not too slow
+            #         if verbose:  # TODO TJL:make sure this is not too slow
             #             print(f"Process #{process:03}: Failed to save Batch #{batch:03}. Trying again...")
             #         time.sleep(0.01)
             if verbose:
@@ -566,23 +571,8 @@ def trace_scene_parallel(
 def plane_intersect_OLD(
     ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm: Uxyz, epsilon: float = 1e-6, verbose=False
 ) -> Vxy:
-    """Finds all the intersections that occur at a plane from the light paths
-    in the raytrace. Output points are transformed from the global (i.e. solar field)
-    reference frame to the local plane reference frame. (3d points are transformed
-    so the XY plane is perpendicular to the target normal.)
-
-    Parameters:
-    -----------
-    ray_trace (RayTrace): the trace that contains the light paths
-    v_plane_center (Pxyz): plane center
-    u_plane_norm (Uxyz): the plane's normal vector
-    epsilon (float, optional): the threshhold for error when determining if a
-        ray is parallel to the plane. Defaults to 1e-6.
-    verbose (bool): to print execution status
-
-    Returns:
-    --------
-    Vxy: intersection points in local plane XY reference frame.
+    """
+    TODO This was the old way of doing plane intersections. Can probably be removed safely.
     """
     if verbose:
         tot = len(ray_trace.light_paths)
@@ -631,7 +621,24 @@ def plane_intersect(
     save_name: str = None,
     max_ram_in_use_percent: float = 95.0,
 ):
-    """Vectorized plane intersection algorithm"""
+    """Finds all the intersections that occur at a plane from the light paths
+    in the raytrace. Output points are transformed from the global (i.e. solar field)
+    reference frame to the local plane reference frame. (3d points are transformed
+    so the XY plane is perpendicular to the target normal.)
+
+    Parameters:
+    -----------
+    ray_trace (RayTrace): the trace that contains the light paths
+    v_plane_center (Pxyz): plane center
+    u_plane_norm (Uxyz): the plane's normal vector
+    epsilon (float, optional): the threshhold for error when determining if a
+        ray is parallel to the plane. Defaults to 1e-6.
+    verbose (bool): to print execution status
+
+    Returns:
+    --------
+    Vxy: intersection points in local plane XY reference frame.
+    """
 
     # Unpack plane
 
@@ -639,7 +646,7 @@ def plane_intersect(
     lpe = ray_trace.light_paths_ensemble
     batch = 0
 
-    # ################# TODO Tjlarki: draft for saving traces ######################
+    # ################# TODO TJL:draft for saving traces ######################
     # # TODO: add deletion if save_in_ram = False
     # if save_in_file:
     #     datasets = [
@@ -653,7 +660,7 @@ def plane_intersect(
 
     # finds where the light intersects the plane
     # algorithm explained at \opencsp\doc\IntersectionWithPlaneAlgorithm.pdf
-    # TODO tjlarki: upload explicitly vectorized algorithm proof
+    # TODO TJL:upload explicitly vectorized algorithm proof
 
     u_plane_norm = u_plane_norm.normalize()
     plane_vectorV = u_plane_norm.data  # column vector
@@ -693,7 +700,7 @@ def plane_intersect(
     if verbose:
         print("Plane intersections caluculated.")
 
-    ################# TODO Tjlarki: draft for saving traces ######################
+    ################# TODO TJL:draft for saving traces ######################
     if save_in_file:
         datasets = [f"Intersection/Batches/Batch{batch:08}"]
         if verbose:
@@ -706,7 +713,7 @@ def plane_intersect(
 
     return filtered_intersec_points.projXY()
     # return np.histogram2d(xyz[:,0], xyz[:,1], bins)
-    # TODO tjlarki: create the histogram from this or bin these results
+    # TODO TJL:create the histogram from this or bin these results
 
 
 def histogram_image(bin_res: float, extent: float, pts: Vxy) -> tuple[np.ndarray, np.ndarray, np.ndarray]:

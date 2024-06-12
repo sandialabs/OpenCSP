@@ -12,6 +12,8 @@ import numpy as np
 import opencsp.common.lib.csp.sun_position as sp
 from opencsp.common.lib.tool.typing_tools import strict_types
 from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from typing import Iterable
 
 # def tracking_surface_normal_xyz(heliostat_xyz,    # (x,y,z) in m.     Heliostat origin.
 #                                 aimpoint_xyz,     # (x,y,z) in m.     Reflection aim point.
@@ -99,12 +101,11 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 #     return nu
 
 
-@strict_types
 def tracking_surface_normal_xyz(
-    heliostat_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Heliostat origin.
-    aimpoint_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Reflection aim point.
-    location_lon_lat: list | np.ndarray | tuple,  # (lon,lat) in rad. Solar field origin.
-    when_ymdhmsz: list | np.ndarray | tuple,
+    heliostat_origin: Pxyz,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint: Pxyz,  # (x,y,z) in m.     Reflection aim point.
+    location_lon_lat: Iterable,  # (lon,lat) in rad. Solar field origin.
+    when_ymdhmsz: tuple,
 ):  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
     #              => July 4, 2022 at 11:20 am MDT (-6 hours)
@@ -112,23 +113,24 @@ def tracking_surface_normal_xyz(
     Computes heliostat surface normal which tracks the sun to the aimpoint.
     """
     # Sun position.
-    sun_xyz = sp.sun_position(location_lon_lat, when_ymdhmsz)
+    sun = Vxyz(sp.sun_position(location_lon_lat, when_ymdhmsz))
 
-    # Construct points as arrays.
-    sun = np.array(sun_xyz)
-    h = np.array(heliostat_xyz)
-    aim = np.array(aimpoint_xyz)
+    # make sure we only keep the first Vxyz
+    sun = sun[0]
+    heliostat_origin = heliostat_origin[0]
+    aimpoint = aimpoint[0]
 
     # Reflected ray to aimpoint.
-    ha = aim - h
-    ha = ha / np.linalg.norm(ha)
+    ha = aimpoint - heliostat_origin
+    ha.normalize_in_place()
 
     # Surface normal
     h_sn = sun + ha
-    h_sn = h_sn / np.linalg.norm(h_sn)
-    n_x = h_sn[0]
-    n_y = h_sn[1]
-    n_z = h_sn[2]
+    h_sn.normalize_in_place()
+
+    # n_x = h_sn[0]
+    # n_y = h_sn[1]
+    # n_z = h_sn[2]
 
     # aim_u = aim / np.linalg.norm(aim)
     # print('\nIn tracking_surface_normal_xyz()...')
@@ -145,11 +147,10 @@ def tracking_surface_normal_xyz(
     # print('In tracking_surface_normal_xyz(), aim_u dot n = ', np.array(aim_u).dot(np.array([n_x, n_y, n_z])))
     # print()
 
-    # Return.
-    return [n_x, n_y, n_z]
+    return h_sn
 
 
-@strict_types
+# @strict_types
 def tracking_surface_normal_xyz_given_sun_vector(
     heliostat_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Heliostat origin.
     aimpoint_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Reflection aim point.
@@ -185,10 +186,10 @@ def tracking_surface_normal_xyz_given_sun_vector(
 
 
 def tracking_surface_normal_xy(
-    heliostat_xyz,  # (x,y,z) in m.     Heliostat origin.
-    aimpoint_xyz,  # (x,y,z) in m.     Reflection aim point.
-    location_lon_lat,  # (lon,lat) in rad. Solar field origin.
-    when_ymdhmsz,
+    heliostat_xyz: Pxyz,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint_xyz: Pxyz,  # (x,y,z) in m.     Reflection aim point.
+    location_lon_lat: Iterable,  # (lon,lat) in rad. Solar field origin.
+    when_ymdhmsz: tuple,
 ):  # (year, month, day, hour, minute, second, timezone) tuple.
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
     #              => July 4, 2022 at 11:20 am MDT (-6 hours)
@@ -197,7 +198,7 @@ def tracking_surface_normal_xy(
     Returns only (x,y) components of the surface normal.
     """
     normal_xyz = tracking_surface_normal_xyz(heliostat_xyz, aimpoint_xyz, location_lon_lat, when_ymdhmsz)
-    return [normal_xyz[0], normal_xyz[1]]
+    return [normal_xyz.x[0], normal_xyz.y[0]]
 
 
 def tracking_nu(

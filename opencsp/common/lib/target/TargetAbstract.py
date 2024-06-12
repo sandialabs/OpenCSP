@@ -141,15 +141,7 @@ class TargetAbstract(ABC):
     #     """
     #     # Sets facet's position given heliostat configuration.
     #     # self.origin = np.array(fac_origin) + fac_rotation.dot(fac_origin)
-    #     if not issubclass(type(fac_origin), Vxyz): # TODO tjlarki: ensure the facet origin is a Vxyz so this check becomes redundant
+    #     if not issubclass(type(fac_origin), Vxyz):
     #         fac_origin = Pxyz(fac_origin)
     #     self.origin = fac_origin
     #     self.rotation = fac_rotation
-
-    #     # TODO tjlarki: experimental feature, Auto Comenting
-    #     # self.add_comment(f"Set the position of the mirror to {list(self.origin)} with a global rotation of {list(self.rotation.as_rotvec())} (rotation given as a rotation vector).")
-    #     return
-
-    # TODO tjlarki: experimental feature, Auto Comenting
-    def add_comment(self, comment: str):
-        self.comments.append(f"\t{comment}")

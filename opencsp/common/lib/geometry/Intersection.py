@@ -26,6 +26,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
 from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
+from opencsp.common.lib.render_control.RenderControlIntersection import RenderControlIntersection
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
 from opencsp.common.lib.tool.typing_tools import strict_types
 
@@ -55,7 +56,7 @@ class Intersection:
         lpe = ray_trace.light_paths_ensemble
         batch = 0
 
-        # ################# TODO Tjlarki: draft for saving traces ######################
+        # ################# TODO TJL:draft for saving traces ######################
         # # TODO: add deletion if save_in_ram = False
         # if save_in_file:
         #     datasets = [
@@ -69,7 +70,7 @@ class Intersection:
 
         # finds where the light intersects the plane
         # algorithm explained at \opencsp\doc\IntersectionWithPlaneAlgorithm.pdf
-        # TODO tjlarki: upload explicitly vectorized algorithm proof
+        # TODO TJL:upload explicitly vectorized algorithm proof
 
         plane_normal_vector = plane_normal_vector.normalize()
         plane_vectorV = plane_normal_vector.data  # column vector
@@ -109,7 +110,7 @@ class Intersection:
         if verbose:
             print("Plane intersections caluculated.")
 
-        ################# TODO Tjlarki: draft for saving traces ######################
+        ################# TODO TJL:draft for saving traces ######################
         if save_in_file:
             datasets = [f"Intersection/Batches/Batch{batch:08}"]
             if verbose:
@@ -122,11 +123,11 @@ class Intersection:
 
         return Intersection(filtered_intersec_points)
         # return np.histogram2d(xyz[:,0], xyz[:,1], bins)
-        # TODO tjlarki: create the histogram from this or bin these results
+        # TODO TJL:create the histogram from this or bin these results
 
     plane_intersec_vec = plane_intersect_from_ray_trace
 
-    # TODO tjlarki: for maddie, make this better
+    # TODO TJL:for maddie, make this better
     def _from_ray_trace_vec_maddie(
         lines: tuple[Pxyz, Vxyz],
         plane: tuple[Pxyz, Uxyz],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
@@ -144,7 +145,7 @@ class Intersection:
 
         # finds where the light intersects the plane
         # algorithm explained at \opencsp\doc\IntersectionWithPlaneAlgorithm.pdf
-        # TODO tjlarki: upload explicitly vectorized algorithm proof
+        # TODO TJL:upload explicitly vectorized algorithm proof
 
         plane_normal_vector = plane_normal_vector.normalize()
         plane_vectorV = plane_normal_vector.data  # column vector
@@ -188,7 +189,7 @@ class Intersection:
 
         return filtered_intersec_points
         # return np.histogram2d(xyz[:,0], xyz[:,1], bins)
-        # TODO tjlarki: create the histogram from this or bin these results
+        # TODO TJL:create the histogram from this or bin these results
 
     @classmethod
     def from_hdf(cls, filename: str, intersection_name: str = "000"):
@@ -235,6 +236,7 @@ class Intersection:
         return Intersection._Pxy_to_flux_map(pyz, bins, resolution_type)
 
     def _Pxy_to_flux_map(points: Pxy, bins: int, resolution_type: str = "pixelX") -> FunctionXYGrid:
+
         xbins = bins
         x_low, x_high = min(points.x), max(points.x)
         y_low, y_high = min(points.y), max(points.y)
@@ -257,6 +259,8 @@ class Intersection:
     # drawing
 
     def draw(self, view: View3d, style: RenderControlPointSeq = None):
+        if style is None:
+            style = RenderControlPointSeq()
         view.draw_single_Pxyz(self.intersection_points, style)
 
     def draw_subset(self, view: View3d, count: int, points_style: RenderControlPointSeq = None):

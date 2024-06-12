@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 4
+Name: tfm004_Intersections at z=6
+Title: Intersections at z=6
+Code tag: TestFluxMaps.test_parabolic_mirror_bullet()
+View spec: xy
+
+Title:
+Intersections at z=6
+
+Caption:
+A mirror with focal length 5 facing up for a ray trace.
+
+Comments:
+Corresponds to the scene shown in tfm001_Mirror_Facing_Up_3d.png
+
