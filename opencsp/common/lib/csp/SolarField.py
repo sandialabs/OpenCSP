@@ -69,12 +69,12 @@ class SolarField(RayTraceable):
             None  # (y,m,d,h,m,s,z). Do not access this member externally; use when_ymdhmsz() function instead.
         )
 
-        self.set_position_in_space(self.origin, self.rotation)
+        self.set_position_in_space()
 
     # required for RayTracable object but currently has no use
-    def set_position_in_space(self, translation: np.ndarray, rotation: Rotation) -> None:
+    def set_position_in_space(self) -> None:
         for h in self.heliostats:
-            h.set_position_in_space(translation + h.origin, rotation)
+            h.set_position_in_space()
 
     # ACCESS
 

@@ -18,6 +18,7 @@ import opencsp.common.lib.csp.ufacet.HeliostatConfiguration as hc
 import opencsp.common.lib.csp.sun_track as st
 import opencsp.common.lib.geometry.transform_3d as t3d
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
+import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.math_tools as mt
 from opencsp.common.lib.csp.ufacet.Facet import Facet
 from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
@@ -56,7 +57,10 @@ class Heliostat(RayTraceable):
         -----------
             name    The name of this heliostat. Used for special styles given in the draw method.
 
-            origin  The torque tube location for this heliostat, as a three vector xyz coordinate
+            origin  The intersection point of the azimuth and elevation axes.
+                    This implementation only supports az el heliostats that satisfy this condition.
+                    For NSTTF heliostats, under a simplified kinematic model, this is the center of the torque tube.
+
 
             facets  List of facets, in order from top-left to bottom-right (row major order).
                     The facet names should be their position in the list (1-indexed).
@@ -73,10 +77,17 @@ class Heliostat(RayTraceable):
         # if len(facets) != len(relative_facet_positions):
         #     raise ValueError(f"number of facets must equal the number of facet positions. "
         #                      f"{len(facets)} facets wer given and {len(relative_facet_positions)} facet positions")
+        origin = np.squeeze(origin)
+        if origin.shape != (3,):
+            lt.error_and_raise(
+                ValueError,
+                "Error in Heliostat(): origin must be a numpy of size 3 with shape (3), but the shape is instead "
+                + str(origin.shape),
+            )
 
         # setting class variables
         self.name = name
-        self.origin = origin
+        self.origin = np.array(origin)  # Origin is at torque tube center.
         # self.num_rows = num_rows
         # self.num_cols = num_cols
         self.num_facets = num_facets
@@ -125,9 +136,6 @@ class Heliostat(RayTraceable):
             for x, y in zip(self.bottom_left_facet.centroid_offset, self.bottom_left_facet.bottom_left_corner_offset)
         ]
 
-        # Centroid
-        self.origin = np.array([origin[0], origin[1], origin[2]])  # Origin is at torque tube center.
-
         self.az = np.deg2rad(180)  # (az,el) = (180,90) degrees corresponds to pointing straight up,
         self.el = np.deg2rad(90)  # as if transitioned by tilting up from face south orientation.
         self.surface_normal = [0, 0, 1]  #
@@ -145,7 +153,7 @@ class Heliostat(RayTraceable):
         )
 
         # SET POSITION IN SPACE
-        self.set_position_in_space(self.origin, self.rotation)
+        self.set_position_in_space()
 
     # ACCESS
 
@@ -352,7 +360,7 @@ class Heliostat(RayTraceable):
                 else:
                     fac.canting = Rotation.from_rotvec(rotvec)
 
-            self.set_position_in_space(self.origin, self.rotation)
+            self.set_position_in_space()
 
     # TODO tjlarki: currently basis location off helisotat origin
     @strict_types
@@ -499,7 +507,7 @@ class Heliostat(RayTraceable):
             if canting == None:
                 continue
             facet.canting = canting
-        self.set_position_in_space(self.origin, self.rotation)
+        self.set_position_in_space()
 
     # MODIFICATION
 
@@ -569,23 +577,32 @@ class Heliostat(RayTraceable):
         #
         hel_rotation = rotation_from_az_el(az, el)
 
-        vector = np.array([0, 0, self.pivot_offset])
+        # heliostat.origin is at torque tube center.
+        # center_facet_origin is at center of facet 13 (NSTTF heliostat only).
+        # This calculation requires the following assumptions:
+        #    - azimuth and elevation axes intersect
+        #    - they intersect at the kinematic origin
+        #    - a vector from the kinematic origin through the mirror origin is perpindicular to the mirror
+        # TODO This is a simplified model of NSTTF heliostats, it needs to be made more general.
+
+        vector = np.array([0, 0, self.pivot_offset])  # TODO vector should be a Vxyz
         vector_offset = hel_rotation.apply(vector)
 
         # !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! TODO tjlarki: Line below is confusing to me
-        origin = np.array(self.origin) + vector_offset  # Origin is at torque tube center.
-
-        self.surface_normal = hel_rotation.apply([0, 0, 1])  # Before rotation, heliostat is face up.
+        center_facet_origin = self.origin + vector_offset  # TODO center_facet_origin should be Pxyz
+        surface_normal = hel_rotation.apply(
+            [0, 0, 1]
+        )  # Before rotation, heliostat is face up. Also, no canting yet. TODO [0,0,1] should be a Vxyz
 
         self.el = el
         self.az = az
-        self.origin = origin  # ?? SCAFFOLDING RCB -- THESE LIST TO ARRAY AND BACK TYPE CONVERSIONS ARE INEFFICIENT.  RESOLVE THIS.
-        # self.surface_normal = list(surface_normal)         # ?? SCAFFOLDING RCB -- THESE LIST TO ARRAY AND BACK TYPE CONVERSIONS ARE INEFFICIENT.  RESOLVE THIS.
+        self.center_facet_origin = center_facet_origin
+        self.surface_normal = list(surface_normal)  # TODO store Vxyz
         # self.rx_rotation      = Rx_rotation
         # self.rz_rotation      = Rz_rotation
         self.rotation = hel_rotation
 
-        self.set_position_in_space(self.origin, self.rotation)
+        self.set_position_in_space()  # This routine fetches origin and roation from heliostat members
 
     def _set_corner_positions_in_space(self):
         """Updates corner positions given this heliostat's configuration."""
@@ -603,11 +620,9 @@ class Heliostat(RayTraceable):
 
     # override from RayTracable
     @strict_types
-    def set_position_in_space(self, location: np.ndarray, rotation: Rotation) -> None:
-        self.origin = location  # + self.pivot_offset
-        self.rotation = rotation
+    def set_position_in_space(self) -> None:
         for facet in self.facets:
-            facet.set_position_in_space(location, rotation)
+            facet.set_position_in_space(self.origin, self.rotation)
             # facet.set_position_in_space(location + self.pivot_offset, rotation)
 
         self._set_corner_positions_in_space()  # specifically orients the corners of the heliostat
