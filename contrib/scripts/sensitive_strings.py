@@ -25,7 +25,6 @@ import contrib.scripts.FileFingerprint as ff  # nopep8
 import contrib.scripts.SensitiveStringMatcher as ssm  # nopep8
 
 
-
 class SensitiveStringsSearcher:
     _text_file_extensions = ['.txt', '.csv', '.py', '.md', '.rst']
     _text_file_path_name_exts = ['.coverageac']
