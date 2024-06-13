@@ -23,19 +23,16 @@ from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlPointSeq import \
-    RenderControlPointSeq
-from opencsp.common.lib.render_control.RenderControlRayTrace import \
-    RenderControlRayTrace
-
+from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
+from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
 
 
 def plane_lines_intersection(
-                        lines: tuple[Pxyz, Vxyz],
-                        plane: tuple[Pxyz, Uxyz],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
-                        epsilon: float = 1e-6,
-                        verbose: bool = False,
-                        ) -> Pxyz:
+    lines: tuple[Pxyz, Vxyz],
+    plane: tuple[Pxyz, Uxyz],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
+    epsilon: float = 1e-6,
+    verbose: bool = False,
+) -> Pxyz:
     """Vectorized plane intersection algorithm
     plane = (plane_point, plane_normal_vector)
         line intersection algorithm
@@ -45,7 +42,7 @@ def plane_lines_intersection(
     -------
     intersection_points: Pxyz
         The intersection (x,y,z) locations for each of the lines with the plane, one per line. Shape (3,N), where N is the number of lines.
-        Disregards direction of line. 
+        Disregards direction of line.
     """
 
     # Unpack plane
@@ -60,36 +57,45 @@ def plane_lines_intersection(
 
     # validate inputs
     if np.ndim(plane_validate[0].data) != 1:
-        lt.error_and_raise(ValueError, f"Error in plane_lines_intersection(): the 'plane' parameter should contain a single origin point, but instead contains {plane_validate[0].shape[1]} points")
+        lt.error_and_raise(
+            ValueError,
+            f"Error in plane_lines_intersection(): the 'plane' parameter should contain a single origin point, but instead contains {plane_validate[0].shape[1]} points",
+        )
     if np.ndim(plane_validate[1].data) != 1:
-        lt.error_and_raise(ValueError, f"Error in plane_lines_intersection(): the 'plane' parameter should contain a single normal vector, but instead contains {plane_validate[1].shape[1]} points")
+        lt.error_and_raise(
+            ValueError,
+            f"Error in plane_lines_intersection(): the 'plane' parameter should contain a single normal vector, but instead contains {plane_validate[1].shape[1]} points",
+        )
     for i in range(directions.data.shape[1]):
         if Vxyz.dot(plane_normal_vector, directions[i]) == 0:
-            lt.error_and_raise(ValueError, f"Error in plane_lines_intersection(): the 'plane' parameter and 'line(s)' parameter(s) are parallel.")
+            lt.error_and_raise(
+                ValueError,
+                f"Error in plane_lines_intersection(): the 'plane' parameter and 'line(s)' parameter(s) are parallel.",
+            )
 
     # finds where the light intersects the plane
     # algorithm explained at --- (??location for new pdf - email to ben and randy)
-    # TODO tjlarki: upload explicitly vectorized algorithm proof 
+    # TODO tjlarki: upload explicitly vectorized algorithm proof
 
     plane_normal_vector = plane_normal_vector.normalize()
     plane_vectorV = plane_normal_vector.data  # column vector
-    plane_pointV = plane_point.data           # column vector
+    plane_pointV = plane_point.data  # column vector
 
     # most recent points in light path ensemble
     lt.debug("setting up values...")
     P = points.data
-    V = directions.data      # current vectors
+    V = directions.data  # current vectors
 
     if verbose:
         print("finding intersections...")
 
     ########## Intersection Algorithm ###########
     # .op means to do the 'op' element wise
-    d = np.matmul(plane_vectorV.T, V)           # (1 x N) <- (1 x 3)(3 x N)
-    W = P - plane_pointV                        # (3 x N) <- (3 x N) -[broadcast] (3 x 1)
-    f = -np.matmul(plane_vectorV.T, W) / d      # (1 x N) <- (1 x 3)(3 x N) ./ (1 x N)
-    F = f * V                                   # (3 x N) <- (1 x N) .* (3 x N)
-    intersection_matrix = P + F                 # (3 x N) <- (3 x N) .- (3 x N)
+    d = np.matmul(plane_vectorV.T, V)  # (1 x N) <- (1 x 3)(3 x N)
+    W = P - plane_pointV  # (3 x N) <- (3 x N) -[broadcast] (3 x 1)
+    f = -np.matmul(plane_vectorV.T, W) / d  # (1 x N) <- (1 x 3)(3 x N) ./ (1 x N)
+    F = f * V  # (3 x N) <- (1 x N) .* (3 x N)
+    intersection_matrix = P + F  # (3 x N) <- (3 x N) .- (3 x N)
     #############################################
     intersection_points = Pxyz(intersection_matrix)
 
@@ -112,5 +118,5 @@ def plane_lines_intersection(
     # return np.histogram2d(xyz[:,0], xyz[:,1], bins)
     # TODO tjlarki: create the histogram from this or bin these results
 
+
 # if __name__ == "__main__":
-    
