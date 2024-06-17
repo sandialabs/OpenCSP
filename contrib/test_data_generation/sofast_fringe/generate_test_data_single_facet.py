@@ -51,7 +51,7 @@ def generate_dataset(
     sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
     # Update mask calculation options
-    sofast.params.mask_keep_largest_area = True
+    sofast.params.mask.keep_largest_area = True
 
     # Define surface data
     if surface_type == 'parabolic':
