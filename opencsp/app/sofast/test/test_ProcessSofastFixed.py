@@ -10,6 +10,7 @@ import numpy as np
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
+from opencsp.app.sofast.lib.ParamsSofastFixed import ParamsSofastFixed
 from opencsp.app.sofast.lib.ProcessSofastFixed import ProcessSofastFixed
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
@@ -53,12 +54,14 @@ class TestProcessSofastFixed(unittest.TestCase):
         measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
 
         # Load expected data
-        datasets = ['CalculationsFixedPattern/Facet_000/SlopeSolverData/slopes_facet_xy']
+        datasets = ['DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy']
         data = h5.load_hdf5_datasets(datasets, file_exp)
         cls.exp_slopes_xy = data['slopes_facet_xy']
 
         # Instantiate class
+        params = ParamsSofastFixed.load_from_hdf(file_exp, 'DataSofastInput/')
         cls.process_sofast_fixed = ProcessSofastFixed(orientation, camera, dot_locs, facet_data)
+        cls.process_sofast_fixed.params = params
         cls.process_sofast_fixed.load_measurement_data(measurement)
 
         # Process
