@@ -63,7 +63,7 @@ class _OptionsFileOutput:
 class _RayTraceParameters:
     source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=20)
     v_target_center = Vxyz((0, 0, 50))
-    v_target_normal = Vxyz((0, 1, 0))
+    v_target_normal = Vxyz((0, 0, -1))
 
 
 @dataclass
