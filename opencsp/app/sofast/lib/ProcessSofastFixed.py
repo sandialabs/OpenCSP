@@ -104,14 +104,14 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         im_dark = self.measurement.image * 0
         images = np.concatenate((im_dark[..., None], self.measurement.image[..., None]), axis=2)
         params = [
-            self.params.mask_hist_thresh,
-            self.params.mask_filt_width,
-            self.params.mask_filt_thresh,
-            self.params.mask_thresh_active_pixels,
+            self.params.mask.hist_thresh,
+            self.params.mask.filt_width,
+            self.params.mask.filt_thresh,
+            self.params.mask.thresh_active_pixels,
         ]
         mask = ip.calc_mask_raw(images, *params)
 
-        if self.params.mask_keep_largest_area:
+        if self.params.mask.keep_largest_area:
             mask = ip.keep_largest_mask_area(mask)
 
         return mask
@@ -155,8 +155,8 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
-            self.params.geometry_params,
-            self.params.geometry_data_debug,
+            self.params.geometry,
+            self.params.debug_geometry,
         )
 
         # Define optic orientation w.r.t. camera
@@ -181,7 +181,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
         u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_optic).as_Vxyz()
 
-        self.params.slope_solver_data_debug.optic_data = self.data_facet
+        self.params.debug_slope_solver.optic_data = self.data_facet
 
         return {
             'v_optic_cam_optic': v_optic_cam_optic,
@@ -191,7 +191,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             'v_optic_screen_optic': v_optic_screen_optic,
             'v_align_point_optic': self.data_facet.v_facet_centroid,
             'dist_optic_screen': self.measurement.dist_optic_screen,
-            'debug': self.params.slope_solver_data_debug,
+            'debug': self.params.debug_slope_solver,
         }
 
     def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
