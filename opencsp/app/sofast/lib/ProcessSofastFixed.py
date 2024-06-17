@@ -247,7 +247,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         # Sofast input
         self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
         self.data_surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_000/')
-        self.data_facet.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_000')
+        self.data_facet.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_000/')
 
         # General
         self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
