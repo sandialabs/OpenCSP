@@ -18,9 +18,9 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
     search_perp_axis_ratio: float = 3.0
     """Defines search region when searching for next dot. Ratio of length along search direction
     to perpendicular distance. Larger value equals narrower search region."""
-    mask_params: ParamsMaskCalculation = field(default_factory=ParamsMaskCalculation)
+    mask: ParamsMaskCalculation = field(default_factory=ParamsMaskCalculation)
     """Parameters for calculating optic mask"""
-    geometry_params: ParamsOpticGeometry = field(default_factory=ParamsOpticGeometry)
+    geometry: ParamsOpticGeometry = field(default_factory=ParamsOpticGeometry)
     """Parameters to use when processing geometry of facet"""
 
     # Debug objects
@@ -46,7 +46,8 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
         ]
         ht.save_hdf5_datasets(data, datasets, file)
 
-        self.geometry_params.save_to_hdf(file, prefix + 'ParamsSofastFixed/')
+        self.geometry.save_to_hdf(file, prefix + 'ParamsSofastFixed/')
+        self.mask.save_to_hdf(file, prefix + 'ParamsSofastFixed/')
 
     @classmethod
     def load_from_hdf(cls, file: str, prefix: str = ''):
@@ -66,10 +67,11 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
         ]
         data = ht.load_hdf5_datasets(datasets, file)
 
-        geometry_params = ParamsOpticGeometry.load_from_hdf(file, prefix)
-        mask_params = ParamsMaskCalculation.load_from_hdf(file, prefix)
+        # Load geometry parameters
+        params_mask = ParamsMaskCalculation.load_from_hdf(file, prefix + 'ParamsSofastFixed/')
+        params_geometry = ParamsOpticGeometry.load_from_hdf(file, prefix + 'ParamsSofastFixed/')
 
-        data['geometry_params'] = geometry_params
-        data['msak_params'] = mask_params
+        # Load sofast parameters
+        data = {'geometry': params_geometry, 'mask': params_mask}
 
         return cls(**data)
