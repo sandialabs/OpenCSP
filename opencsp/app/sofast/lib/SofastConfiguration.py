@@ -108,7 +108,7 @@ class SofastConfiguration:
             stats.append(
                 {
                     'delta_x_sample_points_average': dx_avg,
-                    'delta_y_sample_average': dy_avg,
+                    'delta_y_sample_points_average': dy_avg,
                     'number_samples': num_samps,
                     'focal_lengths_parabolic_xy': focal_lengths_xy,
                 }
@@ -166,10 +166,10 @@ class SofastConfiguration:
         v_cam_fov_screen += v_screen_cam_screen
 
         # Calculate camera X/Y axes
-        v_cam_x_screen = Vxyz(([0, axes_length], [0, 0], [0, 0])).rotate(display.r_cam_screen) + v_screen_cam_screen
-        v_cam_y_screen = Vxyz(([0, 0], [0, axes_length], [0, 0])).rotate(display.r_cam_screen) + v_screen_cam_screen
+        v_cam_x_screen = Vxyz(([0, axes_length], [0, 0], [0, 0])).rotate(orientation.r_cam_screen) + v_screen_cam_screen
+        v_cam_y_screen = Vxyz(([0, 0], [0, axes_length], [0, 0])).rotate(orientation.r_cam_screen) + v_screen_cam_screen
         v_cam_z_screen = (
-            Vxyz(([0, 0], [0, 0], [0, length_z_axis_cam])).rotate(display.r_cam_screen) + v_screen_cam_screen
+            Vxyz(([0, 0], [0, 0], [0, length_z_axis_cam])).rotate(orientation.r_cam_screen) + v_screen_cam_screen
         )
 
         # Calculate object axes
