@@ -20,9 +20,9 @@ class ParamsSofastFringe(hdf5_tools.HDF5_IO_Abstract):
     """Parameters for calculating optic geometry"""
 
     # Debug objects
-    debug_slope_solver: SlopeSolverDataDebug = field(default_factory=SlopeSolverDataDebug)
+    slope_solver_data_debug: SlopeSolverDataDebug = field(default_factory=SlopeSolverDataDebug)
     """Debug options for slope solving"""
-    debug_geometry: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
+    geometry_data_debug: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
     """Debug options for geometry processing"""
 
     def save_to_hdf(self, file: str, prefix: str = ''):
