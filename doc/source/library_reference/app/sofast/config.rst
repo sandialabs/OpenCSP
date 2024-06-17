@@ -98,16 +98,6 @@ opencsp.app.sofast.lib.PatternSofastFixed
    :undoc-members:
    :show-inheritance:
 
-opencsp.app.sofast.lib.visualize_setup
-======================================
-
-.. currentmodule:: opencsp.app.sofast.lib.visualize_setup
-
-.. automodule:: opencsp.app.sofast.lib.visualize_setup
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 opencsp.app.sofast.SofastGUI
 ============================
 
