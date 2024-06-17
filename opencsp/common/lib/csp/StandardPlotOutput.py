@@ -196,7 +196,7 @@ class StandardPlotOutput:
                 )
 
             # Slope x
-            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation X ")
+            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation X")
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
@@ -216,7 +216,7 @@ class StandardPlotOutput:
                 )
 
             # Slope Y
-            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation Y ")
+            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation Y")
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
