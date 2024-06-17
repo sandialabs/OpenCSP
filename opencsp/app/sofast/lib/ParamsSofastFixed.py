@@ -72,6 +72,7 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
         params_geometry = ParamsOpticGeometry.load_from_hdf(file, prefix + 'ParamsSofastFixed/')
 
         # Load sofast parameters
-        data = {'geometry': params_geometry, 'mask': params_mask}
+        data['geometry'] = params_geometry
+        data['mask'] = params_mask
 
         return cls(**data)
