@@ -19,7 +19,7 @@ class SofastConfiguration:
     """Class for analyzing the configuration of a Sofast setup/measurement."""
 
     def __init__(self) -> 'SofastConfiguration':
-        self.data_sofast_object = None
+        self.data_sofast_object: ProcessSofastFringe | ProcessSofastFixed = None
         self._is_fringe = None
         self._is_fixed = None
 
