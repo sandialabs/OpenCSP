@@ -33,7 +33,7 @@ class ParamsSofastFringe(hdf5_tools.HDF5_IO_Abstract):
         prefix : str
             Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
-        self.mask.save_to_hdf(file, prefix + 'ParmsSofastFringe/')
+        self.mask.save_to_hdf(file, prefix + 'ParamsSofastFringe/')
         self.geometry.save_to_hdf(file, prefix + 'ParamsSofastFringe/')
 
     @classmethod
