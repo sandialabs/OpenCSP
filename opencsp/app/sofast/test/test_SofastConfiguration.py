@@ -148,13 +148,50 @@ class TestSofastConfiguration(unittest.TestCase):
         self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'], stats_in[0]['focal_lengths_parabolic_xy'])
 
     def test_visualize_setup_fixed(self):
-        pass
+        # Create configuration object
+        config = SofastConfiguration()
+        config.load_sofast_object(self.process_sofast_fixed)
+
+        # Create figures
+        fig = plt.figure()
+        ax = fig.add_subplot(projection='3d')
+        config.visualize_setup(
+            ax=ax,
+            v_screen_object_screen=self.process_sofast_fixed.data_geometry_facet[
+                0
+            ].spatial_orientation.v_screen_optic_screen,
+            r_object_screen=self.process_sofast_fixed.data_geometry_facet[0].spatial_orientation.r_optic_screen,
+        )
+        file_out = join(self.dir_output, 'fixed_setup_visualize.png')
+        fig.savefig(file_out)
+
+        # Compare
+        file_in = join(self.dir_input, 'fixed_setup_visualize.png')
+        self.compare_actual_expected_images(file_out, file_in)
 
     def test_measurement_stats_setup_fixed(self):
-        pass
+        # Create configuration object
+        config = SofastConfiguration()
+        config.load_sofast_object(self.process_sofast_fixed)
+
+        # Get measured stats
+        stats = config.get_measurement_stats()
+
+        # Get expected stats
+        file_stats_in = join(self.dir_input, 'stats_fixed.json')
+        with open(file_stats_in, 'r', encoding='utf-8') as f:
+            stats_in = json.load(f)
+
+        # Compare
+        self.assertAlmostEqual(stats[0]['delta_x_sample_points_average'], stats_in[0]['delta_x_sample_points_average'])
+        self.assertAlmostEqual(stats[0]['delta_y_sample_points_average'], stats_in[0]['delta_y_sample_points_average'])
+        self.assertAlmostEqual(stats[0]['number_samples'], stats_in[0]['number_samples'])
+        self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'], stats_in[0]['focal_lengths_parabolic_xy'])
 
     def compare_actual_expected_images(self, actual_location: str, expected_location: str, tolerance=0.2):
-        self.assertIsNone(mplt.compare_images(expected_location, actual_location, tolerance))
+        output = mplt.compare_images(expected_location, actual_location, tolerance)
+        if output is not None:
+            raise AssertionError(output)
 
 
 if __name__ == '__main__':
