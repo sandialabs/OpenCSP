@@ -23,8 +23,8 @@ from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
-import opencsp.common.lib.tool.log_tools as lt
 from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class ProcessSofastFixed(HDF5_SaveAbstract):
@@ -155,7 +155,8 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
-            debug=self.params.geometry_data_debug,
+            self.params.geometry_params,
+            self.params.geometry_data_debug,
         )
 
         # Define optic orientation w.r.t. camera
