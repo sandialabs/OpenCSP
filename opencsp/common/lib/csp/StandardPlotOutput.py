@@ -30,6 +30,8 @@ class _OptionsSlopeVis:
     quiver_scale: float | tuple[float, float, float] = 25
     quiver_color: str | tuple[str, str, str] = 'white'
     deviation_clim: float = 5
+    to_plot_slope: bool = True
+    to_plot_slope_deviation: bool = True
 
 
 @dataclass
@@ -38,6 +40,7 @@ class _OptionsCurvatureVis:
     clim: float = 50
     processing: list[str] | tuple[list[str], list[str], list[str]] = field(default_factory=list)
     smooth_kernel_width: float | tuple[float, float, float] = 1
+    to_plot: bool = True
 
 
 @dataclass
@@ -143,17 +146,35 @@ class StandardPlotOutput:
 
     def _plot_slope_curvature_measured_optic(self):
         """Plots optic slope/curvature plots for measured optic"""
-        if self.optic_measured is not None:
-            self._plot_slope_curvature(self.optic_measured, 'measured')
-        else:
+        if self.optic_measured is None:
             lt.info('No measured optic; skipping measured optic slope/curvature plots.')
+            return
+
+        if self.options_slope_vis:
+            self._plot_slope(self.optic_measured, 'measured')
+        else:
+            lt.info('Slope plotting turned off; skipping measured optic slope plots.')
+
+        if self.options_curvature_vis.to_plot:
+            self._plot_curvature(self.optic_measured, 'measured')
+        else:
+            lt.info('Curvature plotting turned off; skipping measured optic curvature plots.')
 
     def _plot_slope_curvature_reference_optic(self):
         """Plots optic slope/curvature plots for reference optic"""
-        if self.optic_reference is not None:
-            self._plot_slope_curvature(self.optic_reference, 'reference')
-        else:
+        if self.optic_reference is None:
             lt.info('No reference optic; skipping reference optic slope/curvature plots.')
+            return
+
+        if self.options_slope_vis:
+            self._plot_slope(self.optic_reference, 'reference')
+        else:
+            lt.info('Slope plotting turned off; skipping reference optic slope plots.')
+
+        if self.options_curvature_vis.to_plot:
+            self._plot_curvature(self.optic_reference, 'reference')
+        else:
+            lt.info('Curvature plotting turned off; skipping reference optic curvature plots.')
 
     def _process_plot_options(self, value) -> list:
         if isinstance(value, (tuple, list)):
@@ -168,6 +189,8 @@ class StandardPlotOutput:
 
     def _plot_slope_deviation(self):
         """Plots slope deviation"""
+        if not self.options_slope_vis.to_plot_slope_deviation:
+            lt.info('Slope deviation plotting turned off; skipping slope deviation plots.')
 
         if (self.optic_measured is not None) and (self.optic_reference is not None):
             # Separate outputs
@@ -289,13 +312,70 @@ class StandardPlotOutput:
                 close_after_save=self.options_file_output.close_after_save,
             )
 
-    def _plot_slope_curvature(self, optic: MirrorAbstract, suffix: str):
+    def _plot_curvature(self, optic: MirrorAbstract, suffix: str):
+        # Separate outputs
+        processings = self._process_plot_options(self.options_curvature_vis.processing)
+        widths = self._process_plot_options(self.options_curvature_vis.smooth_kernel_width)
+
+        # Curvature combined
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Combined ' + suffix)
+        optic.plot_orthorectified_curvature(
+            res=self.options_curvature_vis.resolution,
+            type_='combined',
+            clim=self.options_curvature_vis.clim,
+            axis=fig_rec.axis,
+            processing=processings[0],
+            smooth_kernel_width=widths[0],
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
+
+        # Curvature X
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature X ' + suffix)
+        optic.plot_orthorectified_curvature(
+            res=self.options_curvature_vis.resolution,
+            type_='x',
+            clim=self.options_curvature_vis.clim,
+            axis=fig_rec.axis,
+            processing=processings[1],
+            smooth_kernel_width=widths[1],
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
+
+        # Curvature Y
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Y ' + suffix)
+        optic.plot_orthorectified_curvature(
+            res=self.options_curvature_vis.resolution,
+            type_='y',
+            clim=self.options_curvature_vis.clim,
+            axis=fig_rec.axis,
+            processing=processings[2],
+            smooth_kernel_width=widths[2],
+        )
+        if self._to_save:
+            fig_rec.save(
+                output_dir=self.options_file_output.output_dir,
+                dpi=self.options_file_output.save_dpi,
+                format='png',
+                close_after_save=self.options_file_output.close_after_save,
+            )
+
+    def _plot_slope(self, optic: MirrorAbstract, suffix: str):
         # Separate outputs
         quiver_densities = self._process_plot_options(self.options_slope_vis.quiver_density)
         quiver_scales = self._process_plot_options(self.options_slope_vis.quiver_scale)
         quiver_colors = self._process_plot_options(self.options_slope_vis.quiver_color)
-        processings = self._process_plot_options(self.options_curvature_vis.processing)
-        widths = self._process_plot_options(self.options_curvature_vis.smooth_kernel_width)
 
         # Slope Magnitude
         fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Magnitude " + suffix)
@@ -345,60 +425,6 @@ class StandardPlotOutput:
             quiver_color=quiver_colors[2],
             clim=self.options_slope_vis.clim,
             axis=fig_rec.axis,
-        )
-        if self._to_save:
-            fig_rec.save(
-                output_dir=self.options_file_output.output_dir,
-                dpi=self.options_file_output.save_dpi,
-                format='png',
-                close_after_save=self.options_file_output.close_after_save,
-            )
-
-        # Curvature combined
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Combined ' + suffix)
-        optic.plot_orthorectified_curvature(
-            res=self.options_curvature_vis.resolution,
-            type_='combined',
-            clim=self.options_curvature_vis.clim,
-            axis=fig_rec.axis,
-            processing=processings[0],
-            smooth_kernel_width=widths[0],
-        )
-        if self._to_save:
-            fig_rec.save(
-                output_dir=self.options_file_output.output_dir,
-                dpi=self.options_file_output.save_dpi,
-                format='png',
-                close_after_save=self.options_file_output.close_after_save,
-            )
-
-        # Curvature X
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature X ' + suffix)
-        optic.plot_orthorectified_curvature(
-            res=self.options_curvature_vis.resolution,
-            type_='x',
-            clim=self.options_curvature_vis.clim,
-            axis=fig_rec.axis,
-            processing=processings[1],
-            smooth_kernel_width=widths[1],
-        )
-        if self._to_save:
-            fig_rec.save(
-                output_dir=self.options_file_output.output_dir,
-                dpi=self.options_file_output.save_dpi,
-                format='png',
-                close_after_save=self.options_file_output.close_after_save,
-            )
-
-        # Curvature Y
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Y ' + suffix)
-        optic.plot_orthorectified_curvature(
-            res=self.options_curvature_vis.resolution,
-            type_='y',
-            clim=self.options_curvature_vis.clim,
-            axis=fig_rec.axis,
-            processing=processings[2],
-            smooth_kernel_width=widths[2],
         )
         if self._to_save:
             fig_rec.save(
