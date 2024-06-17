@@ -239,6 +239,9 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         ----------
         file : str
             HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
         # Sofast input
         # self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
