@@ -293,10 +293,10 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
 
         # Calculate raw mask
         params = [
-            self.params.mask_hist_thresh,
-            self.params.mask_filt_width,
-            self.params.mask_filt_thresh,
-            self.params.mask_thresh_active_pixels,
+            self.params.mask.hist_thresh,
+            self.params.mask.filt_width,
+            self.params.mask.filt_thresh,
+            self.params.mask.thresh_active_pixels,
         ]
         mask_raw = ip.calc_mask_raw(self.measurement.mask_images, *params)
 
@@ -309,11 +309,11 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             self.data_error,
         ) = po.process_undefined_geometry(
             mask_raw,
-            self.params.mask_keep_largest_area,
+            self.params.mask.keep_largest_area,
             self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
-            self.params.geometry_data_debug,
+            self.params.debug_geometry,
         )
 
         # Save data
@@ -334,22 +334,22 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         self.num_facets = 1
         self.optic_type = 'single'
 
-        if self.params.geometry_data_debug.debug_active:
+        if self.params.debug_geometry.debug_active:
             lt.info('Sofast image processing debug on.')
-        if self.params.slope_solver_data_debug.debug_active:
+        if self.params.debug_slope_solver.debug_active:
             lt.info('SlopeSolver debug on.')
 
         # Calculate raw mask
         params = [
-            self.params.mask_hist_thresh,
-            self.params.mask_filt_width,
-            self.params.mask_filt_thresh,
-            self.params.mask_thresh_active_pixels,
+            self.params.mask.hist_thresh,
+            self.params.mask.filt_width,
+            self.params.mask.filt_thresh,
+            self.params.mask.thresh_active_pixels,
         ]
         mask_raw = ip.calc_mask_raw(self.measurement.mask_images, *params)
 
         # If enabled, keep only the largest mask area
-        if self.params.mask_keep_largest_area:
+        if self.params.mask.keep_largest_area:
             mask_raw2 = ip.keep_largest_mask_area(mask_raw)
             mask_raw = np.logical_and(mask_raw, mask_raw2)
 
@@ -366,8 +366,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
-            self.params.geometry_params,
-            self.params.geometry_data_debug,
+            self.params.geometry,
+            self.params.debug_geometry,
         )
 
         # Save data
@@ -400,19 +400,19 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
 
         # Calculate mask
         params = [
-            self.params.mask_hist_thresh,
-            self.params.mask_filt_width,
-            self.params.mask_filt_thresh,
-            self.params.mask_thresh_active_pixels,
+            self.params.mask.hist_thresh,
+            self.params.mask.filt_width,
+            self.params.mask.filt_thresh,
+            self.params.mask.thresh_active_pixels,
         ]
         mask_raw = ip.calc_mask_raw(self.measurement.mask_images, *params)
 
-        if self.params.mask_keep_largest_area:
+        if self.params.mask.keep_largest_area:
             lt.warn(
                 '"keep_largest_area" mask processing option cannot be used '
                 'for multifacet ensembles. This will be turned off.'
             )
-            self.params.mask_keep_largest_area = False
+            self.params.mask.keep_largest_area = False
 
         (
             self.data_geometry_general,
@@ -428,8 +428,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             self.orientation,
             self.camera,
             self.measurement.dist_optic_screen,
-            self.params.geometry_params,
-            self.params.geometry_data_debug,
+            self.params.geometry,
+            self.params.debug_geometry,
         )
 
         # Initialize data dictionaries
@@ -518,8 +518,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         self.data_characterization_facet = []
         for facet_idx in range(self.num_facets):
             # Check debug status
-            if self.params.slope_solver_data_debug.debug_active:
-                self.params.slope_solver_data_debug.optic_data = self.data_facet_def[facet_idx]
+            if self.params.debug_slope_solver.debug_active:
+                self.params.debug_slope_solver.optic_data = self.data_facet_def[facet_idx]
 
             # Instantiate slope solver object
             kwargs = {
@@ -531,7 +531,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
                 'v_align_point_optic': self.data_geometry_facet[facet_idx].v_align_point_facet,
                 'dist_optic_screen': self.data_geometry_facet[facet_idx].measure_point_screen_distance,
                 'surface': surfaces[facet_idx],
-                'debug': self.params.slope_solver_data_debug,
+                'debug': self.params.debug_slope_solver,
             }
 
             # Instantiate slope solver
