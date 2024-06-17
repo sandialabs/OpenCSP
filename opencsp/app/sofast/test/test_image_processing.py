@@ -118,8 +118,8 @@ class TestImageProcessing(unittest.TestCase):
         # Get default parameters from Sofast class
         params = ParamsSofastFringe()
         args = [
-            params.geometry_params.perimeter_refine_axial_search_dist,
-            params.geometry_params.perimeter_refine_perpendicular_search_dist,
+            params.geometry.perimeter_refine_axial_search_dist,
+            params.geometry.perimeter_refine_perpendicular_search_dist,
         ]
 
         # Load test data
