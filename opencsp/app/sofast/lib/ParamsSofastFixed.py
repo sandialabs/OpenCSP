@@ -24,9 +24,9 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
     """Parameters to use when processing geometry of facet"""
 
     # Debug objects
-    slope_solver_data_debug: SlopeSolverDataDebug = field(default_factory=SlopeSolverDataDebug)
+    debug_slope_solver: SlopeSolverDataDebug = field(default_factory=SlopeSolverDataDebug)
     """Debug options for slope solving"""
-    geometry_data_debug: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
+    debug_geometry: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
     """Debug options for geometry processing"""
 
     def save_to_hdf(self, file: str, prefix: str = ''):
