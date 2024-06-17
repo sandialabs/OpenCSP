@@ -145,7 +145,8 @@ class TestSofastConfiguration(unittest.TestCase):
         self.assertAlmostEqual(stats[0]['delta_x_sample_points_average'], stats_in[0]['delta_x_sample_points_average'])
         self.assertAlmostEqual(stats[0]['delta_y_sample_points_average'], stats_in[0]['delta_y_sample_points_average'])
         self.assertAlmostEqual(stats[0]['number_samples'], stats_in[0]['number_samples'])
-        self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'], stats_in[0]['focal_lengths_parabolic_xy'])
+        self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'][0], stats_in[0]['focal_lengths_parabolic_xy'][0])
+        self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'][1], stats_in[0]['focal_lengths_parabolic_xy'][1])
 
     def test_visualize_setup_fixed(self):
         # Create configuration object
@@ -186,7 +187,8 @@ class TestSofastConfiguration(unittest.TestCase):
         self.assertAlmostEqual(stats[0]['delta_x_sample_points_average'], stats_in[0]['delta_x_sample_points_average'])
         self.assertAlmostEqual(stats[0]['delta_y_sample_points_average'], stats_in[0]['delta_y_sample_points_average'])
         self.assertAlmostEqual(stats[0]['number_samples'], stats_in[0]['number_samples'])
-        self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'], stats_in[0]['focal_lengths_parabolic_xy'])
+        self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'][0], stats_in[0]['focal_lengths_parabolic_xy'][0])
+        self.assertAlmostEqual(stats[0]['focal_lengths_parabolic_xy'][1], stats_in[0]['focal_lengths_parabolic_xy'][1])
 
     def compare_actual_expected_images(self, actual_location: str, expected_location: str, tolerance=0.2):
         output = mplt.compare_images(expected_location, actual_location, tolerance)
