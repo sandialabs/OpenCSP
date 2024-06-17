@@ -193,6 +193,9 @@ class TestSofastConfiguration(unittest.TestCase):
         if output is not None:
             raise AssertionError(output)
 
+    def tearDown(self) -> None:
+        plt.close('all')
+
 
 if __name__ == '__main__':
     unittest.main()
