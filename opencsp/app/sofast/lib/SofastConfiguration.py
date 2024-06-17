@@ -144,7 +144,6 @@ class SofastConfiguration:
             Rotation, object to screen reference frames, by default None.
             Only used if v_screen_object_screen is not None
         """
-        display = self.data_sofast_object.display
         orientation = self.data_sofast_object.orientation
         camera = self.data_sofast_object.camera
 
@@ -178,11 +177,16 @@ class SofastConfiguration:
             v_obj_y_screen = Vxyz(([0, 0], [0, axes_length], [0, 0])).rotate(r_object_screen) + v_screen_object_screen
             v_obj_z_screen = Vxyz(([0, 0], [0, 0], [0, axes_length])).rotate(r_object_screen) + v_screen_object_screen
 
-        # Calculate screen outline
-        p_screen_outline = display.interp_func(Vxy(([0, 1, 1, 0, 0], [0, 0, 1, 1, 0])))
-
-        # Calculate center of screen
-        p_screen_cent = display.interp_func(Vxy((0.5, 0.5)))
+        # Calculate screen outline and center
+        if self._is_fringe:
+            display = self.data_sofast_object.display
+            p_screen_outline = display.interp_func(Vxy(([0, 0.95, 0.95, 0, 0], [0, 0, 0.95, 0.95, 0])))
+            p_screen_cent = display.interp_func(Vxy((0.5, 0.5)))
+        elif self._is_fixed:
+            p_screen_outline = Vxyz([np.nan, np.nan, 0])
+            p_screen_cent = self.data_sofast_object.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(
+                Vxy([0, 0], dtype=int)
+            )
 
         # Define positive xyz screen axes extent
         if v_screen_object_screen is None:
