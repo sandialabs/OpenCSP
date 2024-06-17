@@ -63,5 +63,6 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
             prefix + 'ParamsMaskCalculation/keep_largest_area',
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
+        data['keep_largest_area'] = bool(data['keep_largest_area'])
 
         return cls(**data)
