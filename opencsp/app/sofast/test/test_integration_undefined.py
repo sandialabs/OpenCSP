@@ -65,20 +65,20 @@ class test_IntegrationUndefined(unittest.TestCase):
         sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
         # Update parameters
-        sofast.params.mask_hist_thresh = params['mask_hist_thresh']
-        sofast.params.mask_filt_width = params['mask_filt_width']
-        sofast.params.mask_filt_thresh = params['mask_filt_thresh']
-        sofast.params.mask_thresh_active_pixels = params['mask_thresh_active_pixels']
-        sofast.params.mask_keep_largest_area = params['mask_keep_largest_area']
-        sofast.params.geometry_params.perimeter_refine_axial_search_dist = params['perimeter_refine_axial_search_dist']
-        sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = params[
+        sofast.params.mask.hist_thresh = params['mask_hist_thresh']
+        sofast.params.mask.filt_width = params['mask_filt_width']
+        sofast.params.mask.filt_thresh = params['mask_filt_thresh']
+        sofast.params.mask.thresh_active_pixels = params['mask_thresh_active_pixels']
+        sofast.params.mask.keep_largest_area = params['mask_keep_largest_area']
+        sofast.params.geometry.perimeter_refine_axial_search_dist = params['perimeter_refine_axial_search_dist']
+        sofast.params.geometry.perimeter_refine_perpendicular_search_dist = params[
             'perimeter_refine_perpendicular_search_dist'
         ]
-        sofast.params.geometry_params.facet_corns_refine_step_length = params['facet_corns_refine_step_length']
-        sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = params[
+        sofast.params.geometry.facet_corns_refine_step_length = params['facet_corns_refine_step_length']
+        sofast.params.geometry.facet_corns_refine_perpendicular_search_dist = params[
             'facet_corns_refine_perpendicular_search_dist'
         ]
-        sofast.params.geometry_params.facet_corns_refine_frac_keep = params['facet_corns_refine_frac_keep']
+        sofast.params.geometry.facet_corns_refine_frac_keep = params['facet_corns_refine_frac_keep']
 
         # Define surface data
         surface = Surface2DParabolic(

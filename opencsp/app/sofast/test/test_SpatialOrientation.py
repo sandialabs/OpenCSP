@@ -24,8 +24,8 @@ class TestSpatialOrientation(unittest.TestCase):
 
         # Load data
         datasets = [
-            'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2',
         ]
 
         ori = SpatialOrientation.load_from_hdf(data_file_facet)

@@ -54,15 +54,15 @@ class TestImageProcessing(unittest.TestCase):
         mask_raw = ip.calc_mask_raw(data['mask_images'])
 
         # Test
-        datasets = ['DataSofastCalculation/image_processing/general/mask_raw']
+        datasets = ['DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw']
         data = load_hdf5_datasets(datasets, self.data_file_facet)
         np.testing.assert_allclose(data['mask_raw'], mask_raw)
 
     def test_mask_centroid(self):
         """Tests image_processing.centroid_mask()"""
         datasets = [
-            'DataSofastCalculation/image_processing/general/v_mask_centroid_image',
-            'DataSofastCalculation/image_processing/general/mask_raw',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_mask_centroid_image',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw',
         ]
 
         # Load test data
@@ -94,8 +94,8 @@ class TestImageProcessing(unittest.TestCase):
     def test_edges_from_mask(self):
         """Tests image_processing.edges_from_mask()"""
         datasets = [
-            'DataSofastCalculation/image_processing/general/v_edges_image',
-            'DataSofastCalculation/image_processing/general/mask_raw',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw',
         ]
 
         # Load test data
@@ -110,16 +110,16 @@ class TestImageProcessing(unittest.TestCase):
     def test_refine_mask_perimeter(self):
         """Tests image_processing.refine_mask_perimeter()"""
         datasets = [
-            'DataSofastCalculation/image_processing/general/v_edges_image',
-            'DataSofastCalculation/image_processing/general/loop_optic_image_exp',
-            'DataSofastCalculation/image_processing/facet_000/loop_facet_image_refine',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/loop_optic_image_exp',
+            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/loop_facet_image_refine',
         ]
 
         # Get default parameters from Sofast class
         params = ParamsSofastFringe()
         args = [
-            params.geometry_params.perimeter_refine_axial_search_dist,
-            params.geometry_params.perimeter_refine_perpendicular_search_dist,
+            params.geometry.perimeter_refine_axial_search_dist,
+            params.geometry.perimeter_refine_perpendicular_search_dist,
         ]
 
         # Load test data
@@ -190,8 +190,8 @@ class TestImageProcessing(unittest.TestCase):
 
         # Load test data
         datasets = [
-            'DataSofastCalculation/geometry/facet_000/v_screen_points_fractional_screens',
-            'DataSofastCalculation/image_processing/facet_000/mask_processed',
+            'DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/v_screen_points_fractional_screens',
+            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/mask_processed',
         ]
         data = load_hdf5_datasets(datasets, self.data_file_facet)
         measurement = MeasurementSofastFringe.load_from_hdf(self.data_file_measurement_facet)
@@ -217,9 +217,9 @@ class TestImageProcessing(unittest.TestCase):
     def test_calculate_active_pixel_pointing_vectors(self):
         """Tests image_processing.calculate_active_pixel_pointing_vectors()"""
         datasets = [
-            'DataSofastCalculation/geometry/facet_000/u_pixel_pointing_facet',
-            'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
-            'DataSofastCalculation/image_processing/facet_000/mask_processed',
+            'DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/u_pixel_pointing_facet',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
+            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/mask_processed',
         ]
 
         # Load test data

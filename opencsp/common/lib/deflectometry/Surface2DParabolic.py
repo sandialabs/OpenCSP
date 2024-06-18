@@ -271,6 +271,16 @@ class Surface2DParabolic(Surface2DAbstract):
         self.v_optic_screen_optic += v_align_optic_step
 
     def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves data to given file. Data is stored as: PREFIX + ParamsSurface/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
         data = [self.initial_focal_lengths_xy, self.robust_least_squares, self.downsample, 'parabolic']
         datasets = [
             prefix + 'ParamsSurface/initial_focal_lengths_xy',
@@ -282,6 +292,16 @@ class Surface2DParabolic(Surface2DAbstract):
 
     @classmethod
     def load_from_hdf(cls, file: str, prefix: str = ''):
+        """Loads data from given file. Assumes data is stored as: PREFIX + ParamsSurface/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to load from
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
+        """
         # Check surface type
         data = load_hdf5_datasets([prefix + 'ParamsSurface/surface_type'], file)
         if data['surface_type'] != 'parabolic':

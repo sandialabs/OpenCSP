@@ -12,11 +12,11 @@ from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
-import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
+from opencsp.common.lib.tool import hdf5_tools
 
 
 @dataclass
-class CalculationDataGeometryGeneral:
+class CalculationDataGeometryGeneral(hdf5_tools.HDF5_SaveAbstract):
     """Data class used in deflectometry measurments. Saves general geometry and
     orientation data associated with a measurement."""
 
@@ -63,7 +63,7 @@ class CalculationDataGeometryGeneral:
 
 
 @dataclass
-class CalculationDataGeometryFacet:
+class CalculationDataGeometryFacet(hdf5_tools.HDF5_SaveAbstract):
     """Data class used in deflectometry calculations of a single facet. Holds
     geometric/orientation data of a single facet measurement setup.
     """
@@ -110,7 +110,7 @@ class CalculationDataGeometryFacet:
 
 
 @dataclass
-class CalculationError:
+class CalculationError(hdf5_tools.HDF5_SaveAbstract):
     """Data class used in deflectometry calculations. Holds data on measurement/calculation
     errors during deflectometry calculations.
     """
@@ -152,7 +152,7 @@ class CalculationError:
 
 
 @dataclass
-class CalculationImageProcessingFacet:
+class CalculationImageProcessingFacet(hdf5_tools.HDF5_SaveAbstract):
     """Data class used in deflectometry calculations of a single facet. Holds
     image processing data of a single facet measurement.
     """
@@ -194,7 +194,7 @@ class CalculationImageProcessingFacet:
 
 
 @dataclass
-class CalculationImageProcessingGeneral:
+class CalculationImageProcessingGeneral(hdf5_tools.HDF5_SaveAbstract):
     """Data class used in deflectometry calculations. Holds general image processing
     calculations from a deflectometry measurement.
     """
@@ -233,7 +233,7 @@ class CalculationImageProcessingGeneral:
 
 
 @dataclass
-class CalculationFacetEnsemble:
+class CalculationFacetEnsemble(hdf5_tools.HDF5_SaveAbstract):
     """Data class used in deflectometry calculations. Holds calculations
     relating to facet ensembles.
     """

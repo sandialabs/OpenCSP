@@ -33,15 +33,11 @@ class TestSlopeSolver(unittest.TestCase):
 
         # Create spatial orientation objects
         datasets = [
-            'DataSofastCalculation/geometry/general/r_optic_cam_refine_1',
-            'DataSofastCalculation/geometry/general/v_cam_optic_cam_refine_2',
-            'DataSofastCalculation/geometry/facet_000/u_pixel_pointing_facet',
-            'DataSofastCalculation/geometry/facet_000/u_cam_measure_point_facet',
-            'DataSofastCalculation/geometry/facet_000/v_screen_points_facet',
-            'DataSofastInput/surface_params/facet_000/initial_focal_lengths_xy',
-            'DataSofastInput/surface_params/facet_000/downsample',
-            'DataSofastInput/surface_params/facet_000/robust_least_squares',
-            'DataSofastInput/surface_params/facet_000/surface_type',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
+            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2',
+            'DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/u_pixel_pointing_facet',
+            'DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/u_cam_measure_point_facet',
+            'DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/v_screen_points_facet',
         ]
         # Load data
         data = h5.load_hdf5_datasets(datasets, cls.data_file_facet)
@@ -54,11 +50,7 @@ class TestSlopeSolver(unittest.TestCase):
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
         # Perform calculations
-        surface = Surface2DParabolic(
-            initial_focal_lengths_xy=data['initial_focal_lengths_xy'],
-            robust_least_squares=bool(data['robust_least_squares']),
-            downsample=data['downsample'],
-        )
+        surface = Surface2DParabolic.load_from_hdf(cls.data_file_facet, 'DataSofastInput/optic_definition/facet_000/')
         kwargs = {
             'v_optic_cam_optic': ori.v_optic_cam_optic,
             'u_active_pixel_pointing_optic': Uxyz(data['u_pixel_pointing_facet']),
@@ -77,20 +69,24 @@ class TestSlopeSolver(unittest.TestCase):
         cls.data_slope = ss.get_data()
 
     def test_transform_alignment(self):
-        data = h5.load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/trans_alignment'], self.data_file_facet)
+        data = h5.load_hdf5_datasets(
+            ['DataSofastCalculation/facet/facet_000/SlopeSolverData/trans_alignment'], self.data_file_facet
+        )
 
         np.testing.assert_allclose(data['trans_alignment'], self.data_slope.trans_alignment.matrix, atol=1e-8, rtol=0)
 
     def test_int_pts(self):
         data = h5.load_hdf5_datasets(
-            ['DataSofastCalculation/facet/facet_000/v_surf_points_facet'], self.data_file_facet
+            ['DataSofastCalculation/facet/facet_000/SlopeSolverData/v_surf_points_facet'], self.data_file_facet
         )
         np.testing.assert_allclose(
             data['v_surf_points_facet'], self.data_slope.v_surf_points_facet.data, atol=1e-8, rtol=0
         )
 
     def test_slopes(self):
-        data = h5.load_hdf5_datasets(['DataSofastCalculation/facet/facet_000/slopes_facet_xy'], self.data_file_facet)
+        data = h5.load_hdf5_datasets(
+            ['DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy'], self.data_file_facet
+        )
         np.testing.assert_allclose(data['slopes_facet_xy'], self.data_slope.slopes_facet_xy, atol=1e-8, rtol=0)
 
     def test_save_hdf(self):
