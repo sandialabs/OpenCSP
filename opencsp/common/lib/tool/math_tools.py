@@ -320,7 +320,7 @@ def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int
         return avg.tolist()
 
 
-@strict_types
+# @strict_types
 def lambda_symmetric_paraboloid(focal_length: numbers.Number) -> Callable[[float, float], float]:
     a = 1.0 / (4 * focal_length)
     return lambda x, y: a * (x**2 + y**2)

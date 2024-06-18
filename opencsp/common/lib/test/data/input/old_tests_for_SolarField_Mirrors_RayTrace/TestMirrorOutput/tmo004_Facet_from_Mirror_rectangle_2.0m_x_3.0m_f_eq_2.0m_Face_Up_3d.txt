@@ -1,0 +1,17 @@
+Metadata:
+Figure number: 1
+Name: tmo004_Facet, from Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up
+Title: Facet, from Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up
+Code tag: TestMirrorOutput.test_facet()
+View spec: 3d
+
+Title:
+Facet, from Mirror (rectangle 2.0m x 3.0m, f=2.0m), Face Up
+
+Caption:
+A facet defined from a parameteric mirror of shape (rectangle 2.0m x 3.0m), with focal length f=2.0m.
+
+Comments:
+Oriented face horizon.
+Render mirror surface with normals, facet outline with corner normals.
+

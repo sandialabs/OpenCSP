@@ -5,6 +5,7 @@ from opencsp.common.lib.geometry.FunctionXYAbstract import FunctionXYAbstract
 from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.render_control.RenderControlFunctionXY as rcfxy
 import numpy as np
+import matplotlib.pyplot as plt
 
 
 class FunctionXYGrid(FunctionXYAbstract):
@@ -129,9 +130,9 @@ class FunctionXYGrid(FunctionXYAbstract):
                 np.flipud(self.values),
                 colorbar=functionXY_style.colorbar,
                 vmin=vmin,
-                levels=3,  # TODO tjlarki: add to render control
+                levels=3,  # TODO TJL:add to render control
                 vmax=vmax,
-                colors="black",  # TODO tjlarki: add to render control
+                colors="black",  # TODO TJL:add to render control
                 #  cmap=functionXY_style.cmap,
                 extent=extent,
             )

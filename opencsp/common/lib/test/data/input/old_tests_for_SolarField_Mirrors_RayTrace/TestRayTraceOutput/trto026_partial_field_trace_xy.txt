@@ -1,0 +1,19 @@
+Metadata:
+Figure number: 1
+Name: trto026_partial_field_trace
+Title: partial_field_trace
+Code tag: TestRayTraceOutput.test_partial_field_trace()
+View spec: xy
+
+Title:
+partial_field_trace
+
+Caption:
+A partial trace of the NSTTF field.
+
+Comments:
+Partial Solar Field Trace.
+Using 1 ray per surface normal and one surface normal per mirror.
+Mirror curvature and canting is defined per heliostat. They are both parabolic and have focal lengths based on the distance of the heliostat to the tower.
+Traces one in every 13 heliostats in the NSTTF field.
+

@@ -16,12 +16,15 @@ class LightPath:
     The LightPath will represent the path of a photon in a light beam.
     There are two ways to think about the photon for this class.
 
-    1. The photon originates at an unknown point, and only has an original known direction (init_direction [OldVxyz]) and then has bounce off a point(s)
+    1. The photon originates at an unknown point, and only has an original known direction
+    (init_direction [OldVxyz]) and then has bounce off a point(s)
     and now is continuing in the direction of current_direction.
 
-    2. The photon originated at the first point in the list of points it has passed through. In this case the init_direction sould be [0, 0, 0].
+    2. The photon originated at the first point in the list of points it has passed through.
+    In this case the init_direction sould be [0, 0, 0].
 
-    In either case, to represent a photon that no longer exists (i.e. his a wall and did not reflect) simply set the current_dirrection to [0, 0, 0].
+    In either case, to represent a photon that no longer exists
+    (i.e. hits a wall and did not reflect) simply set the current_dirrection to [0, 0, 0].
     """
 
     def __init__(
@@ -62,7 +65,7 @@ class LightPath:
     def __repr__(self) -> str:
         return f"{self.init_direction} --> \n{self.points_list} --> \n{self.current_direction}"
 
-    def __str__(self) -> str:  # TODO tjlarki: make a more useful string representation
+    def __str__(self) -> str:  # TODO TJL:make a more useful string representation
         return f"{self.init_direction} --> \n{self.points_list} --> \n{self.current_direction}"
 
     def many_rays_from_many_vectors(
@@ -93,19 +96,17 @@ class LightPath:
         return res
 
     def draw(self, view: View3d, path_style: rclp.RenderControlLightPath = rclp.default_path()) -> None:
-        # print("drawing ray") # TODO tristan print for debug
-        # print(f"Points: \n{self.points_list}") # TODO tristan debug print
+        # print("drawing ray") #TODO TJL:print for debug
+        # print(f"Points: \n{self.points_list}") # TODO TJL:debug print
         points_array = list(self.points_list.data.T)
         init_direction_array = self.init_direction.data.T[0]
         current_direction_array = self.current_direction.data.T[0]
 
         if path_style.end_at_plane == None:
             view.draw_xyz_list(
-                [points_array[0] - init_direction_array * path_style.init_length]
-                + points_array  # initial direction
-                + [  # each point passed through
-                    points_array[-1] + current_direction_array * path_style.current_length
-                ],  # current direction
+                [points_array[0] - init_direction_array * path_style.init_length]  # initial direction
+                + points_array  # each point passed through
+                + [points_array[-1] + current_direction_array * path_style.current_length],  # current direction
                 style=path_style.line_render_control,
             )
 
@@ -130,11 +131,9 @@ class LightPath:
             curr_length = (Pxyz(points_array[-1]) - intersection).magnitude()
 
             view.draw_xyz_list(
-                [points_array[0] - init_direction_array * path_style.init_length]
-                + points_array  # initial direction
-                + [  # each point passed through
-                    points_array[-1] + current_direction_array * curr_length
-                ],  # current direction
+                [points_array[0] - init_direction_array * path_style.init_length]  # initial direction
+                + points_array  # each point passed through
+                + [points_array[-1] + current_direction_array * curr_length],  # current direction
                 style=path_style.line_render_control,
             )
 

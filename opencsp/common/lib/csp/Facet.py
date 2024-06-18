@@ -1,28 +1,33 @@
 """Facet class inherited by all facet classes"""
 
 from typing import Callable
+from warnings import warn
 
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
-from opencsp.common.lib.csp.OpticOrientation import OpticOrientation
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import VisualizeOrthorectifiedSlopeAbstract
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.render.View3d import View3d
+from opencsp.common.lib.render_control.RenderControlFacet import RenderControlFacet
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
+from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbstract
+
+UP = Vxyz([0, 0, 1])
 
 
-class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
+class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
     """Facet representation that contains a MirrorAbstract object."""
 
-    def __init__(self, mirror: MirrorAbstract) -> 'Facet':
+    def __init__(self, mirror: MirrorAbstract, name: str = None) -> 'Facet':
         """Instantiates Facet class
 
         Parameters
@@ -31,21 +36,18 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
             Mirror object held inside Facet
         """
         self.mirror = mirror
-        self.ori = OpticOrientation()
+        self.name = name
+
+        # OpticOrientationAbstract information
+        OpticOrientationAbstract.__init__(self)
+
         self.pointing_function = None
 
     @property
-    def transform_mirror_base_to_child(self) -> TransformXYZ:
-        return self.mirror.ori.transform_base_to_parent
+    def transform_mirror_to_self(self) -> TransformXYZ:
+        return self.mirror._self_to_parent_transform
 
-    @property
-    def transform_mirror_base_to_base(self) -> TransformXYZ:
-        return self.ori.transform_child_to_base * self.transform_mirror_base_to_child
-
-    @property
-    def transform_mirror_base_to_parent(self) -> TransformXYZ:
-        return self.ori.transform_child_to_parent * self.transform_mirror_base_to_child
-
+    # override from VisualizeOrthorectifiedSlopeAbstract
     @property
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
         """Returns bounding box aligned to XY axes in facet's child coordinate
@@ -57,45 +59,40 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
             Left, right, bottom, top. Facet's child coordinate reference frame.
         """
         # Get XYZ locations of all points making up mirror region
-        points_xy = Vxy.merge([loop.vertices for loop in self.mirror.region.loops])  # mirror base
-        points_z = self.mirror.surface_displacement_at(points_xy)  # mirror base
-        points_xyz = Vxyz((points_xy.x, points_xy.y, points_z))  # mirror base
+        points_xy = Vxy.merge([loop.vertices for loop in self.mirror.region.loops])  # mirror frame
+        points_z = self.mirror.surface_displacement_at(points_xy)  # mirror frame
+        points_xyz = Vxyz((points_xy.x, points_xy.y, points_z))  # mirror frame
 
         # Transform "mirror base" to "facet child" coordinates
-        xyz = self.transform_mirror_base_to_child.apply(points_xyz)  # child
+        xyz = self.mirror._self_to_parent_transform.apply(points_xyz)  # facet frame
 
         # Find bounding box
-        return xyz.x.min(), xyz.x.max(), xyz.y.min(), xyz.y.max()  # child
+        return xyz.x.min(), xyz.x.max(), xyz.y.min(), xyz.y.max()  # facet frame
 
-    def survey_of_points(
-        self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None
-    ) -> tuple[Pxyz, Vxyz]:
+    # override from OpticOrientationAbstract
+    @property
+    def children(self) -> list[OpticOrientationAbstract]:
+        return [self.mirror]
+
+    # override from OpticOrientationAbstract
+    def _add_child_helper(self, new_child: OpticOrientationAbstract):
+        raise ValueError("Facet does not accept new children.")
+
+    # override from RayTraceable
+    def survey_of_points(self, resolution: Resolution) -> tuple[Pxyz, Vxyz]:
         # Get sample point locations (z=0 plane in "child" reference frame)
-        bbox = self.axis_aligned_bounding_box  # left, right, bottom, top, "child"
-        width = bbox[1] - bbox[0]
-        height = bbox[3] - bbox[2]
-        region = RegionXY(LoopXY.from_rectangle(bbox[0], bbox[2], width, height))  # facet child
-        points_child_xy = region.points_sample(resolution, resolution_type, random_seed)  # facet child
-        points_child_xyz = Vxyz((points_child_xy.x, points_child_xy.y, np.zeros(len(points_child_xy))))  # facet child
+        resolution.resolve_in_place(self.axis_aligned_bounding_box)
+        return self._survey_of_points_helper(resolution, TransformXYZ.identity())
 
-        # Filter points that are inside mirror region
-        points_mirror_base_xyz = self.transform_mirror_base_to_child.inv().apply(points_child_xyz)  # mirror base
-        mask = self.mirror.region.is_inside_or_on_border(points_mirror_base_xyz.projXY())
-        points_mirror_base_xyz = points_mirror_base_xyz[mask]  # mirror base
+    def _survey_of_points_helper(
+        self, given_resolution: Resolution, frame_transform: TransformXYZ
+    ) -> tuple[Pxyz, Vxyz]:
+        resolution = given_resolution.change_frame_and_copy(frame_transform)
+        resolution.resolve_in_place(self.axis_aligned_bounding_box)
 
-        # Calculate points and normals at sample locations
-        points_mirror_base, normals_mirror_base = self.mirror.point_and_normal_in_space(
-            points_mirror_base_xyz.projXY()
-        )  # facet child
-        points_mirror_base = self.transform_mirror_base_to_child.inv().apply(points_mirror_base)  # mirror base
-        normals_mirror_base.rotate_in_place(self.transform_mirror_base_to_child.inv().R)  # mirror base
+        return self.mirror._survey_of_points_helper(resolution, self.mirror._self_to_parent_transform.inv())
 
-        # Convert from mirror to fixed reference frame
-        points = self.transform_mirror_base_to_parent.apply(points_mirror_base)  # facet parent
-        normals = normals_mirror_base.rotate(self.transform_mirror_base_to_parent.R)  # facet parent
-
-        return points, normals  # facet parent
-
+    # override from VisualizeOrthorectifiedSlopeAbstract
     def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
         """Returns X and Y surface slopes in ndarray format given X and Y
         sampling axes in the facet's child coordinate reference frame.
@@ -117,13 +114,13 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         points_samp = Vxyz((x_mat, y_mat, z_mat))  # facet child
 
         # Get mask of points on mirror
-        points_samp_mirror = self.transform_mirror_base_to_child.inv().apply(points_samp)  # mirror base
+        points_samp_mirror = self.transform_mirror_to_self.inv().apply(points_samp)  # mirror base
         mask = self.mirror.in_bounds(points_samp_mirror.projXY())
         points_samp_mirror = points_samp_mirror[mask]
 
         # Get normal vectors
         normals = self.mirror.surface_norm_at(points_samp_mirror.projXY())  # mirror base
-        normals.rotate_in_place(self.transform_mirror_base_to_child.R)  # facet child
+        normals.rotate_in_place(self.transform_mirror_to_self.R)  # facet child
 
         # Calculate slopes and output as 2D array
         slope_data = np.zeros((2, len(points_samp))) * np.nan  # facet child
@@ -131,7 +128,11 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         slope_data = np.reshape(slope_data, (2, y_vec.size, x_vec.size))  # facet child
         return slope_data  # facet child
 
-    def draw(self, view: View3d, mirror_style: RenderControlMirror, transform: TransformXYZ | None = None) -> None:
+    # override function from RayTraceable
+    def most_basic_ray_tracable_objects(self) -> list[RayTraceable]:
+        return self.mirror.most_basic_ray_tracable_objects()
+
+    def draw(self, view: View3d, facet_style: RenderControlFacet = None, transform: TransformXYZ = None) -> None:
         """
         Draws facet mirror onto a View3d object.
 
@@ -144,16 +145,77 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         transform : TransformXYZ
             3d transform used to position points in the mirror's base coordinate
             reference frame in space. If None, defaults to position points
-            in the facet's parent coordinate reference frame.
+            in the facet's global coordinate reference frame.
         """
+
+        if facet_style is None:
+            facet_style = RenderControlFacet()
+
         if transform is None:
-            transform = self.transform_mirror_base_to_parent
-        self.mirror.draw(view, mirror_style, transform)
+            transform = self.self_to_global_tranformation
 
-    def set_position_in_space(self, translation: Pxyz, rotation: Rotation) -> None:
-        self.ori.transform_base_to_parent = TransformXYZ.from_R_V(rotation, translation)
+        origin = transform.apply(Vxyz.origin())
 
-    def define_pointing_function(self, func: Callable) -> None:
+        # Centroid.
+        if facet_style.draw_centroid:
+            view.draw_single_Pxyz(origin, style=facet_style.centroid_style)
+
+        # Outline.
+        if facet_style.draw_outline:
+            # corners = [self.top_left_corner,
+            #            self.top_right_corner,
+            #            self.bottom_right_corner,
+            #            self.bottom_left_corner]
+            # view.draw_xyz_list(corners, close=True, style=facet_style.outline_style)
+            left, right, bottom, top = self.axis_aligned_bounding_box
+            border = Pxyz([[left, left, right, right], [top, bottom, bottom, top], [0, 0, 0, 0]])
+            view.draw_Vxyz(transform.apply(border), close=True, style=facet_style.outline_style)
+
+        # Surface normal.
+        if facet_style.draw_surface_normal:
+            # Construct ray.
+            surface_normal_ray = transform.apply(UP * facet_style.surface_normal_length)
+            # Draw ray and its base.
+            view.draw_single_Pxyz(origin, style=facet_style.surface_normal_base_style)
+            view.draw_Vxyz(Vxyz.merge([origin, surface_normal_ray]), style=facet_style.surface_normal_style)
+
+        # # Surface normal drawn at corners.
+        # # (Not the surface normal at the corner.  Facet curvature is not shown.)
+        # if facet_style.draw_surface_normal_at_corners:
+        #     # Construct rays.
+        #     top_left_ray = self.surface_normal_ray(self.top_left_corner, facet_style.corner_normal_length)
+        #     top_right_ray = self.surface_normal_ray(self.top_right_corner, facet_style.corner_normal_length)
+        #     bottom_left_ray = self.surface_normal_ray(self.bottom_left_corner, facet_style.corner_normal_length)
+        #     bottom_right_ray = self.surface_normal_ray(self.bottom_right_corner, facet_style.corner_normal_length)
+        #     rays = [top_left_ray,
+        #             top_right_ray,
+        #             bottom_left_ray,
+        #             bottom_right_ray]
+        #     corners = [self.top_left_corner,
+        #                self.top_right_corner,
+        #                self.bottom_right_corner,
+        #                self.bottom_left_corner]
+        #     # Draw each ray and its base.
+        #     for base, ray in zip(corners, rays):
+        #         view.draw_xyz(base, style=facet_style.corner_normal_base_style)
+        #         view.draw_xyz_list(ray, style=facet_style.corner_normal_style)
+
+        # Name.
+        if facet_style.draw_name:
+            view.draw_xyz_text(origin.data.T[0], self.name, style=facet_style.name_style)
+
+        if facet_style.draw_mirror_curvature:
+            self.mirror.draw(view, facet_style.mirror_styles, transform * self.mirror._self_to_parent_transform)
+
+        # pass  # end function
+
+    ### POINTING FUNCTION METHODS
+    # TODO TJL: Pointing Function methods are not tested with the updated base classes.
+    #           There will need to be an addition to `Facet` that allows users to specify the ways
+    #           a facet mounts the mirror it contains. Defining some function might
+    #           be the way to do this, but that is a task for the future.
+
+    def define_pointing_function_UNVERIFIED(self, func: Callable[..., TransformXYZ]) -> None:
         """Sets the canting function to use. I.e., defines the
         "set_pointing" function.
 
@@ -164,17 +226,18 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         """
         self.pointing_function = func
 
-    def set_pointing(self, *args) -> None:
+    def set_pointing_UNVERIFIED(self, *args) -> None:
         """Sets current facet canting (i.e. sets
         self.ori.transform_child_to_base using the given arguments.
         """
+        # warn("Depricated, do not use OpticOrientation instance, use OpticOrietionAbstract.")
         if self.pointing_function is None:
             raise ValueError('self.pointing_function is not defined. Use self.define_pointing_function.')
-
-        self.ori.transform_child_to_base = self.pointing_function(*args)
+        # self.ori.transform_child_to_base = self.pointing_function(*args)
+        self.mirror._self_to_parent_transform = self.pointing_function(*args)
 
     @classmethod
-    def generate_az_el(cls, mirror: MirrorAbstract) -> 'Facet':
+    def generate_az_el_UNVERIFIED(cls, mirror: MirrorAbstract) -> 'Facet':
         """Generates Facet object defined by a simple azimuth then elevation
         canting strategy. The "pointing_function" accessed by self.set_pointing
         has the following inputs
@@ -193,7 +256,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         return facet
 
     @classmethod
-    def generate_rotation_defined(cls, mirror: MirrorAbstract) -> 'Facet':
+    def generate_rotation_defined_UNVERIFIED(cls, mirror: MirrorAbstract) -> 'Facet':
         """Generates FacetCantable object defined by a given scipy Rotation object.
         The "pointing_function" accessed by self.set_pointing has the following input
             - rotation - scipy.spatial.transform.Rotation - rotation object
@@ -207,3 +270,5 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract):
         facet.define_pointing_function(pointing_function)
 
         return facet
+
+    ###  END POINTING FUNCTION METHODS

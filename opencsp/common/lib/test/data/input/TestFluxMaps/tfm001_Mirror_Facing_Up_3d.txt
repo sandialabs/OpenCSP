@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 1
+Name: tfm001_Mirror Facing Up
+Title: Mirror Facing Up
+Code tag: TestFluxMaps.test_parabolic_mirror_bullet()
+View spec: 3d
+
+Title:
+Mirror Facing Up
+
+Caption:
+A mirror with focal length 5 facing up for a ray trace.
+
+Comments:
+Corresponds to the scene shown in tfm001_Mirror_Facing_Up_3d.png
+

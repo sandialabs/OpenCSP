@@ -20,11 +20,15 @@ from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 import opencsp.common.lib.csp.RayTrace as rt
 from opencsp.common.lib.csp.Scene import Scene
-from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.Pxyz import Pxyz
+from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
+from opencsp.common.lib.render_control import RenderControlFacet as rcf
+from opencsp.common.lib.render_control import RenderControlFacetEnsemble as rcfe
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 from opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
@@ -45,15 +49,12 @@ def visualize_mirror() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate mirror pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
+    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler("xz", [sun_el, -sun_azm], degrees=True))
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
-    euler_angles = rot_pointing.as_euler('zxz')
-    rot_pointing = Rotation.from_euler('xz', euler_angles[1:])
-
-    # Position optic
-    mirror.set_position_in_space(optic_loc, rot_pointing)
+    euler_angles = rot_pointing.as_euler("zxz")
+    rot_pointing = Rotation.from_euler("xz", euler_angles[1:])
 
     # Define source
     source = define_source_sun_time()
@@ -63,11 +64,15 @@ def visualize_mirror() -> None:
     scene.add_light_source(source)
     scene.add_object(mirror)
 
+    # Position optic
+    transform = TransformXYZ.from_R_V(rot_pointing, optic_loc)
+    scene.set_position_in_space(mirror, transform)
+
     # Ray trace mirror
     image, trace = ray_trace_obj(scene, targ_loc, targ_norm)
 
     # Plot ray trace
-    plot_ray_trace(scene, image, trace, 'Mirror')
+    plot_ray_trace(scene, image, trace, "Mirror")
 
 
 def visualize_facet() -> None:
@@ -83,18 +88,15 @@ def visualize_facet() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate facet pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
+    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler("xz", [sun_el, -sun_azm], degrees=True))
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
-    euler_angles = rot_pointing.as_euler('zxz')
-    rot_pointing = Rotation.from_euler('xz', euler_angles[1:])
-
-    # Position optic
-    facet.set_position_in_space(optic_loc, Rotation.identity())
+    euler_angles = rot_pointing.as_euler("zxz")
+    rot_pointing = Rotation.from_euler("xz", euler_angles[1:])
 
     # Point facet
-    facet.set_pointing(rot_pointing)
+    # facet.set_pointing(rot_pointing)
 
     # Define source
     source = define_source_sun_time()
@@ -104,11 +106,15 @@ def visualize_facet() -> None:
     scene.add_light_source(source)
     scene.add_object(facet)
 
+    # Position optic
+    transform = TransformXYZ.from_R_V(rot_pointing, optic_loc)
+    scene.set_position_in_space(facet, transform)
+
     # Ray trace facet
-    image, trace = ray_trace_obj(scene, targ_loc, targ_norm, obj_res=2)
+    image, trace = ray_trace_obj(scene, targ_loc, targ_norm, obj_res=Resolution.pixelX(2))
 
     # Plot ray trace
-    plot_ray_trace(scene, image, trace, 'Facet', plot_rays=True)
+    plot_ray_trace(scene, image, trace, "Facet", plot_rays=True)
 
 
 def visualize_mirror_array() -> None:
@@ -124,18 +130,15 @@ def visualize_mirror_array() -> None:
     optic_loc = Vxyz((0, 95, 0))
 
     # Calculate mirror_array pointing az/el
-    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [sun_el, -sun_azm], degrees=True))
+    v_sun = Vxyz((0, 1, 0)).rotate(Rotation.from_euler("xz", [sun_el, -sun_azm], degrees=True))
     v_optic_targ = (targ_loc - optic_loc).normalize()
     v_pointing = (v_sun + v_optic_targ).normalize()
     rot_pointing = Vxyz((0, 0, 1)).align_to(v_pointing)
-    euler_angles = rot_pointing.as_euler('zxz')
-    rot_pointing = Rotation.from_euler('xz', euler_angles[1:])
-
-    # Position mirror_array
-    mirror_array.set_position_in_space(optic_loc, Rotation.identity())
+    euler_angles = rot_pointing.as_euler("zxz")
+    rot_pointing = Rotation.from_euler("xz", euler_angles[1:])
 
     # Point mirror_array
-    mirror_array.set_pointing(rot_pointing)
+    # mirror_array.set_pointing(rot_pointing)
 
     # Define source
     source = define_source_sun_time()
@@ -145,11 +148,15 @@ def visualize_mirror_array() -> None:
     scene.add_light_source(source)
     scene.add_object(mirror_array)
 
+    # Position mirror_array
+    transform = TransformXYZ.from_R_V(rot_pointing, optic_loc)
+    scene.set_position_in_space(mirror_array, transform)
+
     # Ray trace mirror_array
     image, trace = ray_trace_obj(scene, targ_loc, targ_norm)
 
     # Plot ray trace
-    plot_ray_trace(scene, image, trace, 'Heliostat')
+    plot_ray_trace(scene, image, trace, "Heliostat")
 
 
 def define_mirror(focal_length: float) -> MirrorParametric:
@@ -172,33 +179,41 @@ def define_mirror_array(focal_length: float) -> FacetEnsemble:
     # Define on-axis canting strategy
     v_aim_point = Vxyz((0, 0, focal_length * 2))
     v_init = Vxyz((0, 0, 1))  # +z vector
-    facets = []
-    for x_loc in x_locs:
-        for y_loc in y_locs:
-            # Create facet
-            facet = define_facet(focal_length)
-            # Position facet in array
-            v_loc = Vxyz((x_loc, y_loc, 0))
-            facet.set_position_in_space(v_loc, Rotation.identity())
-            # Set pointing of facet
-            v_point = v_aim_point - v_loc
-            rot = v_init.align_to(v_point)
-            facet.set_pointing(rot)
-            # Save facets
-            facets.append(facet)
-    return FacetEnsemble.generate_rotation_defined(facets)
+    facets = [define_facet(focal_length) for _ in range(25)]
+    facet_locations = Pxyz.merge([Pxyz([x, y, 0]) for y in y_locs for x in x_locs])
+    facet_canting = [v_init.align_to(v_aim_point - v_loc) for v_loc in facet_locations]
+    # for x_loc in x_locs:
+    #     for y_loc in y_locs:
+    #         # Create facet
+    #         facet = define_facet(focal_length)
+    #         # Position facet in array
+    #         v_loc = Vxyz((x_loc, y_loc, 0))
+    #         facet.set_position_in_space(v_loc, Rotation.identity())
+    #         # Set pointing of facet
+    #         v_point = v_aim_point - v_loc
+    #         rot = v_init.align_to(v_point)
+    #         facet.set_pointing(rot)
+    #         # Save facets
+    #         facets.append(facet)
+
+    # Build facet ensemble
+    facet_ensemble = FacetEnsemble(facets)
+    facet_ensemble.set_facet_positions(facet_locations)
+    facet_ensemble.set_facet_canting(facet_canting)
+
+    return facet_ensemble  # FacetEnsemble.generate_rotation_defined(facets)
 
 
 def define_source_sun_time(res: int = 10) -> LightSourceSun:
     # Create source (sun)
-    tz = pytz.timezone('US/Mountain')
+    tz = pytz.timezone("US/Mountain")
     time = datetime.datetime(2023, 7, 1, 12, 0, 0, 0, tz)
     loc = (35.0844, -106.6504)  # degrees, Albuquerque, NM
-    return LightSourceSun.from_location_time(loc, time, resolution=res)
+    return LightSourceSun.from_location_time(loc, time, resolution=10)
 
 
 def ray_trace_obj(
-    scene: Scene, v_targ_cent: Vxyz, v_targ_norm: Uxyz, obj_res: int = 20
+    scene: Scene, v_targ_cent: Vxyz, v_targ_norm: Uxyz, obj_res: Resolution = Resolution.pixelX(20)
 ) -> tuple[np.ndarray, rt.RayTrace]:
     # Trace scene
     trace = rt.trace_scene(scene, obj_resolution=obj_res)
@@ -219,28 +234,33 @@ def ray_trace_obj(
 def plot_ray_trace(scene: Scene, image: np.ndarray, trace: rt.RayTrace, title: str, plot_rays: bool = False) -> None:
     """Plots and saves images"""
     # Define save directory
-    save_dir = os.path.join(os.path.dirname(__file__), 'data/output')
+    save_dir = os.path.join(os.path.dirname(__file__), "data/output")
 
     # Define visualization controls
     figure_control = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
     mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
+    facet_control = rcf.RenderControlFacet(draw_mirror_curvature=True, mirror_styles=mirror_control)
+    fe_control = rcfe.RenderControlFacetEnsemble(default_style=facet_control)
     axis_control_m = rca.meters()
     if plot_rays:
         light_path_control = RenderControlLightPath(current_length=10)
         ray_trace_control = RenderControlRayTrace(light_path_control=light_path_control)
 
+    controls = {MirrorParametric: mirror_control, Facet: facet_control, FacetEnsemble: fe_control}
+
     # Plot scenario
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title=title + ': Ray Trace')
+    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title=title + ": Ray Trace")
     if plot_rays:
         trace.draw(fig_record.view, ray_trace_control)
-    scene.objects[0].draw(fig_record.view, mirror_control)
-    fig_record.axis.axis('equal')
-    fig_record.save(save_dir, 'ray_trace_' + title, 'png')
+    scene.draw_objects(fig_record.view, controls)
+    fig_record.axis.axis("equal")
+    fig_record.view.show(block=True)
+    # fig_record.save(save_dir, 'ray_trace_' + title, 'png')
 
     # Plot image
-    fig_record = fm.setup_figure(figure_control, axis_control_m, title=title + ': Sun Image')
-    fig_record.axis.imshow(image, cmap='jet')
-    fig_record.save(save_dir, 'sun_image_' + title, 'png')
+    fig_record = fm.setup_figure(figure_control, axis_control_m, title=title + ": Sun Image")
+    fig_record.axis.imshow(image, cmap="jet")
+    fig_record.save(save_dir, "sun_image_" + title, "png")
 
 
 def example_optics_and_ray_tracing_driver():
@@ -250,5 +270,5 @@ def example_optics_and_ray_tracing_driver():
     visualize_mirror_array()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     example_optics_and_ray_tracing_driver()

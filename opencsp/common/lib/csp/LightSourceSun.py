@@ -80,8 +80,9 @@ class LightSourceSun(LightSource):
             To print updates.
         """
         # Calculate direction of sun pointing
-        alt = pysolar.solar.get_altitude(loc[0], loc[1], time)
-        azm = pysolar.solar.get_azimuth(loc[0], loc[1], time)
+        longitude, latitude = loc
+        alt = pysolar.solar.get_altitude(latitude, longitude, time)
+        azm = pysolar.solar.get_azimuth(latitude, longitude, time)
         sun_pointing = -Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [alt, -azm], degrees=True))
 
         # Calculate sun ray cone pointing down (z=-1)
@@ -169,9 +170,8 @@ class LightSourceSun(LightSource):
         sun_radius = sun_dia / 2
 
         if resolution >= 3:
-            xs = ys = np.linspace(
-                -sun_radius, sun_radius, resolution
-            )  # defines a square of points, corners cut off later
+            # defines a square of points, corners cut off later
+            xs = ys = np.linspace(-sun_radius, sun_radius, resolution)
         elif resolution == 2:
             xs = ys = np.array([-sun_radius / 3, sun_radius / 3])
         elif resolution == 1:
