@@ -1,8 +1,3 @@
-"""
-
-
-"""
-
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
 from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
@@ -39,8 +34,7 @@ class RenderControlTower:
         We add this method here so that RenderControlHeliostat can be used similarly to RenderControlEnsemble."""
         return self
 
-
-# Common Configurations
+    # Common Configurations
 
 
 def normal_tower():
