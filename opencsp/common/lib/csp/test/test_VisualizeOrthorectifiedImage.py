@@ -168,6 +168,10 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         """Tests if image files match."""
         self.assertIsNone(mplt.compare_images(expected_location, actual_location, tolerance))
 
+    @classmethod
+    def tearDownClass(cls) -> None:
+        plt.close('all')
+
 
 if __name__ == '__main__':
     unittest.main()
