@@ -160,7 +160,7 @@ class MirrorPoint(MirrorAbstract):
 
         # If surface is interpolated, sample using MirrorAbstact method
         else:
-            points, normals = super().survey_of_points(resolution, resolution_type, random_seed)
+            points, normals = super().survey_of_points(resolution)
 
         return points, normals
 
