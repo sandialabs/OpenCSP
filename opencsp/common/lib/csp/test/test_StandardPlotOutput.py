@@ -67,6 +67,7 @@ class TestStandardPlotOutput(unittest.TestCase):
         # Update file options
         output.options_file_output.to_save = True
         output.options_file_output.output_dir = dir_out
+        output.options_file_output.number_in_name = False
 
         # Update raytrace options
         output.options_ray_trace_vis.ensquared_energy_max_semi_width = 1
@@ -81,24 +82,24 @@ class TestStandardPlotOutput(unittest.TestCase):
 
         # Get list of created plots
         files = [
-            "001_Slope_Magnitude_measured_xy.png",
-            "002_Slope_X_measured_xy.png",
-            "003_Slope_Y_measured_xy.png",
-            "004_Curvature_Combined_measured_xy.png",
-            "005_Curvature_X_measured_xy.png",
-            "006_Curvature_Y_measured_xy.png",
-            "007_Slope_Magnitude_reference_xy.png",
-            "008_Slope_X_reference_xy.png",
-            "009_Slope_Y_reference_xy.png",
-            "010_Curvature_Combined_reference_xy.png",
-            "011_Curvature_X_reference_xy.png",
-            "012_Curvature_Y_reference_xy.png",
-            "013_Slope_Deviation_Magnitude_xy.png",
-            "014_Slope_Deviation_X_xy.png",
-            "015_Slope_Deviation_Y_xy.png",
-            "016_Ray_Trace_Image_measured_xy.png",
-            "017_Ray_Trace_Image_reference_xy.png",
-            "018_Ensquared_Energy_xy.png",
+            "Slope_Magnitude_measured_xy.png",
+            "Slope_X_measured_xy.png",
+            "Slope_Y_measured_xy.png",
+            "Curvature_Combined_measured_xy.png",
+            "Curvature_X_measured_xy.png",
+            "Curvature_Y_measured_xy.png",
+            "Slope_Magnitude_reference_xy.png",
+            "Slope_X_reference_xy.png",
+            "Slope_Y_reference_xy.png",
+            "Curvature_Combined_reference_xy.png",
+            "Curvature_X_reference_xy.png",
+            "Curvature_Y_reference_xy.png",
+            "Slope_Deviation_Magnitude_xy.png",
+            "Slope_Deviation_X_xy.png",
+            "Slope_Deviation_Y_xy.png",
+            "Ray_Trace_Image_measured_xy.png",
+            "Ray_Trace_Image_reference_xy.png",
+            "Ensquared_Energy_xy.png",
         ]
         for file in files:
             file_in = join(dir_in, file)

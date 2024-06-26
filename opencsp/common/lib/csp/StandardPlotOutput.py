@@ -61,6 +61,7 @@ class _OptionsFileOutput:
     save_dpi: int = 200
     save_format: str = 'png'
     close_after_save: bool = False
+    number_in_name: bool = True
 
 
 @dataclass
@@ -200,7 +201,12 @@ class StandardPlotOutput:
             quiver_colors = self._process_plot_options(self.options_slope_vis.quiver_color)
 
             # Slope magnitude
-            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation Magnitude")
+            fig_rec = fm.setup_figure(
+                self.fig_control,
+                self.axis_control,
+                name="Slope Deviation Magnitude",
+                number_in_name=self.options_file_output.number_in_name,
+            )
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
@@ -220,7 +226,9 @@ class StandardPlotOutput:
                 )
 
             # Slope x
-            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation X")
+            fig_rec = fm.setup_figure(
+                self.fig_control, self.axis_control, name="Slope Deviation X", number_in_name=False
+            )
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
@@ -240,7 +248,9 @@ class StandardPlotOutput:
                 )
 
             # Slope Y
-            fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Deviation Y")
+            fig_rec = fm.setup_figure(
+                self.fig_control, self.axis_control, name="Slope Deviation Y", number_in_name=False
+            )
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
@@ -273,7 +283,7 @@ class StandardPlotOutput:
 
     def _plot_enclosed_energy(self):
         """Makes measured and/or reference enclosed energy plots"""
-        fig_rec = fm.setup_figure(self.fig_control, name='Ensquared Energy')
+        fig_rec = fm.setup_figure(self.fig_control, name='Ensquared Energy', number_in_name=False)
 
         # Dray reference if available
         if self._ray_trace_output_reference is not None:
@@ -319,7 +329,9 @@ class StandardPlotOutput:
         widths = self._process_plot_options(self.options_curvature_vis.smooth_kernel_width)
 
         # Curvature combined
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Combined ' + suffix)
+        fig_rec = fm.setup_figure(
+            self.fig_control, self.axis_control, name='Curvature Combined ' + suffix, number_in_name=False
+        )
         optic.plot_orthorectified_curvature(
             res=self.options_curvature_vis.resolution,
             type_='combined',
@@ -337,7 +349,9 @@ class StandardPlotOutput:
             )
 
         # Curvature X
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature X ' + suffix)
+        fig_rec = fm.setup_figure(
+            self.fig_control, self.axis_control, name='Curvature X ' + suffix, number_in_name=False
+        )
         optic.plot_orthorectified_curvature(
             res=self.options_curvature_vis.resolution,
             type_='x',
@@ -355,7 +369,9 @@ class StandardPlotOutput:
             )
 
         # Curvature Y
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Curvature Y ' + suffix)
+        fig_rec = fm.setup_figure(
+            self.fig_control, self.axis_control, name='Curvature Y ' + suffix, number_in_name=False
+        )
         optic.plot_orthorectified_curvature(
             res=self.options_curvature_vis.resolution,
             type_='y',
@@ -379,7 +395,9 @@ class StandardPlotOutput:
         quiver_colors = self._process_plot_options(self.options_slope_vis.quiver_color)
 
         # Slope Magnitude
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Magnitude " + suffix)
+        fig_rec = fm.setup_figure(
+            self.fig_control, self.axis_control, name="Slope Magnitude " + suffix, number_in_name=False
+        )
         optic.plot_orthorectified_slope(
             self.options_slope_vis.resolution,
             type_='magnitude',
@@ -398,7 +416,7 @@ class StandardPlotOutput:
             )
 
         # X Slope
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope X " + suffix)
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope X " + suffix, number_in_name=False)
         optic.plot_orthorectified_slope(
             self.options_slope_vis.resolution,
             type_='x',
@@ -417,7 +435,7 @@ class StandardPlotOutput:
             )
 
         # Y Slope
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Y " + suffix)
+        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name="Slope Y " + suffix, number_in_name=False)
         optic.plot_orthorectified_slope(
             self.options_slope_vis.resolution,
             type_='y',
@@ -437,7 +455,9 @@ class StandardPlotOutput:
 
     def _plot_ray_trace_image(self, ray_trace_data: _RayTraceOutput, suffix: str):
         # Draw sun image on target
-        fig_rec = fm.setup_figure(self.fig_control, self.axis_control, name='Ray Trace Image ' + suffix)
+        fig_rec = fm.setup_figure(
+            self.fig_control, self.axis_control, name='Ray Trace Image ' + suffix, number_in_name=False
+        )
         fig_rec.axis.imshow(
             ray_trace_data.histogram,
             cmap='jet',
