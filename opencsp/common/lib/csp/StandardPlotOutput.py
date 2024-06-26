@@ -16,6 +16,7 @@ from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 import opencsp.common.lib.csp.RayTrace as rt
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.csp.Scene import Scene
+from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
@@ -46,7 +47,7 @@ class _OptionsCurvatureVis:
 @dataclass
 class _OptionsRayTraceVis:
     to_ray_trace: bool = True
-    ray_trace_optic_res: int = 20
+    ray_trace_optic_res: float = 0.05
     hist_bin_res: float = 0.07
     hist_extent: float = 3
     ensquared_energy_max_semi_width: float = 2
@@ -525,7 +526,8 @@ class StandardPlotOutput:
         scene.add_object(obj)
 
         # Trace scene
-        trace = rt.trace_scene(scene, obj_resolution=self.options_ray_trace_vis.ray_trace_optic_res)
+        res = Resolution.separation(self.options_ray_trace_vis.ray_trace_optic_res)
+        trace = rt.trace_scene(scene, obj_resolution=res)
 
         # Calculate intersection with plane
         ray_trace = rt.RayTrace(scene)

@@ -1,8 +1,6 @@
 import os
 from os.path import join
 
-from scipy.spatial.transform import Rotation
-
 import opencsp.app.sofast.lib.load_saved_data as lsd
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
@@ -18,9 +16,7 @@ def example_single_facet() -> None:
 
     1. Load Sofast measurement data
     2. Define viewing/illumination geometry
-    3. Create an OpenCSP representation of an ideal facet
-    4. Create an OpenCSP representation of facet measured by Sofast
-    5. Create standard output plots:
+    3. Create standard output plots:
         - Perform ray trace of facet
         - Plot orthorectified slope maps
         - Plot orthorectified slope error map
@@ -50,14 +46,7 @@ def example_single_facet() -> None:
     v_target_normal = Vxyz((0, 0, -1))
     source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
 
-    # 3. Create an OpenCSP representation of an measured/ideal facet
-    # =====================================================
-    r = Rotation.identity()
-    v = Vxyz((0, 0, 0))
-    optic_meas.set_position_in_space(v, r)
-    optic_ref.set_position_in_space(v, r)
-
-    # 4. Create standard output plots
+    # 3. Create standard output plots
     # ===============================
 
     # Define optics to plot
