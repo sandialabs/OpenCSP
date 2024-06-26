@@ -2,6 +2,7 @@ import copy
 from dataclasses import dataclass, field, replace
 import numpy as np
 import numpy.typing as npt
+import os
 import sys
 
 import opencsp.common.lib.csp.LightSource as ls
@@ -11,6 +12,7 @@ from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.log_tools as lt
 
 
 @dataclass(frozen=True)
@@ -154,17 +156,47 @@ class SpotAnalysisOperable:
 
         return ret
 
-    @property
-    def primary_image_name_for_logs(self):
-        image_name = self.primary_image.source_path
+    def get_primary_path_nameext(self) -> tuple[str, str]:
+        """
+        Finds the best source path/name.ext for the primary image of this operable.
+
+        The source path is chosen from among the primary_image's .source_path,
+        the primary_image_source_path, and the primary_image's .cache_path.
+
+        Returns
+        -------
+        source_path: str
+            The path component of the source of the primary_image.
+            "unknown_path" if there isn't an associated source.
+        source_name_ext: str
+            The name.ext component of the source of the primary_image.
+            "unknown_image" if there isn't an associated source.
+        """
+        for image_name in [
+            self.primary_image.source_path,
+            self.primary_image_source_path,
+            self.primary_image.cache_path,
+        ]:
+            if image_name is not None and image_name != "":
+                break
 
         if image_name == None or image_name == "":
-            image_name = "unknown image"
+            ret_path, ret_name_ext = "unknown_path", "unknown_image"
         else:
-            path, name, ext = ft.path_components(image_name)
-            image_name = name + ext
+            ret_path, name, ext = ft.path_components(image_name)
+            ret_name_ext = name + ext
 
-        return image_name
+        return ret_path, ret_name_ext
+
+    @property
+    def best_primary_nameext(self) -> str:
+        """The name.ext of the source of the primary_image."""
+        return self.get_primary_path_nameext()[1]
+
+    @property
+    def best_primary_pathnameext(self) -> str:
+        """The path/name.ext of the source of the primary_image."""
+        return os.path.join(*self.get_primary_path_nameext())
 
     @property
     def max_popf(self) -> npt.NDArray[np.float_]:
@@ -183,3 +215,21 @@ class SpotAnalysisOperable:
             return self.population_statistics.minf
         else:
             return np.min(self.primary_image.nparray)
+
+    def get_fiducials_by_type(
+        self, fiducial_type: type[af.AbstractFiducials]
+    ) -> list[aa.AbstractAnnotations | af.AbstractFiducials]:
+        """
+        Returns all fiducials from self.given_fiducials, self.found_fiducials,
+        and self.annotations that match the given type.
+        """
+        matching_given_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.given_fiducials)
+        matching_found_fiducials = filter(lambda f: isinstance(f, fiducial_type), self.found_fiducials)
+        matching_annotations = filter(lambda f: isinstance(f, fiducial_type), self.annotations)
+        ret = list(matching_given_fiducials) + list(matching_found_fiducials) + list(matching_annotations)
+        if len(ret) == 0:
+            lt.debug(
+                "In SpotAnalysisOperable.get_fiducials_by_type(): "
+                + f"found 0 fiducials matching type {fiducial_type.__name__} for image {self.best_primary_pathnameext}"
+            )
+        return ret

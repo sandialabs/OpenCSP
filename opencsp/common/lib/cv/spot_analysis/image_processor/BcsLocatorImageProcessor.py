@@ -48,7 +48,7 @@ class BcsLocatorImageProcessor(AbstractSpotAnalysisImagesProcessor):
             lt.error_and_raise(
                 RuntimeError,
                 "Error in BcsLocatorImageProcessor._execute(): image must be grayscale (2 dimensions), but "
-                + f"the shape of the image is {image.shape} for '{operable.primary_image_source_path}'",
+                + f"the shape of the image is {image.shape} for '{operable.best_primary_pathnameext}'",
             )
 
         # find all possible matches

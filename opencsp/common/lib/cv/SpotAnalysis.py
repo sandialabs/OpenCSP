@@ -4,6 +4,7 @@ from PIL import Image as Image
 from typing import Iterator
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
+from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
 import opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor as asaip
 
 # from opencsp.common.lib.cv.spot_analysis.image_processor import * # I suggest importing these dynamically as needed, to reduce startup time
@@ -170,6 +171,8 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         """ Other supporting data for processing input images. If not None, then
         all values here will be made available for processing as the default
         values. """
+        self.visualization_coordinator = VisualizationCoordinator()
+        """ Shows the same image from all visualization processors at the same time. """
 
         self.set_image_processors(image_processors)
 
@@ -181,6 +184,10 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             if i == 0:
                 continue
             image_processor.assign_inputs(self.image_processors[i - 1])
+
+        # register the visualization processors
+        self.visualization_coordinator.clear()
+        self.visualization_coordinator.register_visualization_processors(image_processors)
 
         # limit the amount of memory that image processors utilize
         from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessorLeger import (

@@ -99,7 +99,7 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
             lt.error_and_raise(
                 ValueError,
                 "Error in SupportingImagesCollectorImageProcessor._execute(): "
-                + f"unable to determine image type for operable {curr_operable.primary_image_source_path} ({curr_operable})",
+                + f"unable to determine image type for operable {curr_operable.best_primary_pathnameext} ({curr_operable})",
             )
 
         if not is_last:
@@ -118,7 +118,8 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
                     lt.warning(
                         "Warning in SupportingImagesCollectorImageProcessor._update_collection(): "
                         + "no PRIMARY image is available, so we can't create new a new operable. "
-                        + f"Removing {curr_image_type} '{self.collection[curr_image_type].primary_image_source_path}' and replacing it with '{curr_operable.primary_image_source_path}'"
+                        + f"Removing {curr_image_type} '{self.collection[curr_image_type].best_primary_pathnameext}' "
+                        + f"and replacing it with '{curr_operable.best_primary_pathnameext}'"
                     )
                     self.collection[curr_image_type] = curr_operable
                     return []
@@ -138,7 +139,8 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
                 lt.warning(
                     "Warning in SupportingImagesCollectorImageProcessor._update_collection(): "
                     + "mismatched image types. "
-                    + f"Removing {curr_image_type} '{self.collection[curr_image_type].primary_image_source_path}' and replacing it with '{curr_operable.primary_image_source_path}'"
+                    + f"Removing {curr_image_type} '{self.collection[curr_image_type].best_primary_pathnameext}' "
+                    + f"and replacing it with '{curr_operable.best_primary_pathnameext}'"
                 )
             self.collection[curr_image_type] = curr_operable
 

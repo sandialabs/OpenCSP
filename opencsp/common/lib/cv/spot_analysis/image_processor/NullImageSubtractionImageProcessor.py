@@ -27,7 +27,7 @@ class NullImageSubtractionImageProcessor(AbstractSpotAnalysisImagesProcessor):
         if (ImageType.NULL not in operable.supporting_images) or (operable.supporting_images[ImageType.NULL] is None):
             lt.warning(
                 "Warning in NullImageSubtractionImageProcessor._execute(): "
-                + f"skipping subtraction of null image for {operable.primary_image_source_path}. "
+                + f"skipping subtraction of null image for {operable.best_primary_pathnameext}. "
                 + "Given image does not have an associated NULL supporting image."
             )
             return [operable]

@@ -50,7 +50,7 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
         averaged_image = averaged_image.astype(operables[0].primary_image.nparray.dtype)
 
         # collect the list of images that were averaged
-        image_names = [operable.primary_image_source_path for operable in operables]
+        image_names = [f"{operable.best_primary_pathnameext}" for operable in operables]
 
         # build the return operable from the first operable
         averaged_cacheable = CacheableImage(averaged_image, source_path=operables[0].primary_image.source_path)
