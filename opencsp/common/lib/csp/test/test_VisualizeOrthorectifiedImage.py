@@ -35,7 +35,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         shape = RegionXY.from_vertices(Vxy(([0.6, -0.6, -0.6, 0.6], [-0.6, -0.6, 0.6, 0.6])))
 
         # Calculate surface xyz points
-        xv = yv = np.arange(-0.6, 0.7, 0.1)
+        xv = yv = np.arange(-0.6, 0.7, 0.02)
         X, Y = np.meshgrid(xv, yv)
         Z = np.zeros(X.shape)
         surface_points = Pxyz((X, Y, Z))
@@ -131,6 +131,34 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         # Create image
         fig, ax = self._get_axes()
         self.test_mirror_nearest.plot_orthorectified_curvature(0.005, 'combined', 100, ax)
+        fig.savefig(file_out, dpi=300)
+        plt.close(fig)
+        # Test
+        self._compare_actual_expected_images(file_out, file_in)
+
+    def test_plot_curvature_magnitude_linear_processing_smooth(self):
+        # Setup files
+        file_out = join(self.dir_output, 'curvature_linear_smooth.png')
+        file_in = join(self.dir_input, 'curvature_linear_smooth.png')
+        # Create image
+        fig, ax = self._get_axes()
+        self.test_mirror_bilinear.plot_orthorectified_curvature(
+            0.005, 'combined', 100, ax, processing=['smooth'], smooth_kernel_width=5
+        )
+        fig.savefig(file_out, dpi=300)
+        plt.close(fig)
+        # Test
+        self._compare_actual_expected_images(file_out, file_in)
+
+    def test_plot_curvature_magnitude_linear_processing_smooth_log(self):
+        # Setup files
+        file_out = join(self.dir_output, 'curvature_linear_smooth_log.png')
+        file_in = join(self.dir_input, 'curvature_linear_smooth_log.png')
+        # Create image
+        fig, ax = self._get_axes()
+        self.test_mirror_bilinear.plot_orthorectified_curvature(
+            0.005, 'combined', 100, ax, processing=['smooth', 'log'], smooth_kernel_width=5
+        )
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
         # Test
