@@ -8,6 +8,8 @@ from typing import Literal
 import matplotlib.pyplot as plt
 import numpy as np
 
+from opencsp.common.lib.csp.visualize_orthorectified_image import add_quivers, plot_orthorectified_image
+
 
 class VisualizeOrthorectifiedSlopeAbstract:
     """Abstract class inherited by all objects which can have orthorectified slope
@@ -22,6 +24,31 @@ class VisualizeOrthorectifiedSlopeAbstract:
     @abstractmethod
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
         pass
+
+    def get_orthorectified_slope_array(self, res) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """Returns slope array given resolution
+
+        Parameters
+        ----------
+        res : float, optional
+            The xy resolution of the plot, meters, by default 0.1
+
+        Returns
+        -------
+        slope_array : ndarray
+            Shape (2, n, m) array of x/y slopes
+        x_vec : ndarray
+            X interpolation vector
+        y_vec : ndarray
+            Y interpolation vector
+        """
+        # Create interpolation axes
+        left, right, bottom, top = self.axis_aligned_bounding_box
+        x_vec = np.arange(left, right, res)  # meters
+        y_vec = np.arange(bottom, top, res)  # meters
+
+        # Calculate slope image
+        return self.orthorectified_slope_array(x_vec, y_vec), x_vec, y_vec
 
     def plot_orthorectified_slope_error(
         self,
@@ -115,11 +142,11 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Plot image on axis
         extent = (left - res / 2, right + res / 2, bottom - res / 2, top + res / 2)
-        self._plot_orthorectified_image(image, axis, cmap, extent, clims, 'mrad')
+        plot_orthorectified_image(image, axis, cmap, extent, clims, 'mrad')
 
         # Add quiver arrows
         if quiver_density is not None:
-            self._add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
+            add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
 
         # Label axes
         axis.set_title(title)
@@ -164,13 +191,8 @@ class VisualizeOrthorectifiedSlopeAbstract:
         if axis is None:
             axis = plt.gca()
 
-        # Create interpolation axes
-        left, right, bottom, top = self.axis_aligned_bounding_box
-        x_vec = np.arange(left, right, res)  # meters
-        y_vec = np.arange(bottom, top, res)  # meters
-
         # Calculate slope image
-        slopes = self.orthorectified_slope_array(x_vec, y_vec)
+        slopes, x_vec, y_vec = self.get_orthorectified_slope_array(res)
 
         # Calculate slope image
         if type_ == 'x':
@@ -202,12 +224,13 @@ class VisualizeOrthorectifiedSlopeAbstract:
             title = 'Slope Magnitude'
 
         # Plot image on axes
+        left, right, bottom, top = self.axis_aligned_bounding_box
         extent = (left - res / 2, right + res / 2, bottom - res / 2, top + res / 2)
-        self._plot_orthorectified_image(image, axis, 'jet', extent, clims, 'mrad')
+        plot_orthorectified_image(image, axis, 'jet', extent, clims, 'mrad')
 
         # Add quiver arrows
         if quiver_density is not None:
-            self._add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
+            add_quivers(x_image, y_image, x_vec, y_vec, quiver_density, axis, quiver_scale, quiver_color)
 
         # Label axes
         axis.set_title(title)
@@ -281,70 +304,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
             extent = (left, right, bottom, top)
 
         # Plot image on axes
-        self._plot_orthorectified_image(image, axis, 'seismic', extent, clims, 'mrad/meter')
+        plot_orthorectified_image(image, axis, 'seismic', extent, clims, 'mrad/meter')
 
         # Label axes
         axis.set_title(title)
-
-    def _add_quivers(
-        self,
-        im_x: np.ndarray,
-        im_y: np.ndarray,
-        x_vec: np.ndarray,
-        y_vec: np.ndarray,
-        quiver_density: float,
-        axis: plt.Axes | None = None,
-        scale: float | None = None,
-        color: str = 'white',
-    ) -> None:
-        """
-        Adds quiver arrows to data plot.
-
-        Parameters
-        ----------
-        im_x/im_y : ndarray
-            Images to sample x/y quiver directions from.
-        x_vec/y_vec : ndarray
-            X and Y data grid axes, meters.
-        quiver_density : float
-            Spacing of quiver arrows in meters.
-        axis : [plt.Axes | None], optional
-            Axes to plot on. The default is None. If None, uses plt.gca().
-        scale : [float | None], optional
-            Matplotlib "scale" for adding quiver arrows. The default is None.
-            If None, uses the default scale.
-        color : str
-            Color of the quiver arrows.
-        """
-        if axis is None:
-            axis = plt.gca()
-
-        # Calculate quiver points
-        res_x = np.mean(np.abs(np.diff(x_vec)))
-        res_y = np.mean(np.abs(np.diff(y_vec)))
-        Nx = int(quiver_density / res_x)
-        Ny = int(quiver_density / res_y)
-        x1 = int(Nx / 2)
-        y1 = int(Ny / 2)
-
-        x_locs, y_locs = np.meshgrid(x_vec[x1::Nx], y_vec[y1::Ny])
-        u_dirs = -im_x[y1::Ny, x1::Nx]
-        v_dirs = -im_y[y1::Ny, x1::Nx]
-
-        # Add quiver arrows to axes
-        axis.quiver(x_locs, y_locs, u_dirs, v_dirs, color=color, scale=scale, scale_units='x')
-
-    def _plot_orthorectified_image(
-        self,
-        image: np.ndarray,
-        axis: plt.Axes,
-        cmap: str,
-        extent: tuple[float, float, float, float],
-        clims: tuple[float, float],
-        cmap_title: str,
-    ):
-        """Plots orthorectified image on axes"""
-        plt_im = axis.imshow(image, cmap, origin='lower', extent=extent)
-        plt_im.set_clim(clims)
-        plt_cmap = plt.colorbar(plt_im, ax=axis)
-        plt_cmap.ax.set_ylabel(cmap_title, rotation=270, labelpad=15)
