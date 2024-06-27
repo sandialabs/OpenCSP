@@ -23,10 +23,11 @@ from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class ProcessSofastFixed:
+class ProcessSofastFixed(HDF5_SaveAbstract):
     """Fixed Pattern Deflectrometry data processing class"""
 
     def __init__(
@@ -34,7 +35,7 @@ class ProcessSofastFixed:
         orientation: SpatialOrientation,
         camera: Camera,
         fixed_pattern_dot_locs: DotLocationsFixedPattern,
-        facet_data: DefinitionFacet,
+        data_facet: DefinitionFacet,
     ) -> 'ProcessSofastFixed':
         """Instantiates class
 
@@ -46,13 +47,13 @@ class ProcessSofastFixed:
             Camera object
         fixed_pattern_dot_locs : DotLocationsFixedPattern
             Image projection dictionary
-        facet_data : DefinitionFacet
+        data_facet : DefinitionFacet
             DefinitionFacet object
         """
         self.orientation = orientation
         self.camera = camera
         self.fixed_pattern_dot_locs = fixed_pattern_dot_locs
-        self.facet_data = facet_data
+        self.data_facet = data_facet
         self.params = ParamsSofastFixed()
 
         # Measurement data
@@ -78,6 +79,9 @@ class ProcessSofastFixed:
         self.blob_index: BlobIndex
         self.slope_solver: SlopeSolver
 
+        # Input parameters
+        self.data_surface: Surface2DAbstract = None
+
     def find_blobs(self) -> BlobIndex:
         """Finds blobs in image"""
         pts_blob = ip.detect_blobs(self.measurement.image, self.blob_detector)
@@ -102,14 +106,14 @@ class ProcessSofastFixed:
         im_dark = self.measurement.image * 0
         images = np.concatenate((im_dark[..., None], self.measurement.image[..., None]), axis=2)
         params = [
-            self.params.mask_hist_thresh,
-            self.params.mask_filt_width,
-            self.params.mask_filt_thresh,
-            self.params.mask_thresh_active_pixels,
+            self.params.mask.hist_thresh,
+            self.params.mask.filt_width,
+            self.params.mask.filt_thresh,
+            self.params.mask.thresh_active_pixels,
         ]
         mask = ip.calc_mask_raw(images, *params)
 
-        if self.params.mask_keep_largest_area:
+        if self.params.mask.keep_largest_area:
             mask = ip.keep_largest_mask_area(mask)
 
         return mask
@@ -147,13 +151,14 @@ class ProcessSofastFixed:
             self.data_image_processing_facet,
             self.data_error,
         ) = pr.process_singlefacet_geometry(
-            self.facet_data,
+            self.data_facet,
             mask_raw,
             self.measurement.v_measure_point_facet,
             self.measurement.dist_optic_screen,
             self.orientation,
             self.camera,
-            debug=self.params.geometry_data_debug,
+            self.params.geometry,
+            self.params.debug_geometry,
         )
 
         # Define optic orientation w.r.t. camera
@@ -178,7 +183,7 @@ class ProcessSofastFixed:
         u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
         u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_optic).as_Vxyz()
 
-        self.params.slope_solver_data_debug.optic_data = self.facet_data
+        self.params.debug_slope_solver.optic_data = self.data_facet
 
         return {
             'v_optic_cam_optic': v_optic_cam_optic,
@@ -186,9 +191,9 @@ class ProcessSofastFixed:
             'u_measure_pixel_pointing_optic': u_cam_measure_point_facet,
             'v_screen_points_facet': v_screen_points_facet,
             'v_optic_screen_optic': v_optic_screen_optic,
-            'v_align_point_optic': self.facet_data.v_facet_centroid,
+            'v_align_point_optic': self.data_facet.v_facet_centroid,
             'dist_optic_screen': self.measurement.dist_optic_screen,
-            'debug': self.params.slope_solver_data_debug,
+            'debug': self.params.debug_slope_solver,
         }
 
     def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
@@ -228,6 +233,8 @@ class ProcessSofastFixed:
         self.slope_solver.solve_slopes()
         self.data_slope_solver = self.slope_solver.get_data()
 
+        self.data_surface = surface
+
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
 
@@ -235,13 +242,24 @@ class ProcessSofastFixed:
         ----------
         file : str
             HDF file to save to
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
-        self.data_slope_solver.save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
-        self.data_geometry_general.save_to_hdf(file, 'CalculationsFixedPattern/')
-        self.data_image_proccessing_general.save_to_hdf(file, 'CalculationsFixedPattern/')
-        self.data_geometry_facet[0].save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
-        self.data_image_processing_facet[0].save_to_hdf(file, 'CalculationsFixedPattern/Facet_000/')
-        self.data_error.save_to_hdf(file, 'CalculationsFixedPattern/')
+        # Sofast input
+        self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
+        self.data_surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_000/')
+        self.data_facet.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_000/')
+
+        # General
+        self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
+        self.data_geometry_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
+        self.data_image_proccessing_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
+
+        # Calculations
+        self.data_slope_solver.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/facet/facet_000/')
+        self.data_geometry_facet[0].save_to_hdf(file, f'{prefix:s}DataSofastCalculation/facet/facet_000/')
+        self.data_image_processing_facet[0].save_to_hdf(file, f'{prefix:s}DataSofastCalculation/facet/facet_000/')
 
         lt.info(f'SofastFixed data saved to: {file:s} with prefix: {prefix:s}')
 
@@ -254,5 +272,5 @@ class ProcessSofastFixed:
         v_normals_data[:2, :] = self.data_slope_solver.slopes_facet_xy
         v_normals_data[:2, :] *= -1
         v_normals = Uxyz(v_normals_data)
-        shape = RegionXY.from_vertices(self.facet_data.v_facet_corners.projXY())
+        shape = RegionXY.from_vertices(self.data_facet.v_facet_corners.projXY())
         return MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
