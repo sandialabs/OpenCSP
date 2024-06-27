@@ -2,6 +2,7 @@ name: github-UBI8-NIGHTLY
 
 # Runs every night at midnight
 on:
+  workflow_dispatch:
   schedule:
     - cron: '00 00 * * *'
 
