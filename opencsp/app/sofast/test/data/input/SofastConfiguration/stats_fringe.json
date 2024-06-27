@@ -1,0 +1,8 @@
+[
+    {
+        "delta_x_sample_points_average": 0.014442801968728129,
+        "delta_y_sample_points_average": 0.014071081701101154,
+        "number_samples": 7105, 
+        "focal_lengths_parabolic_xy": [120.0160082546748, 108.907382158662]
+    }
+]
