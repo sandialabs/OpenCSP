@@ -7,10 +7,6 @@ import numpy as np
 
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlLightPath import RenderControlLightPath
-from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
-from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
-from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 import opencsp.common.lib.csp.RayTrace as rt
@@ -26,49 +22,88 @@ import opencsp.common.lib.tool.log_tools as lt
 @dataclass
 class _OptionsSlopeVis:
     resolution: float = 0.01
+    """Resolution in meters"""
     clim: float = 5
+    """Colorbar limits; [-clim, clim] for x/y plots and [0, clim] for magnitude plots"""
     quiver_density: float | tuple[float, float, float] = 0.1
+    """The density of the quiver arrows in meters. Can be single value of tuple of three values for [x, y, magnitude]."""
     quiver_scale: float | tuple[float, float, float] = 25
+    """The scale of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
     quiver_color: str | tuple[str, str, str] = 'white'
-    deviation_clim: float = 5
-    to_plot_slope: bool = True
-    to_plot_slope_deviation: bool = True
+    """The color of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
+    to_plot: bool = True
+    """Flag to produce plots or not"""
+
+
+@dataclass
+class _OptionsSlopeDeviationVis:
+    resolution: float = 0.01
+    """Resolution in meters"""
+    clim: float = 5
+    """Colorbar limits. [-clim, clim] for x/y plots and [0, clim] for magnitude plots"""
+    quiver_density: float | tuple[float, float, float] = 0.1
+    """The density of the quiver arrows in meters. Can be single value of tuple of three values for [x, y, magnitude]."""
+    quiver_scale: float | tuple[float, float, float] = 25
+    """The scale of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
+    quiver_color: str | tuple[str, str, str] = 'white'
+    """The color of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
+    to_plot: bool = True
+    """Flag to produce plots or not"""
 
 
 @dataclass
 class _OptionsCurvatureVis:
     resolution: float = 0.01
+    """Resolution in meters"""
     clim: float = 50
+    """Colorbar limits. [-clim, clim]"""
     processing: list[str] | tuple[list[str], list[str], list[str]] = field(default_factory=list)
+    """Processing string to apply when in MirrorAbstract.plot_orthorectified_curvature().
+    Can be single value of tuple of three values for [x, y, combined]."""
     smooth_kernel_width: float | tuple[float, float, float] = 1
+    """Width of square smoothing kernel to apply to curvature images in MirrorAbstract.plot_orthorectified_curvature()."""
     to_plot: bool = True
+    """Flag to produce plots or not"""
 
 
 @dataclass
 class _OptionsRayTraceVis:
-    to_ray_trace: bool = True
     ray_trace_optic_res: float = 0.05
+    """Sampling resolution of optic in meters"""
     hist_bin_res: float = 0.07
+    """Bin resolution when creating 2d histogram images"""
     hist_extent: float = 3
-    ensquared_energy_max_semi_width: float = 2
-    ray_trace_plot_ray_length: float = 80
+    """Width of histogram image in meters"""
+    enclosed_energy_max_semi_width: float = 2
+    """The max semi-width of aperture when computing enclosed energy plots"""
+    to_plot: bool = True
+    """Flag to produce plots or not"""
 
 
 @dataclass
 class _OptionsFileOutput:
     to_save: bool = False
+    """Flag to save figures or not"""
     output_dir: str = ''
+    """Output path to save directory"""
     save_dpi: int = 200
+    """DPI of saved figures"""
     save_format: str = 'png'
+    """Saved figure format"""
     close_after_save: bool = False
+    """To close figures after save"""
     number_in_name: bool = True
+    """To keep figure number in save name"""
 
 
 @dataclass
 class _RayTraceParameters:
     source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=20)
+    """Source to use when producing ray trace image"""
     v_target_center = Vxyz((0, 0, 50))
+    """Location of target in scene"""
     v_target_normal = Vxyz((0, 0, -1))
+    """Orientation of target in scene"""
 
 
 @dataclass
@@ -87,6 +122,8 @@ class StandardPlotOutput:
     def __init__(self):
         self.options_slope_vis = _OptionsSlopeVis()
         """Slope visualization options"""
+        self.options_slope_deviation_vis = _OptionsSlopeDeviationVis()
+        """Slope defiation visualization options"""
         self.options_curvature_vis = _OptionsCurvatureVis()
         """Curvature visualization options"""
         self.options_ray_trace_vis = _OptionsRayTraceVis()
@@ -105,12 +142,6 @@ class StandardPlotOutput:
         # Set up figure control objects for plots
         self.fig_control = RenderControlFigure(tile_array=(4, 2), tile_square=True)
         self.axis_control = rca.meters()
-        self.point_styles = RenderControlPointSeq(linestyle='--', color='k', markersize=0)
-        self.mirror_control = RenderControlMirror(surface_normals=True, norm_res=1, point_styles=self.point_styles)
-        self.light_path_control = RenderControlLightPath(
-            current_length=self.options_ray_trace_vis.ray_trace_plot_ray_length
-        )
-        self.ray_trace_control = RenderControlRayTrace(light_path_control=self.light_path_control)
 
         # Define output data storage classes
         self._ray_trace_output_measured: _RayTraceOutput = None
@@ -133,7 +164,7 @@ class StandardPlotOutput:
         self._plot_slope_curvature_reference_optic()
         self._plot_slope_deviation()
 
-        if self.options_ray_trace_vis.to_ray_trace:
+        if self.options_ray_trace_vis.to_plot:
             # Perform ray tracing, if set
             self._perform_ray_trace_optic_measured()
             self._perform_ray_trace_optic_reference()
@@ -142,9 +173,7 @@ class StandardPlotOutput:
             self._plot_ray_trace_image_reference_optic()
             self._plot_enclosed_energy()
         else:
-            lt.info(
-                'Ray tracing turned off in self.options_ray_trace_vis.to_ray_trace; skipping all ray tracing plots.'
-            )
+            lt.info('Ray tracing turned off in self.options_ray_trace_vis.to_plot; skipping all ray tracing plots.')
 
     def _plot_slope_curvature_measured_optic(self):
         # Plots optic slope/curvature plots for measured optic
@@ -191,8 +220,9 @@ class StandardPlotOutput:
 
     def _plot_slope_deviation(self):
         # Plots slope deviation
-        if not self.options_slope_vis.to_plot_slope_deviation:
+        if not self.options_slope_deviation_vis.to_plot:
             lt.info('Slope deviation plotting turned off; skipping slope deviation plots.')
+            return
 
         if (self.optic_measured is not None) and (self.optic_reference is not None):
             # Separate outputs
@@ -214,7 +244,7 @@ class StandardPlotOutput:
                 quiver_density=quiver_densities[0],
                 quiver_scale=quiver_scales[0],
                 quiver_color=quiver_colors[0],
-                clim=self.options_slope_vis.deviation_clim,
+                clim=self.options_slope_deviation_vis.clim,
                 axis=fig_rec.axis,
             )
             if self._to_save:
@@ -236,7 +266,7 @@ class StandardPlotOutput:
                 quiver_density=quiver_densities[1],
                 quiver_scale=quiver_scales[1],
                 quiver_color=quiver_colors[1],
-                clim=self.options_slope_vis.deviation_clim,
+                clim=self.options_slope_deviation_vis.clim,
                 axis=fig_rec.axis,
             )
             if self._to_save:
@@ -258,7 +288,7 @@ class StandardPlotOutput:
                 quiver_density=quiver_densities[2],
                 quiver_scale=quiver_scales[2],
                 quiver_color=quiver_colors[2],
-                clim=self.options_slope_vis.deviation_clim,
+                clim=self.options_slope_deviation_vis.clim,
                 axis=fig_rec.axis,
             )
             if self._to_save:
@@ -493,7 +523,7 @@ class StandardPlotOutput:
             )
 
             # Create ensquared energy curve
-            ee, ws = rt.ensquared_energy(ray_pts_meas, self.options_ray_trace_vis.ensquared_energy_max_semi_width)
+            ee, ws = rt.ensquared_energy(ray_pts_meas, self.options_ray_trace_vis.enclosed_energy_max_semi_width)
 
             # Save
             self._ray_trace_output_measured = _RayTraceOutput(ray_trace, image, xv, yv, ee, ws)
@@ -516,7 +546,7 @@ class StandardPlotOutput:
             )
 
             # Create ensquared energy curve
-            ee, ws = rt.ensquared_energy(ray_pts, self.options_ray_trace_vis.ensquared_energy_max_semi_width)
+            ee, ws = rt.ensquared_energy(ray_pts, self.options_ray_trace_vis.enclosed_energy_max_semi_width)
 
             # Save data
             self._ray_trace_output_reference = _RayTraceOutput(ray_trace, image, xv, yv, ee, ws)
