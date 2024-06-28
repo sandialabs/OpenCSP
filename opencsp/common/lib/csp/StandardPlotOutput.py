@@ -118,12 +118,12 @@ class StandardPlotOutput:
 
     @property
     def _is_reference_optic(self) -> bool:
-        """To make reference optic plots"""
+        # To make reference optic plots
         return self.optic_reference is not None
 
     @property
     def _to_save(self) -> bool:
-        """To save plots or not"""
+        # To save plots or not
         return self.options_file_output.to_save
 
     def plot(self):
@@ -147,7 +147,7 @@ class StandardPlotOutput:
             )
 
     def _plot_slope_curvature_measured_optic(self):
-        """Plots optic slope/curvature plots for measured optic"""
+        # Plots optic slope/curvature plots for measured optic
         if self.optic_measured is None:
             lt.info('No measured optic; skipping measured optic slope/curvature plots.')
             return
@@ -163,7 +163,7 @@ class StandardPlotOutput:
             lt.info('Curvature plotting turned off; skipping measured optic curvature plots.')
 
     def _plot_slope_curvature_reference_optic(self):
-        """Plots optic slope/curvature plots for reference optic"""
+        # Plots optic slope/curvature plots for reference optic
         if self.optic_reference is None:
             lt.info('No reference optic; skipping reference optic slope/curvature plots.')
             return
@@ -190,7 +190,7 @@ class StandardPlotOutput:
             return [value] * 3
 
     def _plot_slope_deviation(self):
-        """Plots slope deviation"""
+        # Plots slope deviation
         if not self.options_slope_vis.to_plot_slope_deviation:
             lt.info('Slope deviation plotting turned off; skipping slope deviation plots.')
 
@@ -272,17 +272,17 @@ class StandardPlotOutput:
             lt.info('Do not have both measured and reference optic; skipping slope deviation plots.')
 
     def _plot_ray_trace_image_measured_optic(self):
-        """Plot ray trace image for measured optic"""
+        # Plot ray trace image for measured optic
         if self._ray_trace_output_measured is not None:
             self._plot_ray_trace_image(self._ray_trace_output_measured, 'measured')
 
     def _plot_ray_trace_image_reference_optic(self):
-        """Plot ray trace image for reference optic"""
+        # Plot ray trace image for reference optic
         if self._ray_trace_output_reference is not None:
             self._plot_ray_trace_image(self._ray_trace_output_reference, 'reference')
 
     def _plot_enclosed_energy(self):
-        """Makes measured and/or reference enclosed energy plots"""
+        # Makes measured and/or reference enclosed energy plots
         fig_rec = fm.setup_figure(self.fig_control, name='Ensquared Energy', number_in_name=False)
 
         # Dray reference if available
@@ -477,7 +477,7 @@ class StandardPlotOutput:
             )
 
     def _perform_ray_trace_optic_measured(self):
-        """Performs ray trace on measured optic"""
+        # Performs ray trace on measured optic
         if self.optic_measured is not None:
             # Perfom ray trace and intersection
             ray_trace = self._ray_trace_scene(self.optic_measured)
@@ -524,22 +524,9 @@ class StandardPlotOutput:
             lt.info('No reference optic; skipping reference optic ray trace.')
 
     def _ray_trace_scene(self, obj: RayTraceable) -> rt.RayTrace:
-        """Performs a raytrace of a simple scene with a source and an optic.
+        # Performs a raytrace of a simple scene with a source and an optic.
+        # Input an optic (obj) and a RayTrace object is returned.
 
-        Parameters
-        ----------
-        obj : RayTraceable
-            Optic
-        source : LightSource
-            Source
-        obj_resolution : int, optional
-            Mirror ray resolution, by default 1
-
-        Returns
-        -------
-        RayTrace
-            Output raytrace object
-        """
         # Create scene with source and optic
         scene = Scene()
         scene.add_light_source(self.params_ray_trace.source)
