@@ -764,7 +764,7 @@ def ensquared_energy(pts: Vxy, semi_width_max: float, res: int = 50) -> tuple[np
     Returns
     -------
     ndarray
-        Fraction of encircled energy
+        Fraction of ensquared energy
     ndarray
         Semi-widths, in meters
     """

@@ -9,5 +9,4 @@ These examples require additional hardware and data.
 ## Example file description:
 | File | Description |
 | :--- | :--- |
-| load_saved_data.py | Loads saved SofastFringe data from HDF5 file. |
-| sofast_command_line_interface.py | Sofast Fixed and Fringe command line interface. |
+| SofastCommandLineInterface.py | Sofast Fixed and Fringe command line interface. |
