@@ -226,7 +226,7 @@ class StandardPlotOutput:
             lt.info('No reference optic; skipping reference optic curvature plots.')
 
     def _process_plot_options(self, value) -> list:
-        # If given a single value or length 1 tuple/list, returns a tuple/list of length 3 of same value.
+        # If given a single value or length 1 tuple/list, returns length 3 list of the copied value.
         # If given a tuple/list of length 3, returns the same value input
         if isinstance(value, (tuple, list)):
             if len(value) == 3:
