@@ -56,10 +56,10 @@ def example_single_facet() -> None:
 
     # Update visualization parameters
     output.options_slope_vis.clim = 7
-    output.options_slope_vis.deviation_clim = 1.5
+    output.options_slope_deviation_vis.clim = 1.5
+    output.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
     output.options_file_output.to_save = True
     output.options_file_output.output_dir = dir_save
-    output.options_ray_trace_vis.ensquared_energy_max_semi_width = 1
 
     # Define ray trace parameters
     output.params_ray_trace.source = source
