@@ -349,7 +349,7 @@ class StandardPlotOutput:
             self.fig_control, name='Ensquared Energy', number_in_name=self.options_file_output.number_in_name
         )
 
-        # Dray reference if available
+        # Draw reference if available
         if self._has_reference_ray_trace:
             fig_rec.axis.plot(
                 self._ray_trace_output_reference.ensquared_energy_widths,
