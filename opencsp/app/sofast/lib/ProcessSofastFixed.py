@@ -82,6 +82,9 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         # Input parameters
         self.data_surface: Surface2DAbstract = None
 
+        # Input parameters
+        self.data_surface: Surface2DAbstract = None
+
     def find_blobs(self) -> BlobIndex:
         """Finds blobs in image"""
         pts_blob = ip.detect_blobs(self.measurement.image, self.blob_detector)
@@ -232,6 +235,8 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.slope_solver.fit_surface()
         self.slope_solver.solve_slopes()
         self.data_slope_solver = self.slope_solver.get_data()
+
+        self.data_surface = surface
 
         self.data_surface = surface
 
