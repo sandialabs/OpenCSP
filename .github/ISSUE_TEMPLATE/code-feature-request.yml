@@ -23,7 +23,6 @@ body:
       label: Feature
       description: Also, describe the feature you would like.
       placeholder: Describe what you want!
-      value: "42!"
     validations:
       required: true
   - type: textarea
@@ -32,7 +31,6 @@ body:
       label: Feature
       description: Also tell us, what are your requirements?
       placeholder: As a X, I need to Y, so that I can Z.
-      value: "42!"
     validations:
       required: true
   - type: dropdown
@@ -50,7 +48,6 @@ body:
       label: Dependencies
       description: Also tell us, what third party dependencies does this feature require?
       placeholder: foobar v1000
-      value: "42!"
     validations:
       required: false
   - type: checkboxes
