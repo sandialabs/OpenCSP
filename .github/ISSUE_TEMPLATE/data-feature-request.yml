@@ -23,16 +23,15 @@ body:
       label: Feature
       description: Also, describe the feature you would like.
       placeholder: Describe what you want!
-      value: "42!"
     validations:
       required: true
   - type: textarea
     id: requirements
     attributes:
-      label: Feature
+      label: Requirements
       description: Also tell us, what are your requirements?
       placeholder: As a X, I need to Y, so that I can Z.
-      value: "42!"
+      value: "As a X, I need to Y, so that I can Z."
     validations:
       required: true
   - type: dropdown
