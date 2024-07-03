@@ -819,7 +819,9 @@ class SofastGUI:
         self._camera_closed(None)
 
     def close_image_acquisition(self) -> None:
-        """Closes image acquisition"""
+        """
+        Close the single Image Acquisition object if open.
+        """
         # Close the camera
         with et.ignored(Exception):
             ImageAcquisitionAbstract.instance().close()

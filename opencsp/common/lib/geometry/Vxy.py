@@ -8,6 +8,18 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class Vxy:
+    """
+    2D vector class to represent 2D points/vectors.
+
+    Parameters
+    ----------
+    data : array-like
+        The 2d point data: 2xN array, length 2 tuple, length 2 list
+    dtype : data type, optional
+        Data type. The default is float.
+
+    """
+
     def __init__(self, data, dtype=float):
         """
         2D vector class to represent 2D points/vectors.
