@@ -3,13 +3,65 @@ from pathlib import Path
 # Assume opencsp is in PYHTONPATH
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
 
-# TODO: import all user-facing classes here.
+# TODO: why aren't these imported from import opencsp as opencsp above
+from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
+from opencsp.app.sofast.SofastGUI import SofastGUI
+from opencsp.app.sofast.lib import *
+
+# from opencsp.app.target.target_color.target_color_2d_gradient import target_color_2d_gradient
+import opencsp.app.target.target_color.target_color_bullseye_error as target_color_bullseye_error
+import opencsp.app.target.target_color.target_color_bullseye as target_color_bullseye
+import opencsp.app.target.target_color.target_color_one_color as target_color_one_color
+import opencsp.app.target.target_color.target_color_polar as target_color_polar
+import opencsp.app.target.target_color.target_color as target_color
 
 
 def test_docstrings_exist_for_methods():
-    class_list = [
-        Sofast
-        # TODO: List all user-facing classes here.
+    sofast_class_list = [
+        opencsp.app.sofast.lib.AbstractMeasurementSofast,
+        opencsp.app.sofast.lib.BlobIndex,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationDataGeometryFacet,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationDataGeometryGeneral,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationError,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationFacetEnsemble,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationImageProcessingFacet,
+        opencsp.app.sofast.lib.calculation_data_classes.CalculationImageProcessingGeneral,
+        opencsp.app.sofast.lib.CalibrateDisplayShape.CalibrateDisplayShape,
+        opencsp.app.sofast.lib.CalibrateSofastFixedDots.CalibrateSofastFixedDots,
+        opencsp.app.sofast.lib.CalibrateDisplayShape.DataCalculation,
+        opencsp.app.sofast.lib.CalibrateDisplayShape.DataInput,
+        opencsp.app.sofast.lib.DebugOpticsGeometry.DebugOpticsGeometry,
+        opencsp.app.sofast.lib.DefinitionEnsemble.DefinitionEnsemble,
+        opencsp.app.sofast.lib.DefinitionFacet.DefinitionFacet,
+        opencsp.app.sofast.lib.DisplayShape.DisplayShape,
+        opencsp.app.sofast.lib.DistanceOpticScreen.DistanceOpticScreen,
+        opencsp.app.sofast.lib.DotLocationsFixedPattern.DotLocationsFixedPattern,
+        opencsp.app.sofast.lib.Fringes.Fringes,
+        opencsp.app.sofast.lib.ImageCalibrationAbstract.ImageCalibrationAbstract,
+        opencsp.app.sofast.lib.ImageCalibrationGlobal.ImageCalibrationGlobal,
+        opencsp.app.sofast.lib.ImageCalibrationScaling.ImageCalibrationScaling,
+        opencsp.app.sofast.lib.MeasurementSofastFixed.MeasurementSofastFixed,
+        opencsp.app.sofast.lib.MeasurementSofastFringe.MeasurementSofastFringe,
+        opencsp.app.sofast.lib.ParamsMaskCalculation.ParamsMaskCalculation,
+        opencsp.app.sofast.lib.ParamsOpticGeometry.ParamsOpticGeometry,
+        opencsp.app.sofast.lib.ParamsSofastFixed.ParamsSofastFixed,
+        opencsp.app.sofast.lib.ParamsSofastFringe.ParamsSofastFringe,
+        opencsp.app.sofast.lib.PatternSofastFixed.PatternSofastFixed,
+        opencsp.app.sofast.lib.ProcessSofastFixed.ProcessSofastFixed,
+        opencsp.app.sofast.lib.ProcessSofastFringe.ProcessSofastFringe,
+        opencsp.app.sofast.lib.SofastConfiguration.SofastConfiguration,
+        opencsp.app.sofast.lib.SpatialOrientation.SpatialOrientation,
+        opencsp.app.sofast.lib.SystemSofastFixed.SystemSofastFixed,
+        opencsp.app.sofast.lib.SystemSofastFringe.SystemSofastFringe,
+        SofastGUI,
+    ]
+    target_class_list = [
+        target_color,
+        target_color_bullseye,
+        target_color_bullseye_error,
+        target_color_one_color,
+        target_color_polar,
+        opencsp.app.target.target_color.lib.ImageColor,
     ]
     target_class_list = [target_color, target_color_polar, opencsp.app.target.target_color.lib.ImageColor]
     camera_calibration_class_list = [
