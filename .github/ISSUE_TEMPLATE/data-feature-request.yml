@@ -1,0 +1,63 @@
+name: Data Feature Request
+description: Request a new data feature.
+title: "[Data Feature]: "
+labels: ["data feature", "under review"]
+assignees:
+  - e10harvey, bbean23, braden6521
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to fill out this feature request!
+  - type: input
+    id: contact
+    attributes:
+      label: Contact Details
+      description: How can we get in touch with you if we need more info?
+      placeholder: ex. email@example.com
+    validations:
+      required: false
+  - type: textarea
+    id: feature-description
+    attributes:
+      label: Feature
+      description: Also, describe the feature you would like.
+      placeholder: Describe what you want!
+      value: "42!"
+    validations:
+      required: true
+  - type: textarea
+    id: requirements
+    attributes:
+      label: Feature
+      description: Also tell us, what are your requirements?
+      placeholder: As a X, I need to Y, so that I can Z.
+      value: "42!"
+    validations:
+      required: true
+  - type: dropdown
+    id: operating-system
+    attributes:
+      label: What OS do you intend to use this on?
+      multiple: true
+      options:
+        - Windows
+        - Linux
+        - MacOS
+  - type: textarea
+    id: dependencies
+    attributes:
+      label: Dependencies
+      description: Also tell us, what third party dependencies does this feature require?
+      placeholder: foobar v1000
+      value: "42!"
+    validations:
+      required: false
+  - type: checkboxes
+    id: contribution-guidelines
+    attributes:
+      label: Contribution Guidelines
+      description: By submitting this issue, you agree to follow our [contribution guidelines](https://github.com/sandialabs/OpenCSP/blob/main/CONTRIBUTING.md). 
+      options:
+        - label: I agree to follow this project's contribution guidelines
+          required: true
