@@ -40,6 +40,26 @@ class test_Docstrings(unittest.TestCase):
         ViewCrossSectionImageProcessor,
         # TODO: List all user-facing classes here.
     ]
+    target_class_list = [target_color, target_color_polar, opencsp.app.target.target_color.lib.ImageColor]
+    camera_calibration_class_list = [
+        opencsp.app.camera_calibration.lib.calibration_camera,
+        opencsp.app.camera_calibration.lib.image_processing,
+        ViewAnnotatedImages,
+    ]
+    scene_reconstruction_class_list = [opencsp.app.scene_reconstruction.lib.SceneReconstruction.SceneReconstruction]
+    # TODO: example_camera_calibration_list
+    # TODO: example_csp_list
+    # TODO: example_scene_reconstruction_list
+    # TODO: example_sofast_fixed_list
+    # TODO: example_solarfield_list
+    # TODO: example_camera_io_list
+    # TODO: example_mirror_list
+    # TODO: example_raytrace_list
+    # TODO: example_sofast_calibration_list
+    # TODO: example_sofast_fringe_list
+    # TODO: example_targetcolor_list
+
+    class_list = sofast_class_list + target_class_list + camera_calibration_class_list + scene_reconstruction_class_list
 
     def test_docstrings_exist_for_methods(self):
         for class_module in self.class_list:
