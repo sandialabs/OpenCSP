@@ -41,37 +41,42 @@ class MeasurementSofastFixed(ams.AbstractMeasurementSofast):
         self.origin = origin
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix='') -> 'MeasurementSofastFixed':
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'MeasurementSofastFixed':
         """
-        Loads from HDF file
+        Loads data from given file. Assumes data is stored as: PREFIX + MeasurementSofastFringe/Field_1
 
         Parameters
         ----------
         file : string
             HDF file to load
-
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
         # Load grid data
         datasets = [prefix + 'MeasurementSofastFixed/image', prefix + 'MeasurementSofastFixed/origin']
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
-        kwargs.update(super()._load_from_hdf(file, prefix + 'MeasurementSofastFixed'))
+        kwargs.update(super()._load_from_hdf(file, prefix + 'MeasurementSofastFixed/'))
 
         kwargs['origin'] = Vxy(kwargs['origin'])
 
         return cls(**kwargs)
 
-    def save_to_hdf(self, file: str, prefix='') -> None:
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
         """
-        Saves to HDF file
+        Saves data to given file. Data is stored as: PREFIX + MeasurementSofastFringe/Field_1
 
         Parameters
         ----------
         file : string
             HDF file to save
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
         datasets = [prefix + 'MeasurementSofastFixed/image', prefix + 'MeasurementSofastFixed/origin']
         data = [self.image, self.origin.data.squeeze()]
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
-        super()._save_to_hdf(file, prefix + 'MeasurementSofastFixed')
+        super()._save_to_hdf(file, prefix + 'MeasurementSofastFixed/')
