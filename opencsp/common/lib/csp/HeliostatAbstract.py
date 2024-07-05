@@ -190,6 +190,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         Uses the `movement_transform(self, *args)` function to
         set the `_self_to_parent_transform` transformation of the FacetEnsemble in heliostat.
         """
+        # current_position = TransformXYZ.from_V(self.facet_ensemble._self_to_parent_transform.V)
         self.current_configuration = config
         self.facet_ensemble._self_to_parent_transform = self.movement_transform(config)
 
