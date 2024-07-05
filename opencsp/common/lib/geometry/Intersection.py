@@ -140,9 +140,19 @@ class Intersection:
         verbose: bool = False,
     ) -> Pxyz:
         """Vectorized plane intersection algorithm
-        plane = (plane_point, plane_normal_vector)
-            line intersection algorithm
-        lines = (points, directions)
+
+        Parameters
+        ----------
+        lines : tuple[Pxyz, Vxyz]
+            The lines to find intersections for with the given plane. The lines
+            consist of two parts: a point (Pxyz) and a direction (Vxyz). Each
+            index in the points should correspond to the same index in the
+            directions. Note that only one Pxyz and Vxyz is needed to represent
+            multiple lines.
+        plane : tuple[Pxyz, Uxyz]
+            The plane to find the intersections of. The plane definition
+            consists of a point Pxyz that the plane goes through, and the normal
+            vector to the plane Uxyz.
 
         Returns
         -------
@@ -188,8 +198,7 @@ class Intersection:
         P = points.data
         V = directions.data  # current vectors
 
-        if verbose:
-            print("finding intersections...")
+        lt.debug("finding intersections...")
 
         ########## Intersection Algorithm ###########
         # .+ means add element wise
@@ -200,23 +209,6 @@ class Intersection:
         intersection_matrix = P + F  # (3 x N) <- (3 x N) .- (3 x N)
         #############################################
         intersection_points = Pxyz(intersection_matrix)
-
-        # filter out points that miss the plane
-        # if verbose:
-        #     print("filtering out missed vectors")
-        # filtered_intersec_points = (
-        #     intersection_points  # Pxyz.merge(list(filter(lambda vec: not vec.hasnan(),intersection_points)))
-        # )
-
-        # if verbose:
-        #     print("Rotating.")
-        # TODO: Do we want the inverse that takes that vector back into the up vector
-        # up_vec = Vxyz([0, 0, 1])
-        # rot = Vxyz.align_to(plane_normal_vector, up_vec)  # .inv()
-        # rotated_intersec_points: Pxyz = filtered_intersec_points.rotate(rot)
-
-        # if verbose:
-        #     print("Plane intersections caluculated.")
 
         return intersection_points
         # return np.histogram2d(xyz[:,0], xyz[:,1], bins)
