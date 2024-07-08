@@ -1,8 +1,5 @@
 """
-Demonstrate Tower Plotting Routines
-
-Copyright (c) 2021 Sandia National Laboratories.
-
+Demonstrates Tower class
 """
 
 from datetime import datetime

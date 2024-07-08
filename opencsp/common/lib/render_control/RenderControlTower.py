@@ -10,14 +10,44 @@ class RenderControlTower:
 
     def __init__(
         self,
-        centroid: bool = False,
+        centroid=False,
         draw_name=False,
-        name_style=rctxt.default(color='k'),
+        name_style=None,
         draw_outline=True,
-        point_styles: RenderControlPointSeq = rcps.marker(),
-        wire_frame: RenderControlPointSeq = rcps.outline(),
-        target: RenderControlPointSeq = rcps.marker(marker='x', color='r', markersize=6),
+        point_styles: RenderControlPointSeq = None,
+        wire_frame: RenderControlPointSeq = None,
+        target: RenderControlPointSeq = None,
     ) -> None:
+        """
+        Controls for rendering a tower.
+
+        Parameters
+        ----------
+        centroid : bool, optional
+            If True, centroid will be drawn on graph as origin of tower. Default is False.
+        draw_name : bool, optional
+            If True then the name will be drawn on graph. Default is False.
+        name_style : None | str
+            If draw_name = True, then styles name using RenderControlText. By default from RenderControlText, color 'black'.
+        draw_outline : bool
+            Draws outline of Tower using wire_frame style. Default is True.
+        point_styles : RenderControlPointSeq
+            Draws target as a point on the Tower.
+        wire_frame : RenderControlPointSeq
+            Outline style of Tower, that draws walls edges. Default is RenderControlSeq outline, color 'black', linewidth '1'.
+        target : RenderControlPointSeq
+            If target, draws a point on Tower. Default color is 'red', with shape 'x', markersize '6'.
+        """
+
+        # default values
+        if name_style is None:
+            namestyle = rctxt.default(color='k')
+        if point_styles is None:
+            point_styles = rcps.marker()
+        if wire_frame is None:
+            wire_frame = rcps.outline()
+        if target is None:
+            target = rcps.marker(marker='x', color='r', markersize=6)
 
         super(RenderControlTower, self).__init__()
 
