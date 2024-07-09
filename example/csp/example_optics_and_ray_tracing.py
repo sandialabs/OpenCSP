@@ -7,6 +7,8 @@
 
 """
 
+import pytest
+
 import datetime
 import os
 
@@ -263,6 +265,7 @@ def plot_ray_trace(scene: Scene, image: np.ndarray, trace: rt.RayTrace, title: s
     fig_record.save(save_dir, "sun_image_" + title, "png")
 
 
+@pytest.mark.skipif(os.name != 'nt', reason='Test hangs. See https://github.com/sandialabs/OpenCSP/issues/133.')
 def example_optics_and_ray_tracing_driver():
     # """A driver for the OpenCSP optics and ray tracing example"""
     visualize_mirror()
