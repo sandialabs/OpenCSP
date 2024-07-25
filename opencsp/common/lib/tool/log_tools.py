@@ -165,6 +165,22 @@ def _add_stream_handlers(logger_: log.Logger, level: int, formatter: log.Formatt
     logger_.addHandler(h2)
 
 
+def _suppress_newlines(logger: log.Logger, **kwargs):
+    suppressed_terminators: dict[log.Handler, str] = {}
+    if "end" in kwargs:
+        for handler in logger.handlers:
+            if isinstance(handler, log.StreamHandler):
+                suppressed_terminators[handler] = handler.terminator
+                handler.terminator = kwargs["end"]
+        del kwargs["end"]
+    return suppressed_terminators, kwargs
+
+
+def _reset_newlines(suppressed_terminator: dict[log.Handler, str]):
+    for handler, terminator in suppressed_terminator.items():
+        handler.terminator = terminator
+
+
 def get_log_method_for_level(level: int) -> Callable:
     """
     Returns one of the log methods (debug, info, warning, error, critical) based on the given level.
@@ -187,6 +203,12 @@ def get_log_method_for_level(level: int) -> Callable:
     error_and_raise(ValueError, f"Error in log_tools.get_log_method_for_level(): unknown log level {level}")
 
 
+def _log(logger: log.Logger, log_method: Callable, *vargs, **kwargs):
+    suppressed_newlines, kwargs = _suppress_newlines(logger, **kwargs)
+    log_method(*vargs, **kwargs)
+    _reset_newlines(suppressed_newlines)
+
+
 def debug(*vargs, **kwargs) -> int:
     """Output debugging information, both to console and log file.
 
@@ -202,10 +224,10 @@ def debug(*vargs, **kwargs) -> int:
         lt.debug('In my_function(), output_file = ' + str(output_file_dir_body_ext))
     """
     if global_multiprocessing_logger is not None:
-        global_multiprocessing_logger.debug(*vargs, **kwargs)
+        _log(global_multiprocessing_logger, global_multiprocessing_logger.debug, *vargs, **kwargs)
     else:
         if global_singleprocessing_logger is not None:
-            global_singleprocessing_logger.debug(*vargs, **kwargs)
+            _log(global_singleprocessing_logger, global_singleprocessing_logger.debug, *vargs, **kwargs)
         else:
             print(*vargs, **kwargs)
     return 0
@@ -223,10 +245,10 @@ def info(*vargs, **kwargs) -> int:
         lt.info('In my_function(), writing file: ' + str(output_file_dir_body_ext) + '...')
     """
     if global_multiprocessing_logger is not None:
-        global_multiprocessing_logger.info(*vargs, **kwargs)
+        _log(global_multiprocessing_logger, global_multiprocessing_logger.info, *vargs, **kwargs)
     else:
         if global_singleprocessing_logger is not None:
-            global_singleprocessing_logger.info(*vargs, **kwargs)
+            _log(global_singleprocessing_logger, global_singleprocessing_logger.info, *vargs, **kwargs)
         else:
             print(*vargs, **kwargs)
     return 0
@@ -246,10 +268,10 @@ def warning(*vargs, **kwargs):
         lt.warn('In my_function(), Plot x label is empty.')
     """
     if global_multiprocessing_logger is not None:
-        global_multiprocessing_logger.warning(*vargs, **kwargs)
+        _log(global_multiprocessing_logger, global_multiprocessing_logger.warning, *vargs, **kwargs)
     else:
         if global_singleprocessing_logger is not None:
-            global_singleprocessing_logger.warning(*vargs, **kwargs)
+            _log(global_singleprocessing_logger, global_singleprocessing_logger.warning, *vargs, **kwargs)
         else:
             print(*vargs, **kwargs)
     return 0
@@ -272,10 +294,10 @@ def error(*vargs, **kwargs) -> int:
         lt.error('In my_function(), non-positive value x=' + str(x) + ' encountered.')
     """
     if global_multiprocessing_logger is not None:
-        global_multiprocessing_logger.error(*vargs, **kwargs)
+        _log(global_multiprocessing_logger, global_multiprocessing_logger.error, *vargs, **kwargs)
     else:
         if global_singleprocessing_logger is not None:
-            global_singleprocessing_logger.error(*vargs, **kwargs)
+            _log(global_singleprocessing_logger, global_singleprocessing_logger.error, *vargs, **kwargs)
         else:
             print(*vargs, **kwargs, file=sys.stderr)
     return 0
@@ -296,10 +318,10 @@ def critical(*vargs, **kwargs) -> int:
         lt.critical('In my_function(), Negative x should be impossible, but x=' + str(x) + ' encountered.')
     """
     if global_multiprocessing_logger is not None:
-        global_multiprocessing_logger.critical(*vargs, **kwargs)
+        _log(global_multiprocessing_logger, global_multiprocessing_logger.critical, *vargs, **kwargs)
     else:
         if global_singleprocessing_logger is not None:
-            global_singleprocessing_logger.critical(*vargs, **kwargs)
+            _log(global_singleprocessing_logger, global_singleprocessing_logger.critical, *vargs, **kwargs)
         else:
             print(*vargs, **kwargs, file=sys.stderr)
     return 0

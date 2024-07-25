@@ -33,12 +33,26 @@ class TestLogTools(unittest.TestCase):
         self.log_dir_body_ext = os.path.join(self.out_dir, test_method + ".txt")
 
     def proc_exec(self, func_name1: str, func_name2: str = None):
-        with subprocess.Popen([sys.executable, __file__, "--funcname", func_name1, "--logname", self.log_dir_body_ext]):
+        stdout1, stdout2 = "", ""
+
+        with subprocess.Popen(
+            [sys.executable, __file__, "--funcname", func_name1, "--logname", self.log_dir_body_ext],
+            stdout=subprocess.PIPE,
+        ) as proc1:
             if func_name2 != None:
                 with subprocess.Popen(
-                    [sys.executable, __file__, "--funcname", func_name2, "--logname", self.log_dir_body_ext]
-                ):
+                    [sys.executable, __file__, "--funcname", func_name2, "--logname", self.log_dir_body_ext],
+                    stdout=subprocess.PIPE,
+                ) as proc2:
                     pass
+
+                    if proc2 is not None and proc2.stdout is not None:
+                        stdout2 = proc2.stdout.read().decode('utf-8')
+
+            if proc1 is not None and proc1.stdout is not None:
+                stdout1 = proc1.stdout.read().decode('utf-8')
+
+        return stdout1 + stdout2
 
     def get_log_contents(self, preserve_lines=False):
         lines = ft.read_text_file(self.log_dir_body_ext)
@@ -135,6 +149,17 @@ class TestLogTools(unittest.TestCase):
             "RuntimeError encountered" in log_contents,
             f"Can't find evidence of RuntimeError in log contents:\n\t\"{log_contents}\"",
         )
+
+    def _log_end_str(self, _):
+        lt.info("Hello", end=",")
+        lt.info(" world!")
+        lt.info("Goodbye", end="")
+        lt.info(" world!")
+
+    def test_end_str(self):
+        stdout = self.proc_exec("_log_end_str")
+        self.assertTrue("Hello, world!" in stdout, f"Can't find hello log in log contents:\n\t\"{stdout}\"")
+        self.assertTrue("Goodbye world!" in stdout, f"Can't find goodbye log in log contents:\n\t\"{stdout}\"")
 
 
 if __name__ == '__main__':
