@@ -8,6 +8,7 @@ Utilities for image processing.
 import numpy as np
 from PIL import Image
 
+import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 # disable auto formatting
@@ -20,7 +21,7 @@ pil_image_formats_readable = pil_image_formats_rw + ["cur", "dcx", "fits", "fli"
                                                      "gd", "imt", "iptc", "naa", "mcidas", "mic", "mpo", "pcd", "pixar", "psd", "sun", "wal", "wmf", "emf", "xpm"]
 """ A list of all image image formats that can be read by the Python Imaging Library (PIL). Note that not all of these formats can be written by PIL. """
 pil_image_formats_writable = pil_image_formats_rw + ["palm", "pdf", "xv"]
-""" A list of all image image formats that can be written by the Python Imaging Library (PIL). Note that not all of these formats can be ready by PIL. """
+""" A list of all image image formats that can be written by the Python Imaging Library (PIL). Note that not all of these formats can be read by PIL. """
 # fmt: on
 
 
@@ -216,3 +217,42 @@ def range_for_threshold(image: np.ndarray, threshold: int) -> tuple[int, int, in
         ret.append(end)
 
     return tuple(ret)
+
+
+def image_files_in_directory(dir: str, allowable_extensions: list[str] = None) -> list[str]:
+    """
+    Get a list of all image files in the given directory, as determined by the file extension.
+
+    Parameters
+    ----------
+    dir : str
+        The directory to get files from.
+    allowable_extensions : list[str], optional
+        The allowed extensions, such as ["png"]. By default pil_image_formats_rw.
+
+    Returns
+    -------
+    image_file_names_exts: list[str]
+        A list of the name.ext for each image file in the given directory.
+    """
+    # normalize input
+    if allowable_extensions is None:
+        allowable_extensions = pil_image_formats_rw
+    for i, ext in enumerate(allowable_extensions):
+        if ext.startswith("."):
+            continue
+        else:
+            allowable_extensions[i] = "." + ext
+
+    # get all matching files
+    files_per_ext = ft.files_in_directory_by_extension(dir, allowable_extensions)
+
+    # condense into a single list
+    files: list[str] = []
+    for ext in files_per_ext:
+        files += files_per_ext[ext]
+
+    # sort
+    files = sorted(files)
+
+    return files
