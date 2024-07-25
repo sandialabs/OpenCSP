@@ -50,6 +50,10 @@ def path_to_cmd_line(path: str):
 
 
 def norm_path(path: str, allow_extended_length_path=True):
+    """
+    Normalizes the given path (use system-style slashes) and prepend the
+    long-path signifier, as necessary.
+    """
     # normalize the path to use all the same slashes
     path = os.path.normpath(path)
 
@@ -72,6 +76,19 @@ def norm_path(path: str, allow_extended_length_path=True):
                     lt.warn(f"Long path name \"{path}\" detected.")
 
     return path
+
+
+def join(*path_components: str):
+    """
+    Joins and normalize the given path components. For example:
+
+        join("a", "b/c.txt")
+
+    ...is the same as:
+
+        norm_path(os.path.join("a", "b/c.txt"))
+    """
+    return norm_path(os.path.join(*path_components))
 
 
 def body_ext_given_file_dir_body_ext(inputdir_body_ext: str):
@@ -1078,6 +1095,7 @@ def to_csv(
     heading_line: str | bool | None,
     data_lines: list[str | csvi.CsvInterface],
     error_if_dir_not_exist: bool = True,
+    overwrite=False,
 ):
     """Writes a ".csv" file with a heading line and subsequent data lines.
 
@@ -1092,6 +1110,9 @@ def to_csv(
         error_if_dir_not_exist: bool
                                 If True, error if not exist.  If False, create dir if necessary.
     """
+    output_body_ext = convert_string_to_file_body(output_file_body) + '.csv'
+    output_dir_body_ext = join(output_dir, output_body_ext)
+
     # Check status of output_dir.
     if os.path.isfile(output_dir):
         lt.error_and_raise(
@@ -1105,9 +1126,15 @@ def to_csv(
             )
     else:
         create_directories_if_necessary(output_dir)
+
+    # Check status of output file
+    if file_exists(output_dir_body_ext):
+        if not overwrite:
+            lt.error_and_raise(
+                FileExistsError, f"The destination file for {description} ('{output_dir_body_ext}') already exists!"
+            )
+
     # Write output file.
-    output_body_ext = convert_string_to_file_body(output_file_body) + '.csv'
-    output_dir_body_ext = os.path.join(output_dir, output_body_ext)
     if description is not None:
         lt.info('Saving ' + description + ': ' + output_dir_body_ext)
     output_stream = open(output_dir_body_ext, 'w')
