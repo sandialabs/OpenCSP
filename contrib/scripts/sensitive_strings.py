@@ -406,7 +406,9 @@ class SensitiveStringsSearcher:
         path, name, ext = ft.path_components(self.allowed_binary_files_csv)
         self.allowed_binary_files = sorted(self.allowed_binary_files)
 
-        self.allowed_binary_files[0].to_csv("Allowed Binary Files", path, name, rows=self.allowed_binary_files)
+        self.allowed_binary_files[0].to_csv(
+            "Allowed Binary Files", path, name, rows=self.allowed_binary_files, overwrite=True
+        )
 
     def search_files(self):
         self._init_files_lists()
@@ -547,7 +549,7 @@ class SensitiveStringsSearcher:
             path, name, ext = ft.path_components(self.cache_file_csv)
             ft.create_directories_if_necessary(path)
             self.new_cached_cleared_files[0].to_csv(
-                "Cleared Files Cache", path, name, rows=self.new_cached_cleared_files
+                "Cleared Files Cache", path, name, rows=self.new_cached_cleared_files, overwrite=True
             )
 
         # Executive summary
