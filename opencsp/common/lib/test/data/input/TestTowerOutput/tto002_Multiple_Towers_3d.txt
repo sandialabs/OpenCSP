@@ -1,0 +1,18 @@
+Metadata:
+Figure number: 1
+Name: tto002_Multiple Towers
+Title: Multiple Towers
+Code tag: TestTowerOutput.test_multiple_towers()
+View spec: 3d
+
+Title:
+Multiple Towers
+
+Caption:
+Sandia NSTTF reciever and control tower.
+
+Comments:
+Demonstration of single 3d tower drawing.
+Black tower is NSTTF receiver tower.
+Green tower is NSTTF control tower.
+
