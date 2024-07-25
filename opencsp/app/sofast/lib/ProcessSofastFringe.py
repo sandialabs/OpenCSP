@@ -676,7 +676,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             # Locate facet
             if self.optic_type == 'multi':
                 trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror].trans_facet_ensemble
-                facet.set_position_in_space(trans.V, trans.R)
+                facet._self_to_parent_transform = TransformXYZ.from_R_V(trans.R, trans.V)
             # Save facets
             facets.append(facet)
 

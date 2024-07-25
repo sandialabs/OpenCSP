@@ -1,11 +1,12 @@
 from os.path import join, dirname
+from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
+from opencsp.app.sofast.lib.DisplayShape import DisplayShape
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
-from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
@@ -15,8 +16,12 @@ import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
+import opencsp.common.lib.render_control.RenderControlFacet as rcf
+import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
+from opencsp.common.lib.geometry.Vxyz import Vxyz
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
 def example_process_facet_ensemble():
@@ -40,54 +45,102 @@ def example_process_facet_ensemble():
     # Set up logger
     lt.logger(join(dir_save, 'log.txt'), lt.log.INFO)
 
-    # Define sample data directory
-    dir_data_sofast = join(opencsp_code_dir(), 'test/data/sofast_fringe')
-    dir_data_common = join(opencsp_code_dir(), 'test/data/sofast_common')
+    base_dir = join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
-    # Directory setup
-    file_measurement = join(dir_data_sofast, 'data_measurement/measurement_ensemble.h5')
-    file_camera = join(dir_data_common, 'camera_sofast_downsampled.h5')
-    file_display = join(dir_data_common, 'display_distorted_2d.h5')
-    file_orientation = join(dir_data_common, 'spatial_orientation.h5')
-    file_calibration = join(dir_data_sofast, 'data_measurement/image_calibration.h5')
-    file_facet = join(dir_data_common, 'Facet_lab_6x4.json')
-    file_ensemble = join(dir_data_common, 'Ensemble_lab_6x4.json')
+    # Directory Setup
+    file_dataset = join(base_dir, 'data_expected_facet_ensemble/data.h5')
+    file_measurement = join(base_dir, 'data_measurement/measurement_ensemble.h5')
 
-    # 1. Load saved single facet Sofast collection data
-    # =================================================
-    camera = Camera.load_from_hdf(file_camera)
-    display = Display.load_from_hdf(file_display)
-    orientation = SpatialOrientation.load_from_hdf(file_orientation)
+    # Load data
+    camera = Camera.load_from_hdf(file_dataset)
+    display = DisplayShape.load_from_hdf(file_dataset)
+    orientation = SpatialOrientation.load_from_hdf(file_dataset)
     measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
-    calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
-    ensemble_data = DefinitionEnsemble.load_from_json(file_ensemble)
+    calibration = ImageCalibrationScaling.load_from_hdf(file_dataset)
 
-    # 2. Process data with Sofast
-    # ===========================
+    # Load sofast params
+    datasets = [
+        'DataSofastInput/sofast_params/mask_hist_thresh',
+        'DataSofastInput/sofast_params/mask_filt_width',
+        'DataSofastInput/sofast_params/mask_filt_thresh',
+        'DataSofastInput/sofast_params/mask_thresh_active_pixels',
+        'DataSofastInput/sofast_params/mask_keep_largest_area',
+        'DataSofastInput/sofast_params/perimeter_refine_axial_search_dist',
+        'DataSofastInput/sofast_params/perimeter_refine_perpendicular_search_dist',
+        'DataSofastInput/sofast_params/facet_corns_refine_step_length',
+        'DataSofastInput/sofast_params/facet_corns_refine_perpendicular_search_dist',
+        'DataSofastInput/sofast_params/facet_corns_refine_frac_keep',
+    ]
+    params = load_hdf5_datasets(datasets, file_dataset)
 
-    # Define facet data
-    facet_data = [DefinitionFacet.load_from_json(file_facet)] * ensemble_data.num_facets
-
-    # Define surface data
-    surface_data = [
-        Surface2DParabolic(initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=False, downsample=20)
-    ] * ensemble_data.num_facets
-
-    # Calibrate fringes
+    # Calibrate measurement
     measurement.calibrate_fringe_images(calibration)
 
     # Instantiate sofast object
-    sofast = Sofast(measurement, orientation, camera, display)
+    sofast = ProcessSofastFringe(measurement, orientation, camera, display)
+
+    # Update parameters
+    sofast.params.mask.hist_thresh = params['mask_hist_thresh']
+    sofast.params.mask.filt_width = params['mask_filt_width']
+    sofast.params.mask.filt_thresh = params['mask_filt_thresh']
+    sofast.params.mask.thresh_active_pixels = params['mask_thresh_active_pixels']
+    sofast.params.mask.keep_largest_area = params['mask_keep_largest_area']
+
+    sofast.params.geometry.perimeter_refine_axial_search_dist = params['perimeter_refine_axial_search_dist']
+    sofast.params.geometry.perimeter_refine_perpendicular_search_dist = params[
+        'perimeter_refine_perpendicular_search_dist'
+    ]
+    sofast.params.geometry.facet_corns_refine_step_length = params['facet_corns_refine_step_length']
+    sofast.params.geometry.facet_corns_refine_perpendicular_search_dist = params[
+        'facet_corns_refine_perpendicular_search_dist'
+    ]
+    sofast.params.geometry.facet_corns_refine_frac_keep = params['facet_corns_refine_frac_keep']
+
+    # Load ensemble data
+    datasets = [
+        'DataSofastInput/optic_definition/ensemble/ensemble_perimeter',
+        'DataSofastInput/optic_definition/ensemble/r_facet_ensemble',
+        'DataSofastInput/optic_definition/ensemble/v_centroid_ensemble',
+        'DataSofastInput/optic_definition/ensemble/v_facet_locations',
+    ]
+    ensemble_data = load_hdf5_datasets(datasets, file_dataset)
+    ensemble_data = DefinitionEnsemble(
+        Vxyz(ensemble_data['v_facet_locations']),
+        [Rotation.from_rotvec(r) for r in ensemble_data['r_facet_ensemble']],
+        ensemble_data['ensemble_perimeter'],
+        Vxyz(ensemble_data['v_centroid_ensemble']),
+    )
+
+    facet_data = []
+    for idx in range(len(ensemble_data.r_facet_ensemble)):
+        datasets = [
+            f'DataSofastInput/optic_definition/facet_{idx:03d}/v_centroid_facet',
+            f'DataSofastInput/optic_definition/facet_{idx:03d}/v_facet_corners',
+        ]
+        data = load_hdf5_datasets(datasets, file_dataset)
+        facet_data.append(DefinitionFacet(Vxyz(data['v_facet_corners']), Vxyz(data['v_centroid_facet'])))
+
+    # Load surface data
+    surfaces = []
+    for idx in range(len(facet_data)):
+        datasets = [
+            f'DataSofastInput/surface_params/facet_{idx:03d}/downsample',
+            f'DataSofastInput/surface_params/facet_{idx:03d}/initial_focal_lengths_xy',
+            f'DataSofastInput/surface_params/facet_{idx:03d}/robust_least_squares',
+        ]
+        data = load_hdf5_datasets(datasets, file_dataset)
+        data['robust_least_squares'] = bool(data['robust_least_squares'])
+        surfaces.append(Surface2DParabolic(**data))
 
     # Update search parameters
-    sofast.params.mask_hist_thresh = 0.83
-    sofast.params.geometry_params.perimeter_refine_perpendicular_search_dist = 10.0
-    sofast.params.geometry_params.facet_corns_refine_frac_keep = 1.0
-    sofast.params.geometry_params.facet_corns_refine_perpendicular_search_dist = 3.0
-    sofast.params.geometry_params.facet_corns_refine_step_length = 5.0
+    # sofast.params.mask_hist_thresh = 0.83
+    # sofast.params.geometry.perimeter_refine_perpendicular_search_dist = 15.0
+    # sofast.params.geometry.facet_corns_refine_frac_keep = 1.0
+    # sofast.params.geometry.facet_corns_refine_perpendicular_search_dist = 3.0
+    # sofast.params.geometry.facet_corns_refine_step_length = 5.0
 
     # Process
-    sofast.process_optic_multifacet(facet_data, ensemble_data, surface_data)
+    sofast.process_optic_multifacet(facet_data, ensemble_data, surfaces)
 
     # 3. Log best-fit parabolic focal lengths
     # =======================================
@@ -105,19 +158,25 @@ def example_process_facet_ensemble():
     # Generate plots
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
     mirror_control = rcm.RenderControlMirror(centroid=True, surface_normals=True, norm_res=1)
+    facet_control = rcf.RenderControlFacet(
+        draw_mirror_curvature=True, mirror_styles=mirror_control, draw_outline=False, draw_surface_normal=True
+    )
+    facet_ensemble_control = rcfe.RenderControlFacetEnsemble(default_style=facet_control, draw_outline=True)
     axis_control_m = rca.meters()
 
+    # TODO: enable once https://github.com/sandialabs/OpenCSP/issues/133 is resolved done
     # Plot slope map
-    fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
-    ensemble.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
-    fig_record.save(dir_save, 'slope_magnitude', 'png')
+    # fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
+    # ensemble.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
+    # fig_record.save(dir_save, 'slope_magnitude', 'png')
 
+    # TODO: enable once https://github.com/sandialabs/OpenCSP/issues/133 is resolved done
     # 5. Plot 3d representation of facet ensemble
     # ===========================================
-    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='Facet Ensemble')
-    ensemble.draw(fig_record.view, mirror_control)
-    fig_record.axis.axis('equal')
-    fig_record.save(dir_save, 'facet_ensemble', 'png')
+    # fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='Facet Ensemble')
+    # ensemble.draw(fig_record.view, facet_ensemble_control)
+    # fig_record.axis.axis('equal')
+    # fig_record.save(dir_save, 'facet_ensemble', 'png')
 
     # 6. Save slope data as HDF5 file
     # ===============================
