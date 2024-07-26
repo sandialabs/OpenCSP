@@ -111,6 +111,35 @@ class TestFileTools(unittest.TestCase):
         ft.copy_and_delete_file(test_dir + "/copy_and_delete_e.tmp", test_dir + "/copy_and_delete_e.tmp")
         self.assertTrue(ft.file_exists(test_dir + "/copy_and_delete_e.tmp"))
 
+    @unittest.skipIf('nt' not in os.name, "Testing slash normalization and path extension on windows only")
+    def test_norm_path(self):
+        actual = ft.norm_path("a/b/c/d")
+        expected = "a\\b\\c\\d"
+        self.assertEqual(actual, expected, "slashes not normalized")
+
+        actual = ft.norm_path(
+            "thisisaverylongpathnameitneedstobeatleast260characterslongbeforethelongpathnamenormalizationkicksinLoremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliquaUtenimadminimveniamquisnostrudexercitationullamcolaborisnis"
+        )
+        normalized_long_path = "\\\\?\\thisisaverylongpathnameitneedstobeatleast260characterslongbeforethelongpathnamenormalizationkicksinLoremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliquaUtenimadminimveniamquisnostrudexercitationullamcolaborisnis"
+        expected = normalized_long_path
+        self.assertEqual(actual, expected, "long path names not normalized")
+
+        actual = ft.norm_path(normalized_long_path)
+        expected = normalized_long_path
+        self.assertEqual(actual, expected, "long path names that are already normalized are being modified")
+
+        actual = ft.norm_path(
+            "thisisaverylongpathnameitneedstobeatleast260characterslongbeforethelongpathnamenormalizationkicksin/LoremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliquaUtenimadminimveniamquisnostrudexercitationullamcolaborisnis"
+        )
+        normalized_long_path_with_slash = "\\\\?\\thisisaverylongpathnameitneedstobeatleast260characterslongbeforethelongpathnamenormalizationkicksin\\LoremipsumdolorsitametconsecteturadipiscingelitseddoeiusmodtemporincididuntutlaboreetdoloremagnaaliquaUtenimadminimveniamquisnostrudexercitationullamcolaborisnis"
+        expected = normalized_long_path_with_slash
+        self.assertEqual(actual, expected, "long path names with a slash aren't being normalized")
+
+    def test_join(self):
+        actual = ft.join("a", "b/c", "d/e.txt")
+        expected = ft.norm_path("a/b/c/d/e.txt")
+        self.assertEqual(actual, expected)
+
 
 if __name__ == '__main__':
     unittest.main()
