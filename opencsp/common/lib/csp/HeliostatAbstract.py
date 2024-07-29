@@ -275,6 +275,56 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
         self.facet_ensemble.set_facet_cantings(facet_canting_rotations)
 
+    def extract_angles(self, func: FunctionXYContinuous) -> None:
+        """_summary_
+
+        Returns
+        -------
+        _type_
+            _description_
+        """
+        # equation for canting angles
+        x_s = Symbol('x')
+        y_s = Symbol('y')
+
+        sym_func = func(x_s, y_s)
+
+        dfdx = diff(sym_func, x_s)
+        dfdy = diff(sym_func, y_s)
+
+        facet_canting_rotations: list[TransformXYZ] = []
+
+        for i, fac in enumerate(self.facet_ensemble.facets):
+            fac_origin = fac.get_transform_relative_to(self.facet_ensemble).apply(Pxyz.origin())
+            x = fac_origin.x[0]
+            y = fac_origin.y[0]
+
+            dfdx_n = dfdx.subs([(x_s, x), (y_s, y)])
+            dfdy_n = dfdy.subs([(x_s, x), (y_s, y)])
+
+            if (dfdx_n == 0.0) and (dfdy_n == 0.0):
+                # Then the surface normal is vertical, and there is no rotation.
+                canting = Rotation.identity()
+
+            else:
+                # gradient of the surface
+                surf_normal = -Uxyz([dfdx_n, dfdy_n, -1.0])
+                UP = Uxyz([0, 0, 1])
+                canting = UP.align_to(surf_normal)
+
+            facet_canting_rotations.append(canting)
+
+            canting_angles = []
+            rot = Rotation.from_matrix(canting.as_matrix())
+            angles = rot.as_euler('xyz', degrees=True)
+
+            canted_x, canted_y = angles[0], angles[1]
+            canting_angles.append((canted_x, canted_y))
+            print(f"cantings: {canting}")
+            print(f"Facet {i}: x_canting_angle = {canted_x:.5f} degrees, y_canting_angle = {canted_y:.5f} degrees")
+
+        return canting_angles
+
     # RENDERING
 
     def draw(self, view: View3d, heliostat_style: RenderControlHeliostat = None, transform: TransformXYZ = None):

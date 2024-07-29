@@ -105,6 +105,17 @@ def facet_outlines(color='k', **kwargs):
     )
 
 
+def facet_outlines_thin(color='k', linewidth=0.25, **kwargs):
+    return RenderControlFacetEnsemble(
+        draw_normal_vector=False,
+        default_style=rcf.outline_thin(color=color, linewidth=linewidth),
+        normal_vector_style=rcps.outline(color=color),
+        normal_vector_base_style=rcps.marker(color=color),
+        draw_centroid=False,
+        **kwargs
+    )
+
+
 def facet_ensemble_outline(color='k', normal_vector_length=4.0, **kwargs):
     return RenderControlFacetEnsemble(
         draw_normal_vector=True,

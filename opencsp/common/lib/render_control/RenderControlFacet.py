@@ -78,6 +78,16 @@ def outline(color='k'):
     )
 
 
+def outline_thin(color='k', linewidth=0.5):
+    return RenderControlFacet(
+        draw_centroid=False,
+        draw_outline=True,
+        outline_style=rcps.outline(color=color, linewidth=linewidth),
+        draw_surface_normal=False,
+        draw_name=False,
+    )
+
+
 def outline_name(color='k'):
     return RenderControlFacet(
         draw_centroid=False,
