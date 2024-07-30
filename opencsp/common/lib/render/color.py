@@ -97,6 +97,10 @@ class Color:
         Build a colormap that will return a color between this instance and the
         next color(s), given a value between 0 and 1.
 
+        TODO add a "N" parameter to increase the number of colors in the
+        colormap. See the "N" parameter of
+        https://matplotlib.org/stable/api/_as_gen/matplotlib.colors.ListedColormap.html#matplotlib-colors-listedcolormap.
+
         Parameters
         ----------
         next_colors: list[Color]
