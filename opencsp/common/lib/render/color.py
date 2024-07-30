@@ -95,7 +95,7 @@ class Color:
     def build_colormap(self, *next_colors: "Color") -> matplotlib.colors.Colormap:
         """
         Build a colormap that will return a color between this instance and the
-        next color(s), given a value between 0 (inclusive) and 1 (exclusive).
+        next color(s), given a value between 0 and 1.
 
         Parameters
         ----------
@@ -128,6 +128,10 @@ class Color:
         new_colors = np.clip(mixed_colors, 0.0, 1.0)
         name = "".join([clr.name.replace(" ", "") for clr in colors_sequence])
         newcmap = matplotlib.colors.ListedColormap(new_colors, name=name)
+
+        # clamp to the extremis (for inputs < 0 or >= 1)
+        newcmap.set_under(new_colors[0])
+        newcmap.set_over(new_colors[-1])
 
         return newcmap
 

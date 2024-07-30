@@ -77,9 +77,9 @@ class test_Color(unittest.TestCase):
         self.assertAlmostEqual(color_map(0.5)[2], 0.5, places=2)
 
         # blue
-        self.assertAlmostEqual(color_map(0.99999)[0], 0.0, places=2)
-        self.assertAlmostEqual(color_map(0.99999)[1], 0.0, places=2)
-        self.assertAlmostEqual(color_map(0.99999)[2], 1.0, places=2)
+        self.assertAlmostEqual(color_map(1.0)[0], 0.0, places=2)
+        self.assertAlmostEqual(color_map(1.0)[1], 0.0, places=2)
+        self.assertAlmostEqual(color_map(1.0)[2], 1.0, places=2)
 
     def test_colormap_3(self):
         color_map = cl.red().build_colormap(cl.green(), cl.blue())
@@ -103,9 +103,9 @@ class test_Color(unittest.TestCase):
         self.assertAlmostEqual(color_map(0.75)[2], 0.5, places=2)
 
         # blue
-        self.assertAlmostEqual(color_map(0.99999)[0], 0.0, places=2)
-        self.assertAlmostEqual(color_map(0.99999)[1], 0.0, places=2)
-        self.assertAlmostEqual(color_map(0.99999)[2], 1.0, places=2)
+        self.assertAlmostEqual(color_map(1.0)[0], 0.0, places=2)
+        self.assertAlmostEqual(color_map(1.0)[1], 0.0, places=2)
+        self.assertAlmostEqual(color_map(1.0)[2], 1.0, places=2)
 
     def test_matplotlibcolors_match(self):
         mpl_colors = matplotlib.color_sequences['tab10']
