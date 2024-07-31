@@ -275,6 +275,11 @@ class View3d(aph.AbstractPlotHandler):
                         kwargs[to_kw] = kwargs[from_kw]
                     del kwargs[from_kw]
 
+            # encapsulate x and y in a list, if not already a list
+            if not hasattr(x[0], 'len'):
+                x = [x]
+                y = [y]
+
             # draw the arrows!
             for list_idx in range(len(x)):
                 for arrow_idx in range(len(x[list_idx]) - 1):

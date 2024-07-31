@@ -1,18 +1,12 @@
-import os
-import subprocess
 import sys
-import time
 import unittest
 
 import matplotlib.pyplot as plt
 
-import opencsp.common.lib.opencsp_path.opencsp_root_path as root_path
-import opencsp.common.lib.process.subprocess_tools as st
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.test.lib.RenderControlFigureRecordInfSave as rcfr_is
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.tool.file_tools as ft
-import opencsp.common.lib.tool.log_tools as lt
 
 is_original_call = "--funcname" in sys.argv
 """ Because we call this file again but with arguments, we need to know if
@@ -21,21 +15,20 @@ of the unit test methods. """
 
 
 class test_figure_management(unittest.TestCase):
-    dir_in = os.path.join('common', 'lib', 'render', 'test', 'data', 'input', 'figure_management')
-    dir_out = os.path.join('common', 'lib', 'render', 'test', 'data', 'output', 'figure_management')
-
-    def __init__(self, *vargs, **kwargs):
-        super().__init__(*vargs, **kwargs)
-        self.dir_in = test_figure_management.dir_in
-        self.dir_out = test_figure_management.dir_out
-
     @classmethod
     def setUpClass(cls) -> None:
+        path, name, _ = ft.path_components(__file__)
+        cls.dir_in = ft.join(path, 'data/input', name.split('test_')[-1])
+        cls.dir_out = ft.join(path, 'data/output', name.split('test_')[-1])
+
         ret = super().setUpClass()
         ft.create_directories_if_necessary(cls.dir_out)
         if is_original_call:
             ft.delete_files_in_directory(cls.dir_out, "*")
         return ret
+
+    def setUp(self) -> None:
+        self.test_name = self.id().split('.')[-1]
 
     def tearDown(self):
         # Make sure we release all matplotlib resources.
