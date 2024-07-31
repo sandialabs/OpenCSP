@@ -1,3 +1,4 @@
+import copy
 import os
 import time
 from typing import Callable, Iterable
@@ -10,6 +11,16 @@ from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 from PIL import Image
+
+from matplotlib.axes import Axes
+import matplotlib.backend_bases as backb
+from matplotlib.figure import Figure
+import matplotlib.image as mpimg
+import matplotlib.pyplot as plt
+from mpl_toolkits.mplot3d.axes3d import Axes3D
+import numpy as np
+from PIL import Image
+import scipy.ndimage
 
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -221,6 +232,59 @@ class View3d(aph.AbstractPlotHandler):
             lt.info(time.time())
             self.clear()
             draw_func()
+
+    # HELPER
+
+    def _plot(self, x: list[list], y: list[list], *vargs, style: any = None, **kwargs):
+        """
+        Like matplotlib.pyplot.plot(), except that we've overloaded this to plot
+        normally or to plot arrows.
+
+        To plot with arrows, set style.marker to 'arrow'. Note that some of the
+        style choices might be presented differently (or not at all) as compared
+        to more standard scatter or line plots.
+
+        Parameters
+        ----------
+        x : list[list]
+            The x locations of the values to plot. For example [np.array([1, 2, 3])].
+        y : list[list]
+            The y locations of the values to plot. For example [np.array([1, 2, 3])].
+        style : any, optional
+            The marker property of the style controls if we draw normally or
+            with arrows. This is the only property that is used from this
+            parameter.
+            This will typically be a RenderControlPointSeq instance. By default
+            None.
+        """
+        if style is not None and isinstance(style, rcps.RenderControlPointSeq) and style.marker == "arrow":
+            # some of the arguments between plot and arrow are different
+            kwargs = copy.copy(kwargs)
+            toremove = ["marker", "markeredgewidth"]
+            for remove_kw in toremove:
+                if remove_kw in kwargs:
+                    del kwargs[remove_kw]
+            substitutions = [
+                ("markersize", "head_width"),
+                ("markeredgecolor", "facecolor"),
+                ("markerfacecolor", "facecolor"),
+            ]
+            for from_kw, to_kw in substitutions:
+                if from_kw in kwargs:
+                    if from_kw is not None:
+                        kwargs[to_kw] = kwargs[from_kw]
+                    del kwargs[from_kw]
+
+            # draw the arrows!
+            for list_idx in range(len(x)):
+                for arrow_idx in range(len(x[list_idx]) - 1):
+                    c1 = (x[list_idx][arrow_idx], y[list_idx][arrow_idx])
+                    c2 = (x[list_idx][arrow_idx + 1], y[list_idx][arrow_idx + 1])
+                    self.axis.arrow(
+                        c1[0], c1[1], c2[0] - c1[0], c2[1] - c1[1], *vargs, length_includes_head=True, **kwargs
+                    )
+        else:
+            self.axis.plot(x, y, *vargs, **kwargs)
 
     # WRITE
 
@@ -518,7 +582,9 @@ class View3d(aph.AbstractPlotHandler):
             )
             assert False
 
-    def draw_xyz(self, xyz, style: rcps.RenderControlPointSeq = None, label: str = None):  # An xyz is [x,y,z]
+    def draw_xyz(
+        self, xyz: tuple[list, list], style: rcps.RenderControlPointSeq = None, label: str = None
+    ):  # An xyz is [x,y,z]
         """Plots a single point, I think (BGB)."""
         if style == None:
             style = rcps.default()
@@ -538,61 +604,32 @@ class View3d(aph.AbstractPlotHandler):
                 markeredgewidth=style.markeredgewidth,
                 markerfacecolor=style.markerfacecolor,
             )
-        elif self.view_spec['type'] == 'xy':
-            self.axis.plot(
-                [xyz[0]],
-                [xyz[1]],
-                label=label,
-                color=style.color,
-                marker=style.marker,
-                markersize=style.markersize,
-                markeredgecolor=style.markeredgecolor,
-                markeredgewidth=style.markeredgewidth,
-                markerfacecolor=style.markerfacecolor,
-            )
-        elif self.view_spec['type'] == 'xz':
-            self.axis.plot(
-                [xyz[0]],
-                [xyz[2]],
-                label=label,
-                color=style.color,
-                marker=style.marker,
-                markersize=style.markersize,
-                markeredgecolor=style.markeredgecolor,
-                markeredgewidth=style.markeredgewidth,
-                markerfacecolor=style.markerfacecolor,
-            )
-        elif self.view_spec['type'] == 'yz':
-            self.axis.plot(
-                [xyz[1]],
-                [xyz[2]],
-                label=label,
-                color=style.color,
-                marker=style.marker,
-                markersize=style.markersize,
-                markeredgecolor=style.markeredgecolor,
-                markeredgewidth=style.markeredgewidth,
-                markerfacecolor=style.markerfacecolor,
-            )
-        elif self.view_spec['type'] == 'vplane':
-            pq = vs.xyz2pq(xyz, self.view_spec)
-            self.axis.plot(
-                [pq[0]],
-                [pq[1]],
-                label=label,
-                color=style.color,
-                marker=style.marker,
-                markersize=style.markersize,
-                markeredgecolor=style.markeredgecolor,
-                markeredgewidth=style.markeredgewidth,
-                markerfacecolor=style.markerfacecolor,
-            )
-        elif self.view_spec['type'] == 'camera':
-            pq = vs.xyz2pq(xyz, self.view_spec)
-            if pq:
-                self.axis.plot(
-                    [pq[0]],
-                    [pq[1]],
+        elif self.view_spec['type'] in ['xy', 'xz', 'yz', 'vplane', 'camera']:
+            coords1, coords2 = None, None
+
+            if self.view_spec['type'] == 'xy':
+                coords1 = [xyz[0]]
+                coords2 = [xyz[1]]
+            elif self.view_spec['type'] == 'xz':
+                coords1 = [xyz[0]]
+                coords2 = [xyz[2]]
+            elif self.view_spec['type'] == 'yz':
+                coords1 = [xyz[1]]
+                coords2 = [xyz[2]]
+            elif self.view_spec['type'] == 'vplane':
+                pq = vs.xyz2pq(xyz, self.view_spec)
+                coords1 = [pq[0]]
+                coords2 = [pq[1]]
+            elif self.view_spec['type'] == 'camera':
+                pq = vs.xyz2pq(xyz, self.view_spec)
+                if pq:
+                    coords1 = [pq[0]]
+                    coords2 = [pq[1]]
+
+            if coords1 is not None:
+                self._plot(
+                    coords1,
+                    coords2,
                     label=label,
                     color=style.color,
                     marker=style.marker,
@@ -617,7 +654,13 @@ class View3d(aph.AbstractPlotHandler):
         for x, y, z, label in zip(p.x, p.y, p.z, labels):
             self.draw_xyz((x, y, z), style, label)
 
-    def draw_xyz_list(self, input_xyz_list: list[list], close=False, style=None, label=None) -> None:
+    def draw_xyz_list(
+        self,
+        input_xyz_list: Iterable[tuple[float, float, float]],
+        close=False,
+        style: rcps.RenderControlPointSeq = None,
+        label: str = None,
+    ) -> None:
         """Draw lines or closed polygons.
 
         Parameters
@@ -635,12 +678,16 @@ class View3d(aph.AbstractPlotHandler):
                 xyz_list.append(input_xyz_list[0])
             else:
                 xyz_list = input_xyz_list
-            # Draw the point list.
+
+            # Draw the point list in 3d.
             if self.view_spec['type'] == '3d':
+                x_list = [xyz[0] for xyz in xyz_list]
+                y_list = [xyz[1] for xyz in xyz_list]
+                z_list = [xyz[2] for xyz in xyz_list]
                 self.axis.plot3D(
-                    [xyz[0] for xyz in xyz_list],
-                    [xyz[1] for xyz in xyz_list],
-                    [xyz[2] for xyz in xyz_list],
+                    x_list,
+                    y_list,
+                    z_list,
                     label=label,
                     linestyle=style.linestyle,
                     linewidth=style.linewidth,
@@ -651,10 +698,29 @@ class View3d(aph.AbstractPlotHandler):
                     markeredgewidth=style.markeredgewidth,
                     markerfacecolor=style.markerfacecolor,
                 )
-            elif self.view_spec['type'] == 'xy':
-                self.axis.plot(
-                    [xyz[0] for xyz in xyz_list],
-                    [xyz[1] for xyz in xyz_list],
+
+            # Draw the point list in 2d.
+            elif self.view_spec['type'] in ['xy', 'yz', 'xz', 'vplane']:
+                if self.view_spec['type'] == 'xy':
+                    coords1 = [xyz[0] for xyz in xyz_list]
+                    coords2 = [xyz[1] for xyz in xyz_list]
+                if self.view_spec['type'] == 'xz':
+                    coords1 = [xyz[0] for xyz in xyz_list]
+                    coords2 = [xyz[2] for xyz in xyz_list]
+                if self.view_spec['type'] == 'yz':
+                    coords1 = [xyz[1] for xyz in xyz_list]
+                    coords2 = [xyz[2] for xyz in xyz_list]
+                if self.view_spec['type'] == 'vplane':
+                    pq_list = [vs.xyz2pq(xyz, self.view_spec) for xyz in xyz_list]
+                    coords1 = [pq[0] for pq in pq_list]
+                    coords2 = [pq[1] for pq in pq_list]
+
+                if style.fill_color is not None:
+                    self.axis.fill(coords1, coords2, color=style.fill_color)
+
+                self._plot(
+                    coords1,
+                    coords2,
                     label=label,
                     linestyle=style.linestyle,
                     linewidth=style.linewidth,
@@ -665,49 +731,8 @@ class View3d(aph.AbstractPlotHandler):
                     markeredgewidth=style.markeredgewidth,
                     markerfacecolor=style.markerfacecolor,
                 )
-            elif self.view_spec['type'] == 'xz':
-                self.axis.plot(
-                    [xyz[0] for xyz in xyz_list],
-                    [xyz[2] for xyz in xyz_list],
-                    label=label,
-                    linestyle=style.linestyle,
-                    linewidth=style.linewidth,
-                    color=style.color,
-                    marker=style.marker,
-                    markersize=style.markersize,
-                    markeredgecolor=style.markeredgecolor,
-                    markeredgewidth=style.markeredgewidth,
-                    markerfacecolor=style.markerfacecolor,
-                )
-            elif self.view_spec['type'] == 'yz':
-                self.axis.plot(
-                    [xyz[1] for xyz in xyz_list],
-                    [xyz[2] for xyz in xyz_list],
-                    label=label,
-                    linestyle=style.linestyle,
-                    linewidth=style.linewidth,
-                    color=style.color,
-                    marker=style.marker,
-                    markersize=style.markersize,
-                    markeredgecolor=style.markeredgecolor,
-                    markeredgewidth=style.markeredgewidth,
-                    markerfacecolor=style.markerfacecolor,
-                )
-            elif self.view_spec['type'] == 'vplane':
-                pq_list = [vs.xyz2pq(xyz, self.view_spec) for xyz in xyz_list]
-                self.axis.plot(
-                    [pq[0] for pq in pq_list],
-                    [pq[1] for pq in pq_list],
-                    label=label,
-                    linestyle=style.linestyle,
-                    linewidth=style.linewidth,
-                    color=style.color,
-                    marker=style.marker,
-                    markersize=style.markersize,
-                    markeredgecolor=style.markeredgecolor,
-                    markeredgewidth=style.markeredgewidth,
-                    markerfacecolor=style.markerfacecolor,
-                )
+
+            # Draw the point list in the camera's perspective.
             elif self.view_spec['type'] == 'camera':
                 pq_list = [vs.xyz2pq(xyz, self.view_spec) for xyz in xyz_list]
                 # Discard all "None" entries, and split into separate contiguous lists.
@@ -724,7 +749,7 @@ class View3d(aph.AbstractPlotHandler):
                     list_of_pq_lists.append(pq_list_2)
                 # Plot the contiguous pq sequences.
                 for pq_list_3 in list_of_pq_lists:
-                    self.axis.plot(
+                    self._plot(
                         [pq[0] for pq in pq_list_3],
                         [pq[1] for pq in pq_list_3],
                         label=label,
@@ -738,12 +763,12 @@ class View3d(aph.AbstractPlotHandler):
                         markerfacecolor=style.markerfacecolor,
                     )
             else:
-                lt.error(
+                lt.error_and_raise(
+                    RuntimeError,
                     "ERROR: In View3d.draw_xyz_list(), unrecognized view_spec['type'] = '"
                     + str(self.view_spec['type'])
-                    + "' encountered."
+                    + "' encountered.",
                 )
-                assert False
 
     def draw_Vxyz(self, V: Vxyz, close=False, style=None, label=None) -> None:
         """Alternative to View3d.drawxyz_list that used the Vxyz class instead"""
@@ -872,7 +897,8 @@ class View3d(aph.AbstractPlotHandler):
             rc_fig = rcf.RenderControlFigure(tile=False)
             rc_axis = rca.RenderControlAxis(z_label='Light Intensity')
             rc_surf = rcs.RenderControlSurface()
-            fig_record = fm.setup_figure_for_3d_data(rc_fig, rc_axis, equal=False, name='Light Intensity', code_tag=f"{__file__}")
+            fig_record = fm.setup_figure_for_3d_data(
+                rc_fig, rc_axis, equal=False, name='Light Intensity', code_tag=f"{__file__}")
             view = fig_record.view
             view.draw_xyz_surface(Z)
             plt.show()
@@ -967,7 +993,22 @@ class View3d(aph.AbstractPlotHandler):
                 + "' encountered.",
             )
 
-    def draw_pq(self, pq, style=rcps.default(), label=None):  # A pq is [p,q]
+    def draw_pq(self, pq: tuple[list, list], style=rcps.default(), label=None):  # A pq is [p,q]
+        """
+        Draws the given points to this view. Only draws the points.
+
+        Parameters
+        ----------
+        pq : tuple[list,list]
+            A pair of pq lists to be plotted on the x and y axis, respectively.
+            Most typically these will be lists of floats. For
+            example: ([0, 1, 2, 3, 4], [0, 1, 2, 3, 4])
+        style : RenderControlPointSeq, optional
+            The style used to render the points. By default rcps.default().
+        label : str, optional
+            The label for this plot for use in the legend, or None for no label. By default None.
+        """
+
         if (len(pq) != 2) and (len(pq) != 3):
             lt.error('ERROR: In draw_pq_text(), len(pq)=', len(pq), ' is not equal to 2 or 3.')
             assert False
@@ -985,10 +1026,12 @@ class View3d(aph.AbstractPlotHandler):
             or (self.view_spec['type'] == 'vplane')
             or (self.view_spec['type'] == 'camera')
         ):
-            self.axis.plot(
+            self._plot(
                 [pq[0]],
                 [pq[1]],
+                style=style,
                 label=label,
+                linestyle=None,
                 color=style.color,
                 marker=style.marker,
                 markersize=style.markersize,
@@ -1010,44 +1053,66 @@ class View3d(aph.AbstractPlotHandler):
 
     def draw_pq_list(
         self,
-        input_pq_list,  # A list of pq pairs, where a pq is [p,q]
-        close=False,  # Draw as a closed polygon.  Ignored if lss than three points.
-        style=rcps.default(),
-        label=None,
+        input_pq_list: Iterable[tuple[any, any]],
+        close: bool = False,
+        style: rcps.RenderControlPointSeq = None,
+        label: str = None,
     ):
+        """
+        Draws the given list to this view.
+
+        Parameters
+        ----------
+        input_pq_list : Iterable[tuple[any, any]]
+            A list of pq pairs to be plotted on the x and y axis, respectively.
+            Most typically this will be a list of [p,q] float pairs. For
+            example: [[0,5], [1,3], [2,5], ...]
+        close : bool
+            Draw as a closed polygon. Ignored if less than three points. By default False.
+        style : RenderControlPointSeq, optional
+            The style used to render the points. By default rcps.default(),
+            which will draw a line plot.
+        label : str, optional
+            The label for this plot for use in the legend, or None for no label. By default None.
+        """
+        if style is None:
+            style = rcps.default()
         if isinstance(input_pq_list, Iterable):
             if not isinstance(input_pq_list, list):
                 input_pq_list = list(input_pq_list)
-        if len(input_pq_list) > 0:
-            # Construct the point list to draw, including closing the polygon if desired.
-            if close and (len(input_pq_list) > 2):
-                pq_list = input_pq_list.copy()
-                pq_list.append(input_pq_list[0])
-            else:
-                pq_list = input_pq_list
-            # Draw the point list.
-            allowed_vs_types = ['xy', 'xz', 'yz', 'vplane', 'camera']
-            if self.view_spec['type'] in allowed_vs_types:
-                self.axis.plot(
-                    [pq[0] for pq in pq_list],
-                    [pq[1] for pq in pq_list],
-                    label=label,
-                    linestyle=style.linestyle,
-                    linewidth=style.linewidth,
-                    color=style.color,
-                    marker=style.marker,
-                    markersize=style.markersize,
-                    markeredgecolor=style.markeredgecolor,
-                    markeredgewidth=style.markeredgewidth,
-                    markerfacecolor=style.markerfacecolor,
-                )
-            else:
-                lt.error_and_raise(
-                    RuntimeError,
-                    "ERROR: In View3d.draw_pq_list(), "
-                    + f"unrecognized view_spec['type'] = '{self.view_spec['type']}' encountered. "
-                    + f"Should be one of {allowed_vs_types}.",
-                )
+        if len(input_pq_list) == 0:
+            return
+
+        # Construct the point list to draw, including closing the polygon if desired.
+        if close and (len(input_pq_list) > 2):
+            pq_list = input_pq_list.copy()
+            pq_list.append(input_pq_list[0])
+        else:
+            pq_list = input_pq_list
+        allowed_vs_types = ['xy', 'xz', 'yz', 'vplane', 'camera']
+        if self.view_spec['type'] not in allowed_vs_types:
+            lt.error_and_raise(
+                RuntimeError,
+                "ERROR: In View3d.draw_pq_list(), "
+                + f"unrecognized view_spec['type'] = '{self.view_spec['type']}' encountered. "
+                + f"Should be one of {allowed_vs_types}.",
+            )
+
+        # Draw the point list lines and markers
+        self._plot(
+            [pq[0] for pq in pq_list],
+            [pq[1] for pq in pq_list],
+            style=style,
+            label=label,
+            linestyle=style.linestyle,
+            linewidth=style.linewidth,
+            color=style.color,
+            marker=style.marker,
+            markersize=style.markersize,
+            markeredgecolor=style.markeredgecolor,
+            markeredgewidth=style.markeredgewidth,
+            markerfacecolor=style.markerfacecolor,
+        )
 
     # VECTOR FIELD PLOTTING
 
