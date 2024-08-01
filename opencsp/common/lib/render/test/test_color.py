@@ -24,7 +24,7 @@ class test_Color(unittest.TestCase):
         self.assertIsNotNone(instance)
 
     def test_init_range(self):
-        """Simple class initialization."""
+        """Verify that the RGB channels are enforced to a range 0-1."""
         color = cl.Color(-1, 1, 2, 'black', 'k')
         self.assertAlmostEqual(color.rgb()[0], 0)
         self.assertAlmostEqual(color.rgb()[1], 1)
@@ -65,6 +65,7 @@ class test_Color(unittest.TestCase):
         self.assertAlmostEqual(color.rgb()[2], 0.49411764, places=5)
 
     def test_colormap_2(self):
+        """Fade from red to blue. Verify there is a smooth transition between colors."""
         color_map = cl.red().build_colormap(cl.blue())
 
         # red
@@ -82,6 +83,9 @@ class test_Color(unittest.TestCase):
         self.assertAlmostEqual(color_map(1.0)[2], 1.0, places=2)
 
     def test_colormap_3(self):
+        """Fade from red to green to blue. Verify there is a smooth transition
+        between colors. It is assumed that if colormaps work for 2 colors and 3
+        colors, then they should work for any number of colors >= 2."""
         color_map = cl.red().build_colormap(cl.green(), cl.blue())
 
         # red
@@ -108,6 +112,10 @@ class test_Color(unittest.TestCase):
         self.assertAlmostEqual(color_map(1.0)[2], 1.0, places=2)
 
     def test_matplotlibcolors_match(self):
+        """
+        The matplotlib tab10 colors are encoded in color.py. This test is here
+        to catch any change in the matplotlib colors, if there ever is any.
+        """
         mpl_colors = matplotlib.color_sequences['tab10']
 
         for i, color in cl.plot_colorsi.items():

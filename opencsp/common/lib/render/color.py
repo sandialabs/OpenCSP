@@ -241,4 +241,7 @@ plot_colors = {name: _plot_colors[name] for name in _plot_color_names}
 plot_colorsi = {i: _plot_colors[i] for i in range(len(_plot_color_names))}
 """ Matplotlib default 'tab10' colors, from https://matplotlib.org/stable/users/prev_whats_new/dflt_style_changes.html
 
+We enumerate these colors here as the simplest possible way of accessing these
+colors, so that we can use or remix them as necessary.
+
 Color order: blue, orange, green, red, purple, brown, pink, gray, yellow, cyan """
