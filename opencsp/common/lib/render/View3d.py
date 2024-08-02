@@ -235,7 +235,7 @@ class View3d(aph.AbstractPlotHandler):
 
     # HELPER
 
-    def _plot(self, x: list[list], y: list[list], *vargs, style: any = None, **kwargs):
+    def _plot(self, x: list | list[list], y: list | list[list], *vargs, style: any = None, **kwargs):
         """
         Like matplotlib.pyplot.plot(), except that we've overloaded this to plot
         normally or to plot arrows.
@@ -246,10 +246,10 @@ class View3d(aph.AbstractPlotHandler):
 
         Parameters
         ----------
-        x : list[list]
-            The x locations of the values to plot. For example [np.array([1, 2, 3])].
-        y : list[list]
-            The y locations of the values to plot. For example [np.array([1, 2, 3])].
+        x : list | list[list]
+            The x locations of the values to plot. For example [1, 2, 3] or [np.array([1, 2, 3])].
+        y : list | list[list]
+            The y locations of the values to plot. For example [1, 2, 3] or [np.array([1, 2, 3])].
         style : any, optional
             The marker property of the style controls if we draw normally or
             with arrows. This is the only property that is used from this
@@ -719,9 +719,6 @@ class View3d(aph.AbstractPlotHandler):
                     pq_list = [vs.xyz2pq(xyz, self.view_spec) for xyz in xyz_list]
                     coords1 = [pq[0] for pq in pq_list]
                     coords2 = [pq[1] for pq in pq_list]
-
-                if style.fill_color is not None:
-                    self.axis.fill(coords1, coords2, color=style.fill_color)
 
                 self._plot(
                     coords1,
