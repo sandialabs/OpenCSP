@@ -173,6 +173,38 @@ class TestLineXY(unittest.TestCase):
         line.flip()
         np.testing.assert_almost_equal(line.ABC, -ABC)
 
+    def test_slope(self):
+        # flat line to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, 0)))
+        self.assertAlmostEqual(line.slope, 0)
+
+        # flat line to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, 0)))
+        self.assertAlmostEqual(line.slope, 0)
+
+        # vertical line up
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((0, 1)))
+        self.assertTrue(np.isinf(line.slope) and not np.isneginf(line.slope))
+
+        # vertical line down
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((0, -1)))
+        self.assertTrue(np.isneginf(line.slope))
+
+        # 45-degree, up and to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, 1)))
+        self.assertAlmostEqual(line.slope, 1)
+
+        # 135-degree, up and to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, 1)))
+        self.assertAlmostEqual(line.slope, -1)
+
+        # 225-degree, down and to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, -1)))
+        self.assertAlmostEqual(line.slope, 1)
+
+        # 315-degree, down and to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, -1)))
+        self.assertAlmostEqual(line.slope, -1)
 
 if __name__ == '__main__':
     unittest.main()
