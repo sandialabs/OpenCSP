@@ -36,6 +36,10 @@ class LineXY:
         self.B = B / mag
         self.C = C / mag
 
+        # The original two points used to create this line, if created with
+        # from_two_points
+        self._original_two_points: tuple[Vxy, Vxy] | None = None
+
     def __repr__(self):
         return '2D Line: ' + self.A.__repr__() + ', ' + self.B.__repr__() + ', ' + self.C.__repr__()
 
@@ -67,9 +71,21 @@ class LineXY:
 
     @property
     def slope(self) -> float:
-        """Get the slope of the line (could be infinity!)"""
+        """Get the slope of the line, as rise over run (could be infinity!)"""
+        # check for infinity
         if abs(self.B) < 1e-10:
-            return np.inf
+            if self._original_two_points is None:
+                # can't tell the difference between pos/neg infinity
+                return np.inf
+
+            else:
+                # use the original two points to determine the positivity of the slope
+                if self._original_two_points[1].y[0] > self._original_two_points[0].y[0]:
+                    return np.PINF
+                else:
+                    return np.NINF
+
+        # return the slope
         return -self.A / self.B
 
     @classmethod
@@ -188,7 +204,9 @@ class LineXY:
 
         ABC = np.concatenate((AB, [C]), axis=0)
 
-        return LineXY(*ABC)
+        ret = LineXY(*ABC)
+        ret._original_two_points = Pxy1, Pxy2
+        return ret
 
     def y_from_x(self, xs: np.ndarray | float) -> np.ndarray | float:
         """
@@ -287,7 +305,7 @@ class LineXY:
         v = np.cross(self.ABC, Lxy.ABC)
         return Vxy(v[:2] / v[2])
 
-    def flip(self):
+    def flip(self) -> "LineXY":
         """
         Flips the orientation of a line. Returns a flipped copy of the LineXY.
 
@@ -298,6 +316,7 @@ class LineXY:
 
         """
         L_out = LineXY(*self.ABC)
+        L_out._original_two_points = self._original_two_points
         L_out.flip_in_place()
         return L_out
 
@@ -310,3 +329,6 @@ class LineXY:
         self.A *= -1
         self.B *= -1
         self.C *= -1
+
+        if self._original_two_points is not None:
+            self._original_two_points = self._original_two_points[1], self._original_two_points[0]
