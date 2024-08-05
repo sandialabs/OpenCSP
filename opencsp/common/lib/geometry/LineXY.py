@@ -2,6 +2,7 @@ import numpy as np
 from numpy.random import RandomState, SeedSequence, MT19937
 from scipy.optimize import minimize
 
+from opencsp.common.lib.geometry.angle import normalize as normalize_angle
 from opencsp.common.lib.geometry.Vxy import Vxy
 
 
@@ -87,6 +88,51 @@ class LineXY:
 
         # return the slope
         return -self.A / self.B
+
+    @property
+    def angle(self) -> float:
+        """
+        Get the angle of this vector in radians, as measured by its slope.
+
+        As in all of OpenCSP, the angle coordinate system is defined as:
+            - 0 along the positive x axis (pointing to the right)
+            - increasing counter-clockwise
+        """
+        slope = self.slope
+
+        # get the angle between -pi/2 and pi/2
+        atan = np.arctan(slope)
+
+        # is the slope positive or negative infinity?
+        if np.isinf(slope) or np.isneginf(slope):
+            return normalize_angle(atan)
+
+        # is the slope zero?
+        if slope == 0:
+            if self._original_two_points is None:
+                # can't tell if right or left pointing
+                return 0
+
+            else:
+                # use the original two points to determine if right or left pointing
+                if self._original_two_points[1].x[0] > self._original_two_points[0].x[0]:
+                    return 0
+                else:
+                    return np.pi
+
+        # correct for 2nd and 3rd quadrants
+        if self._original_two_points is not None:
+            vector = self._original_two_points[1] - self._original_two_points[0]
+            if atan < 0:
+                if vector.y[0] > 0:
+                    # 2nd quadrant
+                    return atan + np.pi
+            elif atan > 0:
+                if vector.y[0] < 0:
+                    # 3rd quadrant
+                    return (np.pi * 3 / 2) - atan
+
+        return normalize_angle(atan)
 
     @classmethod
     def fit_from_points(cls, Pxy: Vxy, seed: int = 1, neighbor_dist: float = 1.0):
@@ -207,6 +253,62 @@ class LineXY:
         ret = LineXY(*ABC)
         ret._original_two_points = Pxy1, Pxy2
         return ret
+
+    @classmethod
+    def from_rho_theta(cls, rho: float, theta: float) -> "LineXY":
+        """
+        Get a new instance of this class built from the rho + theta representation of a line.
+
+        Parameters
+        ----------
+        rho : float
+            The right angle distance between the line and the origin (0,0). For
+            images, this will be the top-left corner of the image.
+        theta : float
+            The angle of the line, in radians, for the standard graphing
+            coordinate system. 0 is on the positive x-axis to the right, and the
+            angle increases counter-clockwise.
+        """
+        a = np.cos(theta - np.pi / 2)
+        b = np.sin(theta - np.pi / 2)
+        x0 = a * rho
+        y0 = b * rho
+        pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * (a)))
+        pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * (a)))
+        ret = cls.from_two_points(Vxy(pt1), Vxy(pt2))
+        return ret
+
+    @classmethod
+    def from_location_angle(cls, location: Vxy, angle: float) -> "LineXY":
+        """
+        Get a new instance of this class built from the xy location + angle representation of a line.
+
+        Parameters
+        ----------
+        location : Vxy
+            A point that the line travels through on the cartesion x/y grid.
+        angle : float
+            The angle of the line, in radians, for the standard graphing
+            coordinate system. 0 is on the positive x-axis to the right, and the
+            angle increases counter-clockwise.
+        """
+        pt1 = location
+
+        # normalize input
+        angle = normalize_angle(angle)
+
+        # # values to help with small angle issues
+        # onepi_angle: float = angle if angle < np.pi else angle-np.pi
+        # small_angle: float = np.deg2rad(3)
+
+        # sohcahtoa
+        hypotenuse = 1000.0
+        x = hypotenuse * np.cos(angle)
+        y = hypotenuse * np.sin(angle)
+        pt2 = Vxy(np.array([[x + pt1.x[0]], [y + pt1.y[0]]]))
+
+        # build the line
+        return cls.from_two_points(pt1, pt2)
 
     def y_from_x(self, xs: np.ndarray | float) -> np.ndarray | float:
         """
