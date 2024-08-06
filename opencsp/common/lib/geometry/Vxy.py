@@ -8,7 +8,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class Vxy:
-    def __init__(self, data, dtype=float):
+    def __init__(self, data: np.ndarray | tuple[float, float] | tuple[list, list] | "Vxy", dtype=float):
         """
         2D vector class to represent 2D points/vectors.
 
@@ -16,7 +16,7 @@ class Vxy:
 
             x = 1
             y = 2
-            vec = Vxy(np.array([[x], [y])) # same as vec = Vxy([x, y])
+            vec = Vxy(np.array([[x], [y]]) # same as vec = Vxy([x, y])
             print(vec.x) # [1.]
             print(vec.y) # [2.]
 
@@ -44,6 +44,8 @@ class Vxy:
 
         """
         # Check input shape
+        if isinstance(data, Vxy):
+            data = data.data
         if type(data) is np.ndarray:
             data = data.squeeze()
             if np.ndim(data) not in [1, 2]:
@@ -78,6 +80,14 @@ class Vxy:
     @classmethod
     def _from_data(cls, data, dtype=float):
         return cls(data, dtype)
+
+    @classmethod
+    def from_list(cls, vals: list["Vxy"]):
+        xs, ys = [], []
+        for val in vals:
+            xs += val.x.tolist()
+            ys += val.y.tolist()
+        return cls((xs, ys))
 
     def _check_is_Vxy(self, v_in):
         """
@@ -368,3 +378,22 @@ class Vxy:
                 "Error in Vxy.astuple(): " + f"can't convert a Vxy with {len(self)} sets of values to a single tuple",
             )
         return self.x[0], self.y[0]
+
+    def asindex(self, axis_order='xy') -> tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]:
+        """
+        Returns the x and y values as integer arrays. This allows for indexing
+        of a numpy array as follows::
+
+            arr_val[vxy_val.asindex()]
+
+        For example, to get an array of 1s at each of the vxy_val coordinates::
+
+            binary_image = np.zeros((np.max(vxy_val.y), np.max(vxy_val.x)), dtype=np.uint8)
+            binary_image[vxy_val.asindex('yx')] = 1
+        """
+        indexes = {'x': self.x.astype(np.int64), 'y': self.y.astype(np.int64)}
+
+        ret = []
+        for axis in axis_order:
+            ret.append(indexes[axis])
+        return tuple(ret)

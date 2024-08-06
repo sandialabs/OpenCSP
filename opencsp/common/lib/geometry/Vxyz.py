@@ -11,7 +11,9 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class Vxyz:
-    def __init__(self, data, dtype=float):
+    def __init__(
+        self, data: np.ndarray | tuple[float, float, float] | tuple[list, list, list] | Vxy | "Vxyz", dtype=float
+    ):
         """
         3D vector class to represent 3D points/vectors.
 
@@ -60,6 +62,8 @@ class Vxyz:
                 raise ValueError('First dimension of 2-dimensional data must be length 3 if ndarray.')
         elif isinstance(data, Vxy):
             data = np.pad(data.data, ((0, 1), (0, 0)))
+        elif isinstance(data, Vxyz):
+            data = data.data
         elif len(data) != 3:
             raise ValueError('Input data must have length 3.')
 
@@ -95,6 +99,13 @@ class Vxyz:
     @classmethod
     def _from_data(cls, data, dtype=float):
         return cls(data, dtype)
+
+    @classmethod
+    def from_list(cls, vals: list["Vxyz"]):
+        xs = [val.x[0] for val in vals]
+        ys = [val.y[0] for val in vals]
+        zs = [val.z[0] for val in vals]
+        return cls((xs, ys, zs))
 
     def _check_is_Vxyz(self, v_in):
         """
