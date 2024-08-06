@@ -127,6 +127,42 @@ class test_figure_management(unittest.TestCase):
         fig_record.view.show()
         fig_record.close()
 
+    def test_save_figsize(self):
+        """Verify that the size of the saved figure is as given in the save parameters."""
+        # create and save the figure with pixel sizes:
+        # small:   900 x 600
+        # regular: 1800 x 1200
+        # large:   2700 x 1800
+        axis_control = rca.meters()
+        figure_control = rcfg.RenderControlFigure(tile=False, figsize=(3, 2))
+        view_spec_2d = vs.view_spec_xy()
+        fig_record = fm.setup_figure(
+            figure_control,
+            axis_control,
+            view_spec_2d,
+            title=self.test_name,
+            code_tag=f"{__file__}.{self.test_name}",
+            equal=False,
+        )
+        # fig_record.view.show()
+        fig_record.save(self.out_dir, f"{self.test_name}_small", format="png", dpi=300, close_after_save=False)
+        fig_record.save(self.out_dir, f"{self.test_name}_regular", format="png", dpi=600, close_after_save=False)
+        fig_record.save(self.out_dir, f"{self.test_name}_large", format="png", dpi=900, close_after_save=False)
+        fig_record.view.show()
+        fig_record.close()
+
+        # load the images and verify their size in pixels
+        with Image.open(ft.join(self.out_dir, f"{self.test_name}_small_xy.png")) as img_small:
+            self.assertEqual(img_small.width, 900)
+            self.assertEqual(img_small.height, 600)
+        with Image.open(ft.join(self.out_dir, f"{self.test_name}_regular_xy.png")) as img_regular:
+            self.assertEqual(img_regular.width, 1800)
+            self.assertEqual(img_regular.height, 1200)
+        with Image.open(ft.join(self.out_dir, f"{self.test_name}_large_xy.png")) as img_large:
+            self.assertEqual(img_large.width, 2700)
+            self.assertEqual(img_large.height, 1800)
+
+
 if __name__ == '__main__':
     import argparse
 

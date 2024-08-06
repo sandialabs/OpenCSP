@@ -299,7 +299,11 @@ class View3d(aph.AbstractPlotHandler):
         # Save the figure.
         output_figure_dir_body_ext = output_figure_dir_body + '.' + format
         lt.info('In View3d.save(), saving figure: ' + output_figure_dir_body_ext)
-        # plt.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
+        self.view.set_size_inches(self.view.get_figwidth(), self.view.get_figheight(), forward=True)
+        #    it could be that another backend requires the following instead:
+        #    self.view.set_figwidth(self.view.get_figwidth() * dpi)
+        #    self.view.set_figheight(self.view.get_figheight() * dpi)
+        self.view.set_dpi(dpi)
         self.view.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
         # Return the outptu file path and directory.
         return output_figure_dir_body_ext
