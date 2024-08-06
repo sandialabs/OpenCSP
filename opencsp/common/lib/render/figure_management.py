@@ -235,6 +235,12 @@ def _setup_figure(
                 window.move(x, y)  # qt
             else:
                 window.geometry(f"+{x}+{y}")  # tkinter
+        if figure_control.maximize:
+            window = fig.canvas.manager.window
+            if hasattr(window, "showMaximized"):
+                window.showMaximized()  # qt
+            else:
+                window.state("zoomed")  # tkinter
         # Copying this command, as from Randy, which suppresses duplicate axes in tile_figure(). ~ BGB
         plt.axis('off')
 

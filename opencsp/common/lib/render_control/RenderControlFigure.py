@@ -17,6 +17,7 @@ class RenderControlFigure:
         figsize=(6.4, 4.8),  # inch.
         upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
         grid=True,
+        maximize=False,
     ):  # Whether or not to draw grid lines.
         """Set of controls for how to render figures.
 
@@ -53,6 +54,9 @@ class RenderControlFigure:
         grid : bool, optional
             Whether or not to draw grid lines. Note: this value seems to be
             inverted. Default True
+        maximize : bool, optional
+            Whether the figure should be maximized (made full screen) as soon as
+            it is made visible. Ignored if tile is True. Default False.
         """
 
         super(RenderControlFigure, self).__init__()
@@ -66,6 +70,7 @@ class RenderControlFigure:
         # Figure size and placement.
         self.figsize = figsize
         self.upper_left_xy = upper_left_xy
+        self.maximize = maximize
 
         # Axis control.
         self.x_label = 'x (m)'

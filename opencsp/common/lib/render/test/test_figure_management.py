@@ -127,6 +127,26 @@ class test_figure_management(unittest.TestCase):
         fig_record.view.show()
         fig_record.close()
 
+    def test_maximize_no_exception(self):
+        """
+        Verify that figure_management._setup_figure() with the figure control
+        parameter "maximize" set doesn't raise an exception.
+        """
+        # TODO how to test that the window has actually been maximized?
+        axis_control = rca.meters()
+        figure_control = rcfg.RenderControlFigure(tile=False, maximize=True)
+        view_spec_2d = vs.view_spec_xy()
+        fig_record = fm.setup_figure(
+            figure_control,
+            axis_control,
+            view_spec_2d,
+            title=self.test_name,
+            code_tag=f"{__file__}.{self.test_name}",
+            equal=False,
+        )
+        fig_record.view.show()
+        fig_record.close()
+
     def test_save_figsize(self):
         """Verify that the size of the saved figure is as given in the save parameters."""
         # create and save the figure with pixel sizes:
