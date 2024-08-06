@@ -1,4 +1,5 @@
 import numbers
+from typing import Union
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -8,7 +9,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class Vxy:
-    def __init__(self, data: np.ndarray | tuple[float, float] | tuple[list, list] | "Vxy", dtype=float):
+    def __init__(self, data: Union[np.ndarray, tuple[float, float], tuple[list, list], "Vxy"], dtype=float):
         """
         2D vector class to represent 2D points/vectors.
 

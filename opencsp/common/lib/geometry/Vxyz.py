@@ -1,7 +1,7 @@
 """Three dimensional vector representation
 """
 
-from typing import Callable
+from typing import Callable, Union
 
 import numpy as np
 import numpy.typing as npt
@@ -12,7 +12,7 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 
 class Vxyz:
     def __init__(
-        self, data: np.ndarray | tuple[float, float, float] | tuple[list, list, list] | Vxy | "Vxyz", dtype=float
+        self, data: Union[np.ndarray, tuple[float, float, float], tuple[list, list, list], Vxy, "Vxyz"], dtype=float
     ):
         """
         3D vector class to represent 3D points/vectors.
