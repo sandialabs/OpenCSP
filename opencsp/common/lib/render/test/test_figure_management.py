@@ -1,18 +1,15 @@
-import os
-import subprocess
 import sys
-import time
 import unittest
 
 import matplotlib.pyplot as plt
+from PIL import Image
 
-import opencsp.common.lib.opencsp_path.opencsp_root_path as root_path
-import opencsp.common.lib.process.subprocess_tools as st
 import opencsp.common.lib.render.figure_management as fm
-import opencsp.common.lib.render.test.lib.RenderControlFigureRecordInfSave as rcfr_is
+import opencsp.common.lib.render.view_spec as vs
+import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
+import opencsp.common.lib.render.test.lib.RenderControlFigureRecordInfSave as rcfr_is
 import opencsp.common.lib.tool.file_tools as ft
-import opencsp.common.lib.tool.log_tools as lt
 
 is_original_call = "--funcname" in sys.argv
 """ Because we call this file again but with arguments, we need to know if
@@ -21,21 +18,18 @@ of the unit test methods. """
 
 
 class test_figure_management(unittest.TestCase):
-    dir_in = os.path.join('common', 'lib', 'render', 'test', 'data', 'input', 'figure_management')
-    dir_out = os.path.join('common', 'lib', 'render', 'test', 'data', 'output', 'figure_management')
-
-    def __init__(self, *vargs, **kwargs):
-        super().__init__(*vargs, **kwargs)
-        self.dir_in = test_figure_management.dir_in
-        self.dir_out = test_figure_management.dir_out
-
     @classmethod
     def setUpClass(cls) -> None:
-        ret = super().setUpClass()
-        ft.create_directories_if_necessary(cls.dir_out)
+        path, name, _ = ft.path_components(__file__)
+        cls.in_dir = ft.join(path, 'data/input', name.split('test_')[-1])
+        cls.out_dir = ft.join(path, 'data/output', name.split('test_')[-1])
+        ft.create_directories_if_necessary(cls.out_dir)
         if is_original_call:
-            ft.delete_files_in_directory(cls.dir_out, "*")
-        return ret
+            ft.delete_files_in_directory(cls.out_dir, "*")
+        return super().setUpClass()
+
+    def setUp(self) -> None:
+        self.test_name = self.id().split('.')[-1]
 
     def tearDown(self):
         # Make sure we release all matplotlib resources.
@@ -65,7 +59,7 @@ class test_figure_management(unittest.TestCase):
         line = list(range(100))
         view.draw_p_list(line)
 
-        figs_txts = fm.save_all_figures(self.dir_out)
+        figs_txts = fm.save_all_figures(self.out_dir)
         self.assert_exists(figs_txts, 1)
 
     def test_save_all_figures_two_lines(self):
@@ -83,7 +77,7 @@ class test_figure_management(unittest.TestCase):
             line = lines[i]
             view.draw_p_list(line)
 
-        figs_txts = fm.save_all_figures(self.dir_out)
+        figs_txts = fm.save_all_figures(self.out_dir)
         self.assert_exists(figs_txts, 2)
 
     def _figure_manager_timeout_1(self):
@@ -113,6 +107,25 @@ class test_figure_management(unittest.TestCase):
 
         return fm
 
+    def test_upper_left_xy_no_exception(self):
+        """
+        Verify that figure_management._setup_figure() with the figure control
+        parameter "upper_left_xy" set doesn't raise an exception.
+        """
+        # TODO how to test that the window has actually been located correctly?
+        axis_control = rca.meters()
+        figure_control = rcfg.RenderControlFigure(tile=False, upper_left_xy=(100, 100))
+        view_spec_2d = vs.view_spec_xy()
+        fig_record = fm.setup_figure(
+            figure_control,
+            axis_control,
+            view_spec_2d,
+            title=self.test_name,
+            code_tag=f"{__file__}.{self.test_name}",
+            equal=False,
+        )
+        fig_record.view.show()
+        fig_record.close()
 
 if __name__ == '__main__':
     import argparse
