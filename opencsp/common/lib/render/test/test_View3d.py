@@ -107,6 +107,43 @@ class test_View3d(unittest.TestCase):
         np.testing.assert_array_equal(expected, image_xy_lists)
         np.testing.assert_array_equal(expected, image_arr)
 
+    def test_draw_image(self):
+        fm.reset_figure_management()
+        color_image = ft.join(self.in_dir, f"{self.test_name}_color.png")
+        grayscale_image = ft.join(self.in_dir, f"{self.test_name}_grayscale.png")
+
+        # setup
+        axis_control = rca.meters(grid=False)
+        figure_control = rcfg.RenderControlFigure(tile=False, figsize=(2, 2))
+        view_spec_2d = vs.view_spec_xy()
+        fig_record = fm.setup_figure(
+            figure_control,
+            axis_control,
+            view_spec_2d,
+            title=self.test_name,
+            code_tag=f"{__file__}.{self.test_name}()",
+            equal=True,
+        )
+
+        # draw
+        x = np.arange(0, np.pi * 2, 0.1)
+        y = np.sin(x)
+        fig_record.view.draw_pq((x * 100 / (np.pi * 2), (y + 1.0) * 80))
+        fig_record.view.draw_image(color_image, (20, 40), (60, 80))
+        fig_record.view.draw_image(grayscale_image, (70, 10), (20, 40), cmap="viridis", draw_on_top=False)
+
+        # save
+        fig_record.view.show()
+        actual_img = Image.fromarray(fig_record.to_array())
+        actual_img.save(ft.join(self.out_dir, f"{self.test_name}_actual.png"))
+        fig_record.close()
+
+        # compare
+        expected_img = Image.open(ft.join(self.in_dir, f"{self.test_name}_expected.png"))
+        actual_image = np.array(actual_img)
+        expected_image = np.array(expected_img)
+        np.testing.assert_array_equal(actual_image, expected_image)
+
 
 if __name__ == '__main__':
     unittest.main()

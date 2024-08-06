@@ -5,6 +5,7 @@ import time
 from typing import Callable, Iterable
 
 import matplotlib.backend_bases as backb
+import matplotlib.colors
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
 from matplotlib.axes import Axes
@@ -413,27 +414,76 @@ class View3d(aph.AbstractPlotHandler):
                 plt.title('')
                 plt.colorbar(im, shrink=0.9)
 
-    def draw_image(self, path_or_array: str | np.ndarray):
-        """Draw an image on top of an existing plot.
+    def draw_image(
+        self,
+        path_or_array: str | np.ndarray,
+        xy_location: tuple[float, float] = None,
+        width_height: tuple[float, float] = None,
+        cmap: str | matplotlib.colors.Colormap = None,
+        draw_on_top: int | bool | None = True,
+    ):
+        """
+        Draw an image on top of an existing plot.
 
         This method is best for drawing images on top of other plots
         (example on top of 3D data). For drawing an image by itself
-        use imshow instead."""
+        use imshow instead.
+
+        Parameters
+        ----------
+        path_or_array : str | np.ndarray
+            The image to be drawn.
+        xy_location : tuple[float, float], optional
+            The location at which to draw the image, in graph coordinate units.
+            None to draw at the lowest extent of the graph. By default None.
+        width_height : tuple[float, float], optional
+            The size to scale the image to, in graph coordinate units. None to
+            fit the x-dimension. By default None.
+        cmap : str | matplotlib.colors.Colormap, optional
+            The color map to color in the image, or None to not color in the
+            image. Only applicable to grayscale images. By default None.
+        draw_on_top : int | bool | None, optional
+            If True, then draw this image on top of other plots. If False, then
+            draw below. A specific zorder can be used by setting this to be an
+            integer. None to use the matplotlib default. Default is True.
+        """
         if isinstance(path_or_array, str):
             img = mpimg.imread(path_or_array)
         else:
             img: np.ndarray = path_or_array
         imgw, imgh = img.shape[1], img.shape[0]
         xbnd, ybnd = self.axis.get_xbound(), self.axis.get_ybound()
-        xdraw = xbnd
+        xdraw, ydraw = xbnd, ybnd
 
-        # stretch the image to fit it's original proportions in the y dimension
-        width = xbnd[1] - xbnd[0]
-        height = imgh * (width / imgw)
-        ymid = (ybnd[1] - ybnd[0]) / 2 + ybnd[0]
-        ydraw = [ymid - height / 2, ymid + height / 2]
+        # assign the x and y location
+        if xy_location is not None:
+            xdraw = xy_location[0], xdraw[1]
+            ydraw = xy_location[1], ydraw[1]
 
-        self.axis.imshow(img, extent=[xdraw[0], xdraw[1], ydraw[0], ydraw[1]], zorder=-1)
+        # assign the width and height
+        if width_height is not None:
+            # stretch the image to fit the desired width and height
+            xdraw = xdraw[0], xdraw[0] + width_height[0]
+            ydraw = ydraw[0], ydraw[0] + width_height[1]
+        else:
+            # stretch the image to fit it's original proportions in the y dimension
+            width = xbnd[1] - xbnd[0]
+            height = imgh * (width / imgw)
+            ymid = (ydraw[1] - ydraw[0]) / 2 + ydraw[0]
+            ydraw = (ymid - height / 2, ymid + height / 2)
+
+        # get the zorder
+        if isinstance(draw_on_top, bool):
+            if draw_on_top:
+                zorder = 2
+            else:
+                zorder = -1
+        elif isinstance(draw_on_top, int):
+            zorder = draw_on_top
+        else:
+            zorder = None
+
+        self.axis.imshow(img, extent=[xdraw[0], xdraw[1], ydraw[0], ydraw[1]], zorder=zorder, cmap=cmap)
 
     def pcolormesh(self, *args, colorbar=False, **kwargs) -> None:
         """Allows plotting like imshow, with the additional option of sizing the boxes at will.
