@@ -33,14 +33,14 @@ jobs:
         with:
           path: OpenCSP
 
-      - name: pytest-cov
+      - name: pytest-cov (OpenCSP/example)
         working-directory: OpenCSP/example
         run: |
           python3 -m pip install -r ../requirements.txt
           export PYTHONPATH=$PWD/../
           pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
 
-      - name: Pip Upgrade pytest-cov
+      - name: Pip Upgrade pytest-cov (OpenCSP/example)
         working-directory: OpenCSP/example
         run: |
           python3 -m pip install -U -r ../requirements.txt

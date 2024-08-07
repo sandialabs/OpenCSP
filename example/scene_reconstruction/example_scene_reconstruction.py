@@ -9,11 +9,8 @@ from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
-
-def scene_reconstruction(save_dir):
+def scene_reconstruction(dir_output, dir_input):
     """Example script that reconstructs the XYZ locations of Aruco markers in a scene."""
-    # Define input directory
-    dir_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
 
     # Load components
     camera = Camera.load_from_hdf(join(dir_input, 'camera.h5'))
@@ -38,22 +35,30 @@ def scene_reconstruction(save_dir):
     cal_scene_recon.align_points(marker_ids, alignment_values)
 
     # Save points as CSV
-    cal_scene_recon.save_data_as_csv(join(save_dir, 'point_locations.csv'))
+    cal_scene_recon.save_data_as_csv(join(dir_output, 'point_locations.csv'))
 
     # Save calibrtion figures
     for fig in cal_scene_recon.figures:
-        fig.savefig(join(save_dir, fig.get_label() + '.png'))
+        fig.savefig(join(dir_output, fig.get_label() + '.png'))
 
 
-def example_driver():
+def example_driver(dir_output_fixture,
+                   dir_input_fixture):
+
+    dir_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
+    dir_output = join(dirname(__file__), 'data/output/scene_reconstruction')
+    if dir_input_fixture:
+        dir_input = dir_input_fixture
+    if dir_output_fixture:
+        dir_output = dir_input_fixture
+
     # Define output directory
-    save_path = join(dirname(__file__), 'data/output/scene_reconstruction')
-    ft.create_directories_if_necessary(save_path)
+    ft.create_directories_if_necessary(dir_input)
 
     # Set up logger
-    lt.logger(join(save_path, 'log.txt'), lt.log.INFO)
+    lt.logger(join(dir_output, 'log.txt'), lt.log.INFO)
 
-    scene_reconstruction(save_path)
+    scene_reconstruction(dir_output, dir_input)
 
 
 if __name__ == '__main__':
