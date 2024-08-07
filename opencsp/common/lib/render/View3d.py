@@ -1,5 +1,6 @@
 import copy
 import os
+import numbers
 import time
 from typing import Callable, Iterable
 
@@ -588,68 +589,60 @@ class View3d(aph.AbstractPlotHandler):
             assert False
 
     def draw_xyz(
-        self, xyz: tuple[list, list], style: rcps.RenderControlPointSeq = None, label: str = None
+        self,
+        xyz: (
+            tuple[float, float] | tuple[float, float, float] | tuple[list, list] | tuple[list, list, list] | np.ndarray
+        ),
+        style: rcps.RenderControlPointSeq = None,
+        label: str = None,
     ):  # An xyz is [x,y,z]
-        """Plots a single point, I think (BGB)."""
-        if style == None:
-            style = rcps.default()
-        if len(xyz) != 3:
-            lt.error('ERROR: In draw_xyz(), len(xyz)=', len(xyz), ' is not equal to 3.')
-            assert False
-        if self.view_spec['type'] == '3d':
-            self.axis.plot3D(
-                [xyz[0]],
-                [xyz[1]],
-                [xyz[2]],
-                label=label,
-                color=style.color,
-                marker=style.marker,
-                markersize=style.markersize,
-                markeredgecolor=style.markeredgecolor,
-                markeredgewidth=style.markeredgewidth,
-                markerfacecolor=style.markerfacecolor,
-            )
-        elif self.view_spec['type'] in ['xy', 'xz', 'yz', 'vplane', 'camera']:
-            coords1, coords2 = None, None
+        """
+        Plots one or more points.
 
-            if self.view_spec['type'] == 'xy':
-                coords1 = [xyz[0]]
-                coords2 = [xyz[1]]
-            elif self.view_spec['type'] == 'xz':
-                coords1 = [xyz[0]]
-                coords2 = [xyz[2]]
-            elif self.view_spec['type'] == 'yz':
-                coords1 = [xyz[1]]
-                coords2 = [xyz[2]]
-            elif self.view_spec['type'] == 'vplane':
-                pq = vs.xyz2pq(xyz, self.view_spec)
-                coords1 = [pq[0]]
-                coords2 = [pq[1]]
-            elif self.view_spec['type'] == 'camera':
-                pq = vs.xyz2pq(xyz, self.view_spec)
-                if pq:
-                    coords1 = [pq[0]]
-                    coords2 = [pq[1]]
+        This is similar to draw_xyz_list, except that it accepts the point
+        locations in a different format. Example usage::
 
-            if coords1 is not None:
-                self._plot(
-                    coords1,
-                    coords2,
-                    label=label,
-                    color=style.color,
-                    marker=style.marker,
-                    markersize=style.markersize,
-                    markeredgecolor=style.markeredgecolor,
-                    markeredgewidth=style.markeredgewidth,
-                    markerfacecolor=style.markerfacecolor,
-                )
+            # viewspec xy or pq
+            draw_xyz((0, 1))
+            draw_xyz((2, 3))
+            # or
+            draw_xyz(([0, 2], [1, 3]))
+            # or
+            draw_xyz(np.array([[0, 1], [2, 3]]))
+
+            # viewspec xyz or pqr
+            draw_xyz((0, 1, 2))
+            draw_xyz((3, 4, 5))
+            # or
+            draw_xyz(([0, 3], [1, 4], [2, 5]))
+            draw_xyz(np.array([[0, 1, 2], [3, 4, 5]]))
+
+        Parameters
+        ----------
+        xyz : tuple[any, any] | tuple[any, any, any] | np.ndarray
+            A set of x, y, and z points. This can be a set of numbers, a set of
+            equal-length lists, or a numpy array with shape (2,N) or (3,N).
+        style : rcps.RenderControlPointSeq, optional
+            The style used to render the points, or None for the default style
+            (blue, marker '.', line style '-'). By default None.
+        label : str, optional
+            The label used to identify this plot on the graph legend. None not
+            to be included in the legend. By default None.
+        """
+        if isinstance(xyz, np.ndarray):
+            lval = xyz
+        elif len(xyz) == 2:
+            if isinstance(xyz[0], numbers.Number):
+                lval = [(xyz[0], xyz[1])]
+            else:
+                lval = [(xyz[0][i], xyz[1][i]) for i in range(len(xyz[0]))]
         else:
-            lt.error(
-                "ERROR: In View3d.draw_xyz(), unrecognized view_spec['type'] = '"
-                + str(self.view_spec['type'])
-                + "' encountered."
-            )
-            assert False
+            if isinstance(xyz[0], numbers.Number):
+                lval = [(xyz[0], xyz[1], xyz[2])]
+            else:
+                lval = [(xyz[0][i], xyz[1][i], xyz[2][i]) for i in range(len(xyz[0]))]
+
+        self.draw_xyz_list(lval, style=style, label=label)
 
     def draw_single_Pxyz(self, p: Pxyz, style: rcps.RenderControlPointSeq = None, labels: list[str] = None):
         if labels == None:
