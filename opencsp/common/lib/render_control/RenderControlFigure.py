@@ -12,11 +12,12 @@ class RenderControlFigure:
     def __init__(
         self,
         tile=True,  # True => Lay out figures in grid.  False => Place at upper_left or default screen center.
-        tile_array=(3, 2),  # (n_x, n_y)
+        tile_array: tuple[int, int] = (3, 2),  # (n_x, n_y)
         tile_square=False,  # Set to True for equal-axis 3d plots.
         figsize=(6.4, 4.8),  # inch.
         upper_left_xy=None,  # pixel.  (0,0) --> Upper left corner of screen.
         grid=True,
+        maximize=False,
     ):  # Whether or not to draw grid lines.
         """Set of controls for how to render figures.
 
@@ -35,13 +36,27 @@ class RenderControlFigure:
             view.draw_pq_list(energy_values, style=style)
             view.show(block=True)
 
-        Args:
-            - tile (bool): True => Lay out figures in grid.  False => Place at upper_left or default screen center.  Default True
-            - tile_array (tuple[int]): How many tiles across and down (n_x, n_y).  Default (3, 2)
-            - tile_square (bool): Set to True for equal-axis 3d plots.  Default False
-            - figsize (tuple[float]): Size of the figure in inches.  Default (6.4, 4.8)
-            - upper_left_xy (tuple[int]): Pixel placement for the first tile.  (0,0) --> Upper left corner of screen.  Default None
-            - grid (bool): Whether or not to draw grid lines.  Note: this value seems to be inverted.  Default True
+        Params:
+        -------
+        tile : bool, optional
+            True => Lay out figures in grid. False => Place at upper_left or
+            default screen center. If True, then figsize, upper_left_xy, and
+            maximize are ignored. Default True
+        tile_array : tuple[int] | None, optional
+            How many tiles across and down (n_x, n_y).
+        tile_square : bool, optional
+            Set to True for equal-axis 3d plots. Default False
+        figsize : tuple[float], optional
+            Size of the figure in inches. Ignored if tile is True. Default (6.4, 4.8)
+        upper_left_xy : tuple[int], optional
+            Pixel placement for the first tile. (0,0) --> Upper left corner of
+            screen. Ignored if tile is True. Default None
+        grid : bool, optional
+            Whether or not to draw grid lines. Note: this value seems to be
+            inverted. Default True
+        maximize : bool, optional
+            Whether the figure should be maximized (made full screen) as soon as
+            it is made visible. Ignored if tile is True. Default False.
         """
 
         super(RenderControlFigure, self).__init__()
@@ -55,6 +70,7 @@ class RenderControlFigure:
         # Figure size and placement.
         self.figsize = figsize
         self.upper_left_xy = upper_left_xy
+        self.maximize = maximize
 
         # Axis control.
         self.x_label = 'x (m)'
