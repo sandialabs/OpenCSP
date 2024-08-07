@@ -392,6 +392,14 @@ class Vxy:
 
             binary_image = np.zeros((np.max(vxy_val.y), np.max(vxy_val.x)), dtype=np.uint8)
             binary_image[vxy_val.asindex('yx')] = 1
+
+        In this type of usage, the 'x' values will be used for the first index,
+        and the 'y' values will be used for the second index. For example:
+
+            arr_val = np.array([ [0, 1, 2], [3, 4, 5], [6, 7, 8] ])
+            vxy_val = Vxy(([0, 1, 2], [0, 1, 0]))
+            print(arr_val[desired_indexes.asindex()])
+            # [0, 4, 6]
         """
         indexes = {'x': self.x.astype(np.int64), 'y': self.y.astype(np.int64)}
 

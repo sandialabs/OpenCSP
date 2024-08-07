@@ -47,6 +47,13 @@ class TestVxyz(unittest.TestCase):
         with np.testing.assert_raises(ValueError):
             Vxyz(np.zeros((4, 4)))
 
+    def test_Vxyz_copy_constructor(self):
+        original = Vxyz([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+        copy = Vxyz(original)
+        self.assertEqual(copy.x.tolist(), [0, 1, 2])
+        self.assertEqual(copy.y.tolist(), [3, 4, 5])
+        self.assertEqual(copy.z.tolist(), [6, 7, 8])
+
     def test_from_list(self):
         # test single-valued Vxy instances
         a1 = Vxyz([0, 1, 2])
