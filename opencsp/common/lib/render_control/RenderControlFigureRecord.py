@@ -4,10 +4,11 @@
 """
 
 import os
+
 import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
+import numpy as np
 import PIL.Image as PilImage
-from typing import Optional
 
 from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.tool.file_tools as ft
@@ -112,6 +113,17 @@ class RenderControlFigureRecord:
         for comment_line in self.comments:
             lt.info(comment_line)
 
+    def to_array(self):
+        return self.figure_to_array(self.figure)
+
+    @staticmethod
+    def figure_to_array(figure: Figure):
+        # Force matplotlib to render to it's internal buffer
+        figure.canvas.draw()
+
+        # Convert the buffer to a numpy array
+        return np.asarray(figure.canvas.buffer_rgba())
+
     def save(self, output_dir: str, output_file_body: str = None, format: str = None, dpi=600, close_after_save=True):
         """Saves this figure record to an image file.
 
@@ -160,7 +172,7 @@ class RenderControlFigureRecord:
                 #     print('Skipping save of existing figure: ' + output_figure_dir_body_ext)
                 # else:
                 output_figure_dir_body_ext = output_figure_dir_body + '.' + format
-                lt.info('Saving figure: ' + output_figure_dir_body_ext)
+                lt.info('In RenderControlFigureRecord.save(), saving figure: ' + output_figure_dir_body_ext)
                 plt.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
         finally:
             # Close figure if desired.

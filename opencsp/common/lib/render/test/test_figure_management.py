@@ -31,6 +31,9 @@ class test_figure_management(unittest.TestCase):
     def setUp(self) -> None:
         self.test_name = self.id().split('.')[-1]
 
+    def setUp(self) -> None:
+        self.test_name = self.id().split('.')[-1]
+
     def tearDown(self):
         # Make sure we release all matplotlib resources.
         plt.close('all')
