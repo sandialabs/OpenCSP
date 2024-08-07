@@ -102,9 +102,12 @@ class Vxyz:
 
     @classmethod
     def from_list(cls, vals: list["Vxyz"]):
-        xs = [val.x[0] for val in vals]
-        ys = [val.y[0] for val in vals]
-        zs = [val.z[0] for val in vals]
+        """Builds a single Vxyz instance from a list of Vxyz instances."""
+        xs, ys, zs = [], [], []
+        for val in vals:
+            xs += val.x.tolist()
+            ys += val.y.tolist()
+            zs += val.z.tolist()
         return cls((xs, ys, zs))
 
     def _check_is_Vxyz(self, v_in):

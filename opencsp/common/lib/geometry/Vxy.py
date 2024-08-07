@@ -84,6 +84,7 @@ class Vxy:
 
     @classmethod
     def from_list(cls, vals: list["Vxy"]):
+        """Builds a single Vxy instance from a list of Vxy instances."""
         xs, ys = [], []
         for val in vals:
             xs += val.x.tolist()
