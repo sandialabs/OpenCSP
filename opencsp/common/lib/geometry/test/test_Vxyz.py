@@ -1,12 +1,13 @@
+import unittest
 import numpy as np
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
-class TestVxyz:
+class TestVxyz(unittest.TestCase):
     @classmethod
-    def setup_class(cls):
+    def setUpClass(cls):
         cls.V1 = Vxyz((2, 2, 2))
         cls.V1_array = np.array([[2], [2], [2]])
 
@@ -45,6 +46,33 @@ class TestVxyz:
         # Raise ValueError if lelngth of first dimension is not 3
         with np.testing.assert_raises(ValueError):
             Vxyz(np.zeros((4, 4)))
+
+    def test_Vxyz_copy_constructor(self):
+        original = Vxyz([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+        copy = Vxyz(original)
+        self.assertEqual(copy.x.tolist(), [0, 1, 2])
+        self.assertEqual(copy.y.tolist(), [3, 4, 5])
+        self.assertEqual(copy.z.tolist(), [6, 7, 8])
+
+    def test_from_list(self):
+        # test single-valued Vxy instances
+        a1 = Vxyz([0, 1, 2])
+        b1 = Vxyz([3, 4, 5])
+        c2 = Vxyz.from_list([a1, b1])
+        self.assertEqual(len(c2), 2)
+        self.assertEqual(c2.x.tolist(), [0, 3])
+        self.assertEqual(c2.y.tolist(), [1, 4])
+        self.assertEqual(c2.z.tolist(), [2, 5])
+
+        # test multi-valued Vxyz instances
+        a2 = Vxyz(list(zip([0, 1, 2], [3, 4, 5])))
+        b3 = Vxyz(list(zip([6, 7, 8], [9, 10, 11], [12, 13, 14])))
+        c4 = Vxyz(list(zip([15, 16, 17], [18, 19, 20], [21, 22, 23], [24, 25, 26])))
+        d9 = Vxyz.from_list([a2, b3, c4])
+        self.assertEqual(len(d9), 9)
+        self.assertEqual(d9.x.tolist(), [0, 3, 6, 9, 12, 15, 18, 21, 24])
+        self.assertEqual(d9.y.tolist(), [1, 4, 7, 10, 13, 16, 19, 22, 25])
+        self.assertEqual(d9.z.tolist(), [2, 5, 8, 11, 14, 17, 20, 23, 26])
 
     def test_xyz(self):
         assert self.V1.x[0] == self.V1_array[0]
@@ -299,3 +327,7 @@ class TestVxyz:
         Vy = Vxyz((0, 3, 0))
         r_out = Vx.align_to(Vy)
         np.testing.assert_almost_equal(r_out.as_rotvec(), np.array([0, 0, np.pi / 2]))
+
+
+if __name__ == "__main__":
+    unittest.main()

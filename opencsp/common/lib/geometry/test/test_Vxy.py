@@ -55,6 +55,30 @@ class TestVxy(unittest.TestCase):
         with np.testing.assert_raises(ValueError):
             Vxy(np.zeros((4, 4)))
 
+    def test_Vxy_copy_constructor(self):
+        original = Vxy([[0, 1, 2], [3, 4, 5]])
+        copy = Vxy(original)
+        self.assertEqual(copy.x.tolist(), [0, 1, 2])
+        self.assertEqual(copy.y.tolist(), [3, 4, 5])
+
+    def test_from_list(self):
+        # test single-valued Vxy instances
+        a1 = Vxy([0, 1])
+        b1 = Vxy([2, 3])
+        c2 = Vxy.from_list([a1, b1])
+        self.assertEqual(len(c2), 2)
+        self.assertEqual(c2.x.tolist(), [0, 2])
+        self.assertEqual(c2.y.tolist(), [1, 3])
+
+        # test multi-valued Vxy instances
+        a2 = Vxy([[0, 1], [2, 3]])
+        b3 = Vxy([[4, 5, 6], [7, 8, 9]])
+        c4 = Vxy([[10, 11, 12, 13], [14, 15, 16, 17]])
+        d9 = Vxy.from_list([a2, b3, c4])
+        self.assertEqual(len(d9), 9)
+        self.assertEqual(d9.x.tolist(), [0, 1, 4, 5, 6, 10, 11, 12, 13])
+        self.assertEqual(d9.y.tolist(), [2, 3, 7, 8, 9, 14, 15, 16, 17])
+
     def test_xy(self):
         assert self.V1.x[0] == self.V1_array[0]
         assert self.V1.y[0] == self.V1_array[1]
@@ -290,6 +314,18 @@ class TestVxy(unittest.TestCase):
         b = Vxy(np.array([[2, 4], [3, 5]]))
         with self.assertRaises(Exception):
             b.astuple()
+
+    def test_asindex(self):
+        # test that indexing into the following array:
+        #     0 1 2
+        #     3 4 5
+        #     6 7 8
+        # at rows/cols (0, 0), (1, 1), and (2, 0), returns the following values:
+        #     0 4 6
+        arr_val = np.array([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
+        desired_indexes = Vxy(([0, 1, 2], [0, 1, 0]))
+        actual_values = arr_val[desired_indexes.asindex()]
+        np.testing.assert_array_equal(actual_values, np.array([0, 4, 6]))
 
 
 if __name__ == '__main__':
