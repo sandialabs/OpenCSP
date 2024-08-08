@@ -8,8 +8,8 @@ import cv2
 import numpy as np
 from PIL import Image
 
+from opencsp import opencsp_settings
 import opencsp.common.lib.file.SimpleCsv as sc
-from opencsp.common.lib.opencsp_path import opencsp_settings
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.process.subprocess_tools as st
 import opencsp.common.lib.tool.exception_tools as et

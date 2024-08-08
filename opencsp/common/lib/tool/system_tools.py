@@ -2,6 +2,8 @@ import os
 import re
 import socket
 
+from opencsp import opencsp_settings
+
 
 def is_solo():
     """Determines if this computer is one of the Solo HPC nodes.
@@ -22,9 +24,7 @@ def is_cluster():
     Returns:
         bool: True if running on a HPC cluster node
     """
-    from opencsp.common.lib.opencsp_path import opencsp_settings
-
-    return opencsp_settings['system']['is_cluster'] == True
+    return opencsp_settings['system'].getboolean('is_cluster')
 
 
 __is_production_run = is_cluster() or not __debug__
