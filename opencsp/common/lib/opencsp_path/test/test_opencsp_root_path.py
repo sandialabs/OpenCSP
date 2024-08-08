@@ -55,7 +55,7 @@ class test_opencsp_root_path(unittest.TestCase):
 
     def test_opencsp_example_dir(self):
         """Just test that the opencsp_example_dir() method works. TODO actually test the returned value."""
-        self.assertIn("example", orp.opencsp_data_example_dir())
+        self.assertIn("example", orp.opencsp_example_dir())
 
     def test_opencsp_scratch_dir(self):
         """Just test that the opencsp_scratch_dir() method works. TODO actually test the returned value."""
@@ -68,10 +68,6 @@ class test_opencsp_root_path(unittest.TestCase):
     def test_opencsp_temporary_dir(self):
         """Just test that the opencsp_temporary_dir() method works. TODO actually test the returned value."""
         self.assertTrue(("temp" in orp.opencsp_temporary_dir()) or ("tmp" in orp.opencsp_temporary_dir()))
-
-    def test__opencsp_settings_dirs(self):
-        """Just test that the _opencsp_settings_dirs() method works. TODO actually test the returned value."""
-        orp._opencsp_settings_dirs()
 
     @unittest.skip("Can't get this test to work. Maybe someone smarter than me can make it work? :(")
     @unittest.mock.patch.dict(os.environ, {"OPENCSP_SETTINGS_DIRS": "~/.opencsp/"})
