@@ -551,10 +551,23 @@ class View3d(aph.AbstractPlotHandler):
 
     # XYZ PLOTTING
 
-    def draw_xyz_text(self, xyz, text, style=rctxt.default()):  # An xyz is [x,y,z]
+    # An xyz is [x,y,z]
+    def draw_xyz_text(self, xyz: tuple[float, float, float], text: str, style: rctxt.RenderControlText | None = None):
+        """
+        Draws the given text at the given location.
+
+        Parameters
+        ----------
+        xyz : tuple[float, float, float]
+            The x, y, and z location to draw the text at.
+        text : str
+            The text to be drawn.
+        style : rctxt.RenderControlText | None, optional
+            The style with which to draw the text, or None for rctxt.default(). By default None
+        """
         if len(xyz) != 3:
-            lt.error('ERROR: In draw_xyz_text(), len(xyz)=', len(xyz), ' is not equal to 3.')
-            assert False
+            lt.error_and_raise(ValueError, 'ERROR: In draw_xyz_text(), len(xyz)=', len(xyz), ' is not equal to 3.')
+
         if self.view_spec['type'] == '3d':
             self.axis.text(
                 xyz[0],
@@ -568,56 +581,39 @@ class View3d(aph.AbstractPlotHandler):
                 fontweight=style.fontweight,
                 zdir=style.zdir,
                 color=style.color,
+                rotation=np.rad2deg(style.rotation),
             )
-        elif self.view_spec['type'] == 'xy':
-            self.axis.text(
-                xyz[0],
-                xyz[1],
-                text,
-                horizontalalignment=style.horizontalalignment,
-                verticalalignment=style.verticalalignment,
-                fontsize=style.fontsize,
-                fontstyle=style.fontstyle,
-                fontweight=style.fontweight,
-                color=style.color,
-            )
-        elif self.view_spec['type'] == 'xz':
-            self.axis.text(
-                xyz[0],
-                xyz[2],
-                text,
-                horizontalalignment=style.horizontalalignment,
-                verticalalignment=style.verticalalignment,
-                fontsize=style.fontsize,
-                fontstyle=style.fontstyle,
-                fontweight=style.fontweight,
-                color=style.color,
-            )
-        elif self.view_spec['type'] == 'yz':
-            self.axis.text(
-                xyz[1],
-                xyz[2],
-                text,
-                horizontalalignment=style.horizontalalignment,
-                verticalalignment=style.verticalalignment,
-                fontsize=style.fontsize,
-                fontstyle=style.fontstyle,
-                fontweight=style.fontweight,
-                color=style.color,
-            )
-        elif self.view_spec['type'] == 'vplane':
-            pq = vs.xyz2pq(xyz, self.view_spec)
-            self.axis.text(
-                pq[0],
-                pq[1],
-                text,
-                horizontalalignment=style.horizontalalignment,
-                verticalalignment=style.verticalalignment,
-                fontsize=style.fontsize,
-                fontstyle=style.fontstyle,
-                fontweight=style.fontweight,
-                color=style.color,
-            )
+        elif self.view_spec['type'] in ['xy', 'xz', 'yz', 'vplane']:
+            coords1, coords2 = None, None
+
+            if self.view_spec['type'] == 'xy':
+                coords1 = xyz[0]
+                coords2 = xyz[1]
+            elif self.view_spec['type'] == 'xz':
+                coords1 = xyz[0]
+                coords2 = xyz[2]
+            elif self.view_spec['type'] == 'yz':
+                coords1 = xyz[1]
+                coords2 = xyz[2]
+            elif self.view_spec['type'] == 'vplane':
+                pq = vs.xyz2pq(xyz, self.view_spec)
+                coords1 = pq[0]
+                coords2 = pq[1]
+
+            if coords1 is not None:
+                self.axis.text(
+                    coords1,
+                    coords2,
+                    text,
+                    horizontalalignment=style.horizontalalignment,
+                    verticalalignment=style.verticalalignment,
+                    fontsize=style.fontsize,
+                    fontstyle=style.fontstyle,
+                    fontweight=style.fontweight,
+                    color=style.color,
+                    rotation=np.rad2deg(style.rotation),
+                )
+
         elif self.view_spec['type'] == 'camera':
             pq = vs.xyz2pq(xyz, self.view_spec)
             if pq:
@@ -631,16 +627,17 @@ class View3d(aph.AbstractPlotHandler):
                     fontstyle=style.fontstyle,
                     fontweight=style.fontweight,
                     color=style.color,
+                    rotation=np.rad2deg(style.rotation),
                     clip_box=self.axis.clipbox,
                     clip_on=True,
                 )
         else:
-            lt.error(
+            lt.error_and_raise(
+                RuntimeError,
                 "ERROR: In View3d.draw_xyz_text(), unrecognized view_spec['type'] = '"
                 + str(self.view_spec['type'])
-                + "' encountered."
+                + "' encountered.",
             )
-            assert False
 
     def draw_xyz(
         self,

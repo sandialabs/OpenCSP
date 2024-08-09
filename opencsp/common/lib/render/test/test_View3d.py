@@ -84,6 +84,59 @@ class test_View3d(unittest.TestCase):
         expected_image = np.array(expected_img)
         np.testing.assert_array_equal(actual_image, expected_image)
 
+    def test_draw_xyz_text(self):
+        """Verify that text gets drawn to the graph. Also test all the other options for drawing."""
+        # draw a box, for reference
+        fig_record = self.setup_figure()
+        fig_record.view.draw_pq_list([(-1, -1), (1, -1), (1, 1), (-1, 1)], close=True)
+
+        # basic text drawing
+        fig_record.view.draw_xyz_text((0, 0, 0), "center", style=rctxt.default(color='black'))
+        fig_record.view.draw_xyz_text((-1, -1, 0), "south-west", style=rctxt.default(color='black'))
+        fig_record.view.draw_xyz_text((1, -1, 0), "south-east", style=rctxt.default(color='black'))
+        fig_record.view.draw_xyz_text((1, 1, 0), "north-east", style=rctxt.default(color='black'))
+        fig_record.view.draw_xyz_text((-1, 1, 0), "north-west", style=rctxt.default(color='black'))
+
+        # text options
+        fig_record.view.draw_xyz_text(
+            (-1, 0, 0), "vertical", style=rctxt.RenderControlText(color='orange', rotation=np.pi / 2)
+        )
+        fig_record.view.draw_xyz_text(
+            (1, 0, 0), "upside-down", style=rctxt.RenderControlText(color='orange', rotation=np.pi)
+        )
+        fig_record.view.draw_xyz_text(
+            (0, 0.1, 0),
+            "left aligned",
+            style=rctxt.RenderControlText(color='orange', horizontalalignment='left', fontsize='small'),
+        )
+        fig_record.view.draw_xyz_text(
+            (0, -0.1, 0),
+            "right aligned",
+            style=rctxt.RenderControlText(color='orange', horizontalalignment='right', fontsize='large'),
+        )
+        fig_record.view.draw_xyz_text(
+            (-0.5, 0, 0),
+            "top aligned",
+            style=rctxt.RenderControlText(color='orange', verticalalignment='top', fontstyle='italic'),
+        )
+        fig_record.view.draw_xyz_text(
+            (0.5, 0, 0),
+            "bottom aligned",
+            style=rctxt.RenderControlText(color='orange', verticalalignment='bottom', fontweight='bold'),
+        )
+
+        # render
+        fig_record.view.show(equal=True)
+        image_text = fig_record.to_array()
+        fig_record.close()
+
+        # save the output
+        Image.fromarray(image_text).save(ft.join(self.out_dir, f"{self.test_name}.png"))
+
+        # load and compare
+        expected = np.array(Image.open(ft.join(self.in_dir, f"{self.test_name}.png")))
+        np.testing.assert_array_equal(expected, image_text)
+
     def test_draw_xyz(self):
         """Verify that the various accepted input arguments produce the same output."""
         style = rcps.RenderControlPointSeq('None', marker='.')
