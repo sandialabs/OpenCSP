@@ -92,10 +92,6 @@ class RenderControlText:
         """
         super(RenderControlText, self).__init__()
 
-        # convert color to rgb tuple
-        if isinstance(color, cl.Color):
-            color = color.rgb()
-
         # Set fields.
         self.horizontalalignment = horizontalalignment
         self.verticalalignment = verticalalignment
@@ -103,8 +99,19 @@ class RenderControlText:
         self.fontstyle = fontstyle
         self.fontweight = fontweight
         self.zdir = zdir
-        self.color = color
+        self._color = color
         self.rotation = rotation
+
+        self._standardize_color_values()
+
+    @property
+    def color(self) -> tuple[float, float, float, float] | None:
+        if self._color is not None:
+            return self._color.rgba()
+
+    def _standardize_color_values(self):
+        # convert to 'Color' class
+        self._color = cl.Color.convert(self._color)
 
 
 def default(fontsize='medium', color='b'):

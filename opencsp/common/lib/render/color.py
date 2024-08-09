@@ -8,7 +8,7 @@ Color Management
 
 """
 
-from typing import Iterator, Iterable
+from typing import Iterator, Iterable, Union
 
 import numpy as np
 import matplotlib.colors
@@ -73,11 +73,36 @@ class Color:
         rgb = matplotlib.colors.hsv_to_rgb((hue, saturation, value))
         return cls(rgb[0], rgb[1], rgb[2], name, value)
 
+    @classmethod
+    def from_str(cls, sval='b') -> "Color":
+        longhand = sval
+        if sval in _plot_color_shorthands:
+            longhand = _plot_color_shorthands[sval]
+
+        rgb = matplotlib.colors.to_rgb(sval)
+
+        return cls(rgb[0], rgb[1], rgb[2], longhand, sval)
+
+    @classmethod
+    def convert(cls, val: Union["Color", str, tuple, None]) -> "Color":
+        if val is None:
+            return None
+        elif isinstance(val, Color):
+            return val
+        elif isinstance(val, str):
+            return cls.from_str(val)
+        else:
+            rgb = val
+            return cls(rgb[0], rgb[1], rgb[2], 'tuple', 'tuple')
+
     def rgb(self) -> tuple[float, float, float]:
         """
         Returns color in [R,G,B] format, with range [0,1] for each.
         """
         return (self.red, self.green, self.blue)
+
+    def rgba(self, alpha=1.0) -> tuple[float, float, float, float]:
+        return (self.red, self.green, self.blue, alpha)
 
     def rgb_255(self) -> tuple[int, int, int]:
         """
@@ -245,3 +270,16 @@ We enumerate these colors here as the simplest possible way of accessing these
 colors, so that we can use or remix them as necessary.
 
 Color order: blue, orange, green, red, purple, brown, pink, gray, yellow, cyan """
+
+
+_plot_color_shorthands = {
+    'b': 'blue',
+    'g': 'green',
+    'r': 'red',
+    'c': 'cyan',
+    'm': 'magenta',
+    'y': 'yellow',
+    'k': 'black',
+    'w': 'white',
+}
+""" From https://matplotlib.org/stable/users/explain/colors/colors.html """
