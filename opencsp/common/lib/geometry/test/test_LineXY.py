@@ -71,6 +71,22 @@ class TestLineXY(unittest.TestCase):
         self.assertAlmostEqual(l3.y_from_x(-1), 1)
         self.assertAlmostEqual(l3.y_from_x(1), 1)
 
+    def test_from_location_angle(self):
+        # horizontal line
+        l1 = LineXY.from_location_angle(Vxy([1, 1]), 0)
+        self.assertAlmostEqual(l1.y_from_x(-1), 1)
+        self.assertAlmostEqual(l1.y_from_x(2), 1)
+
+        # 45-degree upward slope
+        l2 = LineXY.from_location_angle(Vxy([1, 1]), np.pi / 4)
+        self.assertAlmostEqual(l2.y_from_x(0), 0)
+        self.assertAlmostEqual(l2.y_from_x(2), 2)
+
+        # vertical line
+        l3 = LineXY.from_location_angle(Vxy([1, 1]), np.pi / 2)
+        self.assertAlmostEqual(l3.x_from_y(-1), 1)
+        self.assertAlmostEqual(l3.x_from_y(2), 1)
+
     def test_y_from_x(self):
         # Line y = -x
         line = LineXY(1, 1, 0)
