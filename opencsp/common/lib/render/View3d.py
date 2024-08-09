@@ -1004,9 +1004,24 @@ class View3d(aph.AbstractPlotHandler):
 
     # PQ PLOTTING
 
-    def draw_pq_text(self, pq, text, style=rctxt.default()):  # A pq is [p,q]
+    def draw_pq_text(self, pq: tuple[float, float], text: str, style: rctxt.RenderControlText = None):  # A pq is [p,q]
+        """
+        Draw the given text at the given location.
+
+        Parameters
+        ----------
+        pq : tuple[float, float]
+            The location at which to draw the text, in graph units.
+        text : str
+            The text to be drawn.
+        style : RenderControlText | None, optional
+            The style with which to render the text, or None for rctxt.default(). Default is rctxt.default().
+        """
         if (len(pq) != 2) and (len(pq) != 3):
             lt.error_and_raise(RuntimeError, 'ERROR: In draw_pq_text(), len(pq)=', len(pq), ' is not equal to 2 or 3.')
+        if style is None:
+            style = rctxt.default()
+
         if self.view_spec['type'] == '3d':
             lt.error_and_raise(
                 RuntimeError,
@@ -1031,6 +1046,7 @@ class View3d(aph.AbstractPlotHandler):
                 fontstyle=style.fontstyle,
                 fontweight=style.fontweight,
                 color=style.color,
+                rotation=np.rad2deg(style.rotation),
                 clip_box=self.axis.clipbox,
                 clip_on=True,
             )
