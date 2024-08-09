@@ -55,6 +55,22 @@ class TestLineXY(unittest.TestCase):
         self.assertAlmostEqual(-linev.C / linev.A, 1)
         self.assertAlmostEqual(linev.B, 0)
 
+    def test_from_rho_theta(self):
+        # vertical line
+        l1 = LineXY.from_rho_theta(1, 0)
+        self.assertAlmostEqual(l1.x_from_y(-1), 1)
+        self.assertAlmostEqual(l1.x_from_y(1), 1)
+
+        # 45-degree downward slope
+        l2 = LineXY.from_rho_theta(np.sqrt(2) / 2, np.pi / 4)
+        self.assertAlmostEqual(l2.y_from_x(0), 1)
+        self.assertAlmostEqual(l2.y_from_x(1), 0)
+
+        # horizontal line
+        l3 = LineXY.from_rho_theta(1, np.pi / 2)
+        self.assertAlmostEqual(l3.y_from_x(-1), 1)
+        self.assertAlmostEqual(l3.y_from_x(1), 1)
+
     def test_y_from_x(self):
         # Line y = -x
         line = LineXY(1, 1, 0)
