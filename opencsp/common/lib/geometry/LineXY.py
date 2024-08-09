@@ -257,7 +257,10 @@ class LineXY:
     @classmethod
     def from_rho_theta(cls, rho: float, theta: float) -> "LineXY":
         """
-        Get a new instance of this class built from the rho + theta representation of a line.
+        Get a new instance of this class built from the rho + theta
+        representation of a line. This is particularly useful for representation
+        of lines found via the Hough Transform of an image
+        (https://docs.opencv.org/3.4/d9/db0/tutorial_hough_lines.html).
 
         Parameters
         ----------
@@ -265,17 +268,19 @@ class LineXY:
             The right angle distance between the line and the origin (0,0). For
             images, this will be the top-left corner of the image.
         theta : float
-            The angle of the line, in radians, for the standard graphing
-            coordinate system. 0 is on the positive x-axis to the right, and the
-            angle increases counter-clockwise.
+            The angle between the right angle distance vector and the X axis.
+            Units are radians on the standard graphing coordinate system (0 is
+            on the positive x-axis to the right, and the angle increases
+            counter-clockwise).
         """
-        a = np.cos(theta - np.pi / 2)
-        b = np.sin(theta - np.pi / 2)
+        a = np.cos(theta)
+        b = np.sin(theta)
         x0 = a * rho
         y0 = b * rho
-        pt1 = (int(x0 + 1000 * (-b)), int(y0 + 1000 * (a)))
-        pt2 = (int(x0 - 1000 * (-b)), int(y0 - 1000 * (a)))
+        pt1 = (x0 + 1000 * (-b), y0 + 1000 * (a))
+        pt2 = (x0 - 1000 * (-b), y0 - 1000 * (a))
         ret = cls.from_two_points(Vxy(pt1), Vxy(pt2))
+
         return ret
 
     @classmethod
