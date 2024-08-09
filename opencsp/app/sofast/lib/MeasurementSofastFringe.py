@@ -119,15 +119,17 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
         self._fringe_images_calibrated = calibration.apply_to_images(self, **kwargs)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix='') -> 'MeasurementSofastFringe':
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'MeasurementSofastFringe':
         """
-        Loads from HDF file
+        Loads data from given file. Assumes data is stored as: PREFIX + MeasurementSofastFringe/Field_1
 
         Parameters
         ----------
         file : string
             HDF file to load
-
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
         # Load grid data
         datasets = [
@@ -137,18 +139,21 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
             prefix + 'MeasurementSofastFringe/fringe_periods_y',
         ]
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
-        kwargs.update(super()._load_from_hdf(file, prefix + 'MeasurementSofastFringe'))
+        kwargs.update(super()._load_from_hdf(file, prefix + 'MeasurementSofastFringe/'))
 
         return cls(**kwargs)
 
-    def save_to_hdf(self, file: str, prefix='') -> None:
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
         """
-        Saves to HDF file
+        Saves data to given file. Data is stored as: PREFIX + MeasurementSofastFringe/Field_1
 
         Parameters
         ----------
         file : string
             HDF file to save
+        prefix : str, optional
+            Prefix to append to folder path within HDF file (folders must be separated by "/").
+            Default is empty string ''.
         """
         datasets = [
             prefix + 'MeasurementSofastFringe/mask_images',
@@ -160,4 +165,4 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
-        super()._save_to_hdf(file, prefix + 'MeasurementSofastFringe')
+        super()._save_to_hdf(file, prefix + 'MeasurementSofastFringe/')

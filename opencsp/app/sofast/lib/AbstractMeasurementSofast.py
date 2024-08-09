@@ -56,18 +56,9 @@ class AbstractMeasurementSofast(h5.HDF5_IO_Abstract, ABC):
         return self.dist_optic_screen_measure.dist_optic_screen
 
     @classmethod
-    def _load_from_hdf(cls, file: str, prefix: str) -> dict[str, any]:
-        """
-        Loads from HDF file
-
-        Parameters
-        ----------
-        file : string
-            HDF file to load
-
-        """
+    def _load_from_hdf(cls, file: str, prefix: str = '') -> dict[str, any]:
         # Load grid data
-        datasets = [prefix + '/date', prefix + '/name']
+        datasets = [prefix + 'date', prefix + 'name']
         kwargs = h5.load_hdf5_datasets(datasets, file)
 
         kwargs['dist_optic_screen_measure'] = sod.DistanceOpticScreen.load_from_hdf(file, prefix)
@@ -75,18 +66,9 @@ class AbstractMeasurementSofast(h5.HDF5_IO_Abstract, ABC):
 
         return kwargs
 
-    def _save_to_hdf(self, file: str, prefix: str) -> None:
-        """
-        Saves to HDF file
-
-        Parameters
-        ----------
-        file : string
-            HDF file to save
-
-        NOTE: Collection date is saved as string in iso-format.
-        """
-        datasets = [prefix + '/date', prefix + '/name']
+    def _save_to_hdf(self, file: str, prefix: str = '') -> None:
+        # NOTE: Collection date is saved as string in iso-format.
+        datasets = [prefix + 'date', prefix + 'name']
         data = [self.date.isoformat(), self.name]
 
         # Save data
