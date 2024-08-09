@@ -259,6 +259,7 @@ class View3d(aph.AbstractPlotHandler):
             This will typically be a RenderControlPointSeq instance. By default
             None.
         """
+        # draw with arrows
         if style is not None and isinstance(style, rcps.RenderControlPointSeq) and style.marker == "arrow":
             # some of the arguments between plot and arrow are different
             kwargs = copy.copy(kwargs)
@@ -290,6 +291,8 @@ class View3d(aph.AbstractPlotHandler):
                     self.axis.arrow(
                         c1[0], c1[1], c2[0] - c1[0], c2[1] - c1[1], *vargs, length_includes_head=True, **kwargs
                     )
+
+        # draw normally
         else:
             self.axis.plot(x, y, *vargs, **kwargs)
 

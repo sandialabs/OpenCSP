@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 import opencsp.common.lib.tool.file_tools as ft
@@ -178,6 +179,47 @@ class test_View3d(unittest.TestCase):
         np.testing.assert_array_equal(expected, image_single_points)
         np.testing.assert_array_equal(expected, image_xy_lists)
         np.testing.assert_array_equal(expected, image_arr)
+
+    def test_draw_xyz_list_style_options(self):
+        """Tests all the various render options for RenderControlPointSeq."""
+        kwargs_default_other = {
+            "linestyle": ('-', '--'),
+            "linewidth": (1, 2),
+            "color": ('b', 'r'),
+            "marker": ('X', '+'),
+            "markersize": (6, 10),
+            "markeredgecolor": (None, 'r'),
+            "markeredgewidth": (None, 3),
+            "markerfacecolor": (None, 'r'),
+            "markeralpha": (1.0, 0.5),
+        }
+        defaults = {kwarg: kwargs_default_other[kwarg][0] for kwarg in kwargs_default_other}
+        others = {kwarg: kwargs_default_other[kwarg][1] for kwarg in kwargs_default_other}
+
+        # setup the plot
+        fig_record = self.setup_figure()
+
+        # plot all the options
+        for i, kwarg in enumerate(kwargs_default_other):
+            style_options = copy.copy(defaults)
+            style_options[kwarg] = others[kwarg]
+            style = rcps.RenderControlPointSeq(**style_options)
+            fig_record.view.draw_xyz_list([(i, 0, 0), (i, 1, 0)], style=style)
+            fig_record.view.draw_xyz_text(
+                (i, -0.5, 0),
+                kwarg,
+                rctxt.RenderControlText(verticalalignment='top', fontsize='small', color='black', rotation=np.pi / 2),
+            )
+        fig_record.view.show(equal=True)
+        image_style_options = fig_record.to_array()
+        fig_record.close()
+
+        # save the output
+        Image.fromarray(image_style_options).save(ft.join(self.out_dir, f"{self.test_name}.png"))
+
+        # load and compare
+        expected = np.array(Image.open(ft.join(self.in_dir, f"{self.test_name}.png")))
+        np.testing.assert_array_equal(expected, image_style_options)
 
     def test_draw_pq_text(self):
         """Verify that text gets drawn to the graph. Also test all the other options for drawing."""
