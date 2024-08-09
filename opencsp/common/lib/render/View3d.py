@@ -13,6 +13,7 @@ from matplotlib.figure import Figure
 from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 from PIL import Image
+import scipy.ndimage
 
 from matplotlib.axes import Axes
 import matplotlib.backend_bases as backb
@@ -28,6 +29,7 @@ from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.axis_3d as ax3d
 import opencsp.common.lib.render.view_spec as vs
+import opencsp.common.lib.render_control.RenderControlHeatmap as rcheat
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
 import opencsp.common.lib.tool.log_tools as lt
@@ -537,6 +539,58 @@ class View3d(aph.AbstractPlotHandler):
             if colorbar:
                 plt.title('')
                 plt.colorbar(im, shrink=0.9)
+
+    def draw_heatmap_2d(
+        self,
+        heatmap_2d: np.ndarray,
+        x_range: tuple[float, float] = None,
+        y_range: tuple[float, float] = None,
+        scale=100.0,
+        style: rcheat.RenderControlHeatmap = None,
+        colorbar_unimplemented=False,
+    ):
+        # validate input
+        if heatmap_2d.ndim > 2:
+            try:
+                heatmap_2d = heatmap_2d.squeeze()
+            except Exception:
+                pass
+        if heatmap_2d.ndim != 2:
+            lt.error_and_raise(
+                ValueError,
+                "Error in View3d.draw_heatmap_2d(): "
+                + f"heatmap should have two dimensions but instead has shape {heatmap_2d.shape}",
+            )
+
+        # normalize input
+        if x_range is None:
+            x_range = [0, heatmap_2d.shape[1]]
+        if y_range is None:
+            y_range = [0, heatmap_2d.shape[0]]
+        if style is None:
+            style = rcheat.RenderControlHeatmap()
+
+        # interpolate heatmap_2d -> np.array((y_range, x_range))
+        zoom_x = (x_range[1] - x_range[0]) / heatmap_2d.shape[1] * scale
+        zoom_y = (y_range[1] - y_range[0]) / heatmap_2d.shape[0] * scale
+        ranged_heatmap = scipy.ndimage.zoom(heatmap_2d, (zoom_x, zoom_y), order=0, grid_mode=False)
+
+        # set the bounds on this plot
+        self.axis.set_xbound(x_range[0], x_range[1])
+        self.axis.set_ybound(y_range[0], y_range[1])
+
+        # draw the heatmap
+        self.draw_image(ranged_heatmap, cmap=style.cmap)
+
+        # draw the division lines
+        if style.linestyle_unimplemented is not None:
+            # TODO
+            pass
+
+        # draw the colorbar
+        if colorbar_unimplemented:
+            # TODO
+            pass
 
     # XYZ <---> PQ CONVERSION
 

@@ -11,6 +11,7 @@ import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
+import opencsp.common.lib.render_control.RenderControlHeatmap as rcheat
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
 import opencsp.common.lib.tool.file_tools as ft
@@ -84,6 +85,25 @@ class test_View3d(unittest.TestCase):
         actual_image = np.array(actual_img)
         expected_image = np.array(expected_img)
         np.testing.assert_array_equal(actual_image, expected_image)
+
+    def test_draw_heatmap2d(self):
+        # build the heatmap
+        linear = np.arange(0, 256, 1)
+        square = linear.reshape((16, 16))
+
+        # with single points
+        fig_record = self.setup_figure(tile=False)
+        fig_record.view.draw_heatmap_2d(square, style=rcheat.RenderControlHeatmap(cmap='inferno'))
+        fig_record.view.show(equal=True)
+        image_heatmap = fig_record.to_array()
+        fig_record.close()
+
+        # save the output
+        Image.fromarray(image_heatmap).save(ft.join(self.out_dir, f"{self.test_name}.png"))
+
+        # load and compare
+        expected = np.array(Image.open(ft.join(self.in_dir, f"{self.test_name}.png")))
+        np.testing.assert_array_equal(expected, image_heatmap)
 
     def test_draw_xyz_text(self):
         """Verify that text gets drawn to the graph. Also test all the other options for drawing."""
