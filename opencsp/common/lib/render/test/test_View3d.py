@@ -92,7 +92,7 @@ class test_View3d(unittest.TestCase):
         square = linear.reshape((16, 16))
 
         # with single points
-        fig_record = self.setup_figure(tile=False)
+        fig_record = self.setup_figure()
         fig_record.view.draw_heatmap_2d(square, style=rcheat.RenderControlHeatmap(cmap='inferno'))
         fig_record.view.show(equal=True)
         image_heatmap = fig_record.to_array()
@@ -312,6 +312,29 @@ class test_View3d(unittest.TestCase):
         # save
         img = Image.fromarray(actual)
         img.save(ft.join(self.out_dir, f"{self.test_name}.png"))
+
+    def test_draw_pq_list_gradient(self):
+        """
+        Verify that a nice purple-yellow 'viridis' gradient is used to draw the
+        four sides of the square.
+        """
+        square = [(0, 0), (1, 0), (1, 1), (0, 1)]
+
+        # draw with gradient
+        fig_record: rcfr.RenderControlFigureRecord = self.setup_figure()
+        fig_record.view.draw_pq_list(square, close=True, gradient=True)
+
+        # render
+        fig_record.view.show(equal=True)
+        image_gradient = fig_record.to_array()
+        fig_record.close()
+
+        # save the output
+        Image.fromarray(image_gradient).save(ft.join(self.out_dir, f"{self.test_name}.png"))
+
+        # load and compare
+        expected = np.array(Image.open(ft.join(self.in_dir, f"{self.test_name}.png")))
+        np.testing.assert_array_equal(expected, image_gradient)
 
 
 if __name__ == '__main__':

@@ -1188,6 +1188,7 @@ class View3d(aph.AbstractPlotHandler):
         close: bool = False,
         style: rcps.RenderControlPointSeq = None,
         label: str = None,
+        gradient: bool | str = False,
     ):
         """
         Draws the given list to this view.
@@ -1205,6 +1206,21 @@ class View3d(aph.AbstractPlotHandler):
             which will draw a line plot.
         label : str, optional
             The label for this plot for use in the legend, or None for no label. By default None.
+        gradient : bool | str, optional
+            If True or a string, then the given list is drawn as a
+            linecollection with color map gradient (default 'Viridis'). If
+            False, then the list is drawn with the single 'style.color' color.
+            Default is False.
+
+            Note: the color map is applied as a single color per segment. To get
+            a fade across a single line, you should do something similar to::
+
+                x1, y1 = line_start
+                x2, y2 = line_end
+                gradient_line_x = np.arange(x1, x2, 20).tolist()
+                gradient_line_y = np.arange(y1, y2, 20).tolist()
+                gradient_line = list(zip(gradient_line_x, gradient_line_y))
+                draw_pq_list(gradient_line, gradient=True)
         """
         if style is None:
             style = rcps.default()
@@ -1229,21 +1245,47 @@ class View3d(aph.AbstractPlotHandler):
                 + f"Should be one of {allowed_vs_types}.",
             )
 
-        # Draw the point list lines and markers
-        self._plot(
-            [pq[0] for pq in pq_list],
-            [pq[1] for pq in pq_list],
-            style=style,
-            label=label,
-            linestyle=style.linestyle,
-            linewidth=style.linewidth,
-            color=style.color,
-            marker=style.marker,
-            markersize=style.markersize,
-            markeredgecolor=style.markeredgecolor,
-            markeredgewidth=style.markeredgewidth,
-            markerfacecolor=style.markerfacecolor,
-        )
+        if (gradient == False) or (len(pq_list) == 1):
+            # Draw the point list lines and markers
+            self._plot(
+                [pq[0] for pq in pq_list],
+                [pq[1] for pq in pq_list],
+                style=style,
+                label=label,
+                linestyle=style.linestyle,
+                linewidth=style.linewidth,
+                color=style.color,
+                marker=style.marker,
+                markersize=style.markersize,
+                markeredgecolor=style.markeredgecolor,
+                markeredgewidth=style.markeredgewidth,
+                markerfacecolor=style.markerfacecolor,
+            )
+
+        else:
+            # construct the color map
+            cmap = gradient
+            if gradient == True:
+                cmap = 'viridis'
+            if isinstance(cmap, str):
+                cmap = matplotlib.colormaps[cmap]
+
+            # set the color map
+            self.axis.set_prop_cycle('color', [cmap(i) for i in np.linspace(0.0, 1.0, len(pq_list) - 1)])
+
+            # draw the line segments
+            for i in range(len(pq_list) - 1):
+                self._plot(
+                    [pq[0] for pq in pq_list[i : i + 2]],
+                    [pq[1] for pq in pq_list[i : i + 2]],
+                    style=style,
+                    label=label,
+                    linestyle=style.linestyle,
+                    linewidth=style.linewidth,
+                    marker=style.marker,
+                    markersize=style.markersize,
+                    markeredgewidth=style.markeredgewidth,
+                )
 
     # VECTOR FIELD PLOTTING
 
