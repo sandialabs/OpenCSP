@@ -890,7 +890,7 @@ class View3d(aph.AbstractPlotHandler):
         self.draw_xyz_list(list(V.data.T), close, style, label)
 
     # TODO TJL: only implemented for 3d views, should extend
-    def draw_xyz_surface(
+    def _draw_xyz_surface_customshape(
         self,
         x_mesh: np.ndarray,
         y_mesh: np.ndarray,
