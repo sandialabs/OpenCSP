@@ -8,6 +8,9 @@ import numpy.typing as npt
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.Vxy import Vxy
+import opencsp.common.lib.render.View3d as v3d
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 
 class Vxyz:
@@ -494,3 +497,19 @@ class Vxyz:
     #     for x, y in zip(xs, ys):
     #         zs.append(func(x, y))
     #     return cls([xs, ys, zs])
+
+    def draw_list(
+        self,
+        figure: rcfr.RenderControlFigureRecord | v3d.View3d,
+        close: bool = None,
+        style: rcps.RenderControlPointSeq = None,
+        label: str = None,
+    ) -> None:
+        """Calls figure.draw_xyz_list(self.data.T) with the default arguments in place for any None's."""
+        kwargs = dict()
+        for key, val in [('close', close), ('style', style), ('label', label)]:
+            if val is not None:
+                kwargs[key] = val
+
+        view = figure if isinstance(figure, v3d.View3d) else figure.view
+        view.draw_xyz_list(self.data.T, **kwargs)

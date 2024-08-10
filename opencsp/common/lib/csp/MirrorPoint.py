@@ -176,7 +176,7 @@ class MirrorPoint(MirrorAbstract):
             p_space = self.location_in_space(domain)
 
             # Draw sample points
-            view.draw_single_Pxyz(p_space, style=mirror_style.point_styles)
+            p_space.draw_point(view, style=mirror_style.point_styles)
 
             # Calculate z height of boundary to draw (lowest z value)
             min_val = min(self.surface_displacement_at(domain))
@@ -189,7 +189,7 @@ class MirrorPoint(MirrorAbstract):
             if mirror_style.point_styles is not None:
                 edge_style = mirror_style.point_styles
                 edge_style.markersize = 0
-                view.draw_Vxyz(edge_values_lifted, style=edge_style)
+                edge_values_lifted.draw_list(view, style=edge_style)
 
             # Draw surface normals
             if mirror_style.surface_normals:

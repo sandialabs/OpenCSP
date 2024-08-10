@@ -309,7 +309,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
         # Centroid.
         if heliostat_style.draw_centroid:
-            view.draw_single_Pxyz(origin, style=heliostat_style.centroid_style)
+            Pxyz(origin).draw_point(view, style=heliostat_style.centroid_style)
 
         # # Outline.
         # if heliostat_style.draw_outline:
@@ -318,7 +318,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         #                    [top, bottom, bottom, top],
         #                    [0, 0, 0, 0]])
         #     corners_moved = transform.apply(corners)
-        #     view.draw_Vxyz(corners_moved, close=True, style=heliostat_style.outline_style)
+        #     corners_moved.draw_list(view, close=True, style=heliostat_style.outline_style)
 
         # # Surface normal.
         # if heliostat_style.draw_surface_normal:
@@ -326,7 +326,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         #     self.facet_ensemble.
         #     surface_normal_ray = transform.apply(UP * heliostat_style.corner_normal_length)
         #     # Draw ray and its base.
-        #     view.draw_Vxyz(Vxyz.merge([origin, surface_normal_ray]),
+        #     Vxyz.merge([origin, surface_normal_ray]).draw_list(view,
         #                    close=False,
         #                    style=heliostat_style.surface_normal_style)
 
@@ -339,7 +339,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         if heliostat_style.post != 0:
             DOWN = Vxyz([0, 0, -heliostat_style.post])
             direction = transform.apply(DOWN)
-            view.draw_Vxyz(Vxyz.merge([origin + DOWN, origin]))
+            Vxyz.merge([origin + DOWN, origin]).draw_list(view)
 
         # Name.
         if heliostat_style.draw_name:

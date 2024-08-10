@@ -23,8 +23,6 @@ import numpy as np
 from PIL import Image
 import scipy.ndimage
 
-from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.axis_3d as ax3d
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
@@ -648,14 +646,6 @@ class View3d(aph.AbstractPlotHandler):
 
         self.draw_xyz_list(lval, style=style, label=label)
 
-    def draw_single_Pxyz(self, p: Pxyz, style: rcps.RenderControlPointSeq = None, labels: list[str] = None):
-        if labels == None:
-            labels = [None] * len(p)
-        if style == None:
-            style = rcps.default(markersize=2)
-        for x, y, z, label in zip(p.x, p.y, p.z, labels):
-            self.draw_xyz((x, y, z), style, label)
-
     def draw_xyz_list(
         self,
         input_xyz_list: Iterable[tuple[float, float, float]],
@@ -768,10 +758,6 @@ class View3d(aph.AbstractPlotHandler):
                     + str(self.view_spec['type'])
                     + "' encountered.",
                 )
-
-    def draw_Vxyz(self, V: Vxyz, close=False, style=None, label=None) -> None:
-        """Alternative to View3d.drawxyz_list that used the Vxyz class instead"""
-        self.draw_xyz_list(list(V.data.T), close, style, label)
 
     # TODO TJL: only implemented for 3d views, should extend
     def draw_xyz_surface(
