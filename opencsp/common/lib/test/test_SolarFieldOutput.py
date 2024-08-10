@@ -503,7 +503,7 @@ class TestSolarFieldOutput(to.TestOutput):
             code_tag=self.code_tag,
         )
         solar_field.draw(fig_record.view, solar_field_style)
-        fig_record.view.draw_Vxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
+        aimpoint_xyz.draw_list(fig_record.view, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
 
         # Output.
         self.show_save_and_check_figure(fig_record)

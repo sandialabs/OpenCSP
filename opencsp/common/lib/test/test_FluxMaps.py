@@ -175,9 +175,9 @@ class TestFluxMaps(to.TestOutput):
         mirror.draw(fig_record.view, mirror_style)
         trace_style = rcrt.init_current_lengths(current_len=6)
         trace.draw(fig_record.view, trace_style)
-        fig_record.view.draw_Vxyz(square(4), close=True, style=rcps.RenderControlPointSeq(color='b', marker=','))
-        fig_record.view.draw_Vxyz(square(5), close=True, style=rcps.RenderControlPointSeq(color='g', marker=','))
-        fig_record.view.draw_Vxyz(square(6), close=True, style=rcps.RenderControlPointSeq(color='r', marker=','))
+        square(4).draw_list(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color='b', marker=','))
+        square(5).draw_list(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color='g', marker=','))
+        square(6).draw_list(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color='r', marker=','))
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=4

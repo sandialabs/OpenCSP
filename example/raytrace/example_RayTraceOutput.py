@@ -646,7 +646,7 @@ class ExampleRayTraceOutput(to.TestOutput):
                 pointing_vector = st.tracking_surface_normal_xyz(
                     heliostat_origin, aimpoint_xyz, lln.NSTTF_ORIGIN, when_ymdhmsz
                 )
-                view.draw_Vxyz(Vxyz.merge([heliostat_origin, heliostat_origin + pointing_vector * 10]))
+                Vxyz.merge([heliostat_origin, heliostat_origin + pointing_vector * 10]).draw_list(view)
                 # debug
 
                 self.show_save_and_check_figure(fig_record)
