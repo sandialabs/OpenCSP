@@ -55,6 +55,38 @@ class TestLineXY(unittest.TestCase):
         self.assertAlmostEqual(-linev.C / linev.A, 1)
         self.assertAlmostEqual(linev.B, 0)
 
+    def test_from_rho_theta(self):
+        # vertical line
+        l1 = LineXY.from_rho_theta(1, 0)
+        self.assertAlmostEqual(l1.x_from_y(-1), 1)
+        self.assertAlmostEqual(l1.x_from_y(1), 1)
+
+        # 45-degree downward slope
+        l2 = LineXY.from_rho_theta(np.sqrt(2) / 2, np.pi / 4)
+        self.assertAlmostEqual(l2.y_from_x(0), 1)
+        self.assertAlmostEqual(l2.y_from_x(1), 0)
+
+        # horizontal line
+        l3 = LineXY.from_rho_theta(1, np.pi / 2)
+        self.assertAlmostEqual(l3.y_from_x(-1), 1)
+        self.assertAlmostEqual(l3.y_from_x(1), 1)
+
+    def test_from_location_angle(self):
+        # horizontal line
+        l1 = LineXY.from_location_angle(Vxy([1, 1]), 0)
+        self.assertAlmostEqual(l1.y_from_x(-1), 1)
+        self.assertAlmostEqual(l1.y_from_x(2), 1)
+
+        # 45-degree upward slope
+        l2 = LineXY.from_location_angle(Vxy([1, 1]), np.pi / 4)
+        self.assertAlmostEqual(l2.y_from_x(0), 0)
+        self.assertAlmostEqual(l2.y_from_x(2), 2)
+
+        # vertical line
+        l3 = LineXY.from_location_angle(Vxy([1, 1]), np.pi / 2)
+        self.assertAlmostEqual(l3.x_from_y(-1), 1)
+        self.assertAlmostEqual(l3.x_from_y(2), 1)
+
     def test_y_from_x(self):
         # Line y = -x
         line = LineXY(1, 1, 0)
@@ -172,6 +204,72 @@ class TestLineXY(unittest.TestCase):
         line = LineXY(*ABC.copy())
         line.flip()
         np.testing.assert_almost_equal(line.ABC, -ABC)
+
+    def test_slope(self):
+        # flat line to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, 0)))
+        self.assertAlmostEqual(line.slope, 0)
+
+        # flat line to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, 0)))
+        self.assertAlmostEqual(line.slope, 0)
+
+        # vertical line up
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((0, 1)))
+        self.assertTrue(np.isinf(line.slope) and not np.isneginf(line.slope))
+
+        # vertical line down
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((0, -1)))
+        self.assertTrue(np.isneginf(line.slope))
+
+        # 45-degree, up and to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, 1)))
+        self.assertAlmostEqual(line.slope, 1)
+
+        # 135-degree, up and to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, 1)))
+        self.assertAlmostEqual(line.slope, -1)
+
+        # 225-degree, down and to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, -1)))
+        self.assertAlmostEqual(line.slope, 1)
+
+        # 315-degree, down and to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, -1)))
+        self.assertAlmostEqual(line.slope, -1)
+
+    def test_angle(self):
+        # flat line to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, 0)))
+        self.assertAlmostEqual(line.angle, 0)
+
+        # flat line to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, 0)))
+        self.assertAlmostEqual(line.angle, np.pi)
+
+        # vertical line up
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((0, 1)))
+        self.assertAlmostEqual(line.angle, np.pi / 2)
+
+        # vertical line down
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((0, -1)))
+        self.assertAlmostEqual(line.angle, np.pi * 3 / 2)
+
+        # 45-degree, up and to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, 1)))
+        self.assertAlmostEqual(line.angle, np.pi / 4)
+
+        # 135-degree, up and to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, 1)))
+        self.assertAlmostEqual(line.angle, np.pi * 3 / 4)
+
+        # 225-degree, down and to the left
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((-1, -1)))
+        self.assertAlmostEqual(line.angle, np.pi * 5 / 4)
+
+        # 315-degree, down and to the right
+        line = LineXY.from_two_points(Vxy((0, 0)), Vxy((1, -1)))
+        self.assertAlmostEqual(line.angle, np.pi * 7 / 4)
 
 
 if __name__ == '__main__':
