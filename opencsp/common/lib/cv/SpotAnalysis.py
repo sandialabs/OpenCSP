@@ -7,6 +7,8 @@ from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
 import opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor as asaip
 
+from opencsp import opencsp_settings
+
 # from opencsp.common.lib.cv.spot_analysis.image_processor import * # I suggest importing these dynamically as needed, to reduce startup time
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
@@ -15,7 +17,6 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysi
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser
 import opencsp.common.lib.render.VideoHandler as vh
-from opencsp.common.lib.opencsp_path import opencsp_settings
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
