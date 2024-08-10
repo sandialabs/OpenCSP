@@ -109,7 +109,9 @@ class SensitiveStringsSearcher:
         ext = ext.lower()
         if ext == ".ipynb":
             is_binary_file = True
-        if self._is_img_ext(ext):
+        elif ext == ".h5":
+            is_binary_file = True
+        elif self._is_img_ext(ext):
             if ext in self._text_file_extensions:
                 is_binary_file = False
             elif (f"{file_path}/{file_name_ext}" in self._text_file_path_name_exts) or (
