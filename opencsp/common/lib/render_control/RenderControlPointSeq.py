@@ -5,7 +5,7 @@
 
 import matplotlib.colors
 
-import opencsp.common.lib.render.color as cl
+import opencsp.common.lib.render.Color as cl
 
 
 class RenderControlPointSeq:

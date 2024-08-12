@@ -1,4 +1,6 @@
-import opencsp.common.lib.render.color as cl
+import matplotlib.colors
+
+import opencsp.common.lib.render.Color as cl
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -6,7 +8,7 @@ class RenderControlSurface:
     def __init__(
         self,
         draw_title=True,
-        color: str | None = "silver",
+        color: str | cl.Color | None = "silver",
         color_map: str | None = None,
         alpha: float = 0.25,
         edgecolor='black',
