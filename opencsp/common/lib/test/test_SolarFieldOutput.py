@@ -753,7 +753,7 @@ class TestSolarFieldOutput(to.TestOutput):
         # fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(), number_in_name=False,
         #                                          input_prefix=self.figure_prefix(13),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
         #                                          title=title, caption=caption, comments=comments, code_tag=self.code_tag)
-        # fig_record.view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        # aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         # solar_field.draw(fig_record.view, solar_field_style)
         # self.show_save_and_check_figure(fig_record)
 
@@ -761,7 +761,7 @@ class TestSolarFieldOutput(to.TestOutput):
         # fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_xy(), number_in_name=False,
         #                                          input_prefix=self.figure_prefix(14),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
         #                                          title=title, caption=caption, comments=comments, code_tag=self.code_tag)
-        # fig_record.view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        # aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         # solar_field.draw(fig_record.view, solar_field_style)
         # self.show_save_and_check_figure(fig_record)
 
@@ -779,7 +779,7 @@ class TestSolarFieldOutput(to.TestOutput):
             comments=comments,
             code_tag=self.code_tag,
         )
-        fig_record.view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
@@ -787,7 +787,7 @@ class TestSolarFieldOutput(to.TestOutput):
         # fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_yz(), number_in_name=False,
         #                                          input_prefix=self.figure_prefix(16),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
         #                                          title=title, caption=caption, comments=comments, code_tag=self.code_tag)
-        # fig_record.view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        # aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         # solar_field.draw(fig_record.view, solar_field_style)
         # self.show_save_and_check_figure(fig_record)
 
@@ -838,7 +838,7 @@ class TestSolarFieldOutput(to.TestOutput):
             code_tag=self.code_tag,
         )
         solar_field.draw(fig_record.view, solar_field_style)
-        fig_record.view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
 
         # Draw dense vector field.
         grid_xy = solar_field.heliostat_field_regular_grid_xy(40, 20)

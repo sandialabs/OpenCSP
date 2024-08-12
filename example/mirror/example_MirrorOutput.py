@@ -404,7 +404,7 @@ class ExampleMirrorOutput(to.TestOutput):
         # trace = rt.trace_scene(scene, Resolution.center())
 
         # trace.draw(fig_record.view, rcrt.RenderControlRayTrace(light_path_control))
-        # fig_record.view.draw_single_Pxyz(aimpoint)
+        # aimpoint.draw_point(fig_record.view)
 
         # Output.
         self.show_save_and_check_figure(fig_record)
