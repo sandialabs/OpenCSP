@@ -666,7 +666,7 @@ class View3d(aph.AbstractPlotHandler):
         if len(input_xyz_list) > 0:
             # Construct the point list to draw, including closing the polygon if desired.
             if close and (len(input_xyz_list) > 2):
-                xyz_list = input_xyz_list.copy()
+                xyz_list = [xyz for xyz in input_xyz_list]
                 xyz_list.append(input_xyz_list[0])
             else:
                 xyz_list = input_xyz_list
@@ -1070,7 +1070,7 @@ class View3d(aph.AbstractPlotHandler):
 
         # Construct the point list to draw, including closing the polygon if desired.
         if close and (len(input_pq_list) > 2):
-            pq_list = input_pq_list.copy()
+            pq_list = [pq for pq in input_pq_list]
             pq_list.append(input_pq_list[0])
         else:
             pq_list = input_pq_list
