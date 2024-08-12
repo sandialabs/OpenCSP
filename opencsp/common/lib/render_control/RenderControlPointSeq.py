@@ -169,9 +169,9 @@ class RenderControlPointSeq:
                 return self._markerfacecolor.rgba(self.markeralpha)
 
     @property
-    def vectorcolor(self) -> tuple[float, float, float, float] | None:
-        if self._vectorcolor is not None:
-            return self._vectorcolor.rgba()
+    def vector_color(self) -> tuple[float, float, float, float] | None:
+        if self._vector_color is not None:
+            return self._vector_color.rgba()
 
     # MODIFICATION
 
