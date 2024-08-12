@@ -5,7 +5,7 @@ Test generation of color target images.
 import matplotlib
 import numpy as np
 
-import opencsp.common.lib.render.color as cl  # ?? SCAFFOLDING RCB - FIX FILENAME TO CAPITALIZED
+import opencsp.common.lib.render.Color as cl  # ?? SCAFFOLDING RCB - FIX FILENAME TO CAPITALIZED
 import opencsp.common.lib.target.TargetColor as tc
 import opencsp.common.lib.target.target_color_2d_rgb as tc2r
 import opencsp.common.lib.target.target_color_convert as tcc
