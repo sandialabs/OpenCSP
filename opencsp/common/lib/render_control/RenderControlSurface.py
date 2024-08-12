@@ -1,4 +1,4 @@
-import opencsp.common.lib.render.color as color
+import opencsp.common.lib.render.color as cl
 import opencsp.common.lib.tool.log_tools as lt
 
 

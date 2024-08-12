@@ -5,7 +5,7 @@
 
 import matplotlib.colors
 
-import opencsp.common.lib.render.color as clr
+import opencsp.common.lib.render.color as cl
 
 
 class RenderControlPointSeq:
@@ -79,14 +79,14 @@ class RenderControlPointSeq:
         self,  # See above for details:
         linestyle='-',  # '-', '--', '-.', ':', '' or 'None'
         linewidth: float = 1,  # float
-        color: str | clr.Color = 'b',  # line color
+        color: str | cl.Color = 'b',  # line color
         marker='x',  # .,ov^<>12348sp*hH+xXDd|_ or None
         markersize: float = 6,  # float
-        markeredgecolor: str | clr.Color = None,  # Defaults to color above if not set.
+        markeredgecolor: str | cl.Color = None,  # Defaults to color above if not set.
         markeredgewidth=None,  # Defaults to linewidth if not set.
-        markerfacecolor: str | clr.Color = None,  # Defaults to color above if not set.
+        markerfacecolor: str | cl.Color = None,  # Defaults to color above if not set.
         markeralpha: float | None = None,
-        vector_color: str | clr.Color = 'b',  # Used if points are in a vector field.
+        vector_color: str | cl.Color = 'b',  # Used if points are in a vector field.
         vector_linewidth: float = 1,  # Used if points are in a vector field.
         vector_scale: float = 1.0,  # Facter to grow/srhink vector length, for points in a vector field.
     ):
@@ -184,10 +184,10 @@ class RenderControlPointSeq:
 
     def _standardize_color_values(self):
         # convert to 'Color' class
-        self._color = clr.Color.convert(self._color)
-        self._markeredgecolor = clr.Color.convert(self._markeredgecolor)
-        self._markerfacecolor = clr.Color.convert(self._markerfacecolor)
-        self._vector_color = clr.Color.convert(self._vector_color)
+        self._color = cl.Color.convert(self._color)
+        self._markeredgecolor = cl.Color.convert(self._markeredgecolor)
+        self._markerfacecolor = cl.Color.convert(self._markerfacecolor)
+        self._vector_color = cl.Color.convert(self._vector_color)
 
 
 # COMMON CASES
