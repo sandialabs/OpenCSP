@@ -145,29 +145,11 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         if is_last:
             self._finished_processing = True
 
-    def cache_image_to_disk_as_necessary(self, operable: SpotAnalysisOperable):
+    def cache_images_to_disk_as_necessary(self):
         """Check memory usage and convert images to files (aka file path
         strings) as necessary in order to reduce memory usage."""
-        # import here to avoid import loops, since AbstractSpotAnalysisImageProcessor inherits from this class
-        from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-            AbstractSpotAnalysisImagesProcessor,
-        )
-
-        total_mem_size = sys.getsizeof(operable) * 2 + sys.getsizeof(self)
         allowed_memory_footprint = image_processors_persistant_memory_total
-        if self._allowed_memory_footprint != None:
-            allowed_memory_footprint = self._allowed_memory_footprint
-
-        if (total_mem_size > allowed_memory_footprint) or (self.save_to_disk):
-            image_processor = self
-            if isinstance(self.input_iter, AbstractSpotAnalysisImagesProcessor):
-                image_processor = self.input_iter
-
-            operable.primary_image.cache(image_processor._get_tmp_path())
-            if not self.cached:
-                for result in self.cummulative_processed_results:
-                    result.primary_image.cache(image_processor._get_tmp_path())
-                self.cached = True
+        CacheableImage.cache_images_to_disk_as_necessary(allowed_memory_footprint, self._get_tmp_path)
 
     def _get_save_dir(self):
         """Finds a temporary directory to save to for the processed output images from this instance."""
@@ -236,13 +218,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         """Should probably not be called by external classes. Evaluate this instance as an iterator instead.
 
         Executes this instance's image processing on a single given input
-        primary image, with the supporting other images. If enough images have
-        been processed as to exceed this instance's memory limitations, then all
-        processed primary images will be stored to disk instead of being kept in
-        memory. The resulting processed images or paths to said images will be
-        recorded in self.cummulative_processed_results and can be accessed by
-        self.all_results after all input images have been processed (aka when
-        is_last=True).
+        primary image, with the supporting other images.
 
         When processed with the run() method, this function will be called for
         all input images.
