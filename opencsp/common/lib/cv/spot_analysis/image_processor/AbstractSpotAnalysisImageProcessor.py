@@ -280,6 +280,35 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
 
         return ret
 
+    def process_images(self, images: list[CacheableImage | np.ndarray | Image.Image]) -> list[CacheableImage]:
+        """
+        Processes the given images with this processor and returns 0, 1, or more
+        than 1 resulting images.
+
+        This method is provided for convenience, to allow for use of the spot
+        analysis image processors as if they were simple functions. The
+        following is an example of a more standard use of an image processor::
+
+            processors = [
+                EchoImageProcessor(),
+                LogScaleImageProcessor(),
+                FalseColorImageProcessor()
+            ]
+            spot_analysis = SpotAnalysis("Log Scale Images", processors)
+            spot_analysis.set_primary_images(images)
+            results = [result for result in spot_analysis]
+        """
+        # import here to avoid cyclic imports
+        from opencsp.common.lib.cv.SpotAnalysis import SpotAnalysis
+
+        spot_analysis = SpotAnalysis(self.name, [self])
+        spot_analysis.set_primary_images(images)
+        ret: list[CacheableImage] = []
+        for result in spot_analysis:
+            ret += result.get_all_images(supporting=False)
+
+        return ret
+
     @abstractmethod
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         """Evaluate an input primary image (and other images/data), and generate the output processed image(s) and data.
