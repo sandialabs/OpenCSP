@@ -87,17 +87,13 @@ class SpotAnalysisOperable:
                 requires_update = True
 
         # record the primary image source, if not available already
-        if primary_image_source_path == None:
-            if primary_image.source_path != None:
+        if primary_image_source_path is None:
+            if primary_image.source_path is not None:
                 primary_image_source_path = primary_image.source_path
             else:
                 primary_image_source_path = primary_image.cache_path
-            requires_update = True
-
-        # set the source path on the cacheable instance of the primary image
-        if primary_image.source_path == None:
-            if primary_image_source_path != None:
-                primary_image.source_path = primary_image_source_path
+            if primary_image_source_path is not None:
+                requires_update = True
 
         if requires_update:
             # use __init__ to update frozen values
@@ -114,8 +110,21 @@ class SpotAnalysisOperable:
                 self.image_processor_notes,
             )
 
-    def __sizeof__(self) -> int:
-        return sys.getsizeof(self.primary_image) + sum([sys.getsizeof(im) for im in self.supporting_images.values()])
+    def get_all_images(self, primary=True, supporting=True, visualization=True, algorithm=True) -> list[CacheableImage]:
+        """
+        Get a list of all images tracked by this operable including all primary
+        images, supporting images, visualization, and algorithm images.
+        """
+        ret: list[CacheableImage] = []
+
+        if primary:
+            ret.append(self.primary_image)
+
+        if supporting:
+            for image_type in self.supporting_images:
+                ret.append(self.supporting_images[image_type])
+
+        return ret
 
     def replace_use_default_values(
         self, supporting_images: dict[ImageType, CacheableImage] = None, data: 'SpotAnalysisOperable' = None
@@ -125,13 +134,13 @@ class SpotAnalysisOperable:
         values."""
         ret = self
 
-        if supporting_images != None:
+        if supporting_images is not None:
             for image_type in supporting_images:
-                if (image_type in ret.supporting_images) and (ret.supporting_images[image_type] != None):
+                if (image_type in ret.supporting_images) and (ret.supporting_images[image_type] is not None):
                     supporting_images[image_type] = ret.supporting_images[image_type]
             ret = replace(ret, supporting_images=supporting_images)
 
-        if data != None:
+        if data is not None:
             given_fiducials = data.given_fiducials if len(self.given_fiducials) == 0 else self.given_fiducials
             found_fiducials = data.found_fiducials if len(self.found_fiducials) == 0 else self.found_fiducials
             annotations = data.annotations if len(self.annotations) == 0 else self.annotations
@@ -180,7 +189,7 @@ class SpotAnalysisOperable:
             if image_name is not None and image_name != "":
                 break
 
-        if image_name == None or image_name == "":
+        if image_name is None or image_name == "":
             ret_path, ret_name_ext = "unknown_path", "unknown_image"
         else:
             ret_path, name, ext = ft.path_components(image_name)
@@ -202,7 +211,7 @@ class SpotAnalysisOperable:
     def max_popf(self) -> npt.NDArray[np.float_]:
         """Returns the maximum population float value, if it exists. Otherwise
         returns the maximum value for this instance's primary image."""
-        if self.population_statistics != None:
+        if self.population_statistics is not None:
             return self.population_statistics.maxf
         else:
             return np.max(self.primary_image.nparray)
@@ -211,7 +220,7 @@ class SpotAnalysisOperable:
     def min_popf(self) -> npt.NDArray[np.float_]:
         """Returns the minimum population float value, if it exists. Otherwise
         returns the minimum value for this instance's primary image."""
-        if self.population_statistics != None:
+        if self.population_statistics is not None:
             return self.population_statistics.minf
         else:
             return np.min(self.primary_image.nparray)
@@ -233,3 +242,11 @@ class SpotAnalysisOperable:
                 + f"found 0 fiducials matching type {fiducial_type.__name__} for image {self.best_primary_pathnameext}"
             )
         return ret
+
+    def __sizeof__(self) -> int:
+        """
+        Get the size of this operable in memory including all primary images,
+        supporting images, and visualization images.
+        """
+        all_images_size = sum([sys.getsizeof(im) for im in self.get_all_images()])
+        return all_images_size
