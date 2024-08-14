@@ -263,7 +263,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         # Release memory from the previous result
         if self._prev_result is not None:
-            self.image_processors[-1].cache_image_to_disk_as_necessary(self._prev_result)
+            self.image_processors[-1].cache_images_to_disk_as_necessary()
             self._prev_result = None
 
         # Attempt to get the next image. Raises StopIteration if there are no
