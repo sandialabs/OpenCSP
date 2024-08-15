@@ -96,7 +96,9 @@ class CacheableImage:
             Where to find and/or save the cached version of the image. Should be
             a numpy (.npy) file.
         source_path: str, optional
-            The source file for the image (an image file, for example jpg or png).
+            The source file for the image (an image file, for example jpg or
+            png). If provided, then this file will be used as the backing cache
+            instead of creating a new cache file.
         """
         # check that all the necessary inputs have been provided
         err_msg = "Error in CacheableImage.__init__(): must provide one of array, cache_path, or source_path!"
@@ -141,49 +143,56 @@ class CacheableImage:
                 with et.ignored(Exception):
                     ft.delete_file(self.cache_path)
 
-    @classmethod
-    def _register_access(cls, instance: "CacheableImage"):
+    @staticmethod
+    def _register_access(instance: "CacheableImage"):
         """
-        Inserts this cacheable image as in index in the registry. This
-        should be called every time the cacheable image is::
+        Inserts this cacheable image as in index in the registry. This should be
+        called every time the cacheable image is accessed for tracking the most
+        recently used instances. This should be called at least during::
 
-            - created
-            - loaded from cache
-            - accessed via nparray()
-            - accessed via to_image()
+            - creation
+            - loading into memory
+            - access via nparray()
+            - access via to_image()
 
         Parameters
         ----------
         instance : CacheableImage
             The instance to be registered.
         """
-        if instance in cls._cacheable_images_registry:
-            with et.ignored(KeyError):
-                del cls._cacheable_images_registry[instance]
-        if instance in cls._inactive_registry:
-            with et.ignored(KeyError):
-                del cls._inactive_registry[instance]
-        cls._cacheable_images_registry[instance] = cls._cacheable_images_last_access_index + 1
-        cls._cacheable_images_last_access_index += 1
+        images_registry = CacheableImage._cacheable_images_registry
+        inactive_registry = CacheableImage._inactive_registry
 
-    @classmethod
-    def _register_inactive(cls, instance: "CacheableImage"):
+        if instance in images_registry:
+            with et.ignored(KeyError):
+                del images_registry[instance]
+        if instance in inactive_registry:
+            with et.ignored(KeyError):
+                del inactive_registry[instance]
+        images_registry[instance] = CacheableImage._cacheable_images_last_access_index + 1
+        CacheableImage._cacheable_images_last_access_index += 1
+
+    @staticmethod
+    def _register_inactive(instance: "CacheableImage"):
         """
         Removes the given instance from the active registry and inserts it into
         the inactive registry. The inactive registry is useful for when a
         cacheable image has been cached and likely won't be active again for a
         while.
         """
-        if instance in cls._cacheable_images_registry:
-            with et.ignored(KeyError):
-                del cls._cacheable_images_registry[instance]
-        if instance in cls._inactive_registry:
-            with et.ignored(KeyError):
-                del cls._inactive_registry[instance]
-        cls._inactive_registry[instance] = 0
+        images_registry = CacheableImage._cacheable_images_registry
+        inactive_registry = CacheableImage._inactive_registry
 
-    @classmethod
-    def lru(cls, deregister=True) -> Optional["CacheableImage"]:
+        if instance in images_registry:
+            with et.ignored(KeyError):
+                del images_registry[instance]
+        if instance in inactive_registry:
+            with et.ignored(KeyError):
+                del inactive_registry[instance]
+        inactive_registry[instance] = 0
+
+    @staticmethod
+    def lru(deregister=True) -> Optional["CacheableImage"]:
         """
         Returns the least recently used cacheable instance, where "use" is
         counted every time the image is loaded from cache.
@@ -193,16 +202,16 @@ class CacheableImage:
 
         This does not load any cached data from disk.
         """
-        for instance_ref in cls._cacheable_images_registry:
+        for instance_ref in CacheableImage._cacheable_images_registry:
             if instance_ref is not None:
                 if deregister:
-                    cls._register_inactive(instance_ref)
+                    CacheableImage._register_inactive(instance_ref)
                 return instance_ref
 
     def __sizeof__(self) -> int:
         """
         Returns the number of bytes in use by the in-memory numpy array and
-        Pillow image.
+        Pillow image for this instance.
 
         This does not load any cached data from disk.
         """
