@@ -133,6 +133,82 @@ class test_CacheableImage(unittest.TestCase):
             sys.getsizeof(ci1) * 3, CacheableImage.all_cacheable_images_size() - existing_sizes, delta=delta
         )
 
+    def test_cache(self):
+        """Test all valid combinations of CacheableImage constructor parameters."""
+        cache_file = ft.join(self.out_dir, f"{self.test_name}.npy")
+
+        # fmt: off
+        valid_combinations = [
+            [ self.example_array, None,                    None                     ],
+            [ self.example_array, self.example_cache_path, None                     ],
+            [ self.example_array, self.example_cache_path, self.example_source_path ],
+            [ self.example_array, self.example_cache_path, self.noexist_source_path ],
+            [ self.example_array, self.noexist_cache_path, None                     ],
+            [ self.example_array, self.noexist_cache_path, self.example_source_path ],
+            [ self.example_array, None,                    self.example_source_path ],
+            [ None,               self.example_cache_path, None                     ],
+            [ None,               self.example_cache_path, self.example_source_path ],
+            [ None,               self.example_cache_path, self.noexist_source_path ],
+            [ None,               self.noexist_cache_path, self.example_source_path ],
+            [ None,               None,                    self.example_source_path ],
+        ]
+        # fmt: on
+
+        for valid_combination in valid_combinations:
+            # setup
+            err_msg = (
+                "Error encountered with the following valid combination of constructor parameters:\n"
+                + f"\tarray = {type(valid_combination[0])}\n"
+                + f"\tcache_path = {valid_combination[1]}\n"
+                + f"\tsource_path = {valid_combination[2]}\n"
+            )
+
+            try:
+                # create the cacheable image
+                cacheable = CacheableImage(*valid_combination)
+
+                # setup
+                should_create_cache_file = False
+                if cacheable.cache_path != self.example_cache_path:
+                    if cacheable.source_path != self.example_source_path:
+                        should_create_cache_file = True
+
+                ft.delete_file(cache_file, error_on_not_exists=False)
+
+                # check memory usage
+                cacheable.nparray
+                cacheable.to_image()
+                self.assertGreaterEqual(sys.getsizeof(cacheable), sys.getsizeof(self.example_array), msg=err_msg)
+
+                # verify that cacheing works
+                self.assertFalse(ft.file_exists(cache_file, error_if_exists_as_dir=False), msg=err_msg)
+                cacheable.cache(cache_file)
+                if should_create_cache_file:
+                    self.assertTrue(ft.file_exists(cache_file), msg=err_msg)
+
+                # check memory usage
+                self.assertAlmostEqual(0, sys.getsizeof(cacheable), delta=100, msg=err_msg)
+
+                # verify that loading from the cache works
+                uncached_array = cacheable.nparray
+                self.assertGreaterEqual(sys.getsizeof(cacheable), sys.getsizeof(self.example_array), msg=err_msg)
+                np.testing.assert_array_equal(self.example_array, uncached_array)
+
+                # cache and delete the cache file
+                # loading from the cache should fail
+                cacheable.cache(cache_file)
+                if should_create_cache_file:
+                    self.assertTrue(ft.file_exists(cache_file), msg=err_msg)
+                    ft.delete_file(cache_file)
+                    with self.assertRaises(Exception, msg=err_msg):
+                        cacheable.nparray
+                else:
+                    self.assertFalse(ft.file_exists(cache_file, error_if_exists_as_dir=False), msg=err_msg)
+
+            except Exception:
+                lt.error(err_msg)
+                raise
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -298,7 +298,7 @@ class CacheableImage:
             return self._array
         elif self.cache_path is not None and ft.file_exists(self.cache_path):
             return self._load_image(self.cache_path)
-        elif ft.file_exists(self.source_path):
+        elif self.source_path is not None and ft.file_exists(self.source_path):
             return self._load_image(self.source_path)
         else:
             lt.error_and_raise(
@@ -329,7 +329,7 @@ class CacheableImage:
     def _does_source_image_match(self, nparray: np.ndarray):
         """Returns true if this image's source_path image file matches the data
         in the given numpy array."""
-        if self.source_path is not None:
+        if self.source_path is not None and ft.file_exists(self.source_path):
             imarray = np.array(Image.open(self.source_path))
             try:
                 arrays_are_equal = np.equal(nparray, imarray).all()
@@ -369,26 +369,27 @@ class CacheableImage:
     def cache(self, cache_path: str = None):
         """
         Stores this instance to the cache and releases the handle to the in-memory image.
-        Note that the memory might not be abailable for garbage collection, if
+        Note that the memory might not be available for garbage collection, if
         there are other parts of the code that still have references to the
         in-memory image or array.
         """
         # get the path to the numpy file
-        if self.cache_path == None:
-            if cache_path == None:
+        if self.cache_path is None:
+            if cache_path is not None:
+                self.validate_cache_path(cache_path, "cache")
+                self.cache_path = cache_path
+            else:
                 lt.error_and_raise(
                     ValueError,
                     "Error in CacheableImage.cache(): "
                     + "this instance does not have a pre-programmed cache_path and the provided cache_path is None. "
                     + "Caching requires at least one path to be non-None!",
                 )
-            else:
-                self.validate_cache_path(cache_path, "cache")
-                self.cache_path = cache_path
 
-        # check that this instance isn't already cached
-        if self._array is None and self._image == None:
-            return
+        else:  # self.cache_path is not None
+            # check if this instance is already cached
+            if self._array is None:
+                return
 
         # Cache this instance.
         if self._does_source_image_match(self.nparray):
@@ -396,7 +397,7 @@ class CacheableImage:
             # depend on that image file instead of writing a new numpy file to
             # disk.
             pass
-        elif ft.file_exists(cache_path) and os.path.getsize(cache_path) > 10:
+        elif ft.file_exists(self.cache_path) and os.path.getsize(self.cache_path) > 10:
             # This instance has already been cached to disk at least once. Don't
             # need to cache it again.
             pass
@@ -404,6 +405,7 @@ class CacheableImage:
             # Write the numpy array to disk.
             try:
                 np.save(cache_path, self.nparray)
+                self.cache_path = cache_path
             except Exception as ex:
                 lt.info(
                     "In CacheableImage.cache(): "
