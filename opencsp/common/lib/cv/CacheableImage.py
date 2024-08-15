@@ -200,14 +200,18 @@ class CacheableImage:
 
         This does not load any cached data from disk.
         """
-        for instance_ref in CacheableImage._cacheable_images_registry:
+        images_registry = CacheableImage._cacheable_images_registry
+
+        for instance_ref in images_registry:
             if instance_ref is not None:
                 if deregister:
                     CacheableImage._register_inactive(instance_ref)
                 return instance_ref
             else:
-                # the CacheableImage has been garbage collected
-                pass
+                # the CacheableImage has been garbage collected, remove its
+                # entry from the weak references dict
+                with et.ignored(KeyError):
+                    del images_registry[instance_ref]
 
     def __sizeof__(self) -> int:
         """
@@ -306,18 +310,20 @@ class CacheableImage:
     def nparray(self) -> npt.NDArray[np.int_] | None:
         """The image data for this image, as a numpy array."""
         self._register_access(self)
-        self._image = None
 
         if self._array is None:
             self._array = self.__load_image()
 
-        return self.__load_image()
+        return self._array
 
     def to_image(self) -> Image.Image:
         """The image data for this image, as a Pillow image."""
-        # self._register_access(self) # registered in self.nparray
         if self._image == None:
+            # self._register_access(self) # registered in self.nparray
             self._image = it.numpy_to_image(self.nparray)
+        else:
+            self._register_access(self)
+
         return self._image
 
     def _does_source_image_match(self, nparray: np.ndarray):
