@@ -129,8 +129,6 @@ class CacheableImage:
         """ The path/name.ext to the cached numpy array. """
         self.source_path = source_path
         """ The path/name.ext to the source image file. """
-        self.cached = False
-        """ True if the numpy version of this image is cached to a file """
 
         self._register_access(self)
 
@@ -207,6 +205,9 @@ class CacheableImage:
                 if deregister:
                     CacheableImage._register_inactive(instance_ref)
                 return instance_ref
+            else:
+                # the CacheableImage has been garbage collected
+                pass
 
     def __sizeof__(self) -> int:
         """
@@ -274,7 +275,10 @@ class CacheableImage:
 
     @staticmethod
     def _load_image(im: str | np.ndarray) -> npt.NDArray[np.int_]:
-        """Loads the cached numpy data or image file. Returns "im" if a numpy array."""
+        """
+        Loads the cached numpy data or image file. If the given "im" is a numpy
+        array then it will be returned as is.
+        """
         if isinstance(im, np.ndarray):
             return im
         elif im.lower().endswith(".npy"):
@@ -289,7 +293,6 @@ class CacheableImage:
         if self._array is not None:
             return self._array
         elif self.cache_path is not None and ft.file_exists(self.cache_path):
-            self.cached = True
             return self._load_image(self.cache_path)
         elif ft.file_exists(self.source_path):
             return self._load_image(self.source_path)
@@ -306,8 +309,7 @@ class CacheableImage:
         self._image = None
 
         if self._array is None:
-            if not self.cached:
-                self._array = self.__load_image()
+            self._array = self.__load_image()
 
         return self.__load_image()
 
@@ -406,7 +408,6 @@ class CacheableImage:
         # Indicate that this instance is cached
         self._array = None
         self._image = None
-        self.cached = True
 
     def save_image(self, image_path_name_ext: str):
         """
