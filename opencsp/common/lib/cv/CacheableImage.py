@@ -31,8 +31,8 @@ class CacheableImage:
     instead be an indicator for where to cache the image to.
 
     The following table determines how images are retrieved based on the given
-    parameters (X = given and file exists, * = given and file doesn't
-    exist):
+    parameters ([X] = given and file exists, [.] = given and file doesn't
+    exist, * = any):
 
         +=======+=========+==========+========================================================================+
         | array | cache_p | source_p | retrieval method                                                       |
@@ -40,41 +40,38 @@ class CacheableImage:
         |   X   |         |          | array                                                                  |
         |       |         |          | cache_path after cacheing (a temporary cache_path will be assigned)    |
         +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |    *    |          | array                                                                  |
+        |   X   |    X    |    *     | array                                                                  |
+        |       |         |          | cache_path after cacheing (array contents will then be ignored)        |
+        +-------+---------+----------+------------------------------------------------------------------------+
+        |   X   |   [X]   |          | array                                                                  |
         |       |         |          | cache_path after cacheing (array contents will be saved to cache_path) |
         +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |    X    |          | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will then be ignored)        |
+        |   X   |   [X]   |    X     | array                                                                  |
+        |       |         |          | source_path after cacheing (array contents will then be ignored)       |
         +-------+---------+----------+------------------------------------------------------------------------+
         |   X   |         |    X     | array                                                                  |
         |       |         |          | source_path after cacheing (array contents will then be ignored)       |
         +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |    *    |    X     | array                                                                  |
-        |       |         |          | source_path after cacheing (array contents will then be ignored)       |
+        |       |    X    |    *     | cache_path                                                             |
         +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |    X    |    X     | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will then be ignored)        |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |    X    |          | cache_path                                                             |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |    *    |    X     | source_path                                                            |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |    X    |    X     | cache_path                                                             |
+        |       |   [X]   |    X     | source_path                                                            |
         +-------+---------+----------+------------------------------------------------------------------------+
         |       |         |    X     | source_path                                                            |
         +-------+---------+----------+------------------------------------------------------------------------+
 
-    In addition, the following cases will raise a FileNotExistError during the
+    In addition, the following cases will raise a FileNotFoundError during the
     __init__ method():
 
         +=======+=========+==========+
         | array | cache_p | source_p |
         +=======+=========+==========+
-        |   X   |         |    *     |
+        |   X   |         |   [X]    |
         +-------+---------+----------+
-        |       |    *    |          |
+        |   X   |   [X]   |   [X]    |
         +-------+---------+----------+
-        |       |         |    *     |
+        |       |   [X]   |          |
+        +-------+---------+----------+
+        |       |         |   [X]    |
         +-------+---------+----------+
     """
 
@@ -101,10 +98,23 @@ class CacheableImage:
         source_path: str, optional
             The source file for the image (an image file, for example jpg or png).
         """
-        if array is None and cache_path == None and source_path == None:
-            lt.error_and_raise(
-                ValueError, "Error in CacheableImage.__init__(): must provide one of array, cache_path, or source_path!"
-            )
+        # check that all the necessary inputs have been provided
+        err_msg = "Error in CacheableImage.__init__(): must provide one of array, cache_path, or source_path!"
+        if array is None:
+            if cache_path is None:
+                if source_path is None:
+                    lt.error_and_raise(ValueError, err_msg)
+                elif not ft.file_exists(source_path):
+                    lt.error_and_raise(FileNotFoundError, err_msg)
+            elif not ft.file_exists(cache_path):
+                if source_path is None or not ft.file_exists(source_path):
+                    lt.error_and_raise(FileNotFoundError, err_msg)
+        else:
+            if cache_path is None or not ft.file_exists(cache_path):
+                if source_path is not None and not ft.file_exists(source_path):
+                    lt.error_and_raise(FileNotFoundError, err_msg)
+
+        # verify that the cache path is valid
         self.validate_cache_path(cache_path, "__init__")
 
         self._array = array
@@ -123,9 +133,13 @@ class CacheableImage:
         self._register_access(self)
 
     def __del__(self):
-        if self.cache_path is not None:
-            with et.ignored(Exception):
-                ft.delete_file(self.cache_path)
+        if not hasattr(self, "cache_path"):
+            # this can happen when an error is raised during __init__()
+            pass
+        else:
+            if self.cache_path is not None:
+                with et.ignored(Exception):
+                    ft.delete_file(self.cache_path)
 
     @classmethod
     def _register_access(cls, instance: "CacheableImage"):
@@ -233,11 +247,20 @@ class CacheableImage:
         """Ensures that the given cache_path ends with ".npy", or is None."""
         if cache_path == None:
             return
+
         if not cache_path.lower().endswith(".npy"):
             _, _, ext = ft.path_components(cache_path)
             lt.error_and_raise(
                 ValueError,
-                f"Error in CacheableImage.{caller_name}(): cache_path must end with '.npy' but instead the extension is {ext}",
+                f"Error in CacheableImage.{caller_name}(): "
+                + f"cache_path must end with '.npy' but instead the extension is {ext}",
+            )
+
+        path, name, ext = ft.path_components(cache_path)
+        if not ft.directory_exists(path):
+            lt.error_and_raise(
+                FileNotFoundError,
+                f"Error in CacheableImage.{caller_name}(): " + f"cache_path directory {path} does not exist",
             )
 
     @staticmethod
