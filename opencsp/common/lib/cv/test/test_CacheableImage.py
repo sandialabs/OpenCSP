@@ -1,6 +1,8 @@
+import sys
 import unittest
 
 import numpy as np
+from PIL import Image
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.tool.file_tools as ft
@@ -94,6 +96,42 @@ class test_CacheableImage(unittest.TestCase):
                     + f"\tcache_path = {invalid_combination[1]}\n"
                     + f"\tsource_path = {invalid_combination[2]}\n"
                 )
+
+    def test_size(self):
+        """
+        Verifies that the size() built-in returns the correct value, and that
+        the sum of all CacheableImages returns the correct value.
+        """
+        # cacheable images exist from other tests, include their sizes as well
+        existing_sizes = CacheableImage.all_cacheable_images_size()
+
+        # something is happening under the hood that causes the reference to the
+        # example array to be larger
+        delta = 40
+
+        # one cacheable image
+        ci1 = CacheableImage(self.example_array, None, self.example_source_path)
+        example_image = None
+        self.assertAlmostEqual(sys.getsizeof(ci1), sys.getsizeof(self.example_array), delta=delta)
+        self.assertAlmostEqual(
+            sys.getsizeof(ci1), CacheableImage.all_cacheable_images_size() - existing_sizes, delta=delta
+        )
+        example_image = ci1.to_image()
+        self.assertAlmostEqual(
+            sys.getsizeof(ci1), sys.getsizeof(self.example_array) + sys.getsizeof(example_image), delta=delta
+        )
+        self.assertAlmostEqual(
+            sys.getsizeof(ci1), CacheableImage.all_cacheable_images_size() - existing_sizes, delta=delta
+        )
+
+        # multiple cacheable images
+        ci2 = CacheableImage(self.example_array, None, self.example_source_path)
+        ci3 = CacheableImage(self.example_array, None, self.example_source_path)
+        ci2.to_image()
+        ci3.to_image()
+        self.assertAlmostEqual(
+            sys.getsizeof(ci1) * 3, CacheableImage.all_cacheable_images_size() - existing_sizes, delta=delta
+        )
 
 
 if __name__ == '__main__':
