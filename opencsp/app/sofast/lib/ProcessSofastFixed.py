@@ -9,6 +9,7 @@ from numpy import ndarray
 
 from opencsp.app.sofast.lib.BlobIndex import BlobIndex
 import opencsp.app.sofast.lib.calculation_data_classes as cdc
+from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
 import opencsp.app.sofast.lib.image_processing as ip
@@ -66,6 +67,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
 
         # Calculations
         self.data_facet: list[DefinitionFacet]
+        self.data_ensemble: DefinitionEnsemble
         self.data_surface: list[Surface2DAbstract]
         self.data_ensemble: DefinitionEnsemble
         self.data_slope_solver: list[SlopeSolverData]
@@ -185,6 +187,78 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             'surface': self.data_surface[0],
         }
 
+    def _process_optic_multifacet_geometry(self, blob_indicies: list[BlobIndex], mask_raw: np.ndarray) -> list[dict]:
+        # Process optic geometry (find mask corners, etc.)
+        (
+            self.data_geometry_general,
+            self.data_image_proccessing_general,
+            self.data_geometry_facet,  # list
+            self.data_image_processing_facet,  # list
+            self.data_error,
+        ) = pr.process_multifacet_geometry(
+            self.data_facet,
+            self.data_ensemble,
+            mask_raw,
+            self.measurement.v_measure_point_facet,
+            self.orientation,
+            self.camera,
+            self.measurement.dist_optic_screen,
+            self.params.geometry,
+            self.params.debug_geometry,
+        )
+
+        kwargs_list = []
+        for idx_facet in range(self.num_facets):
+            # Get image points and blob indices
+            pts_image, pts_index_xy = blob_indicies[idx_facet].get_data()
+
+            # Define optic orientation w.r.t. camera
+            rot_facet_ensemble = self.data_ensemble.r_facet_ensemble[idx_facet]
+            rot_ensemble_cam = self.data_geometry_general.r_optic_cam_refine_2
+            rot_facet_cam = rot_ensemble_cam * rot_facet_ensemble
+
+            v_cam_ensemble_cam = self.data_geometry_general.v_cam_optic_cam_refine_3
+            v_ensemble_facet_ensemble = self.data_ensemble.v_facet_locations[idx_facet]
+            v_ensemble_facet_cam = v_ensemble_facet_ensemble.rotate(rot_ensemble_cam)
+            v_cam_facet_cam = v_cam_ensemble_cam + v_ensemble_facet_cam
+
+            u_cam_measure_point_facet = self.data_geometry_facet[idx_facet].u_cam_measure_point_facet
+
+            # Get screen/camera poses
+            rot_cam_facet = rot_facet_cam.inv()
+            rot_facet_screen = self.orientation.r_cam_screen * rot_facet_cam
+            rot_screen_facet = rot_facet_screen.inv()
+
+            v_facet_cam_facet = -v_cam_facet_cam.rotate(rot_cam_facet)
+            v_cam_screen_facet = self.orientation.v_cam_screen_cam.rotate(rot_cam_facet)
+            v_facet_screen_facet = v_facet_cam_facet + v_cam_screen_facet
+
+            # Calculate xyz screen points
+            v_screen_points_screen = self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
+            v_screen_points_facet = v_facet_screen_facet + v_screen_points_screen.rotate(rot_screen_facet)
+
+            # Calculate active pixel pointing
+            u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
+            u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_facet).as_Vxyz()
+
+            # Update debug data
+            self.params.debug_slope_solver.optic_data = self.data_facet[idx_facet]
+
+            # Construct list of surface kwargs
+            kwargs_list.append(
+                {
+                    'v_optic_cam_optic': v_facet_cam_facet,
+                    'u_active_pixel_pointing_optic': u_pixel_pointing_facet,
+                    'u_measure_pixel_pointing_optic': u_cam_measure_point_facet,
+                    'v_screen_points_facet': v_screen_points_facet,
+                    'v_optic_screen_optic': v_facet_screen_facet,
+                    'v_align_point_optic': self.data_geometry_facet[idx_facet].v_align_point_facet,
+                    'dist_optic_screen': self.data_geometry_facet[idx_facet].measure_point_screen_distance,
+                    'debug': self.params.debug_slope_solver,
+                    'surface': self.data_surface[idx_facet],
+                }
+            )
+        return kwargs_list
 
     def process_single_facet_optic(self, data_facet: DefinitionFacet, surface: Surface2DAbstract) -> None:
         """Processes single facet optic. Saves data to self.data_slope_solver
@@ -215,6 +289,56 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         slope_solver.solve_slopes()
         self.slope_solver = slope_solver
         self.data_slope_solver = [self.slope_solver.get_data()]
+
+    def process_multi_facet_optic(
+        self, data_facet: list[DefinitionFacet], surface: list[Surface2DAbstract], data_ensemble: DefinitionEnsemble
+    ) -> None:
+        """Processes multi facet optic. Saves data to self.data_slope_solver
+
+        Parameters
+        ----------
+        data_facet : list[DefinitionFacet]
+            List of facet data objects.
+        data_ensemble : DefinitionEnsemble
+            Ensemble data object.
+        surface_data : list[Surface2dAbstract]
+            List of surface type definitions.
+        """
+
+        # Check inputs
+        if len(data_facet) != len(surface):
+            lt.error_and_raise(
+                ValueError,
+                'Length of data_facet does not equal length of data_surface'
+                f'data_facet={len(data_facet)}, surface_data={len(surface)}',
+            )
+
+        self.optic_type = 'multi_facet'
+        self.num_facets = len(data_facet)
+        self.data_facet = [d.copy() for d in data_facet]
+        self.data_ensemble = data_ensemble.copy()
+        self.data_surface = surface
+
+        # Find blobs
+        self.blob_index = self.find_blobs()
+
+        # Calculate mask
+        mask_raw = self._calculate_mask()
+
+        # Generate geometry and slope solver inputs
+        kwargs_list = self._process_optic_multifacet_geometry(self.blob_index, mask_raw)
+
+        # Calculate slope
+        self.slope_solver = []
+        self.data_slope_solver = []
+
+        for kwargs in kwargs_list:
+            slope_solver = SlopeSolver(**kwargs)
+            slope_solver.fit_surface()
+            slope_solver.solve_slopes()
+            # TODO: Make slope_solver a list for both single/multi
+            self.slope_solver.append(slope_solver)
+            self.data_slope_solver.append(self.slope_solver.get_data())
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
