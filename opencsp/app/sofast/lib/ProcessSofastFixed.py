@@ -210,6 +210,10 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         surface : Surface2DAbstract
             Surface 2d class
         """
+
+        self.optic_type = 'single_facet'
+        self.num_facets = 1
+
         # Find blobs
         self.blob_index = self.find_blobs()
 
