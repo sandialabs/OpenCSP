@@ -31,11 +31,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
     """Fixed Pattern Deflectrometry data processing class"""
 
     def __init__(
-        self,
-        orientation: SpatialOrientation,
-        camera: Camera,
-        fixed_pattern_dot_locs: DotLocationsFixedPattern,
-        data_facet: DefinitionFacet,
+        self, orientation: SpatialOrientation, camera: Camera, fixed_pattern_dot_locs: DotLocationsFixedPattern
     ) -> 'ProcessSofastFixed':
         """Instantiates class
 
@@ -47,13 +43,10 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             Camera object
         fixed_pattern_dot_locs : DotLocationsFixedPattern
             Image projection dictionary
-        data_facet : DefinitionFacet
-            DefinitionFacet object
         """
         self.orientation = orientation
         self.camera = camera
         self.fixed_pattern_dot_locs = fixed_pattern_dot_locs
-        self.data_facet = data_facet
         self.params = ParamsSofastFixed()
         self.optic_type: Literal['single_facet', 'multi_facet', 'undefined'] = None
         self.num_facets: int = None
@@ -72,6 +65,9 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.blob_detector.filterByInertia = False
 
         # Calculations
+        self.data_facet: list[DefinitionFacet]
+        self.data_surface: list[Surface2DAbstract]
+        self.data_ensemble: DefinitionEnsemble
         self.data_slope_solver: SlopeSolverData
         self.data_geometry_general: cdc.CalculationDataGeometryGeneral
         self.data_image_proccessing_general: cdc.CalculationImageProcessingGeneral
@@ -80,9 +76,6 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_error: cdc.CalculationError
         self.blob_index: BlobIndex
         self.slope_solver: SlopeSolver
-
-        # Input parameters
-        self.data_surface: Surface2DAbstract = None
 
     def find_blobs(self) -> BlobIndex:
         """Finds blobs in image"""
@@ -146,7 +139,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             self.data_image_processing_facet,
             self.data_error,
         ) = pr.process_singlefacet_geometry(
-            self.data_facet,
+            self.data_facet[0],
             mask_raw,
             self.measurement.v_measure_point_facet,
             self.measurement.dist_optic_screen,
@@ -178,7 +171,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
         u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_optic).as_Vxyz()
 
-        self.params.debug_slope_solver.optic_data = self.data_facet
+        self.params.debug_slope_solver.optic_data = self.data_facet[0]
 
         return {
             'v_optic_cam_optic': v_optic_cam_optic,
@@ -186,7 +179,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             'u_measure_pixel_pointing_optic': u_cam_measure_point_facet,
             'v_screen_points_facet': v_screen_points_facet,
             'v_optic_screen_optic': v_optic_screen_optic,
-            'v_align_point_optic': self.data_facet.v_facet_centroid,
+            'v_align_point_optic': self.data_facet[0].v_facet_centroid,
             'dist_optic_screen': self.measurement.dist_optic_screen,
             'debug': self.params.debug_slope_solver,
             'surface': surface,
@@ -202,7 +195,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         """
         self.measurement = measurement
 
-    def process_single_facet_optic(self, surface: Surface2DAbstract) -> None:
+    def process_single_facet_optic(self, data_facet: DefinitionFacet, surface: Surface2DAbstract) -> None:
         """Processes single facet optic. Saves data to self.data_slope_solver
 
         Parameters
@@ -213,6 +206,8 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
 
         self.optic_type = 'single_facet'
         self.num_facets = 1
+        self.data_facet = [data_facet]
+        self.data_surface = [surface]
 
         # Find blobs
         self.blob_index = self.find_blobs()
@@ -242,10 +237,11 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             Prefix to append to folder path within HDF file (folders must be separated by "/").
             Default is empty string ''.
         """
-        # Sofast input
+        # Sofast input parameters
         self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
-        self.data_surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_000/')
-        self.data_facet.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_000/')
+        for idx, (data_facet, data_surface) in enumerate(zip(self.data_facet, self.data_surface)):
+            data_surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:3d}/')
+            data_facet.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:3d}/')
 
         # General
         self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
@@ -263,10 +259,14 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest'
     ) -> MirrorPoint:
         """Returns mirror object with slope data"""
-        v_surf_pts = self.data_slope_solver.v_surf_points_facet
-        v_normals_data = np.ones((3, len(v_surf_pts)))
-        v_normals_data[:2, :] = self.data_slope_solver.slopes_facet_xy
-        v_normals_data[:2, :] *= -1
-        v_normals = Uxyz(v_normals_data)
-        shape = RegionXY.from_vertices(self.data_facet.v_facet_corners.projXY())
-        return MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
+        if self.optic_type in ['single_facet', 'undefined']:
+            v_surf_pts = self.data_slope_solver.v_surf_points_facet
+            v_normals_data = np.ones((3, len(v_surf_pts)))
+            v_normals_data[:2, :] = self.data_slope_solver.slopes_facet_xy
+            v_normals_data[:2, :] *= -1
+            v_normals = Uxyz(v_normals_data)
+            shape = RegionXY.from_vertices(self.data_facet[0].v_facet_corners.projXY())
+            return MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
+        elif self.optic_type == 'multi_facet':
+            # TODO: fill in for multifacet
+            pass
