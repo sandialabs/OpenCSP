@@ -359,7 +359,7 @@ def process_undefined_geometry(
 
 
 def process_multifacet_geometry(
-    facet_data: DefinitionFacet,
+    facet_data: list[DefinitionFacet],
     ensemble_data: DefinitionEnsemble,
     mask_raw: ndarray,
     v_meas_pt_ensemble: Vxyz,
