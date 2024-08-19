@@ -126,15 +126,12 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.measurement = measurement
 
     def _process_optic_singlefacet_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> dict:
-        # Get image points and blob indices
-        pts_image, pts_index_xy = blob_index.get_data()
-
         # Process optic geometry (find mask corners, etc.)
         (
             self.data_geometry_general,
             self.data_image_proccessing_general,
-            self.data_geometry_facet,
-            self.data_image_processing_facet,
+            self.data_geometry_facet,  # list
+            self.data_image_processing_facet,  # list
             self.data_error,
         ) = pr.process_singlefacet_geometry(
             self.data_facet[0],
@@ -147,12 +144,15 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             self.params.debug_geometry,
         )
 
+        # Get image points and blob indices
+        pts_image, pts_index_xy = blob_index.get_data()
+
         # Define optic orientation w.r.t. camera
         rot_optic_cam = self.data_geometry_general.r_optic_cam_refine_1
         v_cam_optic_cam = self.data_geometry_general.v_cam_optic_cam_refine_2
         u_cam_measure_point_facet = self.data_geometry_facet[0].u_cam_measure_point_facet
 
-        # Get screen-camera pose
+        # Get screen/camera poses
         rot_cam_optic = rot_optic_cam.inv()
         rot_optic_screen = self.orientation.r_cam_screen * rot_optic_cam
         rot_screen_optic = rot_optic_screen.inv()
@@ -169,8 +169,10 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
         u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_optic).as_Vxyz()
 
+        # Update debug data
         self.params.debug_slope_solver.optic_data = self.data_facet[0]
 
+        # Construct surface kwargs
         return {
             'v_optic_cam_optic': v_optic_cam_optic,
             'u_active_pixel_pointing_optic': u_pixel_pointing_facet,
@@ -204,7 +206,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
 
         self.optic_type = 'single_facet'
         self.num_facets = 1
-        self.data_facet = [data_facet]
+        self.data_facet = [data_facet.copy()]
         self.data_surface = [surface]
 
         # Find blobs
