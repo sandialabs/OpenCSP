@@ -1,3 +1,4 @@
 sphinx
 sphinx-argparse
 sphinx-rtd-theme
+nbsphinx

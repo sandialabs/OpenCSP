@@ -31,5 +31,6 @@ jobs:
           pip install -r requirements.txt
           cd doc
           pip install -r requirements.txt
+          apt-get install -y pandoc
           ./make_docs.sh
           
