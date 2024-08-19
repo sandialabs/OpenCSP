@@ -24,6 +24,25 @@ NumPy-style docstrings with bulleted lists. We require NumPy compliant docstring
 Models, Public Classes, and Public Functions. For more internal and development-facing 
 documentation please use hash tags.
 
+All documentation is verified to pass sphinx-build without errors via https://github.com/sandialabs/OpenCSP/blob/develop/.github/workflows/docs_check.yml.
+Solely documentation that has a associated sphinx config in https://github.com/sandialabs/OpenCSP/tree/develop/doc/source will be included in this online documentation.
+There are several different ways to include documentation in the sphinx config depending on what the source of documentation is. For general guidance, please see
+https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html. For examples of how this is currently done in OpenCSP, please see any of the config.rst files in doc/source. A common 
+use-case is to include NewClass with its documented and undocumented non-private members, to do that you would add the following to 
+https://github.com/sandialabs/OpenCSP/blob/develop/doc/source/library_reference/app/sofast/config.rst:
+
+    .. code-block:: rst
+
+        opencsp.app.sofast.lib.NewClass
+        ===============================
+
+        .. currentmodule:: opencsp.app.sofast.lib.NewClass
+
+        .. automodule:: opencsp.app.sofast.lib.NewClass
+           :members:
+           :undoc-members:
+           :show-inheritance:
+
 We highly recommend using Visual Studio Code for development. If using VS Code,
 please install the following plugins:
 
@@ -72,7 +91,7 @@ commits:
    for FILE in $(git diff --cached --name-only | egrep '.*\.py$')
    do
      if [ -e $FILE ]; then
-       black $FILE -C -S
+       black $FILE --line-length 120 -C -S
        git add $FILE
      fi
    done
