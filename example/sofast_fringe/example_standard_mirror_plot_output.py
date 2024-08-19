@@ -37,8 +37,8 @@ def example_single_facet() -> None:
 
     # 1. Load Sofast measurement data
     # ===============================
-    optic_meas = lsd.load_mirror_from_hdf(file_data)
-    optic_ref = lsd.load_ideal_mirror_from_hdf(file_data, 100.0)
+    optic_meas = lsd.load_mirror(file_data)
+    optic_ref = lsd.load_mirror_ideal(file_data, 100.0)
 
     # 2. Define viewing/illumination geometry
     # =======================================

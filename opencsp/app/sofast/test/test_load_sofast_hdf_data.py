@@ -13,16 +13,16 @@ class TestImageProcessing(unittest.TestCase):
         cls.file_fixed = join(opencsp_code_dir(), 'test/data/sofast_fixed/data_expected/calculation_facet.h5')
 
     def test_load_fringe(self):
-        lsd.load_single_mirror(self.file_fringe)
+        lsd.load_mirror(self.file_fringe)
 
     def test_load_fringe_ideal(self):
-        lsd.load_single_mirror_ideal_parabolic(self.file_fringe, 100.0)
+        lsd.load_mirror_ideal(self.file_fringe, 100.0)
 
     def test_load_fixed(self):
-        lsd.load_single_mirror(self.file_fixed)
+        lsd.load_mirror(self.file_fixed)
 
     def test_load_fixed_ideal(self):
-        lsd.load_single_mirror_ideal_parabolic(self.file_fixed, 100.0)
+        lsd.load_mirror_ideal(self.file_fixed, 100.0)
 
 
 if __name__ == '__main__':
