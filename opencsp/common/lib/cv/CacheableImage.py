@@ -52,6 +52,9 @@ class CacheableImage:
         |   X   |         |    X     | array                                                                  |
         |       |         |          | source_path after cacheing (array contents will then be ignored)       |
         +-------+---------+----------+------------------------------------------------------------------------+
+        |   X   |         |   [X]    | array                                                                  |
+        |       |         |          | cache_path after cacheing (array contents will be saved to cache_path) |
+        +-------+---------+----------+------------------------------------------------------------------------+
         |       |    X    |    *     | cache_path                                                             |
         +-------+---------+----------+------------------------------------------------------------------------+
         |       |   [X]   |    X     | source_path                                                            |
@@ -65,10 +68,6 @@ class CacheableImage:
         +=======+=========+==========+
         | array | cache_p | source_p |
         +=======+=========+==========+
-        |   X   |         |   [X]    |
-        +-------+---------+----------+
-        |   X   |   [X]   |   [X]    |
-        +-------+---------+----------+
         |       |   [X]   |          |
         +-------+---------+----------+
         |       |         |   [X]    |
@@ -101,30 +100,35 @@ class CacheableImage:
             instead of creating a new cache file.
         """
         # check that all the necessary inputs have been provided
-        err_msg = "Error in CacheableImage.__init__(): must provide one of array, cache_path, or source_path!"
+        err_msg = "Error in CacheableImage.__init__(): must provide at least one of array, cache_path, or source_path!"
+        fnfe_msg = err_msg + " %s file %s does not exist!"
         if array is None:
             if cache_path is None:
                 if source_path is None:
                     lt.error_and_raise(ValueError, err_msg)
                 elif not ft.file_exists(source_path):
-                    lt.error_and_raise(FileNotFoundError, err_msg)
+                    lt.error_and_raise(FileNotFoundError, fnfe_msg % ("source", source_path))
             elif not ft.file_exists(cache_path):
-                if source_path is None or not ft.file_exists(source_path):
-                    lt.error_and_raise(FileNotFoundError, err_msg)
-        else:
-            if cache_path is None or not ft.file_exists(cache_path):
-                if source_path is not None and not ft.file_exists(source_path):
-                    lt.error_and_raise(FileNotFoundError, err_msg)
+                if source_path is None:
+                    lt.error_and_raise(FileNotFoundError, fnfe_msg % ("cache", source_path))
+                elif not ft.file_exists(source_path):
+                    lt.error_and_raise(FileNotFoundError, fnfe_msg % ("source/cache", source_path + "/" + cache_path))
 
-        # verify that the cache path is valid
+        # verify that the paths are valid
         self.validate_cache_path(cache_path, "__init__")
+        self.validate_source_path(source_path, "__init__")
 
         self._array = array
-        """ The in-memory numpy array version of this image. None if not
-        assigned, or if the data exists as a Pillow image, or if cached. """
+        """
+        The in-memory numpy array version of this image. None if not assigned or
+        if cached. Should always be available whenever self._image is available.
+        """
         self._image = None
-        """ The in-memory Pillow version of this image. None if not assigned, or
-        if the data exists as a numpy array, or if cached. """
+        """
+        The in-memory Pillow version of this image. None if not assigned, or if
+        the data exists as a numpy array but not as an image, or if this
+        instance is cached.
+        """
         self.cache_path = cache_path
         """ The path/name.ext to the cached numpy array. """
         self.source_path = source_path
@@ -195,8 +199,10 @@ class CacheableImage:
         Returns the least recently used cacheable instance, where "use" is
         counted every time the image is loaded from cache.
 
-        If deregister is true, then the returned instance is removed frmo the
-        "active" list to the "inactive" list of cacheable images.
+        If deregister is true, then the returned instance is moved from the
+        "active" list to the "inactive" list of cacheable images. This is useful
+        when we anticipate that the returned instance isn't going to be used for
+        a while, such as from the method cache_images_to_disk_as_necessary().
 
         This does not load any cached data from disk.
         """
@@ -275,6 +281,22 @@ class CacheableImage:
             lt.error_and_raise(
                 FileNotFoundError,
                 f"Error in CacheableImage.{caller_name}(): " + f"cache_path directory {path} does not exist",
+            )
+
+    def validate_source_path(self, source_path: Optional[str], caller_name: str):
+        """Ensures that the given source_path has one of the readable file extensions, or is None."""
+        if source_path == None:
+            return
+
+        _, _, ext = ft.path_components(source_path)
+        ext = ext[1:]  # strip off the leading period "."
+        allowed_exts = sorted(it.pil_image_formats_rw + it.pil_image_formats_readable)
+        if ext.lower() not in allowed_exts:
+            lt.error_and_raise(
+                ValueError,
+                f"Error in CacheableImage.{caller_name}(): "
+                + f"{source_path} must be readable by Pillow, but "
+                + f"the extension {ext} isn't in the known extensions {allowed_exts}!",
             )
 
     @staticmethod
