@@ -84,7 +84,7 @@ class TestProcessSofastFixed(unittest.TestCase):
     def test_slopes_xy(self):
         """Tests slope data"""
         np.testing.assert_allclose(
-            self.process_sofast_fixed.data_slope_solver.slopes_facet_xy, self.exp_slopes_xy, rtol=0, atol=1e-6
+            self.process_sofast_fixed.data_slope_solver[0].slopes_facet_xy, self.exp_slopes_xy, rtol=0, atol=1e-6
         )
 
     def tearDown(self) -> None:

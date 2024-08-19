@@ -68,7 +68,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_facet: list[DefinitionFacet]
         self.data_surface: list[Surface2DAbstract]
         self.data_ensemble: DefinitionEnsemble
-        self.data_slope_solver: SlopeSolverData
+        self.data_slope_solver: list[SlopeSolverData]
         self.data_geometry_general: cdc.CalculationDataGeometryGeneral
         self.data_image_proccessing_general: cdc.CalculationImageProcessingGeneral
         self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet]
@@ -185,15 +185,6 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             'surface': self.data_surface[0],
         }
 
-    def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
-        """Saves measurement data in class
-
-        Parameters
-        ----------
-        measurement: MeasurementSofastFixed
-            Fixed pattern measurement object
-        """
-        self.measurement = measurement
 
     def process_single_facet_optic(self, data_facet: DefinitionFacet, surface: Surface2DAbstract) -> None:
         """Processes single facet optic. Saves data to self.data_slope_solver
@@ -219,12 +210,11 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         kwargs = self._process_optic_singlefacet_geometry(self.blob_index, mask_raw)
 
         # Calculate slope
-        self.slope_solver = SlopeSolver(**kwargs)
-        self.slope_solver.fit_surface()
-        self.slope_solver.solve_slopes()
-        self.data_slope_solver = self.slope_solver.get_data()
-
-        self.data_surface = surface
+        slope_solver = SlopeSolver(**kwargs)
+        slope_solver.fit_surface()
+        slope_solver.solve_slopes()
+        self.slope_solver = slope_solver
+        self.data_slope_solver = [self.slope_solver.get_data()]
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
@@ -249,9 +239,16 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_image_proccessing_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
 
         # Calculations
-        self.data_slope_solver.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/facet/facet_000/')
-        self.data_geometry_facet[0].save_to_hdf(file, f'{prefix:s}DataSofastCalculation/facet/facet_000/')
-        self.data_image_processing_facet[0].save_to_hdf(file, f'{prefix:s}DataSofastCalculation/facet/facet_000/')
+        for idx_facet in range(self.num_facets):
+            self.data_slope_solver[idx_facet].save_to_hdf(
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:3d}/'
+            )
+            self.data_geometry_facet[idx_facet].save_to_hdf(
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:3d}/'
+            )
+            self.data_image_processing_facet[idx_facet].save_to_hdf(
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:3d}/'
+            )
 
         lt.info(f'SofastFixed data saved to: {file:s} with prefix: {prefix:s}')
 
@@ -260,9 +257,9 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
     ) -> MirrorPoint:
         """Returns mirror object with slope data"""
         if self.optic_type in ['single_facet', 'undefined']:
-            v_surf_pts = self.data_slope_solver.v_surf_points_facet
+            v_surf_pts = self.data_slope_solver[0].v_surf_points_facet
             v_normals_data = np.ones((3, len(v_surf_pts)))
-            v_normals_data[:2, :] = self.data_slope_solver.slopes_facet_xy
+            v_normals_data[:2, :] = self.data_slope_solver[0].slopes_facet_xy
             v_normals_data[:2, :] *= -1
             v_normals = Uxyz(v_normals_data)
             shape = RegionXY.from_vertices(self.data_facet[0].v_facet_corners.projXY())
