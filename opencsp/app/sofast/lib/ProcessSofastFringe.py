@@ -258,9 +258,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             List of facet data objects.
         ensemble_data : DefinitionEnsemble
             Ensemble data object.
-        surface_data : dict
-            See Sofast documentation or Sofast.help() for more details.
-
+        surface_data : list[Surface2dAbstract]
+            List of surface type definitions.
         """
         # Check inputs
         if len(facet_data) != len(surfaces):
