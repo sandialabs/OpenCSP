@@ -60,12 +60,12 @@ class TestProcessSofastFixed(unittest.TestCase):
 
         # Instantiate class
         params = ParamsSofastFixed.load_from_hdf(file_exp, 'DataSofastInput/')
-        cls.process_sofast_fixed = ProcessSofastFixed(orientation, camera, dot_locs, facet_data)
+        cls.process_sofast_fixed = ProcessSofastFixed(orientation, camera, dot_locs)
         cls.process_sofast_fixed.params = params
         cls.process_sofast_fixed.load_measurement_data(measurement)
 
         # Process
-        cls.process_sofast_fixed.process_single_facet_optic(surface)
+        cls.process_sofast_fixed.process_single_facet_optic(facet_data, surface)
 
     def test_save_as_hdf(self):
         """Tests saving to HDF file"""
