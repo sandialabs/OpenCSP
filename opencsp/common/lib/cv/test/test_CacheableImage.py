@@ -139,45 +139,46 @@ class test_CacheableImage(unittest.TestCase):
 
     def test_cache(self):
         """Test all valid combinations of CacheableImage constructor parameters."""
-        cache_file = ft.join(self.out_dir, f"{self.test_name}.npy")
+        default_cache_file = ft.join(self.out_dir, f"{self.test_name}.npy")
+        noexist_cache_file = ft.join(self.out_dir, f"{self.test_name}_no_exist.npy")
 
         # fmt: off
         valid_combinations = [
-            [ self.example_array, None,                    None                     ],
-            [ self.example_array, self.example_cache_path, None                     ],
-            [ self.example_array, self.example_cache_path, self.example_source_path ],
-            [ self.example_array, self.example_cache_path, self.noexist_source_path ],
-            [ self.example_array, self.noexist_cache_path, None                     ],
-            [ self.example_array, self.noexist_cache_path, self.example_source_path ],
-            [ self.example_array, None,                    self.example_source_path ],
-            [ None,               self.example_cache_path, None                     ],
-            [ None,               self.example_cache_path, self.example_source_path ],
-            [ None,               self.example_cache_path, self.noexist_source_path ],
-            [ None,               self.noexist_cache_path, self.example_source_path ],
-            [ None,               None,                    self.example_source_path ],
+            [ self.example_array, None,                    None,                     default_cache_file      ],
+            [ self.example_array, self.example_cache_path, None,                     self.example_cache_path ],
+            [ self.example_array, None,                    self.noexist_source_path, default_cache_file      ],
+            [ self.example_array, self.example_cache_path, self.example_source_path, None                    ],
+            [ self.example_array, noexist_cache_file,      None,                     noexist_cache_file      ],
+            [ self.example_array, self.example_cache_path, self.noexist_source_path, None                    ],
+            [ self.example_array, noexist_cache_file,      self.example_source_path, None                    ],
+            [ self.example_array, noexist_cache_file,      self.noexist_source_path, noexist_cache_file      ],
+            [ self.example_array, None,                    self.example_source_path, None                    ],
+            [ None,               self.example_cache_path, None,                     None                    ],
+            [ None,               self.example_cache_path, self.example_source_path, None                    ],
+            [ None,               self.example_cache_path, self.noexist_source_path, None                    ],
+            [ None,               noexist_cache_file,      self.example_source_path, None                    ],
+            [ None,               None,                    self.example_source_path, None                    ],
         ]
         # fmt: on
 
         for valid_combination in valid_combinations:
             # setup
             err_msg = (
-                "Error encountered with the following valid combination of constructor parameters:\n"
+                f"Error encountered in {self.test_name} with the following valid combination of constructor parameters:\n"
                 + f"\tarray = {type(valid_combination[0])}\n"
                 + f"\tcache_path = {valid_combination[1]}\n"
                 + f"\tsource_path = {valid_combination[2]}\n"
             )
 
             try:
+                # setup
+                should_create_cache_file = valid_combination[3]
+                valid_combination = valid_combination[:3]
+                ft.delete_file(default_cache_file, error_on_not_exists=False)
+                ft.delete_file(noexist_cache_file, error_on_not_exists=False)
+
                 # create the cacheable image
                 cacheable = CacheableImage(*valid_combination)
-
-                # setup
-                should_create_cache_file = False
-                if cacheable.cache_path != self.example_cache_path:
-                    if cacheable.source_path != self.example_source_path:
-                        should_create_cache_file = True
-
-                ft.delete_file(cache_file, error_on_not_exists=False)
 
                 # check memory usage
                 cacheable.nparray
@@ -185,10 +186,13 @@ class test_CacheableImage(unittest.TestCase):
                 self.assertGreaterEqual(sys.getsizeof(cacheable), sys.getsizeof(self.example_array), msg=err_msg)
 
                 # verify that cacheing works
-                self.assertFalse(ft.file_exists(cache_file, error_if_exists_as_dir=False), msg=err_msg)
-                cacheable.cache(cache_file)
-                if should_create_cache_file:
-                    self.assertTrue(ft.file_exists(cache_file), msg=err_msg)
+                self.assertFalse(ft.file_exists(default_cache_file), msg=err_msg)
+                cacheable.cache(default_cache_file)
+                if should_create_cache_file is not None:
+                    self.assertTrue(ft.file_exists(should_create_cache_file), msg=err_msg)
+                else:
+                    self.assertFalse(ft.file_exists(default_cache_file), msg=err_msg)
+                    self.assertFalse(ft.file_exists(noexist_cache_file), msg=err_msg)
 
                 # check memory usage
                 self.assertAlmostEqual(0, sys.getsizeof(cacheable), delta=100, msg=err_msg)
@@ -200,18 +204,72 @@ class test_CacheableImage(unittest.TestCase):
 
                 # cache and delete the cache file
                 # loading from the cache should fail
-                cacheable.cache(cache_file)
-                if should_create_cache_file:
-                    self.assertTrue(ft.file_exists(cache_file), msg=err_msg)
-                    ft.delete_file(cache_file)
+                cacheable.cache(default_cache_file)
+                if should_create_cache_file is not None:
+                    self.assertTrue(ft.file_exists(should_create_cache_file), msg=err_msg)
+                    ft.delete_file(should_create_cache_file)
                     with self.assertRaises(Exception, msg=err_msg):
                         cacheable.nparray
                 else:
-                    self.assertFalse(ft.file_exists(cache_file, error_if_exists_as_dir=False), msg=err_msg)
+                    self.assertFalse(ft.file_exists(default_cache_file), msg=err_msg)
+                    self.assertFalse(ft.file_exists(noexist_cache_file), msg=err_msg)
 
             except Exception:
                 lt.error(err_msg)
                 raise
+
+    def test_lru(self):
+        """Verifies that the Least Recently Used functionality works as expected"""
+
+        # create three cacheable images
+        # new LRU: 1, 2, 3
+        c1 = CacheableImage(self.example_array)
+        self.assertEqual(c1, CacheableImage.lru(False))
+        c2 = CacheableImage(self.example_array)
+        self.assertEqual(c1, CacheableImage.lru(False))
+        c3 = CacheableImage(self.example_array)
+        self.assertEqual(c1, CacheableImage.lru(False))
+
+        # get the value from the 1st image, then the 2nd image
+        # LRU: 2, 3, 1
+        c1.nparray
+        self.assertEqual(c2, CacheableImage.lru(False))
+        # LRU: 3, 1, 2
+        c2.nparray
+        self.assertEqual(c3, CacheableImage.lru(False))
+
+        # cache the 1st image, check that this doesn't change the lru
+        # LRU: 3, 2, 1
+        c1.cache(ft.join(self.out_dir, f"{self.test_name}_c1.npy"))
+        self.assertEqual(c3, CacheableImage.lru(False))
+
+        # get the value of the 3rd image, check that the 2nd is now the LRU
+        # LRU: 2, 1, 3
+        c3.nparray
+        self.assertEqual(c2, CacheableImage.lru(False))
+
+        # deregister the 2nd, then 1st, then 3rd
+        self.assertEqual(c2, CacheableImage.lru(True))
+        # LRU: 1, 3
+        self.assertEqual(c1, CacheableImage.lru(True))
+        # LRU: 3
+        self.assertEqual(c3, CacheableImage.lru(True))
+        # LRU:
+        self.assertEqual(None, CacheableImage.lru(True))
+
+        # get the value for and deregister the 1st, then 2nd, then 3rd
+        # LRU: 1
+        c1.nparray
+        self.assertEqual(c1, CacheableImage.lru(True))
+        # LRU: 2
+        c2.nparray
+        self.assertEqual(c2, CacheableImage.lru(True))
+        # LRU: 3
+        c3.nparray
+        self.assertEqual(c3, CacheableImage.lru(True))
+
+        # check that there are no more registered cacheable images
+        self.assertEqual(None, CacheableImage.lru(False))
 
 
 if __name__ == '__main__':
