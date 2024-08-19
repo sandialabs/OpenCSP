@@ -13,7 +13,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
 
 
-def load_ideal_mirror_from_hdf(file: str, focal_length: float) -> MirrorParametric:
+def load_mirror_ideal(file: str, focal_length: float) -> MirrorParametric:
     """Uses the "OpticDefinition" in the given SOFAST HDF file and given
     focal length to create a reference Facet
 
@@ -38,7 +38,7 @@ def load_ideal_mirror_from_hdf(file: str, focal_length: float) -> MirrorParametr
     return MirrorParametric.generate_symmetric_paraboloid(focal_length, region_facet)
 
 
-def load_mirror_from_hdf(file: str) -> MirrorPoint:
+def load_mirror(file: str) -> MirrorPoint:
     """Loads Sofast data of a single facet data collection into
     a Facet object.
 
