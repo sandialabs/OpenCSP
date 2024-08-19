@@ -55,6 +55,8 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.fixed_pattern_dot_locs = fixed_pattern_dot_locs
         self.data_facet = data_facet
         self.params = ParamsSofastFixed()
+        self.optic_type: Literal['single_facet', 'multi_facet', 'undefined'] = None
+        self.num_facets: int = None
 
         # Measurement data
         self.measurement: MeasurementSofastFixed
@@ -87,21 +89,17 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         pts_blob = ip.detect_blobs(self.measurement.image, self.blob_detector)
 
         # Index blobs
-        blob_index = BlobIndex(pts_blob, *self.fixed_pattern_dot_locs.dot_extent)
-        blob_index.search_thresh = self.params.blob_search_thresh
-        blob_index.search_perp_axis_ratio = self.params.search_perp_axis_ratio
-        blob_index.run(self.measurement.origin)
+        if self.optic_type == 'single_facet':
+            blob_index = BlobIndex(pts_blob, *self.fixed_pattern_dot_locs.dot_extent)
+            blob_index.search_thresh = self.params.blob_search_thresh
+            blob_index.search_perp_axis_ratio = self.params.search_perp_axis_ratio
+            blob_index.run(self.measurement.origin)
+        elif self.optic_type == 'multi_facet':
+            pass
 
         return blob_index
 
-    def calculate_mask(self) -> ndarray:
-        """Calculate mask image
-
-        Parameters
-        ----------
-        image : ndarray
-            Measurement image
-        """
+    def _calculate_mask(self) -> ndarray:
         # Calculate mask
         im_dark = self.measurement.image * 0
         images = np.concatenate((im_dark[..., None], self.measurement.image[..., None]), axis=2)
@@ -113,37 +111,34 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         ]
         mask = ip.calc_mask_raw(images, *params)
 
-        if self.params.mask.keep_largest_area:
+        if self.optic_type == 'multi_facet':
+            lt.warn(
+                '"keep_largest_area" mask processing option cannot be used '
+                'for multifacet ensembles. This will be turned off.'
+            )
+            self.params.mask.keep_largest_area = False
+        elif self.params.mask.keep_largest_area:
             mask = ip.keep_largest_mask_area(mask)
 
         return mask
 
-    def generate_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> dict:
-        """Generates blob dataset from sofast dataset.
+    def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
+        """Saves measurement data in class
 
         Parameters
         ----------
-        blob_index : BlobIndex
-            BlobIndex object with all blobs assigned
-        mask_raw : ndarray
-            Mask array
-
-        Returns
-        -------
-        dict
-            Key word argument dictionary for SlopeSolver (does not include "surface_data")
-
-        Sets Attributes
-        ---------------
-        self.data_geometry_general
-        self.data_image_proccessing_general
-        self.data_geometry_facet
-        self.data_image_processing_facet
-        self.data_error
+        measurement: MeasurementSofastFixed
+            Fixed pattern measurement object
         """
+        self.measurement = measurement
+
+    def _process_optic_singlefacet_geometry(
+        self, blob_index: BlobIndex, mask_raw: np.ndarray, surface: Surface2DAbstract
+    ) -> dict:
+        # Get image points and blob indices
         pts_image, pts_index_xy = blob_index.get_data()
 
-        # Process optic geometry
+        # Process optic geometry (find mask corners, etc.)
         (
             self.data_geometry_general,
             self.data_image_proccessing_general,
@@ -194,6 +189,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             'v_align_point_optic': self.data_facet.v_facet_centroid,
             'dist_optic_screen': self.measurement.dist_optic_screen,
             'debug': self.params.debug_slope_solver,
+            'surface': surface,
         }
 
     def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
@@ -218,14 +214,10 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.blob_index = self.find_blobs()
 
         # Calculate mask
-        mask_raw = self.calculate_mask()
-        mask_raw = ip.keep_largest_mask_area(mask_raw)
+        mask_raw = self._calculate_mask()
 
         # Generate geometry and slope solver inputs
-        kwargs = self.generate_geometry(self.blob_index, mask_raw)
-
-        # Add surface fitting parameters
-        kwargs.update({'surface': surface})
+        kwargs = self._process_optic_singlefacet_geometry(self.blob_index, mask_raw, surface)
 
         # Calculate slope
         self.slope_solver = SlopeSolver(**kwargs)
