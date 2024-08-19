@@ -1,7 +1,7 @@
 import os
 from os.path import join
 
-import opencsp.app.sofast.lib.load_saved_data as lsd
+import opencsp.app.sofast.lib.load_sofast_hdf_data as lsd
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.geometry.Uxyz import Uxyz
