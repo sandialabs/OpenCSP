@@ -41,6 +41,10 @@ class test_CacheableImage(unittest.TestCase):
         self.noexist_cache_path = ft.join(self.out_dir, "noexist.npy")
         self.noexist_source_path = ft.join(self.out_dir, "noexist.png")
 
+        # de-register all cacheable images
+        while CacheableImage.lru() != None:
+            pass
+
     def test_init_valid(self):
         """Test all valid combinations of CacheableImage constructor parameters."""
         # fmt: off
@@ -51,7 +55,9 @@ class test_CacheableImage(unittest.TestCase):
             [ self.example_array, self.example_cache_path, self.noexist_source_path ],
             [ self.example_array, self.noexist_cache_path, None                     ],
             [ self.example_array, self.noexist_cache_path, self.example_source_path ],
+            [ self.example_array, self.noexist_cache_path, self.noexist_source_path ],
             [ self.example_array, None,                    self.example_source_path ],
+            [ self.example_array, None,                    self.noexist_source_path ],
             [ None,               self.example_cache_path, None                     ],
             [ None,               self.example_cache_path, self.example_source_path ],
             [ None,               self.example_cache_path, self.noexist_source_path ],
@@ -65,7 +71,7 @@ class test_CacheableImage(unittest.TestCase):
                 CacheableImage(*valid_combination)
             except Exception:
                 lt.error(
-                    "Encountered exception with the following valid combination of constructor parameters:\n"
+                    f"Encountered exception in {self.test_name} with the following valid combination of constructor parameters:\n"
                     + f"\tarray = {type(valid_combination[0])}\n"
                     + f"\tcache_path = {valid_combination[1]}\n"
                     + f"\tsource_path = {valid_combination[2]}\n"
@@ -82,8 +88,6 @@ class test_CacheableImage(unittest.TestCase):
             [ None,               None,                    self.noexist_source_path ],
             [ None,               self.noexist_cache_path, None                     ],
             [ None,               self.noexist_cache_path, self.noexist_source_path ],
-            [ self.example_array, None,                    self.noexist_source_path ],
-            [ self.example_array, self.noexist_cache_path, self.noexist_source_path ],
         ]
         # fmt: on
 
@@ -91,7 +95,7 @@ class test_CacheableImage(unittest.TestCase):
             with self.assertRaises(FileNotFoundError):
                 CacheableImage(*invalid_combination)
                 lt.error(
-                    "Expected exception for the following invalid combination of constructor parameters:\n"
+                    f"Expected exception in {self.test_name} for the following invalid combination of constructor parameters:\n"
                     + f"\tarray = {type(invalid_combination[0])}\n"
                     + f"\tcache_path = {invalid_combination[1]}\n"
                     + f"\tsource_path = {invalid_combination[2]}\n"
