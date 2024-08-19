@@ -125,9 +125,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         """
         self.measurement = measurement
 
-    def _process_optic_singlefacet_geometry(
-        self, blob_index: BlobIndex, mask_raw: np.ndarray, surface: Surface2DAbstract
-    ) -> dict:
+    def _process_optic_singlefacet_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> dict:
         # Get image points and blob indices
         pts_image, pts_index_xy = blob_index.get_data()
 
@@ -182,7 +180,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             'v_align_point_optic': self.data_facet[0].v_facet_centroid,
             'dist_optic_screen': self.measurement.dist_optic_screen,
             'debug': self.params.debug_slope_solver,
-            'surface': surface,
+            'surface': self.data_surface[0],
         }
 
     def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
@@ -216,7 +214,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         mask_raw = self._calculate_mask()
 
         # Generate geometry and slope solver inputs
-        kwargs = self._process_optic_singlefacet_geometry(self.blob_index, mask_raw, surface)
+        kwargs = self._process_optic_singlefacet_geometry(self.blob_index, mask_raw)
 
         # Calculate slope
         self.slope_solver = SlopeSolver(**kwargs)
