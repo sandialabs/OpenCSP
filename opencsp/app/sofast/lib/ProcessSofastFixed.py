@@ -77,7 +77,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet]
         self.data_error: cdc.CalculationError
         self.blob_index: BlobIndex
-        self.slope_solver: SlopeSolver
+        self.slope_solver: list[SlopeSolver]
 
     def find_blobs(self) -> BlobIndex:
         """Finds blobs in image"""
@@ -331,12 +331,10 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         # Calculate slope
         self.slope_solver = []
         self.data_slope_solver = []
-
         for kwargs in kwargs_list:
             slope_solver = SlopeSolver(**kwargs)
             slope_solver.fit_surface()
             slope_solver.solve_slopes()
-            # TODO: Make slope_solver a list for both single/multi
             self.slope_solver.append(slope_solver)
             self.data_slope_solver.append(self.slope_solver.get_data())
 
