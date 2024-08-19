@@ -141,9 +141,93 @@ class CacheableImage:
             # this can happen when an error is raised during __init__()
             pass
         else:
-            if self.cache_path is not None:
+            if self._cache_path is not None:
                 with et.ignored(Exception):
-                    ft.delete_file(self.cache_path)
+                    ft.delete_file(self._cache_path)
+                    self._cache_path = None
+
+    @property
+    def cache_path(self) -> str | None:
+        """
+        The path/name.ext to the cached numpy array, if set. Guaranteed to pass
+        validate_cache_path().
+        """
+        return self._cache_path
+
+    @cache_path.setter
+    def cache_path(self, new_val: str | None):
+        """
+        Parameters
+        ----------
+        new_val : str
+            The path/name.ext to the cached numpy array. This file doesn't need
+            to exist yet, but if it does exist, then its contents should match
+            self.nparray. Must pass validate_cache_path().
+        """
+        if new_val is not None:
+            # verify the ending to the cache path file
+            new_val = ft.norm_path(new_val)
+            self.validate_cache_path(new_val, "cache_path")
+
+            # verify the file contents equal the array contents
+            try:
+                arrval = self.nparray
+            except Exception:
+                arrval = None
+            if arrval is not None:
+                if ft.file_exists(new_val):
+                    cache_val = self._load_image(new_val)
+                    if not np.equal(arrval, cache_val).all():
+                        lt.error_and_raise(
+                            ValueError,
+                            "Error in CacheableImage.source_path(): "
+                            + f"the contents of self.nparray and {new_val} do not match!"
+                            + f" ({self.cache_path=}, {self.source_path=})",
+                        )
+
+        self._cache_path = new_val
+
+    @property
+    def source_path(self) -> str | None:
+        """
+        The path/name.ext to the source image file, if set. Guaranteed to pass
+        validate_source_path().
+        """
+        return self._source_path
+
+    @source_path.setter
+    def source_path(self, new_val: str | None):
+        """
+        Parameters
+        ----------
+        new_val : str
+            The path/name.ext to the source image file. This file doesn't need
+            to exist yet, but if it does exist, then it must be readable by
+            Pillow and its contents should match self.nparray. Must pass
+            validate_source_path().
+        """
+        if new_val is not None:
+            # verify we can read the file
+            new_val = ft.norm_path(new_val)
+            self.validate_source_path(new_val, "source_path")
+
+            # verify the file contents equal the array contents
+            try:
+                arrval = self.nparray
+            except Exception:
+                arrval = None
+            if arrval is not None:
+                if ft.file_exists(new_val):
+                    image = self._load_image(new_val)
+                    if not np.equal(arrval, image).all():
+                        lt.error_and_raise(
+                            ValueError,
+                            "Error in CacheableImage.source_path(): "
+                            + f"the contents of self.nparray and {new_val} do not match!"
+                            + f" ({self.cache_path=}, {self.source_path=})",
+                        )
+
+        self._source_path = new_val
 
     @staticmethod
     def _register_access(instance: "CacheableImage"):
@@ -276,13 +360,6 @@ class CacheableImage:
                 + f"cache_path must end with '.npy' but instead the extension is {ext}",
             )
 
-        path, name, ext = ft.path_components(cache_path)
-        if not ft.directory_exists(path):
-            lt.error_and_raise(
-                FileNotFoundError,
-                f"Error in CacheableImage.{caller_name}(): " + f"cache_path directory {path} does not exist",
-            )
-
     def validate_source_path(self, source_path: Optional[str], caller_name: str):
         """Ensures that the given source_path has one of the readable file extensions, or is None."""
         if source_path == None:
@@ -320,12 +397,12 @@ class CacheableImage:
             return self._array
         elif self.cache_path is not None and ft.file_exists(self.cache_path):
             return self._load_image(self.cache_path)
-        elif self.source_path is not None and ft.file_exists(self.source_path):
-            return self._load_image(self.source_path)
+        elif self._source_path is not None and ft.file_exists(self._source_path):
+            return self._load_image(self._source_path)
         else:
             lt.error_and_raise(
                 RuntimeError,
-                f"Error in CacheableImage.__load_image(): Can't load image! {self._array=}, {self.cache_path=}, {self.source_path=}",
+                f"Error in CacheableImage.__load_image(): Can't load image! {self._array=}, {self.cache_path=}, {self._source_path=}",
             )
 
     @property
@@ -351,8 +428,8 @@ class CacheableImage:
     def _does_source_image_match(self, nparray: np.ndarray):
         """Returns true if this image's source_path image file matches the data
         in the given numpy array."""
-        if self.source_path is not None and ft.file_exists(self.source_path):
-            imarray = np.array(Image.open(self.source_path))
+        if self._source_path is not None and ft.file_exists(self._source_path):
+            imarray = np.array(Image.open(self._source_path))
             try:
                 arrays_are_equal = np.equal(nparray, imarray).all()
             except Exception:
@@ -382,7 +459,7 @@ class CacheableImage:
                     ValueError,
                     "Error in CacheableImage(): "
                     + "the cacheable image array data and image file must be identical, but they are not! "
-                    + f"{self.cache_path=}, {self.source_path=}"
+                    + f"{self.cache_path=}, {self._source_path=}"
                     + errtxt,
                 )
 
@@ -394,24 +471,50 @@ class CacheableImage:
         Note that the memory might not be available for garbage collection, if
         there are other parts of the code that still have references to the
         in-memory image or array.
+
+        Parameters
+        ----------
+        cache_path : str, optional
+            The path to cache to, as necessary. Can be None if either cache_path
+            or source_path are already set. By default None.
         """
-        # get the path to the numpy file
-        if self.cache_path is None:
+        # use either self.cache_path or cache_path, depending on:
+        # 1. self.cache_path exists
+        # 2. cache_path exists
+        # 3. self.cache_path is set and cache_path does not exist
+        # 4. self.cache_path is not set cache_path is set
+        # 5. self.source_path exists
+        if self.cache_path is not None:
+            if ft.file_exists(self.cache_path):
+                # 1. do nothing
+                pass
+            elif cache_path is not None:
+                if ft.file_exists(cache_path):
+                    # 2. update self.cache_path to the already existing file
+                    self.cache_path = cache_path
+                else:
+                    # 3. do nothing
+                    pass
+            else:
+                # 3. do nothing
+                pass
+        else:
             if cache_path is not None:
-                self.validate_cache_path(cache_path, "cache")
+                # 4. use the non-None value
                 self.cache_path = cache_path
             else:
-                lt.error_and_raise(
-                    ValueError,
-                    "Error in CacheableImage.cache(): "
-                    + "this instance does not have a pre-programmed cache_path and the provided cache_path is None. "
-                    + "Caching requires at least one path to be non-None!",
-                )
-
-        else:  # self.cache_path is not None
-            # check if this instance is already cached
-            if self._array is None:
-                return
+                if self._source_path is not None and ft.file_exists(self._source_path):
+                    # 5. don't need to create a numpy file if we can just read from the source file
+                    pass
+                else:
+                    # We don't have enough information about where to put the
+                    # contents for this instance.
+                    lt.error_and_raise(
+                        ValueError,
+                        "Error in CacheableImage.cache(): "
+                        + "this instance was not created with a cache_path and the provided cache_path is None. "
+                        + "Cacheing requires at least one path (cache_path or source_path) to be non-None!",
+                    )
 
         # Cache this instance.
         if self._does_source_image_match(self.nparray):
@@ -421,19 +524,18 @@ class CacheableImage:
             pass
         elif ft.file_exists(self.cache_path) and os.path.getsize(self.cache_path) > 10:
             # This instance has already been cached to disk at least once. Don't
-            # need to cache it again.
+            # need to cache it again. We check the size to make sure that the
+            # file was actually cached and doesn't just exist as a placeholder.
             pass
         else:
             # Write the numpy array to disk.
             try:
-                np.save(cache_path, self.nparray)
-                self.cache_path = cache_path
-            except Exception as ex:
-                lt.info(
-                    "In CacheableImage.cache(): "
-                    + f"exception encountered while trying to save to file {cache_path}. "
-                    + f"Exception: {repr(ex)}"
+                np.save(self.cache_path, self.nparray)
+            except Exception:
+                lt.error(
+                    "In CacheableImage.cache(): " + f"exception encountered while trying to save to file {cache_path}. "
                 )
+                raise
 
         # Indicate that this instance is cached
         self._array = None
@@ -452,11 +554,11 @@ class CacheableImage:
             The file path/name.ext to save to. For example "image.png".
         """
         self.to_image().save(image_path_name_ext)
-        self.source_path = image_path_name_ext
+        self._source_path = image_path_name_ext
 
     @staticmethod
     def cache_images_to_disk_as_necessary(
-        memory_limit_bytes: int, tmp_path_generator: Callable[[], str] = None, log_level=lt.log.DEBUG
+        memory_limit_bytes: int, tmp_path_generator: Callable[[], str], log_level=lt.log.DEBUG
     ):
         """Check memory usage and convert images to files (aka file path
         strings) as necessary in order to reduce memory usage."""
@@ -484,13 +586,7 @@ class CacheableImage:
             if cacheable_image.cache_path is not None:
                 cacheable_image.cache(None)
             else:  # cache_path is None
-                if tmp_path_generator is not None:
-                    cacheable_image.cache(tmp_path_generator())
-                else:
-                    lt.error_and_raise(
-                        RuntimeError,
-                        f"Attempting to cache CacheableImage {cacheable_image}, " + "but cache_path hasn't been set!",
-                    )
+                cacheable_image.cache(tmp_path_generator())
             total_mem_size -= cacheable_image_size
 
         log_method(f"New total memory size after cacheing images: {int(total_mem_size / 1024 / 1024)}MB")
