@@ -113,6 +113,38 @@ class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
         for operable in results:
             self.assertTrue(np.all(operable.primary_image.nparray == 1))
 
+    def test_process_operable(self):
+        """Verify that process_operable() updates the pixels"""
+        for operable in self.example_operables:
+            # sanity check: no pixels are equal to 1
+            self.assertTrue(np.all(operable.primary_image.nparray != 1))
+
+            # process the operable
+            instance = SetOnesImageProcessor()
+            result = instance.process_operable(operable, is_last=True)
+
+            # verify the input operable hasn't been touched
+            self.assertTrue(np.all(operable.primary_image.nparray != 1))
+
+            # verify all pixels in the new operable are equal to 1
+            self.assertTrue(np.all(result[0].primary_image.nparray == 1))
+
+    def test_process_images(self):
+        """Verify that process_images() updates the pixels"""
+        for operable in self.example_operables:
+            # sanity check: no pixels are equal to 1
+            self.assertTrue(np.all(operable.primary_image.nparray != 1))
+
+            # process the image
+            instance = SetOnesImageProcessor()
+            result = instance.process_images([operable.primary_image])
+
+            # verify the input image hasn't been touched
+            self.assertTrue(np.all(operable.primary_image.nparray != 1))
+
+            # verify all pixels in the new image are equal to 1
+            self.assertTrue(np.all(result[0].nparray == 1))
+
 
 if __name__ == '__main__':
     unittest.main()
