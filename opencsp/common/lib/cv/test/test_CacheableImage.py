@@ -2,11 +2,9 @@ import sys
 import unittest
 
 import numpy as np
-from PIL import Image
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.tool.file_tools as ft
-import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -270,6 +268,37 @@ class test_CacheableImage(unittest.TestCase):
 
         # check that there are no more registered cacheable images
         self.assertEqual(None, CacheableImage.lru(False))
+
+    def test_save_image(self):
+        """Verify that after saving the image, cacheing no longer creates a cache file"""
+        cache_file = ft.join(self.out_dir, f"{self.test_name}.npy")
+        image_file = ft.join(self.out_dir, f"{self.test_name}.png")
+        ci = CacheableImage(self.example_array, source_path=image_file)
+
+        # Sanity test: cacheing without saving the image creates a cache file.
+        # This is in preparation for the "finale".
+        self.assertFalse(ft.file_exists(cache_file))
+        ci.cache(cache_file)
+        self.assertTrue(ft.file_exists(cache_file))
+
+        # re-load the data
+        ci.nparray
+
+        # delete the cache file
+        ft.delete_file(cache_file)
+        self.assertFalse(ft.file_exists(cache_file))
+
+        # save to the image file
+        self.assertFalse(ft.file_exists(image_file))
+        ci.save_image(image_file)
+        self.assertTrue(ft.file_exists(image_file))
+        self.assertEqual(image_file, ci.source_path)
+
+        # Finale: cacheing should not re-create the cache file because now the
+        # image file exists
+        self.assertFalse(ft.file_exists(cache_file))
+        ci.cache(cache_file)
+        self.assertFalse(ft.file_exists(cache_file))
 
 
 if __name__ == '__main__':
