@@ -1,4 +1,8 @@
+import copy
+import dataclasses
 import unittest
+
+import numpy as np
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.cv.CacheableImage as ci
@@ -9,6 +13,14 @@ import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable as sao
 class DoNothingImageProcessor(asaip.AbstractSpotAnalysisImagesProcessor):
     def _execute(self, operable: sao.SpotAnalysisOperable, is_last: bool) -> list[sao.SpotAnalysisOperable]:
         return [operable]
+
+
+class SetOnesImageProcessor(asaip.AbstractSpotAnalysisImagesProcessor):
+    def _execute(self, operable: sao.SpotAnalysisOperable, is_last: bool) -> list[sao.SpotAnalysisOperable]:
+        img = copy.copy(operable.primary_image.nparray)
+        img[:, :] = 1
+        ret = dataclasses.replace(operable, primary_image=img)
+        return [ret]
 
 
 class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
@@ -25,12 +37,12 @@ class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
         self.test_name = self.id().split('.')[-1]
 
         self.example_cache_path = ft.join(self.in_dir, "example_image.npy")
-        self.cacheable_image = ci.CacheableImage(self.example_cache_path)
+        self.cacheable_image = ci.CacheableImage(cache_path=self.example_cache_path)
         self.example_operable = sao.SpotAnalysisOperable(self.cacheable_image)
 
         self.example_operables: list[sao.SpotAnalysisOperable] = []
         for i in range(3):
-            ci_i = ci.CacheableImage(self.example_cache_path)
+            ci_i = ci.CacheableImage(cache_path=self.example_cache_path)
             sao_i = sao.SpotAnalysisOperable(ci_i)
             self.example_operables.append(sao_i)
 
@@ -66,6 +78,40 @@ class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
         for result in instance:
             pass
         self.assertTrue(instance.finished)
+
+    def test_iterator_finishes_all(self):
+        instance = DoNothingImageProcessor()
+        nprocessed = 0
+
+        # test with an assignment of a few operables
+        instance.assign_inputs(self.example_operables)
+        for result in instance:
+            nprocessed += 1
+        self.assertEqual(nprocessed, 3)
+
+        # test with an assignment of an additional "two" operables
+        instance.assign_inputs([self.example_operable, self.example_operable])
+        for result in instance:
+            nprocessed += 1
+        self.assertEqual(nprocessed, 5)
+
+    def test_run(self):
+        """Verify that run() touches all the operables"""
+        # sanity check: no pixels are equal to 1
+        for operable in self.example_operables:
+            self.assertTrue(np.all(operable.primary_image.nparray != 1))
+
+        # process all images
+        instance = SetOnesImageProcessor()
+        results = instance.run(self.example_operables)
+
+        # verify the input operables haven't been touched
+        for operable in self.example_operables:
+            self.assertTrue(np.all(operable.primary_image.nparray != 1))
+
+        # verify all pixels in the new operables are equal to 1
+        for operable in results:
+            self.assertTrue(np.all(operable.primary_image.nparray == 1))
 
 
 if __name__ == '__main__':

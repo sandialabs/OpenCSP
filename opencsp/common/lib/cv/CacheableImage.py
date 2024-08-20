@@ -113,6 +113,10 @@ class CacheableImage:
                     lt.error_and_raise(FileNotFoundError, fnfe_msg % ("cache", source_path))
                 elif not ft.file_exists(source_path):
                     lt.error_and_raise(FileNotFoundError, fnfe_msg % ("source/cache", source_path + "/" + cache_path))
+        elif not isinstance(array, np.ndarray):
+            lt.error_and_raise(
+                TypeError, "Error in CacheableImage.__init__(): " + "given array must be a numpy array, if given!"
+            )
 
         # verify that the paths are valid
         self.validate_cache_path(cache_path, "__init__")

@@ -214,7 +214,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             | Iterator[SpotAnalysisOperable]
             | Union['AbstractSpotAnalysisImagesProcessor']
         ),
-    ) -> list[CacheableImage]:
+    ) -> list[SpotAnalysisOperable]:
         """Performs image processing on the input images."""
         if isinstance(operables, (ImagesIterable, ImagesStream)):
             operables = SpotAnalysisImagesStream(operables)
