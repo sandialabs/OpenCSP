@@ -44,6 +44,29 @@ class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
         instance = DoNothingImageProcessor("Other Name")
         self.assertEqual(instance.name, "Other Name")
 
+    def test_finished(self):
+        """
+        Verify that finished is True only when no images have been assigned, or
+        when all images have been processed.
+        """
+        # 0
+        instance = DoNothingImageProcessor()
+        self.assertTrue(instance.finished)
+
+        # 1
+        instance.assign_inputs([self.example_operable])
+        self.assertFalse(instance.finished)
+        for result in instance:
+            pass
+        self.assertTrue(instance.finished)
+
+        # > 1
+        instance.assign_inputs(self.example_operables)
+        self.assertFalse(instance.finished)
+        for result in instance:
+            pass
+        self.assertTrue(instance.finished)
+
 
 if __name__ == '__main__':
     unittest.main()
