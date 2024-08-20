@@ -281,9 +281,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             for callback in self._on_image_processed:
                 callback(operable)
 
-        # register the new operable's "previous_operable" value based on operables_in_flight
-        for i in range(len(ret)):
-            ret[i] = dataclasses.replace(ret[i], previous_operables=(copy.copy(self.operables_in_flight), self))
+        # de-register any operable on which we're waiting for results
         if len(ret) > 0 or is_last:
             self.operables_in_flight.clear()
 
