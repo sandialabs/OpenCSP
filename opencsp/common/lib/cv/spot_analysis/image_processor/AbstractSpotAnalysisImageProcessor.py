@@ -30,10 +30,22 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
 
     This is an abstract class. Implementations can be found in the same
     directory. To create a new implementation, inherit from one of the existing
-    implementations or this class.
+    implementations or this class. The most basic implementation need only
+    implement the _execute method::
+
+        def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
+            raise NotImplementedError()
     """
 
     def __init__(self, name: str = None):
+        """
+        Parameters
+        ----------
+        name : str, optional
+            The name to use for this image processor instance, or None to
+            default to the class name. By default None.
+        """
+
         # set default parameter values
         if name is None:
             name = self.__class__.__name__
