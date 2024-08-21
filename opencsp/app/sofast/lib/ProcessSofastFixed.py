@@ -291,7 +291,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_slope_solver = [self.slope_solver.get_data()]
 
     def process_multi_facet_optic(
-        self, data_facet: list[DefinitionFacet], surface: list[Surface2DAbstract], data_ensemble: DefinitionEnsemble
+        self, data_facet: list[DefinitionFacet], surfaces: list[Surface2DAbstract], data_ensemble: DefinitionEnsemble
     ) -> None:
         """Processes multi facet optic. Saves data to self.data_slope_solver
 
@@ -301,23 +301,23 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             List of facet data objects.
         data_ensemble : DefinitionEnsemble
             Ensemble data object.
-        surface_data : list[Surface2dAbstract]
+        surfaces : list[Surface2dAbstract]
             List of surface type definitions.
         """
 
         # Check inputs
-        if len(data_facet) != len(surface):
+        if len(data_facet) != len(surfaces):
             lt.error_and_raise(
                 ValueError,
                 'Length of data_facet does not equal length of data_surface'
-                f'data_facet={len(data_facet)}, surface_data={len(surface)}',
+                f'data_facet={len(data_facet)}, surface_data={len(surfaces)}',
             )
 
         self.optic_type = 'multi_facet'
         self.num_facets = len(data_facet)
         self.data_facet = [d.copy() for d in data_facet]
         self.data_ensemble = data_ensemble.copy()
-        self.data_surface = surface
+        self.data_surface = surfaces
 
         # Find blobs
         self.blob_index = self.find_blobs()
