@@ -24,6 +24,7 @@ from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -79,18 +80,26 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.blob_index: BlobIndex
         self.slope_solver: list[SlopeSolver]
 
-    def find_blobs(self) -> BlobIndex:
-        """Finds blobs in image"""
+    def find_blobs(self, pts_known: Vxy, xys_known: tuple[tuple[int, int]]) -> BlobIndex:
+        """Finds blobs in image
+
+        Parameters
+        ----------
+        pts_known : Vxy
+            Length N, xy pixel location of known point(s) with known xy dot index locations
+        xys_known : tuple[tuple[int]]
+            Length N integer xy dot indices
+
+        NOTE: N=number of facets
+        """
         pts_blob = ip.detect_blobs(self.measurement.image, self.blob_detector)
 
         # Index blobs
-        if self.optic_type == 'single_facet':
-            blob_index = BlobIndex(pts_blob, *self.fixed_pattern_dot_locs.dot_extent)
-            blob_index.search_thresh = self.params.blob_search_thresh
-            blob_index.search_perp_axis_ratio = self.params.search_perp_axis_ratio
-            blob_index.run(self.measurement.origin)
-        elif self.optic_type == 'multi_facet':
-            pass
+        blob_index = BlobIndex(pts_blob, *self.fixed_pattern_dot_locs.dot_extent)
+        blob_index.search_thresh = self.params.blob_search_thresh
+        blob_index.search_perp_axis_ratio = self.params.search_perp_axis_ratio
+        for pt_known, xy_known in zip(pts_known, xys_known):
+            blob_index.run(pt_known, xy_known[0], xy_known[1])
 
         return blob_index
 
@@ -187,7 +196,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             'surface': self.data_surface[0],
         }
 
-    def _process_optic_multifacet_geometry(self, blob_indicies: list[BlobIndex], mask_raw: np.ndarray) -> list[dict]:
+    def _process_optic_multifacet_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> list[dict]:
         # Process optic geometry (find mask corners, etc.)
         (
             self.data_geometry_general,
@@ -210,7 +219,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         kwargs_list = []
         for idx_facet in range(self.num_facets):
             # Get image points and blob indices
-            pts_image, pts_index_xy = blob_indicies[idx_facet].get_data()
+            pts_image, pts_index_xy = blob_index.get_data()
 
             # Define optic orientation w.r.t. camera
             rot_facet_ensemble = self.data_ensemble.r_facet_ensemble[idx_facet]
@@ -260,14 +269,28 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             )
         return kwargs_list
 
-    def process_single_facet_optic(self, data_facet: DefinitionFacet, surface: Surface2DAbstract) -> None:
+    def process_single_facet_optic(
+        self, data_facet: DefinitionFacet, surface: Surface2DAbstract, pt_known: Vxy, xy_known: tuple[int, int]
+    ) -> None:
         """Processes single facet optic. Saves data to self.data_slope_solver
 
         Parameters
         ----------
+        data_facet : DefinitionFacet objec
+            Facet definition
         surface : Surface2DAbstract
             Surface 2d class
+        pt_known : Vxy
+            Length 1, xy pixel location of known point(s) with known xy dot index locations
+        xy_known : tuple[int, int]
+            Integer xy dot indices
         """
+
+        # Check inputs
+        if len(pt_known) != 1:
+            lt.error_and_raise(
+                ValueError, f'Only 1 pt_known can be given for single facet processing but {len(pt_known):d} were given'
+            )
 
         self.optic_type = 'single_facet'
         self.num_facets = 1
@@ -275,7 +298,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_surface = [surface]
 
         # Find blobs
-        self.blob_index = self.find_blobs()
+        self.blob_index = self.find_blobs(pt_known, (xy_known,))
 
         # Calculate mask
         mask_raw = self._calculate_mask()
@@ -291,7 +314,12 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_slope_solver = [self.slope_solver.get_data()]
 
     def process_multi_facet_optic(
-        self, data_facet: list[DefinitionFacet], surfaces: list[Surface2DAbstract], data_ensemble: DefinitionEnsemble
+        self,
+        data_facet: list[DefinitionFacet],
+        surfaces: list[Surface2DAbstract],
+        data_ensemble: DefinitionEnsemble,
+        pts_known: Vxy,
+        xys_known: tuple[tuple[int, int]],
     ) -> None:
         """Processes multi facet optic. Saves data to self.data_slope_solver
 
@@ -302,15 +330,22 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         data_ensemble : DefinitionEnsemble
             Ensemble data object.
         surfaces : list[Surface2dAbstract]
-            List of surface type definitions.
+            List of surface type definitions
+        pts_known : Vxy
+            Length N, xy pixel location of known point(s) with known xy dot index locations
+        xys_known : tuple[tuple[int, int]]
+            List of N integer xy dot indices corresponding to pts_known
+
+        NOTE: N=number of facets
         """
 
         # Check inputs
-        if len(data_facet) != len(surfaces):
+        if len(data_facet) != len(surfaces) != len(pts_known) != len(xys_known):
             lt.error_and_raise(
                 ValueError,
                 'Length of data_facet does not equal length of data_surface'
-                f'data_facet={len(data_facet)}, surface_data={len(surfaces)}',
+                + f'data_facet={len(data_facet)}, surface_data={len(surfaces)}, '
+                + f'pts_known={len(pts_known)}, xys_known={len(xys_known)}',
             )
 
         self.optic_type = 'multi_facet'
@@ -320,7 +355,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_surface = surfaces
 
         # Find blobs
-        self.blob_index = self.find_blobs()
+        self.blob_index = self.find_blobs(pts_known, xys_known)
 
         # Calculate mask
         mask_raw = self._calculate_mask()
