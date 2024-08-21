@@ -57,8 +57,8 @@ def calc_mask_raw(
 
         # Make sure first and last values of histogram are zero
         hist = np.concatenate([[0], hist, [0]])
-        delta = edges[1] - edges[0]
-        edges = np.concatenate([[edges[0] - delta], edges, [edges[-1] + delta]])
+        bin_step = edges[1] - edges[0]
+        edges = np.concatenate([[edges[0] - bin_step], edges, [edges[-1] + bin_step]])
 
         # Find two peaks in histogram (light and dark regions)
         for dist in np.arange(N_PEAK_STEP, N_BINS_IMAGE, N_PEAK_STEP):
@@ -72,8 +72,8 @@ def calc_mask_raw(
         idx_hist_min = np.argmin(hist[peaks[0] : peaks[1]]) + peaks[0]
 
         # Find index of histogram that is "hist_thresh" the way between the min and max
-        thresh_hist_min = edges[idx_hist_min + 1] - 1
-        thresh_hist_max = edges[peaks[1]] - 1
+        thresh_hist_min = edges[idx_hist_min + 1]
+        thresh_hist_max = edges[peaks[1]]
         thresh = thresh_hist_min + (thresh_hist_max - thresh_hist_min) * hist_thresh
 
         # Calculate threshold mask
