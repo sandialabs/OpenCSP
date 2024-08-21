@@ -649,6 +649,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             Optic object
         """
         facets = []
+        trans_list = []
         for idx_mirror, data in enumerate(self.data_characterization_facet):
             # Get surface points
             pts: Vxyz = data.v_surf_points_facet
@@ -673,16 +674,18 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             mirror = MirrorPoint(pts, norm_vecs, shape, interp_type)
             # Create facet
             facet = Facet(mirror)
-            # Locate facet
+            # Locate facet within ensemble
             if self.optic_type == 'multi':
                 trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror].trans_facet_ensemble
-                facet._self_to_parent_transform = TransformXYZ.from_R_V(trans.R, trans.V)
+                trans_list.append(trans)
             # Save facets
             facets.append(facet)
 
         # Return optics
         if self.optic_type == 'multi':
-            return FacetEnsemble(facets)
+            ensemble = FacetEnsemble(facets)
+            ensemble.set_facet_transform_list(trans_list)
+            return ensemble
         else:
             return facets[0]
 
