@@ -45,6 +45,7 @@ extensions = [
     "sphinx.ext.todo",
     "sphinxarg.ext",
     "sphinx_rtd_theme",
+    "nbsphinx",
 ]
 
 # Add any paths that contain templates here, relative to this directory.
