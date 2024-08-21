@@ -1,11 +1,11 @@
-from abc import abstractmethod, ABC
-from warnings import warn
-from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
-from opencsp.common.lib.tool.typing_tools import strict_types
+from abc import abstractmethod
 import copy
+from warnings import warn
+
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
 
-class OpticOrientationAbstract(ABC):
+class OpticOrientationAbstract:
     """
     Classes that extend OpticOrientationAbstract are objects that can be in different
     orientations, and can contain child objects (that also extend OpticOrientationAbstract)
@@ -45,23 +45,20 @@ class OpticOrientationAbstract(ABC):
     """
 
     def __init__(self) -> None:
-        # self._children: list['OpticOrientationAbstract'] = None
         self._parent: 'OpticOrientationAbstract' = None
         self._self_to_parent_transform: TransformXYZ = None
 
         self._set_optic_children()
 
     def no_parent_copy(self):
-        """
-        Deep copy of Optic without a parential attachement.
-        """
+        """Deep copy of Optic without a parential attachement."""
         copy_of_self = copy.deepcopy(self)
         copy_of_self._parent = None
         return copy_of_self
 
     def _set_optic_children(self) -> None:
-        """Call this function in the constructor to set the children of self
-        and set self as the parent of the children."""
+        # Call this function in the constructor to set the children of self
+        # and set self as the parent of the children.
         if self.children is not None:
             for child in self.children:
                 # print("debug child", child, "debug self", self)
@@ -77,9 +74,9 @@ class OpticOrientationAbstract(ABC):
     @abstractmethod
     def _add_child_helper(self, new_child: 'OpticOrientationAbstract'):
         "Add child OpticOrientationAbstract object to self."
-        ...
 
     def add_child(self, new_child: 'OpticOrientationAbstract', new_child_to_self_transform=TransformXYZ.identity()):
+        """Adds a child to the current optic"""
         if new_child.parent is not None:
             raise ValueError(
                 "Cannot add a child optic if that child is already owned by a parent: \n"
@@ -104,14 +101,13 @@ class OpticOrientationAbstract(ABC):
 
     @property
     def parent(self) -> 'OpticOrientationAbstract':
-        """..."""
+        """The parent of the current Optic"""
         return self._parent
 
     @property
     def _children_to_self_transform(self) -> list[TransformXYZ]:
-        """The list of transformations that take each child OpticOrientationAbstract object
-        from their frames of reference into the 'self' frame.
-        """
+        # The list of transformations that take each child OpticOrientationAbstract object
+        # from their frames of reference into the 'self' frame.
         if self.children is None:
             return None
         return [child._self_to_parent_transform for child in self.children]
@@ -156,31 +152,28 @@ class OpticOrientationAbstract(ABC):
         `TransformXYZ`
             The transformation that takes self to the `target` frame of reference
         """
-        warn("this function has not been verified")
         if target is self:
             return TransformXYZ.identity()
 
         # look up the tree
         searcher = self
         transform = TransformXYZ.identity()
-        while searcher._self_to_parent_transform is not None:
-            if searcher is target:
-                return transform
+        while searcher.parent is not None:
             transform = searcher._self_to_parent_transform * transform
             searcher = searcher._parent
+            if searcher is target:
+                return transform
 
         # look down the tree
         searcher = target
         transform = TransformXYZ.identity()
-        while searcher._self_to_parent_transform is not None:
-            if searcher is self:
-                return transform.inv()
+        while searcher.parent is not None:
             transform = searcher._self_to_parent_transform * transform
             searcher = searcher._parent
+            if searcher is self:
+                return transform.inv()
 
-        raise ValueError("target is not an in the parent-child" " tree of self.")
-
-        pass  # end of get_transform_relative_to
+        raise ValueError("The given 'target' is not an in the current parent-child tree.")
 
     def get_most_basic_optics(self) -> list['OpticOrientationAbstract']:
         """Return the list of the smallest optic that makes up composite optics."""
