@@ -63,8 +63,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         - data_error - errors between optic/sceario definitions and internal calculations
         - data_image_processing_general - general optic image processing calculations
         - data_image_processing_facet - facet specific image processing calculations
-        - data_characterization_facet - facet specific slope calculations in facet reference frame
-        - data_characterization_ensemble - facet specific slope/pointing calculations in ensemble reference frame
+        - data_calculation_facet - facet specific slope calculations in facet reference frame
+        - data_calculation_ensemble - facet specific slope/pointing calculations in ensemble reference frame
 
     External Data Storage
     ---------------------
@@ -198,8 +198,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet] = None
         self.data_error: cdc.CalculationError = None
 
-        self.data_characterization_facet: list[SlopeSolverData] = None
-        self.data_characterization_ensemble: list[cdc.CalculationFacetEnsemble] = None
+        self.data_calculation_facet: list[SlopeSolverData] = None
+        self.data_calculation_ensemble: list[cdc.CalculationFacetEnsemble] = None
 
     def help(self) -> None:
         """Prints Sofast doc string"""
@@ -514,7 +514,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             lt.error_and_raise(ValueError, 'Not all facets geometrically processed; cannot solve slopes.')
 
         # Loop through all input facets and solve slopes
-        self.data_characterization_facet = []
+        self.data_calculation_facet = []
         for facet_idx in range(self.num_facets):
             # Check debug status
             if self.params.debug_slope_solver.debug_active:
@@ -543,7 +543,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             slope_solver.solve_slopes()
 
             # Save slope data
-            self.data_characterization_facet.append(slope_solver.get_data())
+            self.data_calculation_facet.append(slope_solver.get_data())
 
         # Save input surface parameters data
         self.data_surfaces = surfaces
@@ -559,7 +559,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             facet pointing directions. If, int, that facet index is assumed
             to have perfect pointing.
         """
-        if self.data_characterization_facet is None:
+        if self.data_calculation_facet is None:
             lt.error_and_raise(ValueError, 'Slopes must be solved first by running "solve_slopes".')
         if reference != 'average' and not isinstance(reference, int):
             lt.error_and_raise(ValueError, 'Given reference must be int or "average".')
@@ -569,7 +569,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             )
 
         # Instantiate data list
-        self.data_characterization_ensemble = []
+        self.data_calculation_ensemble = []
 
         trans_facet_ensemble_list = []
         v_pointing_matrix = np.zeros((3, self.num_facets))
@@ -578,7 +578,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             trans_1 = TransformXYZ.from_R_V(
                 self.data_ensemble_def.r_facet_ensemble[idx], self.data_ensemble_def.v_facet_locations[idx]
             )
-            trans_2 = self.data_characterization_facet[idx].trans_alignment
+            trans_2 = self.data_calculation_facet[idx].trans_alignment
             # Calculate inverse of slope solving transform
             trans_2 = TransformXYZ.from_V(-trans_2.V) * TransformXYZ.from_R(trans_2.R.inv())
             # Create local to global transformation
@@ -603,7 +603,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         # Calculate global slope and surface points
         for idx in range(self.num_facets):
             # Get slope data
-            slopes = self.data_characterization_facet[idx].slopes_facet_xy  # facet coordinats
+            slopes = self.data_calculation_facet[idx].slopes_facet_xy  # facet coordinats
 
             # Calculate surface normals in local (facet) coordinates
             u_surf_norms = np.ones((3, slopes.shape[1]))
@@ -617,7 +617,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
 
             # Convert surface points to global (ensemble) coordinates
             v_surf_points_ensemble = trans_facet_ensemble_list[idx].apply(
-                self.data_characterization_facet[idx].v_surf_points_facet
+                self.data_calculation_facet[idx].v_surf_points_facet
             )
 
             # Calculate pointing vectors in ensemble coordinates
@@ -626,7 +626,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             data = cdc.CalculationFacetEnsemble(
                 trans_facet_ensemble_list[idx], slopes_ensemble_xy, v_surf_points_ensemble, v_facet_pointing_ensemble
             )
-            self.data_characterization_ensemble.append(data)
+            self.data_calculation_ensemble.append(data)
 
     def get_optic(
         self, interp_type: Literal['bilinear', 'clough_tocher', 'nearest'] = 'nearest'
@@ -648,7 +648,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         """
         facets = []
         trans_list = []
-        for idx_mirror, data in enumerate(self.data_characterization_facet):
+        for idx_mirror, data in enumerate(self.data_calculation_facet):
             # Get surface points
             pts: Vxyz = data.v_surf_points_facet
             # Get normals from slopes
@@ -674,7 +674,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
             facet = Facet(mirror)
             # Locate facet within ensemble
             if self.optic_type == 'multi':
-                trans: TransformXYZ = self.data_characterization_ensemble[idx_mirror].trans_facet_ensemble
+                trans: TransformXYZ = self.data_calculation_ensemble[idx_mirror].trans_facet_ensemble
                 trans_list.append(trans)
             # Save facets
             facets.append(facet)
@@ -725,7 +725,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         # Calculations, one per facet
         for idx_facet in range(self.num_facets):
             # Save facet slope data
-            self.data_characterization_facet[idx_facet].save_to_hdf(
+            self.data_calculation_facet[idx_facet].save_to_hdf(
                 file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
             )
             # Save facet geometry data
@@ -737,8 +737,8 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
                 file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
             )
 
-            if self.data_characterization_ensemble:
+            if self.data_calculation_ensemble:
                 # Save ensemle data
-                self.data_characterization_ensemble[idx_facet].save_to_hdf(
+                self.data_calculation_ensemble[idx_facet].save_to_hdf(
                     file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
                 )

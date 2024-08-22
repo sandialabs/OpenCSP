@@ -150,7 +150,7 @@ class TestProcessSofastFixed(unittest.TestCase):
         for idx_facet in range(self.sofast_facet_ensemble.num_facets):
             with self.subTest(i=idx_facet):
                 np.testing.assert_allclose(
-                    self.sofast_facet_ensemble.data_slope_solver[idx_facet].slopes_facet_xy,
+                    self.sofast_facet_ensemble.data_calculation_facet[idx_facet].slopes_facet_xy,
                     self.exp_slopes_xy_facet_ensemble[idx_facet],
                     rtol=0,
                     atol=1e-6,
@@ -159,7 +159,7 @@ class TestProcessSofastFixed(unittest.TestCase):
     def test_slopes_xy_single_facet(self):
         """Tests slope data"""
         np.testing.assert_allclose(
-            self.sofast_single_facet.data_slope_solver[0].slopes_facet_xy,
+            self.sofast_single_facet.data_calculation_facet[0].slopes_facet_xy,
             self.exp_slopes_xy_single_facet,
             rtol=0,
             atol=1e-6,
