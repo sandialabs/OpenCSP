@@ -318,8 +318,8 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         slope_solver = SlopeSolver(**kwargs)
         slope_solver.fit_surface()
         slope_solver.solve_slopes()
-        self.slope_solver = slope_solver
-        self.data_slope_solver = [self.slope_solver.get_data()]
+        self.slope_solver = [slope_solver]
+        self.data_slope_solver = [slope_solver.get_data()]
 
     def process_multi_facet_optic(
         self,
