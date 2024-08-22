@@ -15,6 +15,9 @@ OpenCSP uses the pytest library.
 
 import configparser
 import os
+import copy
+import sys
+import argparse
 
 
 def _opencsp_settings_dirs() -> list[str]:
@@ -49,6 +52,55 @@ def _opencsp_settings_dirs() -> list[str]:
 
     return ret
 
+def apply_command_line_arguments(settings_from_ini: configparser.ConfigParser) -> configparser.ConfigParser:
+    settings_mixed = copy.copy(settings_from_ini)
+
+    # parse the command line
+    parser = argparse.ArgumentParser(prog="OpenCSP/__init__.py",
+                                     description='OpenCSP settings parser', add_help=False, exit_on_error=False)
+    parser.add_argument(
+        '--dir-input',
+        dest="dir_input",
+        default="",
+        type=str,
+        help="Use the given directory value as the input directory instead of [opencsp_root_path]/[large_data_example_dir].",
+    )
+    parser.add_argument(
+        '--dir-output',
+        dest="dir_output",
+        default="",
+        type=str,
+        help="Use the given directory value as the output directory instead of [opencsp_root_path]/[scratch_dir]/[scratch_name].",
+    )
+    args, remaining = parser.parse_known_args(sys.argv[1:])
+    dir_input: str = args.dir_input
+    dir_output: str = args.dir_output
+    sys.argv = [sys.argv[0]] + remaining
+    overridden_values: list[tuple[str, str]] = []
+
+    # apply the command line arguments to the settings
+    if dir_input != "":
+        settings_mixed["opencsp_root_path"]["large_data_example_dir"] = dir_input
+        overridden_values.append(("opencsp_root_path/large_data_example_dir", dir_input))
+    if dir_output != "":
+        dir_output_path, dir_output_name = os.path.dirname(dir_output), os.path.basename(dir_output)
+        try:
+            os.makedirs(dir_output)
+        except FileExistsError:
+            pass
+        settings_mixed["opencsp_root_path"]["scratch_dir"] = dir_output_path
+        settings_mixed["opencsp_root_path"]["scratch_name"] = dir_output_name
+        overridden_values.append(("opencsp_root_path/scratch_dir", dir_output_path))
+        overridden_values.append(("opencsp_root_path/scratch_name", dir_output_name))
+
+    # let the user know if values have been overridden
+    if len(overridden_values) > 0:
+        print("Some settings have been overridden from the command line:")
+        for setting_name, command_line_value in overridden_values:
+            print(f"\t{setting_name}: {command_line_value}")
+
+    return settings_mixed
+
 
 _settings_files: list[str] = []
 
@@ -70,4 +122,5 @@ for section in opencsp_settings.sections():
     for key in opencsp_settings[section]:
         print(f"opencsp_settings[{section}][{key}]={opencsp_settings[section][key]}")
 
+opencsp_settings = apply_command_line_arguments(opencsp_settings)
 __all__ = ['opencsp_settings']
