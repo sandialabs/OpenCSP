@@ -478,8 +478,8 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         # Sofast input parameters
         self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
         for idx, (data_facet, data_surface) in enumerate(zip(self.data_facet, self.data_surface)):
-            data_surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:3d}/')
-            data_facet.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:3d}/')
+            data_surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:03d}/')
+            data_facet.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:03d}/')
 
         # General
         self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
@@ -489,13 +489,13 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         # Calculations
         for idx_facet in range(self.num_facets):
             self.data_slope_solver[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:3d}/'
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
             )
             self.data_geometry_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:3d}/'
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
             )
             self.data_image_processing_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:3d}/'
+                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
             )
 
         lt.info(f'SofastFixed data saved to: {file:s} with prefix: {prefix:s}')
