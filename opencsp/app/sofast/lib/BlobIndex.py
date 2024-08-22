@@ -4,6 +4,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.tool import log_tools as lt
 
 
@@ -479,8 +480,24 @@ class BlobIndex:
         points = Vxy((x_pts[mask_assigned], y_pts[mask_assigned]))
         return points, indices
 
-    def get_data_in_region(self) -> tuple[Vxy, Vxy]:
-        """FILL IN DOCS"""
+    def get_data_in_region(self, loop: LoopXY) -> tuple[Vxy, Vxy]:
+        """Returns found points and indices within given region
+
+        Parameters
+        ----------
+        loop : LoopXY
+            The loop to search within
+
+        Returns
+        -------
+        points : Vxy
+            Lenght N vector, located points xy locations, pixels
+        indices_xy : Vxy
+            Length N vector, located points xy blob indices, int
+        """
+        points, indices = self.get_data()
+        mask = loop.is_inside(points)
+        return points[mask], indices[mask]
 
     def get_data_mat(self) -> tuple[np.ndarray, np.ndarray]:
         """Returns found points and indices in matrix form
