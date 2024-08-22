@@ -1,11 +1,11 @@
-from abc import abstractmethod
+from abc import abstractmethod, ABC
 import copy
 from warnings import warn
 
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 
 
-class OpticOrientationAbstract:
+class OpticOrientationAbstract(ABC):
     """
     Classes that extend OpticOrientationAbstract are objects that can be in different
     orientations, and can contain child objects (that also extend OpticOrientationAbstract)
