@@ -1,4 +1,4 @@
-"""Example script that runs fixed pattern deflectometry analysis on saved data
+"""Test script that runs fixed pattern deflectometry analysis on saved data
 """
 
 from os.path import join
@@ -41,6 +41,7 @@ class TestProcessSofastFixed(unittest.TestCase):
         cls.sofast_facet_ensemble: ProcessSofastFixed = None
         cls.exp_slopes_xy_single_facet: np.ndarray = None
         cls.exp_slopes_xy_facet_ensemble: list[np.ndarray] = None
+        cls.exp_facet_pointing_trans: list[np.ndarray] = None
 
         cls._process_facet_ensemble(cls)
         cls._process_single_facet(cls)
@@ -68,10 +69,15 @@ class TestProcessSofastFixed(unittest.TestCase):
 
         # Load expected data
         self.exp_slopes_xy_facet_ensemble = []
+        self.exp_facet_pointing_trans = []
         for idx_facet in range(ensemble_data.num_facets):
-            datasets = [f'DataSofastCalculation/facet/facet_{idx_facet:03d}/SlopeSolverData/slopes_facet_xy']
+            datasets = [
+                f'DataSofastCalculation/facet/facet_{idx_facet:03d}/SlopeSolverData/slopes_facet_xy',
+                f'DataSofastCalculation/facet/facet_{idx_facet:03d}/CalculationEnsemble/trans_facet_ensemble',
+            ]
             data = h5.load_hdf5_datasets(datasets, file_exp)
             self.exp_slopes_xy_facet_ensemble.append(data['slopes_facet_xy'])
+            self.exp_facet_pointing_trans.append(data['trans_facet_ensemble'])
 
         # Instantiate class
         params = ParamsSofastFixed.load_from_hdf(file_exp, 'DataSofastInput/')
@@ -164,6 +170,17 @@ class TestProcessSofastFixed(unittest.TestCase):
             rtol=0,
             atol=1e-6,
         )
+
+    def test_facet_pointing_ensemble(self):
+        """Tests facet pointing"""
+        for idx_facet in range(self.sofast_facet_ensemble.num_facets):
+            with self.subTest(i=idx_facet):
+                np.testing.assert_allclose(
+                    self.sofast_facet_ensemble.data_calculation_ensemble[idx_facet].trans_facet_ensemble.matrix,
+                    self.exp_facet_pointing_trans[idx_facet],
+                    rtol=0,
+                    atol=1e-6,
+                )
 
     def tearDown(self) -> None:
         # Make sure we release all matplotlib resources.
