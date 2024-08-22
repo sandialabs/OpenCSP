@@ -1,25 +1,19 @@
 """Facet class inherited by all facet classes"""
 
-from typing import Callable
-from warnings import warn
-
 import numpy as np
-from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import VisualizeOrthorectifiedSlopeAbstract
-from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlFacet import RenderControlFacet
-from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
 from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbstract
+import opencsp.common.lib.tool.log_tools as lt
 
 UP = Vxyz([0, 0, 1])
 
@@ -45,6 +39,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
 
     @property
     def transform_mirror_to_self(self) -> TransformXYZ:
+        """Returns the mirror to facet 3d transform"""
         return self.mirror._self_to_parent_transform
 
     # override from VisualizeOrthorectifiedSlopeAbstract
@@ -61,6 +56,10 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         # Get XYZ locations of all points making up mirror region
         points_xy = Vxy.merge([loop.vertices for loop in self.mirror.region.loops])  # mirror frame
         points_z = self.mirror.surface_displacement_at(points_xy)  # mirror frame
+        # If the corners aren't in range of the mirror's interpolation function, set to 0
+        if np.any(np.isnan(points_z)):
+            lt.warn('Could not find corner z values for facet; filling with zeros.')
+            points_z = np.nan_to_num(points_z, nan=0)
         points_xyz = Vxyz((points_xy.x, points_xy.y, points_z))  # mirror frame
 
         # Transform "mirror base" to "facet child" coordinates
@@ -206,69 +205,3 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
 
         if facet_style.draw_mirror_curvature:
             self.mirror.draw(view, facet_style.mirror_styles, transform * self.mirror._self_to_parent_transform)
-
-        # pass  # end function
-
-    ### POINTING FUNCTION METHODS
-    # TODO TJL: Pointing Function methods are not tested with the updated base classes.
-    #           There will need to be an addition to `Facet` that allows users to specify the ways
-    #           a facet mounts the mirror it contains. Defining some function might
-    #           be the way to do this, but that is a task for the future.
-
-    def define_pointing_function_UNVERIFIED(self, func: Callable[..., TransformXYZ]) -> None:
-        """Sets the canting function to use. I.e., defines the
-        "set_pointing" function.
-
-        Parameters
-        ----------
-        func : Callable
-            Function that returns a "child to base" TransformXYZ object.
-        """
-        self.pointing_function = func
-
-    def set_pointing_UNVERIFIED(self, *args) -> None:
-        """Sets current facet canting (i.e. sets
-        self.ori.transform_child_to_base using the given arguments.
-        """
-        # warn("Depricated, do not use OpticOrientation instance, use OpticOrietionAbstract.")
-        if self.pointing_function is None:
-            raise ValueError('self.pointing_function is not defined. Use self.define_pointing_function.')
-        # self.ori.transform_child_to_base = self.pointing_function(*args)
-        self.mirror._self_to_parent_transform = self.pointing_function(*args)
-
-    @classmethod
-    def generate_az_el_UNVERIFIED(cls, mirror: MirrorAbstract) -> 'Facet':
-        """Generates Facet object defined by a simple azimuth then elevation
-        canting strategy. The "pointing_function" accessed by self.set_pointing
-        has the following inputs
-            - az - float - azimuth angle (rotation about z axis) in radians
-            - el - float - elevation angle (rotation about x axis) in radians
-        """
-
-        def pointing_function(az: float, el: float) -> TransformXYZ:
-            r = Rotation.from_euler('zx', [az, el], degrees=False)
-            return TransformXYZ.from_R(r)
-
-        # Create facet
-        facet = cls(mirror)
-        facet.define_pointing_function(pointing_function)
-
-        return facet
-
-    @classmethod
-    def generate_rotation_defined_UNVERIFIED(cls, mirror: MirrorAbstract) -> 'Facet':
-        """Generates FacetCantable object defined by a given scipy Rotation object.
-        The "pointing_function" accessed by self.set_pointing has the following input
-            - rotation - scipy.spatial.transform.Rotation - rotation object
-        """
-
-        def pointing_function(rotation: Rotation) -> TransformXYZ:
-            return TransformXYZ.from_R(rotation)
-
-        # Create facet
-        facet = cls(mirror)
-        facet.define_pointing_function(pointing_function)
-
-        return facet
-
-    ###  END POINTING FUNCTION METHODS
