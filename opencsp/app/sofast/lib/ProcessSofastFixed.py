@@ -71,21 +71,21 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         # Instantiate data containers
         self.num_facets: int = None
         self.optic_type: Literal['undefined', 'single', 'multi'] = None
-        self.data_facet_def: list[DefinitionFacet]
-        self.data_ensemble_def: DefinitionEnsemble
+        self.data_facet_def: list[DefinitionFacet] = None
+        self.data_ensemble_def: DefinitionEnsemble = None
 
-        self.data_surfaces: list[Surface2DAbstract]
+        self.data_surfaces: list[Surface2DAbstract] = None
 
-        self.data_geometry_general: cdc.CalculationDataGeometryGeneral
-        self.data_image_proccessing_general: cdc.CalculationImageProcessingGeneral
-        self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet]
-        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet]
-        self.data_error: cdc.CalculationError
+        self.data_geometry_general: cdc.CalculationDataGeometryGeneral = None
+        self.data_image_proccessing_general: cdc.CalculationImageProcessingGeneral = None
+        self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet] = None
+        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet] = None
+        self.data_error: cdc.CalculationError = None
 
-        self.data_calculation_facet: list[SlopeSolverData]
-        self.data_calculation_ensemble: list[cdc.CalculationFacetEnsemble]
-        self.slope_solver: list[SlopeSolver]
-        self.blob_index: BlobIndex
+        self.data_calculation_facet: list[SlopeSolverData] = None
+        self.data_calculation_ensemble: list[cdc.CalculationFacetEnsemble] = None
+        self.slope_solvers: list[SlopeSolver] = None
+        self.blob_index: BlobIndex = None
 
     def find_blobs(self, pts_known: Vxy, xys_known: tuple[tuple[int, int]]) -> BlobIndex:
         """Finds blobs in image
@@ -320,7 +320,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         slope_solver = SlopeSolver(**kwargs)
         slope_solver.fit_surface()
         slope_solver.solve_slopes()
-        self.slope_solver = [slope_solver]
+        self.slope_solvers = [slope_solver]
         self.data_calculation_facet = [slope_solver.get_data()]
 
     def process_multi_facet_optic(
@@ -374,13 +374,13 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         kwargs_list = self._process_optic_multifacet_geometry(self.blob_index, mask_raw)
 
         # Calculate slope
-        self.slope_solver = []
+        self.slope_solvers = []
         self.data_calculation_facet = []
         for kwargs in kwargs_list:
             slope_solver = SlopeSolver(**kwargs)
             slope_solver.fit_surface()
             slope_solver.solve_slopes()
-            self.slope_solver.append(slope_solver)
+            self.slope_solvers.append(slope_solver)
             self.data_calculation_facet.append(slope_solver.get_data())
 
         # Calculate facet pointing
