@@ -13,6 +13,7 @@ from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ParamsSofastFringe import ParamsSofastFringe
+from opencsp.app.sofast.lib.ProcessSofastAbstract import ProcessSofastAbstract
 import opencsp.app.sofast.lib.process_optics_geometry as po
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
@@ -20,7 +21,6 @@ from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
-from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
@@ -31,7 +31,7 @@ from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class ProcessSofastFringe(HDF5_SaveAbstract):
+class ProcessSofastFringe(HDF5_SaveAbstract, ProcessSofastAbstract):
     """Class that processes measurement data captured by a SOFAST
     system. Computes optic surface slope and saves data to HDF5 format.
 
@@ -175,31 +175,13 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
         display : Display
             Display object used to capture data.
         """
-        # Store data
+        super().__init__()
+
+        self.orientation = orientation
+        self.camera = camera
         self.measurement = measurement
         self.display = display
-        self.camera = camera
-        self.orientation = orientation
-
-        # Define default calculation parameters
         self.params = ParamsSofastFringe()
-
-        # Instantiate data containers
-        self.num_facets: int = 0
-        self.optic_type: Literal['undefined', 'single', 'multi'] = None
-        self.data_facet_def: list[DefinitionFacet] = None
-        self.data_ensemble_def: DefinitionEnsemble = None
-
-        self.data_surfaces: list[Surface2DAbstract] = None
-
-        self.data_geometry_general: cdc.CalculationDataGeometryGeneral = None
-        self.data_image_processing_general: cdc.CalculationImageProcessingGeneral = None
-        self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet] = None
-        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet] = None
-        self.data_error: cdc.CalculationError = None
-
-        self.data_calculation_facet: list[SlopeSolverData] = None
-        self.data_calculation_ensemble: list[cdc.CalculationFacetEnsemble] = None
 
     def help(self) -> None:
         """Prints Sofast doc string"""

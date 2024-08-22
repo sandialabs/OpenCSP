@@ -15,6 +15,7 @@ from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPat
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.MeasurementSofastFixed import MeasurementSofastFixed
 from opencsp.app.sofast.lib.ParamsSofastFixed import ParamsSofastFixed
+from opencsp.app.sofast.lib.ProcessSofastAbstract import ProcessSofastAbstract
 import opencsp.app.sofast.lib.process_optics_geometry as pr
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
@@ -22,7 +23,6 @@ from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
-from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
@@ -33,7 +33,7 @@ from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class ProcessSofastFixed(HDF5_SaveAbstract):
+class ProcessSofastFixed(HDF5_SaveAbstract, ProcessSofastAbstract):
     """Fixed Pattern Deflectrometry data processing class"""
 
     def __init__(
@@ -50,13 +50,13 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         fixed_pattern_dot_locs : DotLocationsFixedPattern
             Image projection dictionary
         """
+        super().__init__()
+
         self.orientation = orientation
         self.camera = camera
+        self.measurement: MeasurementSofastFixed
         self.fixed_pattern_dot_locs = fixed_pattern_dot_locs
         self.params = ParamsSofastFixed()
-
-        # Measurement data
-        self.measurement: MeasurementSofastFixed
 
         # Define blob detector
         self.blob_detector: cv.SimpleBlobDetector_Params = cv.SimpleBlobDetector_Params()
@@ -68,22 +68,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.blob_detector.filterByConvexity = False
         self.blob_detector.filterByInertia = False
 
-        # Instantiate data containers
-        self.num_facets: int = None
-        self.optic_type: Literal['undefined', 'single', 'multi'] = None
-        self.data_facet_def: list[DefinitionFacet] = None
-        self.data_ensemble_def: DefinitionEnsemble = None
-
-        self.data_surfaces: list[Surface2DAbstract] = None
-
-        self.data_geometry_general: cdc.CalculationDataGeometryGeneral = None
-        self.data_image_proccessing_general: cdc.CalculationImageProcessingGeneral = None
-        self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet] = None
-        self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet] = None
-        self.data_error: cdc.CalculationError = None
-
-        self.data_calculation_facet: list[SlopeSolverData] = None
-        self.data_calculation_ensemble: list[cdc.CalculationFacetEnsemble] = None
+        # Instantiate other data containers
         self.slope_solvers: list[SlopeSolver] = None
         self.blob_index: BlobIndex = None
 

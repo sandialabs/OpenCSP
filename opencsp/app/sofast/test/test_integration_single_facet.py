@@ -80,9 +80,9 @@ class TestSingle(unittest.TestCase):
             sofast.process_optic_singlefacet(facet_data, surface)
 
             # Store test data
-            cls.slopes.append(sofast.data_characterization_facet[0].slopes_facet_xy)
-            cls.surf_coefs.append(sofast.data_characterization_facet[0].surf_coefs_facet)
-            cls.v_surf_points_facet.append(sofast.data_characterization_facet[0].v_surf_points_facet.data)
+            cls.slopes.append(sofast.data_calculation_facet[0].slopes_facet_xy)
+            cls.surf_coefs.append(sofast.data_calculation_facet[0].surf_coefs_facet)
+            cls.v_surf_points_facet.append(sofast.data_calculation_facet[0].v_surf_points_facet.data)
 
     def test_slopes(self):
         datasets = ['DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy']
