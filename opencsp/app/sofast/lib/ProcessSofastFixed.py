@@ -18,12 +18,16 @@ from opencsp.app.sofast.lib.ParamsSofastFixed import ParamsSofastFixed
 import opencsp.app.sofast.lib.process_optics_geometry as pr
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
+from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.MirrorPoint import MirrorPoint
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.SlopeSolverData import SlopeSolverData
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
 import opencsp.common.lib.tool.log_tools as lt
@@ -77,6 +81,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         self.data_geometry_facet: list[cdc.CalculationDataGeometryFacet]
         self.data_image_processing_facet: list[cdc.CalculationImageProcessingFacet]
         self.data_error: cdc.CalculationError
+        self.data_calculation_ensemble: list[cdc.CalculationFacetEnsemble]
         self.blob_index: BlobIndex
         self.slope_solver: list[SlopeSolver]
 
@@ -115,7 +120,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
         ]
         mask = ip.calc_mask_raw(images, *params)
 
-        if self.optic_type == 'multi_facet':
+        if (self.optic_type == 'multi_facet') and self.params.mask.keep_largest_area:
             lt.warn(
                 '"keep_largest_area" mask processing option cannot be used '
                 'for multifacet ensembles. This will be turned off.'
@@ -218,8 +223,11 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
 
         kwargs_list = []
         for idx_facet in range(self.num_facets):
+            # Get pixel region of current facet
+            loop = self.data_image_processing_facet[idx_facet].loop_facet_image_refine
+
             # Get image points and blob indices
-            pts_image, pts_index_xy = blob_index.get_data()
+            pts_image, pts_index_xy = blob_index.get_data_in_region(loop)
 
             # Define optic orientation w.r.t. camera
             rot_facet_ensemble = self.data_ensemble.r_facet_ensemble[idx_facet]
@@ -371,7 +379,90 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             slope_solver.fit_surface()
             slope_solver.solve_slopes()
             self.slope_solver.append(slope_solver)
-            self.data_slope_solver.append(self.slope_solver.get_data())
+            self.data_slope_solver.append(slope_solver.get_data())
+
+        # Calculate facet pointing
+        self._calculate_facet_pointing()
+
+    def _calculate_facet_pointing(self, reference: Literal['average'] | int = 'average') -> None:
+        """
+        Calculates facet pointing relative to the given reference.
+
+        Parameters
+        ----------
+        reference : 'average' | int
+            If 'average', the pointing reference is the average of all
+            facet pointing directions. If, int, that facet index is assumed
+            to have perfect pointing.
+        """
+        if self.data_slope_solver is None:
+            lt.error_and_raise(ValueError, 'Slopes must be solved first by running "solve_slopes".')
+        if (reference != 'average') and not isinstance(reference, int):
+            lt.error_and_raise(ValueError, 'Given reference must be int or "average".')
+        if isinstance(reference, int) and (reference >= self.num_facets):
+            lt.error_and_raise(
+                ValueError, f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.'
+            )
+
+        # Instantiate data list
+        self.data_calculation_ensemble = []
+
+        trans_facet_ensemble_list = []
+        v_pointing_matrix = np.zeros((3, self.num_facets))
+        for idx in range(self.num_facets):
+            # Get transformation from user-input and slope solving
+            trans_1 = TransformXYZ.from_R_V(
+                self.data_ensemble.r_facet_ensemble[idx], self.data_ensemble.v_facet_locations[idx]
+            )
+            trans_2 = self.data_slope_solver[idx].trans_alignment
+            # Calculate inverse of slope solving transform
+            trans_2 = TransformXYZ.from_V(-trans_2.V) * TransformXYZ.from_R(trans_2.R.inv())
+            # Create local to global transformation
+            trans_facet_ensemble_list.append(trans_2 * trans_1)
+
+            # Calculate pointing vector in ensemble coordinates
+            v_pointing = Vxyz((0, 0, 1)).rotate(trans_facet_ensemble_list[idx].R)
+            v_pointing_matrix[:, idx] = v_pointing.data.squeeze()
+
+        # Calculate reference pointing direction
+        if isinstance(reference, int):
+            v_pointing_ref = Vxyz(v_pointing_matrix[:, reference])
+        elif reference == 'average':
+            v_pointing_ref = Vxyz(v_pointing_matrix.mean(1))
+        # Calculate rotation to align pointing vectors
+        r_align_pointing = v_pointing_ref.align_to(Vxyz((0, 0, 1)))
+        trans_align_pointing = TransformXYZ.from_R(r_align_pointing)
+
+        # Apply alignment rotation to total transformation
+        trans_facet_ensemble_list = [trans_align_pointing * t for t in trans_facet_ensemble_list]
+
+        # Calculate global slope and surface points
+        for idx in range(self.num_facets):
+            # Get slope data
+            slopes = self.data_slope_solver[idx].slopes_facet_xy  # facet coordinats
+
+            # Calculate surface normals in local (facet) coordinates
+            u_surf_norms = np.ones((3, slopes.shape[1]))
+            u_surf_norms[:2] = -slopes
+            u_surf_norms = Uxyz(u_surf_norms).as_Vxyz()
+
+            # Apply rotation to normal vectors
+            u_surf_norms_global = u_surf_norms.rotate(trans_facet_ensemble_list[idx].R)
+            # Convert normal vectors to global (ensemble) slopes
+            slopes_ensemble_xy = -u_surf_norms_global.data[:2] / u_surf_norms_global.data[2:]
+
+            # Convert surface points to global (ensemble) coordinates
+            v_surf_points_ensemble = trans_facet_ensemble_list[idx].apply(
+                self.data_slope_solver[idx].v_surf_points_facet
+            )
+
+            # Calculate pointing vectors in ensemble coordinates
+            v_facet_pointing_ensemble = Vxyz((0, 0, 1)).rotate(trans_facet_ensemble_list[idx].R)
+
+            data = cdc.CalculationFacetEnsemble(
+                trans_facet_ensemble_list[idx], slopes_ensemble_xy, v_surf_points_ensemble, v_facet_pointing_ensemble
+            )
+            self.data_calculation_ensemble.append(data)
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
@@ -411,16 +502,33 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
 
     def get_mirror(
         self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest'
-    ) -> MirrorPoint:
+    ) -> Facet | FacetEnsemble:
         """Returns mirror object with slope data"""
-        if self.optic_type in ['single_facet', 'undefined']:
-            v_surf_pts = self.data_slope_solver[0].v_surf_points_facet
+        facets = []
+        trans_list = []
+        for idx_facet in range(self.num_facets):
+            # Get mirror surface points
+            v_surf_pts = self.data_slope_solver[idx_facet].v_surf_points_facet
+            # Get point normal vectors
             v_normals_data = np.ones((3, len(v_surf_pts)))
-            v_normals_data[:2, :] = self.data_slope_solver[0].slopes_facet_xy
+            v_normals_data[:2, :] = self.data_slope_solver[idx_facet].slopes_facet_xy
             v_normals_data[:2, :] *= -1
             v_normals = Uxyz(v_normals_data)
-            shape = RegionXY.from_vertices(self.data_facet[0].v_facet_corners.projXY())
-            return MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
-        elif self.optic_type == 'multi_facet':
-            # TODO: fill in for multifacet
-            pass
+            # Get optic shape
+            shape = RegionXY.from_vertices(self.data_facet[idx_facet].v_facet_corners.projXY())
+            # Create mirror
+            mirror = MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
+            # Create facet
+            facets.append(Facet(mirror))
+            # Get facet pointing if multi-facet
+            if self.optic_type == 'multi_facet':
+                trans: TransformXYZ = self.data_calculation_ensemble[idx_facet].trans_facet_ensemble
+                trans_list.append(trans)
+
+        # Return either ensemble or facet
+        if self.optic_type == 'multi_facet':
+            ensemble = FacetEnsemble(facets)
+            ensemble.set_facet_transform_list(trans_list)
+            return ensemble
+        else:
+            return facets[0]
