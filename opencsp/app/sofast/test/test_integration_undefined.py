@@ -91,8 +91,8 @@ class test_IntegrationUndefined(unittest.TestCase):
         sofast.process_optic_undefined(surface)
 
         # Test
-        slopes = sofast.data_characterization_facet[0].slopes_facet_xy
-        slope_coefs = sofast.data_characterization_facet[0].slope_coefs_facet
+        slopes = sofast.data_calculation_facet[0].slopes_facet_xy
+        slope_coefs = sofast.data_calculation_facet[0].slope_coefs_facet
 
         np.testing.assert_allclose(data['slopes_facet_xy'], slopes, atol=1e-7, rtol=0)
         np.testing.assert_allclose(data['slope_coefs_facet'], slope_coefs, atol=1e-8, rtol=0)

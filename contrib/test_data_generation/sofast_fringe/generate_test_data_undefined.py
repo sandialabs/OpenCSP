@@ -54,7 +54,7 @@ def generate_dataset(
 
     # Show slope map
     mask = sofast.data_image_processing_facet[0].mask_processed
-    slopes_xy = sofast.data_characterization_facet[0].slopes_facet_xy
+    slopes_xy = sofast.data_calculation_facet[0].slopes_facet_xy
     slopes = np.sqrt(np.sum(slopes_xy**2, 0))
     image = np.zeros(mask.shape) * np.nan
     image[mask] = slopes

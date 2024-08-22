@@ -62,7 +62,7 @@ class SofastConfiguration:
         for idx_facet in range(num_facets):
             if self._is_fringe:
                 # Get data
-                data_calc = self.data_sofast_object.data_characterization_facet[idx_facet]
+                data_calc = self.data_sofast_object.data_calculation_facet[idx_facet]
                 data_im_proc = self.data_sofast_object.data_image_processing_facet[idx_facet]
                 data_surf = self.data_sofast_object.data_surfaces[idx_facet]
 
