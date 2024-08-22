@@ -65,7 +65,9 @@ class TestProcessSofastFixed(unittest.TestCase):
         cls.process_sofast_fixed.load_measurement_data(measurement)
 
         # Process
-        cls.process_sofast_fixed.process_single_facet_optic(facet_data, surface)
+        pt_known = measurement.origin
+        xy_known = (0, 0)
+        cls.process_sofast_fixed.process_single_facet_optic(facet_data, surface, pt_known, xy_known)
 
     def test_save_as_hdf(self):
         """Tests saving to HDF file"""
@@ -77,7 +79,7 @@ class TestProcessSofastFixed(unittest.TestCase):
         axis_control_m = rca.meters()
 
         fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
-        mirror = self.process_sofast_fixed.get_mirror('bilinear')
+        mirror = self.process_sofast_fixed.get_mirror('bilinear').mirror
         mirror.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_mng.axis)
         fig_mng.save(self.save_dir, 'sofast_fixed_orthorectified_slope_magnitude', 'png')
 
