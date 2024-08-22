@@ -5,7 +5,7 @@ Online Documentation
 --------------------
 
 Detailed contribution guidelines may be found in our [online documentation](
-https://opencsp.readthedocs.io/en/main/contributing.html).
+https://opencsp.readthedocs.io/en/latest/contributing.html).
 
 Legal Disclaimer
 ----------------
