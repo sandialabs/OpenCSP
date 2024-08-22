@@ -61,6 +61,7 @@ class CalibrateSofastFixedDots:
         x_max: int,
         y_min: int,
         y_max: int,
+        xy_pts_known: tuple[tuple[int, int]] = None,
     ) -> 'CalibrateSofastFixedDots':
         """Instantiates the calibration class
 
@@ -69,7 +70,7 @@ class CalibrateSofastFixedDots:
         files_images : list[str]
             File paths to images of Aruco markers and dots
         origin_pts : Vxy
-            Points on the images corresponding to index (0, 0)
+            Points on the images corresponding to index `xy_pts_known`
         camera : Camera
             Camera calibration parameters of camera used to take images
         pts_xyz_corners : Vxyz
@@ -80,6 +81,10 @@ class CalibrateSofastFixedDots:
             Expected min/max x index values (follows screen x axis)
         y_min/y_max : int
             Expected min/max y index values (follows screen y axis)
+        xy_pts_known : tuple[tuple[int, int]]
+            The origin point xy indices. One xy point for each input image.
+            For example, for two images using (0, 0) - xy_pts_known = ((0, 0), (0, 0)).
+            If None, defaults to all zeros.
         """
         # Load images
         self._images: list[ImageMarker] = []
@@ -92,8 +97,12 @@ class CalibrateSofastFixedDots:
             for pt_xyz, pt_id in zip(pts_xyz_corners, pts_ids_corners):
                 im.set_point_id_located(pt_id, pt_xyz.data.squeeze())
 
+        if xy_pts_known is None:
+            xy_pts_known = ((0, 0),) * len(origin_pts)
+
         # Save data
         self._origin_pts = origin_pts
+        self._xy_pts_known = xy_pts_known
         self._camera = camera
         self._pts_xyz_corners = pts_xyz_corners
         self._pts_ids_corners = pts_ids_corners
@@ -150,7 +159,9 @@ class CalibrateSofastFixedDots:
             # Index all found points
             blob_index = BlobIndex(pts, -self._x_max, -self._x_min, self._y_min, self._y_max)
             blob_index.search_thresh = self.blob_search_threshold
-            blob_index.run(origin_pt)
+            blob_index.run(
+                origin_pt, x_known=self._xy_pts_known[idx_image][0], y_known=self._xy_pts_known[idx_image][1]
+            )
             points, indices = blob_index.get_data_mat()
 
             # Save points and indices
