@@ -131,7 +131,7 @@ class TestProcessSofastFixed(unittest.TestCase):
         axis_control_m = rca.meters()
 
         fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
-        ensemble = self.sofast_facet_ensemble.get_mirror('bilinear')
+        ensemble = self.sofast_facet_ensemble.get_optic('bilinear')
         ensemble.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_mng.axis)
         fig_mng.save(self.save_dir, 'slope_magnitude_facet_ensemble', 'png')
 
@@ -141,7 +141,7 @@ class TestProcessSofastFixed(unittest.TestCase):
         axis_control_m = rca.meters()
 
         fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
-        facet = self.sofast_single_facet.get_mirror('bilinear')
+        facet = self.sofast_single_facet.get_optic('bilinear')
         facet.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_mng.axis)
         fig_mng.save(self.save_dir, 'slope_magnitude_single_facet', 'png')
 

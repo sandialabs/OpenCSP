@@ -466,6 +466,39 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             )
             self.data_calculation_ensemble.append(data)
 
+    def get_optic(
+        self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest'
+    ) -> Facet | FacetEnsemble:
+        """Returns mirror object with slope data"""
+        facets = []
+        trans_list = []
+        for idx_facet in range(self.num_facets):
+            # Get mirror surface points
+            v_surf_pts = self.data_calculation_facet[idx_facet].v_surf_points_facet
+            # Get point normal vectors
+            v_normals_data = np.ones((3, len(v_surf_pts)))
+            v_normals_data[:2, :] = self.data_calculation_facet[idx_facet].slopes_facet_xy
+            v_normals_data[:2, :] *= -1
+            v_normals = Uxyz(v_normals_data)
+            # Get optic shape
+            shape = RegionXY.from_vertices(self.data_facet_def[idx_facet].v_facet_corners.projXY())
+            # Create mirror
+            mirror = MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
+            # Create facet
+            facets.append(Facet(mirror))
+            # Get facet pointing if multi-facet
+            if self.optic_type == 'multi':
+                trans: TransformXYZ = self.data_calculation_ensemble[idx_facet].trans_facet_ensemble
+                trans_list.append(trans)
+
+        # Return either ensemble or facet
+        if self.optic_type == 'multi':
+            ensemble = FacetEnsemble(facets)
+            ensemble.set_facet_transform_list(trans_list)
+            return ensemble
+        else:
+            return facets[0]
+
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
 
@@ -501,36 +534,3 @@ class ProcessSofastFixed(HDF5_SaveAbstract):
             )
 
         lt.info(f'SofastFixed data saved to: {file:s} with prefix: {prefix:s}')
-
-    def get_mirror(
-        self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest'
-    ) -> Facet | FacetEnsemble:
-        """Returns mirror object with slope data"""
-        facets = []
-        trans_list = []
-        for idx_facet in range(self.num_facets):
-            # Get mirror surface points
-            v_surf_pts = self.data_calculation_facet[idx_facet].v_surf_points_facet
-            # Get point normal vectors
-            v_normals_data = np.ones((3, len(v_surf_pts)))
-            v_normals_data[:2, :] = self.data_calculation_facet[idx_facet].slopes_facet_xy
-            v_normals_data[:2, :] *= -1
-            v_normals = Uxyz(v_normals_data)
-            # Get optic shape
-            shape = RegionXY.from_vertices(self.data_facet_def[idx_facet].v_facet_corners.projXY())
-            # Create mirror
-            mirror = MirrorPoint(v_surf_pts, v_normals, shape, interpolation_type)
-            # Create facet
-            facets.append(Facet(mirror))
-            # Get facet pointing if multi-facet
-            if self.optic_type == 'multi':
-                trans: TransformXYZ = self.data_calculation_ensemble[idx_facet].trans_facet_ensemble
-                trans_list.append(trans)
-
-        # Return either ensemble or facet
-        if self.optic_type == 'multi':
-            ensemble = FacetEnsemble(facets)
-            ensemble.set_facet_transform_list(trans_list)
-            return ensemble
-        else:
-            return facets[0]
