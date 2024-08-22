@@ -27,11 +27,10 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class ProcessSofastFringe(HDF5_SaveAbstract, ProcessSofastAbstract):
+class ProcessSofastFringe(ProcessSofastAbstract):
     """Class that processes measurement data captured by a SOFAST
     system. Computes optic surface slope and saves data to HDF5 format.
 
@@ -668,59 +667,3 @@ class ProcessSofastFringe(HDF5_SaveAbstract, ProcessSofastAbstract):
             return ensemble
         else:
             return facets[0]
-
-    def save_to_hdf(self, file: str, prefix: str = ''):
-        """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
-
-        Parameters
-        ----------
-        file : str
-            HDF file to save to
-        prefix : str
-            Prefix to append to folder path within HDF file (folders must be separated by "/")
-        """
-        # Log
-        lt.info(f'Saving SofastFringe data to: {file:s}, in HDF5 folder: "{prefix:s}"')
-
-        # One per measurement
-        if self.data_error is not None:
-            self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-        self.data_geometry_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-        self.data_image_processing_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-
-        # Sofast parameters
-        self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
-
-        # Facet definition
-        if self.data_facet_def is not None:
-            for idx_facet, facet_data in enumerate(self.data_facet_def):
-                facet_data.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
-
-        # Ensemble definition
-        if self.data_ensemble_def is not None:
-            self.data_ensemble_def.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/')
-
-        # Surface definition
-        for idx_facet, surface in enumerate(self.data_surfaces):
-            surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
-
-        # Calculations, one per facet
-        for idx_facet in range(self.num_facets):
-            # Save facet slope data
-            self.data_calculation_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
-            # Save facet geometry data
-            self.data_geometry_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
-            # Save facet image processing data
-            self.data_image_processing_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
-
-            if self.data_calculation_ensemble:
-                # Save ensemle data
-                self.data_calculation_ensemble[idx_facet].save_to_hdf(
-                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-                )

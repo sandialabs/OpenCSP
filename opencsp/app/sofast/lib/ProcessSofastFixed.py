@@ -29,11 +29,10 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
-from opencsp.common.lib.tool.hdf5_tools import HDF5_SaveAbstract
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class ProcessSofastFixed(HDF5_SaveAbstract, ProcessSofastAbstract):
+class ProcessSofastFixed(ProcessSofastAbstract):
     """Fixed Pattern Deflectrometry data processing class"""
 
     def __init__(
@@ -132,7 +131,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract, ProcessSofastAbstract):
         # Process optic geometry (find mask corners, etc.)
         (
             self.data_geometry_general,
-            self.data_image_proccessing_general,
+            self.data_image_processing_general,
             self.data_geometry_facet,  # list
             self.data_image_processing_facet,  # list
             self.data_error,
@@ -192,7 +191,7 @@ class ProcessSofastFixed(HDF5_SaveAbstract, ProcessSofastAbstract):
         # Process optic geometry (find mask corners, etc.)
         (
             self.data_geometry_general,
-            self.data_image_proccessing_general,
+            self.data_image_processing_general,
             self.data_geometry_facet,  # list
             self.data_image_processing_facet,  # list
             self.data_error,
@@ -483,39 +482,3 @@ class ProcessSofastFixed(HDF5_SaveAbstract, ProcessSofastAbstract):
             return ensemble
         else:
             return facets[0]
-
-    def save_to_hdf(self, file: str, prefix: str = ''):
-        """Saves data to given HDF5 file. Data is stored in CalculationsFixedPattern/...
-
-        Parameters
-        ----------
-        file : str
-            HDF file to save to
-        prefix : str, optional
-            Prefix to append to folder path within HDF file (folders must be separated by "/").
-            Default is empty string ''.
-        """
-        # Sofast input parameters
-        self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
-        for idx, (data_facet_def, data_surfaces) in enumerate(zip(self.data_facet_def, self.data_surfaces)):
-            data_surfaces.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:03d}/')
-            data_facet_def.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx:03d}/')
-
-        # General
-        self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-        self.data_geometry_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-        self.data_image_proccessing_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-
-        # Calculations
-        for idx_facet in range(self.num_facets):
-            self.data_calculation_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
-            self.data_geometry_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
-            self.data_image_processing_facet[idx_facet].save_to_hdf(
-                file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
-            )
-
-        lt.info(f'SofastFixed data saved to: {file:s} with prefix: {prefix:s}')
