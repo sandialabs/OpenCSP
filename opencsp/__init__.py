@@ -66,8 +66,4 @@ for _dirname in _opencsp_settings_dirs():
 opencsp_settings = configparser.ConfigParser(allow_no_value=True)
 opencsp_settings.read(_settings_files)
 
-for section in opencsp_settings.sections():
-    for key in opencsp_settings[section]:
-        print(f"opencsp_settings[{section}][{key}]={opencsp_settings[section][key]}")
-
 __all__ = ['opencsp_settings']
