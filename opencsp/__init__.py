@@ -52,12 +52,14 @@ def _opencsp_settings_dirs() -> list[str]:
 
     return ret
 
+
 def apply_command_line_arguments(settings_from_ini: configparser.ConfigParser) -> configparser.ConfigParser:
     settings_mixed = copy.copy(settings_from_ini)
 
     # parse the command line
-    parser = argparse.ArgumentParser(prog="OpenCSP/__init__.py",
-                                     description='OpenCSP settings parser', add_help=False, exit_on_error=False)
+    parser = argparse.ArgumentParser(
+        prog="OpenCSP/__init__.py", description='OpenCSP settings parser', add_help=False, exit_on_error=False
+    )
     parser.add_argument(
         '--dir-input',
         dest="dir_input",

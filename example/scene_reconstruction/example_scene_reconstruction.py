@@ -22,7 +22,7 @@ def scene_reconstruction(dir_output, dir_input):
         The directory containing the input files needed for scene reconstruction. This includes:
         - 'camera.h5': HDF5 file containing camera parameters.
         - 'known_point_locations.csv': CSV file with known point locations.
-        - 'aruco_marker_images/*.JPG': Directory containing images of Aruco markers.
+        - 'aruco_marker_images/NAME.JPG': Directory containing images of Aruco markers.
         - 'point_pair_distances.csv': CSV file with distances between point pairs.
         - 'alignment_points.csv': CSV file with alignment points.
 
