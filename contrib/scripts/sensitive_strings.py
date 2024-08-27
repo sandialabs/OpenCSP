@@ -109,7 +109,7 @@ class SensitiveStringsSearcher:
         ext = ext.lower()
         if ext == ".ipynb":
             is_binary_file = True
-        if self._is_img_ext(ext):
+        elif self._is_img_ext(ext):
             if ext in self._text_file_extensions:
                 is_binary_file = False
             elif (f"{file_path}/{file_name_ext}" in self._text_file_path_name_exts) or (
@@ -118,6 +118,11 @@ class SensitiveStringsSearcher:
                 is_binary_file = False
             else:
                 is_binary_file = True
+        elif ft.file_size(ft.join(file_path, file_name_ext)) > 1e6:
+            # assume any file > 1MB is a binary file, in order to prevent
+            # sensitive_strings from taking hours to check these files
+            # needlessly
+            is_binary_file = True
         if not is_binary_file:
             # attempt to parse the file as a text file
             try:
