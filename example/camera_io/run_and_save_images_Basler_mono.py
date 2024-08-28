@@ -1,5 +1,5 @@
 """Example program that captures images from a 12 bit monochrome Basler
-camera and saves the images in TIFF format.
+camera and saves the images in TIFF format. Camera is run at minimum gain.
 """
 
 import argparse
