@@ -28,16 +28,17 @@ def main():
     # Connect to camera
     cam = ImageAcquisitionMono(args.camera_index, 'Mono12')
 
-    # Calibrate exposure and set frame rate
-    if args.calibrate:
-        cam.calibrate_exposure()
-
+    # Set exposure
     if args.e is not None:
         cam.exposure_time = args.e
 
+    # Set gain
     if args.g is not None:
-        print(args.g)
         cam.gain = args.g
+
+    # Calibrate exposure and set frame rate
+    if args.calibrate:
+        cam.calibrate_exposure()
 
     print('Exposure time range: ', cam.cap.ExposureTimeRaw.Min, '-', cam.cap.ExposureTimeRaw.Max)
     print('Gain range: ', cam.cap.GainRaw.Min, '-', cam.cap.GainRaw.Max)
