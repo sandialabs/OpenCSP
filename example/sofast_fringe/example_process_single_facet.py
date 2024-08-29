@@ -126,6 +126,7 @@ def example_process_single_facet():
     config = SofastConfiguration()
     config.load_sofast_object(sofast)
     measurement_stats = config.get_measurement_stats()
+
     # Save measurement stats as JSON
     with open(join(dir_save_cur, 'measurement_statistics.json'), 'w', encoding='utf-8') as f:
         json.dump(measurement_stats, f, indent=3)
