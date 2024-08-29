@@ -23,7 +23,7 @@ with the following subfolders:
 Notes
 -----
 - The script assumes that the input data files are located in the specified directories.
-"""
+- Chat GPT 40 assisted with the generation of some docstrings in this file."""
 
 import json
 from os.path import join, dirname
