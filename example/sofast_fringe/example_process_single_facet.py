@@ -1,18 +1,30 @@
+"""Example script that processes a SOFAST run of a single facet.
+To run the example, run: `python path/to/example_process_single_facet.py`
+
+Output files will be automatically saved in the data/output/single_facet folder.
+"""
+
+import json
 from os.path import join, dirname
+
+import imageio.v3 as imageio
 
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
+from opencsp.app.sofast.lib.Fringes import Fringes
 from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
-from opencsp.common.lib.csp.Facet import Facet
+from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
+from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
+from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
+from opencsp.common.lib.geometry.Uxyz import Uxyz
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
-import opencsp.common.lib.render.figure_management as fm
-import opencsp.common.lib.render_control.RenderControlAxis as rca
-import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -20,11 +32,11 @@ import opencsp.common.lib.tool.log_tools as lt
 def example_process_single_facet():
     """Performs processing of previously collected Sofast data of single facet mirror.
 
-    1. Load saved single facet Sofast collection data
-    2. Processes data with Sofast
-    3. Log best-fit parabolic focal lengths
-    4. Plot slope magnitude
-    5. Save slope data as HDF5 file
+    1. Load saved single facet Sofast collection data from HDF5 file
+    2. Save projected sinusoidal fringe images to PNG format
+    3. Save captured sinusoidal fringe images and mask images to PNG format
+    4. Processes data with Sofast and save processed data to HDF5
+    5. Generate plot suite and save images files
     """
     # General setup
     # =============
@@ -34,7 +46,7 @@ def example_process_single_facet():
     ft.create_directories_if_necessary(dir_save)
 
     # Set up logger
-    lt.logger(join(dir_save, 'log.txt'), lt.log.INFO)
+    lt.logger(join(dir_save, 'log.txt'), lt.log.WARN)
 
     # Define sample data directory
     dir_data_sofast = join(opencsp_code_dir(), 'test/data/sofast_fringe')
@@ -57,8 +69,43 @@ def example_process_single_facet():
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
     facet_data = DefinitionFacet.load_from_json(file_facet)
 
-    # 2. Process data with Sofast
-    # ===========================
+    # 2. Save projected sinusoidal fringe images to PNG format
+    # ========================================================
+    fringes = Fringes(measurement.fringe_periods_x, measurement.fringe_periods_y)
+    images = fringes.get_frames(640, 320, 'uint8', [0, 255])
+    dir_save_cur = join(dir_save, '1_images_fringes_projected')
+    ft.create_directories_if_necessary(dir_save_cur)
+    # Save y images
+    for idx_image in range(measurement.num_y_ims):
+        image = images[..., idx_image]
+        imageio.imwrite(join(dir_save_cur, f'y_{idx_image:02d}.png'), image)
+    # Save x images
+    for idx_image in range(measurement.num_x_ims):
+        image = images[..., measurement.num_y_ims + idx_image]
+        imageio.imwrite(join(dir_save_cur, f'x_{idx_image:02d}.png'), image)
+
+    # 3. Save captured sinusoidal fringe images and mask images to PNG format
+    # =======================================================================
+    dir_save_cur = join(dir_save, '2_images_captured')
+    ft.create_directories_if_necessary(dir_save_cur)
+
+    # Save mask images
+    for idx_image in [0, 1]:
+        image = measurement.mask_images[..., idx_image]
+        imageio.imwrite(join(dir_save_cur, f'mask_{idx_image:02d}.png'), image)
+    # Save y images
+    for idx_image in range(measurement.num_y_ims):
+        image = measurement.fringe_images_y[..., idx_image]
+        imageio.imwrite(join(dir_save_cur, f'y_{idx_image:02d}.png'), image)
+    # Save x images
+    for idx_image in range(measurement.num_x_ims):
+        image = measurement.fringe_images_x[..., idx_image]
+        imageio.imwrite(join(dir_save_cur, f'x_{idx_image:02d}.png'), image)
+
+    # 4. Processes data with Sofast and save processed data to HDF5
+    # =============================================================
+    dir_save_cur = join(dir_save, '3_processed_data')
+    ft.create_directories_if_necessary(dir_save_cur)
 
     # Define surface definition (parabolic surface)
     surface = Surface2DParabolic(initial_focal_lengths_xy=(300.0, 300.0), robust_least_squares=True, downsample=10)
@@ -72,30 +119,51 @@ def example_process_single_facet():
     # Process
     sofast.process_optic_singlefacet(facet_data, surface)
 
-    # 3. Log best-fit parabolic focal lengths
-    # =======================================
-    surf_coefs = sofast.data_calculation_facet[0].surf_coefs_facet
-    focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
-    lt.info(f'Facet xy focal lengths (meters): ' f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
+    # Save processed data to HDF5 format
+    sofast.save_to_hdf(join(dir_save_cur, 'data_sofast_processed.h5'))
 
-    # 4. Plot slope magnitude
-    # =======================
+    # Save measurement statistics to JSON
+    config = SofastConfiguration()
+    config.load_sofast_object(sofast)
+    measurement_stats = config.get_measurement_stats()
+    # Save measurement stats as JSON
+    with open(join(dir_save_cur, 'measurement_statistics.json'), 'w', encoding='utf-8') as f:
+        json.dump(measurement_stats, f, indent=3)
 
-    # Get optic representation
-    facet: Facet = sofast.get_optic()
+    # 5. Generate plot suite and save images files
+    # ============================================
+    dir_save_cur = join(dir_save, '4_processed_output_figures')
+    ft.create_directories_if_necessary(dir_save_cur)
 
-    # Generate plots
-    figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
-    axis_control_m = rca.meters()
+    # Get measured and reference optics
+    mirror_measured = sofast.get_optic().mirror.no_parent_copy()
+    mirror_reference = MirrorParametric.generate_symmetric_paraboloid(100, mirror_measured.region)
 
-    # Plot slope map
-    fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
-    facet.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
-    fig_record.save(dir_save, 'slope_magnitude', 'png')
+    # Define viewing/illumination geometry
+    v_target_center = Vxyz((0, 0, 100))
+    v_target_normal = Vxyz((0, 0, -1))
+    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
 
-    # 5. Save slope data as HDF5 file
-    # ===============================
-    sofast.save_to_hdf(f'{dir_save}/data_singlefacet.h5')
+    # Save optic objects
+    plots = StandardPlotOutput()
+    plots.optic_measured = mirror_measured
+    plots.optic_reference = mirror_reference
+
+    # Update visualization parameters
+    plots.options_slope_vis.clim = 7
+    plots.options_slope_deviation_vis.clim = 1.5
+    plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
+    plots.options_file_output.to_save = True
+    plots.options_file_output.number_in_name = False
+    plots.options_file_output.output_dir = dir_save_cur
+
+    # Define ray trace parameters
+    plots.params_ray_trace.source = source
+    plots.params_ray_trace.v_target_center = v_target_center
+    plots.params_ray_trace.v_target_normal = v_target_normal
+
+    # Create standard output plots
+    plots.plot()
 
 
 if __name__ == '__main__':
