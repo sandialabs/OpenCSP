@@ -1,7 +1,28 @@
-"""Example script that processes a SOFAST run of a single facet.
-To run the example, run: `python path/to/example_process_single_facet.py`
+"""Module for processing and analyzing SOFAST data for a single facet mirror.
 
-Output files will be automatically saved in the data/output/single_facet folder.
+This script performs the following steps:
+1. Load saved single facet SOFAST collection data from an HDF5 file.
+2. Save projected sinusoidal fringe images to PNG format.
+3. Save captured sinusoidal fringe images and mask images to PNG format.
+4. Process data with SOFAST and save processed data to HDF5.
+5. Generate a suite of plots and save image files.
+
+Examples
+--------
+To run the script, simply execute it as a standalone program:
+
+>>> python example_process_single_facet.py
+
+This will perform the processing steps and save the results to the data/output/single_facet directory
+with the following subfolders:
+1_images_fringes_projected - The patterns sent to the display during the SOFAST measurement of the optic.
+2_images_captured - The captured images of the displayed patterns as seen by the SOFAST camera
+3_processed_data - The processed data from SOFAST.
+4_processed_output_figures - The output figure suite from a SOFAST characterization.
+
+Notes
+-----
+- The script assumes that the input data files are located in the specified directories.
 """
 
 import json
