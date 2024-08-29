@@ -43,8 +43,7 @@ class TestMulti(unittest.TestCase):
             base_dir = os.path.join(opencsp_code_dir(), 'test/data/sofast_fringe')
 
         # Directory Setup
-        # file_dataset = os.path.join(base_dir, 'data_expected_facet_ensemble/data.h5')
-        file_dataset = "C:/Users/bsmith4/Desktop/data_multifacet.h5"
+        file_dataset = os.path.join(base_dir, 'data_expected_facet_ensemble/data.h5')
         file_measurement = os.path.join(base_dir, 'data_measurement/measurement_ensemble.h5')
 
         # Load data
@@ -68,7 +67,7 @@ class TestMulti(unittest.TestCase):
         sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
         # Update sofast processing parameters
-        sofast.params = sofast.params.load_from_hdf(file_dataset, 'DataSofastInput')
+        sofast.params = sofast.params.load_from_hdf(file_dataset, 'DataSofastInput/')
 
         # Run SOFAST
         sofast.process_optic_multifacet(data_facets, data_ensemble, data_surfaces)
