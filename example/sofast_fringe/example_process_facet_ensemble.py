@@ -36,13 +36,12 @@ import opencsp.common.lib.tool.log_tools as lt
 def example_process_facet_ensemble():
     """Performs processing of previously collected SOFAST data of facet ensemble.
 
-    1. Load saved facet ensemble SOFAST collection data from HDF5 file
+    1. Load saved facet ensemble Sofast collection data
     2. Save projected sinusoidal fringe images to PNG format
     3. Save captured sinusoidal fringe images and mask images to PNG format
     4. Processes data with SOFAST and save processed data to HDF5
     5. Generate plot suite and save images files
     """
-    # TODO: fix 1-5 labels
     # General setup
     # =============
 
@@ -53,27 +52,30 @@ def example_process_facet_ensemble():
     # Set up logger
     lt.logger(join(dir_save, 'log.txt'), lt.log.WARN)
 
-    # TODO: make similar to single facet example
-    base_dir = join(opencsp_code_dir(), 'test/data/sofast_fringe')
+    # Define sample data directory
+    dir_data_sofast = join(opencsp_code_dir(), 'test/data/sofast_fringe')
+    dir_data_common = join(opencsp_code_dir(), 'test/data/sofast_common')
 
     # Directory Setup
-    file_dataset = join(base_dir, 'data_expected_facet_ensemble/data.h5')
-    file_measurement = join(base_dir, 'data_measurement/measurement_ensemble.h5')
+    file_measurement = join(dir_data_sofast, 'data_measurement/measurement_ensemble.h5')
+    file_camera = join(dir_data_common, 'camera_sofast_downsampled.h5')
+    file_display = join(dir_data_common, 'display_distorted_2d.h5')
+    file_orientation = join(dir_data_common, 'spatial_orientation.h5')
+    file_calibration = join(dir_data_sofast, 'data_measurement/image_calibration.h5')
+    file_facet = join(dir_data_common, 'Facet_lab_6x4.json')
+    file_ensemble = join(dir_data_common, 'Ensemble_lab_6x4.json')
+    file_params = join(dir_data_sofast, 'data_expected_facet_ensemble/data.h5')
 
     # 1. Load saved facet ensemble Sofast collection data
     # =================================================
-    camera = Camera.load_from_hdf(file_dataset)
-    display = DisplayShape.load_from_hdf(file_dataset)
-    orientation = SpatialOrientation.load_from_hdf(file_dataset)
+    camera = Camera.load_from_hdf(file_camera)
+    display = DisplayShape.load_from_hdf(file_display)
+    orientation = SpatialOrientation.load_from_hdf(file_orientation)
     measurement = MeasurementSofastFringe.load_from_hdf(file_measurement)
-    calibration = ImageCalibrationScaling.load_from_hdf(file_dataset)
-    data_ensemble = DefinitionEnsemble.load_from_hdf(file_dataset, 'DataSofastInput/optic_definition/')
-    data_facets = []
-    data_surfaces = []
-    for idx_facet in range(data_ensemble.num_facets):
-        prefix = f'DataSofastInput/optic_definition/facet_{idx_facet:03d}/'
-        data_surfaces.append(Surface2DParabolic.load_from_hdf(file_dataset, prefix))
-        data_facets.append(DefinitionFacet.load_from_hdf(file_dataset, prefix))
+    calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
+    data_ensemble = DefinitionEnsemble.load_from_json(file_ensemble)
+    data_facets = [DefinitionFacet.load_from_json(file_facet)] * data_ensemble.num_facets
+    data_surfaces = [Surface2DParabolic((500.0, 500.0), False, 10)] * data_ensemble.num_facets
 
     # 2. Save projected sinusoidal fringe images to PNG format
     # ========================================================
@@ -120,7 +122,7 @@ def example_process_facet_ensemble():
     sofast = ProcessSofastFringe(measurement, orientation, camera, display)
 
     # Update sofast processing parameters
-    sofast.params = sofast.params.load_from_hdf(file_dataset, 'DataSofastInput/')
+    sofast.params = sofast.params.load_from_hdf(file_params, 'DataSofastInput/')
 
     # Process
     sofast.process_optic_multifacet(data_facets, data_ensemble, data_surfaces)
@@ -139,41 +141,41 @@ def example_process_facet_ensemble():
 
     # 5. Generate plot suite and save images files
     # ============================================
-    # dir_save_cur = join(dir_save, '4_processed_output_figures')
-    # ft.create_directories_if_necessary(dir_save_cur)
+    dir_save_cur = join(dir_save, '4_processed_output_figures')
+    ft.create_directories_if_necessary(dir_save_cur)
 
-    # # Get measured and reference optics
-    # ensemble_measured = sofast.get_optic()
-    # region = ensemble_measured.facets[0].mirror.region
-    # facets = [Facet(MirrorParametric.generate_flat(region)) for _ in range(sofast.num_facets)]
-    # ensemble_reference = FacetEnsemble(facets)
-    # ensemble_reference.set_facet_positions(data_ensemble.v_facet_locations)
+    # Get measured and reference optics
+    ensemble_measured = sofast.get_optic()
+    region = ensemble_measured.facets[0].mirror.region
+    facets = [Facet(MirrorParametric.generate_flat(region)) for _ in range(sofast.num_facets)]
+    ensemble_reference = FacetEnsemble(facets)
+    ensemble_reference.set_facet_positions(data_ensemble.v_facet_locations)
 
-    # # Define viewing/illumination geometry
-    # v_target_center = Vxyz((0, 0, 100))
-    # v_target_normal = Vxyz((0, 0, -1))
-    # source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
+    # Define viewing/illumination geometry
+    v_target_center = Vxyz((0, 0, 100))
+    v_target_normal = Vxyz((0, 0, -1))
+    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
 
-    # # Save optic objects
-    # plots = StandardPlotOutput()
-    # plots.optic_measured = ensemble_measured
-    # plots.optic_reference = ensemble_reference
+    # Save optic objects
+    plots = StandardPlotOutput()
+    plots.optic_measured = ensemble_measured
+    plots.optic_reference = ensemble_reference
 
-    # # Update visualization parameters
-    # plots.options_slope_vis.clim = 7
-    # plots.options_slope_deviation_vis.clim = 1.5
-    # plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
-    # plots.options_file_output.to_save = True
-    # plots.options_file_output.number_in_name = False
-    # plots.options_file_output.output_dir = dir_save_cur
+    # Update visualization parameters
+    plots.options_slope_vis.clim = 7
+    plots.options_slope_deviation_vis.clim = 1.5
+    plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
+    plots.options_file_output.to_save = True
+    plots.options_file_output.number_in_name = False
+    plots.options_file_output.output_dir = dir_save_cur
 
-    # # Define ray trace parameters
-    # plots.params_ray_trace.source = source
-    # plots.params_ray_trace.v_target_center = v_target_center
-    # plots.params_ray_trace.v_target_normal = v_target_normal
+    # Define ray trace parameters
+    plots.params_ray_trace.source = source
+    plots.params_ray_trace.v_target_center = v_target_center
+    plots.params_ray_trace.v_target_normal = v_target_normal
 
     # Create standard output plots
-    # plots.plot()
+    plots.plot()
 
 
 if __name__ == '__main__':
