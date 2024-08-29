@@ -82,6 +82,19 @@ def example_process_single_facet():
     file_calibration = join(dir_data_sofast, 'data_measurement/image_calibration.h5')
     file_facet = join(dir_data_common, 'Facet_NSTTF.json')
 
+    # Or, optionally, process high-resolution  SOFAST sample data by uncommenting the lines below
+    #
+    # dir_data_sofast = 'path/to/sample_data/sofast/sandia_lab/sofast_fringe'
+    # dir_data_common = 'path/to/sample_data/sofast/sandia_lab/sofast_common'
+    # file_measurement = join(dir_data_sofast, 'data_measurement/facet_landscape_rectangular.h5')
+    # file_camera = join(dir_data_common, 'camera_sofast_optics_lab_landscape.h5')
+    # file_display = join(dir_data_common, 'display_shape_optics_lab_landscape_rectangular_distorted_2d_11x11.h5')
+    # file_orientation = join(dir_data_common, 'spatial_orientation_optics_lab_landscape.h5')
+    # file_calibration = join(
+    #     dir_data_sofast, 'data_measurement/image_calibration_scaling_nominal_optics_lab_landscape.h5'
+    # )
+    # file_facet = join(dir_data_common, 'facet_NSTTF.json')
+
     # 1. Load saved single facet Sofast collection data
     # =================================================
     camera = Camera.load_from_hdf(file_camera)
@@ -174,8 +187,15 @@ def example_process_single_facet():
 
     # Update visualization parameters
     plots.options_slope_vis.clim = 7
+    plots.options_slope_vis.resolution = 0.001
+
     plots.options_slope_deviation_vis.clim = 1.5
+    plots.options_slope_deviation_vis.resolution = 0.001
+
+    plots.options_curvature_vis.resolution = 0.001
+
     plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
+
     plots.options_file_output.to_save = True
     plots.options_file_output.number_in_name = False
     plots.options_file_output.output_dir = dir_save_cur
