@@ -30,12 +30,12 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def example_process_single_facet():
-    """Performs processing of previously collected Sofast data of single facet mirror.
+    """Performs processing of previously collected SOFAST data of single facet mirror.
 
-    1. Load saved single facet Sofast collection data from HDF5 file
+    1. Load saved single facet SOFAST collection data from HDF5 file
     2. Save projected sinusoidal fringe images to PNG format
     3. Save captured sinusoidal fringe images and mask images to PNG format
-    4. Processes data with Sofast and save processed data to HDF5
+    4. Processes data with SOFAST and save processed data to HDF5
     5. Generate plot suite and save images files
     """
     # General setup
