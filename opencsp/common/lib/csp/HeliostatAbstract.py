@@ -309,7 +309,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
         # Centroid.
         if heliostat_style.draw_centroid:
-            Pxyz(origin).draw_point(view, style=heliostat_style.centroid_style)
+            origin.draw_points(view, style=heliostat_style.centroid_style)
 
         # # Outline.
         # if heliostat_style.draw_outline:
@@ -339,7 +339,7 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         if heliostat_style.post != 0:
             DOWN = Vxyz([0, 0, -heliostat_style.post])
             direction = transform.apply(DOWN)
-            Vxyz.merge([origin + DOWN, origin]).draw_list(view)
+            Vxyz.merge([origin + DOWN, origin]).draw_line(view)
 
         # Name.
         if heliostat_style.draw_name:

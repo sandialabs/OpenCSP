@@ -182,17 +182,17 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
         # origin of the facet ensemble
         if facet_ensemble_style.draw_centroid:
-            Pxyz(origin).draw_point(view)
+            origin.draw_points(view)
 
         # pointing vector of the facet ensemble
         if facet_ensemble_style.draw_normal_vector:
-            Vxyz.merge([origin, normal_vector]).draw_list(view, style=facet_ensemble_style.normal_vector_style)
+            Vxyz.merge([origin, normal_vector]).draw_line(view, style=facet_ensemble_style.normal_vector_style)
 
         if facet_ensemble_style.draw_outline:
             left, right, top, bottom = self.axis_aligned_bounding_box
             corners = Pxyz([[left, left, right, right], [top, bottom, bottom, top], [0, 0, 0, 0]])
             corners_moved = transform.apply(corners)
-            corners_moved.draw_list(view, close=True, style=facet_ensemble_style.outline_style)
+            corners_moved.draw_line(view, close=True, style=facet_ensemble_style.outline_style)
 
     # debug function
     def set_facet_transform_list(self, transformations: list[TransformXYZ]):

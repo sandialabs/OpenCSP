@@ -318,7 +318,7 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
         # Draw Origin
         if solar_field_style.draw_origin:
-            Pxyz(origin).draw_point(view)
+            origin.draw_points(view)
 
         # Heliostats.
         if solar_field_style.draw_heliostats:

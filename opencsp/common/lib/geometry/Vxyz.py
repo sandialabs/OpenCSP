@@ -498,14 +498,18 @@ class Vxyz:
     #         zs.append(func(x, y))
     #     return cls([xs, ys, zs])
 
-    def draw_list(
+    def draw_line(
         self,
         figure: rcfr.RenderControlFigureRecord | v3d.View3d,
         close: bool = None,
         style: rcps.RenderControlPointSeq = None,
         label: str = None,
     ) -> None:
-        """Calls figure.draw_xyz_list(self.data.T) with the default arguments in place for any None's."""
+        """
+        Calls figure.draw_xyz_list(self.data.T) to draw all xyz points in a
+        single series. Uses the default arguments for draw_xyz_list in place of
+        any None's.
+        """
         kwargs = dict()
         for key, val in [('close', close), ('style', style), ('label', label)]:
             if val is not None:
@@ -513,3 +517,19 @@ class Vxyz:
 
         view = figure if isinstance(figure, v3d.View3d) else figure.view
         view.draw_xyz_list(self.data.T, **kwargs)
+
+    def draw_points(
+        self,
+        figure: rcfr.RenderControlFigureRecord | v3d.View3d,
+        style: rcps.RenderControlPointSeq = None,
+        labels: list[str] = None,
+    ):
+        """
+        Calls figure.draw_xyz(p) to draw all xyz points in this instance
+        individually. Uses the default arguments in place for any None's.
+        """
+        if labels is None:
+            labels = [None] * len(self)
+        view = figure if isinstance(figure, v3d.View3d) else figure.view
+        for x, y, z, label in zip(self.x, self.y, self.z, labels):
+            view.draw_xyz((x, y, z), style, label)

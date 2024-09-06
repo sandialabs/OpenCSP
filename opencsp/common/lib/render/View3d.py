@@ -653,13 +653,24 @@ class View3d(aph.AbstractPlotHandler):
         style: rcps.RenderControlPointSeq = None,
         label: str = None,
     ) -> None:
-        """Draw lines or closed polygons.
+        """
+        Draw lines or closed polygons.
 
         Parameters
         ----------
-            input_xyz_list: List of xyz three vectors (eg [[0,0,0], [1,1,1]])
-            close: Draw as a closed polygon (ignored if input_xyz_list < 3 points)"""
-
+        input_xyz_list : Iterable[tuple[float, float, float]]
+            List of xyz three vectors (eg [[0,0,0], [1,1,1]]). The vectors must
+            be indexable, such as with input_xyz_list[0][0].
+        close : bool, optional
+            True to draw as a closed polygon (ignored if input_xyz_list < 3
+            points), or False to draw as given. By default False.
+        style : rcps.RenderControlPointSeq, optional
+            The style with which to render, or None for
+            RenderControlPointSeq.default(). By default None.
+        label : str, optional
+            The label to assign to this plot to be used in the legend, or None
+            for no label. By default None.
+        """
         if style == None:
             style = rcps.default()
 

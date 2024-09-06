@@ -284,9 +284,9 @@ class Intersection:
     def draw(self, view: View3d, style: RenderControlPointSeq = None):
         if style is None:
             style = RenderControlPointSeq()
-        self.intersection_points.draw_point(view, style)
+        self.intersection_points.draw_points(view, style)
 
     def draw_subset(self, view: View3d, count: int, points_style: RenderControlPointSeq = None):
         for i in np.floor(np.linspace(0, len(self.intersection_points) - 1, count)):
             p = Pxyz(self.intersection_points[int(i)])
-            p.draw_point(view)
+            p.draw_points(view)

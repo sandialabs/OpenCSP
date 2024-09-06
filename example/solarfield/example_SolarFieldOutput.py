@@ -503,7 +503,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
             code_tag=self.code_tag,
         )
         solar_field.draw(fig_record.view, solar_field_style)
-        aimpoint_xyz.draw_list(fig_record.view, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
+        aimpoint_xyz.draw_line(fig_record.view, style=rcps.marker(color='tab:orange'), label='aimpoint_xyz')
 
         # Output.
         self.show_save_and_check_figure(fig_record)
@@ -763,7 +763,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
             comments=comments,
             code_tag=self.code_tag,
         )
-        aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        aimpoint_xyz.draw_points(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
@@ -781,7 +781,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
             comments=comments,
             code_tag=self.code_tag,
         )
-        aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        aimpoint_xyz.draw_points(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
@@ -799,7 +799,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
             comments=comments,
             code_tag=self.code_tag,
         )
-        aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        aimpoint_xyz.draw_points(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
@@ -817,7 +817,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
             comments=comments,
             code_tag=self.code_tag,
         )
-        aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        aimpoint_xyz.draw_points(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
         solar_field.draw(fig_record.view, solar_field_style)
         self.show_save_and_check_figure(fig_record)
 
@@ -868,7 +868,7 @@ class ExampleSolarFieldOutput(to.TestOutput):
             code_tag=self.code_tag,
         )
         solar_field.draw(fig_record.view, solar_field_style)
-        aimpoint_xyz.draw_point(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
+        aimpoint_xyz.draw_points(fig_record.view, style=rcps.marker(color='tab:orange'), labels='aimpoint_xyz')
 
         # Draw dense vector field.
         grid_xy = solar_field.heliostat_field_regular_grid_xy(40, 20)

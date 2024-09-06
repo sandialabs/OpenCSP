@@ -158,7 +158,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
 
         # Centroid.
         if facet_style.draw_centroid:
-            Pxyz(origin).draw_point(view, style=facet_style.centroid_style)
+            origin.draw_points(view, style=facet_style.centroid_style)
 
         # Outline.
         if facet_style.draw_outline:
@@ -169,15 +169,15 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
             # view.draw_xyz_list(corners, close=True, style=facet_style.outline_style)
             left, right, bottom, top = self.axis_aligned_bounding_box
             border = Pxyz([[left, left, right, right], [top, bottom, bottom, top], [0, 0, 0, 0]])
-            transform.apply(border).draw_list(view, close=True, style=facet_style.outline_style)
+            transform.apply(border).draw_line(view, close=True, style=facet_style.outline_style)
 
         # Surface normal.
         if facet_style.draw_surface_normal:
             # Construct ray.
             surface_normal_ray = transform.apply(UP * facet_style.surface_normal_length)
             # Draw ray and its base.
-            Pxyz(origin).draw_point(view, style=facet_style.surface_normal_base_style)
-            Vxyz.merge([origin, surface_normal_ray]).draw_list(view, style=facet_style.surface_normal_style)
+            origin.draw_points(view, style=facet_style.surface_normal_base_style)
+            Vxyz.merge([origin, surface_normal_ray]).draw_line(view, style=facet_style.surface_normal_style)
 
         # # Surface normal drawn at corners.
         # # (Not the surface normal at the corner.  Facet curvature is not shown.)
