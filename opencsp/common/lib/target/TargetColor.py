@@ -11,7 +11,7 @@ from matplotlib.tri import Triangulation
 from scipy.spatial.transform import Rotation
 from sympy import Symbol, diff
 
-import opencsp.common.lib.render.color as Color  # ?? SCAFFOLDING RCB - FIX FILENAME TO CAPITALIZED
+import opencsp.common.lib.render.Color as cl  # ?? SCAFFOLDING RCB - FIX FILENAME TO CAPITALIZED
 import opencsp.common.lib.target.TargetColor as tc
 import opencsp.common.lib.target.target_color_2d_rgb as tc2r
 import opencsp.common.lib.target.target_color_convert as tcc
@@ -31,7 +31,7 @@ class TargetColor(TargetAbstract):
         image_width: float,  # Meters
         image_height: float,  # Meters
         dpm: float,  # dots per meter
-        initial_color: Color.Color,  # Color to fill canvas before adding patterns.
+        initial_color: cl.Color,  # Color to fill canvas before adding patterns.
     ) -> None:
         super().__init__(image_width, image_height, dpm)  # initalizes the attributes universal to all mirrors
         # Set initial pattern.
@@ -71,7 +71,7 @@ class TargetColor(TargetAbstract):
 
     # Linear color bar, x direction
     def set_image_to_linear_color_bar_x(
-        self, color_below_min: Color, color_bar, color_above_max: Color, discrete_or_continuous: str
+        self, color_below_min: cl, color_bar, color_above_max: cl, discrete_or_continuous: str
     ) -> None:
         n_rows, n_cols = self.rows_cols()
         for row in range(0, n_rows):
@@ -94,14 +94,18 @@ class TargetColor(TargetAbstract):
     # Linear color bar, y direction
     def set_image_to_linear_color_bar_y(
         self,
-        color_below_min: Color,
+        color_below_min: cl,
         color_bar,
-        color_above_max: Color,
+        color_above_max: cl,
         discrete_or_continuous: str,
-        lateral_gradient_type: str = 'saturated_to_white',  # Defines scheme for modulating saturation from left to right.  Values: None, 'saturated_to_white' or 'light_to_saturated'
-        saturated_to_white_exponent: float = 1.5,  # Dimensionless.  Applies if lateral_gradient_type == 'saturated_to_white'.
-        light_to_saturated_min: float = 0.2,  # Dimensionless.  Applies if lateral_gradient_type == 'light_to_saturated'.
-        light_to_saturated_max: float = 1.0,  # Dimensionless.  Applies if lateral_gradient_type == 'light_to_saturated'.
+        # Defines scheme for modulating saturation from left to right.  Values: None, 'saturated_to_white' or 'light_to_saturated'
+        lateral_gradient_type: str = 'saturated_to_white',
+        # Dimensionless.  Applies if lateral_gradient_type == 'saturated_to_white'.
+        saturated_to_white_exponent: float = 1.5,
+        # Dimensionless.  Applies if lateral_gradient_type == 'light_to_saturated'.
+        light_to_saturated_min: float = 0.2,
+        # Dimensionless.  Applies if lateral_gradient_type == 'light_to_saturated'.
+        light_to_saturated_max: float = 1.0,
     ) -> None:
         n_rows, n_cols = self.rows_cols()
         for row in range(0, n_rows):
@@ -182,26 +186,33 @@ class TargetColor(TargetAbstract):
     def set_image_to_polar_color_bar(
         self,
         # Control color by angle.
-        color_below_min: Color = Color.black(),  # Color to use for values below min limit of color bar.
-        color_bar=tcc.O_color_bar(),  # Color bar for angular values in [0,2pi).  # ?? SCAFFOLDING RCB -- TYPE TIP NEEDED.
-        color_above_max: Color = Color.white(),  # Color to use for values of max limit of color bar.
-        discrete_or_continuous: str = 'continuous',  # 'discrete' or 'continuous'  # ?? SCAFFOLDING RCB -- RENAME TO "color_interpolation_type" ?
+        color_below_min: cl = cl.black(),  # Color to use for values below min limit of color bar.
+        # Color bar for angular values in [0,2pi).  # ?? SCAFFOLDING RCB -- TYPE TIP NEEDED.
+        color_bar=tcc.O_color_bar(),
+        color_above_max: cl = cl.white(),  # Color to use for values of max limit of color bar.
+        # 'discrete' or 'continuous'  # ?? SCAFFOLDING RCB -- RENAME TO "color_interpolation_type" ?
+        discrete_or_continuous: str = 'continuous',
         # Modulating saturation with radius.
-        pattern_boundary: str = 'image_boundary',  # Defines range for saturation modulation as a function of radius.  Values: 'circle' or 'image_boundary'
-        radial_gradient_type: str = 'saturated_center_to_white',  # Defines scheme for modulating saturation as a function of radius.  Values: 'saturated_center_to_white' or 'light_center_to_saturated'
-        saturated_center_to_white_exponent: float = 1.5,  # Dimensionless.  Applies if radial_gradient_type == 'saturated_center_to_white'.
-        light_center_to_saturated_saturation_min: float = 0.2,  # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
-        light_center_to_saturated_saturation_max: float = 1.0,  # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
+        # Defines range for saturation modulation as a function of radius.  Values: 'circle' or 'image_boundary'
+        pattern_boundary: str = 'image_boundary',
+        # Defines scheme for modulating saturation as a function of radius.  Values: 'saturated_center_to_white' or 'light_center_to_saturated'
+        radial_gradient_type: str = 'saturated_center_to_white',
+        # Dimensionless.  Applies if radial_gradient_type == 'saturated_center_to_white'.
+        saturated_center_to_white_exponent: float = 1.5,
+        # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
+        light_center_to_saturated_saturation_min: float = 0.2,
+        # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
+        light_center_to_saturated_saturation_max: float = 1.0,
         # Fiducial marks.
         draw_center_fiducial=True,  # Boolean.   Whether to draw a mark at the target center.
         center_fiducial_width_pix=3,  # Pixels.    Width of center fiducial; should be odd number.
-        center_fiducial_color: Color = Color.black(),  # Color.     Color of center fiducial.
+        center_fiducial_color: cl = cl.black(),  # Color.     Color of center fiducial.
         draw_edge_fiducials=True,  # Boolean.   Whether to draw fiducial tick marks along target edges.
         n_ticks_x=7,  # No units.  Number of tick marks to draw along top/bottom horizontal target edges.
         n_ticks_y=7,  # No units.  Number of tick marks to draw along left/right vertical target edges.
         tick_length=0.025,  # Meters.    Length to draw edge tick marks.
         tick_width_pix=3,  # Pixels.    Width to draw edge tick marks; should be odd number.
-        tick_color: Color = Color.black(),  # Color.     Color of edge tick marks.
+        tick_color: cl = cl.black(),  # Color.     Color of edge tick marks.
     ) -> None:
         n_rows, n_cols = self.rows_cols()
         center_row = n_rows / 2.0
@@ -422,7 +433,7 @@ class TargetColor(TargetAbstract):
                     )
                     assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION.
 
-    def set_fiducial_pixel(self, this_row: int, this_col: int, color: Color) -> None:
+    def set_fiducial_pixel(self, this_row: int, this_col: int, color: cl) -> None:
         n_rows, n_cols = self.rows_cols()
         if (this_row >= 0) and (this_row < n_rows):
             if (this_col >= 0) and (this_col < n_cols):
@@ -493,14 +504,16 @@ def construct_target_linear_color_bar(
     image_width: float,  # Meter
     image_height: float,  # Meter
     dpm: float,  # Dots per meter
-    color_below_min: Color,  # Color for values below min of color bar.
+    color_below_min: cl,  # Color for values below min of color bar.
     color_bar,  # Color bar mapping values to colors.  # ?? SCAFFOLDING RCB -- ADD COLOR_BAR TYPE TIP
     color_bar_name: str,  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
-    color_above_max: Color,  # Color for values above max of color bar.
+    color_above_max: cl,  # Color for values above max of color bar.
     x_or_y: str,  # Direction of color variation.
     discrete_or_continuous: str,
-    lateral_gradient_type: str = None,  # Defines scheme for modulating saturation from left to right.  Values: None, 'saturated_to_white' or 'light_to_saturated'
-    saturated_to_white_exponent: float = 1.5,  # Dimensionless.  Applies if lateral_gradient_type == 'saturated_to_white'.
+    # Defines scheme for modulating saturation from left to right.  Values: None, 'saturated_to_white' or 'light_to_saturated'
+    lateral_gradient_type: str = None,
+    # Dimensionless.  Applies if lateral_gradient_type == 'saturated_to_white'.
+    saturated_to_white_exponent: float = 1.5,
     light_to_saturated_min: float = 0.2,  # Dimensionless.  Applies if lateral_gradient_type == 'light_to_saturated'.
     light_to_saturated_max: float = 1.0,  # Dimensionless.  Applies if lateral_gradient_type == 'light_to_saturated'.
 ) -> TargetColor:
@@ -544,28 +557,34 @@ def construct_target_polar_color_bar(  # Target dimensions.
     image_height: float,  # Meter
     dpm: float,  # Dots per meter
     # Control color by angle.
-    color_below_min: Color = Color.black(),  # Color to use for values below min limit of color bar.
+    color_below_min: cl = cl.black(),  # Color to use for values below min limit of color bar.
     color_bar=tcc.O_color_bar(),  # Color bar for angular values in [0,2pi).  # ?? SCAFFOLDING RCB -- TYPE TIP NEEDED.
     color_bar_name: str = 'O',  # Terse name of color bar, for output filename.  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
-    color_above_max: Color = Color.white(),  # Color to use for values of max limit of color bar.
-    discrete_or_continuous: str = 'continuous',  # Indicates whether to interpolate colors between segments. Values 'discrete' or 'continuous'  # ?? SCAFFOLDING RCB -- RENAME TO "color_interpolation_type" ?
+    color_above_max: cl = cl.white(),  # Color to use for values of max limit of color bar.
+    # Indicates whether to interpolate colors between segments. Values 'discrete' or 'continuous'  # ?? SCAFFOLDING RCB -- RENAME TO "color_interpolation_type" ?
+    discrete_or_continuous: str = 'continuous',
     # Modulating saturation with radius.
-    pattern_boundary: str = 'image_boundary',  # Defines range for saturation modulation as a function of radius. Values 'circle' or 'image_boundary'
-    radial_gradient_type: str = 'saturated_center_to_white',  # Defines scheme for modulatiing saturation as a function of radius. Values 'saturated_center_to_white' or 'light_center_to_saturated'
+    # Defines range for saturation modulation as a function of radius. Values 'circle' or 'image_boundary'
+    pattern_boundary: str = 'image_boundary',
+    # Defines scheme for modulatiing saturation as a function of radius. Values 'saturated_center_to_white' or 'light_center_to_saturated'
+    radial_gradient_type: str = 'saturated_center_to_white',
     radial_gradient_name: str = 's2w',  # Terse name of radial intensity function, for output filename. Values 's2w' or 'l2s'
-    saturated_center_to_white_exponent: float = 1.5,  # Dimensionless.  Applies if radial_gradient_type == 'saturated_center_to_white'.
-    light_center_to_saturated_saturation_min: float = 0.2,  # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
-    light_center_to_saturated_saturation_max: float = 1.0,  # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
+    # Dimensionless.  Applies if radial_gradient_type == 'saturated_center_to_white'.
+    saturated_center_to_white_exponent: float = 1.5,
+    # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
+    light_center_to_saturated_saturation_min: float = 0.2,
+    # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
+    light_center_to_saturated_saturation_max: float = 1.0,
     # Fiducial marks.
     draw_center_fiducial=True,  # Boolean.   Whether to draw a mark at the target center.
     center_fiducial_width_pix=3,  # Pixels.    Width of center fiducial; should be odd number.
-    center_fiducial_color: Color = Color.white(),  # Color.     Color of center fiducial.
+    center_fiducial_color: cl = cl.white(),  # Color.     Color of center fiducial.
     draw_edge_fiducials=True,  # Boolean.   Whether to draw fiducial tick marks along target edges.
     n_ticks_x=7,  # No units.  Number of tick marks to draw along top/bottom horizontal target edges.
     n_ticks_y=7,  # No units.  Number of tick marks to draw along left/right vertical target edges.
     tick_length=0.010,  # Meters.    Length to draw edge tick marks.
     tick_width_pix=3,  # Pixels.    Width to draw edge tick marks; should be odd number.
-    tick_color: Color = Color.black(),  # Color.     Color of edge tick marks.
+    tick_color: cl = cl.black(),  # Color.     Color of edge tick marks.
 ) -> TargetColor:
     # Blank target.
     target = tc.TargetColor(image_width, image_height, dpm, color_below_min)
@@ -652,7 +671,7 @@ def construct_target_blue_under_red_cross_green(
 ) -> TargetColor:
     # Blank target.
     target = tc.TargetColor(
-        image_width, image_height, dpm, Color.black()
+        image_width, image_height, dpm, cl.black()
     )  # We will cover the entire image with new colors.
     # Set colors.
     target.set_image_to_blue_under_red_cross_green()
@@ -671,7 +690,7 @@ def construct_target_rgb_cube_inscribed_square(
 ) -> TargetColor:
     # Blank target.
     target = tc.TargetColor(
-        image_width, image_height, dpm, Color.black()
+        image_width, image_height, dpm, cl.black()
     )  # We will cover the entire image with new colors.
     # Set colors.
     target.set_image_to_rgb_cube_inscribed_square(project_to_cube)
@@ -703,7 +722,7 @@ def construct_target_rgb_cube_inscribed_square(
 def extend_target_left(
     target: TargetColor,  # Target to extend.
     new_pixels: int,  # Pixels.  Number of additional pixels to extend.
-    new_color: Color.Color,  # Color to fill new pixels.
+    new_color: cl.Color,  # Color to fill new pixels.
     new_target_name: str = None,  # If none, new target name will extend input target name.
 ) -> TargetColor:
     """
@@ -777,7 +796,7 @@ def extend_target_left(
 def extend_target_right(
     target: TargetColor,  # Target to extend.
     new_pixels: int,  # Pixels.  Number of additional pixels to extend.
-    new_color: Color.Color,  # Color to fill new pixels.
+    new_color: cl.Color,  # Color to fill new pixels.
     new_target_name: str = None,  # If none, new target name will extend input target name.
 ) -> TargetColor:
     """
@@ -858,7 +877,7 @@ def extend_target_right(
 def extend_target_top(
     target: TargetColor,  # Target to extend.
     new_pixels: int,  # Pixels.  Number of additional pixels to extend.
-    new_color: Color.Color,  # Color to fill new pixels.
+    new_color: cl.Color,  # Color to fill new pixels.
     new_target_name: str = None,  # If none, new target name will extend input target name.
 ) -> TargetColor:
     """
@@ -939,7 +958,7 @@ def extend_target_top(
 def extend_target_bottom(
     target: TargetColor,  # Target to extend.
     new_pixels: int,  # Pixels.  Number of additional pixels to extend.
-    new_color: Color.Color,  # Color to fill new pixels.
+    new_color: cl.Color,  # Color to fill new pixels.
     new_target_name: str = None,  # If none, new target name will extend input target name.
 ) -> TargetColor:
     """
@@ -1019,7 +1038,7 @@ def extend_target_bottom(
 def extend_target_all(
     target: TargetColor,  # Target to extend.
     new_pixels: int,  # Pixels.  Number of additional pixels to extend.
-    new_color: Color.Color,  # Color to fill new pixels.
+    new_color: cl.Color,  # Color to fill new pixels.
     new_target_name: str = None,  # If none, new target name will extend input target name.
 ) -> TargetColor:
     """
@@ -1053,7 +1072,7 @@ def extend_target_all(
 
 
 def extend_target_for_splice_left_right(
-    target: TargetColor, n_extend: int, fill_color: Color.Color, auto_expand: str
+    target: TargetColor, n_extend: int, fill_color: cl.Color, auto_expand: str
 ) -> TargetColor:
     if auto_expand == 'fill_top':
         new_target = extend_target_top(target, n_extend, fill_color, new_target_name=target.pattern_description)
@@ -1104,7 +1123,7 @@ def splice_targets_left_right(
     left_target: TargetColor,  # Target to place at left of new target.
     right_target: TargetColor,  # Target to place at right of new target.
     gap: int,  # Pixels.  Gap to leave between targets.
-    initial_color: Color.Color,  # Color to fill canvas before adding patterns.
+    initial_color: cl.Color,  # Color to fill canvas before adding patterns.
     auto_expand: str = 'fill_even',  # Whether to expand smaller target if sizes don't match.
     # Values: None, 'fill_top', 'fill_bottom', 'fill_even'.
     new_target_name: str = None,  # If none, new target name will combine left/right names.
@@ -1245,7 +1264,7 @@ def splice_targets_above_below(
     above_target: TargetColor,  # Target to place at top of new target.
     below_target: TargetColor,  # Target to place at bottom of new target.
     gap: int,  # Pixels.  Gap to leave between targets.
-    initial_color: Color.Color,  # Color to fill canvas before adding patterns.
+    initial_color: cl.Color,  # Color to fill canvas before adding patterns.
     new_target_name: str = None,  # If none, new target name will combine above/below names.
 ) -> TargetColor:
     """
@@ -1530,27 +1549,30 @@ def construct_linear_color_bar_cascade(  # Dimensions.
     composite_dpm,  # dots/meter.  Pixel resolution.
     # Main color bar.
     color_below_min,  # Color.       Color to use below minimum end of color bar.
-    color_bar,  #              Color sequence for color bar.
-    color_bar_name,  #              Terse descriptive name of color sequence, for output filename.
+    color_bar,  # Color sequence for color bar.
+    color_bar_name,  # Terse descriptive name of color sequence, for output filename.
     color_above_max,  # Color.       Color to use above maximum end of color bar.
     # Reference color bar.
     ref_color_below_min,  # Color.       Color to use below minimum end of reference color bar.
-    ref_color_bar,  #              Color sequence for reference color bar.
-    ref_color_bar_name,  #              Terse descriptive name of reference color sequence, for output filename.
+    ref_color_bar,  # Color sequence for reference color bar.
+    ref_color_bar_name,  # Terse descriptive name of reference color sequence, for output filename.
     ref_color_above_max,  # Color.       Color to use above maximum end of reference color bar.
     # Direction.
     x_or_y,  # ?? SCAFFOLDING RCB -- DOESN'T CHANGE STACK OR CASCADE DIRECTION WRT X_OR_Y PARAMETER.
     # Color stack specification.
     stack_sequence,  # List of stack heights desired.  Example:  [1, 2, 4, 6, 8, 10]
-    list_of_discrete_or_continuous_lists,  # Corresponding list of lists of 'discrete' or 'continuous' strings indicating whether to interpolate colors for each stack entry.  # ?? SCAFFOLDING RCB -- DOCUMENT BETTER
+    # Corresponding list of lists of 'discrete' or 'continuous' strings indicating whether to interpolate colors for each stack entry.  # ?? SCAFFOLDING RCB -- DOCUMENT BETTER
+    list_of_discrete_or_continuous_lists,
     list_of_saturation_spec_lists,  # ?? SCAFFOLDING RCB -- DOCUMENT THIS
     # Grey context bar specification.
-    include_grey_neighbors,  # Boolean.  Whether to include a discrete grey scale for disambiguation on either side of each stack.
+    # Boolean.  Whether to include a discrete grey scale for disambiguation on either side of each stack.
+    include_grey_neighbors,
     grey_bar_width: float,  # meters.  Width of grey context bars, if included.
     # Space between bars.
     gap_between_bars_pix: int = 10,  # pixels  # ?? SCAFFOLDING RCB -- SHOULD THIS BE IN INCHES?
     ref_gap_pix: int = 10,  # pixels  # ?? SCAFFOLDING RCB -- SHOULD THIS BE IN INCHES?
-    gap_color=Color.white(),  # Color for both gap between color bar stacks, and also spacing required at end of stack if needed.
+    # Color for both gap between color bar stacks, and also spacing required at end of stack if needed.
+    gap_color=cl.white(),
 ) -> tc.TargetColor:
     # Check input.
     if len(stack_sequence) == 0:
@@ -1634,8 +1656,8 @@ def construct_linear_color_bar_cascade(  # Dimensions.
             grey_rgb_list = [
                 (255 * x, 255 * x, 255 * x) for x in grey_scale_list
             ]  # ?? SCAFFOLDING RCB -- IF COLOR_BAR BECOMES A CLASS, UPDATE THIS.
-            grey_below_min = Color.black()
-            grey_above_max = Color.white()
+            grey_below_min = cl.black()
+            grey_above_max = cl.white()
             grey_bar_name = 'grey_' + str(len(grey_scale_list))
             grey_target = tc.construct_target_linear_color_bar(
                 grey_bar_width,

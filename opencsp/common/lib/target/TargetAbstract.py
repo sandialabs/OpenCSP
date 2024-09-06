@@ -4,7 +4,7 @@ import numpy as np
 
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.RegionXY import RegionXY
-from opencsp.common.lib.render.color import Color
+import opencsp.common.lib.render.Color as cl
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
 import opencsp.common.lib.target.target_image as ti
 import opencsp.common.lib.tool.unit_conversion as uc
@@ -28,7 +28,8 @@ class TargetAbstract(ABC):
         # Construct image object.
         self.image = ti.construct_target_image(self.image_width, self.image_height, self.dpm)
         # Set initial pattern.
-        self.pattern_description = 'blank'  # ?? SCAFFOLDING RCB -- RENAME THIS VARIABLE TO "NAME"?  SEE splice_targets_above_below() FOR MAYBE REASON WHY
+        # ?? SCAFFOLDING RCB -- RENAME THIS VARIABLE TO "NAME"?  SEE splice_targets_above_below() FOR MAYBE REASON WHY
+        self.pattern_description = 'blank'
 
     # ACCESS
 
@@ -66,7 +67,7 @@ class TargetAbstract(ABC):
 
     # ?? SCAFFOLDING RCB -- ASK TRISTAN ABOUT THIS
     # @abstractmethod   # ?? SCAFFOLDING RCB -- FILL THIS IN
-    # def color_at(self, p:Pxy) -> Color:
+    # def color_at(self, p:Pxy) -> cl.Color:
     #     """
     #     Gives the color of the point on the target
 
@@ -79,7 +80,7 @@ class TargetAbstract(ABC):
 
     #     Returns
     #     -------
-    #     color : Color
+    #     color : cl.Color
     #         Image content at the point (x, y)
     #     """
     #     ...

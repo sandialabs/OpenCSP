@@ -3,6 +3,8 @@
 
 """
 
+import opencsp.common.lib.render.Color as cl
+
 
 class RenderControlText:
     """
@@ -53,14 +55,41 @@ class RenderControlText:
 
     def __init__(
         self,  # See above for details:
-        horizontalalignment='center',  # center, right, left
-        verticalalignment='center',  # center, top, bottom, baseline, center_baseline
-        fontsize='medium',  # float or xx-small, x-small, small, medium, large, x-large, xx-large
-        fontstyle='normal',  # normal, italic, oblique
-        fontweight='normal',  # 0-1000, or light, normal, bold (see above for full list)
-        zdir=None,  # None, 'x', 'y', 'z', (1,1,0), (1,1,1), ...
-        color='b',  # bgrcmykw (see above)
+        horizontalalignment: str = 'center',  # center, right, left
+        verticalalignment: str = 'center',  # center, top, bottom, baseline, center_baseline
+        fontsize: str | float = 'medium',  # float or xx-small, x-small, small, medium, large, x-large, xx-large
+        fontstyle: str = 'normal',  # normal, italic, oblique
+        fontweight: int | str = 'normal',  # 0-1000, or light, normal, bold (see above for full list)
+        zdir: str | tuple[int, int, int] | None = None,  # None, 'x', 'y', 'z', (1,1,0), (1,1,1), ...
+        color: str | cl.Color = 'b',  # bgrcmykw (see above)
+        rotation: float = 0,  # radians, 0=horizontal, pi/2=vertical
     ):
+        """
+        Controls for how text gets rendered.
+
+        Parameters
+        ----------
+        horizontalalignment: str, optional
+            Horizontal alignment, one of 'center', 'right', 'left'. Default is 'center'.
+        verticalalignment: str, optional
+            Vertical alignment, one of 'center', 'top', 'bottom', 'baseline', 'center_baseline'. Default is 'center'.
+        fontsize: str | float, optional
+            float or xx-small, x-small, small, medium, large, x-large, xx-large. Default is 'medium'.
+        fontstyle: str, optional
+            normal, italic, oblique. Default is 'normal'.
+        fontweight: int | str, optional
+            0-1000, or light, normal, bold (see above for full list). Default is 'normal'.
+        zdir: str | tuple[int, int, int] | None, optional
+            Which direction is up when rendering in 3d. One of 'x', 'y', 'z', or
+            a direction such as (1,1,0), (1,1,1), ..., or None for the
+            matplotlib default. Default is None.
+        color: str | Color, optional
+            Color of the text, which can be specified as either a matplotlib
+            named color or a Color instance. Default is 'b' (blue).
+        rotation: float, optional
+            The orientation of the text in radians where 0=horizontal and
+            pi/2=vertical. Default is 0.
+        """
         super(RenderControlText, self).__init__()
 
         # Set fields.
@@ -70,7 +99,19 @@ class RenderControlText:
         self.fontstyle = fontstyle
         self.fontweight = fontweight
         self.zdir = zdir
-        self.color = color
+        self._color = color
+        self.rotation = rotation
+
+        self._standardize_color_values()
+
+    @property
+    def color(self) -> tuple[float, float, float, float] | None:
+        if self._color is not None:
+            return self._color.rgba()
+
+    def _standardize_color_values(self):
+        # convert to 'Color' class
+        self._color = cl.Color.convert(self._color)
 
 
 def default(fontsize='medium', color='b'):
