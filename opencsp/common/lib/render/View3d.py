@@ -23,8 +23,6 @@ import numpy as np
 from PIL import Image
 import scipy.ndimage
 
-from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.axis_3d as ax3d
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
@@ -648,14 +646,6 @@ class View3d(aph.AbstractPlotHandler):
 
         self.draw_xyz_list(lval, style=style, label=label)
 
-    def draw_single_Pxyz(self, p: Pxyz, style: rcps.RenderControlPointSeq = None, labels: list[str] = None):
-        if labels == None:
-            labels = [None] * len(p)
-        if style == None:
-            style = rcps.default(markersize=2)
-        for x, y, z, label in zip(p.x, p.y, p.z, labels):
-            self.draw_xyz((x, y, z), style, label)
-
     def draw_xyz_list(
         self,
         input_xyz_list: Iterable[tuple[float, float, float]],
@@ -663,20 +653,31 @@ class View3d(aph.AbstractPlotHandler):
         style: rcps.RenderControlPointSeq = None,
         label: str = None,
     ) -> None:
-        """Draw lines or closed polygons.
+        """
+        Draw lines or closed polygons.
 
         Parameters
         ----------
-            input_xyz_list: List of xyz three vectors (eg [[0,0,0], [1,1,1]])
-            close: Draw as a closed polygon (ignored if input_xyz_list < 3 points)"""
-
+        input_xyz_list : Iterable[tuple[float, float, float]]
+            List of xyz three vectors (eg [[0,0,0], [1,1,1]]). The vectors must
+            be indexable, such as with input_xyz_list[0][0].
+        close : bool, optional
+            True to draw as a closed polygon (ignored if input_xyz_list < 3
+            points), or False to draw as given. By default False.
+        style : rcps.RenderControlPointSeq, optional
+            The style with which to render, or None for
+            RenderControlPointSeq.default(). By default None.
+        label : str, optional
+            The label to assign to this plot to be used in the legend, or None
+            for no label. By default None.
+        """
         if style == None:
             style = rcps.default()
 
         if len(input_xyz_list) > 0:
             # Construct the point list to draw, including closing the polygon if desired.
             if close and (len(input_xyz_list) > 2):
-                xyz_list = input_xyz_list.copy()
+                xyz_list = [xyz for xyz in input_xyz_list]
                 xyz_list.append(input_xyz_list[0])
             else:
                 xyz_list = input_xyz_list
@@ -768,10 +769,6 @@ class View3d(aph.AbstractPlotHandler):
                     + str(self.view_spec['type'])
                     + "' encountered.",
                 )
-
-    def draw_Vxyz(self, V: Vxyz, close=False, style=None, label=None) -> None:
-        """Alternative to View3d.drawxyz_list that used the Vxyz class instead"""
-        self.draw_xyz_list(list(V.data.T), close, style, label)
 
     # TODO TJL: only implemented for 3d views, should extend
     def draw_xyz_surface(
@@ -1084,7 +1081,7 @@ class View3d(aph.AbstractPlotHandler):
 
         # Construct the point list to draw, including closing the polygon if desired.
         if close and (len(input_pq_list) > 2):
-            pq_list = input_pq_list.copy()
+            pq_list = [pq for pq in input_pq_list]
             pq_list.append(input_pq_list[0])
         else:
             pq_list = input_pq_list
