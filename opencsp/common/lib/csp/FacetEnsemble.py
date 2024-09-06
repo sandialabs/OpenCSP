@@ -1,6 +1,5 @@
 """Rigid ensemble of facets"""
 
-import copy
 from typing import Callable
 from warnings import warn
 import numpy as np
@@ -10,17 +9,14 @@ from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbst
 from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import VisualizeOrthorectifiedSlopeAbstract
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
-from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
+from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlFacet import RenderControlFacet
 from opencsp.common.lib.render_control.RenderControlFacetEnsemble import RenderControlFacetEnsemble
-from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
-from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 
 class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
@@ -182,7 +178,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
         # origin of the facet ensemble
         if facet_ensemble_style.draw_centroid:
-            origin.draw_points(view)
+            origin.draw_points(view, style=rcps.marker())
 
         # pointing vector of the facet ensemble
         if facet_ensemble_style.draw_normal_vector:
