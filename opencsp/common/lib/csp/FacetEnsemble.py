@@ -178,7 +178,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
         # origin of the facet ensemble
         if facet_ensemble_style.draw_centroid:
-            origin.draw_points(view, style=rcps.marker())
+            origin.draw_points(view, style=rcps.marker(markersize=1))
 
         # pointing vector of the facet ensemble
         if facet_ensemble_style.draw_normal_vector:

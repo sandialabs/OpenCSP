@@ -5,39 +5,26 @@ Demonstrate Solar Field Plotting Routines
 
 """
 
-import os
-from datetime import datetime
-
-import matplotlib.pyplot as plt
 import numpy as np
 
 import opencsp.common.lib.csp.SolarField as sf
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
-import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
-import opencsp.common.lib.render_control.RenderControlAxis as rca
-import opencsp.common.lib.render_control.RenderControlEnsemble as rce
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
 import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
-import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
-import opencsp.common.lib.test.support_test as stest
 import opencsp.common.lib.test.TestOutput as to
-import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 from opencsp.common.lib.csp.HeliostatConfiguration import HeliostatConfiguration
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
-from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 
 UP = Vxyz([0, 0, 1])
 NORTH = Vxyz([0, 1, 0])
