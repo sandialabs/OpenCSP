@@ -35,7 +35,7 @@ jobs:
         with:
           path: OpenCSP
 
-      - name: pytest-cov
+      - name: pytest-cov (OpenCSP/opencsp)
         working-directory: OpenCSP/opencsp
         run: |
           python3 -m pip install -r ../requirements.txt
