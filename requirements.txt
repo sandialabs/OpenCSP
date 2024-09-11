@@ -22,7 +22,7 @@ sympy >= 1.12
 
 # packages that can't be installed with conda but can be installed with pip on solo #pippkgs
 ipykernel >= 6.29.3
-opencv-contrib-python == 4.5.5.64
+opencv-contrib-python >= 4.8.1.78
 pytest >= 8.1.1
 python-pptx >= 0.6.23
 rawpy >= 0.19.1
