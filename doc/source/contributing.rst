@@ -82,8 +82,9 @@ Continuous integration (CI) testing will fail if the changes are not pep8 compli
     black /path/to/opencsp -C -S
 
 
-NOTE, the following pre-commit hook can be added to automatically apply black to your
-commits:
+.. note::
+    The following pre-commit hook can be added to automatically apply black to your
+    commits:
 
 ::
 
@@ -193,9 +194,10 @@ Windows
 MacOS
 ^^^^^
 
-IMPORTANT: MacOS is not fully supported by OpenCSP.
+.. warning::
+    MacOS is not fully supported by OpenCSP.
 
-rawpy may be available via pip install, however, if you are on a M1 or M2 Mac, you may need to install rawpy from source. In order to install rawpy from source, we recommend using the brew package manager. In fact, ffmpeg can be installed with brew as well.
+rawpy may be available via pip install, however, if you are on a M1, M2, or M3 Mac, you may need to install rawpy from source. In order to install rawpy from source, we recommend using the brew package manager. In fact, ffmpeg can be installed with brew as well.
 
 Attempt to install the OpenCSP requirements:
 
@@ -353,9 +355,14 @@ Working with remotes
 Now that you have a fork of OpenCSP cloned, you have a single remote named `origin`. This remote
 refers to your fork on GitHub: https://github.com/<github-username>/OpenCSP. This fork contains
 the same branches that the upstream repository at https://github.com/sandialabs/OpenCSP contained
-when it was forked. Note that the branches only reflect the state of the upstream repository at 
-the time it was forked. In order to create a new topic branch with the latest changes from upstream, 
-you must use multiple remotes. To create a upstream remote:
+when it was forked. 
+
+.. note::
+    The branches only reflect the state of the upstream repository at the time it was forked. 
+    In order to create a new topic branch with the latest changes from upstream, you must use 
+    multiple remotes.
+
+To create a upstream remote:
 ::
 
     cd /path/to/OpenCSP
