@@ -6,6 +6,7 @@ import tkinter
 from typing import Callable, Optional
 
 import cv2 as cv
+import cv2.aruco as aruco
 import numpy as np
 from PIL import Image, ImageTk
 
@@ -190,7 +191,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         self.canvas.configure(background='black', highlightthickness=0)
 
         # Save aruco marker dictionary for calibration image generation
-        self.aruco_dictionary = cv.aruco.Dictionary_get(cv.aruco.DICT_4X4_1000)
+        self.aruco_dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)
 
         # Save active area data
         self._x_active_1: int
@@ -628,5 +629,5 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         img_2d = np.ones((width, width), dtype='uint8') * self.display_data.projector_max_int
 
         # Create marker image
-        cv.aruco.drawMarker(self.aruco_dictionary, id_, width, img_2d)
+        aruco.drawMarker(self.aruco_dictionary, id_, width, img_2d)
         return np.concatenate([img_2d[:, :, None]] * 3, axis=2)
