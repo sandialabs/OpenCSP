@@ -25,15 +25,12 @@ body:
       placeholder: Tell us what you see!
     validations:
       required: true
-  - type: dropdown
+  - type: textarea
     id: version
     attributes:
       label: Version
       description: What version of our software are you running?
-      options:
-        - develop@5fd52b5
-        - main@8c65300
-      default: 0
+      placeholder: develop@c481fdc
     validations:
       required: true
   - type: dropdown
