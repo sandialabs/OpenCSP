@@ -11,6 +11,7 @@ _Please summarize the code changes in this pull request._
 _Please describe any relevant implementation details for reviewers, e.g. how correctness was verified._
 
 ## Submission checklist
+- [ ] Target branch is `develop`, not `main`
 - [ ] Existing tests are updated or new tests were added
 - [ ] `opencsp/test/test_DocStringsExist.py` are verified to include this change or have been updated accordingly
 - [ ] .rst file(s) under `doc/` are verified to include this change or have been updated accordingly
