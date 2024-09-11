@@ -99,6 +99,55 @@ commits:
 Getting Started
 ---------------
 
+OpenCSP provides both a library and stand-alone applications that can be used for modeling concentrating solar-thermal power technologies. Lets briefly take a look at the directories within the OpenCSP code base.
+
+Directory Summary
++++++++++++++++++
+
+- *opencsp/app*: OpenCSP library and applications
+- *opencsp/common*: Common code used by the library and applications
+- *doc*: developer documentation
+- *example*: OpenCSP examples
+- *contrib*: Contributed code that is not actively tested or maintained
+
+opencsp/app
++++++++++++
+This directory contains the OpenCSP library and application code.
+
+opencsp/app/camera_calibration
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Graphical User Interface which aides in the calibration of machine vision cameras.
+
+opencsp/app/scene_reconstruction
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+Reconstructs a 3d scene of Aruco markers using a calibrated camera.
+
+opencsp/app/select_image_points
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+A Graphical User Interface that allows the user to select points on an image. Results are saved to text file.
+
+opencsp/app/sofast
+^^^^^^^^^^^^^^^^^^
+High-precision deflectometry measurement of CSP mirrors, including heliostat facets, full heliostats, and dishes.
+
+opencsp/app/target
+^^^^^^^^^^^^^^^^^^
+Generation and interpretation of optical targets.
+
+
+opencsp/common
+++++++++++++++
+This directory contains the OpenCSP common data and code used by the library and applications above.
+
+opencsp/common/data
+^^^^^^^^^^^^^^^^^^^
+This directoy contains common data used for testing and running examples.
+
+opencsp/common/lib
+^^^^^^^^^^^^^^^^^^
+This directory contains common code and data structures used by the library and application code above. For example, classes to represent light sources, facets, mirrors, and heliostats reside here.
+
+
 Setting up your development environment
 +++++++++++++++++++++++++++++++++++++++
 
@@ -116,28 +165,79 @@ How to install OpenCSP's dependencies
 
 With python version 3.10 or greater, run the following:
 
+Linux
+^^^^^
+
 ::  
     
     $ cd /path/to/OpenCSP/../
-    $ python -m venv ./venv_opencsp
-    # On Linux:
-    $ . ./venv_opencsp/bin/activate
-    # Or, on Windows:
-    $ . ./venv_opencsp/Scripts/activate
-    $ (venv_opencsp) cd OpenCSP
-    $ (venv_opencsp) pip install -r requirements.txt
+    $ python -m venv ./venv
+    # On Linux or MacOS:
+    $ . ./venv/bin/activate
+    $ (venv) cd OpenCSP
+    $ (venv) pip install -r requirements.txt
+
+
+Windows
+^^^^^^^
+
+::
+    
+    $ cd \path\to\OpenCSP\..\
+    $ python -m venv .\venv
+    $ . .\venv\Scripts\activate
+    $ (venv) cd OpenCSP
+    $ (venv) pip install -r requirements.txt
+
+
+MacOS
+^^^^^
+
+IMPORTANT: MacOS is not fully supported by OpenCSP.
+
+rawpy may be available via pip install, however, if you are on a M1 or M2 Mac, you may need to install rawpy from source. In order to install rawpy from source, we recommend using the brew package manager. In fact, ffmpeg can be installed with brew as well.
+
+Attempt to install the OpenCSP requirements:
+
+::
+
+    $ cd /path/to/OpenCSP/../
+    $ python -m venv ./venv
+    $ . ./venv/bin/activate
+    $ (venv) cd OpenCSP
+    $ (venv) pip install -r requirements.txt
+
+If rawpy is not available, you can install it from source as follows:
+
+1. Install brew. Please see https://brew.sh.
+2. Install rawpy from source:
+
+::  
+    
+    $ brew install python-tk@3.10 libomp llvm
+    $ git clone git@github.com:letmaik/rawpy.git
+    $ cd rawpy
+    $ pip install wheel numpy cython
+    $ pip install .
+
+3. Comment out the 'rawpy' line in requirements.txt and then run:
+
+::
+
+    $ (venv) cd OpenCSP
+    $ (venv) pip install -r requirements.txt
 
 Running OpenCSP's test suite
 ++++++++++++++++++++++++++++
 
-Within venv_opencsp, you can now run:
+Within venv, you can now run:
 
 ::
 
-    $ (venv_opencsp) cd /path/to/OpenCSP
-    $ (venv_opencsp) export PYTHONPATH=$PWD
-    $ (venv_opencsp) cd opencsp
-    $ (venv_opencsp) pytest
+    $ (venv) cd /path/to/OpenCSP
+    $ (venv) export PYTHONPATH=$PWD
+    $ (venv) cd opencsp
+    $ (venv) pytest
    
    
 Testing
@@ -306,4 +406,5 @@ the PR, consider filing a follow-on issue.
 
 Release Process
 ---------------
-TODO
+Stable releases are tagged on the `main` branch. The tip of the `main` branch is the latest stable release.
+The `develop` branch will contain the latest unreleased changes and should be used with caution.
