@@ -53,7 +53,7 @@ import opencsp.common.lib.render_control.RenderControlTower as rct
 
 # import opencsp.common.lib.test.support_test as stest
 import opencsp.common.lib.test.TestOutput as to
-from opencsp.common.lib.opencsp_path import opencsp_settings
+from opencsp import opencsp_settings
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -3176,7 +3176,7 @@ class TestMotionBasedCanting(to.TestOutput):
     #         offset_x,
     #     )
 
-    def test_find_all_canting_angles(self) -> None:
+    def test_find_all_canting_angles_5_W2(self) -> None:
         """
         Draws ray trace intersection for 25 facets with the target.
 
@@ -3186,6 +3186,1742 @@ class TestMotionBasedCanting(to.TestOutput):
 
         # View Setup
         heliostat_name = "5W2"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_W3(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5W3"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_W4(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5W4"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_W5(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5W5"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_W6(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5W6"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_W7(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5W7"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_W8(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5W8"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E1(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E1"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E2(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E2"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E3(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E3"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E4(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E4"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E5(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E5"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E6(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E6"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E7(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E7"
+
+        # Initial positions
+        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        target_loc = tower.target_loc
+        target_plane_normal = Uxyz([0, 1, 0])
+        test_tolerance = 0.001
+        tower_control = rct.normal_tower()
+        test_canted_x_angle = 0
+        test_canted_y_angle = 0
+
+        # Define tracking time
+        # https://gml.noaa.gov/grad/solcalc/ using NSTTF lon: -106.509 and lat: 34.96
+        TIME = (2024, 3, 21, 13, 13, 5, -6)  # NSTTF spring equinox, solar noon
+        AIMPOINT = target_loc
+        UP = Vxyz([0, 0, 1])
+
+        # Configuration setup
+        solar_field = self.solar_field
+        test_heliostat = solar_field.lookup_heliostat(heliostat_name)
+
+        self.set_tracking(test_heliostat, AIMPOINT, lln.NSTTF_ORIGIN, TIME)
+
+        azimuth = test_heliostat._az
+        elevation = test_heliostat._el
+
+        canted_x_angles, canted_y_angles, f_idx, offset_x, offset_z = self.find_all_canting_angle_values(
+            TIME,
+            AIMPOINT,
+            target_loc,
+            target_plane_normal,
+            heliostat_name,
+            azimuth,
+            elevation,
+            test_canted_x_angle,
+            test_canted_y_angle,
+            test_tolerance,
+        )
+
+        canting_rotations = []
+
+        for facet in range(0, 25):
+            # position = Pxyz.merge(test_heliostat._self_to_parent_transform.apply(Pxyz.origin()))
+            canting = Rotation.from_euler('xyz', [canted_x_angles[facet], canted_y_angles[facet], 0], degrees=False)
+            canting_rotations.append(canting)
+            print(f"rotation: {canting.as_euler('xyz')}")
+        test_heliostat.set_facet_canting(canting_rotations)
+
+        trc_f_origin_x = []
+        trc_f_origin_y = []
+        trc_f_origin_z = []
+        trc_x_sur_norm = []
+        trc_y_sur_norm = []
+        trc_z_sur_norm = []
+
+        # tracking
+        for facet in test_heliostat.facet_ensemble.facets:
+            trc_facet_origin, trc_sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            trc_f_origin_x.append(trc_facet_origin.x)
+            trc_f_origin_y.append(trc_facet_origin.y)
+            trc_f_origin_z.append(trc_facet_origin.z)
+            trc_x_sur_norm.append(trc_sur_norm.x)
+            trc_y_sur_norm.append(trc_sur_norm.y)
+            trc_z_sur_norm.append(trc_sur_norm.z)
+
+        az = np.deg2rad(180)
+        el = np.deg2rad(90)
+        test_config = hc.HeliostatConfiguration('az-el', az=az, el=el)
+        test_heliostat.set_orientation(test_config)
+
+        f_origin_x = []
+        f_origin_y = []
+        f_origin_z = []
+        x_sur_norm = []
+        y_sur_norm = []
+        z_sur_norm = []
+
+        # face-up
+        for facet in test_heliostat.facet_ensemble.facets:
+            _, sur_norm = facet.survey_of_points(Resolution.center())
+            # print(f"x: {facet_normal.x}, y: {facet_normal.y}, z: {facet_normal.z}")
+            x_sur_norm.append(sur_norm.x)
+            y_sur_norm.append(sur_norm.y)
+            z_sur_norm.append(sur_norm.z)
+
+        for facet in test_heliostat.facet_ensemble.no_parent_copy().facets:
+            facet_origin, _ = facet.survey_of_points(Resolution.center())
+            f_origin_x.append(facet_origin.x)
+            f_origin_y.append(facet_origin.y)
+            f_origin_z.append(facet_origin.z)
+
+        self.save_to_csv(
+            heliostat_name,
+            f_idx,
+            f_origin_x,
+            f_origin_y,
+            f_origin_z,
+            canted_x_angles,
+            canted_y_angles,
+            x_sur_norm,
+            y_sur_norm,
+            z_sur_norm,
+            azimuth,
+            elevation,
+            trc_f_origin_x,
+            trc_f_origin_y,
+            trc_f_origin_z,
+            trc_x_sur_norm,
+            trc_y_sur_norm,
+            trc_z_sur_norm,
+            offset_z,
+            offset_x,
+        )
+
+    def test_find_all_canting_angles_5_E8(self) -> None:
+        """
+        Draws ray trace intersection for 25 facets with the target.
+
+        """
+        # Initialize test.
+        self.start_test()
+
+        # View Setup
+        heliostat_name = "5E8"
 
         # Initial positions
         tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
@@ -4384,11 +6120,25 @@ if __name__ == "__main__":
     # test_object.test_canted_y_angle_binary_search()
     # test_object.test_find_single_canting_angles()
     # test_object.test_off_axis_code()
-    test_object.test_find_all_canting_angles()
+    test_object.test_find_all_canting_angles_5_W2()
+    test_object.test_find_all_canting_angles_5_W3()
+    test_object.test_find_all_canting_angles_5_W4()
+    test_object.test_find_all_canting_angles_5_W5()
+    test_object.test_find_all_canting_angles_5_W6()
+    test_object.test_find_all_canting_angles_5_W7()
+    test_object.test_find_all_canting_angles_5_W8()
+    test_object.test_find_all_canting_angles_5_E1()
+    test_object.test_find_all_canting_angles_5_E2()
+    test_object.test_find_all_canting_angles_5_E3()
+    test_object.test_find_all_canting_angles_5_E4()
+    test_object.test_find_all_canting_angles_5_E5()
+    test_object.test_find_all_canting_angles_5_E6()
+    test_object.test_find_all_canting_angles_5_E7()
+    test_object.test_find_all_canting_angles_5_E8()
     # test_object.test_create_canted_heliostat(heliostat_name)
     # test_object.example_canting_calculated(heliostat_name)
     # test_object.example_canting_bar_charts_calculated(heliostat_name)
-    test_object.generate_csv(heliostat_name)
+    # test_object.generate_csv(heliostat_name)
 
     lt.info('All tests complete.')
     # Cleanup.
