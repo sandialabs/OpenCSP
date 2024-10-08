@@ -3,7 +3,7 @@ Multiple combinations of display and surface types are iterated over.
 """
 
 from os.path import join, dirname, exists
-from typing import Literal
+from typing import Literal, Final
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -73,8 +73,9 @@ def generate_dataset(
     print(f'All data saved to: {file_dataset_out:s}')
 
     # Show slope map
-    mask = sofast.data_image_processing_facet[0].mask_processed
-    slopes_xy = sofast.data_calculation_facet[0].slopes_facet_xy
+    idx_facet: Final = 0
+    mask = sofast.data_image_processing_facet[idx_facet].mask_processed
+    slopes_xy = sofast.data_calculation_facet[idx_facet].slopes_facet_xy
     slopes = np.sqrt(np.sum(slopes_xy**2, 0))
     image = np.zeros(mask.shape) * np.nan
     image[mask] = slopes
