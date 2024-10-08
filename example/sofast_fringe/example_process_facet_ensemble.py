@@ -8,6 +8,7 @@ from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScali
 from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFringe
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
+from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
@@ -132,21 +133,16 @@ def example_process_facet_ensemble():
         data['robust_least_squares'] = bool(data['robust_least_squares'])
         surfaces.append(Surface2DParabolic(**data))
 
-    # Update search parameters
-    # sofast.params.mask_hist_thresh = 0.83
-    # sofast.params.geometry.perimeter_refine_perpendicular_search_dist = 15.0
-    # sofast.params.geometry.facet_corns_refine_frac_keep = 1.0
-    # sofast.params.geometry.facet_corns_refine_perpendicular_search_dist = 3.0
-    # sofast.params.geometry.facet_corns_refine_step_length = 5.0
-
     # Process
     sofast.process_optic_multifacet(facet_data, ensemble_data, surfaces)
 
     # 3. Log best-fit parabolic focal lengths
     # =======================================
-    for idx in range(sofast.num_facets):
-        surf_coefs = sofast.data_calculation_facet[idx].surf_coefs_facet
-        focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
+    sofast_config = SofastConfiguration()
+    sofast_config.load_sofast_object(sofast)
+    sofast_stats = sofast_config.get_measurement_stats()
+    for stat in sofast_stats:
+        focal_lengths_xy = stat['focal_lengths_parabolic_xy']
         lt.info(f'Facet {idx:d} xy focal lengths (meters): {focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
 
     # 4. Plot slope magnitude
@@ -165,8 +161,10 @@ def example_process_facet_ensemble():
     axis_control_m = rca.meters()
 
     # Plot slope map
+    res = 0.002  # meter, make the plot with 2mm spatial resolution
+    clim = 7  # mrad, draw the plot with +/-7mrad scale bars, this mirror has erorrs that extent to about +/-7mrad
     fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
-    ensemble.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
+    ensemble.plot_orthorectified_slope(res=res, clim=clim, axis=fig_record.axis)
     fig_record.save(dir_save, 'slope_magnitude', 'png')
 
     # 5. Plot 3d representation of facet ensemble
