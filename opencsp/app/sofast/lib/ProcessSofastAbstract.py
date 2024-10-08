@@ -10,7 +10,7 @@ Notes
 - The `ProcessSofastAbstract` class is designed to be subclassed and extended with specific
   processing logic.
 
-ChatGPT 40 assisted in generating some docstrings in this module.
+ChatGPT 4o assisted in generating some docstrings in this module.
 """
 
 from typing import Literal
