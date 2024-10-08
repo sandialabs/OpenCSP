@@ -191,9 +191,29 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             facet._self_to_parent_transform = transformation
 
     def set_facet_positions(self, positions: Pxyz):
-        """Sets the positions of the facets relative to the ensemble.
-        NOTE: Will remove previously set facet canting rotations
         """
+        Set the positions of the facets relative to one another.
+        This function updates the positions of the facets in the ensemble.
+        It will remove any previously set facet canting rotations.
+
+        Parameters
+        ----------
+        positions : Pxyz
+            A sequence of positions to set for each facet. The length of
+            this sequence must match the number of facets in the ensemble.
+
+        Raises
+        ------
+        ValueError
+            If the length of `positions` does not match the number of facets
+            in the ensemble.
+
+        Notes
+        -----
+        This method modifies the internal transformation of each facet
+        based on the provided positions.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if len(positions) != len(self.facets):
             raise ValueError(
                 f"This FacetEnsemble contains {len(self.facets)} and"
@@ -205,9 +225,31 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             facet._self_to_parent_transform = TransformXYZ.from_V(pos)
 
     def set_facet_canting(self, canting_rotations: list[Rotation]):
-        """Sets facet canting relative to ensemble.
-        NOTE: Will remove previously set facet positionals
         """
+        Set the canting rotations of the facets relative to the ensemble.
+        This function updates the canting rotations of the facets in the
+        ensemble. It will remove any previously set facet positional
+        transformations.
+
+        Parameters
+        ----------
+        canting_rotations : list[Rotation]
+            A list of rotation objects to set for each facet. The length
+            of this list must match the number of facets in the ensemble.
+
+        Raises
+        ------
+        ValueError
+            If the length of `canting_rotations` does not match the number
+            of facets in the ensemble.
+
+        Notes
+        -----
+        This method modifies the internal transformation of each facet
+        based on the provided canting rotations and their corresponding
+        positions.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if len(canting_rotations) != len(self.facets):
             raise ValueError(
                 f"This FacetEnsemble contains {len(self.facets)} and"

@@ -645,8 +645,7 @@ class ProcessSofastFringe(HDF5_SaveAbstract):
 
         Returns
         -------
-        FacetEnsemble | Facet
-            Optic object
+        FacetEnsemble if ProcessSofastFringe.optic_type = 'multi', otherwise Facet
         """
         facets = []
         trans_list = []
