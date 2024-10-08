@@ -101,7 +101,7 @@ class SensitiveStringsSearcher:
         cache_entry = fc.FileCache.for_file(self.root_search_dir, file_path, file_name_ext)
         self.new_cached_cleared_files.append(cache_entry)
 
-    def _is_binary_file(self, file_path: str, file_name_ext: str):
+    def _is_binary_file(self, rel_file_path: str, file_name_ext: str):
         is_binary_file = False
 
         # check if a binary file
@@ -112,13 +112,13 @@ class SensitiveStringsSearcher:
         elif self._is_img_ext(ext):
             if ext in self._text_file_extensions:
                 is_binary_file = False
-            elif (f"{file_path}/{file_name_ext}" in self._text_file_path_name_exts) or (
+            elif (f"{rel_file_path}/{file_name_ext}" in self._text_file_path_name_exts) or (
                 file_name_ext in self._text_file_path_name_exts
             ):
                 is_binary_file = False
             else:
                 is_binary_file = True
-        elif ft.file_size(ft.join(file_path, file_name_ext)) > 1e6:
+        elif ft.file_size(self.norm_path(rel_file_path, file_name_ext)) > 1e6:
             # assume any file > 1MB is a binary file, in order to prevent
             # sensitive_strings from taking hours to check these files
             # needlessly
@@ -126,20 +126,20 @@ class SensitiveStringsSearcher:
         if not is_binary_file:
             # attempt to parse the file as a text file
             try:
-                file_path_norm: str = self.norm_path(file_path, file_name_ext)
+                file_path_norm: str = self.norm_path(rel_file_path, file_name_ext)
                 ft.read_text_file(file_path_norm)
             except UnicodeDecodeError:
                 is_binary_file = True
 
         return is_binary_file
 
-    def _enqueue_unknown_binary_files_for_later_processing(self, file_path: str, file_name_ext: str):
+    def _enqueue_unknown_binary_files_for_later_processing(self, rel_file_path: str, file_name_ext: str):
         """If the given file is recognized as an allowed file, and it's fingerprint matches the allowed file, then we
         can dismiss it from the list of unfound files and add it to the list of the accepted files.
 
         However, if the given file isn't recognized or it's fingerprint is different, then add it to the unknown list,
         to be dealt with later."""
-        file_ff = ff.FileFingerprint.for_file(self.root_search_dir, file_path, file_name_ext)
+        file_ff = ff.FileFingerprint.for_file(self.root_search_dir, rel_file_path, file_name_ext)
 
         if file_ff in self.allowed_binary_files:
             # we already know and trust this binary file
@@ -150,11 +150,11 @@ class SensitiveStringsSearcher:
             # we'll deal with unknown files as a group later
             self.unknown_binary_files.append(file_ff)
 
-    def parse_file(self, file_path: str, file_name_ext: str) -> list[str]:
-        file_path_norm: str = self.norm_path(file_path, file_name_ext)
+    def parse_file(self, rel_file_path: str, file_name_ext: str) -> list[str]:
+        file_path_norm: str = self.norm_path(rel_file_path, file_name_ext)
         lt.debug(file_path_norm)
 
-        if self._is_binary_file(file_path, file_name_ext):
+        if self._is_binary_file(rel_file_path, file_name_ext):
             return []
         else:
             return ft.read_text_file(file_path_norm)
@@ -447,23 +447,23 @@ class SensitiveStringsSearcher:
         for file_path_name_ext in files:
             if self.verbose:
                 lt.info(f"Searching file {file_path_name_ext}")
-            file_path, file_name, file_ext = ft.path_components(file_path_name_ext)
+            rel_file_path, file_name, file_ext = ft.path_components(file_path_name_ext)
             file_name_ext = file_name + file_ext
-            if self._is_file_in_cleared_cache(file_path, file_name_ext):
+            if self._is_file_in_cleared_cache(rel_file_path, file_name_ext):
                 # file cleared in a previous run, don't need to check again
-                self._register_file_in_cleared_cache(file_path, file_name_ext)
+                self._register_file_in_cleared_cache(rel_file_path, file_name_ext)
             else:
                 # need to check this file
-                if self._is_binary_file(file_path, file_name_ext):
+                if self._is_binary_file(rel_file_path, file_name_ext):
                     # deal with non-parseable binary files as a group, below
-                    self._enqueue_unknown_binary_files_for_later_processing(file_path, file_name_ext)
+                    self._enqueue_unknown_binary_files_for_later_processing(rel_file_path, file_name_ext)
                 else:
                     # check text files for sensitive strings
-                    file_matches = self.search_file(file_path, file_name_ext)
+                    file_matches = self.search_file(rel_file_path, file_name_ext)
                     if len(file_matches) > 0:
                         matches[file_path_name_ext] = file_matches
                     else:
-                        self._register_file_in_cleared_cache(file_path, file_name_ext)
+                        self._register_file_in_cleared_cache(rel_file_path, file_name_ext)
 
         # Potentially remove unfound binary files
         if len(self.unfound_allowed_binary_files) > 0 and self.remove_unfound_binaries:
