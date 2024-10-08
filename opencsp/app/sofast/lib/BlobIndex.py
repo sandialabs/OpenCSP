@@ -1,3 +1,4 @@
+from enum import Enum
 from typing import Literal
 
 import matplotlib.pyplot as plt
@@ -6,6 +7,16 @@ import numpy as np
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.tool import log_tools as lt
+
+
+class Step(Enum):
+    """Gives step direction
+    - Left/right for horizontal searches
+    - Up/down for vertical searches
+    """
+
+    RIGHT_OR_DOWN = 1
+    LEFT_OR_UP = -1
 
 
 class BlobIndex:
@@ -17,12 +28,15 @@ class BlobIndex:
     Attributes
     ----------
     search_thresh : float
-
+        Threshold, in pixels. As algorithm calculates the expected location of the next blob, if a blob
+        is within "search_thresh" of the expected location, that blob is considered found.
+    max_num_iters : int
+        Maximum number of iterations to use when fitting found blobs to grid pattern.
     search_perp_axis_ratio : float
         Ratio of point distances: (perpendicular to axis) / (along axis) used to
         search for points.
     apply_filter : bool
-        To filter bad points (experimental)
+        To filter bad points (experimental, not implemented yet)
     """
 
     def __init__(self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int) -> 'BlobIndex':
@@ -47,11 +61,15 @@ class BlobIndex:
         self._is_assigned = np.zeros(self._num_pts, dtype=bool)
         self._neighbor_dists = np.zeros((self._num_pts, 4)) * np.nan  # left, right, up, down
 
-        self.search_thresh = 5.0  # pixels
+        self.search_thresh: float = 5.0  # pixels
+        """Threshold, in pixels. As algorithm calculates the expected location of the next blob, if a blob
+        is within 'search_thresh' of the expected location, that blob is considered found"""
         self.max_num_iters: int = 100
-        """Maximum number of search iterations"""
-        self.search_perp_axis_ratio = 3.0
-        self.apply_filter = False
+        """Maximum number of iterations to use when fitting found blobs to grid pattern"""
+        self.search_perp_axis_ratio: float = 3.0
+        """Ratio of point distances: (perpendicular to axis) / (along axis) used to search for points"""
+        self.apply_filter: bool = False
+        """To filter bad points (experimental, not implemented yet)"""
 
         self._offset_x = -x_min  # index
         self._offset_y = -y_min  # index
@@ -270,19 +288,18 @@ class BlobIndex:
         idx_g, x, y = self._find_nearest_in_direction(idx_d, 'down')
         self._assign(idx_g, x, y)
 
-    def _extend_data(self, direction: Literal['x', 'y'], step: Literal[1, -1]) -> None:
+    def _extend_data(self, direction: Literal['x', 'y'], step: Step) -> None:
         # Extends found blob rows/collumns in given direction
         # Steps in the given axis, a or b
+        #
         # Parameters
         # ----------
         # direction : Literal['x', 'y']
         #     Axis to search
-        # step : Literal[1, -1]
+        # step : Step
         #     Direction to search
-        #     -  1 = right/down
-        #     - -1 = left/up
-        if step not in [-1, 1]:
-            raise ValueError(f'Step must be -1 or 1, not {step}')
+        if not isinstance(step, Step):
+            raise ValueError(f'Step must be a Step class, not type {type(step)}')
 
         if direction == 'x':
             idxs_a = self._idx_y
@@ -302,8 +319,8 @@ class BlobIndex:
             is_b = idxs_b[mask]  # indices of points on axis
             # Step through all points on axis
             for i_b in is_b:
-                if not i_b + step in is_b:  # If adjacent point is not assigned, find it
-                    idx_b_prev = i_b - step  # Index used for slope calc
+                if not i_b + step.value in is_b:  # If adjacent point is not assigned, find it
+                    idx_b_prev = i_b - step.value  # Index used for slope calc
                     if idx_b_prev in is_b:  # If history exists, find points
                         for idx_b_next in range(500):
                             # First iteration, use previously assigned points
@@ -329,11 +346,11 @@ class BlobIndex:
                             # Assign point
                             if dist < self.search_thresh:
                                 if direction == 'x':
-                                    idx_x = int(i_b + step + (idx_b_next * step))
+                                    idx_x = int(i_b + step.value + (idx_b_next * step.value))
                                     idx_y = int(idx_a)
                                 else:
                                     idx_x = int(idx_a)
-                                    idx_y = int(i_b + step + (idx_b_next * step))
+                                    idx_y = int(i_b + step.value + (idx_b_next * step.value))
                                 self._assign(idx_new, idx_x, idx_y)
                             else:
                                 break
@@ -396,12 +413,12 @@ class BlobIndex:
         # Extend rows
         prev_num_unassigned = self._num_unassigned()
         for idx in range(self.max_num_iters):
-            self._extend_data('x', -1)
-            self._extend_data('x', 1)
+            self._extend_data('x', Step(-1))
+            self._extend_data('x', Step(1))
             if self.apply_filter:
                 self._filter_bad_points()
-            self._extend_data('y', -1)
-            self._extend_data('y', 1)
+            self._extend_data('y', Step(-1))
+            self._extend_data('y', Step(1))
             if self.apply_filter:
                 self._filter_bad_points()
 
