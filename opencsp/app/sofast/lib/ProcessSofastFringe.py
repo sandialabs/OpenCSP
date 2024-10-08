@@ -170,7 +170,7 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         self.camera = camera
         self.measurement = measurement
         self.display = display
-        self.params = ParamsSofastFringe()
+        self.params: ParamsSofastFringe = ParamsSofastFringe()
 
     def help(self) -> None:
         """Prints Sofast doc string"""
