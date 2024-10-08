@@ -45,7 +45,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         self.camera = camera
         self.measurement: MeasurementSofastFixed
         self.fixed_pattern_dot_locs = fixed_pattern_dot_locs
-        self.params = ParamsSofastFixed()
+        self.params: ParamsSofastFixed = ParamsSofastFixed()
 
         # Define blob detector
         self.blob_detector: cv.SimpleBlobDetector_Params = cv.SimpleBlobDetector_Params()
