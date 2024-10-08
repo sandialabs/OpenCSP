@@ -138,7 +138,9 @@ class TestProcessSofastFixed(unittest.TestCase):
 
         fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
         ensemble = self.sofast_facet_ensemble.get_optic('bilinear')
-        ensemble.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_mng.axis)
+        res_meter = 0.002  # meter, 2mm resolution
+        clim_mrad = 7  # +/- 7 mrad color bar limits
+        ensemble.plot_orthorectified_slope(res=res_meter, clim=clim_mrad, axis=fig_mng.axis)
         fig_mng.save(self.save_dir, 'slope_magnitude_facet_ensemble', 'png')
 
     def test_save_single_facet_slope_figure(self):
@@ -148,7 +150,9 @@ class TestProcessSofastFixed(unittest.TestCase):
 
         fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
         facet = self.sofast_single_facet.get_optic('bilinear')
-        facet.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_mng.axis)
+        res_meter = 0.002  # meter, 2mm resolution
+        clim_mrad = 7  # +/- 7 mrad color bar limits
+        facet.plot_orthorectified_slope(res=res_meter, clim=clim_mrad, axis=fig_mng.axis)
         fig_mng.save(self.save_dir, 'slope_magnitude_single_facet', 'png')
 
     def test_slopes_xy_facet_ensemble(self):
@@ -158,8 +162,8 @@ class TestProcessSofastFixed(unittest.TestCase):
                 np.testing.assert_allclose(
                     self.sofast_facet_ensemble.data_calculation_facet[idx_facet].slopes_facet_xy,
                     self.exp_slopes_xy_facet_ensemble[idx_facet],
-                    rtol=0,
-                    atol=1e-6,
+                    rtol=0,  # relative tolerance (i.e. +/- a fixed fraction of the expected value)
+                    atol=1e-6,  # absolute tolerance (i.e. +/- a fixed value)
                 )
 
     def test_slopes_xy_single_facet(self):
@@ -167,8 +171,8 @@ class TestProcessSofastFixed(unittest.TestCase):
         np.testing.assert_allclose(
             self.sofast_single_facet.data_calculation_facet[0].slopes_facet_xy,
             self.exp_slopes_xy_single_facet,
-            rtol=0,
-            atol=1e-6,
+            rtol=0,  # relative tolerance (i.e. +/- a fixed fraction of the expected value)
+            atol=1e-6,  # absolute tolerance (i.e. +/- a fixed value)
         )
 
     def test_facet_pointing_ensemble(self):
@@ -178,8 +182,8 @@ class TestProcessSofastFixed(unittest.TestCase):
                 np.testing.assert_allclose(
                     self.sofast_facet_ensemble.data_calculation_ensemble[idx_facet].trans_facet_ensemble.matrix,
                     self.exp_facet_pointing_trans[idx_facet],
-                    rtol=0,
-                    atol=1e-6,
+                    rtol=0,  # relative tolerance (i.e. +/- a fixed fraction of the expected value)
+                    atol=1e-6,  # absolute tolerance (i.e. +/- a fixed value)
                 )
 
     def tearDown(self) -> None:
