@@ -211,14 +211,15 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
             slopes = self.data_calculation_facet[idx].slopes_facet_xy  # facet coordinats
 
             # Calculate surface normals in local (facet) coordinates
-            u_surf_norms = np.ones((3, slopes.shape[1]))
+            number_data_points = slopes.shape[1]
+            u_surf_norms = np.ones((3, number_data_points))
             u_surf_norms[:2] = -slopes
             u_surf_norms = Uxyz(u_surf_norms).as_Vxyz()
 
             # Apply rotation to normal vectors
             u_surf_norms_global = u_surf_norms.rotate(trans_facet_ensemble_list[idx].R)
             # Convert normal vectors to global (ensemble) slopes
-            slopes_ensemble_xy = -u_surf_norms_global.data[:2] / u_surf_norms_global.data[2:]
+            slopes_ensemble_xy = -u_surf_norms_global.projXY().data / u_surf_norms_global.z
 
             # Convert surface points to global (ensemble) coordinates
             v_surf_points_ensemble = trans_facet_ensemble_list[idx].apply(
@@ -261,7 +262,8 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
             pts: Vxyz = self.data_calculation_facet[idx_mirror].v_surf_points_facet
             # Get normals from slopes
             slopes: np.ndarray = self.data_calculation_facet[idx_mirror].slopes_facet_xy
-            norm_data = np.ones((3, slopes.shape[1]))
+            number_data_points = slopes.shape[1]
+            norm_data = np.ones((3, number_data_points))
             norm_data[:2] = -slopes
             norm_vecs = Uxyz(norm_data)
             # Get mirror shape
