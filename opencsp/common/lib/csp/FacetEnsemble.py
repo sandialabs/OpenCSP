@@ -1,8 +1,5 @@
 """Rigid ensemble of facets"""
 
-import copy
-from typing import Callable
-from warnings import warn
 import numpy as np
 from scipy.spatial.transform import Rotation
 
@@ -10,17 +7,13 @@ from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbst
 from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import VisualizeOrthorectifiedSlopeAbstract
 from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
-from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
+from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
-from opencsp.common.lib.render_control.RenderControlFacet import RenderControlFacet
 from opencsp.common.lib.render_control.RenderControlFacetEnsemble import RenderControlFacetEnsemble
-from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
-from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
 
 
 class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
@@ -42,16 +35,12 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
     @property
     def facet_positions(self) -> Pxyz:
-        """
-        Finds the locations of the facets relative to the `FacetEnsemble` origin.
-        If the ensemble was only modified using the `set_facet_positions` and
-        `set_facet_canting` functions then this essentially just ignored the
-        rotations.
-        """
+        """The locations of the facets relative to the `FacetEnsemble` origin."""
         return Pxyz.merge([facet._self_to_parent_transform.apply(Pxyz.origin()) for facet in self.facets])
 
     @property
     def transform_mirror_to_self(self):
+        """List of transforms from Mirror to self"""
         return [facet.mirror.get_transform_relative_to(self) for facet in self.facets]
 
     # override from VisualizeOrthorectifiedSlopeAbstract
@@ -175,7 +164,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
         # individual facets
         if facet_ensemble_style.draw_facets:
-            for idx, facet in enumerate(self.facets):
+            for facet in self.facets:
                 transform_facet = transform * facet._self_to_parent_transform
                 facet_style = facet_ensemble_style.get_facet_style(facet.name)
                 facet.draw(view, facet_style, transform_facet)
@@ -194,19 +183,16 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             corners_moved = transform.apply(corners)
             view.draw_Vxyz(corners_moved, close=True, style=facet_ensemble_style.outline_style)
 
-    # debug function
     def set_facet_transform_list(self, transformations: list[TransformXYZ]):
         """
         Combines the `set_facet_positions` and `set_facet_canting` functions into a single action.
         """
-        warn("Untested function")
         for transformation, facet in zip(transformations, self.facets):
             facet._self_to_parent_transform = transformation
 
     def set_facet_positions(self, positions: Pxyz):
-        """
-        The function for setting the positions of the facets relative to one another.
-
+        """Sets the positions of the facets relative to the ensemble.
+        NOTE: Will remove previously set facet canting rotations
         """
         if len(positions) != len(self.facets):
             raise ValueError(
@@ -219,6 +205,9 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             facet._self_to_parent_transform = TransformXYZ.from_V(pos)
 
     def set_facet_canting(self, canting_rotations: list[Rotation]):
+        """Sets facet canting relative to ensemble.
+        NOTE: Will remove previously set facet positionals
+        """
         if len(canting_rotations) != len(self.facets):
             raise ValueError(
                 f"This FacetEnsemble contains {len(self.facets)} and"
@@ -229,61 +218,3 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             pos: Pxyz
             canting: Rotation
             facet._self_to_parent_transform = TransformXYZ.from_R_V(canting, pos)
-
-    # FUNCITONS BELOW THIS HAVE NOT BEEN TESTED !!!
-
-    def define_pointing_function_UNVERIFIED(self, func: Callable[..., TransformXYZ]) -> None:
-        """Sets the canting function to use. I.e., defines the
-        "set_pointing" function.
-
-        Parameters
-        ----------
-        func : Callable
-            Function that returns a "child to base" TransformXYZ object.
-        """
-        self.pointing_function = func
-
-    def set_pointing_UNVERIFIED(self, *args) -> None:
-        """Sets current facet ensemble canting (i.e. sets
-        self.ori.transform_child_to_base using the given arguments.
-        """
-        warn("Depricated, do not use OpticOrientation instance, use OpticOrietionAbstract.")
-        if self.pointing_function is None:
-            raise ValueError('self.pointing_function is not defined. Use self.define_pointing_function.')
-
-        self._self_to_parent_transform = self.pointing_function(*args)
-
-    @classmethod
-    def generate_az_el_UNVERIFIED(cls, facets: list[Facet]) -> 'FacetEnsemble':
-        """Generates HeliostatCantable object defined by a simple azimuth then elevation
-        canting strategy. The "pointing_function" accessed by self.set_pointing
-        has the following inputs
-            - az - float - azimuth angle (rotation about z axis) in radians
-            - el - float - elevation angle (rotation about x axis) in radians
-        """
-
-        def pointing_function(az: float, el: float) -> TransformXYZ:
-            r = Rotation.from_euler('zx', [az, el], degrees=False)
-            return TransformXYZ.from_R(r)
-
-        # Create heliostat
-        heliostat = cls(facets)
-        heliostat.define_pointing_function(pointing_function)
-
-        return heliostat
-
-    @classmethod
-    def generate_rotation_defined_UNVERIFIED(cls, facets: list[Facet]) -> 'FacetEnsemble':
-        """Generates HeliostatCantable object defined by a given scipy Rotation object.
-        The "pointing_function" accessed by self.set_pointing has the following input
-            - rotation - scipy.spatial.transform.Rotation
-        """
-
-        def pointing_function(rotation: Rotation) -> TransformXYZ:
-            return TransformXYZ.from_R(rotation)
-
-        # Create heliostat
-        heliostat = cls(facets)
-        heliostat.define_pointing_function(pointing_function)
-
-        return heliostat

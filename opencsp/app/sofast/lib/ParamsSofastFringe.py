@@ -51,8 +51,8 @@ class ParamsSofastFringe(hdf5_tools.HDF5_IO_Abstract):
             Default is empty string ''.
         """
         # Load geometry parameters
-        params_mask = ParamsMaskCalculation.load_from_hdf(file, prefix + '/ParamsSofastFringe/')
-        params_geometry = ParamsOpticGeometry.load_from_hdf(file, prefix + '/ParamsSofastFringe/')
+        params_mask = ParamsMaskCalculation.load_from_hdf(file, prefix + 'ParamsSofastFringe/')
+        params_geometry = ParamsOpticGeometry.load_from_hdf(file, prefix + 'ParamsSofastFringe/')
 
         # Load sofast parameters
         data = {'geometry': params_geometry, 'mask': params_mask}

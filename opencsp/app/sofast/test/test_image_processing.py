@@ -138,8 +138,8 @@ class TestImageProcessing(unittest.TestCase):
         """Tests image_processing.refine_facet_corners()"""
         # Load edge data
         datasets = [
-            'DataSofastCalculation/image_processing/general/v_edges_image',
-            'DataSofastInput/optic_definition/ensemble/r_facet_ensemble',
+            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image',
+            'DataSofastInput/optic_definition/DefinitionEnsemble/r_facet_ensemble',
         ]
         data = load_hdf5_datasets(datasets, self.data_file_multi)
         num_facets = data['r_facet_ensemble'].shape[0]
@@ -151,9 +151,9 @@ class TestImageProcessing(unittest.TestCase):
         for facet_idx in range(num_facets):
             # Get sofast parameters
             datasets = [
-                'DataSofastInput/sofast_params/facet_corns_refine_step_length',
-                'DataSofastInput/sofast_params/facet_corns_refine_perpendicular_search_dist',
-                'DataSofastInput/sofast_params/facet_corns_refine_frac_keep',
+                'DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_step_length',
+                'DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_perpendicular_search_dist',
+                'DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_frac_keep',
             ]
             data = load_hdf5_datasets(datasets, self.data_file_multi)
             args = [
@@ -164,9 +164,9 @@ class TestImageProcessing(unittest.TestCase):
 
             # Load input and expected output data
             datasets = [
-                f'DataSofastCalculation/image_processing/facet_{facet_idx:03d}/loop_facet_image_refine',
-                f'DataSofastCalculation/image_processing/facet_{facet_idx:03d}/v_facet_corners_image_exp',
-                f'DataSofastCalculation/image_processing/facet_{facet_idx:03d}/v_facet_centroid_image_exp',
+                f'DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/loop_facet_image_refine',
+                f'DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/v_facet_corners_image_exp',
+                f'DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/v_facet_centroid_image_exp',
             ]
             data = load_hdf5_datasets(datasets, self.data_file_multi)
             v_facet_corners_image_exp = Vxy(data['v_facet_corners_image_exp'])
