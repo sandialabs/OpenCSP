@@ -110,9 +110,10 @@ class ImageAcquisition(ImageAcquisitionAbstract):
     def get_frame(self) -> np.ndarray:
         # Start frame capture
         self.cap.StartGrabbingMax(1)
-        grabResult = self.cap.RetrieveResult(
-            int(self.cap.ExposureTimeRaw.Max / 1000 * 1.5), pylon.TimeoutHandling_ThrowException
-        )
+        exposure_time_ms = self.cap.ExposureTimeRaw.Max / 1000  # exposure time, ms
+        # Grab the frame
+        # After 1.5 times the expected image acquisition time, throw a pylon.TimeoutHandling_ThrowException
+        grabResult = self.cap.RetrieveResult(int(exposure_time_ms * 1.5), pylon.TimeoutHandling_ThrowException)
 
         # Access image data
         if grabResult.GrabSucceeded():
