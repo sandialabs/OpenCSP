@@ -275,6 +275,8 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
         self.facet_ensemble.set_facet_canting(facet_canting_rotations)
 
+        return facet_canting_rotations
+
     # RENDERING
 
     def draw(self, view: View3d, heliostat_style: RenderControlHeliostat = None, transform: TransformXYZ = None):
