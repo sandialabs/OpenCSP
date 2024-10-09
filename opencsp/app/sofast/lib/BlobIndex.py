@@ -63,13 +63,13 @@ class BlobIndex:
 
         self.search_thresh: float = 5.0  # pixels
         """Threshold, in pixels. As algorithm calculates the expected location of the next blob, if a blob
-        is within 'search_thresh' of the expected location, that blob is considered found"""
+        is within 'search_thresh' of the expected location, that blob is considered found. Default 5.0"""
         self.max_num_iters: int = 100
-        """Maximum number of iterations to use when fitting found blobs to grid pattern"""
+        """Maximum number of iterations to use when fitting found blobs to grid pattern. Default 100"""
         self.search_perp_axis_ratio: float = 3.0
-        """Ratio of point distances: (perpendicular to axis) / (along axis) used to search for points"""
+        """Ratio of point distances: (perpendicular to axis) / (along axis) used to search for points. Default 3.0"""
         self.apply_filter: bool = False
-        """To filter bad points (experimental, not implemented yet)"""
+        """To filter bad points (experimental, not implemented yet). Default False"""
 
         self._offset_x = -x_min  # index
         self._offset_y = -y_min  # index
