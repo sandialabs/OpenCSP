@@ -127,6 +127,22 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         slope_data = np.reshape(slope_data, (2, y_vec.size, x_vec.size))  # facet child
         return slope_data  # facet child
 
+    def get_2D_dimensions(self) -> tuple[float, float]:
+        """Returns width and heightin facet's child coordinate
+        reference frame.
+
+        Returns
+        -------
+        tuple[float, float]
+            Width: following (+)x infinity in the (-) direction for x_max(right) - following (-x) infinity in the (+) direction for x_min(left).
+            Height: following (+)y infinity in the (-) direction for y_max(top) - following (-y) infinity in the (+) direction for y_min(bottom).
+            Facet's child coordinate reference frame.
+        """
+        left, right, bottom, top = self.axis_aligned_bounding_box
+        width = right - left
+        height = top - bottom
+        return width, height
+
     # override function from RayTraceable
     def most_basic_ray_tracable_objects(self) -> list[RayTraceable]:
         return self.mirror.most_basic_ray_tracable_objects()

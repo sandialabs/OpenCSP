@@ -1,6 +1,7 @@
 """Rigid ensemble of facets"""
 
 import numpy as np
+import pandas as pd
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.csp.OpticOrientationAbstract import OpticOrientationAbstract
@@ -34,6 +35,17 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
         self.num_facets = len(facets)
         self.pointing_function = None
+
+        # TODO MHH better way to do this
+        self.TOP_LEFT_FACET_INDX = 1
+        self.TOP_RIGHT_FACET_INDX = 5
+        self.BOTTOM_RIGHT_FACET_INDX = 25
+        self.BOTTOM_LEFT_FACET_INDX = 21
+
+        self.TOP_LEFT_CORNER_INDX = 0
+        self.TOP_RIGHT_CORNER_INDX = 1
+        self.BOTTOM_RIGHT_CORNER_INDX = 2
+        self.BOTTOM_LEFT_CORNER_INDX = 3
 
     @property
     def facet_positions(self) -> Pxyz:
@@ -87,7 +99,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         matching_facets = filter(lambda facet: facet.name == facet_name, self.facets)
         first_matching = next(matching_facets, None)
         if first_matching is None:
-            raise KeyError(f"No heliostat with the name '{facet_name}' appears in the SolarField {self}.")
+            raise KeyError(f"No facet with the name '{facet_name}' appears in the facet ensemble {self}.")
         # Return.
         return first_matching
 

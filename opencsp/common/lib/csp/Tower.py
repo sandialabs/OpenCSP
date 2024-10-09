@@ -30,15 +30,15 @@ class Tower(RayTraceable):
     parts : list[str]
         The parts that build the Tower. Includes walls (top, northface, southface, bottom), and optionl target.
     height : float
-        The height of Tower. Currently set for NSTTF Tower height of 61 m.
+        The height of Tower. Currently set for NSTTF Tower height of 63.5508 m.
     east : float
-        The East wall of the Tower. Currently set for 8.8 m. TODO, MHH find dimensions of tower (in particular width)
+        The East wall of the Tower. Currently set for 5.485 m. TODO, MHH find dimensions of tower (in particular width)
     west : float
-        The West wall of the Tower. Currently set for 8.8 m.
+        The West wall of the Tower. Currently set for 5.485 m.
     south : float
-        The South wall of the Tower. Currently set for 8.8 m.
+        The South wall of the Tower. Currently set for 9.1168 m.
     north : float
-        The North wall of the Tower. Currently set for 8.8 m.
+        The North wall of the Tower. Currently set for 6.25 m.
     x_aim : float
         The x component of the target in relation to the Tower origin.
     y_aim : float
@@ -52,14 +52,14 @@ class Tower(RayTraceable):
         name: str,
         origin: Pxyz,
         parts: list[str] = ["whole tower"],
-        height: float = 100,
-        east: float = 8.8,
-        west: float = -8.8,
-        south: float = -8.8,
-        north: float = 8.8,
+        height: float = 63.5508,
+        east: float = 5.485,
+        west: float = -5.485,
+        south: float = -9.1186,
+        north: float = 6.25,
         x_aim: float = 0,
-        y_aim: float = 8.8,
-        z_aim: float = 100,
+        y_aim: float = 6.25,
+        z_aim: float = 63.5508,
     ):
 
         # parameters used for control tower at NSTTF
