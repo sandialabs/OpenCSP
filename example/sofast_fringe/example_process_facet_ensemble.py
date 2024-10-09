@@ -162,7 +162,7 @@ def example_process_facet_ensemble():
 
     # Plot slope map
     res = 0.002  # meter, make the plot with 2mm spatial resolution
-    clim = 7  # mrad, draw the plot with +/-7mrad scale bars, this mirror has erorrs that extent to about +/-7mrad
+    clim = 7  # mrad, draw the plot with +/-7mrad scale bars, this mirror has erorrs that extend to about +/-7mrad
     fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
     ensemble.plot_orthorectified_slope(res=res, clim=clim, axis=fig_record.axis)
     fig_record.save(dir_save, 'slope_magnitude', 'png')
