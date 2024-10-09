@@ -274,6 +274,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
                 f"This FacetEnsemble contains {len(self.facets)} and"
                 f" the argument only gave {len(canting_rotations)} rotations."
             )
+
         for facet, pos, canting in zip(self.facets, self.facet_positions, canting_rotations):
             facet: Facet
             pos: Pxyz
