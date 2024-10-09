@@ -74,7 +74,7 @@ def example_process_single_facet():
 
     # 3. Log best-fit parabolic focal lengths
     # =======================================
-    surf_coefs = sofast.data_characterization_facet[0].surf_coefs_facet
+    surf_coefs = sofast.data_calculation_facet[0].surf_coefs_facet
     focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
     lt.info(f'Facet xy focal lengths (meters): ' f'{focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}')
 

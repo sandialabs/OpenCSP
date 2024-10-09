@@ -14,6 +14,7 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlFacetEnsemble import RenderControlFacetEnsemble
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
@@ -56,10 +57,15 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         """
         # Get XYZ locations of all points making up mirror region
         xyz = []  # facet frame
-        for facet in self.facets:
+        for facet_idx, facet in enumerate(self.facets):
             # Get all mirror region vertices
             points_xy = Pxy.merge([loop.vertices for loop in facet.mirror.region.loops])  # mirror frame
             points_z = facet.mirror.surface_displacement_at(points_xy)  # mirror frame
+            # If the corners aren't in range of the mirror's interpolation function, set to 0
+            if np.any(np.isnan(points_z)):
+                lt.warn(f'Could not find corner z values for facet number {facet_idx:3d}; filling with zeros.')
+                points_z = np.nan_to_num(points_z, nan=0)
+            # Translate xyz points to their locations in the ensemble
             points_xyz = Pxyz((points_xy.x, points_xy.y, points_z))  # mirror frame
             points_xyz = facet.mirror.get_transform_relative_to(self).apply(points_xyz)  # facet frame
             xyz.append(points_xyz)  # facet frame

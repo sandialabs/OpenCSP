@@ -1,10 +1,22 @@
+from enum import Enum
 from typing import Literal
 
 import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.tool import log_tools as lt
+
+
+class Step(Enum):
+    """Gives step direction
+    - Left/right for horizontal searches
+    - Up/down for vertical searches
+    """
+
+    RIGHT_OR_DOWN = 1
+    LEFT_OR_UP = -1
 
 
 class BlobIndex:
@@ -16,12 +28,15 @@ class BlobIndex:
     Attributes
     ----------
     search_thresh : float
-
+        Threshold, in pixels. As algorithm calculates the expected location of the next blob, if a blob
+        is within "search_thresh" of the expected location, that blob is considered found.
+    max_num_iters : int
+        Maximum number of iterations to use when fitting found blobs to grid pattern.
     search_perp_axis_ratio : float
         Ratio of point distances: (perpendicular to axis) / (along axis) used to
         search for points.
     apply_filter : bool
-        To filter bad points (experimental)
+        To filter bad points (experimental, not implemented yet)
     """
 
     def __init__(self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int) -> 'BlobIndex':
@@ -46,9 +61,15 @@ class BlobIndex:
         self._is_assigned = np.zeros(self._num_pts, dtype=bool)
         self._neighbor_dists = np.zeros((self._num_pts, 4)) * np.nan  # left, right, up, down
 
-        self.search_thresh = 5.0  # pixels
-        self.search_perp_axis_ratio = 3.0
-        self.apply_filter = False
+        self.search_thresh: float = 5.0  # pixels
+        """Threshold, in pixels. As algorithm calculates the expected location of the next blob, if a blob
+        is within 'search_thresh' of the expected location, that blob is considered found. Default 5.0"""
+        self.max_num_iters: int = 100
+        """Maximum number of iterations to use when fitting found blobs to grid pattern. Default 100"""
+        self.search_perp_axis_ratio: float = 3.0
+        """Ratio of point distances: (perpendicular to axis) / (along axis) used to search for points. Default 3.0"""
+        self.apply_filter: bool = False
+        """To filter bad points (experimental, not implemented yet). Default False"""
 
         self._offset_x = -x_min  # index
         self._offset_y = -y_min  # index
@@ -131,17 +152,14 @@ class BlobIndex:
         return (not np.isnan(idx)), int(idx)
 
     def _assign(self, idx_pt: int, idx_x: int, idx_y: int) -> None:
-        """Assigns given blob index an xy index
+        # Assigns given blob index an xy index
+        # idx_pt : int
+        #     Index of point (indexing self._points)
+        # idx_x : int
+        #     X blob index
+        # idx_y : int
+        #     Y blob index
 
-        Parameters
-        ----------
-        idx_pt : int
-            Index of point (indexing self._points)
-        idx_x : int
-            X blob index
-        idx_y : int
-            Y blob index
-        """
         # Assign vectors
         self._idx_x[idx_pt] = idx_x
         self._idx_y[idx_pt] = idx_y
@@ -153,13 +171,8 @@ class BlobIndex:
         lt.debug(f'Blob number {idx_pt:d} was assigned ({idx_x:d}, {idx_y:d})')
 
     def _unassign(self, idx_pt: int) -> None:
-        """Unassigns a point index
+        # Unassigns a point index
 
-        Parameters
-        ----------
-        idx_pt : int
-            Index of point (indexing self._points)
-        """
         # Unassign matrices
         idx_mat_x = self._idx_x[idx_pt] + self._offset_x
         idx_mat_y = self._idx_y[idx_pt] + self._offset_y
@@ -177,18 +190,12 @@ class BlobIndex:
 
         lt.debug(f'Blob number {idx_pt:d} was unassigned')
 
-    def _assign_center(self, pt_origin: Vxy) -> None:
-        """Assigns the center point to (0, 0)
-
-        Parameters
-        ----------
-        pt_origin : Vxy
-            Location of origin, pixels
-        """
+    def _assign_center(self, pt_origin: Vxy, idx_x: int, idx_y: int) -> None:
+        # Assigns given origin point to given xy index
         idx, dist = self._nearest_unassigned_idx_from_xy_point(pt_origin)
         if dist > self.search_thresh:
-            lt.warn(f'Assigning point {idx:d} to index (0, 0) resulted in {dist:.2f} pixels error.')
-        self._assign(idx, 0, 0)
+            lt.warn(f'Assigning point {idx:d} to index ({idx_x:d}, {idx_y:d}) resulted in {dist:.2f} pixels error.')
+        self._assign(idx, idx_x, idx_y)
 
     def _find_nearest_in_direction(
         self, idx_pt: int, direction: Literal['right', 'left', 'up', 'down']
@@ -248,15 +255,14 @@ class BlobIndex:
         """Returns number of unassigned points (referencing self._points)"""
         return np.logical_not(self._is_assigned).sum()
 
-    def _find_3x3_center_block(self) -> None:
-        """Finds the center 3x3 block around center point using nearest in direction method
-        a  b  c
-        d  e  f
-        g  h  i
-        """
-        ret, idx_e = self._point_index_from_xy_index(0, 0)
+    def _find_3x3_center_block(self, idx_x: int, idx_y: int) -> None:
+        # Finds the center 3x3 block around center point using nearest in direction method
+        # a  b  c
+        # d  e  f
+        # g  h  i
+        ret, idx_e = self._point_index_from_xy_index(idx_x, idx_y)
         if not ret:
-            lt.warn('Could not find 3x3 center block. Could not find point index (0, 0).')
+            lt.warn(f'Could not find 3x3 center block. Could not find point index xy=({idx_x:d}, {idx_y:d}).')
         # Right
         idx_f, x, y = self._find_nearest_in_direction(idx_e, 'right')
         self._assign(idx_f, x, y)
@@ -282,22 +288,18 @@ class BlobIndex:
         idx_g, x, y = self._find_nearest_in_direction(idx_d, 'down')
         self._assign(idx_g, x, y)
 
-    def _extend_data(self, direction: Literal['x', 'y'], step: Literal[1, -1]) -> None:
-        """Extends found blob rows/collumns in given direction
-
-        Steps in the given axis, a or b
-
-        Parameters
-        ----------
-        direction : Literal['x', 'y']
-            Axis to search
-        step : Literal[1, -1]
-            Direction to search
-            -  1 = right/down
-            - -1 = left/up
-        """
-        if step not in [-1, 1]:
-            raise ValueError(f'Step must be -1 or 1, not {step}')
+    def _extend_data(self, direction: Literal['x', 'y'], step: Step) -> None:
+        # Extends found blob rows/collumns in given direction
+        # Steps in the given axis, a or b
+        #
+        # Parameters
+        # ----------
+        # direction : Literal['x', 'y']
+        #     Axis to search
+        # step : Step
+        #     Direction to search
+        if not isinstance(step, Step):
+            raise ValueError(f'Step must be a Step class, not type {type(step)}')
 
         if direction == 'x':
             idxs_a = self._idx_y
@@ -317,8 +319,8 @@ class BlobIndex:
             is_b = idxs_b[mask]  # indices of points on axis
             # Step through all points on axis
             for i_b in is_b:
-                if not i_b + step in is_b:  # If adjacent point is not assigned, find it
-                    idx_b_prev = i_b - step  # Index used for slope calc
+                if not i_b + step.value in is_b:  # If adjacent point is not assigned, find it
+                    idx_b_prev = i_b - step.value  # Index used for slope calc
                     if idx_b_prev in is_b:  # If history exists, find points
                         for idx_b_next in range(500):
                             # First iteration, use previously assigned points
@@ -344,36 +346,33 @@ class BlobIndex:
                             # Assign point
                             if dist < self.search_thresh:
                                 if direction == 'x':
-                                    idx_x = int(i_b + step + (idx_b_next * step))
+                                    idx_x = int(i_b + step.value + (idx_b_next * step.value))
                                     idx_y = int(idx_a)
                                 else:
                                     idx_x = int(idx_a)
-                                    idx_y = int(i_b + step + (idx_b_next * step))
+                                    idx_y = int(i_b + step.value + (idx_b_next * step.value))
                                 self._assign(idx_new, idx_x, idx_y)
                             else:
                                 break
 
     def _exp_pt_from_pt_pair(self, pt_cur: Vxy, pt_prev: Vxy) -> Vxy:
-        """Calculates the expected point from a given current and previous point pair
-
-        Parameters
-        ----------
-        pt_cur : Vxy
-            Current point, pixels
-        pt_prev : Vxy
-            Previous point, pixels
-
-        Returns
-        -------
-        Vxy
-            Refined expected point location
-        """
+        # Calculates the expected point from a given current and previous point pair
+        # Parameters
+        # ----------
+        # pt_cur : Vxy
+        #     Current point, pixels
+        # pt_prev : Vxy
+        #     Previous point, pixels
+        # Returns
+        # -------
+        # Vxy
+        #     Refined expected point location
         del_y = (pt_cur.y - pt_prev.y)[0]  # pixels
         del_x = (pt_cur.x - pt_prev.x)[0]  # pixels
         return pt_cur + Vxy((del_x, del_y))  # pixels
 
     def _filter_bad_points(self) -> None:
-        """Filters erroneous assigned points"""
+        # Filters erroneous assigned points
         del_1_x = np.diff(self._points_mat, axis=1)
         del_1_y = np.diff(self._points_mat, axis=0)
         del_2_x = np.diff(del_1_x, axis=1)
@@ -397,27 +396,29 @@ class BlobIndex:
         for idx in idxs_bad_pts:
             self._unassign(idx)
 
-    def run(self, pt_origin: Vxy) -> None:
+    def run(self, pt_known: Vxy, x_known: int, y_known: int) -> None:
         """Runs blob indexing sequence
 
         Parameters
         ----------
-        pt_origin : Vxy
-            Location of origin point with blob index of (0, 0), pixels
+        pt_known : Vxy
+            Location of known point with known blob index, pixels
+        x/y_known : int
+            XY indies of known points
         """
         # Assign center point
-        self._assign_center(pt_origin)
+        self._assign_center(pt_known, x_known, y_known)
         # Find 3x3 core point block
-        self._find_3x3_center_block()
+        self._find_3x3_center_block(x_known, y_known)
         # Extend rows
         prev_num_unassigned = self._num_unassigned()
-        for idx in range(100):
-            self._extend_data('x', -1)
-            self._extend_data('x', 1)
+        for idx in range(self.max_num_iters):
+            self._extend_data('x', Step(-1))
+            self._extend_data('x', Step(1))
             if self.apply_filter:
                 self._filter_bad_points()
-            self._extend_data('y', -1)
-            self._extend_data('y', 1)
+            self._extend_data('y', Step(-1))
+            self._extend_data('y', Step(1))
             if self.apply_filter:
                 self._filter_bad_points()
 
@@ -426,8 +427,7 @@ class BlobIndex:
             if prev_num_unassigned == cur_num_unassigned:
                 lt.debug(f'All possible points found in {idx + 1:d} iterations.')
                 break
-            else:
-                prev_num_unassigned = cur_num_unassigned
+            prev_num_unassigned = cur_num_unassigned
 
     def plot_points_labels(self, labels: bool = False) -> None:
         """Plots points and labels
@@ -496,6 +496,25 @@ class BlobIndex:
         indices = Vxy((idx_x[mask_assigned], idx_y[mask_assigned]), int)
         points = Vxy((x_pts[mask_assigned], y_pts[mask_assigned]))
         return points, indices
+
+    def get_data_in_region(self, loop: LoopXY) -> tuple[Vxy, Vxy]:
+        """Returns found points and indices within given region
+
+        Parameters
+        ----------
+        loop : LoopXY
+            The loop to search within
+
+        Returns
+        -------
+        points : Vxy
+            Lenght N vector, located points xy locations, pixels
+        indices_xy : Vxy
+            Length N vector, located points xy blob indices, int
+        """
+        points, indices = self.get_data()
+        mask = loop.is_inside(points)
+        return points[mask], indices[mask]
 
     def get_data_mat(self) -> tuple[np.ndarray, np.ndarray]:
         """Returns found points and indices in matrix form

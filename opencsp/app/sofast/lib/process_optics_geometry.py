@@ -359,7 +359,7 @@ def process_undefined_geometry(
 
 
 def process_multifacet_geometry(
-    facet_data: DefinitionFacet,
+    facet_data: list[DefinitionFacet],
     ensemble_data: DefinitionEnsemble,
     mask_raw: ndarray,
     v_meas_pt_ensemble: Vxyz,
@@ -451,7 +451,8 @@ def process_multifacet_geometry(
 
     # Calculate ensemble corners in ensemble coordinates
     v_ensemble_corns_ensemble = []
-    for r_facet_ensemble_cur, (idx_facet, idx_corn) in zip(r_facet_ensemble, ensemble_corns_indices):
+    for idx_facet, idx_corn in ensemble_corns_indices:
+        r_facet_ensemble_cur = r_facet_ensemble[idx_facet]
         v_ensemble_corns_ensemble.append(
             (
                 v_facet_locs_ensemble[idx_facet]
