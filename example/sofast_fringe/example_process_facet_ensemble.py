@@ -164,19 +164,17 @@ def example_process_facet_ensemble():
     facet_ensemble_control = rcfe.RenderControlFacetEnsemble(default_style=facet_control, draw_outline=True)
     axis_control_m = rca.meters()
 
-    # TODO: enable once https://github.com/sandialabs/OpenCSP/issues/133 is resolved done
     # Plot slope map
-    # fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
-    # ensemble.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
-    # fig_record.save(dir_save, 'slope_magnitude', 'png')
+    fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
+    ensemble.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
+    fig_record.save(dir_save, 'slope_magnitude', 'png')
 
-    # TODO: enable once https://github.com/sandialabs/OpenCSP/issues/133 is resolved done
     # 5. Plot 3d representation of facet ensemble
     # ===========================================
-    # fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='Facet Ensemble')
-    # ensemble.draw(fig_record.view, facet_ensemble_control)
-    # fig_record.axis.axis('equal')
-    # fig_record.save(dir_save, 'facet_ensemble', 'png')
+    fig_record = fm.setup_figure_for_3d_data(figure_control, axis_control_m, title='Facet Ensemble')
+    ensemble.draw(fig_record.view, facet_ensemble_control)
+    fig_record.axis.axis('equal')
+    fig_record.save(dir_save, 'facet_ensemble', 'png')
 
     # 6. Save slope data as HDF5 file
     # ===============================
