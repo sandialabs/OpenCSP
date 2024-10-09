@@ -36,17 +36,6 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
         self.num_facets = len(facets)
         self.pointing_function = None
 
-        # TODO MHH better way to do this
-        self.TOP_LEFT_FACET_INDX = 1
-        self.TOP_RIGHT_FACET_INDX = 5
-        self.BOTTOM_RIGHT_FACET_INDX = 25
-        self.BOTTOM_LEFT_FACET_INDX = 21
-
-        self.TOP_LEFT_CORNER_INDX = 0
-        self.TOP_RIGHT_CORNER_INDX = 1
-        self.BOTTOM_RIGHT_CORNER_INDX = 2
-        self.BOTTOM_LEFT_CORNER_INDX = 3
-
     @property
     def facet_positions(self) -> Pxyz:
         """The locations of the facets relative to the `FacetEnsemble` origin."""
