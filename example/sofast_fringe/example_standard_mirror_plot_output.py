@@ -1,7 +1,7 @@
 import os
 from os.path import join
 
-import opencsp.app.sofast.lib.load_saved_data as lsd
+import opencsp.app.sofast.lib.load_sofast_hdf_data as lsd
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.geometry.Uxyz import Uxyz
@@ -37,8 +37,8 @@ def example_single_facet() -> None:
 
     # 1. Load Sofast measurement data
     # ===============================
-    optic_meas = lsd.load_mirror_from_hdf(file_data)
-    optic_ref = lsd.load_ideal_mirror_from_hdf(file_data, 100.0)
+    optic_meas = lsd.load_mirror(file_data)
+    optic_ref = lsd.load_mirror_ideal(file_data, 100.0)
 
     # 2. Define viewing/illumination geometry
     # =======================================

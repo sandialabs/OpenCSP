@@ -75,7 +75,13 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         # Set exposure values to be stepped over when performing exposure calibration
         shutter_min = self.cap.ExposureTimeRaw.Min
         shutter_max = self.cap.ExposureTimeRaw.Max
-        self._shutter_cal_values = np.linspace(shutter_min, shutter_max, 2**13).astype(int)
+
+        self._shutter_cal_values: np.ndarray = np.linspace(shutter_min, shutter_max, 2**13).astype(int)
+
+        # Apply model-specific processing for Basler mono cameras
+        if devices[instance].GetModelName() == 'acA3088-16gm':
+            # If type acA3088-16gm, make sure shutter values are multiple of 25
+            self._shutter_cal_values = (self._shutter_cal_values.astype(float) / 25).astype(int) * 25
 
     @classmethod
     def _check_pypylon_version(cls):
@@ -104,7 +110,10 @@ class ImageAcquisition(ImageAcquisitionAbstract):
     def get_frame(self) -> np.ndarray:
         # Start frame capture
         self.cap.StartGrabbingMax(1)
-        grabResult = self.cap.RetrieveResult(5000, pylon.TimeoutHandling_ThrowException)
+        exposure_time_ms = self.cap.ExposureTimeRaw.Max / 1000  # exposure time, ms
+        # Grab the frame
+        # After 1.5 times the expected image acquisition time, throw a pylon.TimeoutHandling_ThrowException
+        grabResult = self.cap.RetrieveResult(int(exposure_time_ms * 1.5), pylon.TimeoutHandling_ThrowException)
 
         # Access image data
         if grabResult.GrabSucceeded():

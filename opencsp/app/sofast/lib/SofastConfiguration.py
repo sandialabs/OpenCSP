@@ -62,7 +62,7 @@ class SofastConfiguration:
         for idx_facet in range(num_facets):
             if self._is_fringe:
                 # Get data
-                data_calc = self.data_sofast_object.data_characterization_facet[idx_facet]
+                data_calc = self.data_sofast_object.data_calculation_facet[idx_facet]
                 data_im_proc = self.data_sofast_object.data_image_processing_facet[idx_facet]
                 data_surf = self.data_sofast_object.data_surfaces[idx_facet]
 
@@ -77,10 +77,10 @@ class SofastConfiguration:
                 num_samps = len(data_calc.v_surf_points_facet)
             else:
                 # Get data
-                data_surf = self.data_sofast_object.slope_solver.surface
-                data_calc = self.data_sofast_object.data_slope_solver
+                data_surf = self.data_sofast_object.slope_solvers[idx_facet].surface
+                data_calc = self.data_sofast_object.data_calculation_facet[idx_facet]
                 # Sample resolution
-                surf_points = self.data_sofast_object.data_slope_solver.v_surf_points_facet
+                surf_points = self.data_sofast_object.data_calculation_facet[idx_facet].v_surf_points_facet
                 pts_index_xy = self.data_sofast_object.blob_index.get_data()[1]
                 point_indices_mat = self.data_sofast_object.blob_index.get_data_mat()[1]
                 offset_x = self.data_sofast_object.blob_index._offset_x

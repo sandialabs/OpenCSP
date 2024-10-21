@@ -61,12 +61,18 @@ class TestSofastConfiguration(unittest.TestCase):
         measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
 
         # Instantiate SofastFixed class and load measurement data
-        sofast = ProcessSofastFixed(orientation, camera, fixed_pattern_dot_locs, facet_data)
+        sofast = ProcessSofastFixed(orientation, camera, fixed_pattern_dot_locs)
         sofast.load_measurement_data(measurement)
 
         # Process
+        # - Since we are using an NSTTF mirror with about a 150m focal length,
+        #     we will seed the initial focal lengths with 150 in x and y
+        # - Since we are testing SofastFixed (which has sparse data compared
+        #     to SofastFringe), we will not downsample the data (set downsample to 1)
         surface = Surface2DParabolic(initial_focal_lengths_xy=(150.0, 150), robust_least_squares=False, downsample=1)
-        sofast.process_single_facet_optic(surface)
+        pt_known = measurement.origin
+        xy_known = (0, 0)
+        sofast.process_single_facet_optic(facet_data, surface, pt_known, xy_known)
 
         return sofast
 
@@ -93,6 +99,10 @@ class TestSofastConfiguration(unittest.TestCase):
         facet_data = DefinitionFacet.load_from_json(file_facet)
 
         # Define surface definition (parabolic surface)
+        # - Since we are using an NSTTF mirror with about a 300m focal length,
+        #     we will seed the initial focal lengths with 300 in x and y
+        # - Since we are testing SofastFringe (which has dense data sampling),
+        #     we will downsample the data by a factor of 10
         surface = Surface2DParabolic(initial_focal_lengths_xy=(300.0, 300.0), robust_least_squares=True, downsample=10)
 
         # Calibrate fringes

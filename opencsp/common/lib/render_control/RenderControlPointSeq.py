@@ -3,7 +3,9 @@
 
 """
 
-import opencsp.common.lib.render.color as clr
+import matplotlib.colors
+
+import opencsp.common.lib.render.Color as cl
 
 
 class RenderControlPointSeq:
@@ -77,13 +79,14 @@ class RenderControlPointSeq:
         self,  # See above for details:
         linestyle='-',  # '-', '--', '-.', ':', '' or 'None'
         linewidth: float = 1,  # float
-        color: str | clr.Color = 'b',  # line color
+        color: str | cl.Color = 'b',  # line color
         marker='x',  # .,ov^<>12348sp*hH+xXDd|_ or None
         markersize: float = 6,  # float
-        markeredgecolor: str | clr.Color = None,  # Defaults to color above if not set.
+        markeredgecolor: str | cl.Color = None,  # Defaults to color above if not set.
         markeredgewidth=None,  # Defaults to linewidth if not set.
-        markerfacecolor: str | clr.Color = None,  # Defaults to color above if not set.
-        vector_color: str | clr.Color = 'b',  # Used if points are in a vector field.
+        markerfacecolor: str | cl.Color = None,  # Defaults to color above if not set.
+        markeralpha: float | None = None,
+        vector_color: str | cl.Color = 'b',  # Used if points are in a vector field.
         vector_linewidth: float = 1,  # Used if points are in a vector field.
         vector_scale: float = 1.0,  # Facter to grow/srhink vector length, for points in a vector field.
     ):
@@ -108,6 +111,10 @@ class RenderControlPointSeq:
             Width of the marker edge in pixels. Defaults is 'linewidth'.
         markerfacecolor : str | Color | None, optional
             The color of the marker faces. Default is 'color'.
+        markeralpha : float | None, optional
+            The alpha value (transparency) with which to draw the markers, where
+            0=fully transparent and 1=fully opaque. None for matplotlib default
+            style. Default is None.
         vector_color : str | Color | None, optional
             The color for vectors. Only applies to points in a vector field.
             Default is 'b'.
@@ -120,16 +127,6 @@ class RenderControlPointSeq:
         """
         super(RenderControlPointSeq, self).__init__()
 
-        # Convert color values
-        if isinstance(color, clr.Color):
-            color = color.rgb()
-        if isinstance(markeredgecolor, clr.Color):
-            markeredgecolor = markeredgecolor.rgb()
-        if isinstance(markerfacecolor, clr.Color):
-            markerfacecolor = markerfacecolor.rgb()
-        if isinstance(vector_color, clr.Color):
-            vector_color = vector_color.rgb()
-
         # Set defaults.
         if markeredgecolor == None:
             markeredgecolor = color
@@ -141,22 +138,56 @@ class RenderControlPointSeq:
         # Set fields.
         self.linestyle = linestyle
         self.linewidth = linewidth
-        self.color = color
+        self._color = color
         self.marker = marker
         self.markersize = markersize
-        self.markeredgecolor = markeredgecolor
+        self._markeredgecolor = markeredgecolor
         self.markeredgewidth = markeredgewidth
-        self.markerfacecolor = markerfacecolor
-        self.vector_color = vector_color
+        self._markerfacecolor = markerfacecolor
+        self.markeralpha = markeralpha
+        self._vector_color = vector_color
         self.vector_linewidth = vector_linewidth
         self.vector_scale = vector_scale
+
+        self._standardize_color_values()
+
+    @property
+    def color(self) -> tuple[float, float, float, float] | None:
+        if self._color is not None:
+            return self._color.rgba()
+
+    @property
+    def markeredgecolor(self) -> tuple[float, float, float, float] | None:
+        if self._markeredgecolor is not None:
+            if self.markeralpha is not None:
+                return self._markeredgecolor.rgba(self.markeralpha)
+
+    @property
+    def markerfacecolor(self) -> tuple[float, float, float, float] | None:
+        if self._markerfacecolor is not None:
+            if self.markeralpha is not None:
+                return self._markerfacecolor.rgba(self.markeralpha)
+
+    @property
+    def vector_color(self) -> tuple[float, float, float, float] | None:
+        if self._vector_color is not None:
+            return self._vector_color.rgba()
 
     # MODIFICATION
 
     def set_color(self, color):
-        self.color = color
-        self.markeredgecolor = color
-        self.markerfacecolor = color
+        self._color = color
+        self._markeredgecolor = color
+        self._markerfacecolor = color
+
+        self._standardize_color_values()
+
+    def _standardize_color_values(self):
+        # convert to 'Color' class
+        self._color = cl.Color.convert(self._color)
+        self._markeredgecolor = cl.Color.convert(self._markeredgecolor)
+        self._markerfacecolor = cl.Color.convert(self._markerfacecolor)
+        self._vector_color = cl.Color.convert(self._vector_color)
 
 
 # COMMON CASES

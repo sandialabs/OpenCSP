@@ -152,12 +152,14 @@ class ImageAcquisitionAbstract(ABC):
 
         # Checks that the minimum value is under-exposed
         self.exposure_time = exposure_values[0]
+        lt.debug(f'Trying minimum exposure: {exposure_values[0]}')
         im = self.get_frame()
         if _check_saturated(im):
             lt.error_and_raise(ValueError, 'Minimum exposure value is too high; image still saturated.')
 
         # Checks that the maximum value is over-exposed
         self.exposure_time = exposure_values[-1]
+        lt.debug(f'Trying maximum exposure: {exposure_values[-1]}')
         im = self.get_frame()
         if not _check_saturated(im):
             lt.error_and_raise(ValueError, 'Maximum exposure value is too low; image not saturated.')

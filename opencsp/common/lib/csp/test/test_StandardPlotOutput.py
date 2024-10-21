@@ -4,7 +4,7 @@ import unittest
 import matplotlib.pyplot as plt
 import matplotlib.testing.compare as mplt
 
-import opencsp.app.sofast.lib.load_saved_data as lsd
+import opencsp.app.sofast.lib.load_sofast_hdf_data as lsd
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.geometry.Uxyz import Uxyz
@@ -51,8 +51,8 @@ class TestStandardPlotOutput(unittest.TestCase):
         file_data = join(opencsp_code_dir(), 'test/data/sofast_fringe/data_expected_facet/data.h5')
 
         # Load Sofast measurement data
-        optic_meas = lsd.load_mirror_from_hdf(file_data)
-        optic_ref = lsd.load_ideal_mirror_from_hdf(file_data, 100.0)
+        optic_meas = lsd.load_mirror(file_data)
+        optic_ref = lsd.load_mirror_ideal(file_data, 100.0)
 
         # Define viewing/illumination geometry
         v_target_center = Vxyz((0, 0, 100))

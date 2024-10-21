@@ -132,8 +132,8 @@ class TestMulti(unittest.TestCase):
         cls.file_dataset = file_dataset
 
         for idx in range(sofast.num_facets):
-            cls.data_test['slopes_facet_xy'].append(sofast.data_characterization_facet[idx].slopes_facet_xy)
-            cls.data_test['surf_coefs_facet'].append(sofast.data_characterization_facet[idx].surf_coefs_facet)
+            cls.data_test['slopes_facet_xy'].append(sofast.data_calculation_facet[idx].slopes_facet_xy)
+            cls.data_test['surf_coefs_facet'].append(sofast.data_calculation_facet[idx].surf_coefs_facet)
 
     def test_slope(self):
         for idx in range(self.num_facets):

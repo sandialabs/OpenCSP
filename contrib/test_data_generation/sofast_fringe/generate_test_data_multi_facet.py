@@ -73,7 +73,7 @@ def generate_dataset(
     image = np.zeros(mask.shape) * np.nan
     for idx in range(sofast.num_facets):
         mask = sofast.data_image_processing_facet[idx].mask_processed
-        slopes_xy = sofast.data_characterization_facet[idx].slopes_facet_xy
+        slopes_xy = sofast.data_calculation_facet[idx].slopes_facet_xy
         slopes = np.sqrt(np.sum(slopes_xy**2, 0))
         image[mask] = slopes
     plt.figure()

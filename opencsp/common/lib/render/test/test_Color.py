@@ -3,7 +3,7 @@ import unittest
 import matplotlib
 
 import opencsp.common.lib.tool.file_tools as ft
-import opencsp.common.lib.render.color as cl
+import opencsp.common.lib.render.Color as cl
 
 
 class test_Color(unittest.TestCase):
