@@ -27,6 +27,14 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
         4. clear the internal list
         5. start a new internal list with the current image
         6. return the new operable, go back to step 1
+
+    Example usage::
+
+        supporting_images_map = {
+            ImageType.PRIMARY: lambda operable, operables: "off" not in operable.get_primary_path_nameext(),
+            ImageType.NULL: lambda operable, operables: "off" in operable.get_primary_path_nameext(),
+        }
+        collector_processor = SupportingImagesCollectorImageProcessor(supporting_images_map)
     """
 
     def __init__(

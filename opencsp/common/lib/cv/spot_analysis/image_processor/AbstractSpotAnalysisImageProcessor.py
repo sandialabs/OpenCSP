@@ -26,7 +26,8 @@ are prioritized for maining in memory. Default (1 GiB). """
 
 
 class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
-    """Class to perform one step of image processing before spot analysis is performed.
+    """
+    Class to perform one step of image processing before spot analysis is performed.
 
     This is an abstract class. Implementations can be found in the same
     directory. To create a new implementation, inherit from one of the existing
@@ -581,7 +582,8 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
     def get_processed_image_save_callback(
         self, dir: str, name_prefix: str = None, ext="jpg"
     ) -> Callable[[SpotAnalysisOperable], str]:
-        """Saves images to the given directory with the file name
+        """
+        Saves images to the given directory with the file name
         "[name_prefix+'_']SA_preprocess_[self.name][index].[ext]". The returned
         function takes an ndarray image as input, and returns the saved
         path_name_ext.

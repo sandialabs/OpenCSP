@@ -49,8 +49,8 @@ class PeakFlux:
         group_assigner = AverageByGroupImageProcessor.group_by_name(re.compile(r"(_off)?( Raw)"))
         group_trigger = AverageByGroupImageProcessor.group_trigger_on_change()
         supporting_images_map = {
-            ImageType.PRIMARY: lambda operable, operables: "off" not in operable.primary_image_source_path,
-            ImageType.NULL: lambda operable, operables: "off" in operable.primary_image_source_path,
+            ImageType.PRIMARY: lambda operable, operables: "off" not in operable.get_primary_path_nameext(),
+            ImageType.NULL: lambda operable, operables: "off" in operable.get_primary_path_nameext(),
         }
 
         self.image_processors: list[AbstractSpotAnalysisImagesProcessor] = [

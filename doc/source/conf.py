@@ -11,7 +11,8 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 from pathlib import Path
-import sys, os
+import sys
+import os
 
 # Check if we're running on Read the Docs' servers
 read_the_docs_build = os.environ.get('READTHEDOCS', None) == 'True'
@@ -43,6 +44,7 @@ extensions = [
     "sphinx.ext.coverage",
     "sphinx.ext.napoleon",
     "sphinx.ext.todo",
+    "sphinx.ext.autosummary",
     "sphinxarg.ext",
     "sphinx_rtd_theme",
     "nbsphinx",

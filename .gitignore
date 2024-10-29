@@ -22,3 +22,6 @@ actual_output/
 
 # test data output
 **/test/data/output/
+
+# documentation generation
+doc/html/
