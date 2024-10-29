@@ -2,13 +2,41 @@ from pathlib import Path
 
 # Assume opencsp is in PYHTONPATH
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as Sofast
+from opencsp.common.lib.cv import CacheableImage, SpotAnalysis
+from opencsp.common.lib.cv.spot_analysis import ImagesStream, SpotAnalysisImagesStream, SpotAnalysisOperable
+from opencsp.common.lib.cv.spot_analysis.image_processor import *
+from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImageProcessor
 
 # TODO: import all user-facing classes here.
 
 
 def test_docstrings_exist_for_methods():
     class_list = [
-        Sofast
+        Sofast,
+        # Spot Analysis
+        SpotAnalysis,
+        SpotAnalysisOperable,
+        ImagesStream,
+        SpotAnalysisImagesStream,
+        CacheableImage,
+        AbstractAggregateImageProcessor,
+        AbstractSpotAnalysisImageProcessor,
+        AbstractVisualizationImageProcessor,
+        AnnotationImageProcessor,
+        AverageByGroupImageProcessor,
+        BcsLocatorImageProcessor,
+        ConvolutionImageProcessor,
+        CroppingImageProcessor,
+        EchoImageProcessor,
+        ExposureDetectionImageProcessor,
+        FalseColorImageProcessor,
+        HotspotImageProcessor,
+        LogScaleImageProcessor,
+        NullImageSubtractionImageProcessor,
+        PopulationStatisticsImageProcessor,
+        SupportingImagesCollectorImageProcessor,
+        View3dImageProcessor,
+        ViewCrossSectionImageProcessor,
         # TODO: List all user-facing classes here.
     ]
 
