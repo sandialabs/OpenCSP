@@ -28,17 +28,17 @@ All documentation is verified to pass sphinx-build without errors via https://gi
 Solely documentation that has a associated sphinx config in https://github.com/sandialabs/OpenCSP/tree/develop/doc/source will be included in this online documentation.
 There are several different ways to include documentation in the sphinx config depending on what the source of documentation is. For general guidance, please see
 https://www.sphinx-doc.org/en/master/usage/extensions/autodoc.html. For examples of how this is currently done in OpenCSP, please see any of the config.rst files in doc/source. A common 
-use-case is to include NewClass with its documented and undocumented non-private members, to do that you would add the following to 
+use-case is to include a new class with its documented and undocumented non-private members. For example, to include the class 'Fringes' in the documentation you would add the following to
 https://github.com/sandialabs/OpenCSP/blob/develop/doc/source/library_reference/app/sofast/config.rst:
 
     .. code-block:: rst
 
-        opencsp.app.sofast.lib.NewClass
+        opencsp.app.sofast.lib.Fringes
         ===============================
 
-        .. currentmodule:: opencsp.app.sofast.lib.NewClass
+        .. currentmodule:: opencsp.app.sofast.lib.Fringes
 
-        .. automodule:: opencsp.app.sofast.lib.NewClass
+        .. automodule:: opencsp.app.sofast.lib.Fringes
            :members:
            :undoc-members:
            :show-inheritance:
