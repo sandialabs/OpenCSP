@@ -1,36 +1,15 @@
-from collections.abc import Iterator
-from enum import Enum
-import functools
+from typing import Iterator
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 import opencsp.common.lib.tool.log_tools as lt
-import opencsp.common.lib.tool.typing_tools as tt
-
-
-@functools.total_ordering
-class ImageType(Enum):
-    PRIMARY = 1
-    """ The image we are trying to analyze. """
-    REFERENCE = 2
-    """ Contains a pattern to be compared or matched with in the PRIMARY image. """
-    NULL = 3
-    """ The same as the PRIMARY image, but without a beam on target. Likely this will be used to subtract out the background. """
-    COMPARISON = 4
-    """ For multi-image comparison, such as for re-alignment to a previous position, motion characterization, or measuring wind effect. """
-    BACKGROUND_MASK = 5
-    """ A boolean image that indicates which pixels should be included in a computation (True to include, False to exclude). """
-
-    def __lt__(self, other):
-        if isinstance(other, self.__class__):
-            return self.value < other.value
-        raise NotImplementedError
 
 
 class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
     """
-    This class combines the image streams for several ImageTypes into
+    This class combines the image streams for several SpotAnalysisImageTypes into
     one convenient package. This helps to guarantee that images that are
     supposed to be processed together stay together for the entirety of the
     SpotAnalysis pipeline.
@@ -46,7 +25,7 @@ class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
         ----------
         primary_iterator : ImagesIterable | ImagesStream
             The images of the spot to be analyzed.
-        other_iterators : dict[ImageType,ImagesStream], optional
+        other_iterators : dict[SpotAnalysisImageType,ImagesStream], optional
             Supporting images that provide extra information for spot analysis. Default None
         """
         if other_iterators == None:

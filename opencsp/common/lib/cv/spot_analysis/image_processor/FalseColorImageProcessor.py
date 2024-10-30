@@ -36,6 +36,12 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.opencv_map = opencv_map
 
     def apply_mapping_jet_custom(self, operable: SpotAnalysisOperable) -> SpotAnalysisOperable:
+        """Updates the primary image with a false color map ('human' or
+        'large'). This has a much larger range of colors that get applied but is
+        also much slower than the OpenCV version.
+
+        See also :py:meth:`image_reshapers.false_color_reshaper`
+        """
         max_value = operable.max_popf
         from_image = operable.primary_image.nparray
         ret = reshapers.false_color_reshaper(from_image, max_value, map_type=self.map_type)

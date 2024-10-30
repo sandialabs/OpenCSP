@@ -37,6 +37,13 @@ These are the book keeping classes that enable the spot analysis pipeline.
    :show-inheritance:
    :member-order: bysource
 
+.. automodule:: opencsp.common.lib.cv.spot_analysis.ImageType
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: bysource
+
 .. automodule:: opencsp.common.lib.cv.CacheableImage
    :members:
    :special-members: __init__

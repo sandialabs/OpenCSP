@@ -3,7 +3,7 @@ import dataclasses
 import numpy as np
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImagesProcessor,

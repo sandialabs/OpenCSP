@@ -90,7 +90,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         For most processors, _execute() will return one resultant operable for
         each input operable. For these standard cases, this will contain one
         value during the process_operable() method, and will be empty otherwise.
-        
+
         Sometimes _execute() may return zero results. In this case, this value
         will contain all the operables passed to _execute() since the last time
         that _execute() returned at least one operable. These "in-flight"
@@ -411,14 +411,12 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         pass
 
     def __len__(self) -> int:
-        """
-        Get the current number of processed output images from this instance.
-
-        This number will potentially be increasing with every call to
-        process_operable() or _execute().
-
-        This will return 0 immediately after a call to assign_inputs().
-        """
+        # Get the current number of processed output images from this instance.
+        #
+        # This number will potentially be increasing with every call to
+        # process_operable() or _execute().
+        #
+        # This will return 0 immediately after a call to assign_inputs().
         return self._num_images_processed
 
     def __iter__(self):
@@ -452,10 +450,10 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             )
 
     def __next__(self):
-        """Get the next processed image and it's support images and data. Since
-        this is only utilized when processing as an iterator instead of by using
-        the run() method, then calling this method will cause one or more input
-        image(s) to be fetched so that it can be executed upon."""
+        # Get the next processed image and it's support images and data. Since
+        # this is only utilized when processing as an iterator instead of by using
+        # the run() method, then calling this method will cause one or more input
+        # image(s) to be fetched so that it can be executed upon.
         if not self.has_next():
             raise StopIteration
 

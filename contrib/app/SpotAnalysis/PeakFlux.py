@@ -6,7 +6,7 @@ import numpy as np
 import opencsp.common.lib.cv.SpotAnalysis as sa
 from opencsp.common.lib.cv.annotations.HotspotAnnotation import HotspotAnnotation
 from opencsp.common.lib.cv.fiducials.BcsFiducial import BcsFiducial
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
 from opencsp.common.lib.cv.spot_analysis.image_processor import *

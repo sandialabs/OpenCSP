@@ -11,8 +11,9 @@ from opencsp import opencsp_settings
 
 # from opencsp.common.lib.cv.spot_analysis.image_processor import * # I suggest importing these dynamically as needed, to reduce startup time
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType, SpotAnalysisImagesStream
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAnalysisImagesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser

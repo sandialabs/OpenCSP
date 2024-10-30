@@ -9,7 +9,7 @@ import opencsp.common.lib.csp.LightSource as ls
 import opencsp.common.lib.cv.annotations.AbstractAnnotations as aa
 import opencsp.common.lib.cv.fiducials.AbstractFiducials as af
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
