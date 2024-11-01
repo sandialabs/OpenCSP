@@ -40,6 +40,17 @@ class SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
         will have these default values applied.
 
         See also :py:meth:`SpotAnalysisOperable.replace_use_default_values`
+
+        Parameters
+        ----------
+        default_support_images : dict[ImageType, CacheableImage]
+            The supporting images that will be assigned as defaults to the
+            generated operables. Can be empty.
+        default_data : SpotAnalysisOperable
+            Additional data that can be assigned as defaults to the generated
+            operables. Includes things that aren't supporting images, such as
+            given_fiducials, found_fiducials, annotations,
+            camera_intrinsics_characterization, light_sources.
         """
         self.default_support_images = default_support_images
         self.default_data = default_data

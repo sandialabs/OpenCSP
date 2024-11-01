@@ -372,7 +372,17 @@ class CacheableImage:
             )
 
     def validate_cache_path(self, cache_path: Optional[str], caller_name: str):
-        """Verifies that the cache_path, if set, ends with ".npy". Raises a ValueError otherwise."""
+        """
+        Verifies that the cache_path, if set, ends with ".npy". Raises a ValueError otherwise.
+
+        Parameters
+        ----------
+        cache_path : str | None
+            The path/name.ext to save this image to, as a numpy array. For example
+            ft.join(orp.opencsp_scratch_dir(), "/OpenCSP/tmp001.npy").
+        caller_name : str
+            Name of the calling method. This is used as part of the generated error message.
+        """
         if cache_path == None:
             return
 

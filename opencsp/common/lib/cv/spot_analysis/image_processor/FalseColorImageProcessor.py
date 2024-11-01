@@ -36,11 +36,23 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.opencv_map = opencv_map
 
     def apply_mapping_jet_custom(self, operable: SpotAnalysisOperable) -> SpotAnalysisOperable:
-        """Updates the primary image with a false color map ('human' or
+        """
+        Updates the primary image with a false color map ('human' or
         'large'). This has a much larger range of colors that get applied but is
         also much slower than the OpenCV version.
 
         See also :py:meth:`image_reshapers.false_color_reshaper`
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            The operable whose primary image to apply the false color to.
+
+        Returns
+        -------
+        SpotAnalysisOperable
+            A copy of the input operable with the primary image replaced with
+            the false color image.
         """
         max_value = operable.max_popf
         from_image = operable.primary_image.nparray
@@ -49,9 +61,22 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
 
     @staticmethod
     def apply_mapping_jet(operable: SpotAnalysisOperable, opencv_map) -> SpotAnalysisOperable:
-        """Updates the primary image with a false color map. Opencv maps can
+        """
+        Updates the primary image with a false color map. Opencv maps can
         represent 256 different grayscale colors and only takes ~0.007s for a
-        1626 x 1236 pixel image."""
+        1626 x 1236 pixel image.
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            The operable whose primary image to apply the false color to.
+
+        Returns
+        -------
+        SpotAnalysisOperable
+            A copy of the input operable with the primary image replaced with
+            the false color image.
+        """
         # rescale to the number of representable colors
         representable_colors = 256
         max_value = operable.max_popf
