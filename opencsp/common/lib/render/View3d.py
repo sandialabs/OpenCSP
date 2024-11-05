@@ -705,8 +705,8 @@ class View3d(aph.AbstractPlotHandler):
         """
         Plots one or more points.
 
-        This is similar to draw_xyz_list, except that it accepts the point
-        locations in a different format. Example usage::
+        This is similar to :py:meth:`draw_xyz_list`, except that it accepts the
+        point locations in a different format. Example usage::
 
             # viewspec xy or pq
             draw_xyz((0, 1))
@@ -770,8 +770,8 @@ class View3d(aph.AbstractPlotHandler):
             the end of the input list as a new last value. Ignored if
             input_xyz_list < 3 points. Default is False.
         style: RenderControlPointSeq | None, optional
-            The style with which to render the input, or None for
-            rcps.default(). Default is None.
+            The style with which to render the input, or None for rcps.default()
+            (blue, marker '.', line style '-'). Default is None.
         label: str | None, optional
             The label used for this graph in the legend, or None to be excluded
             from the legend. Default is None.
