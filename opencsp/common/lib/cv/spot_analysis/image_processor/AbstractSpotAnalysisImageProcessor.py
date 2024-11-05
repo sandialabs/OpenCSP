@@ -19,7 +19,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.typing_tools as tt
 
-image_processors_persistant_memory_total: int = 1 * pow(2, 30)  # default total of 1GB
+image_processors_persistant_memory_total: int = 1 * pow(2, 30)  # default total of 1GiB
 """ The amount of system memory that image processors are allowed to retain
 as cache between calls to their 'run()' method. The most recently used results
 are prioritized for maining in memory. Default (1 GiB). """
@@ -51,12 +51,10 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             name = self.__class__.__name__
 
         self._name = name
-        """ Name of this instance, probably the class name. """
+        # Name of this instance, probably the class name.
         self._num_images_processed: int = 0
-        """
-        The running total of the number of resulting images this instance
-        produced, since the last time that inputs were assigned.
-        """
+        # The running total of the number of resulting images this instance
+        # produced, since the last time that inputs were assigned.
         self.save_to_disk: int = False
         """ True to save results to the hard drive instead of holding them in
         memory. If False, then this is dynamically determined at runtime during
@@ -68,18 +66,18 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         self.is_iterator_primed = False
         """ True if __iter__ has been called since assign_inputs. False otherwise. """
         self._finished_processing = False
-        """ True if we've finished iterating over all input images. This gets set
-        when we get a StopIteration error from next(input_iter). """
+        # True if we've finished iterating over all input images. This gets set
+        # when we get a StopIteration error from next(input_iter).
         self.cached = False
         """ True if we've ever cached the processed results of this processor to
         disk since processing was started. """
         self._my_tmp_dir = None
-        """ The directory where temporary images from this instance are saved to. """
+        # The directory where temporary images from this instance are saved to.
         self._tmp_images_saved = 0
-        """ How many images have been saved by this instance since it was created. """
+        # How many images have been saved by this instance since it was created.
         self._clear_tmp_on_deconstruct = True
-        """ If true, then delete all png images in _my_tmp_dir, and then also
-        the directory if empty. """
+        # If true, then delete all png images in _my_tmp_dir, and then also
+        # the directory if empty.
         self.next_item: SpotAnalysisOperable = None
         """
         The next fetched item from the input_iter, held in anticipation for the
