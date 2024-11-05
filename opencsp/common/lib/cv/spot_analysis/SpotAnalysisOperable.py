@@ -248,5 +248,5 @@ class SpotAnalysisOperable:
         Get the size of this operable in memory including all primary images,
         supporting images, and visualization images.
         """
-        all_images_size = sum([sys.getsizeof(im) for im in self.get_all_images()])
+        all_images_size = sum([sys.getsizeof(img) for img in self.get_all_images()])
         return all_images_size

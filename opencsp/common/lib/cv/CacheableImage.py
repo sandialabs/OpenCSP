@@ -75,14 +75,12 @@ class CacheableImage:
     """
 
     _cacheable_images_registry: weakref.WeakKeyDictionary["CacheableImage", int] = {}
-    """
-    Class variable that tracks the existance of each cacheable image and the
-    order of accesses.
-    """
+    # Class variable that tracks the existence of each cacheable image and the
+    # order of accesses.
     _inactive_registry: weakref.WeakKeyDictionary["CacheableImage", int] = {}
-    """ Like _cacheable_images_registry, but for instances that have been deregistered and not reregistered. """
+    # Like _cacheable_images_registry, but for instances that have been deregistered and not reregistered.
     _cacheable_images_last_access_index: int = 0
-    """ The last value used in the _cacheable_images_registry for maintaining access order. """
+    # The last value used in the _cacheable_images_registry for maintaining access order.
 
     def __init__(self, array: np.ndarray = None, cache_path: str = None, source_path: str = None):
         """
@@ -123,16 +121,12 @@ class CacheableImage:
         self.validate_source_path(source_path, "__init__")
 
         self._array = array
-        """
-        The in-memory numpy array version of this image. None if not assigned or
-        if cached. Should always be available whenever self._image is available.
-        """
+        # The in-memory numpy array version of this image. None if not assigned or
+        # if cached. Should always be available whenever self._image is available.
         self._image = None
-        """
-        The in-memory Pillow version of this image. None if not assigned, or if
-        the data exists as a numpy array but not as an image, or if this
-        instance is cached.
-        """
+        # The in-memory Pillow version of this image. None if not assigned, or if
+        # the data exists as a numpy array but not as an image, or if this
+        # instance is cached.
         self.cache_path = cache_path
         """ The path/name.ext to the cached numpy array. """
         self.source_path = source_path
@@ -235,21 +229,19 @@ class CacheableImage:
 
     @staticmethod
     def _register_access(instance: "CacheableImage"):
-        """
-        Inserts this cacheable image as in index in the registry. This should be
-        called every time the cacheable image is accessed for tracking the most
-        recently used instances. This should be called at least during::
-
-            - creation
-            - loading into memory
-            - access via nparray()
-            - access via to_image()
-
-        Parameters
-        ----------
-        instance : CacheableImage
-            The instance to be registered.
-        """
+        # Inserts this cacheable image as in index in the registry. This should be
+        # called every time the cacheable image is accessed for tracking the most
+        # recently used instances. This should be called at least during::
+        #
+        #    - creation
+        #    - loading into memory
+        #    - access via nparray()
+        #    - access via to_image()
+        #
+        # Parameters
+        # ----------
+        # instance : CacheableImage
+        #    The instance to be registered.
         images_registry = CacheableImage._cacheable_images_registry
         inactive_registry = CacheableImage._inactive_registry
 
@@ -264,12 +256,10 @@ class CacheableImage:
 
     @staticmethod
     def _register_inactive(instance: "CacheableImage"):
-        """
-        Removes the given instance from the active registry and inserts it into
-        the inactive registry. The inactive registry is useful for when a
-        cacheable image has been cached and likely won't be active again for a
-        while.
-        """
+        # Removes the given instance from the active registry and inserts it into
+        # the inactive registry. The inactive registry is useful for when a
+        # cacheable image has been cached and likely won't be active again for a
+        # while.
         images_registry = CacheableImage._cacheable_images_registry
         inactive_registry = CacheableImage._inactive_registry
 
@@ -308,12 +298,10 @@ class CacheableImage:
                     del images_registry[instance_ref]
 
     def __sizeof__(self) -> int:
-        """
-        Returns the number of bytes in use by the in-memory numpy array and
-        Pillow image for this instance.
-
-        This does not load any cached data from disk.
-        """
+        # Returns the number of bytes in use by the in-memory numpy array and
+        # Pillow image for this instance.
+        #
+        # This does not load any cached data from disk.
         return sys.getsizeof(self._array) + sys.getsizeof(self._image)
 
     @classmethod
@@ -382,10 +370,8 @@ class CacheableImage:
 
     @staticmethod
     def _load_image(im: str | np.ndarray) -> npt.NDArray[np.int_]:
-        """
-        Loads the cached numpy data or image file. If the given "im" is a numpy
-        array then it will be returned as is.
-        """
+        # Loads the cached numpy data or image file. If the given "im" is a numpy
+        # array then it will be returned as is.
         if isinstance(im, np.ndarray):
             return im
         elif im.lower().endswith(".npy"):
@@ -395,7 +381,7 @@ class CacheableImage:
             return np.array(im)
 
     def __load_image(self) -> npt.NDArray[np.int_] | None:
-        """Loads the numpy array from the cache or image file, as necessary."""
+        # Loads the numpy array from the cache or image file, as necessary.
         # self._register_access(self) # registered in self.nparray
         if self._array is not None:
             return self._array

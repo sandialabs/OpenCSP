@@ -22,7 +22,7 @@ import opencsp.common.lib.tool.typing_tools as tt
 image_processors_persistant_memory_total: int = 1 * pow(2, 30)  # default total of 1GB
 """ The amount of system memory that image processors are allowed to retain
 as cache between calls to their 'run()' method. The most recently used results
-are prioritized for maining in memory. """
+are prioritized for maining in memory. Default (1 GiB). """
 
 
 class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
@@ -106,7 +106,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         consumes and produces single images.
         """
         self._on_image_processed: list[Callable[[SpotAnalysisOperable]]] = []
-        """ A list of callbacks to be evaluated when an image is finished processing. """
+        # A list of callbacks to be evaluated when an image is finished processing.
 
         # initialize some of the state
         self.assign_inputs([])
@@ -164,7 +164,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         CacheableImage.cache_images_to_disk_as_necessary(allowed_memory_footprint, self._get_tmp_path)
 
     def _get_save_dir(self):
-        """Finds a temporary directory to save to for the processed output images from this instance."""
+        # Finds a temporary directory to save to for the processed output images from this instance.
         if self._my_tmp_dir == None:
             scratch_dir = os.path.join(orp.opencsp_scratch_dir(), "spot_analysis_image_processing")
             i = 0
@@ -183,13 +183,12 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         return self._my_tmp_dir
 
     def _get_tmp_path(self) -> str:
-        """Get the path+name+ext to save a cacheable image to, in our temporary
-        directory, in numpy format.
-
-        Returns:
-            path_name_ext: str
-                Where to save the image.
-        """
+        # Get the path+name+ext to save a cacheable image to, in our temporary
+        # directory, in numpy format.
+        #
+        # Returns:
+        #     path_name_ext: str
+        #         Where to save the image.
         # get the path
         path_name_ext = os.path.join(self._get_save_dir(), f"{self._tmp_images_saved}.npy")
         self._tmp_images_saved += 1
