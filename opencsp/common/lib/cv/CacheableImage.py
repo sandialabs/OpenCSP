@@ -416,8 +416,8 @@ class CacheableImage:
         return self._image
 
     def _does_source_image_match(self, nparray: np.ndarray):
-        """Returns true if this image's source_path image file matches the data
-        in the given numpy array."""
+        # Returns true if this image's source_path image file matches the data
+        # in the given numpy array.
         if self._source_path is not None and ft.file_exists(self._source_path):
             imarray = np.array(Image.open(self._source_path))
             try:
