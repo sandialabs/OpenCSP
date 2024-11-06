@@ -302,7 +302,7 @@ class CacheableImage:
         # Pillow image for this instance.
         #
         # This does not load any cached data from disk.
-        return sys.getsizeof(self._array) + sys.getsizeof(self._image)
+        return sys.getsizeof(self._array) + it.getsizeof_approx(self._image)
 
     @classmethod
     def all_cacheable_images_size(cls):

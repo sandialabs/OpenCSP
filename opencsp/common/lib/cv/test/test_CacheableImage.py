@@ -5,6 +5,7 @@ import numpy as np
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -107,22 +108,41 @@ class test_CacheableImage(unittest.TestCase):
         # cacheable images exist from other tests, include their sizes as well
         existing_sizes = CacheableImage.all_cacheable_images_size()
 
-        # Something is happening under the hood that causes the reference to the
-        # example array to be larger. I'm setting the delta to the minimum
-        # needed to pass here. It could be that this number needs to be
-        # increased in the future.
-        delta = 48
+        implementation_overhead = 48
+        # Note that this number is stemming from the CPython implementation of
+        # objects and the memory those objects require for their book-keeping.
+        # Therefore this number could be different on every system and could
+        # also change with python versions.
+
+        delta = 2 * implementation_overhead
+        # Also, we don't actually care that much what the
+        # implementation-specific number is, so let's just make the buffer a
+        # little bigger.
 
         # one cacheable image
         ci1 = CacheableImage(self.example_array, None, self.example_source_path)
+        # sys.getsizeof(ci1): 4976
         example_image = None
         self.assertAlmostEqual(sys.getsizeof(ci1), sys.getsizeof(self.example_array), delta=delta)
+        self.assertAlmostEqual(
+            sys.getsizeof(ci1),
+            4800,
+            delta=1000,
+            msg="Sanity check that the memory usage is roughly proportional to the size of the image failed.",
+        )
         self.assertAlmostEqual(
             sys.getsizeof(ci1), CacheableImage.all_cacheable_images_size() - existing_sizes, delta=delta
         )
         example_image = ci1.to_image()
+        # sys.getsizeof(ci1): 9808
         self.assertAlmostEqual(
-            sys.getsizeof(ci1), sys.getsizeof(self.example_array) + sys.getsizeof(example_image), delta=delta
+            sys.getsizeof(ci1), sys.getsizeof(self.example_array) + it.getsizeof_approx(example_image), delta=delta
+        )
+        self.assertAlmostEqual(
+            sys.getsizeof(ci1),
+            9600,
+            delta=2000,
+            msg="Sanity check that the memory usage is roughly proportional to the size of the image failed.",
         )
         self.assertAlmostEqual(
             sys.getsizeof(ci1), CacheableImage.all_cacheable_images_size() - existing_sizes, delta=delta
@@ -133,6 +153,7 @@ class test_CacheableImage(unittest.TestCase):
         ci3 = CacheableImage(self.example_array, None, self.example_source_path)
         ci2.to_image()
         ci3.to_image()
+        # CacheableImage.all_cacheable_images_size(): 29424
         self.assertAlmostEqual(
             sys.getsizeof(ci1) * 3, CacheableImage.all_cacheable_images_size() - existing_sizes, delta=delta
         )
@@ -276,15 +297,20 @@ class test_CacheableImage(unittest.TestCase):
         cache_file = ft.join(self.out_dir, f"{self.test_name}.npy")
         image_file = ft.join(self.out_dir, f"{self.test_name}.png")
         ci = CacheableImage(self.example_array, source_path=image_file)
+        in_memory_size = sys.getsizeof(ci)
 
         # Sanity test: cacheing without saving the image creates a cache file.
         # This is in preparation for the "finale".
         self.assertFalse(ft.file_exists(cache_file))
         ci.cache(cache_file)
         self.assertTrue(ft.file_exists(cache_file))
+        cached_size = sys.getsizeof(ci)
+        self.assertLess(cached_size, in_memory_size)
 
         # re-load the data
         ci.nparray
+        in_memory_size = sys.getsizeof(ci)
+        self.assertGreater(in_memory_size, cached_size)
 
         # delete the cache file
         ft.delete_file(cache_file)
@@ -301,6 +327,8 @@ class test_CacheableImage(unittest.TestCase):
         self.assertFalse(ft.file_exists(cache_file))
         ci.cache(cache_file)
         self.assertFalse(ft.file_exists(cache_file))
+        cached_size = sys.getsizeof(ci)
+        self.assertLess(cached_size, in_memory_size)
 
 
 if __name__ == '__main__':
