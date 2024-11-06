@@ -134,7 +134,15 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             'AbstractSpotAnalysisImagesProcessor', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
         ],
     ):
-        """Register the input operables to be processed either with the run() method, or as an iterator."""
+        """
+        Register the input operables to be processed either with the run()
+        method, or as an iterator.
+
+        Parameters
+        ----------
+        operables : Union[ AbstractSpotAnalysisImagesProcessor, list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable] ]
+            The operables to be processed.
+        """
         # initialize the state for a new set of inputs
         self.input_operables = operables
         self._num_images_processed = 0
@@ -192,12 +200,33 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         self._tmp_images_saved += 1
         return path_name_ext
 
-    def _save_image(self, im: CacheableImage, idx_list: list[int], dir: str, name_prefix: str = None, ext="jpg"):
+    def _save_image(self, im: CacheableImage, idx_list: list[int], dir: str, name_prefix: str = None, ext="jpg") -> str:
+        # Saves the given image to the given path.
+        #
+        # Parameters
+        # ----------
+        # im : CacheableImage
+        #     The image to be saved.
+        # idx_list : list[int]
+        #     Length-1 list where idx_list[0] is the count of images saved with
+        #     this method. Used for naming the saved images. This value is updated
+        #     as part of the execution of this method.
+        # dir : str
+        #     The directory to save the image to.
+        # name_prefix : str, optional
+        #     A prefix to prepend to the image name, by default empty string
+        # ext : str, optional
+        #     The extension/type to save the image with, by default "jpg"
+        #
+        # Returns
+        # -------
+        # str
+        #     The path/name.ext of the newly saved image.
         idx = idx_list[0]
         image_name = ("" if name_prefix == None else f"{name_prefix}_") + f"SA_preprocess_{self.name}{idx}"
         image_path_name_ext = os.path.join(dir, image_name + "." + ext)
         lt.debug("Saving SpotAnalysis processed image to " + image_path_name_ext)
-        im.save_image(image_path_name_ext)
+        im.to_image().save(image_path_name_ext)
         idx_list[0] = idx + 1
         return image_path_name_ext
 
@@ -212,7 +241,26 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             | Union['AbstractSpotAnalysisImagesProcessor']
         ),
     ) -> list[SpotAnalysisOperable]:
-        """Performs image processing on the input images."""
+        """
+        Performs image processing on the input operables and returns the results.
+
+        This is provided as a convenience method. The more typical way to use
+        this class is to create a SpotAnalysis instance, assign this image
+        processor to that instance, and then iterate over the results.
+
+        See also: :py:meth:`process_images` as another convenience method.
+
+        Parameters
+        ----------
+        operables : ImagesIterable  |  ImagesStream  |  SpotAnalysisImagesStream  |  list[SpotAnalysisOperable]  |  Iterator[SpotAnalysisOperable]  |  Union[AbstractSpotAnalysisImagesProcessor]
+            The input operables to be processed. If these are images, then they
+            will be wrapped in a SpotAnalysisOperablesStream.
+
+        Returns
+        -------
+        list[SpotAnalysisOperable]
+            The resulting operables after processing.
+        """
         if isinstance(operables, (ImagesIterable, ImagesStream)):
             operables = SpotAnalysisImagesStream(operables)
         if isinstance(operables, SpotAnalysisImagesStream):
@@ -304,6 +352,16 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             spot_analysis = SpotAnalysis("Log Scale Images", processors)
             spot_analysis.set_primary_images(images)
             results = [result for result in spot_analysis]
+
+        Parameters
+        ----------
+        images : list[CacheableImage  |  np.ndarray  |  Image.Image]
+            The images to be processed.
+
+        Returns
+        -------
+        list[CacheableImage]
+            The resulting images after processing.
         """
         # import here to avoid cyclic imports
         from opencsp.common.lib.cv.SpotAnalysis import SpotAnalysis
@@ -379,7 +437,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             # We must have already finished processing all input images, either
             # through the run() method or by simply having iterated through them
             # all.
-            raise StopIteration
+            return self
         elif self.input_iter != None:
             # We must be iterating through the input images already.
             return self

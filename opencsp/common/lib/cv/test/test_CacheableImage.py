@@ -41,7 +41,7 @@ class test_CacheableImage(unittest.TestCase):
         self.noexist_source_path = ft.join(self.out_dir, "noexist.png")
 
         # de-register all cacheable images
-        while CacheableImage.lru() != None:
+        while CacheableImage.lru() is not None:
             pass
 
     def test_init_valid(self):
@@ -165,6 +165,7 @@ class test_CacheableImage(unittest.TestCase):
 
         # fmt: off
         valid_combinations = [
+        #     np array,           .np cache file,          .png source file,         expected .np cache file
             [ self.example_array, None,                    None,                     default_cache_file      ],
             [ self.example_array, self.example_cache_path, None,                     self.example_cache_path ],
             [ self.example_array, None,                    self.noexist_source_path, default_cache_file      ],
@@ -216,7 +217,7 @@ class test_CacheableImage(unittest.TestCase):
                     self.assertFalse(ft.file_exists(noexist_cache_file), msg=err_msg)
 
                 # check memory usage
-                self.assertAlmostEqual(0, sys.getsizeof(cacheable), delta=100, msg=err_msg)
+                self.assertAlmostEqual(0, sys.getsizeof(cacheable), delta=cacheable._expected_cached_size, msg=err_msg)
 
                 # verify that loading from the cache works
                 uncached_array = cacheable.nparray
@@ -329,6 +330,27 @@ class test_CacheableImage(unittest.TestCase):
         self.assertFalse(ft.file_exists(cache_file))
         cached_size = sys.getsizeof(ci)
         self.assertLess(cached_size, in_memory_size)
+
+    def test_cache_memlimit0(self):
+        """Check that cacheing doesn't halt forever when the memory limit is 0."""
+        default_cache_file = ft.join(self.out_dir, f"{self.test_name}.npy")
+        cache_path_gen = lambda: default_cache_file
+
+        # create the cacheable image
+        ci1 = CacheableImage(cache_path=self.example_cache_path)
+        self.assertAlmostEqual(0, sys.getsizeof(ci1), delta=ci1._expected_cached_size)
+
+        # verify we're not cached yet
+        ci1.nparray
+        self.assertAlmostEqual(40 * 40 * 3, sys.getsizeof(ci1), delta=ci1._expected_cached_size)
+
+        # verify the memory limit is working
+        ci1.cache_images_to_disk_as_necessary(1e10, cache_path_gen)
+        self.assertAlmostEqual(40 * 40 * 3, sys.getsizeof(ci1), delta=ci1._expected_cached_size)
+
+        # check that a memory limit of 0 is accepted
+        ci1.cache_images_to_disk_as_necessary(0, cache_path_gen)
+        self.assertAlmostEqual(0, sys.getsizeof(ci1), delta=ci1._expected_cached_size)
 
 
 if __name__ == '__main__':

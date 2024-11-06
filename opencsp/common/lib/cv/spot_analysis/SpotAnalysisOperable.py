@@ -114,6 +114,26 @@ class SpotAnalysisOperable:
         """
         Get a list of all images tracked by this operable including all primary
         images, supporting images, visualization, and algorithm images.
+
+        Parameters
+        ----------
+        primary : bool, optional
+            True to include the primary image in the list of returned images. By
+            default True.
+        supporting : bool, optional
+            True to include the supporting images, if any, in the list of
+            returned images. By default True.
+        visualization : bool, optional
+            True to include the visualization images in the list of returned
+            images. By default True.
+        algorithm : bool, optional
+            True to include the algorithm images, if any, in the list of
+            returned images. By default True.
+
+        Returns
+        -------
+        list[CacheableImage]
+            The images tracked by this operable.
         """
         ret: list[CacheableImage] = []
 

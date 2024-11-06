@@ -24,11 +24,15 @@ class CacheableImage:
     priority order for the data that is returned from various methods:
     (1) in-memory array, (2) numpy cache file, (3) image source file.
 
-    Only one of the inputs (array, cache_path, source_path) are required. The
-    "array" parameter should be the raw image data, the cache_path should be a
-    string to a .npy file, and the source_path should be a string to an image
-    file. Note that the cache_path file doesn't need to exist yet, but can
-    instead be an indicator for where to cache the image to.
+    Parameters
+    ----------
+    Only one of the inputs (array, cache_path, source_path) are required in the
+    constructor. In fact, there is a method :py:meth:`from_single_source` that
+    tries to guess which input is being provided. The "array" parameter should
+    be the raw image data, the cache_path should be a string to a .npy file, and
+    the source_path should be a string to an image file. Note that the
+    cache_path file doesn't need to exist yet, but can instead be an indicator
+    for where to cache the image to.
 
     The following table determines how images are retrieved based on the given
     parameters ([X] = given and file exists, [.] = given and file doesn't
@@ -72,6 +76,29 @@ class CacheableImage:
         +-------+---------+----------+
         |       |         |   [X]    |
         +-------+---------+----------+
+
+
+    sys.getsizeof
+    -------------
+    This class overrides the default __sizeof__ dunder method, meaning that the
+    size returned by sys.getsizeof(cacheable_image) is not just the size of all
+    variables tracked by the instance. Rather, the size of the Numpy array and
+    Pillow image are returned. This metric better represents the
+    memory-conserving use case that is intended for this class.
+
+    __sizeof__ returns close to 0 if the array and image attributes have been
+    set to None (aka the cache() method has been executed). Note that this does
+    not depend on the state of the garbage collector, which might not actually
+    free the memory for some time after it is no longer being tracked by this
+    class. An attempt at freeing the memory can be done immediately with
+    `gc.collect()` but the results of this are going to be implementation
+    specific.
+
+    The size of the source path, image path, and all other attributes are not
+    included in the return value of __sizeof__. This decision was made for
+    simplicity. Also the additional memory has very little impact. For example a
+    256 character path uses ~0.013% as much memory as a 1920x1080 monochrome
+    image.
     """
 
     _cacheable_images_registry: weakref.WeakKeyDictionary["CacheableImage", int] = {}
@@ -81,6 +108,11 @@ class CacheableImage:
     # Like _cacheable_images_registry, but for instances that have been deregistered and not reregistered.
     _cacheable_images_last_access_index: int = 0
     # The last value used in the _cacheable_images_registry for maintaining access order.
+    _expected_cached_size: int = (48 * 2) * 2
+    # Upper bound on the anticipated return value from __sizeof__ after cache()
+    # has just been evaluated. Each python variable uses ~"48" bytes, there are
+    # "*2" variables included (array and image), and we don't care about
+    # specifics so add some buffer "*2".
 
     def __init__(self, array: np.ndarray = None, cache_path: str = None, source_path: str = None):
         """
@@ -425,11 +457,10 @@ class CacheableImage:
             except Exception:
                 return False
 
-            enforce_source_image_matches = True
-            # Debugging: check that the programmer didn't misuse CacheableImage
-            # by setting the source_path to a file that doesn't actually match
-            # the numpy array or cache path.
-            if enforce_source_image_matches and not arrays_are_equal:
+            # Check that the programmer didn't misuse CacheableImage by setting
+            # the source_path to a file that doesn't actually match the numpy
+            # array or cache path.
+            if not arrays_are_equal:
                 try:
                     import os
                     import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
@@ -465,8 +496,8 @@ class CacheableImage:
         Parameters
         ----------
         cache_path : str, optional
-            The path to cache to, as necessary. Can be None if either cache_path
-            or source_path are already set. By default None.
+            The path/name.ext to cache to, as necessary. Can be None if either
+            cache_path or source_path are already set. By default None.
         """
         # use either self.cache_path or cache_path, depending on:
         # 1. self.cache_path exists
@@ -516,6 +547,8 @@ class CacheableImage:
             # This instance has already been cached to disk at least once. Don't
             # need to cache it again. We check the size to make sure that the
             # file was actually cached and doesn't just exist as a placeholder.
+            # I chose '> 10' instead of '> 0' because I'm paranoid that
+            # getsize() will return a small number of bytes on some systems.
             pass
         else:
             # Write the numpy array to disk.
@@ -533,10 +566,15 @@ class CacheableImage:
 
     def save_image(self, image_path_name_ext: str):
         """
-        Saves this image as an image file to the given file.
+        Saves this image as an image file to the given file. This method is best
+        used when an image is intended to be kept after a computation, in which
+        case the newly saved image file can be the on-disk reference instead of
+        an on-disk cache file.
 
         Note: this replaces the internal reference to source_path, if any, with
-        the newly given path.
+        the newly given path. It is therefore suggested to not use this method
+        unless you are using this class as part of an end-use application, in
+        order to avoid unintended side effects.
 
         Parameters
         ----------
@@ -550,8 +588,37 @@ class CacheableImage:
     def cache_images_to_disk_as_necessary(
         memory_limit_bytes: int, tmp_path_generator: Callable[[], str], log_level=lt.log.DEBUG
     ):
-        """Check memory usage and convert images to files (aka file path
-        strings) as necessary in order to reduce memory usage."""
+        """
+        Check memory usage and convert images to files (aka file path strings)
+        as necessary in order to reduce memory usage.
+
+        Note that due to the small amount of necessary memory used by each
+        CacheableImage instance, all instances can be cached and still be above
+        the `memory_limit_bytes` threshold. This can happen either when
+        memory_limit_bytes is sufficiently small, or the number of live
+        CacheableImages is sufficiently large. In these cases, this method may
+        not be able to lower the amount of memory in use.
+
+        Parameters
+        ----------
+        memory_limit_bytes : int
+            The total number of bytes of memory that all CacheableImages are
+            allowed to use for their in-memory arrays and images, in sum. Note
+            that each CachableImage instance will still use some small amount of
+            memory even after it has been cached.
+        tmp_path_generator : Callable[[], str]
+            A function that returns a path/name.ext for a file that does not
+            exist yet. This file will be used to save the numpy array out to.
+        log_level : int, optional
+            The level to print out status messages to, including the amount of
+            memory in use before and after caching images. By default
+            lt.log.DEBUG.
+        """
+        # By providing the memory_limit_bytes as a parameter, we're effectively
+        # enabling the user to choose a lower memory threshold than is the
+        # default. There's also the benefit of requiring the user to think about
+        # how much memory they want to use, which is going to be system and
+        # application specific.
         total_mem_size = CacheableImage.all_cacheable_images_size()
         if total_mem_size <= memory_limit_bytes:
             return
@@ -571,12 +638,14 @@ class CacheableImage:
 
             # free the LRU instance's memory by cacheing it to disk
             cacheable_image_size = sys.getsizeof(cacheable_image)
-            if cacheable_image_size == 0:
-                pass  # already cached to disk
+            if cacheable_image_size <= cacheable_image._expected_cached_size:
+                continue  # already cached to disk, probably
             if cacheable_image.cache_path is not None:
                 cacheable_image.cache(None)
             else:  # cache_path is None
                 cacheable_image.cache(tmp_path_generator())
-            total_mem_size -= cacheable_image_size
+
+            bytes_cached_to_disk = cacheable_image_size - sys.getsizeof(cacheable_image)
+            total_mem_size -= bytes_cached_to_disk
 
         log_method(f"New total memory size after cacheing images: {int(total_mem_size / 1024 / 1024)}MB")
