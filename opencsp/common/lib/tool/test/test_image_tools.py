@@ -1,10 +1,12 @@
+import unittest
+
 import numpy as np
 import numpy.testing as nptest
-import os
-import unittest
+import PIL.Image as Image
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class TestImageTools(unittest.TestCase):
@@ -87,6 +89,30 @@ class TestImageTools(unittest.TestCase):
         self.assertIn("b.PNG", png_jpg_image_files)
         self.assertIn("c.jpg", png_jpg_image_files)
         self.assertNotIn("d.txt", png_jpg_image_files)
+
+    def test_getsizeof_approx(self):
+        """
+        Verifies that the returned size of the image in memory is somewhere in
+        the ballpark for how much memory we're expecting.
+        """
+        implementation_overhead = 48
+        # The delta accounts for the extra bytes of memory used for the python
+        # object overhead. This number is going to be system and implementation
+        # specific, and so might change with different python versions.
+
+        delta = 2 * implementation_overhead
+        # Also, we don't actually care that much what the
+        # implementation-specific number is, so let's just make the buffer a
+        # little bigger.
+
+        img = Image.new('RGB', (40, 40))
+        self.assertAlmostEqual(it.getsizeof_approx(img), 40 * 40 * 3, delta=delta)
+        if 40 * 40 * 3 + implementation_overhead != it.getsizeof_approx(img):
+            lt.warn(
+                "Warning in test_image_tools.test_getsizeof_approx(): "
+                + "40*40*3 + implementation_overhead != it.getsizeof_approx(img) "
+                + f"({40*40*3} + {implementation_overhead} != {it.getsizeof_approx(img)})"
+            )
 
 
 if __name__ == '__main__':
