@@ -192,7 +192,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
     def set_facet_transform_list(self, transformations: list[TransformXYZ]):
         """
-        Combines the `set_facet_positions` and `set_facet_canting` functions into a single action.
+        Combines the `set_facet_positions` and `set_facet_cantings` functions into a single action.
         """
         for transformation, facet in zip(transformations, self.facets):
             facet._self_to_parent_transform = transformation
@@ -231,7 +231,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             pos: Pxyz
             facet._self_to_parent_transform = TransformXYZ.from_V(pos)
 
-    def set_facet_canting(self, canting_rotations: list[Rotation]):
+    def set_facet_cantings(self, canting_rotations: list[Rotation]):
         """
         Set the canting rotations of the facets relative to the ensemble.
         This function updates the canting rotations of the facets in the
