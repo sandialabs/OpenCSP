@@ -100,6 +100,24 @@ class ImageAcquisition(ImageAcquisitionAbstract):
             cls._has_checked_pypylon_version = True
 
     def instance_matches(self, possible_matches: list[ImageAcquisitionAbstract]) -> bool:
+        """
+        Determine whether this camera instance matches any instance in the provided list.
+
+        This method checks if there is another camera instance in the `possible_matches`
+        list that has the same `basler_index` as the current instance.
+
+        Parameters
+        ----------
+        possible_matches : list[ImageAcquisitionAbstract]
+            A list of camera instances to check against. Each instance should be of
+            type `ImageAcquisitionAbstract` and may have a `basler_index` attribute.
+
+        Returns
+        -------
+        bool
+            True when the first matching instance is found; False otherwise.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         for camera in possible_matches:
             if not hasattr(camera, 'basler_index'):
                 continue
@@ -108,6 +126,33 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return False
 
     def get_frame(self) -> np.ndarray:
+        """
+        Captures a single frame from the Basler DCAM monochromatic camera.
+
+        This method initiates the frame capture process and retrieves the image data
+        from the camera. The method waits for the frame to be captured and returns
+        the image data as a NumPy array.
+
+        Returns
+        -------
+        np.ndarray
+            The captured image as a NumPy array. The shape of the array will depend
+            on the pixel format set during initialization (e.g., Mono8, Mono12).
+
+        Raises
+        ------
+        pylon.RuntimeException
+            If the frame grab is unsuccessful, an exception is raised indicating the
+            failure to capture the frame.
+
+        Notes
+        -----
+        The method calculates the expected exposure time in milliseconds and uses
+        this value to set a timeout for the frame retrieval. The timeout is set to
+        1.5 times the expected image acquisition time to ensure that the frame is
+        captured successfully.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Start frame capture
         self.cap.StartGrabbingMax(1)
         exposure_time_ms = self.cap.ExposureTimeRaw.Max / 1000  # exposure time, ms
@@ -170,6 +215,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return self._shutter_cal_values
 
     def close(self):
+        """Closes the camera connection"""
         with et.ignored(Exception):
             super().close()
         with et.ignored(Exception):

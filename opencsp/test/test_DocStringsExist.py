@@ -10,8 +10,12 @@ from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotated
 from opencsp.app.sofast.SofastGUI import SofastGUI
 from opencsp.app.sofast.lib import *
 from opencsp.app.select_image_points import SelectImagePoints
-
 import opencsp.app.target.target_color.target_color as target_color
+
+import opencsp.common.lib.camera.CameraTransform as CameraTransform
+import opencsp.common.lib.camera.ImageAcquisition_DCAM_color as ImageAcquisition_DCAM_color
+import opencsp.common.lib.camera.ImageAcquisition_MSMF as ImageAcquisition_MSMF
+import opencsp.common.lib.camera.UCamera as UCamera
 
 
 def test_docstrings_exist_for_methods():
@@ -93,7 +97,22 @@ def test_docstrings_exist_for_methods():
         + target_class_list
     )
 
-    class_list = app_class_list
+    camera_class_list = [
+        opencsp.common.lib.camera.Camera.Camera,
+        CameraTransform,
+        opencsp.common.lib.camera.ImageAcquisitionAbstract.ImageAcquisitionAbstract,
+        opencsp.common.lib.camera.ImageAcquisition_DCAM_color.ImageAcquisition,
+        opencsp.common.lib.camera.ImageAcquisition_DCAM_mono.ImageAcquisition,
+        opencsp.common.lib.camera.ImageAcquisition_MSMF.ImageAcquisition,
+        opencsp.common.lib.camera.LiveView.LiveView,
+        opencsp.common.lib.camera.UCamera.Camera,
+        opencsp.common.lib.camera.UCamera.RealCamera,
+        opencsp.common.lib.camera.image_processing,
+    ]
+
+    common_class_list = camera_class_list
+
+    class_list = app_class_list + common_class_list
 
     for class_module in class_list:
         print(class_module)
