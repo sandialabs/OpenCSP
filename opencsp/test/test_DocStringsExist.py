@@ -22,6 +22,9 @@ import opencsp.common.lib.deflectometry.ParamsSlopeSolver as ParamsSlopeSolver
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract as ParamsSlopeSolverAbstract
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid as ParamsSlopeSolverParaboloid
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano as ParamsSlopeSolverPlano
+import opencsp.common.lib.geometry.ReferenceFrame as ReferenceFrame
+import opencsp.common.lib.geometry.TranslationXYZ as TranslationXYZ
+import opencsp.common.lib.geometry.matrix_geometry_3d as matrix_geometry_3d
 
 
 def test_docstrings_exist_for_methods():
@@ -179,8 +182,40 @@ def test_docstrings_exist_for_methods():
 
     geo_class_list = [opencsp.common.lib.geo.lon_lat_nsttf]
 
+    geometry_class_list = [
+        opencsp.common.lib.geometry.EdgeXY,
+        opencsp.common.lib.geometry.FunctionXYAbstract,
+        opencsp.common.lib.geometry.FunctionXYContinuous,
+        opencsp.common.lib.geometry.FunctionXYDiscrete,
+        opencsp.common.lib.geometry.FunctionXYGrid,
+        opencsp.common.lib.geometry.Intersection,
+        opencsp.common.lib.geometry.LineXY,
+        opencsp.common.lib.geometry.LoopXY,
+        opencsp.common.lib.geometry.Pxy,
+        opencsp.common.lib.geometry.Pxyz,
+        opencsp.common.lib.geometry.ReferenceFrame,
+        opencsp.common.lib.geometry.RegionXY,
+        opencsp.common.lib.geometry.TransformXYZ,
+        opencsp.common.lib.geometry.TranslationXYZ,
+        opencsp.common.lib.geometry.Uxy,
+        opencsp.common.lib.geometry.Uxyz,
+        opencsp.common.lib.geometry.Vxy,
+        opencsp.common.lib.geometry.Vxyz,
+        opencsp.common.lib.geometry.angle,
+        opencsp.common.lib.geometry.geometry_2d,
+        opencsp.common.lib.geometry.geometry_3d,
+        opencsp.common.lib.geometry.matrix_geometry_3d,
+        opencsp.common.lib.geometry.transform_3d,
+    ]
+
     common_class_list = (
-        camera_class_list + csp_class_list + cv_class_list + deflectometry_class_list + file_class_list + geo_class_list
+        camera_class_list
+        + csp_class_list
+        + cv_class_list
+        + deflectometry_class_list
+        + file_class_list
+        + geo_class_list
+        + geometry_class_list
     )
 
     class_list = app_class_list + common_class_list
