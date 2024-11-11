@@ -8,7 +8,6 @@ import example as example
 from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
 from opencsp.app.sofast.SofastGUI import SofastGUI
 from opencsp.app.sofast.lib import *
-from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 
 # from opencsp.app.target.target_color.target_color_2d_gradient import target_color_2d_gradient
 import opencsp.app.target.target_color.target_color_bullseye_error as target_color_bullseye_error
@@ -39,7 +38,6 @@ def test_docstrings_exist_for_methods():
         opencsp.app.sofast.lib.DistanceOpticScreen.DistanceOpticScreen,
         opencsp.app.sofast.lib.DotLocationsFixedPattern.DotLocationsFixedPattern,
         SofastGUI,
-        visualize_setup,
         opencsp.app.sofast.lib.Fringes.Fringes,
         opencsp.app.sofast.lib.ImageCalibrationAbstract.ImageCalibrationAbstract,
         opencsp.app.sofast.lib.ImageCalibrationGlobal.ImageCalibrationGlobal,
