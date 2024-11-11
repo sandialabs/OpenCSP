@@ -177,7 +177,11 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.file.SimpleCsv,
     ]
 
-    common_class_list = camera_class_list + csp_class_list + cv_class_list + deflectometry_class_list + file_class_list
+    geo_class_list = [opencsp.common.lib.geo.lon_lat_nsttf]
+
+    common_class_list = (
+        camera_class_list + csp_class_list + cv_class_list + deflectometry_class_list + file_class_list + geo_class_list
+    )
 
     class_list = app_class_list + common_class_list
 
