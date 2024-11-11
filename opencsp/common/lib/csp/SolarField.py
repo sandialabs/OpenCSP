@@ -38,7 +38,12 @@ from opencsp.common.lib.tool.typing_tools import strict_types
 class SolarField(RayTraceable, OpticOrientationAbstract):
     """
     Representation of a heliostat solar field.
+
+    This class manages a collection of heliostats and their configurations, allowing for
+    spatial placement and rendering of the solar field.
     """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
 
     # CONSTRUCTION
 
@@ -49,7 +54,21 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         name: str = None,
         short_name: str = None,
     ) -> None:
+        """
+        Initializes a SolarField object with the specified heliostats and location.
 
+        Parameters
+        ----------
+        heliostats : list[HeliostatAbstract]
+            A list of heliostat objects that make up the solar field.
+        origin_lon_lat : list[float] | tuple[float, float], optional
+            The longitude and latitude of the solar field's location (default is None).
+        name : str, optional
+            The name of the solar field (default is None).
+        short_name : str, optional
+            A short name for the solar field (default is None).
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # assert isinstance(heliostats[0], HeliostatAbstract)
 
         self.heliostats = heliostats
@@ -73,9 +92,27 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
     def set_heliostat_positions(self, positions: list[Pxyz]):
         """
-        Places the heliostats at the points provided. The Pxyzs should appear in the same order
-        as the heliostats in `self.heliostats`.
+        Places the heliostats at the specified positions.
+
+        Parameters
+        ----------
+        positions : list[Pxyz]
+            A list of Pxyz objects representing the positions for each heliostat.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        ValueError
+            If the number of positions does not match the number of heliostats.
+
+        Notes
+        -----
+        The Pxyzs should appear in the same order as the heliostats in `self.heliostats`.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         for heliostat, point in zip(self.heliostats, positions):
             heliostat_position_transform = TransformXYZ.from_V(point)
             heliostat._self_to_parent_transform = heliostat_position_transform
@@ -88,25 +125,26 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         facet_attributes_csv: str,
         name=None,
     ):
-        """returns the solar field that is requested based on the given information
+        """
+        Creates a SolarField object from CSV files containing heliostat and facet attributes.
 
-        Paramters
-        ---------
-        long_lat: list[float] | tuple[float, float]
-            the (longitude, latitude) pair that defined the location of
-            the solar fields real world location
-        heliostat_attribute_csv: str
-            filepath to the csv file that contains information about the desired heliostats.
-        facet_attricute_csv: str
-            filepath ot the csv file that describes how the facets in the desired heliostats
-            will be positoned and named.
-        name: str
-            optional argument that can be used to define the name of the field
+        Parameters
+        ----------
+        long_lat : list[float] | tuple[float, float]
+            The (longitude, latitude) pair defining the location of the solar field.
+        heliostat_attributes_csv : str
+            The file path to the CSV file containing heliostat attributes.
+        facet_attributes_csv : str
+            The file path to the CSV file describing the facets of the heliostats.
+        name : str, optional
+            An optional name for the solar field (default is None).
 
         Returns
         -------
-        `SolarField`
+        SolarField
+            A SolarField object initialized with the specified attributes.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         with open(heliostat_attributes_csv) as h_csv:
             h_reader = csv.reader(h_csv)
             h_headers = next(h_reader)
@@ -161,6 +199,15 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
 
     @property
     def children(self):
+        """
+        Retrieves the list of child objects (heliostats) in the solar field.
+
+        Returns
+        -------
+        list[RayTraceable]
+            A list of heliostat objects in the solar field.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         return self.heliostats
 
     # override OpticOrientationAbstract
@@ -170,8 +217,16 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
     # ACCESS
 
     def heliostat_name_list(self) -> list[str]:
-        """Returns a list of all the names of heliostats in the
-        solar field. The order is the same as the order the heliostats are stored."""
+        """
+        Returns a list of all the names of heliostats in the solar field.
+
+        The order is the same as the order the heliostats are stored.
+
+        Returns
+        -------
+        list[str]
+            A list of heliostat names.
+        """
         name_list = [h.name for h in self.heliostats]
         return name_list
 
@@ -188,8 +243,25 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
     #     return self._when_ymdhmsz
 
     def lookup_heliostat(self, heliostat_name: str) -> HeliostatAbstract:
-        """Returns the first HeliostatAbstract in the solarfield that matches the given name.
-        If there are no heliostats that match the given name it throws a KeyError."""
+        """
+        Returns the first HeliostatAbstract in the solar field that matches the given name.
+
+        Parameters
+        ----------
+        heliostat_name : str
+            The name of the heliostat to look up.
+
+        Returns
+        -------
+        HeliostatAbstract
+            The matching heliostat object.
+
+        Raises
+        ------
+        KeyError
+            If no heliostat with the specified name exists in the solar field.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Check input.
         matching_heliostats = filter(lambda heliostat: heliostat.name == heliostat_name, self.heliostats)
         first_matching = next(matching_heliostats, None)
@@ -217,8 +289,15 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         return [xyz_min, xyz_max]
 
     def heliostat_bounding_box_xy(self):
-        """Returns an axis alligned bounding box that only
-        takes into account the heliostat origins"""
+        """
+        Returns an axis-aligned bounding box that only takes into account the heliostat origins.
+
+        Returns
+        -------
+        list[list[float]]
+            A list containing the minimum and maximum coordinates of the bounding box in the XY plane.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         heliostat_origins = Pxyz.merge([h._self_to_parent_transform.apply(Pxyz.origin()) for h in self.heliostats])
         x_min = min(heliostat_origins.x)
         x_max = max(heliostat_origins.x)
@@ -310,7 +389,23 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         solar_field_style: RenderControlSolarField = RenderControlSolarField(),
         transform: TransformXYZ = None,
     ) -> None:
+        """
+        Draws the solar field in a 3D view.
 
+        Parameters
+        ----------
+        view : View3d
+            The 3D view in which to draw the solar field.
+        solar_field_style : RenderControlSolarField, optional
+            The style settings for rendering the solar field (default is a new RenderControlSolarField object).
+        transform : TransformXYZ, optional
+            A transformation to apply to the solar field when drawing (default is None).
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if transform is None:
             transform = self.self_to_global_tranformation
 
@@ -366,6 +461,20 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         return (points, normals)
 
     def survey_of_points(self, resolution: Resolution) -> tuple[Pxyz, Vxyz]:
+        """
+        Returns a grid of equispaced points and the normal vectors at those points.
+
+        Parameters
+        ----------
+        resolution : Resolution
+            The rectangular resolution of the points gathered.
+
+        Returns
+        -------
+        tuple[Pxyz, Vxyz]
+            A tuple containing the sampled points and their corresponding normal vectors.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Get sample point locations (z=0 plane in "child" reference frame)
         return self._survey_of_points_helper(resolution, TransformXYZ.identity())
 

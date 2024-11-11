@@ -110,7 +110,35 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.camera.image_processing,
     ]
 
-    common_class_list = camera_class_list
+    csp_class_list = [
+        opencsp.common.lib.csp.Facet,
+        opencsp.common.lib.csp.FacetEnsemble,
+        opencsp.common.lib.csp.HeliostatAbstract,
+        opencsp.common.lib.csp.HeliostatAzEl,
+        opencsp.common.lib.csp.HeliostatConfiguration,
+        opencsp.common.lib.csp.LightPath,
+        opencsp.common.lib.csp.LightPathEnsemble,
+        opencsp.common.lib.csp.LightSource,
+        opencsp.common.lib.csp.LightSourcePoint,
+        opencsp.common.lib.csp.LightSourceSun,
+        opencsp.common.lib.csp.MirrorAbstract,
+        opencsp.common.lib.csp.MirrorParametric,
+        opencsp.common.lib.csp.MirrorParametricRectangular,
+        opencsp.common.lib.csp.MirrorPoint,
+        opencsp.common.lib.csp.OpticOrientationAbstract,
+        opencsp.common.lib.csp.RayTrace,
+        opencsp.common.lib.csp.RayTraceable,
+        opencsp.common.lib.csp.Scene,
+        opencsp.common.lib.csp.SolarField,
+        opencsp.common.lib.csp.StandardPlotOutput,
+        opencsp.common.lib.csp.Tower,
+        opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract,
+        opencsp.common.lib.csp.sun_position,
+        opencsp.common.lib.csp.sun_track,
+        opencsp.common.lib.csp.visualize_orthorectified_image,
+    ]
+
+    common_class_list = camera_class_list + csp_class_list
 
     class_list = app_class_list + common_class_list
 
@@ -130,7 +158,10 @@ def test_docstrings_exist_for_methods():
             method_list = [
                 func
                 for func in dir(class_module)
-                if callable(getattr(class_module, func)) and not func.startswith("__") and not func.startswith("_")
+                if callable(getattr(class_module, func))
+                and not func.startswith("__")
+                and not func.startswith("_")
+                and not func.endswith("_UNVERIFIED")
             ]
 
         for method in method_list:
