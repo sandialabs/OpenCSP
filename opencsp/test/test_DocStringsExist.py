@@ -25,6 +25,7 @@ import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano as ParamsSlopeSol
 import opencsp.common.lib.geometry.ReferenceFrame as ReferenceFrame
 import opencsp.common.lib.geometry.TranslationXYZ as TranslationXYZ
 import opencsp.common.lib.geometry.matrix_geometry_3d as matrix_geometry_3d
+import opencsp.common.lib.opencsp_path.optical_analysis_data_path as optical_analysis_data_path
 
 
 def test_docstrings_exist_for_methods():
@@ -208,6 +209,12 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.geometry.transform_3d,
     ]
 
+    opencsp_path_class_list = [
+        opencsp.common.lib.opencsp_path.data_path_for_test,
+        opencsp.common.lib.opencsp_path.opencsp_root_path,
+        opencsp.common.lib.opencsp_path.optical_analysis_data_path,
+    ]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -216,6 +223,7 @@ def test_docstrings_exist_for_methods():
         + file_class_list
         + geo_class_list
         + geometry_class_list
+        + opencsp_path_class_list
     )
 
     class_list = app_class_list + common_class_list
