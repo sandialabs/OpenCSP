@@ -307,7 +307,7 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
         # Draw surface boundary
         if mirror_style.point_styles is not None:
             mirror_style.point_styles.markersize = 0
-            view.draw_Vxyz(edge_values_lifted, style=mirror_style.point_styles)
+            edge_values_lifted.draw_line(view, style=mirror_style.point_styles)
 
         # Draw surface normals
         if mirror_style.surface_normals:

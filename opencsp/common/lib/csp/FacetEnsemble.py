@@ -14,6 +14,7 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlFacetEnsemble import RenderControlFacetEnsemble
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -177,17 +178,17 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
 
         # origin of the facet ensemble
         if facet_ensemble_style.draw_centroid:
-            view.draw_single_Pxyz(origin)
+            origin.draw_points(view, style=rcps.marker(markersize=1))
 
         # pointing vector of the facet ensemble
         if facet_ensemble_style.draw_normal_vector:
-            view.draw_Vxyz(Vxyz.merge([origin, normal_vector]), style=facet_ensemble_style.normal_vector_style)
+            Vxyz.merge([origin, normal_vector]).draw_line(view, style=facet_ensemble_style.normal_vector_style)
 
         if facet_ensemble_style.draw_outline:
             left, right, top, bottom = self.axis_aligned_bounding_box
             corners = Pxyz([[left, left, right, right], [top, bottom, bottom, top], [0, 0, 0, 0]])
             corners_moved = transform.apply(corners)
-            view.draw_Vxyz(corners_moved, close=True, style=facet_ensemble_style.outline_style)
+            corners_moved.draw_line(view, close=True, style=facet_ensemble_style.outline_style)
 
     def set_facet_transform_list(self, transformations: list[TransformXYZ]):
         """

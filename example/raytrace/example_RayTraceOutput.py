@@ -639,14 +639,14 @@ class ExampleRayTraceOutput(to.TestOutput):
             def _draw_helper(view: View3d) -> None:
                 sf1.draw(view, solar_field_style)
                 trace.draw(view, trace_control)
-                view.draw_single_Pxyz(aimpoint_xyz, style=rcps.marker(color='tab:orange'))
+                aimpoint_xyz.draw_points(view, style=rcps.marker(color='tab:orange'))
 
                 # debug
                 heliostat_origin = sf1.heliostats[0].self_to_global_tranformation.apply(Pxyz.origin())
                 pointing_vector = st.tracking_surface_normal_xyz(
                     heliostat_origin, aimpoint_xyz, lln.NSTTF_ORIGIN, when_ymdhmsz
                 )
-                view.draw_Vxyz(Vxyz.merge([heliostat_origin, heliostat_origin + pointing_vector * 10]))
+                Vxyz.merge([heliostat_origin, heliostat_origin + pointing_vector * 10]).draw_line(view)
                 # debug
 
                 self.show_save_and_check_figure(fig_record)
@@ -770,7 +770,7 @@ class ExampleRayTraceOutput(to.TestOutput):
         trace = rt.trace_scene(scene, Resolution.center(), verbose=False)
         trace.draw(view, RenderControlRayTrace(RenderControlLightPath(15, 200)))
 
-        view.draw_single_Pxyz(aimpoint_xyz, rcps.RenderControlPointSeq(color='orange', marker='.'))
+        aimpoint_xyz.draw_points(view, rcps.RenderControlPointSeq(color='orange', marker='.'))
 
         self.show_save_and_check_figure(fig_record)
 

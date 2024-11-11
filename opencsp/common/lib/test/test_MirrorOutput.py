@@ -6,7 +6,6 @@ import copy
 import datetime
 from typing import Callable
 
-import matplotlib
 import numpy as np
 import pytz
 from scipy.spatial.transform import Rotation
@@ -14,7 +13,7 @@ from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
+from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Pxy import Pxy
 
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
@@ -22,13 +21,11 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
-import opencsp.common.lib.render_control.RenderControlEnsemble as rce
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
 import opencsp.common.lib.render_control.RenderControlLightPath as rclp
-import opencsp.common.lib.render_control.RenderControlRayTrace as rcrt
 import opencsp.common.lib.test.TestOutput as to
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
@@ -39,7 +36,6 @@ from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 from opencsp.common.lib.csp.SolarField import SolarField
 import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
-import opencsp.common.lib.csp.RayTrace as rt
 
 
 PI = np.pi
@@ -331,7 +327,7 @@ class TestMirrorOutput(to.TestOutput):
         # trace = rt.trace_scene(scene, Resolution.center())
 
         # trace.draw(fig_record.view, rcrt.RenderControlRayTrace(light_path_control))
-        # fig_record.view.draw_single_Pxyz(aimpoint)
+        # aimpoint.draw_point(fig_record.view)
 
         # Output.
         self.show_save_and_check_figure(fig_record)
