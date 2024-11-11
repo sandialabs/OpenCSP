@@ -5,6 +5,7 @@ Utilities for image processing.
 
 """
 
+import sys
 import numpy as np
 from PIL import Image
 
@@ -256,3 +257,35 @@ def image_files_in_directory(dir: str, allowable_extensions: list[str] = None) -
     files = sorted(files)
 
     return files
+
+
+def getsizeof_approx(img: Image) -> int:
+    """
+    Get the number of bytes of memory used by the given image.
+
+    Note that this value is approximate. It should be close based on the basic
+    assumptions of uncompressed data in memory, and one byte per pixel per color
+    channel.
+
+    Parameters
+    ----------
+    img : Image
+        The image to get the size of.
+
+    Returns
+    -------
+    int
+        Number of bytes of memory that the image object + image data together occupy.
+    """
+    # Get the size of the image object
+    object_size = sys.getsizeof(img)
+
+    # Calculate the approximate size of the image data
+    if img is None:
+        image_data_size = 0
+    else:
+        width, height = img.size
+        mode_size = len(img.getbands())  # Number of bytes per pixel
+        image_data_size = width * height * mode_size
+
+    return object_size + image_data_size

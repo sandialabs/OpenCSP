@@ -190,15 +190,6 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         self.visualization_coordinator.clear()
         self.visualization_coordinator.register_visualization_processors(image_processors)
 
-        # limit the amount of memory that image processors utilize
-        from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessorLeger import (
-            image_processors_persistant_memory_total,
-        )
-
-        mem_per_image_processor = image_processors_persistant_memory_total / len(self.image_processors)
-        for image_processor in self.image_processors:
-            image_processor._allowed_memory_footprint = mem_per_image_processor
-
         # assign the input stream to the first image processor
         if self.input_stream != None:
             self._assign_inputs(self.input_stream)
@@ -263,7 +254,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         # Release memory from the previous result
         if self._prev_result is not None:
-            self.image_processors[-1].cache_image_to_disk_as_necessary(self._prev_result)
+            self.image_processors[-1].cache_images_to_disk_as_necessary()
             self._prev_result = None
 
         # Attempt to get the next image. Raises StopIteration if there are no
