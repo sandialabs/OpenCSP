@@ -16,6 +16,7 @@ import opencsp.common.lib.camera.CameraTransform as CameraTransform
 import opencsp.common.lib.camera.ImageAcquisition_DCAM_color as ImageAcquisition_DCAM_color
 import opencsp.common.lib.camera.ImageAcquisition_MSMF as ImageAcquisition_MSMF
 import opencsp.common.lib.camera.UCamera as UCamera
+import opencsp.common.lib.cv.SpotAnalysis as SpotAnalysis
 
 
 def test_docstrings_exist_for_methods():
@@ -138,7 +139,15 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.csp.visualize_orthorectified_image,
     ]
 
-    common_class_list = camera_class_list + csp_class_list
+    cv_class_list = [
+        opencsp.common.lib.cv.CacheableImage,
+        opencsp.common.lib.cv.OpticalFlow,
+        opencsp.common.lib.cv.SpotAnalysis,
+        opencsp.common.lib.cv.image_filters,
+        opencsp.common.lib.cv.image_reshapers,
+    ]
+
+    common_class_list = camera_class_list + csp_class_list + cv_class_list
 
     class_list = app_class_list + common_class_list
 

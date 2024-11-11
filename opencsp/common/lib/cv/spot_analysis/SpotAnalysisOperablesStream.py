@@ -9,15 +9,44 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysi
 
 
 class SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
+    """
+    An iterator that streams SpotAnalysisOperable objects from a collection of images.
+
+    This class allows for the iteration over a collection of images, converting them into
+    `SpotAnalysisOperable` objects. It can handle various types of image sources, including
+    `ImagesIterable`, `ImagesStream`, and `SpotAnalysisImagesStream`.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(
         self, images: ImagesIterable | ImagesStream | SpotAnalysisImagesStream | Iterator[SpotAnalysisOperable]
     ):
+        """
+        Initializes the SpotAnalysisOperablesStream with the provided image source.
+
+        Parameters
+        ----------
+        images : ImagesIterable | ImagesStream | SpotAnalysisImagesStream | Iterator[SpotAnalysisOperable]
+            The source of images to be processed.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.images = images
         self.images_iter = None
         self.default_support_images: dict[ImageType, CacheableImage] = None
         self.default_data: SpotAnalysisOperable = None
 
     def set_defaults(self, default_support_images: dict[ImageType, CacheableImage], default_data: SpotAnalysisOperable):
+        """
+        Sets default support images and data for the operables.
+
+        Parameters
+        ----------
+        default_support_images : dict[ImageType, CacheableImage]
+            A dictionary of default support images to be used in the operables.
+        default_data : SpotAnalysisOperable
+            Default data to be used in the operables.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.default_support_images = default_support_images
         self.default_data = default_data
 
