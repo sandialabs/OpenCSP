@@ -9,6 +9,28 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class ImageAcquisitionAbstract(ABC):
+    """
+    Abstract base class for image acquisition from cameras.
+
+    This class defines the interface for acquiring images from various camera types.
+    It implements a multiton design pattern to ensure that only one instance of a
+    camera is active at a time. The class provides methods for exposure calibration,
+    frame retrieval, and managing camera settings.
+
+    Attributes
+    ----------
+    _instances : dict[int, ImageAcquisitionAbstract]
+        A dictionary of all instantiated camera instances, ensuring that each index
+        corresponds to a unique camera instance.
+    _next_instance_idx : int
+        The index to use for the next camera instance added to the `_instances` dictionary.
+    on_close : list[Callable[[ImageAcquisitionAbstract], None]]
+        A list of callback functions to be executed when the camera is closed.
+    is_closed : bool
+        A flag indicating whether the camera connection is closed.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     _instances: dict[int, 'ImageAcquisitionAbstract'] = {}
     """ All instantiated camera instances. We use a dictionary to ensure that once an index is assigned,
     then all references to that same index will return the same camera (or None if the camera was closed). """

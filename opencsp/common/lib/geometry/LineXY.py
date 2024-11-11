@@ -7,6 +7,28 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 
 
 class LineXY:
+    """
+    Representation of a homogeneous line in 2D space.
+
+    The line is represented in the general form \( Ax + By + C = 0 \) and
+    provides various properties and methods to work with lines, including
+    calculating distances, intersections, and fitting lines to sets of points.
+
+    Attributes
+    ----------
+    A : float
+        Coefficient A of the line equation.
+    B : float
+        Coefficient B of the line equation.
+    C : float
+        Coefficient C of the line equation, representing the distance from the
+        origin along the normal vector.
+    _original_two_points : tuple[Vxy, Vxy] | None
+        The original two points used to create the line, if created with
+        `from_two_points`.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self, A: float, B: float, C: float):
         """
         Representation of a homogenous line with the following properties:
