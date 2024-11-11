@@ -17,6 +17,11 @@ import opencsp.common.lib.camera.ImageAcquisition_DCAM_color as ImageAcquisition
 import opencsp.common.lib.camera.ImageAcquisition_MSMF as ImageAcquisition_MSMF
 import opencsp.common.lib.camera.UCamera as UCamera
 import opencsp.common.lib.cv.SpotAnalysis as SpotAnalysis
+import opencsp.common.lib.deflectometry.ImageProjectionSetupGUI as ImageProjectionSetupGUI
+import opencsp.common.lib.deflectometry.ParamsSlopeSolver as ParamsSlopeSolver
+import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract as ParamsSlopeSolverAbstract
+import opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid as ParamsSlopeSolverParaboloid
+import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano as ParamsSlopeSolverPlano
 
 
 def test_docstrings_exist_for_methods():
@@ -147,7 +152,24 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.cv.image_reshapers,
     ]
 
-    common_class_list = camera_class_list + csp_class_list + cv_class_list
+    deflectometry_class_list = [
+        opencsp.common.lib.deflectometry.CalibrationCameraPosition,
+        opencsp.common.lib.deflectometry.ImageProjection,
+        opencsp.common.lib.deflectometry.ImageProjectionSetupGUI,
+        opencsp.common.lib.deflectometry.ParamsSlopeSolver,
+        opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract,
+        opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid,
+        opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano,
+        opencsp.common.lib.deflectometry.SlopeSolver,
+        opencsp.common.lib.deflectometry.SlopeSolverData,
+        opencsp.common.lib.deflectometry.SlopeSolverDataDebug,
+        opencsp.common.lib.deflectometry.Surface2DAbstract,
+        opencsp.common.lib.deflectometry.Surface2DParabolic,
+        opencsp.common.lib.deflectometry.Surface2DPlano,
+        opencsp.common.lib.deflectometry.slope_fitting_2d,
+    ]
+
+    common_class_list = camera_class_list + csp_class_list + cv_class_list + deflectometry_class_list
 
     class_list = app_class_list + common_class_list
 
