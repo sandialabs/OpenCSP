@@ -215,6 +215,12 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.opencsp_path.optical_analysis_data_path,
     ]
 
+    photogrammetry_class_list = [
+        opencsp.common.lib.photogrammetry.ImageMarker,
+        opencsp.common.lib.photogrammetry.bundle_adjustment,
+        opencsp.common.lib.photogrammetry.photogrammetry,
+    ]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -224,6 +230,7 @@ def test_docstrings_exist_for_methods():
         + geo_class_list
         + geometry_class_list
         + opencsp_path_class_list
+        + photogrammetry_class_list
     )
 
     class_list = app_class_list + common_class_list
