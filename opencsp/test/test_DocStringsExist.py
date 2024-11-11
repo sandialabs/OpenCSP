@@ -1,5 +1,4 @@
 import inspect
-<<<<<<< HEAD
 import unittest
 
 import opencsp as opencsp
@@ -11,18 +10,20 @@ from opencsp.common.lib.cv import CacheableImage, SpotAnalysis
 from opencsp.common.lib.cv.spot_analysis import ImagesStream, SpotAnalysisImagesStream, SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor import *
 from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImageProcessor
-=======
 
 # Assume opencsp is in PYHTONPATH
 import opencsp as opencsp
 import example as example
->>>>>>> 767739b (Check opencsp.app for doc strings)
 
 # TODO: why aren't these imported from import opencsp as opencsp above
 from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
 from opencsp.app.sofast.SofastGUI import SofastGUI
 from opencsp.app.sofast.lib import *
 
+<<<<<<< HEAD
+=======
+# from opencsp.app.target.target_color.target_color_2d_gradient import target_color_2d_gradient
+>>>>>>> a785026 (Move target color files to contrib)
 import opencsp.app.target.target_color.target_color as target_color
 
 
@@ -104,14 +105,7 @@ class test_Docstrings(unittest.TestCase):
         SofastGUI,
     ]
 
-    target_class_list = [
-        opencsp.app.target.target_color.lib.ImageColor,
-        target_color_bullseye_error,
-        target_color_bullseye,
-        target_color_one_color,
-        target_color_polar,
-        target_color,
-    ]
+    target_class_list = [opencsp.app.target.target_color.lib.ImageColor, target_color]
 
     camera_calibration_class_list = [
         opencsp.app.camera_calibration.lib.calibration_camera,
