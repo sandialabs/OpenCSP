@@ -26,6 +26,8 @@ import opencsp.common.lib.geometry.ReferenceFrame as ReferenceFrame
 import opencsp.common.lib.geometry.TranslationXYZ as TranslationXYZ
 import opencsp.common.lib.geometry.matrix_geometry_3d as matrix_geometry_3d
 import opencsp.common.lib.opencsp_path.optical_analysis_data_path as optical_analysis_data_path
+import opencsp.common.lib.process.ServerSynchronizer as ServerSynchronizer
+import opencsp.common.lib.process.parallel_video_tools as parallel_video_tools
 
 
 def test_docstrings_exist_for_methods():
@@ -221,6 +223,15 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.photogrammetry.photogrammetry,
     ]
 
+    process_class_list = [
+        opencsp.common.lib.process.MultiprocessNonDaemonic,
+        opencsp.common.lib.process.ParallelPartitioner,
+        opencsp.common.lib.process.ServerSynchronizer,
+        opencsp.common.lib.process.parallel_file_tools,
+        opencsp.common.lib.process.parallel_video_tools,
+        opencsp.common.lib.process.subprocess_tools,
+    ]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -231,6 +242,7 @@ def test_docstrings_exist_for_methods():
         + geometry_class_list
         + opencsp_path_class_list
         + photogrammetry_class_list
+        + process_class_list
     )
 
     class_list = app_class_list + common_class_list

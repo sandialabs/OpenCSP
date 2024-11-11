@@ -10,6 +10,11 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class ServerSynchronizer:
+    """
+    Helper class to force all servers to wait at specified synchronization points.
+    This is particularly useful for scatter-gather type workflows.
+    """
+
     path = os.path.join(orp.opencsp_temporary_dir(), "synchronize_servers_by_file")
 
     def __init__(
