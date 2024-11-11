@@ -1,6 +1,7 @@
 """Module for processing and analyzing SOFAST data for an ensemble of mirrors.
 
 This script performs the following steps:
+
 1. Load saved facet ensemble SOFAST collection data from an HDF5 file.
 2. Save projected sinusoidal fringe images to PNG format.
 3. Save captured sinusoidal fringe images and mask images to PNG format.
@@ -15,6 +16,7 @@ To run the script, simply execute it as a standalone program:
 
 This will perform the processing steps and save the results to the data/output/single_facet directory
 with the following subfolders:
+
 1_images_fringes_projected - The patterns sent to the display during the SOFAST measurement of the optic.
 2_images_captured - The captured images of the displayed patterns as seen by the SOFAST camera
 3_processed_data - The processed data from SOFAST.
@@ -23,7 +25,7 @@ with the following subfolders:
 Notes
 -----
 - The script assumes that the input data files are located in the specified directories.
-- Chat GPT 40 assisted with the generation of some docstrings in this file."""
+- Chat GPT 4o assisted with the generation of some docstrings in this file."""
 
 import json
 from os.path import join, dirname
@@ -39,7 +41,6 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe
 from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
-from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.Facet import Facet
