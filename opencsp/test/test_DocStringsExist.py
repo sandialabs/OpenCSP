@@ -169,7 +169,15 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.deflectometry.slope_fitting_2d,
     ]
 
-    common_class_list = camera_class_list + csp_class_list + cv_class_list + deflectometry_class_list
+    file_class_list = [
+        opencsp.common.lib.file.AbstractAttributeParser,
+        opencsp.common.lib.file.AttributesManager,
+        opencsp.common.lib.file.CsvColumns,
+        opencsp.common.lib.file.CsvInterface,
+        opencsp.common.lib.file.SimpleCsv,
+    ]
+
+    common_class_list = camera_class_list + csp_class_list + cv_class_list + deflectometry_class_list + file_class_list
 
     class_list = app_class_list + common_class_list
 
