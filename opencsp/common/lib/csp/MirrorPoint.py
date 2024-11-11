@@ -1,7 +1,3 @@
-"""Mirror class representing mirrors with scattered surface point
-locations.
-"""
-
 from typing import Literal
 from warnings import warn
 
@@ -22,6 +18,10 @@ from opencsp.common.lib.render_control.RenderControlMirror import RenderControlM
 
 
 class MirrorPoint(MirrorAbstract):
+    """Mirror class representing mirrors with scattered surface point
+    locations.
+    """
+
     def __init__(
         self,
         surface_points: Pxyz,

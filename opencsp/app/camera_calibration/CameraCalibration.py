@@ -24,6 +24,47 @@ import opencsp.common.lib.tool.tk_tools as tkt
 
 
 class CalibrationGUI:
+    """
+    A graphical user interface (GUI) for calibrating a machine vision camera.
+
+    This class provides a user-friendly interface to load previously captured
+    calibration images, find checkerboard corners, and calibrate the camera
+    using the selected images. It also allows users to visualize the
+    reprojection error and save the calibrated camera parameters.
+
+    The GUI includes options to select images, find corners, view found
+    corners, calibrate the camera, visualize distortion, and save the camera
+    configuration.
+
+    Attributes
+    ----------
+    root : tkinter.Tk
+        The main window of the GUI.
+    files : list[str]
+        List of selected image file paths.
+    images : list[np.ndarray]
+        List of loaded images as NumPy arrays.
+    used_file_names : list[str]
+        List of file names of the loaded images.
+    p_object : list[Vxyz]
+        List of object points in 3D space corresponding to the checkerboard corners.
+    p_image : list[Vxy]
+        List of image points in 2D space corresponding to the detected corners.
+    img_size_xy : tuple[int, int]
+        Size of the images (width, height).
+    camera : Camera
+        The calibrated camera object.
+    r_cam_object : list[Rotation]
+        List of rotation matrices for each calibration image.
+    v_cam_object_cam : list[Vxyz]
+        List of camera position vectors for each calibration image.
+    avg_reproj_error : list[float]
+        Average reprojection error for the calibration.
+    reproj_errors : list[float]
+        List of reprojection errors for each calibration image.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self):
         """
         GUI for calibrating machine vision Camera
