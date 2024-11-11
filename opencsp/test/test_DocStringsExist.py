@@ -22,7 +22,6 @@ import example as example
 from opencsp.app.camera_calibration.lib.ViewAnnotatedImages import ViewAnnotatedImages
 from opencsp.app.sofast.SofastGUI import SofastGUI
 from opencsp.app.sofast.lib import *
-from opencsp.app.sofast.lib.visualize_setup import visualize_setup
 
 import opencsp.app.target.target_color.target_color as target_color
 
@@ -85,7 +84,6 @@ class test_Docstrings(unittest.TestCase):
         opencsp.app.sofast.lib.DistanceOpticScreen.DistanceOpticScreen,
         opencsp.app.sofast.lib.DotLocationsFixedPattern.DotLocationsFixedPattern,
         SofastGUI,
-        visualize_setup,
         opencsp.app.sofast.lib.Fringes.Fringes,
         opencsp.app.sofast.lib.ImageCalibrationAbstract.ImageCalibrationAbstract,
         opencsp.app.sofast.lib.ImageCalibrationGlobal.ImageCalibrationGlobal,
