@@ -46,6 +46,7 @@ import opencsp.common.lib.render_control.RenderControlKeyTracks
 import opencsp.common.lib.render_control.RenderControlPowerpointPresentation
 import opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
 import opencsp.common.lib.render_control.RenderControlVideoTracks
+import opencsp.common.lib.tool.dict_tools
 
 
 def test_docstrings_exist_for_methods():
@@ -310,6 +311,23 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.target.target_image,
     ]
 
+    tool_class_list = [
+        opencsp.common.lib.tool.dict_tools,
+        opencsp.common.lib.tool.exception_tools,
+        opencsp.common.lib.tool.file_tools,
+        opencsp.common.lib.tool.hdf5_tools,
+        opencsp.common.lib.tool.image_tools,
+        opencsp.common.lib.tool.list_tools,
+        opencsp.common.lib.tool.log_tools,
+        opencsp.common.lib.tool.math_tools,
+        opencsp.common.lib.tool.string_tools,
+        opencsp.common.lib.tool.system_tools,
+        opencsp.common.lib.tool.time_date_tools,
+        opencsp.common.lib.tool.tk_tools,
+        opencsp.common.lib.tool.typing_tools,
+        opencsp.common.lib.tool.unit_conversion,
+    ]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -324,6 +342,7 @@ def test_docstrings_exist_for_methods():
         + render_class_list
         + render_control_class_list
         + common_target_class_list
+        + tool_class_list
     )
 
     class_list = app_class_list + common_class_list
