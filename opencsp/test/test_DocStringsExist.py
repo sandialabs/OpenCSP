@@ -300,6 +300,15 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.render_control.RenderControlVideoTracks,
     ]
 
+    common_target_class_list = [
+        opencsp.common.lib.target.TargetAbstract,
+        opencsp.common.lib.target.TargetColor,
+        opencsp.common.lib.target.target_color_1d_gradient,
+        opencsp.common.lib.target.target_color_2d_rgb,
+        opencsp.common.lib.target.target_color_convert,
+        opencsp.common.lib.target.target_image,
+    ]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -313,6 +322,7 @@ def test_docstrings_exist_for_methods():
         + process_class_list
         + render_class_list
         + render_control_class_list
+        + common_target_class_list
     )
 
     class_list = app_class_list + common_class_list
