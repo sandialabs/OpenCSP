@@ -328,6 +328,8 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.tool.unit_conversion,
     ]
 
+    uas_class_list = [opencsp.common.lib.uas.Scan, opencsp.common.lib.uas.ScanPass, opencsp.common.lib.uas.WayPoint]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -343,6 +345,7 @@ def test_docstrings_exist_for_methods():
         + render_control_class_list
         + common_target_class_list
         + tool_class_list
+        + uas_class_list
     )
 
     class_list = app_class_list + common_class_list
