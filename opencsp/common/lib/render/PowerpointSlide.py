@@ -12,6 +12,10 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class PowerpointSlide:
+    """
+    Generate a powerpoint slide. Once completed, it should be added to a powerpoint presentation.
+    """
+
     def __init__(
         self,
         slide_control: RenderControlPowerpointSlide,

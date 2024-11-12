@@ -28,6 +28,11 @@ import opencsp.common.lib.geometry.matrix_geometry_3d as matrix_geometry_3d
 import opencsp.common.lib.opencsp_path.optical_analysis_data_path as optical_analysis_data_path
 import opencsp.common.lib.process.ServerSynchronizer as ServerSynchronizer
 import opencsp.common.lib.process.parallel_video_tools as parallel_video_tools
+import opencsp.common.lib.render.PlotAnnotation as PlotAnnotation
+import opencsp.common.lib.render.PowerpointSlide as PowerpointSlide
+import opencsp.common.lib.render.general_plot as general_plot
+import opencsp.common.lib.render.image_plot as image_plot
+import opencsp.common.lib.render.pandas_plot as pandas_plot
 
 
 def test_docstrings_exist_for_methods():
@@ -232,6 +237,21 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.process.subprocess_tools,
     ]
 
+    render_class_list = [
+        opencsp.common.lib.render.Color,
+        opencsp.common.lib.render.ImageAttributeParser,
+        opencsp.common.lib.render.PlotAnnotation,
+        opencsp.common.lib.render.PowerpointSlide,
+        opencsp.common.lib.render.VideoHandler,
+        opencsp.common.lib.render.View3d,
+        opencsp.common.lib.render.axis_3d,
+        opencsp.common.lib.render.figure_management,
+        opencsp.common.lib.render.general_plot,
+        opencsp.common.lib.render.image_plot,
+        opencsp.common.lib.render.pandas_plot,
+        opencsp.common.lib.render.view_spec,
+    ]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -243,6 +263,7 @@ def test_docstrings_exist_for_methods():
         + opencsp_path_class_list
         + photogrammetry_class_list
         + process_class_list
+        + render_class_list
     )
 
     class_list = app_class_list + common_class_list

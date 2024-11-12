@@ -18,6 +18,13 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class VideoHandler:
+    """Handle video creation, frame extraction, and video transcoding. The format for generated videos and
+    frames is controlled by the video_control and frame_control render controllers.
+
+    Not all of these arguments are required for every use case of this class. The generator methods
+    VideoCreator(), VideoTransformer(), and VideoExtractor() can be used to simplify the required
+    parameters down to the most common use cases."""
+
     _video_extensions = [
         "mp4",
         "avi",

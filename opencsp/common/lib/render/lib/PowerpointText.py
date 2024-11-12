@@ -7,6 +7,24 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class PowerpointText(pps.PowerpointShape):
+    """
+    A class representing text elements in a PowerPoint presentation.
+
+    This class allows for the creation, manipulation, and storage of text elements
+    that can be added to PowerPoint slides. It supports saving to and loading from
+    text files for persistence.
+
+    Attributes
+    ----------
+    dims : tuple[float, float, float, float]
+        The dimensions of the text element in the PowerPoint slide.
+    is_title : bool
+        A flag indicating whether this text element is a title.
+    parent_slide : PowerpointSlide
+        The parent slide to which this text element belongs.
+    """
+
+    # "ChatGPT 4o" assisted with generating this docstring.
     _tmp_save_path = os.path.join(orp.opencsp_temporary_dir(), "PowerpointTexts", "texts", "tmp")
 
     def __init__(
@@ -17,6 +35,23 @@ class PowerpointText(pps.PowerpointShape):
         is_title=False,
         parent_slide=None,
     ):
+        """
+        Initializes the PowerpointText instance.
+
+        Parameters
+        ----------
+        val : str, optional
+            The text value of the PowerPoint text element. Defaults to None.
+        dims : tuple[float, float, float, float], optional
+            The dimensions of the text element (left, top, width, height). Defaults to None.
+        cell_dims : tuple[float, float, float, float], optional
+            The dimensions of the cell containing the text. Defaults to None.
+        is_title : bool, optional
+            A flag indicating whether this text element is a title. Defaults to False.
+        parent_slide : PowerpointSlide, optional
+            The parent slide to which this text element belongs. Defaults to None.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         super().__init__(cell_dims)
         self._val = val
         self.dims = dims
