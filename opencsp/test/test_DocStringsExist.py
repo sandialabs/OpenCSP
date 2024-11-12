@@ -175,6 +175,9 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.cv.SpotAnalysis,
         opencsp.common.lib.cv.image_filters,
         opencsp.common.lib.cv.image_reshapers,
+        opencsp.common.lib.cv.annotations.AbstractAnnotations,
+        opencsp.common.lib.cv.annotations.HotspotAnnotation,
+        opencsp.common.lib.cv.annotations.PointAnnotations,
     ]
 
     deflectometry_class_list = [
