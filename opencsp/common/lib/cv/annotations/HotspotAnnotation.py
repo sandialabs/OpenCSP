@@ -18,6 +18,8 @@ class HotspotAnnotation(PointAnnotations):
         The point location of the hotspot annotation.
     """
 
+    # "ChatGPT 4o" assisted with generating this docstring.
+
     def __init__(self, style: rcps.RenderControlPointSeq = None, point: p2.Pxy = None):
         """
         A class representing a hotspot annotation in a graphical context.
@@ -45,6 +47,7 @@ class HotspotAnnotation(PointAnnotations):
         >>> print(hotspot_with_point.point)
         Pxy(10, 20)
         """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if style is None:
             style = rcps.RenderControlPointSeq(color='blue', marker='x', markersize=1)
         super().__init__(style, point)

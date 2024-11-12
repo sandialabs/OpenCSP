@@ -16,4 +16,6 @@ class PointAnnotations(pf.PointFiducials, AbstractAnnotations):
     AbstractAnnotations : Provides an abstract base for annotation classes.
     """
 
+    # "ChatGPT 4o" assisted with generating this docstring.
+
     pass
