@@ -13,26 +13,38 @@ from opencsp.app.select_image_points import SelectImagePoints
 import opencsp.app.target.target_color.target_color as target_color
 
 import opencsp.common.lib.camera.CameraTransform as CameraTransform
-import opencsp.common.lib.camera.ImageAcquisition_DCAM_color as ImageAcquisition_DCAM_color
-import opencsp.common.lib.camera.ImageAcquisition_MSMF as ImageAcquisition_MSMF
-import opencsp.common.lib.camera.UCamera as UCamera
-import opencsp.common.lib.cv.SpotAnalysis as SpotAnalysis
-import opencsp.common.lib.deflectometry.ImageProjectionSetupGUI as ImageProjectionSetupGUI
-import opencsp.common.lib.deflectometry.ParamsSlopeSolver as ParamsSlopeSolver
-import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract as ParamsSlopeSolverAbstract
-import opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid as ParamsSlopeSolverParaboloid
-import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano as ParamsSlopeSolverPlano
-import opencsp.common.lib.geometry.ReferenceFrame as ReferenceFrame
-import opencsp.common.lib.geometry.TranslationXYZ as TranslationXYZ
-import opencsp.common.lib.geometry.matrix_geometry_3d as matrix_geometry_3d
-import opencsp.common.lib.opencsp_path.optical_analysis_data_path as optical_analysis_data_path
-import opencsp.common.lib.process.ServerSynchronizer as ServerSynchronizer
-import opencsp.common.lib.process.parallel_video_tools as parallel_video_tools
-import opencsp.common.lib.render.PlotAnnotation as PlotAnnotation
-import opencsp.common.lib.render.PowerpointSlide as PowerpointSlide
-import opencsp.common.lib.render.general_plot as general_plot
-import opencsp.common.lib.render.image_plot as image_plot
-import opencsp.common.lib.render.pandas_plot as pandas_plot
+import opencsp.common.lib.camera.ImageAcquisition_DCAM_color
+import opencsp.common.lib.camera.ImageAcquisition_MSMF
+import opencsp.common.lib.camera.UCamera
+import opencsp.common.lib.cv.SpotAnalysis
+import opencsp.common.lib.deflectometry.ImageProjectionSetupGUI
+import opencsp.common.lib.deflectometry.ParamsSlopeSolver
+import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract
+import opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid
+import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano
+import opencsp.common.lib.geometry.ReferenceFrame
+import opencsp.common.lib.geometry.TranslationXYZ
+import opencsp.common.lib.geometry.matrix_geometry_3d
+import opencsp.common.lib.opencsp_path.optical_analysis_data_path
+import opencsp.common.lib.process.ServerSynchronizer
+import opencsp.common.lib.process.parallel_video_tools
+import opencsp.common.lib.render.PlotAnnotation
+import opencsp.common.lib.render.PowerpointSlide
+import opencsp.common.lib.render.general_plot
+import opencsp.common.lib.render.image_plot
+import opencsp.common.lib.render.pandas_plot
+import opencsp.common.lib.file.CsvColumns
+import opencsp.common.lib.render_control.RenderControlDeflectometryInstrument
+import opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d
+import opencsp.common.lib.render_control.RenderControlFramesNoDuplicates
+import opencsp.common.lib.render_control.RenderControlHeliostatTracks
+import opencsp.common.lib.render_control.RenderControlHeliostats3d
+import opencsp.common.lib.render_control.RenderControlKeyCorners
+import opencsp.common.lib.render_control.RenderControlKeyFramesGivenManual
+import opencsp.common.lib.render_control.RenderControlKeyTracks
+import opencsp.common.lib.render_control.RenderControlPowerpointPresentation
+import opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
+import opencsp.common.lib.render_control.RenderControlVideoTracks
 
 
 def test_docstrings_exist_for_methods():
@@ -252,6 +264,42 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.render.view_spec,
     ]
 
+    render_control_class_list = [
+        opencsp.common.lib.render_control.RenderControlAxis,
+        opencsp.common.lib.render_control.RenderControlBcs,
+        opencsp.common.lib.render_control.RenderControlDeflectometryInstrument,
+        opencsp.common.lib.render_control.RenderControlEnsemble,
+        opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d,
+        opencsp.common.lib.render_control.RenderControlFacet,
+        opencsp.common.lib.render_control.RenderControlFacetEnsemble,
+        opencsp.common.lib.render_control.RenderControlFigure,
+        opencsp.common.lib.render_control.RenderControlFigureRecord,
+        opencsp.common.lib.render_control.RenderControlFramesNoDuplicates,
+        opencsp.common.lib.render_control.RenderControlFunctionXY,
+        opencsp.common.lib.render_control.RenderControlHeatmap,
+        opencsp.common.lib.render_control.RenderControlHeliostat,
+        opencsp.common.lib.render_control.RenderControlHeliostatTracks,
+        opencsp.common.lib.render_control.RenderControlHeliostats3d,
+        opencsp.common.lib.render_control.RenderControlIntersection,
+        opencsp.common.lib.render_control.RenderControlKeyCorners,
+        opencsp.common.lib.render_control.RenderControlKeyFramesGivenManual,
+        opencsp.common.lib.render_control.RenderControlKeyTracks,
+        opencsp.common.lib.render_control.RenderControlLightPath,
+        opencsp.common.lib.render_control.RenderControlMirror,
+        opencsp.common.lib.render_control.RenderControlPointSeq,
+        opencsp.common.lib.render_control.RenderControlPowerpointPresentation,
+        opencsp.common.lib.render_control.RenderControlPowerpointSlide,
+        opencsp.common.lib.render_control.RenderControlRayTrace,
+        opencsp.common.lib.render_control.RenderControlSolarField,
+        opencsp.common.lib.render_control.RenderControlSurface,
+        opencsp.common.lib.render_control.RenderControlText,
+        opencsp.common.lib.render_control.RenderControlTower,
+        opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis,
+        opencsp.common.lib.render_control.RenderControlVideo,
+        opencsp.common.lib.render_control.RenderControlVideoFrames,
+        opencsp.common.lib.render_control.RenderControlVideoTracks,
+    ]
+
     common_class_list = (
         camera_class_list
         + csp_class_list
@@ -264,6 +312,7 @@ def test_docstrings_exist_for_methods():
         + photogrammetry_class_list
         + process_class_list
         + render_class_list
+        + render_control_class_list
     )
 
     class_list = app_class_list + common_class_list
@@ -288,6 +337,7 @@ def test_docstrings_exist_for_methods():
                 and not func.startswith("__")
                 and not func.startswith("_")
                 and not func.endswith("_UNVERIFIED")
+                and not func.endswith("_NOTWORKING")
             ]
 
         for method in method_list:

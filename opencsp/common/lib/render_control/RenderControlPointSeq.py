@@ -1,8 +1,3 @@
-"""
-
-
-"""
-
 import matplotlib.colors
 
 import opencsp.common.lib.render.Color as cl
@@ -91,40 +86,36 @@ class RenderControlPointSeq:
         vector_scale: float = 1.0,  # Facter to grow/srhink vector length, for points in a vector field.
     ):
         """
+        Initialize the rendering control for point sequences.
+
+        Parameters
+        ----------
         linestyle : str
-            Determines how lines are drawn. One of '-', '--', '-.', ':', '' or
-            'None'. Default is '-' (solid line).
+            Determines how lines are drawn. One of '-', '--', '-.', ':', '' or 'None'. Default is '-'.
         linewidth : float
-            Width of lines in the number of pixels. Default is 1.
+            Width of lines in pixels. Default is 1.
         color : str | Color
-            The primary color use for everything that doesn't have a color
-            specified. If a Color object then the rgb() value of the Color
-            object will be used. Default is 'b'.
+            The primary color used for everything that doesn't have a color specified. Default is 'b'.
         marker : str | None, optional
-            The style of marker to use. See the class description for more
-            information. Default is point '.'.
+            The style of marker to use. See the class description for more information. Default is 'x'.
         markersize : float, optional
-            Size of the marker, in pixels. Default is 6.
+            Size of the marker in pixels. Default is 6.
         markeredgecolor : str | Color | None, optional
-            The color of the marker edges. Default is 'color'.
+            The color of the marker edges. Default is the same as `color`.
         markeredgewidth : float | None, optional
-            Width of the marker edge in pixels. Defaults is 'linewidth'.
+            Width of the marker edge in pixels. Defaults to `linewidth`.
         markerfacecolor : str | Color | None, optional
-            The color of the marker faces. Default is 'color'.
+            The color of the marker faces. Default is the same as `color`.
         markeralpha : float | None, optional
-            The alpha value (transparency) with which to draw the markers, where
-            0=fully transparent and 1=fully opaque. None for matplotlib default
-            style. Default is None.
+            The alpha value (transparency) for the markers, where 0 is fully transparent and 1 is fully opaque. Default is None.
         vector_color : str | Color | None, optional
-            The color for vectors. Only applies to points in a vector field.
-            Default is 'b'.
+            The color for vectors. Only applies to points in a vector field. Default is 'b'.
         vector_linewidth : float, optional
-            The line width for vectors, in pixels. Only applies to points in a
-            vector field. default is 1.
+            The line width for vectors, in pixels. Only applies to points in a vector field. Default is 1.
         vector_scale : float, optional
-            Facter to grow/srhink vector length. Only applies to points in a
-            vector field. Default is 1.
+            Factor to grow/shrink vector length. Only applies to points in a vector field. Default is 1.
         """
+        # "ChatGPT 4o" assisted with generating this docstring.
         super(RenderControlPointSeq, self).__init__()
 
         # Set defaults.
@@ -195,36 +186,128 @@ class RenderControlPointSeq:
 
 def default(marker='.', color='b', linewidth=1, markersize=8):
     """
-    What to draw if no particular preference is expressed.
+    Create a default render control for point sequences.
+
+    This function returns a `RenderControlPointSeq` instance with default settings.
+
+    Parameters
+    ----------
+    marker : str, optional
+        Marker style for the points. By default, '.' (point marker).
+    color : str, optional
+        Color for the points. By default, 'b' (blue).
+    linewidth : float, optional
+        Line width for connecting lines. By default, 1.
+    markersize : float, optional
+        Size of the marker in pixels. By default, 8.
+
+    Returns
+    -------
+    RenderControlPointSeq
+        An instance of `RenderControlPointSeq` configured with default parameters.
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
 def outline(color='k', linewidth=1):
     """
-    Outlines of physical objects.
+    Create a render control for outlines of physical objects.
+
+    This function returns a `RenderControlPointSeq` instance configured to draw outlines only.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the outlines. By default, 'k' (black).
+    linewidth : float, optional
+        Line width for the outlines. By default, 1.
+
+    Returns
+    -------
+    RenderControlPointSeq
+        An instance of `RenderControlPointSeq` configured to display outlines only.
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker='None')
 
 
 def data_curve(color='b', linewidth=1, marker='.', markersize=3) -> RenderControlPointSeq:
     """
-    A data curve with data points identified.
+    Create a render control for a data curve with identified data points.
+
+    This function returns a `RenderControlPointSeq` instance configured to draw a data curve
+    with specified data points.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the data curve. By default, 'b' (blue).
+    linewidth : float, optional
+        Line width for the data curve. By default, 1.
+    marker : str, optional
+        Marker style for the data points. By default, '.' (point marker).
+    markersize : float, optional
+        Size of the marker in pixels. By default, 3.
+
+    Returns
+    -------
+    RenderControlPointSeq
+        An instance of `RenderControlPointSeq` configured for a data curve.
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
 def marker(marker='o', color='b', markersize=3) -> RenderControlPointSeq:
     """
-    A data curve with data points identified.
+    Create a render control for displaying markers.
+
+    This function returns a `RenderControlPointSeq` instance configured to display markers.
+
+    Parameters
+    ----------
+    marker : str, optional
+        Marker style for the points. By default, 'o' (circle marker).
+    color : str, optional
+        Color for the markers. By default, 'b' (blue).
+    markersize : float, optional
+        Size of the marker in pixels. By default, 3.
+
+    Returns
+    -------
+    RenderControlPointSeq
+        An instance of `RenderControlPointSeq` configured to display markers.
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlPointSeq(linestyle='None', color=color, marker=marker, markersize=markersize)
 
 
 def vector_field(marker='.', color='b', markersize=3, vector_linewidth=1, vector_scale=1.0) -> RenderControlPointSeq:
     """
-    A field of vector needles.
+    Create a render control for a field of vector needles.
+
+    This function returns a `RenderControlPointSeq` instance configured to draw a field of vectors.
+
+    Parameters
+    ----------
+    marker : str, optional
+        Marker style for the points. By default, '.' (point marker).
+    color : str, optional
+        Color for the vector needles. By default, 'b' (blue).
+    markersize : float, optional
+        Size of the marker in pixels. By default, 3.
+    vector_linewidth : float, optional
+        Line width for the vector needles. By default, 1.
+    vector_scale : float, optional
+        Factor to grow/shrink vector length. By default, 1.0.
+
+    Returns
+    -------
+    RenderControlPointSeq
+        An instance of `RenderControlPointSeq` configured for a vector field.
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlPointSeq(
         linestyle='None',
         color=color,
@@ -237,4 +320,24 @@ def vector_field(marker='.', color='b', markersize=3, vector_linewidth=1, vector
 
 
 def thin(marker=',', linewidth=0.3, color='y') -> RenderControlPointSeq:
+    """
+    Create a render control for a thin line style.
+
+    This function returns a `RenderControlPointSeq` instance configured for a thin line style.
+
+    Parameters
+    ----------
+    marker : str, optional
+        Marker style for the points. By default, ',' (pixel marker).
+    linewidth : float, optional
+        Line width for the points. By default, 0.3.
+    color : str, optional
+        Color for the points. By default, 'y' (yellow).
+
+    Returns
+    -------
+    RenderControlPointSeq
+        An instance of `RenderControlPointSeq` configured for a thin line style.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlPointSeq(color=color, marker=marker, linewidth=linewidth)
