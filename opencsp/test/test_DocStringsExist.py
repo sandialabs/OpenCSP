@@ -255,6 +255,9 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.process.parallel_file_tools,
         opencsp.common.lib.process.parallel_video_tools,
         opencsp.common.lib.process.subprocess_tools,
+        opencsp.common.lib.process.lib.CalledProcessError,
+        opencsp.common.lib.process.lib.ProcessOutputLine,
+        opencsp.common.lib.process.lib.ServerSynchronizerError,
     ]
 
     render_class_list = [
