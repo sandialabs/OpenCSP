@@ -273,6 +273,10 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.render.image_plot,
         opencsp.common.lib.render.pandas_plot,
         opencsp.common.lib.render.view_spec,
+        opencsp.common.lib.render.lib.AbstractPlotHandler,
+        opencsp.common.lib.render.lib.PowerpointImage,
+        opencsp.common.lib.render.lib.PowerpointShape,
+        opencsp.common.lib.render.lib.PowerpointText,
     ]
 
     render_control_class_list = [
