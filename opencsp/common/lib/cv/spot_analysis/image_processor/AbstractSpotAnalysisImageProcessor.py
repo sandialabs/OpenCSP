@@ -12,7 +12,7 @@ from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import _SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAnalysisImagesStream
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
@@ -265,7 +265,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         if isinstance(operables, (ImagesIterable, ImagesStream)):
             operables = SpotAnalysisImagesStream(operables)
         if isinstance(operables, SpotAnalysisImagesStream):
-            operables = SpotAnalysisOperablesStream(operables)
+            operables = _SpotAnalysisOperablesStream(operables)
         self.assign_inputs(operables)
         ret = [result for result in self]
         return ret

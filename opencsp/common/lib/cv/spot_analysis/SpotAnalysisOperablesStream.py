@@ -9,8 +9,12 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAna
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
-class SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
+class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
     """
+    This class is meant for internal use. Users of the SpotAnalysis class or
+    SpotAnalysisImageProcessor classes should not need to know the mechanics of
+    this class.
+
     A stream that accepts images as input and provides SpotAnalysisOperables as output.
 
     This stream can be set up with default values for supporting images or other

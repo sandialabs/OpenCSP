@@ -15,7 +15,7 @@ from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAnalysisImagesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import _SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser
 import opencsp.common.lib.render.VideoHandler as vh
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
@@ -183,7 +183,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         on the first call to process_next(). """
         self._prev_result: SpotAnalysisOperable = None
         """ The previously returned result. """
-        self.input_stream: SpotAnalysisOperablesStream = None
+        self.input_stream: _SpotAnalysisOperablesStream = None
         """ The images to be processed. """
         self.save_dir: str = save_dir
         """ If not None, then primary images will be saved to the given
@@ -237,8 +237,8 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             return ImagesIterable(images)
 
     def _assign_inputs(self, input_operables: Iterator[SpotAnalysisOperable]):
-        if not isinstance(input_operables, SpotAnalysisOperablesStream):
-            input_operables = SpotAnalysisOperablesStream(input_operables)
+        if not isinstance(input_operables, _SpotAnalysisOperablesStream):
+            input_operables = _SpotAnalysisOperablesStream(input_operables)
         self.input_stream = input_operables
         self._prev_result = None
         self.image_processors[0].assign_inputs(self.input_stream)
@@ -257,10 +257,11 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         See also: set_input_operables()"""
         primary_images = self._images2stream(images)
         images_stream = SpotAnalysisImagesStream(primary_images, {})
-        self._assign_inputs(SpotAnalysisOperablesStream(images_stream))
+        self._assign_inputs(_SpotAnalysisOperablesStream(images_stream))
 
     def set_input_operables(
-        self, input_operables: SpotAnalysisOperablesStream | list[SpotAnalysisOperable] | Iterator[SpotAnalysisOperable]
+        self,
+        input_operables: _SpotAnalysisOperablesStream | list[SpotAnalysisOperable] | Iterator[SpotAnalysisOperable],
     ):
         """Assigns primary and supporting images, and other necessary data, in preparation for process_next().
 
