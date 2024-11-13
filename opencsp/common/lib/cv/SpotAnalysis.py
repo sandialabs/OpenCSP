@@ -44,7 +44,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         f. Motion characterization video analysis
         g. Wind BCS video trajectory analysis
         h. Laser-based cross-check
-        i. Earth mover's metric for comparisons (scipy has a method, also maaaaaybe look at https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/rubner-jcviu-00.pdf)
+        i. Earth mover's metric for comparisons (possible implementations (1) scipy has a method or (2) https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/rubner-jcviu-00.pdf)
         j. Enclosed power
 
     These are our expected outputs:
