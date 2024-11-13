@@ -178,6 +178,9 @@ def test_docstrings_exist_for_methods():
         opencsp.common.lib.cv.annotations.AbstractAnnotations,
         opencsp.common.lib.cv.annotations.HotspotAnnotation,
         opencsp.common.lib.cv.annotations.PointAnnotations,
+        opencsp.common.lib.cv.fiducials.AbstractFiducials,
+        opencsp.common.lib.cv.fiducials.BcsFiducial,
+        opencsp.common.lib.cv.fiducials.PointFiducials,
     ]
 
     deflectometry_class_list = [
