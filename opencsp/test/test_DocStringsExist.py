@@ -62,7 +62,9 @@ class test_Docstrings(unittest.TestCase):
                     undocumented_methods.append(method)
 
             self.assertEqual(
-                len(undocumented_methods), 0, "Found undocumented methods:\n\t" + "\n\t".join(undocumented_methods)
+                len(undocumented_methods),
+                0,
+                f"Found undocumented methods in {class_module}:\n\t" + "\n\t".join(undocumented_methods),
             )
 
 

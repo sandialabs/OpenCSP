@@ -159,7 +159,8 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
                 self.operables_in_flight.clear()
                 self.results_on_deck.clear()
 
-    def register_processed_result(self, is_last: bool):
+    def _register_processed_result(self, is_last: bool):
+        """Updates internal variables for tracking the number of processed operables."""
         self._num_images_processed += 1
         if is_last:
             self._finished_processing = True
@@ -320,7 +321,7 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
 
         # record processed results
         if is_last:
-            self.register_processed_result(is_last)
+            self._register_processed_result(is_last)
 
         # execute any registered callbacks
         for operable in ret:
