@@ -22,10 +22,13 @@ class CacheableImage:
     The intended use for this class is to reduce memory usage by caching
     images to disk while not in use. Therefore, there is an inherent
     priority order for the data that is returned from various methods:
-    (1) in-memory array, (2) numpy cache file, (3) image source file.
 
-    Parameters
-    ----------
+        1. in-memory array
+        2. numpy cache file
+        3. image source file
+
+    Sources
+    -------
     Only one of the inputs (array, cache_path, source_path) are required in the
     constructor. In fact, there is a method :py:meth:`from_single_source` that
     tries to guess which input is being provided. The "array" parameter should
@@ -35,41 +38,35 @@ class CacheableImage:
     for where to cache the image to.
 
     The following table determines how images are retrieved based on the given
-    parameters ([X] = given and file exists, [.] = given and file doesn't
+    parameters ([X] = given and file exists, [X] = given and file doesn't
     exist, * = any):
 
-        +=======+=========+==========+========================================================================+
-        | array | cache_p | source_p | retrieval method                                                       |
-        +=======+=========+==========+========================================================================+
-        |   X   |         |          | array                                                                  |
-        |       |         |          | cache_path after cacheing (a temporary cache_path will be assigned)    |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |    X    |    *     | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will then be ignored)        |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |   [X]   |          | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will be saved to cache_path) |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |   [X]   |    X     | array                                                                  |
-        |       |         |          | source_path after cacheing (array contents will then be ignored)       |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |         |    X     | array                                                                  |
-        |       |         |          | source_path after cacheing (array contents will then be ignored)       |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |         |   [X]    | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will be saved to cache_path) |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |    X    |    *     | cache_path                                                             |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |   [X]   |    X     | source_path                                                            |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |         |    X     | source_path                                                            |
-        +-------+---------+----------+------------------------------------------------------------------------+
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        | array | cache_p | source_p | retrieval method                                                                  |
+        +=======+=========+==========+===================================================================================+
+        |   X   |         |          | **array** (cache_path after cacheing, a temporary cache_path will be assigned)    |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |    X    |    \*    | **array** (cache_path after cacheing, array contents will then be ignored)        |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |   [X]   |          | **array** (cache_path after cacheing, array contents will be saved to cache_path) |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |   [X]   |    X     | **array** (source_path after cacheing, array contents will then be ignored)       |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |         |    X     | **array** (source_path after cacheing, array contents will then be ignored)       |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |         |   [X]    | **array** (cache_path after cacheing, array contents will be saved to cache_path) |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |       |    X    |    \*    | **cache_path**                                                                    |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |       |   [X]   |    X     | **source_path**                                                                   |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |       |         |    X     | **source_path**                                                                   |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
 
     In addition, the following cases will raise a FileNotFoundError during the
     __init__ method():
 
-        +=======+=========+==========+
+        +-------+---------+----------+
         | array | cache_p | source_p |
         +=======+=========+==========+
         |       |   [X]   |          |
