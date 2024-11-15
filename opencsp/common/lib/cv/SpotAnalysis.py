@@ -1,15 +1,14 @@
-import numpy as np
 import os
-from PIL import Image as Image
 from typing import Iterator
 
-from opencsp.common.lib.cv.CacheableImage import CacheableImage
-from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
-import opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor as asaip
+from PIL import Image as Image
+import numpy as np
 
 from opencsp import opencsp_settings
+from opencsp.common.lib.cv.CacheableImage import CacheableImage
 
 # from opencsp.common.lib.cv.spot_analysis.image_processor import * # I suggest importing these dynamically as needed, to reduce startup time
+from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImageProcessor
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
 from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
@@ -17,6 +16,7 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAna
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import _SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser
+from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
 import opencsp.common.lib.render.VideoHandler as vh
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
@@ -151,7 +151,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
     def __init__(
         self,
         name: str,
-        image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor],
+        image_processors: list[AbstractSpotAnalysisImageProcessor],
         save_dir: str = None,
         save_overwrite=False,
     ):
@@ -161,7 +161,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         name: str
             The name of this instance. For example, this could be one of the use
             cases listed above.
-        image_processors: list[AbstractSpotAnalysisImagesProcessor]
+        image_processors: list[AbstractSpotAnalysisImageProcessor]
             The list of processors that will be pipelined together and used to
             process input images.
         save_dir: str
@@ -174,7 +174,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         self.name = name
         """ The name of this instance. For example, this could be one of the use
         cases listed above. """
-        self.image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor] = []
+        self.image_processors: list[AbstractSpotAnalysisImageProcessor] = []
         """ List of processors, one per step of the analysis. The output from
         each processor can include one or more images (or numeric values), and
         is made available to all subsequent processors. """
@@ -210,7 +210,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         self.set_image_processors(image_processors)
 
-    def set_image_processors(self, image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor]):
+    def set_image_processors(self, image_processors: list[AbstractSpotAnalysisImageProcessor]):
         self.image_processors = image_processors
 
         # chain the image processors together

@@ -6,13 +6,13 @@ import numpy as np
 import opencsp.common.lib.cv.image_reshapers as reshapers
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class FalseColorImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Image processor to produce color gradient images from grayscale
     images, for better contrast and legibility by humans.

@@ -6,18 +6,18 @@ import unittest
 import numpy as np
 
 import opencsp.common.lib.cv.CacheableImage as ci
-import opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor as asaip
+from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImageProcessor
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable as sao
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class DoNothingImageProcessor(asaip.AbstractSpotAnalysisImagesProcessor):
+class DoNothingImageProcessor(AbstractSpotAnalysisImageProcessor):
     def _execute(self, operable: sao.SpotAnalysisOperable, is_last: bool) -> list[sao.SpotAnalysisOperable]:
         return [operable]
 
 
-class SetOnesImageProcessor(asaip.AbstractSpotAnalysisImagesProcessor):
+class SetOnesImageProcessor(AbstractSpotAnalysisImageProcessor):
     def _execute(self, operable: sao.SpotAnalysisOperable, is_last: bool) -> list[sao.SpotAnalysisOperable]:
         img = copy.copy(operable.primary_image.nparray)
         img[:, :] = 1

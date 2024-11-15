@@ -4,7 +4,7 @@ import numpy as np
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
@@ -17,7 +17,7 @@ class _RollingWindowOperableStats:
     dims: np.ndarray
 
 
-class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Generates statistics for groups of images.
 

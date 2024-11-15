@@ -10,7 +10,7 @@ import opencsp.common.lib.cv.image_filters as filters
 import opencsp.common.lib.cv.image_reshapers as reshapers
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.FalseColorImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.render.figure_management as fm
@@ -22,7 +22,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class HotspotImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class HotspotImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Adds an annotation marker to images to indicate at which pixel the
     brightest part of the image is.

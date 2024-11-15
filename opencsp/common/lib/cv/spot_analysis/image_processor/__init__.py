@@ -2,7 +2,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractAggregateImageP
     AbstractAggregateImageProcessor,
 )
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractVisualizationImageProcessor import (
     AbstractVisualizationImageProcessor,
@@ -38,7 +38,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.ViewCrossSectionImagePr
 # Make these classes available when importing cv.spot_analysis.image_processor.*
 __all__ = [
     'AbstractAggregateImageProcessor',
-    'AbstractSpotAnalysisImagesProcessor',
+    'AbstractSpotAnalysisImageProcessor',
     'AbstractVisualizationImageProcessor',
     'AnnotationImageProcessor',
     'AverageByGroupImageProcessor',

@@ -25,7 +25,7 @@ as cache between calls to their 'run()' method. The most recently used results
 are prioritized for maining in memory. Default (1 GiB). """
 
 
-class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
+class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
     """
     Class to perform one step of image processing before spot analysis is performed.
 
@@ -132,7 +132,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
     def assign_inputs(
         self,
         operables: Union[
-            'AbstractSpotAnalysisImagesProcessor', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
+            'AbstractSpotAnalysisImageProcessor', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
         ],
     ):
         """
@@ -141,7 +141,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
 
         Parameters
         ----------
-        operables : Union[ AbstractSpotAnalysisImagesProcessor, list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable] ]
+        operables : Union[ AbstractSpotAnalysisImageProcessor, list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable] ]
             The operables to be processed.
         """
         # initialize the state for a new set of inputs
@@ -239,7 +239,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             | SpotAnalysisImagesStream
             | list[SpotAnalysisOperable]
             | Iterator[SpotAnalysisOperable]
-            | Union['AbstractSpotAnalysisImagesProcessor']
+            | Union['AbstractSpotAnalysisImageProcessor']
         ),
     ) -> list[SpotAnalysisOperable]:
         """
@@ -253,7 +253,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
 
         Parameters
         ----------
-        operables : ImagesIterable  |  ImagesStream  |  SpotAnalysisImagesStream  |  list[SpotAnalysisOperable]  |  Iterator[SpotAnalysisOperable]  |  Union[AbstractSpotAnalysisImagesProcessor]
+        operables : ImagesIterable  |  ImagesStream  |  SpotAnalysisImagesStream  |  list[SpotAnalysisOperable]  |  Iterator[SpotAnalysisOperable]  |  Union[AbstractSpotAnalysisImageProcessor]
             The input operables to be processed. If these are images, then they
             will be wrapped in a SpotAnalysisOperablesStream.
 
@@ -501,7 +501,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             if not is_last:
                 lt.error_and_raise(
                     RuntimeError,
-                    f"Programmer error in AbstractSpotAnalysisImagesProcessor.__next__() ({self.name}): "
+                    f"Programmer error in AbstractSpotAnalysisImageProcessor.__next__() ({self.name}): "
                     + "as long as there are input image available (aka is_last is False) we should keep executing until "
                     + f"at least one result becomes available, but {is_last=} and {len(output_operables)=}",
                 )

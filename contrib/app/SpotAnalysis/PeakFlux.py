@@ -53,7 +53,7 @@ class PeakFlux:
             ImageType.NULL: lambda operable, operables: "off" in operable.get_primary_path_nameext(),
         }
 
-        self.image_processors: list[AbstractSpotAnalysisImagesProcessor] = [
+        self.image_processors: list[AbstractSpotAnalysisImageProcessor] = [
             CroppingImageProcessor(*self.crop_box),
             AverageByGroupImageProcessor(group_assigner, group_trigger),
             EchoImageProcessor(),

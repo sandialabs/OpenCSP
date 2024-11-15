@@ -117,7 +117,7 @@ class VisualizationCoordinator:
         """
         self.closed = True
 
-    def register_visualization_processors(self, all_processors: list[AbstractSpotAnalysisImagesProcessor]):
+    def register_visualization_processors(self, all_processors: list[AbstractSpotAnalysisImageProcessor]):
         """
         Finds all AbstractVisualizationImageProcessors in the given list of
         all_processors and registers this coordinator with them. This
@@ -126,7 +126,7 @@ class VisualizationCoordinator:
 
         Parameters
         ----------
-        all_processors: list[AbstractSpotAnalysisImagesProcessor]
+        all_processors: list[AbstractSpotAnalysisImageProcessor]
             Processors to search through for visualization processors, some of
             which may be visualization processor and some not.
         """
