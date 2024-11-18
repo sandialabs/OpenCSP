@@ -53,7 +53,7 @@ class SpotAnalysisOperable:
     processor that they came from, if any. If this operable has no previous
     operables registered with it, then this will have the value (None, None).
     Does not include no-nothing image processors such as
-    :py:class:`EchoImageProcessor`.
+    :py:class:`.EchoImageProcessor`.
     """
     given_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ Any fiducials handed to us in the currently processing image. """

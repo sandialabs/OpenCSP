@@ -32,7 +32,7 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
     This is an abstract class. Implementations can be found in the same
     directory. To create a new implementation, inherit from one of the existing
     implementations or this class. The most basic implementation need only
-    implement the :py:method:`_execute` method::
+    implement the :py:meth:`_execute` method::
 
         def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
             raise NotImplementedError()
@@ -100,10 +100,10 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
         """
         self.results_on_deck: list[SpotAnalysisOperable] = []
         """
-        Sometimes :py:meth:`_execute` may return multiple results. In this
-        case, we hold on to the processed operables and return only one of them
-        per iteration in __next__(). This gaurantees that each image processor
-        in the chain consumes and produces single images.
+        Sometimes :py:meth:`_execute` may return multiple results. In this case,
+        we hold on to the processed operables and return only one of them per
+        iteration in __next__(). This gaurantees that each image processor in
+        the chain consumes and produces single images.
         """
         self._on_image_processed: list[Callable[[SpotAnalysisOperable]]] = []
         # A list of callbacks to be evaluated when an image is finished processing.
@@ -401,7 +401,7 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
         pipeline. The exception is for do-nothing image processors, such as for
         the EchoImageProcessor. Note that image processors that return the same
         input operable as an output won't be added to the operable's
-        :py:attr:`previous_operables` history.
+        :py:attr:`.previous_operables` history.
 
         Parameters
         ----------
