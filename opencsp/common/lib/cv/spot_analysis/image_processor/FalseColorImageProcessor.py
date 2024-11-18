@@ -6,13 +6,13 @@ import numpy as np
 import opencsp.common.lib.cv.image_reshapers as reshapers
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class FalseColorImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Image processor to produce color gradient images from grayscale
     images, for better contrast and legibility by humans.
@@ -36,6 +36,24 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
         self.opencv_map = opencv_map
 
     def apply_mapping_jet_custom(self, operable: SpotAnalysisOperable) -> SpotAnalysisOperable:
+        """
+        Updates the primary image with a false color map ('human' or
+        'large'). This has a much larger range of colors that get applied but is
+        also much slower than the OpenCV version.
+
+        See also :py:meth:`image_reshapers.false_color_reshaper`
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            The operable whose primary image to apply the false color to.
+
+        Returns
+        -------
+        SpotAnalysisOperable
+            A copy of the input operable with the primary image replaced with
+            the false color image.
+        """
         max_value = operable.max_popf
         from_image = operable.primary_image.nparray
         ret = reshapers.false_color_reshaper(from_image, max_value, map_type=self.map_type)
@@ -43,9 +61,22 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImagesProcessor):
 
     @staticmethod
     def apply_mapping_jet(operable: SpotAnalysisOperable, opencv_map) -> SpotAnalysisOperable:
-        """Updates the primary image with a false color map. Opencv maps can
+        """
+        Updates the primary image with a false color map. Opencv maps can
         represent 256 different grayscale colors and only takes ~0.007s for a
-        1626 x 1236 pixel image."""
+        1626 x 1236 pixel image.
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            The operable whose primary image to apply the false color to.
+
+        Returns
+        -------
+        SpotAnalysisOperable
+            A copy of the input operable with the primary image replaced with
+            the false color image.
+        """
         # rescale to the number of representable colors
         representable_colors = 256
         max_value = operable.max_popf

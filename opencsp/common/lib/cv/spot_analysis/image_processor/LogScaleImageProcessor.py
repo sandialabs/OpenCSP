@@ -1,11 +1,11 @@
 import dataclasses
 import numpy as np
 
-from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImagesProcessor
+from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImageProcessor
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
-class LogScaleImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class LogScaleImageProcessor(AbstractSpotAnalysisImageProcessor):
     """Converts the input images into a log scale."""
 
     def __init__(self, max_value_input=0, cummulative_max_value_input=False, max_value_output=65535):

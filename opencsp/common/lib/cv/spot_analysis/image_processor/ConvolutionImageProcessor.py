@@ -9,12 +9,12 @@ import scipy.signal
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class ConvolutionImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class ConvolutionImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Convolves an image by the given kernel
 

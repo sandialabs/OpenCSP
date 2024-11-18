@@ -2,14 +2,14 @@ import numpy as np
 
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class ExposureDetectionImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class ExposureDetectionImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Detects over and under exposure in images and adds the relavent tag to the image.
 
@@ -134,7 +134,7 @@ if __name__ == "__main__":
     images_path_name_ext = [indir + '/' + filename for filename in images_filenames]
 
     import opencsp.common.lib.cv.SpotAnalysis as sa
-    from opencsp.common.lib.cv.spot_analysis.image_processor import *
+    from opencsp.common.lib.cv.spot_analysis.image_processor import CroppingImageProcessor
 
     image_processors = [
         CroppingImageProcessor(x1, x2, y1, y2),

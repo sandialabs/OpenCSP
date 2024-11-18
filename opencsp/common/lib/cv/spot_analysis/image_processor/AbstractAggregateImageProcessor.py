@@ -6,12 +6,12 @@ import numpy as np
 
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class AbstractAggregateImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
+class AbstractAggregateImageProcessor(AbstractSpotAnalysisImageProcessor, ABC):
     """
     Detects and collects images that are part of the same group, so that they can be acted upon all at the same time.
 

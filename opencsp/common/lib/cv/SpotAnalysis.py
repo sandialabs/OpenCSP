@@ -1,21 +1,22 @@
-import numpy as np
 import os
-from PIL import Image as Image
 from typing import Iterator
 
-from opencsp.common.lib.cv.CacheableImage import CacheableImage
-from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
-import opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor as asaip
+from PIL import Image as Image
+import numpy as np
 
 from opencsp import opencsp_settings
+from opencsp.common.lib.cv.CacheableImage import CacheableImage
 
 # from opencsp.common.lib.cv.spot_analysis.image_processor import * # I suggest importing these dynamically as needed, to reduce startup time
+from opencsp.common.lib.cv.spot_analysis.image_processor import AbstractSpotAnalysisImageProcessor
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType, SpotAnalysisImagesStream
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAnalysisImagesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import _SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser
+from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
 import opencsp.common.lib.render.VideoHandler as vh
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
@@ -34,91 +35,123 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
     evaluation. Once defined, a SpotAnalysis instance can be used to evaluate
     one image/video per evaluation.
 
-    A list of possible use cases for this class include::
+    A list of possible use cases for this class include:
+        a. BCS
+        b. BCS-based heliostat calibration
+        c. Vertical laser characterization
+        d. Laser beam spread characterization
+        e. 2f returned spot analysis
+        f. Motion characterization video analysis
+        g. Wind BCS video trajectory analysis
+        h. Laser-based cross-check
+        i. Earth mover's metric for comparisons (possible implementations (1) scipy has a method or (2) https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/rubner-jcviu-00.pdf)
+        j. Enclosed power
 
-        1. BCS
-        2. BCS-based heliostat calibration
-        3. Vertical laser characterization
-        4. Laser beam spread characterization
-        5. 2f returned spot analysis
-        6. Motion characterization video analysis
-        7. Wind BCS video trajectory analysis
-        8. Laser-based cross-check
-        9. Earth mover's metric for comparisons (scipy has a method, also maaaaaybe look at https://www.cs.cmu.edu/~efros/courses/LBMV07/Papers/rubner-jcviu-00.pdf)
-        10. Enclosed power
-
-    These are our expected outputs::
-
+    These are our expected outputs:
         - Annotated images
         - Visualizations (ex 2d or 3d heat-flux map, side-by-side comparisons)
         - Accompanying statistics INI files
         - Other details text file (heliostat name and location, date and time, heliostat operator, etc...)
         - Powerpoint slides
 
-    The features necessary to support these use cases include::
+    The features necessary to support these use cases include:
+        1. BCS target location (:py:class:`.BcsLocatorImageProcessor`)
+        2. Square target location (TargetBoardLocatorImageProcessor)
+        3. NULL image subtraction (:py:class:`.NullImageSubtractionImageProcessor`)
+        4. Ambient and gradient light subtraction (NOT IMPLEMENTED YET)
+        5. Lens correction (NOT IMPLEMENTED YET)
+        6. Intensity per pixel generation (NOT IMPLEMENTED YET)
+        7. Centroid calculation (a-h) (NOT IMPLEMENTED YET)
+        8. FWHM analysis (a,b,d,e,j) (NOT IMPLEMENTED YET)
+        9. Astigmatism identification (a-e,j) (NOT IMPLEMENTED YET)
+        10. Automatic beam identification (b) (NOT IMPLEMENTED YET)
+        11. Video-to-frame extraction (f,g) (:py:class:`.ImagesStream`)
+        12. Video streaming (f,g) (NOT IMPLEMENTED YET)
+        13. Networked image collection (b) (NOT IMPLEMENTED YET)
+        14. Color-aware image subtraction (c,d,e,h) (NOT IMPLEMENTED YET)
+        15. Color-aware light subtraction (c,d,e,h) (NOT IMPLEMENTED YET)
+        16. Time series analysis (f,g) (NOT IMPLEMENTED YET)
+        17. Laser placement and pointing angle as image metadata (e,h) (NOT IMPLEMENTED YET)
+        18. Laser placement and pointing angle as separate input (e,h) (NOT IMPLEMENTED YET)
+        19. Earth mover's metric (i) (NOT IMPLEMENTED YET)
+        20. Multi-image comparison (f,g,i) (NOT IMPLEMENTED YET)
+        21. Intensity-to-power mapping (a,d,i,j) (NOT IMPLEMENTED YET)
+        22. Noise smoothing (:py:class:`.ConvolutionImageProcessor`)
+        23. Noise removal and quanitification (NOT IMPLEMENTED YET)
+        24. Multi-image averaging over time (a-e,h-j) (:py:class:`.AverageByGroupImageProcessor`)
+        25. Fiducial identification (e,18,21,23,24) (NOT IMPLEMENTED YET)
+        26. Screen/camera plane homography (TargetBoardLocatorImageProcessor)
+        27. Self-PnP and stabilization (:py:class:`.StabilizationImageProcessor`)
+        28. Annotate power envelopes (NOT IMPLEMENTED YET)
+        29. Orthorectify wrt. target (TargetBoardLocatorImageProcessor)
+        30. Orthorectify wrt. beam (NOT IMPLEMENTED YET)
+        31. Spot radius in mrad, at angle Beta relative to centroid (NOT IMPLEMENTED YET)
+        32. Spot radius in mrad, at a half angle relative to the heliostat location (NOT IMPLEMENTED YET)
+        33. Beam radius in mrad, at angle Beta relative to centroid (NOT IMPLEMENTED YET)
+        34. Beam radius in mrad, at a half angle relative to the heliostat location (NOT IMPLEMENTED YET)
+        35. Cropping (:py:class:`.CroppingImageProcessor`)
+        36. Over and under exposure detection (:py:class:`.ExposureDetectionImageProcessor`)
+        37. Tagging images as NULL images (NOT IMPLEMENTED YET)
+        38. Filters (gaussian, box, etc) (:py:class:`.ConvoluationImageProcessor`)
+        39. Peak value pixel identification (:py:class:`.HotspotImageProcessor`)
+        40. Logorithmic scaling (:py:class:`.LogScaleImageProcessor`)
+        41. False color visualization (:py:class:`.FalseColorImageProcessor`)
+        42. Over/under exposure visualization (NOT IMPLEMENTED YET)
+        43. Image fill/inpainting (:py:class:`.InpaintImageProcessor`)
 
-        a. NULL image subtraction (TODO)
-        b. Ambient and gradient light subtraction (TODO)
-        c. Lens correction (TODO)
-        d. Intensity per pixel generation (TODO)
-        e. Centroid calculation (1-8) (TODO)
-        f. FWHM analysis (1,2,4,5,10) (TODO)
-        g. Astigmatism identification (1-5,10) (TODO)
-        h. Automatic beam identification (2) (TODO)
-        i. Video-to-frame extraction (6,7) (TODO)
-        j. Video streaming (6,7) (TODO)
-        k. Networked image collection (2) (TODO)
-        l. Color-aware image subtraction (3,4,5,8) (TODO)
-        m. Color-aware light subtraction (3,4,5,8) (TODO)
-        n. Time series analysis (6,7) (TODO)
-        o. Laser placement and pointing angle as image metadata (5,8) (TODO)
-        p. Laser placement and pointing angle as separate input (5,8) (TODO)
-        q. Earth mover's metric (9) (TODO)
-        r. Multi-image comparison (6,7,9) (TODO)
-        s. Intensity-to-power mapping (1,4,9,10) (TODO)
-        t. Noise removal and quantification (TODO)
-        u. Multi-image averaging over time (1-5,8-10) (TODO)
-        v. Fiducial identification (5,r,u,w,x) (TODO)
-        w. Screen/camera plane homography (TODO)
-        x. Self-PnP (TODO)
-        y. Annotate power envelopes (TODO)
-        z. Orthorectify wrt. target (TODO)
-        aa. Orthorectify wrt. beam (TODO)
-        ab. Spot radius in mrad, at angle Beta relative to centroid (TODO)
-        ac. Spot radius in mrad, at a half angle relative to the heliostat location (TODO)
-        ad. Beam radius in mrad, at angle Beta relative to centroid (TODO)
-        ae. Beam radius in mrad, at a half angle relative to the heliostat location (TODO)
-        af. Cropping (TODO)
-        ag. Over and under exposure detection (TODO)
-        ah. Tagging images as NULL images (TODO)
-        ai. Filters (gaussian, box, etc) (TODO)
-        aj. Peak value pixel identification (TODO)
-        ak. Logorithmic scaling (LogScaleImageProcessor)
-        al. False color visualization (FalseColorImageProcessor)
-        am. Over/under exposure visualization (TODO)
+    The inputs to support these features include:
+        - primary image or images (:py:meth:`set_primary_images`)
+        - reference image (7,8,22) (:py:meth:`set_default_support_images`)
+        - null image (1,2,12,13,20) (:py:meth:`set_default_support_images`)
+        - comparison image (18) (:py:meth:`set_default_support_images`)
+        - background selection (2,11,13) (NOT IMPLEMENTED YET)
+        - camera lens characterization (3) (NOT IMPLEMENTED YET)
+        - image server network address (11) (NOT IMPLEMENTED YET)
+        - laser color/wavelength (12,13) (NOT IMPLEMENTED YET)
+        - camera color characterization (12,13) (NOT IMPLEMENTED YET)
+        - laser placement and pointing angle (16) (NOT IMPLEMENTED YET)
+        - intensity-to-power mapping (19) (NOT IMPLEMENTED YET)
+        - multiple primary images, or a primary video (20,24) (:py:meth:`set_primary_images`)
+        - fiducial definition and location (25) (NOT IMPLEMENTED YET)
+        - manual 3D point identification from 2D images (25) (NOT IMPLEMENTED YET)
 
-    The inputs to support these features include::
+    Example usage::
 
-        - primary image or images (TODO)
-        - reference image (g,h,v) (TODO)
-        - null image (a,b,l,m,t) (TODO)
-        - comparison image (r) (TODO)
-        - background selection (b,l,m) (TODO)
-        - camera lens characterization (c) (TODO)
-        - image server network address (k) (TODO)
-        - laser color/wavelength (l,m) (TODO)
-        - camera color characterization (l,m) (TODO)
-        - laser placement and pointing angle (p) (TODO)
-        - intensity-to-power mapping (s) (TODO)
-        - multiple primary images, or a primary video (u,x) (TODO)
-        - fiducial definition and location (v) (TODO)
-        - manual 3D point identification from 2D images (w) (TODO)
+        group_assigner = AverageByGroupImageProcessor.group_by_name(re.compile(r"(foo|bar)"))
+        group_trigger = AverageByGroupImageProcessor.group_trigger_on_change()
+
+        image_processors = {
+            'Crop': CroppingImageProcessor(x1=200, x2=600, y1=100, y2=400),
+            'AvgG': AverageByGroupImageProcessor(group_assigner, group_trigger),
+            'Echo': EchoImageProcessor(),
+            'Noiz': ConvolutionImageProcessor(kernel="box", diameter=3),
+            'Ve3d': View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100)),
+            'Stat': PopulationStatisticsImageProcessor(min_pop_size=1, initial_min=0, initial_max=255),
+            'Fclr': FalseColorImageProcessor(),
+        }
+        pptx_processor = PowerpointImageProcessor(
+            save_dir=outdir,
+            save_name="processing_pipeline",
+            processors_per_slide=[
+                [image_processors['Noiz'], image_processors['Ve3d']],
+                [image_processors['Fclr']],
+            ],
+        )
+        image_processors_list = list(image_processors.values()) + [pptx_processor]
+
+        spot_analysis = sa.SpotAnalysis(
+            experiment_name, image_processors_list, save_dir=outdir
+        )
+        spot_analysis.set_primary_images(images_path_name_exts)
+
+        for result in spot_analysis:
+            pass
     """
 
     def __init__(
         self,
         name: str,
-        image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor],
+        image_processors: list[AbstractSpotAnalysisImageProcessor],
         save_dir: str = None,
         save_overwrite=False,
     ):
@@ -128,7 +161,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         name: str
             The name of this instance. For example, this could be one of the use
             cases listed above.
-        image_processors: list[AbstractSpotAnalysisImagesProcessor]
+        image_processors: list[AbstractSpotAnalysisImageProcessor]
             The list of processors that will be pipelined together and used to
             process input images.
         save_dir: str
@@ -141,7 +174,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         self.name = name
         """ The name of this instance. For example, this could be one of the use
         cases listed above. """
-        self.image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor] = []
+        self.image_processors: list[AbstractSpotAnalysisImageProcessor] = []
         """ List of processors, one per step of the analysis. The output from
         each processor can include one or more images (or numeric values), and
         is made available to all subsequent processors. """
@@ -150,7 +183,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         on the first call to process_next(). """
         self._prev_result: SpotAnalysisOperable = None
         """ The previously returned result. """
-        self.input_stream: SpotAnalysisOperablesStream = None
+        self.input_stream: _SpotAnalysisOperablesStream = None
         """ The images to be processed. """
         self.save_dir: str = save_dir
         """ If not None, then primary images will be saved to the given
@@ -177,7 +210,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         self.set_image_processors(image_processors)
 
-    def set_image_processors(self, image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor]):
+    def set_image_processors(self, image_processors: list[AbstractSpotAnalysisImageProcessor]):
         self.image_processors = image_processors
 
         # chain the image processors together
@@ -204,8 +237,8 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             return ImagesIterable(images)
 
     def _assign_inputs(self, input_operables: Iterator[SpotAnalysisOperable]):
-        if not isinstance(input_operables, SpotAnalysisOperablesStream):
-            input_operables = SpotAnalysisOperablesStream(input_operables)
+        if not isinstance(input_operables, _SpotAnalysisOperablesStream):
+            input_operables = _SpotAnalysisOperablesStream(input_operables)
         self.input_stream = input_operables
         self._prev_result = None
         self.image_processors[0].assign_inputs(self.input_stream)
@@ -213,13 +246,22 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
     def set_primary_images(self, images: list[str] | list[np.ndarray] | vh.VideoHandler | ImagesStream):
         """Assigns the images of the spot to be analyzed, in preparation for process_next().
 
+        Parameters
+        ----------
+        images : list[str] | list[np.ndarray] | vh.VideoHandler | ImagesStream
+            The primary input images to be processed. Can be a list of images
+            path/name.ext, list of images loaded into numpy arrays, a video
+            handler instance set with a video to be broken into frames, or an
+            images stream.
+
         See also: set_input_operables()"""
         primary_images = self._images2stream(images)
         images_stream = SpotAnalysisImagesStream(primary_images, {})
-        self._assign_inputs(SpotAnalysisOperablesStream(images_stream))
+        self._assign_inputs(_SpotAnalysisOperablesStream(images_stream))
 
     def set_input_operables(
-        self, input_operables: SpotAnalysisOperablesStream | list[SpotAnalysisOperable] | Iterator[SpotAnalysisOperable]
+        self,
+        input_operables: _SpotAnalysisOperablesStream | list[SpotAnalysisOperable] | Iterator[SpotAnalysisOperable],
     ):
         """Assigns primary and supporting images, and other necessary data, in preparation for process_next().
 

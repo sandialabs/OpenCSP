@@ -3,15 +3,15 @@ from typing import Callable
 
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 
 
-class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, ABC):
+class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, ABC):
     """
-    An AbstractSpotAnalysisImagesProcessor that is used to generate visualizations.
+    An AbstractSpotAnalysisImageProcessor that is used to generate visualizations.
 
     By convention subclasses are named "View*ImageProcessor" (their name starts
     with "View" and ends with "ImageProcessor"). Note that subclasses should not
@@ -84,7 +84,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImagesProcessor, A
         Parameters
         ----------
         name : str
-            Passed through to AbstractSpotAnalysisImagesProcessor.__init__()
+            Passed through to AbstractSpotAnalysisImageProcessor.__init__()
         interactive : bool | Callable[[SpotAnalysisOperable], bool], optional
             If True then the spot analysis pipeline is paused until the user presses the "enter" key, by default False
         """

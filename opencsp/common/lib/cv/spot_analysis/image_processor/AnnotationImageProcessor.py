@@ -7,7 +7,7 @@ from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.fiducials.PointFiducials import PointFiducials
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
@@ -15,7 +15,7 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.file_tools as ft
 
 
-class AnnotationImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class AnnotationImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Draws annotations on top of the input image. The annotations drawn are those in operable.given_fiducials and
     operable.found_fiducials.

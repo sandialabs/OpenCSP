@@ -22,10 +22,13 @@ class CacheableImage:
     The intended use for this class is to reduce memory usage by caching
     images to disk while not in use. Therefore, there is an inherent
     priority order for the data that is returned from various methods:
-    (1) in-memory array, (2) numpy cache file, (3) image source file.
 
-    Parameters
-    ----------
+        1. in-memory array
+        2. numpy cache file
+        3. image source file
+
+    Sources
+    -------
     Only one of the inputs (array, cache_path, source_path) are required in the
     constructor. In fact, there is a method :py:meth:`from_single_source` that
     tries to guess which input is being provided. The "array" parameter should
@@ -35,41 +38,35 @@ class CacheableImage:
     for where to cache the image to.
 
     The following table determines how images are retrieved based on the given
-    parameters ([X] = given and file exists, [.] = given and file doesn't
+    parameters ([X] = given and file exists, [X] = given and file doesn't
     exist, * = any):
 
-        +=======+=========+==========+========================================================================+
-        | array | cache_p | source_p | retrieval method                                                       |
-        +=======+=========+==========+========================================================================+
-        |   X   |         |          | array                                                                  |
-        |       |         |          | cache_path after cacheing (a temporary cache_path will be assigned)    |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |    X    |    *     | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will then be ignored)        |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |   [X]   |          | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will be saved to cache_path) |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |   [X]   |    X     | array                                                                  |
-        |       |         |          | source_path after cacheing (array contents will then be ignored)       |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |         |    X     | array                                                                  |
-        |       |         |          | source_path after cacheing (array contents will then be ignored)       |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |   X   |         |   [X]    | array                                                                  |
-        |       |         |          | cache_path after cacheing (array contents will be saved to cache_path) |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |    X    |    *     | cache_path                                                             |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |   [X]   |    X     | source_path                                                            |
-        +-------+---------+----------+------------------------------------------------------------------------+
-        |       |         |    X     | source_path                                                            |
-        +-------+---------+----------+------------------------------------------------------------------------+
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        | array | cache_p | source_p | retrieval method                                                                  |
+        +=======+=========+==========+===================================================================================+
+        |   X   |         |          | **array** (cache_path after cacheing, a temporary cache_path will be assigned)    |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |    X    |    \*    | **array** (cache_path after cacheing, array contents will then be ignored)        |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |   [X]   |          | **array** (cache_path after cacheing, array contents will be saved to cache_path) |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |   [X]   |    X     | **array** (source_path after cacheing, array contents will then be ignored)       |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |         |    X     | **array** (source_path after cacheing, array contents will then be ignored)       |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |   X   |         |   [X]    | **array** (cache_path after cacheing, array contents will be saved to cache_path) |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |       |    X    |    \*    | **cache_path**                                                                    |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |       |   [X]   |    X     | **source_path**                                                                   |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
+        |       |         |    X     | **source_path**                                                                   |
+        +-------+---------+----------+-----------------------------------------------------------------------------------+
 
     In addition, the following cases will raise a FileNotFoundError during the
     __init__ method():
 
-        +=======+=========+==========+
+        +-------+---------+----------+
         | array | cache_p | source_p |
         +=======+=========+==========+
         |       |   [X]   |          |
@@ -372,7 +369,17 @@ class CacheableImage:
             )
 
     def validate_cache_path(self, cache_path: Optional[str], caller_name: str):
-        """Ensures that the given cache_path ends with ".npy", or is None."""
+        """
+        Verifies that the cache_path, if set, ends with ".npy". Raises a ValueError otherwise.
+
+        Parameters
+        ----------
+        cache_path : str | None
+            The path/name.ext to save this image to, as a numpy array. For example
+            ft.join(orp.opencsp_scratch_dir(), "/OpenCSP/tmp001.npy").
+        caller_name : str
+            Name of the calling method. This is used as part of the generated error message.
+        """
         if cache_path == None:
             return
 
@@ -429,7 +436,8 @@ class CacheableImage:
 
     @property
     def nparray(self) -> npt.NDArray[np.int_] | None:
-        """The image data for this image, as a numpy array."""
+        """The data for this CacheableImage, as a numpy array. This is the
+        default internal representation of data for this class."""
         self._register_access(self)
 
         if self._array is None:
@@ -438,7 +446,8 @@ class CacheableImage:
         return self._array
 
     def to_image(self) -> Image.Image:
-        """The image data for this image, as a Pillow image."""
+        """Converts the numpy array representation of this image into a Pillow
+        Image class and returns the converted value."""
         if self._image == None:
             # self._register_access(self) # registered in self.nparray
             self._image = it.numpy_to_image(self.nparray)
@@ -489,15 +498,17 @@ class CacheableImage:
     def cache(self, cache_path: str = None):
         """
         Stores this instance to the cache and releases the handle to the in-memory image.
-        Note that the memory might not be available for garbage collection, if
+        Note that the memory might not be abailable for garbage collection, if
         there are other parts of the code that still have references to the
         in-memory image or array.
 
         Parameters
         ----------
         cache_path : str, optional
-            The path/name.ext to cache to, as necessary. Can be None if either
-            cache_path or source_path are already set. By default None.
+            The cache path/name.ext to use for storing this image, in case this
+            image doesn't already have a cache path. Can be None if a new cache
+            file isn't needed (the source image file is accessible or this
+            instance has been cached before). By default None
         """
         # use either self.cache_path or cache_path, depending on:
         # 1. self.cache_path exists

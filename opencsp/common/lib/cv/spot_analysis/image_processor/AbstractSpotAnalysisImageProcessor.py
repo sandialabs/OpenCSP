@@ -12,7 +12,7 @@ from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.ImagesIterable import ImagesIterable
 from opencsp.common.lib.cv.spot_analysis.ImagesStream import ImagesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import SpotAnalysisOperablesStream
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import _SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAnalysisImagesStream
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
@@ -25,8 +25,9 @@ as cache between calls to their 'run()' method. The most recently used results
 are prioritized for maining in memory. Default (1 GiB). """
 
 
-class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
-    """Class to perform one step of image processing before spot analysis is performed.
+class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
+    """
+    Class to perform one step of image processing before spot analysis is performed.
 
     This is an abstract class. Implementations can be found in the same
     directory. To create a new implementation, inherit from one of the existing
@@ -89,7 +90,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         For most processors, _execute() will return one resultant operable for
         each input operable. For these standard cases, this will contain one
         value during the process_operable() method, and will be empty otherwise.
-        
+
         Sometimes _execute() may return zero results. In this case, this value
         will contain all the operables passed to _execute() since the last time
         that _execute() returned at least one operable. These "in-flight"
@@ -131,7 +132,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
     def assign_inputs(
         self,
         operables: Union[
-            'AbstractSpotAnalysisImagesProcessor', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
+            'AbstractSpotAnalysisImageProcessor', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
         ],
     ):
         """
@@ -140,7 +141,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
 
         Parameters
         ----------
-        operables : Union[ AbstractSpotAnalysisImagesProcessor, list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable] ]
+        operables : Union[ AbstractSpotAnalysisImageProcessor, list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable] ]
             The operables to be processed.
         """
         # initialize the state for a new set of inputs
@@ -158,7 +159,8 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
                 self.operables_in_flight.clear()
                 self.results_on_deck.clear()
 
-    def register_processed_result(self, is_last: bool):
+    def _register_processed_result(self, is_last: bool):
+        """Updates internal variables for tracking the number of processed operables."""
         self._num_images_processed += 1
         if is_last:
             self._finished_processing = True
@@ -238,7 +240,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             | SpotAnalysisImagesStream
             | list[SpotAnalysisOperable]
             | Iterator[SpotAnalysisOperable]
-            | Union['AbstractSpotAnalysisImagesProcessor']
+            | Union['AbstractSpotAnalysisImageProcessor']
         ),
     ) -> list[SpotAnalysisOperable]:
         """
@@ -252,7 +254,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
 
         Parameters
         ----------
-        operables : ImagesIterable  |  ImagesStream  |  SpotAnalysisImagesStream  |  list[SpotAnalysisOperable]  |  Iterator[SpotAnalysisOperable]  |  Union[AbstractSpotAnalysisImagesProcessor]
+        operables : ImagesIterable  |  ImagesStream  |  SpotAnalysisImagesStream  |  list[SpotAnalysisOperable]  |  Iterator[SpotAnalysisOperable]  |  Union[AbstractSpotAnalysisImageProcessor]
             The input operables to be processed. If these are images, then they
             will be wrapped in a SpotAnalysisOperablesStream.
 
@@ -264,7 +266,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         if isinstance(operables, (ImagesIterable, ImagesStream)):
             operables = SpotAnalysisImagesStream(operables)
         if isinstance(operables, SpotAnalysisImagesStream):
-            operables = SpotAnalysisOperablesStream(operables)
+            operables = _SpotAnalysisOperablesStream(operables)
         self.assign_inputs(operables)
         ret = [result for result in self]
         return ret
@@ -319,7 +321,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
 
         # record processed results
         if is_last:
-            self.register_processed_result(is_last)
+            self._register_processed_result(is_last)
 
         # execute any registered callbacks
         for operable in ret:
@@ -410,14 +412,12 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
         pass
 
     def __len__(self) -> int:
-        """
-        Get the current number of processed output images from this instance.
-
-        This number will potentially be increasing with every call to
-        process_operable() or _execute().
-
-        This will return 0 immediately after a call to assign_inputs().
-        """
+        # Get the current number of processed output images from this instance.
+        #
+        # This number will potentially be increasing with every call to
+        # process_operable() or _execute().
+        #
+        # This will return 0 immediately after a call to assign_inputs().
         return self._num_images_processed
 
     def __iter__(self):
@@ -451,10 +451,10 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             )
 
     def __next__(self):
-        """Get the next processed image and it's support images and data. Since
-        this is only utilized when processing as an iterator instead of by using
-        the run() method, then calling this method will cause one or more input
-        image(s) to be fetched so that it can be executed upon."""
+        # Get the next processed image and it's support images and data. Since
+        # this is only utilized when processing as an iterator instead of by using
+        # the run() method, then calling this method will cause one or more input
+        # image(s) to be fetched so that it can be executed upon.
         if not self.has_next():
             raise StopIteration
 
@@ -502,7 +502,7 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
             if not is_last:
                 lt.error_and_raise(
                     RuntimeError,
-                    f"Programmer error in AbstractSpotAnalysisImagesProcessor.__next__() ({self.name}): "
+                    f"Programmer error in AbstractSpotAnalysisImageProcessor.__next__() ({self.name}): "
                     + "as long as there are input image available (aka is_last is False) we should keep executing until "
                     + f"at least one result becomes available, but {is_last=} and {len(output_operables)=}",
                 )
@@ -581,7 +581,8 @@ class AbstractSpotAnalysisImagesProcessor(Iterator[SpotAnalysisOperable]):
     def get_processed_image_save_callback(
         self, dir: str, name_prefix: str = None, ext="jpg"
     ) -> Callable[[SpotAnalysisOperable], str]:
-        """Saves images to the given directory with the file name
+        """
+        Saves images to the given directory with the file name
         "[name_prefix+'_']SA_preprocess_[self.name][index].[ext]". The returned
         function takes an ndarray image as input, and returns the saved
         path_name_ext.

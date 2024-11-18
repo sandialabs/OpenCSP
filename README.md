@@ -4,7 +4,7 @@ This is the collection of library and application code, originally started at th
 
 ## Directory Summary
   - opencsp/app: OpenCSP library and applications
-  - opencsp/common: Common code used by the library and applications
+  - opencsp/common: Common code used by the library and applications ([readthedocs](https://opencsp.readthedocs.io))
   - doc: developer documentation
   - example: OpenCSP examples
   - contrib: Contributed code that is not actively tested or maintained

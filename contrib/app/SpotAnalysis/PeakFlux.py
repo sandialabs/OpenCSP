@@ -6,7 +6,7 @@ import numpy as np
 import opencsp.common.lib.cv.SpotAnalysis as sa
 from opencsp.common.lib.cv.annotations.HotspotAnnotation import HotspotAnnotation
 from opencsp.common.lib.cv.fiducials.BcsFiducial import BcsFiducial
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser as saoap
 from opencsp.common.lib.cv.spot_analysis.image_processor import *
@@ -49,11 +49,11 @@ class PeakFlux:
         group_assigner = AverageByGroupImageProcessor.group_by_name(re.compile(r"(_off)?( Raw)"))
         group_trigger = AverageByGroupImageProcessor.group_trigger_on_change()
         supporting_images_map = {
-            ImageType.PRIMARY: lambda operable, operables: "off" not in operable.primary_image_source_path,
-            ImageType.NULL: lambda operable, operables: "off" in operable.primary_image_source_path,
+            ImageType.PRIMARY: lambda operable, operables: "off" not in operable.get_primary_path_nameext(),
+            ImageType.NULL: lambda operable, operables: "off" in operable.get_primary_path_nameext(),
         }
 
-        self.image_processors: list[AbstractSpotAnalysisImagesProcessor] = [
+        self.image_processors: list[AbstractSpotAnalysisImageProcessor] = [
             CroppingImageProcessor(*self.crop_box),
             AverageByGroupImageProcessor(group_assigner, group_trigger),
             EchoImageProcessor(),

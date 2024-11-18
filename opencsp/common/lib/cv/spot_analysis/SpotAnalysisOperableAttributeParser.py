@@ -25,7 +25,7 @@ class SpotAnalysisOperableAttributeParser(iap.ImageAttributeParser):
         super().__init__(current_image_source=current_image_source)
 
         # prepare values to be assigned to this instance
-        image_processors: list[asaip.AbstractSpotAnalysisImagesProcessor] = tt.default(
+        image_processors: list[asaip.AbstractSpotAnalysisImageProcessor] = tt.default(
             lambda: spot_analysis.image_processors, []
         )
 

@@ -2,10 +2,10 @@ import dataclasses
 from typing import Callable
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-    AbstractSpotAnalysisImagesProcessor,
+    AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -15,7 +15,7 @@ class NoPrimaryImageException(Exception):
         super().__init__(msg)
 
 
-class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcessor):
+class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
     Collects primary and supporting images together from a stream of mixed images.
 
@@ -27,6 +27,14 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImagesProcesso
         4. clear the internal list
         5. start a new internal list with the current image
         6. return the new operable, go back to step 1
+
+    Example usage::
+
+        supporting_images_map = {
+            ImageType.PRIMARY: lambda operable, operables: "off" not in operable.get_primary_path_nameext(),
+            ImageType.NULL: lambda operable, operables: "off" in operable.get_primary_path_nameext(),
+        }
+        collector_processor = SupportingImagesCollectorImageProcessor(supporting_images_map)
     """
 
     def __init__(

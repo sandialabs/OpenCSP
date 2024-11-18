@@ -9,7 +9,7 @@ import opencsp.common.lib.csp.LightSource as ls
 import opencsp.common.lib.cv.annotations.AbstractAnnotations as aa
 import opencsp.common.lib.cv.fiducials.AbstractFiducials as af
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import ImageType
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
@@ -17,7 +17,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 @dataclass(frozen=True)
 class SpotAnalysisOperable:
-    """Contains a list of all the pieces that might be used or generated during
+    """
+    Contains a list of all the pieces that might be used or generated during
     spot analysis. This helps to guarantee that related data stays together for
     the whole process. Note that although not all fields will be populated, the
     primary_image at least should be.
@@ -30,7 +31,7 @@ class SpotAnalysisOperable:
     primary_image_source_path: str = None
     """ The path_name_ext of the primary image, if the source is a file on disk.
     This should be used as the secondary source of this information, after
-    primary_image.source_path. """
+    :py:meth:`best_primary_pathnameext` and :py:attr:`primary_image`.source_path. """
     supporting_images: dict[ImageType, CacheableImage] = field(default_factory=dict)
     """ The supporting images, if any, that were provided with the
     associated input primary image. """
