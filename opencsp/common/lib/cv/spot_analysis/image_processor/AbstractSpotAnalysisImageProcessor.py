@@ -32,7 +32,7 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
     This is an abstract class. Implementations can be found in the same
     directory. To create a new implementation, inherit from one of the existing
     implementations or this class. The most basic implementation need only
-    implement the _execute method::
+    implement the :py:method:`_execute` method::
 
         def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
             raise NotImplementedError()
@@ -87,10 +87,11 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
         """
         self.operables_in_flight: list[SpotAnalysisOperable] = []
         """
-        For most processors, _execute() will return one resultant operable for
-        each input operable. For these standard cases, this will contain one
-        value during the process_operable() method, and will be empty otherwise.
-
+        For most processors, :py:meth:`_execute` will return one resultant
+        operable for each input operable. For these standard cases, this will
+        contain one value during the :py:meth:`process_operable` method, and
+        will be empty otherwise.
+        
         Sometimes _execute() may return zero results. In this case, this value
         will contain all the operables passed to _execute() since the last time
         that _execute() returned at least one operable. These "in-flight"
@@ -99,10 +100,10 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
         """
         self.results_on_deck: list[SpotAnalysisOperable] = []
         """
-        Sometimes _execute() may return multiple results. In this case, we hold
-        on to the processed operables and return only one of them per iteration
-        in __next__(). This gaurantees that each image processor in the chain
-        consumes and produces single images.
+        Sometimes :py:meth:`_execute` may return multiple results. In this
+        case, we hold on to the processed operables and return only one of them
+        per iteration in __next__(). This gaurantees that each image processor
+        in the chain consumes and produces single images.
         """
         self._on_image_processed: list[Callable[[SpotAnalysisOperable]]] = []
         # A list of callbacks to be evaluated when an image is finished processing.
@@ -328,6 +329,17 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
             for callback in self._on_image_processed:
                 callback(operable)
 
+        # register the new operable's "previous_operable" value based on operables_in_flight
+        for i in range(len(ret)):
+            # Don't register the returned operable as its own previous operable.
+            # This shouldn't happen with image processors that follow the
+            # convention of producing a new operable as their output, but it is
+            # possible.
+            # Do nothing image processors can also return the same input
+            # operable as output, such as for the EchoImageProcessor.
+            if ret[i] not in self.operables_in_flight:
+                ret[i] = dataclasses.replace(ret[i], previous_operables=(copy.copy(self.operables_in_flight), self))
+
         # de-register any operable on which we're waiting for results
         if len(ret) > 0 or is_last:
             self.operables_in_flight.clear()
@@ -380,7 +392,16 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         """Evaluate an input primary image (and other images/data), and generate the output processed image(s) and data.
 
-        The actual image processing method. Called from process_operable().
+        This is the actual image processing method implemented by each image
+        processing class. It is called from :py:meth:`process_operable`.
+
+        In most cases, the resulting operable(s) should be different from the
+        input operable(s). This keeps operables (mostly) immutable and makes
+        following the chain of logic easier for debugging an image processing
+        pipeline. The exception is for do-nothing image processors, such as for
+        the EchoImageProcessor. Note that image processors that return the same
+        input operable as an output won't be added to the operable's
+        :py:attr:`previous_operables` history.
 
         Parameters
         ----------
