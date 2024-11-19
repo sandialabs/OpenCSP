@@ -219,6 +219,33 @@ class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
             )
             raise
 
+    def test_set_previous_operables(self):
+        """Verify that image processors append themselves to the operable's history."""
+        operable_1 = self.example_operable
+        processor_1 = SetOnesImageProcessor()
+        operable_2 = processor_1.process_operable(operable_1, is_last=True)[0]
+        processor_2 = SetOnesImageProcessor()
+        operable_3 = processor_2.process_operable(operable_2, is_last=True)[0]
+
+        # verify we got different operables as return values
+        self.assertNotEqual(operable_1, operable_2)
+        self.assertNotEqual(operable_1, operable_3)
+        self.assertNotEqual(operable_2, operable_3)
+
+        # verify each operable's history
+        self.assertEqual(operable_1.previous_operables, (None, None))
+        self.assertEqual(operable_2.previous_operables[0], [operable_1])
+        self.assertEqual(operable_2.previous_operables[1], processor_1)
+        self.assertEqual(operable_3.previous_operables[0], [operable_2])
+        self.assertEqual(operable_3.previous_operables[1], processor_2)
+
+        # sanity check - do nothing processors don't add themselves to the history
+        processor_3 = DoNothingImageProcessor()
+        operable_4 = processor_3.process_operable(operable_3, is_last=True)[0]
+        self.assertEqual(operable_3, operable_4)
+        self.assertEqual(operable_4.previous_operables[0], [operable_2])
+        self.assertEqual(operable_4.previous_operables[1], processor_2)
+
 
 if __name__ == '__main__':
     unittest.main()

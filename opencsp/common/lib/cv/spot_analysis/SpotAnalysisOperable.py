@@ -4,6 +4,7 @@ import numpy as np
 import numpy.typing as npt
 import os
 import sys
+from typing import TYPE_CHECKING, Optional, Union
 
 import opencsp.common.lib.csp.LightSource as ls
 import opencsp.common.lib.cv.annotations.AbstractAnnotations as aa
@@ -13,6 +14,13 @@ from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
+
+if TYPE_CHECKING:
+    # Use the TYPE_CHECKING magic value to avoid cyclic imports at runtime.
+    # This import is only here for type annotations.
+    from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
+        AbstractSpotAnalysisImagesProcessor,
+    )
 
 
 @dataclass(frozen=True)
@@ -33,8 +41,20 @@ class SpotAnalysisOperable:
     This should be used as the secondary source of this information, after
     :py:meth:`best_primary_pathnameext` and :py:attr:`primary_image`.source_path. """
     supporting_images: dict[ImageType, CacheableImage] = field(default_factory=dict)
-    """ The supporting images, if any, that were provided with the
-    associated input primary image. """
+    """
+    The supporting images, if any, that were provided with the associated input
+    primary image. These images will be used as part of the computation.
+    """
+    previous_operables: (
+        tuple[list['SpotAnalysisOperable'], "AbstractSpotAnalysisImagesProcessor"] | tuple[None, None]
+    ) = (None, None)
+    """
+    The operable(s) that were used to generate this operable, and the image
+    processor that they came from, if any. If this operable has no previous
+    operables registered with it, then this will have the value (None, None).
+    Does not include no-nothing image processors such as
+    :py:class:`.EchoImageProcessor`.
+    """
     given_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ Any fiducials handed to us in the currently processing image. """
     found_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
@@ -102,6 +122,7 @@ class SpotAnalysisOperable:
                 primary_image,
                 primary_image_source_path,
                 supporting_images,
+                self.previous_operables,
                 self.given_fiducials,
                 self.found_fiducials,
                 self.annotations,
@@ -114,7 +135,8 @@ class SpotAnalysisOperable:
     def get_all_images(self, primary=True, supporting=True, visualization=True, algorithm=True) -> list[CacheableImage]:
         """
         Get a list of all images tracked by this operable including all primary
-        images, supporting images, visualization, and algorithm images.
+        images, supporting images, visualization, and algorithm images. Does not
+        include images from previous operables.
 
         Parameters
         ----------
@@ -264,6 +286,23 @@ class SpotAnalysisOperable:
             )
         return ret
 
+    def is_ancestor_of(self, other: "SpotAnalysisOperable") -> bool:
+        """
+        Returns true if this operable is in the other operable's
+        previous_operables tree. Does not match for equality between this and
+        the other operable.
+        """
+        if other.previous_operables[0] is None:
+            return False
+
+        for prev in other.previous_operables[0]:
+            if prev == self:
+                return True
+            elif self.is_ancestor_of(prev):
+                return True
+
+        return False
+
     def __sizeof__(self) -> int:
         """
         Get the size of this operable in memory including all primary images,
@@ -271,3 +310,12 @@ class SpotAnalysisOperable:
         """
         all_images_size = sum([sys.getsizeof(img) for img in self.get_all_images()])
         return all_images_size
+
+    def __str__(self):
+        name = self.__class__.__name__
+        image_shape = self.primary_image.nparray.shape
+        imgsize = f"{image_shape[1]}w{image_shape[0]}h"
+        source_path = self.best_primary_pathnameext
+        nfiducials = len(self.given_fiducials) + len(self.found_fiducials)
+
+        return f"<{name},{imgsize=},{source_path=},{nfiducials=}>"

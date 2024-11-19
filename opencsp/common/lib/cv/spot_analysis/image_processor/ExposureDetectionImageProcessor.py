@@ -11,7 +11,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 class ExposureDetectionImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
-    Detects over and under exposure in images and adds the relavent tag to the image.
+    A do-nothing processor that detects over and under exposure in images and adds the relavent tag to the image.
 
     Over or under exposure is determined by the proportion of pixels that are at near the max_pixel_value threshold.
     If more pixels than the over exposure limit is at the maximum level, then the image is considered over exposed. If
