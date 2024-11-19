@@ -141,7 +141,7 @@ class DefinitionEnsemble:
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str) -> 'DefinitionEnsemble':
+    def load_from_hdf(cls, file: str, prefix: str = '') -> 'DefinitionEnsemble':
         """Loads DefinitionEnsemble object from given file.  Data is stored in PREFIX + DefinitionEnsemble/...
 
         Parameters

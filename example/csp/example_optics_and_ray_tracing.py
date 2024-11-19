@@ -201,7 +201,7 @@ def define_mirror_array(focal_length: float) -> FacetEnsemble:
     # Build facet ensemble
     facet_ensemble = FacetEnsemble(facets)
     facet_ensemble.set_facet_positions(facet_locations)
-    facet_ensemble.set_facet_canting(facet_canting)
+    facet_ensemble.set_facet_cantings(facet_canting)
 
     return facet_ensemble  # FacetEnsemble.generate_rotation_defined(facets)
 

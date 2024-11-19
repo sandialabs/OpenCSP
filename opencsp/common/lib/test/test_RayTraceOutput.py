@@ -130,7 +130,7 @@ class TestRayTraceOutput(to.TestOutput):
         self.fe2x2 = FacetEnsemble(self.h2x2_facets)
         fe2x2_positions = Pxyz([[-1.1, 1.1, -1.1, 1.1], [1.6, 1.6, -1.6, -1.6], [0, 0, 0, 0]])
         self.fe2x2.set_facet_positions(fe2x2_positions)
-        self.fe2x2.set_facet_canting(self.h2x2_canting)
+        self.fe2x2.set_facet_cantings(self.h2x2_canting)
         self.h2x2 = HeliostatAzEl(self.fe2x2, 'Simple 2x2 Heliostat')
         self.h2x2.pivot = 0
         self.h2x2_title = 'Heliostat with Parametrically Defined Facets'

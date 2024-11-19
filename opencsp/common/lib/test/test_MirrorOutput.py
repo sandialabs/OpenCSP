@@ -129,7 +129,7 @@ class TestMirrorOutput(to.TestOutput):
             tilt_left * tilt_down,
             tilt_right * tilt_down,
         ]
-        fe2x2.set_facet_canting(fe_2x2_canting_rotations)
+        fe2x2.set_facet_cantings(fe_2x2_canting_rotations)
 
         self.h2x2 = HeliostatAzEl(fe2x2, name='Simple 2x2 Heliostat')
         self.h2x2_title = 'Heliostat with Parametrically Defined Facets'
