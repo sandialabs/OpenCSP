@@ -120,7 +120,7 @@ class test_Docstrings(unittest.TestCase):
         opencsp.common.lib.cv.spot_analysis.image_processor.ViewCrossSectionImageProcessor,
     ]
 
-    class_list = app_class_list
+    class_list = app_class_list + cv_class_list
 
     def test_docstrings_exist_for_methods(self):
         for class_module in self.class_list:
