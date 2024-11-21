@@ -59,7 +59,9 @@ def bullseye_color_bar(
     cx_offset_trim_pix,
     target_img_width_pix,
 ):
-    # Bullseye.
+    """
+    Placeholder
+    """
     for row in range(0, n_rows):
         for col in range(0, n_cols):
             r_mrad = bullseye_error.radius_in_mrad_given_row_col(

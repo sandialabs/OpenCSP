@@ -12,7 +12,6 @@ import numpy as np
 import os
 
 import opencsp.common.lib.opencsp_path.opencsp_root_path as ort
-import opencsp.app.target.target_color.target_color_bullseye_error
 import opencsp.common.lib.target.target_color_convert
 import opencsp.common.lib.target.target_color_1d_gradient
 import opencsp.common.lib.target.target_image

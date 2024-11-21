@@ -9,6 +9,29 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class Vxy:
+    """
+    A class to represent 2D points or vectors.
+
+    This class allows for the creation and manipulation of 2D vectors,
+    including operations such as addition, subtraction, scaling,
+    normalization, rotation, and dot/cross products.
+
+    The vectors can be initialized from various data formats, including
+    NumPy arrays, tuples, lists, or other instances of the Vxy class.
+
+    Attributes
+    ----------
+    data : np.ndarray
+        An array with shape (2, N), where N is the number of 2D vectors.
+    dtype : np.dtype
+        The data type of the vector elements.
+    x : np.ndarray
+        The x-coordinates of the vectors.
+    y : np.ndarray
+        The y-coordinates of the vectors.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self, data: Union[np.ndarray, tuple[float, float], tuple[list, list], "Vxy"], dtype=float):
         """
         2D vector class to represent 2D points/vectors.

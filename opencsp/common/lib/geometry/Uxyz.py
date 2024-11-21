@@ -2,7 +2,38 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class Uxyz(Vxyz):
+    """
+    A class representing a 3D unit vector.
+
+    The Uxyz class extends the Vxyz class to specifically represent unit vectors
+    in three-dimensional space. Upon initialization, the vector is normalized to
+    ensure it has a magnitude of 1.
+
+    Attributes
+    ----------
+    _data : np.ndarray
+        The underlying data representing the vector, normalized to unit length.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self, data, dtype=float):
+        """
+        Instantiate class for representing a 3D unit vector.
+
+        Parameters
+        ----------
+        data : array-like
+            The input data for the vector, which can be a list, tuple, or
+            NumPy array of length 3.
+        dtype : data type, optional
+            The data type of the vector elements. The default is float.
+
+        Returns
+        -------
+        Uxyz
+            An instance of the Uxyz class representing a unit vector.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Initialize vector
         super().__init__(data, dtype)
 
