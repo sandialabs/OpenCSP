@@ -25,13 +25,14 @@ class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
         self, images: ImagesIterable | ImagesStream | SpotAnalysisImagesStream | Iterator[SpotAnalysisOperable]
     ):
         """
+        Initializes the SpotAnalysisOperablesStream with the provided image source.
+
         Parameters
         ----------
         images : ImagesIterable | ImagesStream | SpotAnalysisImagesStream | Iterator[SpotAnalysisOperable]
-            The images stream to be used as the primary images for the produced
-            operables. This stream will be restartable as long as the given
-            'images' stream is restartable.
+            The source of images to be processed.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.images = images
         self.images_iter = None
         self.default_support_images: dict[ImageType, CacheableImage] = None
@@ -39,23 +40,16 @@ class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
 
     def set_defaults(self, default_support_images: dict[ImageType, CacheableImage], default_data: SpotAnalysisOperable):
         """
-        This stream can be set up with default values for supporting images or
-        other SpotAnalysisOperable data. If set, then all produced operables
-        will have these default values applied.
-
-        See also :py:meth:`SpotAnalysisOperable.replace_use_default_values`
+        Sets default support images and data for the operables.
 
         Parameters
         ----------
         default_support_images : dict[ImageType, CacheableImage]
-            The supporting images that will be assigned as defaults to the
-            generated operables. Can be empty.
+            A dictionary of default support images to be used in the operables.
         default_data : SpotAnalysisOperable
-            Additional data that can be assigned as defaults to the generated
-            operables. Includes things that aren't supporting images, such as
-            given_fiducials, found_fiducials, annotations,
-            camera_intrinsics_characterization, light_sources.
+            Default data to be used in the operables.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.default_support_images = default_support_images
         self.default_data = default_data
 
