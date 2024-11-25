@@ -10,51 +10,6 @@ import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.typing_tools as tt
 
 
-@functools.total_ordering
-class ImageType(Enum):
-    """
-    Enumeration for different types of images used in analysis.
-
-    This enumeration defines various image types that can be utilized in
-    image processing and analysis workflows. Each type serves a specific
-    purpose in the context of image comparison, background subtraction,
-    and other analytical tasks.
-
-    Attributes
-    ----------
-    PRIMARY : int
-        The image we are trying to analyze.
-    REFERENCE : int
-        Contains a pattern to be compared or matched with in the PRIMARY image.
-    NULL : int
-        The same as the PRIMARY image, but without a beam on target.
-        Likely used to subtract out the background.
-    COMPARISON : int
-        For multi-image comparison, such as for re-alignment to a previous
-        position, motion characterization, or measuring wind effect.
-    BACKGROUND_MASK : int
-        A boolean image that indicates which pixels should be included in
-        a computation (True to include, False to exclude).
-    """
-
-    # "ChatGPT 4o" assisted with generating this docstring.
-    PRIMARY = 1
-    """ The image we are trying to analyze. """
-    REFERENCE = 2
-    """ Contains a pattern to be compared or matched with in the PRIMARY image. """
-    NULL = 3
-    """ The same as the PRIMARY image, but without a beam on target. Likely this will be used to subtract out the background. """
-    COMPARISON = 4
-    """ For multi-image comparison, such as for re-alignment to a previous position, motion characterization, or measuring wind effect. """
-    BACKGROUND_MASK = 5
-    """ A boolean image that indicates which pixels should be included in a computation (True to include, False to exclude). """
-
-    def __lt__(self, other):
-        if isinstance(other, self.__class__):
-            return self.value < other.value
-        raise NotImplementedError
-
-
 class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
     """
     This class combines the image streams for several SpotAnalysisImageTypes into
