@@ -425,7 +425,7 @@ class test_Docstrings(unittest.TestCase):
 
     common_class_list = (
         cv_class_list
-        # camera_class_list
+        + camera_class_list
         # + csp_class_list
         # + cv_class_list
         # + deflectometry_class_list

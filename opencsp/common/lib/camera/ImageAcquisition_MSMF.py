@@ -24,6 +24,26 @@ class ImageAcquisition(ImageAcquisitionAbstract):
             raise IOError("Error opening webcam")
 
     def instance_matches(self, possible_matches: list[ImageAcquisitionAbstract]) -> bool:
+        """
+        Determine whether this camera instance matches any instance in the provided list.
+
+        This method checks if there is another instance of the `ImageAcquisition` class
+        in the `possible_matches` list. Since only one MSMF camera is supported,
+        the method returns True if any instance of `ImageAcquisition` is found; otherwise,
+        it returns False.
+
+        Parameters
+        ----------
+        possible_matches : list[ImageAcquisitionAbstract]
+            A list of camera instances to check against. Each instance should be of
+            type `ImageAcquisitionAbstract`.
+
+        Returns
+        -------
+        bool
+            True if a matching instance of `ImageAcquisition` is found; False otherwise.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         for camera in possible_matches:
             if isinstance(camera, ImageAcquisition):
                 # only one MSMF camera is supported
@@ -31,6 +51,33 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         return False
 
     def get_frame(self) -> np.ndarray:
+        """
+        Captures a single frame from the connected camera.
+
+        This method reads a frame from the camera and returns it as a NumPy array.
+        If the captured frame is in color (3-dimensional), it is converted to a
+        grayscale image by averaging the color channels. The method raises an
+        exception if the frame capture is unsuccessful.
+
+        Returns
+        -------
+        np.ndarray
+            The captured image as a NumPy array. The shape of the array will be:
+            - (height, width) for grayscale images.
+            - If the input frame is in color, it will be converted to grayscale
+            by averaging the channels.
+
+        Raises
+        ------
+        Exception
+            If the frame was not captured successfully, an exception is raised
+            indicating the failure to capture the frame.
+
+        ValueError
+            If the output frame does not have 2 or 3 dimensions, a ValueError
+            is raised indicating the incorrect number of dimensions.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Capture image
         ret, frame = self.cap.read()
 
@@ -90,6 +137,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         raise ValueError('exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.')
 
     def close(self):
+        """Closes the camera connection"""
         with et.ignored(Exception):
             super().close()
         with et.ignored(Exception):
