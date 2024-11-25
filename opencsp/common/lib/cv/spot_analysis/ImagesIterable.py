@@ -72,6 +72,7 @@ class ImagesIterable(Iterable[CacheableImage]):
     Calling iter() on this instance forces iter() calls to all contained
     iterators.
     """
+
     def __init__(self, stream: Callable[[int], CacheableImage] | list[str | CacheableImage] | vh.VideoHandler):
         """
         Initializes the ImagesIterable with the provided stream.
