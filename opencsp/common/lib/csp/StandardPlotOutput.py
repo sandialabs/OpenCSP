@@ -1,4 +1,4 @@
-"""Class used to display/save the suite of standard output plots after measuring a CSP Mirror/FacetEnsemble.
+"""Class used to display/save the suite of standard output plots after measuring a COutSP Mirror/FacetEnsemble.
 """
 
 from dataclasses import dataclass, field
