@@ -12,3 +12,4 @@ This section describes the OpenCSP classes and interfaces.
    app/scene_reconstruction/index.rst
    common/lib/cv/index.rst
    common/lib/camera/index.rst
+   common/lib/csp/index.rst

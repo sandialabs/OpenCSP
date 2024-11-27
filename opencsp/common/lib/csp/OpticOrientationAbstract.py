@@ -11,28 +11,28 @@ class OpticOrientationAbstract(ABC):
     orientations, and can contain child objects (that also extend OpticOrientationAbstract)
     that transform with it.
 
-    Core Attributes:
-    ----------------
+    Core Attributes
+    ---------------
     `self._parent`: `OpticOrientationAbstract`
-        - This is the `OpticOrientationAbstract` object that contains the self.
+        This is the `OpticOrientationAbstract` object that contains the self.
         If `self` is the largest object then this attribute will be `None`.
         If an object already has a parent, then it cannot be added to another object as a child.
         This should be accessed via the `@property` method `self.parent`.
 
     `self._self_to_parent_transform`: `TransformXYZ`
-        - This is the relatice transformation from the `self` coordinate frame to
+        This is the relatice transformation from the `self` coordinate frame to
         the `self._parent` frame.
 
     (`@property`) `self.children`: `list[OpticOrientationAbstract]`
-        - This property is an abstract method that must be implemented by all deriving classes.
-        There should not be a setter for this atribute. Ideally, there is little information that
-        is stored in two places. However, for both parents and children to find eachother,
+        This property is an abstract method that must be implemented by all deriving classes.
+        There should not be a setter for this attribute. Ideally, there is little information that
+        is stored in two places. However, for both parents and children to find each other,
         the information about children must be stored in the parent. When implementing `self.children`,
         ensure that children hold reference to parents.
 
     Derived Attributes
     ------------------
-    Other attributes of a `OpticOrientationAbstract` are caluculated based on the other information
+    Other attributes of a `OpticOrientationAbstract` are calculated based on the other information
     in the core attributes.
 
     - `_children_to_self_transform`

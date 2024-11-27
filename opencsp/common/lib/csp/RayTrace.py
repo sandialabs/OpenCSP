@@ -213,11 +213,14 @@ def calc_reflected_ray(normal_v: Vxyz, incoming_v: Vxyz) -> Vxyz:
     Notes
     -----
     The algorithm for reflection is based on the formula:
-    \[
-    \text{reflected\_ray} = \text{incoming\_ray} - 2 \cdot (\text{normal} \cdot \text{incoming\_ray}) \cdot \text{normal}
-    \]
 
-    norm_v and inc_v must broadcast together.
+    .. code-block:: text
+
+        \[
+        \text{reflected\_ray} = \text{incoming\_ray} - 2 \cdot (\text{normal} \cdot \text{incoming\_ray}) \cdot \text{normal}
+        \]
+
+        norm_v and inc_v must broadcast together.
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Process input vector
