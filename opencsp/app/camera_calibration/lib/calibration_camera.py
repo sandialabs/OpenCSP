@@ -36,7 +36,7 @@ def calibrate_camera(
 
     Returns
     -------
-    Camera : Camera
+    Camera : opencsp.common.lib.camera.Camera.Camera
         Camera class.
     r_cam_object : list[Rotation, ...]
         Camera-object rotation vector
@@ -74,7 +74,7 @@ def view_distortion(camera: Camera, ax1: Axes, ax2: Axes, ax3: Axes, num_samps: 
 
     Parameters
     ----------
-    camera : Camera
+    camera : opencsp.common.lib.camera.Camera.Camera
         Camera to visualize.
     ax1 : Axes
         Axis to plot radial distortion.
