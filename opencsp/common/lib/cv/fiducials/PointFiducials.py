@@ -59,7 +59,6 @@ class PointFiducials(AbstractFiducials):
             The pixel locations of the points of interest.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
-        return
         return self.points
 
     @property
@@ -70,7 +69,7 @@ class PointFiducials(AbstractFiducials):
         Raises
         ------
         NotImplementedError
-            If the orientation is not yet implemented for PointFiducials.
+            If the orientation is not yet implemented for this class.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         raise NotImplementedError("Orientation is not yet implemented for PointFiducials")
@@ -83,7 +82,7 @@ class PointFiducials(AbstractFiducials):
         Returns
         -------
         list[float]
-            A list of sizes for each point. Currently returns a list of zeros.
+            A list of sizes for each point. The default implementation for PointFiducials returns a list of zeros.
 
         Notes
         -----
@@ -101,7 +100,7 @@ class PointFiducials(AbstractFiducials):
         Returns
         -------
         list[float]
-            A list of scales for each point. Currently returns a list of zeros.
+            A list of scales for each point. The default implementation for PointFiducials returns a list of zeros.
 
         Notes
         -----

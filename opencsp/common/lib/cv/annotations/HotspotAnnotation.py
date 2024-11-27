@@ -5,7 +5,9 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 class HotspotAnnotation(PointAnnotations):
     """
-    A class representing a hotspot annotation in a graphical context.
+    A class representing a hotspot annotation, likely created from a :py:class:`HotspotImageProcessor` instance.
+    
+    The hotspot is the overall hottest location in an image, when accounting for the surrounding area. It may be the different from the centroid location or the single hottest pixel location.
 
     This class extends the `PointAnnotations` class to create a specific type of annotation
     that represents a hotspot, which can be rendered with a specific style and point location.
@@ -22,11 +24,6 @@ class HotspotAnnotation(PointAnnotations):
 
     def __init__(self, style: rcps.RenderControlPointSeq = None, point: p2.Pxy = None):
         """
-        A class representing a hotspot annotation in a graphical context.
-
-        This class extends the `PointAnnotations` class to create a specific type of annotation
-        that represents a hotspot, which can be rendered with a specific style and point location.
-
         Parameters
         ----------
         style : rcps.RenderControlPointSeq, optional
@@ -38,14 +35,17 @@ class HotspotAnnotation(PointAnnotations):
 
         Examples
         --------
-        >>> hotspot = HotspotAnnotation()
-        >>> print(hotspot.style.color)
-        'blue'
-
-        >>> point = p2.Pxy(10, 20)
-        >>> hotspot_with_point = HotspotAnnotation(point=point)
-        >>> print(hotspot_with_point.point)
-        Pxy(10, 20)
+        >>> processor = HotspotImageProcessor(desired_shape=(30, 30))
+        >>> input_image = CacheableImage.from_single_source("C:/path/to/image.png")
+        >>> input_operable = SpotAnalysisOperable(input_image)
+        >>> result = processor.process_operable(input_operable, is_last=True)[0]
+        >>> hotspot = result.get_fiducials_by_type(HotspotAnnotation)[0]
+        >>> lt.info(str(type(hotspot)))
+        <class 'opencsp.common.lib.cv.annotations.HotspotAnnotation.HotspotAnnotation'>
+        >>> lt.info(str(hotspot.origin))
+        2D Point:
+        array([[2517.],
+               [2733.]])
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         if style is None:

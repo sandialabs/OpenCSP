@@ -30,7 +30,10 @@ class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
         Parameters
         ----------
         images : ImagesIterable | ImagesStream | SpotAnalysisImagesStream | Iterator[SpotAnalysisOperable]
-            The source of images to be processed.
+            The source of images to be processed. This will be used as the
+            primary images for the produced operables. This
+            SpotAnalysisOperablesStream stream will be restartable so long as
+            the given 'images' stream is also restartable.
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.images = images
@@ -40,14 +43,22 @@ class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
 
     def set_defaults(self, default_support_images: dict[ImageType, CacheableImage], default_data: SpotAnalysisOperable):
         """
-        Sets default support images and data for the operables.
+        This stream can be set up with default values for supporting images or
+        other SpotAnalysisOperable data. If set, then all produced operables
+        will have these default values applied.
+        
+        See also :py:meth:`SpotAnalysisOperable.replace_use_default_values`
 
         Parameters
         ----------
         default_support_images : dict[ImageType, CacheableImage]
-            A dictionary of default support images to be used in the operables.
+            A dictionary of default support images to be used as defaults
+            in the generated operables. Can be empty.
         default_data : SpotAnalysisOperable
-            Default data to be used in the operables.
+            Additional data that can be assigned as defaults to the generated
+            operables. Includes things that aren't supporting images, such as
+            given_fiducials, found_fiducials, annotations,
+            camera_intrinsics_characterization, light_sources.
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.default_support_images = default_support_images

@@ -22,6 +22,9 @@ Base Classes
 Utility Functions
 =================
 
+image_filters
+-------------
+
 .. currentmodule:: opencsp.common.lib.cv.image_filters
 
 .. automodule:: opencsp.common.lib.cv.image_filters
@@ -30,6 +33,9 @@ Utility Functions
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
+
+image_reshapers
+---------------
 
 .. currentmodule:: opencsp.common.lib.cv.image_reshapers
 

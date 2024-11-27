@@ -265,10 +265,10 @@ class OpticalFlow:
 
         Returns
         -------
-        tuple[np.ndarray, np.ndarray]
-            A tuple containing:
-            - np.ndarray: The magnitude of the flow per pixel.
-            - np.ndarray: The direction of the flow per pixel (radians, 0 to the right, positive counter-clockwise).
+        self.mag: np.ndarray
+            The magnitude of the flow per pixel (units are in pixels).
+        self.ang: np.ndarray
+            The direction of the flow per pixel (units are in radians, 0 to the right, positive counter-clockwise).
 
         Notes
         -----
@@ -605,7 +605,7 @@ class OpticalFlow:
         Saves the magnitude and angle matrices computed in the `dense()` method to the specified file.
 
         Note:
-            This method saves the matrices exactly as they were computed in `dense()`, without applying any limits.
+            This method saves the matrices exactly as they were computed in `dense()`, without applying any limits from limit_by_magnitude or limit_by_angle.
 
         Parameters
         ----------
@@ -618,7 +618,7 @@ class OpticalFlow:
 
         Returns
         -------
-        str
+        saved_path_name_ext: str
             The full path of the saved file.
 
         Raises
@@ -667,7 +667,7 @@ class OpticalFlow:
     @classmethod
     def from_file(cls, dir: str, name_ext: str, error_on_not_exist=True):
         """
-        Creates an instance of the class by loading magnitude and angle matrices from a file.
+        Creates an instance of the class by loading magnitude and angle matrices from a file generated from the :py:meth:`save` method.
 
         Parameters
         ----------
@@ -704,7 +704,7 @@ class OpticalFlow:
         Returns
         -------
         tuple[np.ndarray, np.ndarray]
-            A tuple containing the magnitude and angle matrices, or (None, None) if the file does not exist.
+            A tuple containing the magnitude and angle matrices as from the :py:meth:`dense` method, or (None, None) if the file does not exist.
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         lt.info(f"Loading flow from {dir}/{name_ext}")

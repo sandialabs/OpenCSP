@@ -46,7 +46,7 @@ class BcsFiducial(AbstractFiducials):
         Parameters
         ----------
         index : int, optional
-            The index of the target for which to retrieve the bounding box. Defaults to 0.
+            Ignored for BcsFiducials.
 
         Returns
         -------
@@ -83,7 +83,7 @@ class BcsFiducial(AbstractFiducials):
         Raises
         ------
         NotImplementedError
-            If the rotation is not yet implemented for BcsFiducial.
+            Rotation is not yet implemented for BcsFiducial.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         raise NotImplementedError("rotation is not yet implemented for PointFiducials")
@@ -96,7 +96,7 @@ class BcsFiducial(AbstractFiducials):
         Returns
         -------
         list[float]
-            A list containing the diameter of the BCS target (radius * 2).
+            A list containing a single value: the diameter of the BCS target.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         return [self.radius_px * 2]
@@ -109,18 +109,18 @@ class BcsFiducial(AbstractFiducials):
         Returns
         -------
         list[float]
-            A list containing the scaled size of the BCS target in meters.
+            A list containing a single value: the size of the BCS target, in meters.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         return [self.size * self.pixels_to_meters]
 
     def _render(self, axes: matplotlib.axes.Axes):
-        # Render the BCS fiducial on the given axes.
+        # Render the BCS fiducial on the given plot's axes.
         #
         # Parameters
         # ----------
         # axes : matplotlib.axes.Axes
-        #    The axes on which to render the BCS fiducial.
+        #    The plot's axes on which to render the BCS fiducial.
         #
         # Notes
         # -----

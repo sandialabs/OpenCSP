@@ -18,7 +18,7 @@ class AbstractFiducials(ABC):
     """
     A collection of markers (such as an ArUco board) that is used to orient the camera relative to observed objects
     in the scene. It is suggested that each implementing class be paired with a complementary locator method or
-    :class:`opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor`.
+:py:class:`opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor`.
     """
 
     def __init__(self, style: rcps.RenderControlPointSeq = None, pixels_to_meters: Callable[[p2.Pxy], v3.Vxyz] = None):
@@ -42,12 +42,12 @@ class AbstractFiducials(ABC):
     @abstractmethod
     def get_bounding_box(self, index=0) -> reg.RegionXY:
         """
-        Get the X/Y bounding box(es) of this instance, in pixels.
+        Get the X/Y bounding box of this instance, in pixels.
 
         Parameters
         ----------
         index : int, optional
-            The index of the fiducial for which to retrieve the bounding box. Defaults to 0.
+            The index of the fiducial for which to retrieve the bounding box, for fiducials that have more than one bounding box. Defaults to 0.
 
         Returns
         -------
@@ -55,7 +55,7 @@ class AbstractFiducials(ABC):
             The bounding box of the fiducial.
         """
 
-    # "ChatGPT 4o" assisted with generating this docstring.
+        # "ChatGPT 4o" assisted with generating this docstring.
 
     @property
     @abstractmethod
@@ -69,13 +69,17 @@ class AbstractFiducials(ABC):
             The origin point(s) of the fiducial.
         """
 
-    # "ChatGPT 4o" assisted with generating this docstring.
+        # "ChatGPT 4o" assisted with generating this docstring.
 
     @property
     @abstractmethod
     def rotation(self) -> scipy.spatial.transform.Rotation:
         """
         Get the pointing of the normal vector(s) of this instance.
+        
+        This is relative to the camera's reference frame, where x is positive
+        to the right, y is positive down, and z is positive in (away from the
+        camera)
 
         Returns
         -------
@@ -113,26 +117,31 @@ class AbstractFiducials(ABC):
     def size(self) -> list[float]:
         """
         Get the scale(s) of this fiducial, in pixels, relative to its longest axis.
+        
+        As an example, if the fiducial is a square QR-code and is oriented tangent
+        to the camera, then the scale will be the number of pixels from one
+        corner to the other.
 
         Returns
         -------
         list[float]
-            The sizes of the fiducial in pixels. For example, if the fiducial is a square QR-code and is oriented tangent
-            to the camera, then the scale will be the number of pixels from one corner to the other.
+            The sizes of the fiducial in pixels.
         """
 
-    # "ChatGPT 4o" assisted with generating this docstring.
+        # "ChatGPT 4o" assisted with generating this docstring.
 
     @property
     def scale(self) -> list[float]:
         """
         Get the scale(s) of this fiducial, in meters, relative to its longest axis.
+        
+        This value, together with the size, can potentially be used to determine the 
+        distance and rotation of the fiducial relative to the camera.
 
         Returns
         -------
         list[float]
-            The scales of the fiducial in meters. This can be used to determine the distance and rotation of the
-            fiducial relative to the camera.
+            The scales of the fiducial in meters.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         ret = []

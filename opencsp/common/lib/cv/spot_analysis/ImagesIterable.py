@@ -80,12 +80,13 @@ class ImagesIterable(Iterable[CacheableImage]):
         Parameters
         ----------
         stream : Callable[[int], CacheableImage] | list[str | CacheableImage] | vh.VideoHandler
-            The stream of images to iterate over.
+            The stream of images to iterate over. If a callable, then will be passed
+            the current iteration index as an argument.
 
         Raises
         ------
         TypeError
-            If the provided stream is not of an expected type (iterator, callable, or list).
+            If the provided stream is not one of the supported types.
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         if isinstance(stream, _IndexableIterable):
