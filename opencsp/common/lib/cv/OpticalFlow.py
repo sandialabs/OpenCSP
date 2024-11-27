@@ -25,13 +25,6 @@ class OpticalFlow:
 
     This class wraps around OpenCV's optical flow functions, providing functionality
     to compute dense optical flow and manage caching of results.
-
-    Attributes
-    ----------
-    mag : np.ndarray, optional
-        OpenCSP version of the magnitude matrix.
-    ang : np.ndarray, optional
-        OpenCSP version of the angle matrix.
     """
 
     # "ChatGPT 4o-mini" assisted with generating this docstring.
@@ -98,15 +91,16 @@ class OpticalFlow:
 
         Notes
         -----
-        Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
+            Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
 
-        opencsp is not compatible with the multiprocessing library on linux. Typical error message::
-            "global /io/opencv/modules/core/src/parallel_impl.cpp (240) WorkerThread 6: Can't spawn new thread: res = 11"
+        opencsp is not compatible with the multiprocessing library on linux. Typical error message:
+        "global /io/opencv/modules/core/src/parallel_impl.cpp (240) WorkerThread 6: Can't spawn new thread: res = 11"
 
         This is due to some sort of bug with how multiprocessing processes and opencv threads interact.
         Possible solutions:
-         - use concurrent.futures.ThreadPoolExecutor
-         - Loky multiprocessing https://github.com/joblib/loky (I (BGB) couldn't make this one work)
+
+        - use concurrent.futures.ThreadPoolExecutor
+        - Loky multiprocessing https://github.com/joblib/loky (I (BGB) couldn't make this one work)
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         self._frame1_dir = frame1_dir
@@ -126,9 +120,9 @@ class OpticalFlow:
         self._cache = cache
 
         self._mag: np.ndarray = None
-        """ XY Matrix. The raw magnitude values returned by opencv, one value per pixel in frame1 """
+        # XY Matrix. The raw magnitude values returned by opencv, one value per pixel in frame1
         self._ang: np.ndarray = None
-        """ XY Matrix. The raw angle values returned by opencv, one value per pixel in frame1 """
+        # XY Matrix. The raw angle values returned by opencv, one value per pixel in frame1
         self.mag: np.ndarray = None
         """ XY Matrix. The OpenCSP version of the magnitude matrix, where each value corresponds to a pixel in frame1 and
         represents the number of pixels that pixel has moved by frame2. """

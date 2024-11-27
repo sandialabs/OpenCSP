@@ -18,7 +18,7 @@ class AbstractFiducials(ABC):
     """
     A collection of markers (such as an ArUco board) that is used to orient the camera relative to observed objects
     in the scene. It is suggested that each implementing class be paired with a complementary locator method or
-    SpotAnalysisImageProcessor.
+    :class:`opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor`.
     """
 
     def __init__(self, style: rcps.RenderControlPointSeq = None, pixels_to_meters: Callable[[p2.Pxy], v3.Vxyz] = None):
@@ -88,15 +88,19 @@ class AbstractFiducials(ABC):
         marker whose origin is in the center of the image and is facing towards the camera could have the rotation
         defined as:
 
-        Rotation.from_euler('y', np.pi)
+        .. code-block:: python
+
+            Rotation.from_euler('y', np.pi)
 
         If that same ArUco marker was also placed upside down, then its rotation could be defined as:
 
-        Rotation.from_euler(
-            'yz',
-            [[np.pi, 0],
-             [0,     np.pi]]
-        )
+        .. code-block:: python
+
+            Rotation.from_euler(
+                'yz',
+                [[np.pi, 0],
+                [0,     np.pi]]
+            )
 
         Note that this just describes rotation, and not the translation. We call the rotation and translation together
         the orientation.

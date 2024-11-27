@@ -5,6 +5,7 @@ class AbstractAnnotations(af.AbstractFiducials):
     """
     Annotations are applied to images to mark specific points of interest. Some
     examples of annotations might include:
+
     - The hotspot in a beam where light is the brightest
     - The power envelope for 90% of the light of a beam
     - Distances between two pixels
