@@ -63,26 +63,34 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         self.blob_index: BlobIndex = None
         self.debug_blob_index: DebugBlobIndex = DebugBlobIndex()
 
-    def find_blobs(self, pts_known: Vxy, xys_known: tuple[tuple[int, int]]) -> BlobIndex:
+    def find_blobs(self, pts_known: Vxy, xys_known: tuple[tuple[int, int]], loop: LoopXY = None) -> BlobIndex:
         """Finds blobs in image
 
         Parameters
         ----------
         pts_known : Vxy
             Length N, xy pixel location of known point(s) with known xy dot index locations
-        xys_known : tuple[tuple[int]]
+        xys_known : tuple[tuple[int, int]]
             Length N integer xy dot indices
+        loop : LoopXY | None
+            Only consider points inside this loop. If None, consider all points.
 
         NOTE: N=number of facets
         """
+        # Find all blobs in image
         pts_blob = ip.detect_blobs(self.measurement.image, self.blob_detector)
+
+        # Filter blobs if loop is given
+        if loop is not None:
+            mask = loop.is_inside(pts_blob)
+            pts_blob = pts_blob[mask]
 
         # Index blobs
         blob_index = BlobIndex(pts_blob, *self.fixed_pattern_dot_locs.dot_extent)
         blob_index.search_thresh = self.params.blob_search_thresh
         blob_index.search_perp_axis_ratio = self.params.search_perp_axis_ratio
-        for pt_known, xy_known in zip(pts_known, xys_known):
-            blob_index.run(pt_known, xy_known[0], xy_known[1])
+        blob_index.debug = self.debug_blob_index
+        blob_index.run(pts_known, xys_known[0], xys_known[1])
 
         return blob_index
 
