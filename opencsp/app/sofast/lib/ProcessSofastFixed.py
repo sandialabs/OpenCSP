@@ -5,7 +5,7 @@ import cv2 as cv
 import numpy as np
 from numpy import ndarray
 
-from opencsp.app.sofast.lib.BlobIndex import BlobIndex
+from opencsp.app.sofast.lib.BlobIndex import BlobIndex, DebugBlobIndex
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
@@ -18,6 +18,7 @@ from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
+from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Vxy import Vxy
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -60,6 +61,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         # Instantiate other data containers
         self.slope_solvers: list[SlopeSolver] = None
         self.blob_index: BlobIndex = None
+        self.debug_blob_index: DebugBlobIndex = DebugBlobIndex()
 
     def find_blobs(self, pts_known: Vxy, xys_known: tuple[tuple[int, int]]) -> BlobIndex:
         """Finds blobs in image
