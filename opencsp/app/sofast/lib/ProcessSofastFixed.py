@@ -187,33 +187,12 @@ class ProcessSofastFixed(ProcessSofastAbstract):
             'surface': self.data_surfaces[0],
         }
 
-    def _process_optic_multifacet_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> list[dict]:
-        # Process optic geometry (find mask corners, etc.)
-        (
-            self.data_geometry_general,
-            self.data_image_processing_general,
-            self.data_geometry_facet,  # list
-            self.data_image_processing_facet,  # list
-            self.data_error,
-        ) = pr.process_multifacet_geometry(
-            self.data_facet_def,
-            self.data_ensemble_def,
-            mask_raw,
-            self.measurement.v_measure_point_facet,
-            self.orientation,
-            self.camera,
-            self.measurement.dist_optic_screen,
-            self.params.geometry,
-            self.params.debug_geometry,
-        )
+    def _process_optic_multifacet_geometry(self, blob_index: list[BlobIndex]) -> list[dict]:
 
         kwargs_list = []
         for idx_facet in range(self.num_facets):
-            # Get pixel region of current facet
-            loop = self.data_image_processing_facet[idx_facet].loop_facet_image_refine
-
             # Get image points and blob indices
-            pts_image, pts_index_xy = blob_index.get_data_in_region(loop)
+            pts_image, pts_index_xy = blob_index[idx_facet].get_data()
 
             # Define optic orientation w.r.t. camera
             rot_facet_ensemble = self.data_ensemble_def.r_facet_ensemble[idx_facet]
@@ -239,6 +218,18 @@ class ProcessSofastFixed(ProcessSofastAbstract):
             # Calculate xyz screen points
             v_screen_points_screen = self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
             v_screen_points_facet = v_facet_screen_facet + v_screen_points_screen.rotate(rot_screen_facet)
+
+            # Check for nans returning from screen point calculation
+            nan_mask = np.isnan(v_screen_points_screen.data).sum(0).astype(bool)
+            if np.any(nan_mask):
+                lt.warn(
+                    f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated '
+                    f'screen points for facet {idx_facet:d}. These data points will be removed.'
+                )
+                # Remove nan data points from screen points
+                active_point_mask = np.logical_not(nan_mask)
+                pts_image = pts_image[active_point_mask]
+                v_screen_points_facet = v_screen_points_facet[active_point_mask]
 
             # Calculate active pixel pointing
             u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
@@ -348,14 +339,38 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         self.data_ensemble_def = data_ensemble_def.copy()
         self.data_surfaces = surfaces
 
-        # Find blobs
-        self.blob_index = self.find_blobs(pts_known, xys_known)
-
         # Calculate mask
         mask_raw = self._calculate_mask()
 
+        # Process optic geometry (find mask corners, etc.)
+        (
+            self.data_geometry_general,
+            self.data_image_processing_general,
+            self.data_geometry_facet,  # list
+            self.data_image_processing_facet,  # list
+            self.data_error,
+        ) = pr.process_multifacet_geometry(
+            self.data_facet_def,
+            self.data_ensemble_def,
+            mask_raw,
+            self.measurement.v_measure_point_facet,
+            self.orientation,
+            self.camera,
+            self.measurement.dist_optic_screen,
+            self.params.geometry,
+            self.params.debug_geometry,
+        )
+
+        # Find blobs
+        self.blob_index: list[BlobIndex] = []
+
+        for idx_facet, geom in enumerate(self.data_image_processing_facet):
+            loop = geom.loop_facet_image_refine
+            self.debug_blob_index.name = f' - Facet {idx_facet:d}'
+            self.blob_index.append(self.find_blobs(pts_known[idx_facet], xys_known[idx_facet], loop))
+
         # Generate geometry and slope solver inputs
-        kwargs_list = self._process_optic_multifacet_geometry(self.blob_index, mask_raw)
+        kwargs_list = self._process_optic_multifacet_geometry(self.blob_index)
 
         # Calculate slope
         self.slope_solvers = []
