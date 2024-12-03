@@ -6,6 +6,7 @@ import numpy as np
 from numpy import ndarray
 
 from opencsp.app.sofast.lib.BlobIndex import BlobIndex, DebugBlobIndex
+from opencsp.app.sofast.lib.calculation_data_classes import CalculationBlobAssignment
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
@@ -62,6 +63,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         self.slope_solvers: list[SlopeSolver] = None
         self.blob_index: BlobIndex = None
         self.debug_blob_index: DebugBlobIndex = DebugBlobIndex()
+        self.data_calculation_blob_assignment: list[CalculationBlobAssignment] = []
 
     def find_blobs(self, pts_known: Vxy, xys_known: tuple[tuple[int, int]], loop: LoopXY = None) -> BlobIndex:
         """Finds blobs in image
@@ -190,6 +192,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
     def _process_optic_multifacet_geometry(self, blob_index: list[BlobIndex]) -> list[dict]:
 
         kwargs_list = []
+        self.data_calculation_blob_assignment = []
         for idx_facet in range(self.num_facets):
             # Get image points and blob indices
             pts_image, pts_index_xy = blob_index[idx_facet].get_data()
@@ -221,15 +224,28 @@ class ProcessSofastFixed(ProcessSofastAbstract):
 
             # Check for nans returning from screen point calculation
             nan_mask = np.isnan(v_screen_points_screen.data).sum(0).astype(bool)
+            active_point_mask: np.ndarray = np.logical_not(nan_mask)
+
+            # Remove nans if any present
             if np.any(nan_mask):
                 lt.warn(
                     f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated '
                     f'screen points for facet {idx_facet:d}. These data points will be removed.'
                 )
                 # Remove nan data points from screen points
-                active_point_mask = np.logical_not(nan_mask)
                 pts_image = pts_image[active_point_mask]
+                pts_index_xy = pts_index_xy[active_point_mask]
                 v_screen_points_facet = v_screen_points_facet[active_point_mask]
+
+            # Make 2d mask of active points (w.r.t. BlobIndex internal 2d arrays)
+            x_idx_mat, y_idx_mat = self.blob_index[idx_facet].pts_index_to_mat_index(pts_index_xy)
+            active_point_mask_mat = np.zeros(self.blob_index[idx_facet].shape_yx_data_mat, dtype=bool)
+            active_point_mask_mat[y_idx_mat, x_idx_mat] = True
+
+            # Save Sofast Fixed calculation parameters (specific to Sofast Fixed calculations)
+            self.data_calculation_blob_assignment.append(
+                CalculationBlobAssignment(pts_image, pts_index_xy, active_point_mask_mat)
+            )
 
             # Calculate active pixel pointing
             u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
@@ -384,3 +400,24 @@ class ProcessSofastFixed(ProcessSofastAbstract):
 
         # Calculate facet pointing
         self._calculate_facet_pointing()
+
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        # Save default data
+        super().save_to_hdf(file, prefix)
+
+        # Calculations, one per facet
+        for idx_facet in range(self.num_facets):
+            # Save facet blob index calcluations (specific to Sofast Fixed)
+            if self.data_calculation_blob_assignment is not None:
+                self.data_calculation_blob_assignment[idx_facet].save_to_hdf(
+                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                )
