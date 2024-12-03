@@ -233,6 +233,36 @@ class CalculationImageProcessingGeneral(hdf5_tools.HDF5_SaveAbstract):
 
 
 @dataclass
+class CalculationBlobAssignment(hdf5_tools.HDF5_SaveAbstract):
+    """Data class for holding calculated parameters from Sofast Fixed blob assignment"""
+
+    pts_image: Vxy = None
+    """Positions in the measured image that correspond to blobs (units of image pixels from upper-left corner)"""
+    pts_index_xy: Vxy = None
+    """XY indices relative to user-defined origin point (0, 0) corresponding to positions in the image (pts_image)"""
+    active_point_mask: ndarray[bool] = None
+    """2d ndarray, mask of active points"""
+
+    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+        """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationBlobAssignment/...
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        data = [self.pts_image.data, self.pts_index_xy.data, self.active_point_mask]
+        datasets = [
+            prefix + 'CalculationBlobAssignment/pts_image',
+            prefix + 'CalculationBlobAssignment/pts_index_xy.data',
+            prefix + 'CalculationBlobAssignment/active_point_mask',
+        ]
+        _save_data_in_file(data, datasets, file)
+
+
+@dataclass
 class CalculationFacetEnsemble(hdf5_tools.HDF5_SaveAbstract):
     """Data class used in deflectometry calculations. Holds calculations
     relating to facet ensembles.
