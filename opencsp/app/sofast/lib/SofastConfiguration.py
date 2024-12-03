@@ -51,22 +51,17 @@ class SofastConfiguration:
         - focal_lengths_parabolic_xy
         """
         self._check_sofast_object_loaded()
-
-        if self._is_fringe:
-            num_facets = self.data_sofast_object.num_facets
-        elif isinstance(self.data_sofast_object, ProcessSofastFixed):
-            num_facets = 1
+        num_facets = self.data_sofast_object.num_facets
 
         stats = []
-
         for idx_facet in range(num_facets):
             if self._is_fringe:
-                # Get data
+                # Get surface data
                 data_calc = self.data_sofast_object.data_calculation_facet[idx_facet]
                 data_im_proc = self.data_sofast_object.data_image_processing_facet[idx_facet]
                 data_surf = self.data_sofast_object.data_surfaces[idx_facet]
 
-                # Sample resolution
+                # Assemble surface points in 2d arrays
                 mask = data_im_proc.mask_processed
                 im_x = np.zeros(mask.shape) * np.nan
                 im_y = np.zeros(mask.shape) * np.nan
@@ -76,19 +71,18 @@ class SofastConfiguration:
                 # Number of points
                 num_samps = len(data_calc.v_surf_points_facet)
             else:
-                # Get data
+                # Get surface data
                 data_surf = self.data_sofast_object.slope_solvers[idx_facet].surface
                 data_calc = self.data_sofast_object.data_calculation_facet[idx_facet]
-                # Sample resolution
+
+                # Assemble surface points in 2d arrays
                 surf_points = self.data_sofast_object.data_calculation_facet[idx_facet].v_surf_points_facet
-                pts_index_xy = self.data_sofast_object.blob_index.get_data()[1]
-                point_indices_mat = self.data_sofast_object.blob_index.get_data_mat()[1]
-                offset_x = self.data_sofast_object.blob_index._offset_x
-                offset_y = self.data_sofast_object.blob_index._offset_y
-                im_x = np.zeros(point_indices_mat.shape[:2]) * np.nan
-                im_y = np.zeros(point_indices_mat.shape[:2]) * np.nan
-                im_y[pts_index_xy.y - offset_y, pts_index_xy.x - offset_x] = surf_points.y
-                im_x[pts_index_xy.y - offset_y, pts_index_xy.x - offset_x] = surf_points.x
+                mask = self.data_sofast_object.data_calculation_blob_assignment[idx_facet].active_point_mask
+                im_x = mask.astype(float) * np.nan
+                im_y = mask.astype(float) * np.nan
+                im_x[mask] = surf_points.x
+                im_y[mask] = surf_points.y
+
                 # Number of points
                 num_samps = len(surf_points)
 
