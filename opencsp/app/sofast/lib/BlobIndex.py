@@ -95,14 +95,16 @@ class BlobIndex:
         """To filter bad points (experimental, not implemented yet). Default False"""
         self.debug: DebugBlobIndex = DebugBlobIndex()
         """BlobIndex debug object"""
+        self.shape_yx_data_mat: tuple[int, int] = (y_max - y_min + 1, x_max - x_min + 1)
+        """The yx shape of the internal data matrix that holds the point pixel locations and xy indices"""
 
         self._offset_x = -x_min  # index
         self._offset_y = -y_min  # index
         idx_x_vec = np.arange(x_min, x_max + 1)  # index
         idx_y_vec = np.arange(y_min, y_max + 1)  # index
         self._idx_x_mat, self._idx_y_mat = np.meshgrid(idx_x_vec, idx_y_vec)  # index
-        self._points_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan  # pixels
-        self._point_indices_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan  # index
+        self._points_mat = np.zeros(self.shape_yx_data_mat + (2,)) * np.nan  # pixels
+        self._point_indices_mat = np.zeros(self.shape_yx_data_mat) * np.nan  # index
 
     def _get_assigned_point_indices(self) -> np.ndarray[int]:
         """Returns found point indices"""
@@ -562,6 +564,22 @@ class BlobIndex:
         indices = Vxy((idx_x[mask_assigned], idx_y[mask_assigned]), int)
         points = Vxy((x_pts[mask_assigned], y_pts[mask_assigned]))
         return points, indices
+
+    def pts_index_to_mat_index(self, pts_index: Vxy) -> tuple[np.ndarray, np.ndarray]:
+        """Returns corresponding matrix indices (see self.get_data_mat) given point
+        indices (assigned x/y indies of points.)
+
+        Parameters
+        ----------
+        pts_index : Vxy
+            Assigned point xy indices, length N.
+
+        Returns
+        -------
+        x, y
+            Length N 1d arrays of corresponding data matrix indices (see self.get_data_mat)
+        """
+        return pts_index.x - self._offset_x, pts_index.y - self._offset_y
 
     def get_data_in_region(self, loop: LoopXY) -> tuple[Vxy, Vxy]:
         """Returns found points and indices within given region
