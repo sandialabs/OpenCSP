@@ -124,25 +124,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         """
         self.measurement = measurement
 
-    def _process_optic_singlefacet_geometry(self, mask_raw: np.ndarray) -> dict:
-        # Process optic geometry (find mask corners, etc.)
-        (
-            self.data_geometry_general,
-            self.data_image_processing_general,
-            self.data_geometry_facet,  # list
-            self.data_image_processing_facet,  # list
-            self.data_error,
-        ) = pr.process_singlefacet_geometry(
-            self.data_facet_def[0],
-            mask_raw,
-            self.measurement.v_measure_point_facet,
-            self.measurement.dist_optic_screen,
-            self.orientation,
-            self.camera,
-            self.params.geometry,
-            self.params.debug_geometry,
-        )
-
+    def _process_optic_singlefacet_geometry(self) -> dict:
         # Get image points and blob indices
         idx_facet = 0  # there canonly be one facet here
         pts_image, pts_index_xy = self.blob_index[idx_facet].get_data()
@@ -319,14 +301,32 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         self.data_facet_def = [data_facet_def.copy()]
         self.data_surfaces = [surface]
 
-        # Find blobs
-        self.blob_index = [self._find_blobs(pt_known, xy_known)]
-
         # Calculate mask
         mask_raw = self._calculate_mask()
 
+        # Process optic geometry (find mask corners, etc.)
+        (
+            self.data_geometry_general,
+            self.data_image_processing_general,
+            self.data_geometry_facet,  # list
+            self.data_image_processing_facet,  # list
+            self.data_error,
+        ) = pr.process_singlefacet_geometry(
+            self.data_facet_def[0],
+            mask_raw,
+            self.measurement.v_measure_point_facet,
+            self.measurement.dist_optic_screen,
+            self.orientation,
+            self.camera,
+            self.params.geometry,
+            self.params.debug_geometry,
+        )
+
+        # Find blobs
+        self.blob_index = [self._find_blobs(pt_known, xy_known)]
+
         # Generate geometry and slope solver inputs
-        kwargs = self._process_optic_singlefacet_geometry(mask_raw)
+        kwargs = self._process_optic_singlefacet_geometry()
 
         # Calculate slope
         slope_solver = SlopeSolver(**kwargs)
