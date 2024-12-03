@@ -177,7 +177,8 @@ class SofastConfiguration:
             p_screen_outline = display.interp_func(Vxy(([0, 0.95, 0.95, 0, 0], [0, 0, 0.95, 0.95, 0])))
             p_screen_cent = display.interp_func(Vxy((0.5, 0.5)))
         elif self._is_fixed:
-            p_screen_outline = Vxyz([np.nan, np.nan, 0])
+            locs = self.data_sofast_object.fixed_pattern_dot_locs.xyz_dot_loc
+            p_screen_outline = Vxyz((locs[..., 0], locs[..., 1], locs[..., 2]))
             p_screen_cent = self.data_sofast_object.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(
                 Vxy([0, 0], dtype=int)
             )
@@ -233,8 +234,12 @@ class SofastConfiguration:
         ax.plot([x, x], [y, y], [z, z + lz2], color='black')
         ax.text(x, y, z + lz1, 'z')
 
-        # Add screen outline
-        ax.plot(*p_screen_outline.data)
+        if self._is_fixed:
+            # Add screen points
+            ax.scatter(*p_screen_outline.data, marker='.', alpha=0.5, color='blue', label='Screen Points')
+        else:
+            # Add screen outline
+            ax.plot(*p_screen_outline.data, color='red', label='Screen Outline')
 
         # Add camera position origin
         ax.scatter(*v_screen_cam_screen.data, color='black')
