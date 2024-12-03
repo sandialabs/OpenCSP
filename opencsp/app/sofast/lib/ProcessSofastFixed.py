@@ -132,7 +132,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         # Define optic orientation w.r.t. camera
         rot_optic_cam = self.data_geometry_general.r_optic_cam_refine_1
         v_cam_optic_cam = self.data_geometry_general.v_cam_optic_cam_refine_2
-        u_cam_measure_point_facet = self.data_geometry_facet[0].u_cam_measure_point_facet
+        u_cam_measure_point_facet = self.data_geometry_facet[idx_facet].u_cam_measure_point_facet
 
         # Get screen/camera poses
         rot_cam_optic = rot_optic_cam.inv()
@@ -177,7 +177,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_optic).as_Vxyz()
 
         # Update debug data
-        self.params.debug_slope_solver.optic_data = self.data_facet_def[0]
+        self.params.debug_slope_solver.optic_data = self.data_facet_def[idx_facet]
 
         # Construct surface kwargs
         return {
@@ -186,10 +186,10 @@ class ProcessSofastFixed(ProcessSofastAbstract):
             'u_measure_pixel_pointing_optic': u_cam_measure_point_facet,
             'v_screen_points_facet': v_screen_points_facet,
             'v_optic_screen_optic': v_optic_screen_optic,
-            'v_align_point_optic': self.data_facet_def[0].v_facet_centroid,
-            'dist_optic_screen': self.measurement.dist_optic_screen,
+            'v_align_point_optic': self.data_geometry_facet[idx_facet].v_align_point_facet,
+            'dist_optic_screen': self.data_geometry_facet[idx_facet].measure_point_screen_distance,
             'debug': self.params.debug_slope_solver,
-            'surface': self.data_surfaces[0],
+            'surface': self.data_surfaces[idx_facet],
         }
 
     def _process_optic_multifacet_geometry(self) -> list[dict]:
@@ -312,7 +312,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
             self.data_image_processing_facet,  # list
             self.data_error,
         ) = pr.process_singlefacet_geometry(
-            self.data_facet_def[0],
+            self.data_facet_def[0],  # 0 because there is only one facet
             mask_raw,
             self.measurement.v_measure_point_facet,
             self.measurement.dist_optic_screen,
