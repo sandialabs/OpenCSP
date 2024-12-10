@@ -155,8 +155,9 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         # Remove nans if any present
         if np.any(nan_mask):
             lt.warn(
-                f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated '
-                f'screen points for facet 0. These data points will be removed.'
+                'ProcessSofastFixed._process_optic_common_geometry(): '
+                f'{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined '
+                f'for facet {idx_facet:d}. These data points will be removed.'
             )
             # Remove nan data points from screen points
             pts_image = pts_image[active_point_mask]
@@ -326,7 +327,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         if len(data_facet_def) != len(surfaces) != len(pts_known) != len(xys_known):
             lt.error_and_raise(
                 ValueError,
-                'Length of data_facet_def does not equal length of data_surfaces'
+                'ProcessSofastFixed: Length of data_facet_def does not equal length of data_surfaces'
                 + f'data_facet_def={len(data_facet_def)}, surface_data={len(surfaces)}, '
                 + f'pts_known={len(pts_known)}, xys_known={len(xys_known)}',
             )
