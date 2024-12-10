@@ -442,8 +442,9 @@ class ProcessSofastFringe(ProcessSofastAbstract):
             mask_bad_pixels = np.zeros(mask_processed.shape, dtype=bool)
             if np.any(nan_mask):
                 lt.warn(
-                    f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated '
-                    'screen points for facet {idx_facet:d}. These data points will be removed.'
+                    'ProcessSofastFringe._process_display(): '
+                    f'{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined '
+                    f'for facet {idx_facet:d}. These data points will be removed.'
                 )
                 # Make mask of NANs
                 mask_bad_pixels[mask_processed] = nan_mask
