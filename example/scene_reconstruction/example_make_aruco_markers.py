@@ -5,6 +5,7 @@ Script that generates Aruco marker PNG files of given size and number
 from os.path import dirname, join
 
 import cv2 as cv
+import cv2.aruco as aruco
 import imageio.v3 as imageio
 import numpy as np
 
@@ -26,7 +27,7 @@ def make_aruco_images(save_path: str, number: str, size: int = 500, padding: int
         Size of white border, pixels, by default 50
     """
     # Define marker parameters
-    dictionary = cv.aruco.Dictionary_get(cv.aruco.DICT_4X4_1000)
+    dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)
     side_pixels = size  # Side width
     font_thickness = 2
     pad_width = padding
@@ -36,7 +37,7 @@ def make_aruco_images(save_path: str, number: str, size: int = 500, padding: int
         img = np.ones((side_pixels, side_pixels), dtype='uint8') * 255
 
         # Create marker image
-        cv.aruco.drawMarker(dictionary, id_, side_pixels, img[-side_pixels:, :])
+        aruco.drawMarker(dictionary, id_, side_pixels, img[-side_pixels:, :])
 
         # Add padding
         img = np.pad(img, ((pad_width, pad_width), (pad_width, pad_width)), constant_values=255)

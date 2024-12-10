@@ -2,6 +2,7 @@
 """
 
 import cv2 as cv
+import cv2.aruco as aruco
 import matplotlib.pyplot as plt
 import numpy as np
 from numpy import ndarray
@@ -43,9 +44,9 @@ def find_aruco_marker(
     image : ndarray
         2D grayscale image.
     adaptiveThreshConstant : float, optional
-        cv.aruco parameter. The default is 10.
+        aruco parameter. The default is 10.
     minMarkerPerimeterRate : float, optional
-        cv.aruco parameter. The default is 0.05.
+        aruco parameter. The default is 0.01.
 
     Returns
     -------
@@ -57,13 +58,14 @@ def find_aruco_marker(
 
     """
     # Setup detection parameters
-    aruco_dict = cv.aruco.Dictionary_get(cv.aruco.DICT_4X4_1000)
-    aruco_detect_params = cv.aruco.DetectorParameters_create()
+    aruco_dict = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)
+    aruco_detect_params = aruco.DetectorParameters()
     aruco_detect_params.adaptiveThreshConstant = adaptiveThreshConstant
     aruco_detect_params.minMarkerPerimeterRate = minMarkerPerimeterRate
 
     # Find targets
-    (corners, ids, _) = cv.aruco.detectMarkers(image, aruco_dict, parameters=aruco_detect_params)
+    arcuoDetector = aruco.ArucoDetector(aruco_dict, detectorParams=aruco_detect_params)
+    (corners, ids, _) = arcuoDetector.detectMarkers(image)
 
     # Refine corner locations (inaccurate using cv.cornerSubPix)
     #     criteria = (cv.TERM_CRITERIA_EPS + cv.TermCriteria_COUNT, max_iterations, precision)

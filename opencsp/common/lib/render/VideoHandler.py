@@ -5,7 +5,7 @@ Video and frames manipulation and creation.
 
 """
 
-from cv2 import cv2 as cv
+import cv2 as cv
 import os
 
 import opencsp.common.lib.process.subprocess_tools as subt
