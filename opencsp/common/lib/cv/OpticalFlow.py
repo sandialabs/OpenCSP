@@ -51,56 +51,63 @@ class OpticalFlow:
         cache=False,
     ):
         """
-        Initializes the OpticalFlow object with the specified parameters.
+        Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
+
+        Note:
+            opencsp is not compatible with the multiprocessing library on Linux. Typical error message::
+                "global /io/opencv/modules/core/src/parallel_impl.cpp (240) WorkerThread 6: Can't spawn new thread: res = 11"
+
+            This is due to some sort of bug with how multiprocessing processes and OpenCV threads interact.
+            Possible solutions:
+             - use concurrent.futures.ThreadPoolExecutor
+             - Loky multiprocessing https://github.com/joblib/loky (I (BGB) couldn't make this one work)
 
         Parameters
         ----------
         frame1_dir : str
-            Directory for the first input image.
+            Directory for frame1.
         frame1_name_ext : str
-            Filename of the first input image.
+            First input image, which will be the reference point for the flow.
         frame2_dir : str
-            Directory for the second input image.
+            Directory for frame2.
         frame2_name_ext : str
-            Filename of the second input image.
+            Second input image, to compare to the first.
         grayscale_normalization : Callable[[np.ndarray], np.ndarray], optional
             A function for normalizing grayscale images (default is None).
-        prev_flow : npt.NDArray[np.float32], optional
-            Previous flow calculations to speed up computation (default is None).
+        prev_flow : optional
+            Previous flow calculations to make computation faster. (default is None).
         pyr_scale : float, optional
-            Image scale for pyramid construction (default is 0.5).
+            Parameter specifying the image scale (<1) to build pyramids for each image; 
+            pyr_scale=0.5 means a classical pyramid, where each next layer is twice smaller than the previous one. 
+            (default is 0.5).
         levels : int, optional
-            Number of pyramid layers (default is 5).
+            Number of pyramid layers including the initial image; levels=1 means that no extra layers are created 
+            and only the original images are used. (default is 1).
         dense_winsize : int, optional
-            Averaging window size for optical flow (default is 15).
+            Averaging window size; larger values increase the algorithm's robustness to image noise and give more 
+            chances for fast motion detection, but yield a more blurred motion field. (default is 15).
         iterations : int, optional
-            Number of iterations at each pyramid level (default is 3).
+            Number of iterations the algorithm does at each pyramid level. (default is 3).
         poly_n : int, optional
-            Size of the pixel neighborhood for polynomial expansion (default is 5).
+            Size of the pixel neighborhood used to find polynomial expansion in each pixel; larger values mean that 
+            the image will be approximated with smoother surfaces, yielding a more robust algorithm and more blurred 
+            motion field, typically poly_n = 5 or 7. (default is 5.)
         poly_sigma : float, optional
-            Standard deviation of the Gaussian used for smoothing (default is 1.2).
+            Standard deviation of the Gaussian that is used to smooth derivatives used as a basis for the polynomial 
+            expansion; for poly_n=5, you can set poly_sigma=1.1, for poly_n=7, a good value would be poly_sigma=1.5. 
+            (default is 1.2).
         dense_flags : int, optional
-            Operation flags for optical flow calculation (default is 0).
+            Operation flags that can be a combination of the following:
+                - OPTFLOW_USE_INITIAL_FLOW uses the input flow as an initial flow approximation.
+                - OPTFLOW_FARNEBACK_GAUSSIAN uses the Gaussian winsize×winsize filter instead of a box filter of 
+                  the same size for optical flow estimation; usually, this option gives more accurate flow than with 
+                  a box filter, at the cost of lower speed; normally, winsize for a Gaussian window should be set 
+                  to a larger value to achieve the same level of robustness. (default is 0).
         cache : bool, optional
-            If True, enables caching of results (default is False).
-
-        Raises
-        ------
-        ValueError
-            If cache is enabled in production mode.
-
-        Notes
-        -----
-            Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
-
-        opencsp is not compatible with the multiprocessing library on linux. Typical error message:
-        "global /io/opencv/modules/core/src/parallel_impl.cpp (240) WorkerThread 6: Can't spawn new thread: res = 11"
-
-        This is due to some sort of bug with how multiprocessing processes and opencv threads interact.
-        Possible solutions:
-
-        - use concurrent.futures.ThreadPoolExecutor
-        - Loky multiprocessing https://github.com/joblib/loky (I (BGB) couldn't make this one work)
+            If True, then pickle the results from the previous 5 computations and save them in the user's home 
+            directory. If False, then don't save them. Defaults to False. The cache option should not be used in 
+            production runs. I (BGB) use it for rapid development. It will error when used while running in production 
+            (aka on solo). (default is False)
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         self._frame1_dir = frame1_dir
@@ -120,9 +127,9 @@ class OpticalFlow:
         self._cache = cache
 
         self._mag: np.ndarray = None
-        # XY Matrix. The raw magnitude values returned by opencv, one value per pixel in frame1
+        """ XY Matrix. The raw magnitude values returned by opencv, one value per pixel in frame1 """
         self._ang: np.ndarray = None
-        # XY Matrix. The raw angle values returned by opencv, one value per pixel in frame1
+        """ XY Matrix. The raw angle values returned by opencv, one value per pixel in frame1 """
         self.mag: np.ndarray = None
         """ XY Matrix. The OpenCSP version of the magnitude matrix, where each value corresponds to a pixel in frame1 and
         represents the number of pixels that pixel has moved by frame2. """

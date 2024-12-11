@@ -46,6 +46,30 @@ image_reshapers
    :show-inheritance:
    :member-order: groupwise
 
+Fiducials
+=========
+
+.. automodule:: opencsp.common.lib.cv.fiducials.AbstractFiducials
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+.. automodule:: opencsp.common.lib.cv.fiducials.BcsFiducial
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+.. automodule:: opencsp.common.lib.cv.fiducials.PointFiducials
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
 Annotations
 ===========
 
@@ -70,30 +94,6 @@ Annotations
 .. currentmodule:: opencsp.common.lib.cv.annotations.PointAnnotations
 
 .. automodule:: opencsp.common.lib.cv.annotations.PointAnnotations
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-Fiducials
-=========
-
-.. automodule:: opencsp.common.lib.cv.fiducials.AbstractFiducials
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. automodule:: opencsp.common.lib.cv.fiducials.BcsFiducial
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. automodule:: opencsp.common.lib.cv.fiducials.PointFiducials
    :members:
    :special-members: __init__
    :undoc-members:
