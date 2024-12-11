@@ -46,7 +46,7 @@ class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
         This stream can be set up with default values for supporting images or
         other SpotAnalysisOperable data. If set, then all produced operables
         will have these default values applied.
-        
+
         See also :py:meth:`SpotAnalysisOperable.replace_use_default_values`
 
         Parameters

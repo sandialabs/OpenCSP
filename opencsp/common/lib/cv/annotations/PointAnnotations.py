@@ -5,7 +5,7 @@ import opencsp.common.lib.cv.fiducials.PointFiducials as pf
 class PointAnnotations(pf.PointFiducials, AbstractAnnotations):
     """
     A class representing point annotations.
-    
+
     An example of this class is :py:class:`HotspotAnnotation`.
 
     This class extends both `PointFiducials` and `AbstractAnnotations` to provide functionality
