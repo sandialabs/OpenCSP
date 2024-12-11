@@ -18,7 +18,7 @@ class AbstractFiducials(ABC):
     """
     A collection of markers (such as an ArUco board) that is used to orient the camera relative to observed objects
     in the scene. It is suggested that each implementing class be paired with a complementary locator method or
-:py:class:`opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor`.
+    :py:class:`opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor`.
     """
 
     def __init__(self, style: rcps.RenderControlPointSeq = None, pixels_to_meters: Callable[[p2.Pxy], v3.Vxyz] = None):
@@ -76,7 +76,7 @@ class AbstractFiducials(ABC):
     def rotation(self) -> scipy.spatial.transform.Rotation:
         """
         Get the pointing of the normal vector(s) of this instance.
-        
+
         This is relative to the camera's reference frame, where x is positive
         to the right, y is positive down, and z is positive in (away from the
         camera)
@@ -117,7 +117,7 @@ class AbstractFiducials(ABC):
     def size(self) -> list[float]:
         """
         Get the scale(s) of this fiducial, in pixels, relative to its longest axis.
-        
+
         As an example, if the fiducial is a square QR-code and is oriented tangent
         to the camera, then the scale will be the number of pixels from one
         corner to the other.
@@ -134,8 +134,8 @@ class AbstractFiducials(ABC):
     def scale(self) -> list[float]:
         """
         Get the scale(s) of this fiducial, in meters, relative to its longest axis.
-        
-        This value, together with the size, can potentially be used to determine the 
+
+        This value, together with the size, can potentially be used to determine the
         distance and rotation of the fiducial relative to the camera.
 
         Returns
