@@ -5,7 +5,7 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 class HotspotAnnotation(PointAnnotations):
     """
-    A class representing a hotspot annotation, likely created from a :py:class:`HotspotImageProcessor` instance.
+    A class representing a hotspot annotation, likely created from a :py:class:`opencsp.common.lib.cv.spot_analysis.image_processor.HotspotImageProcessor` instance.
 
     The hotspot is the overall hottest location in an image, when accounting for the surrounding area. It may be the different from the centroid location or the single hottest pixel location.
 
