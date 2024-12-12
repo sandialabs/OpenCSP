@@ -5,7 +5,7 @@ Annotations to add to plots and images.
 
 """
 
-from cv2 import cv2 as cv
+import cv2 as cv
 import matplotlib.pyplot as plt
 
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps

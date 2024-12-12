@@ -5,7 +5,7 @@ Model of machine vision camera pose in six degrees of freedom.
 
 """
 
-from cv2 import cv2 as cv
+import cv2 as cv
 import numpy as np
 
 import opencsp.common.lib.geometry.geometry_3d as g3d

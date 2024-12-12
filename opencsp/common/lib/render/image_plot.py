@@ -5,7 +5,7 @@ Image plotting, with annotations.
 
 """
 
-from cv2 import cv2 as cv
+import cv2 as cv
 import matplotlib.pyplot as plt
 import os
 

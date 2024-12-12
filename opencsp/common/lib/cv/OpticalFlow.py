@@ -20,6 +20,14 @@ import opencsp.common.lib.tool.system_tools as st
 
 
 class OpticalFlow:
+    """
+    A class for computing optical flow between two images using OpenCV.
+
+    This class wraps around OpenCV's optical flow functions, providing functionality
+    to compute dense optical flow and manage caching of results.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     _max_cache_count = 10
 
     def __init__(
@@ -42,35 +50,66 @@ class OpticalFlow:
         dense_flags=0,
         cache=False,
     ):
-        """Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
-
-        Note: opencsp is not compatible with the multiprocessing library on linux. Typical error message::
-            "global /io/opencv/modules/core/src/parallel_impl.cpp (240) WorkerThread 6: Can't spawn new thread: res = 11"
-
-        This is due to some sort of bug with how multiprocessing processes and opencv threads interact.
-        Possible solutions:
-         - use concurrent.futures.ThreadPoolExecutor
-         - Loky multiprocessing https://github.com/joblib/loky (I (BGB) couldn't make this one work)
-
-        Args:
-        -----
-            - frame1_dir (str): Directory for frame1
-            - frame1_name_ext (str): First input image, which will be the reference point for the flow
-            - frame2_dir (str): Directory for frame2
-            - frame2_name_ext (str): Second input image, to compare to the first
-            - prev_flow (_type_, optional): I think this is the previous flow calculations to make computation faster? Idk... Defaults to None.
-            - pyr_scale (float, optional): parameter, specifying the image scale (<1) to build pyramids for each image; pyr_scale=0.5 means a classical pyramid, where each next layer is twice smaller than the previous one. Defaults to 0.5.
-            - levels (int, optional): number of pyramid layers including the initial image; levels=1 means that no extra layers are created and only the original images are used. Defaults to 5.
-            - dense_winsize (int, optional): averaging window size; larger values increase the algorithm robustness to image noise and give more chances for fast motion detection, but yield more blurred motion field. Defaults to 15.
-            - iterations (int, optional): number of iterations the algorithm does at each pyramid level. Defaults to 3.
-            - poly_n (int, optional): size of the pixel neighborhood used to find polynomial expansion in each pixel; larger values mean that the image will be approximated with smoother surfaces, yielding more robust algorithm and more blurred motion field, typically poly_n =5 or 7. Defaults to 5.
-            - poly_sigma (float, optional): standard deviation of the Gaussian that is used to smooth derivatives used as a basis for the polynomial expansion; for poly_n=5, you can set poly_sigma=1.1, for poly_n=7, a good value would be poly_sigma=1.5. Defaults to 1.2.
-            - dense_flags (int, optional): operation flags that can be a combination of the following:
-                - OPTFLOW_USE_INITIAL_FLOW uses the input flow as an initial flow approximation.
-                - OPTFLOW_FARNEBACK_GAUSSIAN uses the Gaussian winsize×winsize filter instead of a box filter of the same size for optical flow estimation; usually, this option gives z more accurate flow than with a box filter, at the cost of lower speed; normally, winsize for a Gaussian window should be set to a larger value to achieve the same level of robustness.
-            - cache (bool, optional): If True, then pickle the results from the previous 5 computations and save them in the user's home directory. If False, then don't save them. Defaults to False.
-                                      The cache option should not be used in production runs. I (BGB) use it for rapid development. It will error when used while running in production (aka on solo).
         """
+        Wrapper class around cv::calcOpticalFlowFarneback (and also cv::calcOpticalFlowPyrLK, eventually).
+
+        Note:
+            opencsp is not compatible with the multiprocessing library on Linux. Typical error message::
+                "global /io/opencv/modules/core/src/parallel_impl.cpp (240) WorkerThread 6: Can't spawn new thread: res = 11"
+
+            This is due to some sort of bug with how multiprocessing processes and OpenCV threads interact.
+            Possible solutions:
+            - use concurrent.futures.ThreadPoolExecutor
+            - Loky multiprocessing https://github.com/joblib/loky
+
+        Parameters
+        ----------
+        frame1_dir : str
+            Directory for frame1.
+        frame1_name_ext : str
+            First input image, which will be the reference point for the flow.
+        frame2_dir : str
+            Directory for frame2.
+        frame2_name_ext : str
+            Second input image, to compare to the first.
+        grayscale_normalization : Callable[[np.ndarray], np.ndarray], optional
+            A function for normalizing grayscale images (default is None).
+        prev_flow : optional
+            Previous flow calculations to make computation faster. (default is None).
+        pyr_scale : float, optional
+            Parameter specifying the image scale (<1) to build pyramids for each image;
+            pyr_scale=0.5 means a classical pyramid, where each next layer is twice smaller than the previous one.
+            (default is 0.5).
+        levels : int, optional
+            Number of pyramid layers including the initial image; levels=1 means that no extra layers are created
+            and only the original images are used. (default is 1).
+        dense_winsize : int, optional
+            Averaging window size; larger values increase the algorithm's robustness to image noise and give more
+            chances for fast motion detection, but yield a more blurred motion field. (default is 15).
+        iterations : int, optional
+            Number of iterations the algorithm does at each pyramid level. (default is 3).
+        poly_n : int, optional
+            Size of the pixel neighborhood used to find polynomial expansion in each pixel; larger values mean that
+            the image will be approximated with smoother surfaces, yielding a more robust algorithm and more blurred
+            motion field, typically poly_n = 5 or 7. (default is 5.)
+        poly_sigma : float, optional
+            Standard deviation of the Gaussian that is used to smooth derivatives used as a basis for the polynomial
+            expansion; for poly_n=5, you can set poly_sigma=1.1, for poly_n=7, a good value would be poly_sigma=1.5.
+            (default is 1.2).
+        dense_flags : int, optional
+            Operation flags that can be a combination of the following:
+                - OPTFLOW_USE_INITIAL_FLOW uses the input flow as an initial flow approximation.
+                - OPTFLOW_FARNEBACK_GAUSSIAN uses the Gaussian winsize×winsize filter instead of a box filter of
+                  the same size for optical flow estimation; usually, this option gives more accurate flow than with
+                  a box filter, at the cost of lower speed; normally, winsize for a Gaussian window should be set
+                  to a larger value to achieve the same level of robustness. (default is 0).
+        cache : bool, optional
+            If True, then pickle the results from the previous 5 computations and save them in the user's home
+            directory. If False, then don't save them. Defaults to False. The cache option should not be used in
+            production runs. I (BGB) use it for rapid development. It will error when used while running in production
+            (aka on solo). (default is False)
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self._frame1_dir = frame1_dir
         self._frame1_name_ext = frame1_name_ext
         self._frame2_dir = frame2_dir
@@ -104,6 +143,16 @@ class OpticalFlow:
                 lt.error_and_raise(ValueError, "OpticalFlow(cache=True) should not be used in production code!")
 
     def clear_cache(self):
+        """
+        Clears the cache directory by deleting cached files.
+
+        This method removes any cached optical flow data stored in the cache directory.
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if ft.directory_exists(self._cache_dir):
             ft.delete_files_in_directory(self._cache_dir, "cache*")
 
@@ -216,14 +265,24 @@ class OpticalFlow:
         return img
 
     def dense(self) -> tuple[np.ndarray, np.ndarray]:
-        """Computes the optical flow between two images on a pixel-by-pixel basis using the Gunnar Farneback's algorithm.
-        https://docs.opencv.org/3.4/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af
-
-        Returns:
-        --------
-            - np.ndarray: self.mag, the magnitude of the flow per pixel (pixels)
-            - np.ndarray: self.ang, the direction of the flow per pixel (radians, 0 to the right, positive counter-clockwise)
         """
+        Computes the optical flow between two images on a pixel-by-pixel basis using Gunnar Farneback's algorithm.
+
+        This method calculates the dense optical flow and returns the magnitude and angle of the flow.
+
+        Returns
+        -------
+        self.mag: np.ndarray
+            The magnitude of the flow per pixel (units are in pixels).
+        self.ang: np.ndarray
+            The direction of the flow per pixel (units are in radians, 0 to the right, positive counter-clockwise).
+
+        Notes
+        -----
+        Uses the Gunnar Farneback's algorithm:
+        https://docs.opencv.org/3.4/dc/d6b/group__video__track.html#ga5d10ebbd59fe09c5f650289ec0ece5af
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if self._mag is None:  # use "is", with "==" numpy does an element-wise comparison
             if not self._load_from_cache():
                 # load the images
@@ -259,20 +318,27 @@ class OpticalFlow:
         return self.mag, self.ang
 
     def limit_by_magnitude(self, lower: float, upper: float, keep="inside"):
-        """Sets any magnitudes not in the keep range (and the corresponding angles) to 0.
+        """
+        Sets any magnitudes not in the specified range (and the corresponding angles) to 0.
 
-        Once applied, you can run dense() again to recover the original values.
+        Once applied, you can run the `dense()` method again to recover the original values.
 
-        Arguments:
+        Parameters
         ----------
-            - lower (float): The bottom of the range of values to include.
-            - upper (float): The top of the range of values to include.
-            - keep (str): Either "inside" or "outside". If "inside", then values <lower or >upper will
-                be set to 0. If "outside", then values >lower and <upper will be set to 0.
+        lower : float
+            The bottom of the range of values to include.
+        upper : float
+            The top of the range of values to include.
+        keep : str, optional
+            Either "inside" or "outside". If "inside", then values < lower or > upper will be set to 0.
+            If "outside", then values > lower and < upper will be set to 0 (default is "inside").
 
-        Returns:
-        --------
-            np.ndarray: The indicies that were set to 0."""
+        Returns
+        -------
+        np.ndarray
+            The indices that were set to 0.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if lower > upper:
             lt.error_and_raise(
                 RuntimeError,
@@ -289,7 +355,27 @@ class OpticalFlow:
         return bad_indicies
 
     def limit_by_angle(self, lower: float, upper: float, keep="inside"):
-        """Same as limit_by_magnitude, but for angle instead."""
+        """
+        Sets any angles not in the specified range (and the corresponding magnitudes) to 0.
+
+        This method is similar to `limit_by_magnitude`, but it operates on the angle values instead.
+
+        Parameters
+        ----------
+        lower : float
+            The bottom of the range of angles to include.
+        upper : float
+            The top of the range of angles to include.
+        keep : str, optional
+            Either "inside" or "outside". If "inside", then values < lower or > upper will be set to 0.
+            If "outside", then values > lower and < upper will be set to 0 (default is "inside").
+
+        Returns
+        -------
+        np.ndarray
+            The indices that were set to 0.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if lower > upper:
             lt.error_and_raise(
                 RuntimeError,
@@ -318,28 +404,34 @@ class OpticalFlow:
         return bad_indicies
 
     def to_img(self, mag_render_clip: tuple[float, float] = None):
-        """Converts the flow to an image by mapping:
-            - magnitude of movement to value/intensity
-            - angle of movement to hue
-                - up: green
-                - down: red
-                - left: blue
-                - right: yellow
-
-        Note: must call dense() first.
-
-        Args:
-        -----
-            mag_render_clip (tuple[float,float]): If set, then clip the rendered magnitude to this range (aka low->0, high->255). Defaults to None.
-
-        Returns:
-        --------
-            np.ndarray: The resulting image, which can be passed to View3D.draw_image (row major, RGB color channels)
-
-        Raises:
-        -------
-            RuntimeError: If dense() hasn't been executed yet
         """
+        Converts the flow to an image by mapping the magnitude of movement to value/intensity and the angle of movement to hue.
+
+        The mapping of angles to hues is as follows:
+            - Up: green
+            - Down: red
+            - Left: blue
+            - Right: yellow
+
+        Note:
+            This method must be called after `dense()` has been executed.
+
+        Parameters
+        ----------
+        mag_render_clip : tuple[float, float], optional
+            If provided, clips the rendered magnitude to this range (low -> 0, high -> 255). Defaults to None.
+
+        Returns
+        -------
+        np.ndarray
+            The resulting image, which can be passed to `View3D.draw_image` (row major, RGB color channels).
+
+        Raises
+        ------
+        RuntimeError
+            If `dense()` hasn't been executed yet.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # HSV range is 0-179 (H), 0-255 (S), 0-255 (V)
         # https://docs.opencv.org/3.4/df/d9d/tutorial_py_colorspaces.html
         if not isinstance(self.mag, np.ndarray):
@@ -372,6 +464,17 @@ class OpticalFlow:
         return bgr
 
     def draw_flow_angle_reference(self):
+        """
+        Generates and displays a reference image for optical flow angles.
+
+        This method creates a circular reference image that visualizes the angles of optical flow with corresponding colors.
+        The image is displayed with angle labels at key positions.
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         r = 500
         h = r * 2
         w = r * 2
@@ -484,8 +587,19 @@ class OpticalFlow:
 
     @staticmethod
     def get_save_file_name_ext(frame1_name_maybe_ext: str):
-        """Get the file name used to save the results from this
-        flow analysis in save(), given the frame1 name."""
+        """
+        Generates the file name used to save the results from the flow analysis.
+
+        Parameters
+        ----------
+        frame1_name_maybe_ext : str
+            The base name of the frame, which may include an extension.
+
+        Returns
+        -------
+        str
+            The generated file name for saving optical flow results.
+        """
         return frame1_name_maybe_ext + "_optflow.npy"
 
     def _default_save_file_name_ext(self, name_ext=""):
@@ -494,21 +608,32 @@ class OpticalFlow:
         return name_ext
 
     def save(self, dir: str, name_ext="", overwrite=False):
-        """Saves the magnitude and angle matrices computed in the dense() method to the given file.
-
-        Note that this saves the matrices exactly as they were computed in dense (aka
-        does not save them as after limit_by_magnitude or limit_by_angle are applied).
-
-        Arguments:
-        ----------
-            dir (str): The directory to save to.
-            name_ext (str, optional): The file to save to. Defaults to get_save_file_name_ext().
-            overwrite (bool, optional): True to overwrite the existing optical flow save file. Defaults to False.
-
-        Returns:
-        --------
-            saved_path_name_ext (str): The location for the saved file.
         """
+        Saves the magnitude and angle matrices computed in the `dense()` method to the specified file.
+
+        Note:
+            This method saves the matrices exactly as they were computed in `dense()`, without applying any limits from limit_by_magnitude or limit_by_angle.
+
+        Parameters
+        ----------
+        dir : str
+            The directory where the file will be saved.
+        name_ext : str, optional
+            The file name to save to. Defaults to the output of `get_save_file_name_ext()`.
+        overwrite : bool, optional
+            If True, overwrites any existing file. Defaults to False.
+
+        Returns
+        -------
+        saved_path_name_ext: str
+            The full path of the saved file.
+
+        Raises
+        ------
+        RuntimeError
+            If the matrices do not exist or if the file already exists and `overwrite` is False.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # I (BGB) tried the save+load with different styles of numpy saving, including
         # np.save(), np.savez(), and np.savez_compressed(). The results for a
         # 7680x4320 image with a NVME drive are:
@@ -548,22 +673,47 @@ class OpticalFlow:
 
     @classmethod
     def from_file(cls, dir: str, name_ext: str, error_on_not_exist=True):
+        """
+        Creates an instance of the class by loading magnitude and angle matrices from a file generated from the :py:meth:`save` method.
+
+        Parameters
+        ----------
+        dir : str
+            The directory where the file is located.
+        name_ext : str
+            The name of the file to load.
+        error_on_not_exist : bool, optional
+            If True, raises an error if the file does not exist. Defaults to True.
+
+        Returns
+        -------
+        OpticalFlow
+            An instance of the class populated with data from the file.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         ret = cls("", "a", "", "b")
         ret.load(dir, name_ext, error_on_not_exist)
         return ret
 
     def load(self, dir: str, name_ext: str = "", error_on_not_exist=True):
-        """Loads the magnitude and angle matrices from the given file into this instance.
-
-        Args:
-            dir (str): The directory to save to.
-            name_ext (str, optional): The file to save to. Defaults to self.frame1_name_ext+"_optflow.npy".
-            error_on_not_exist (bool, optional): True to throw an error when the given file doesn't exist. Defaults to True.
-
-        Returns:
-            mag (np.ndarray): The magnitudes matrix, as is returned from the dense() method, or None if the file doesn't exist
-            ang (np.ndarray): The angles matrix, as is returned from the dense() method, or None if the file doesn't exist
         """
+        Loads the magnitude and angle matrices from the specified file into this instance.
+
+        Parameters
+        ----------
+        dir : str
+            The directory where the file is located.
+        name_ext : str, optional
+            The name of the file to load. Defaults to the output of `_default_save_file_name_ext()`.
+        error_on_not_exist : bool, optional
+            If True, raises an error if the file does not exist. Defaults to True.
+
+        Returns
+        -------
+        tuple[np.ndarray, np.ndarray]
+            A tuple containing the magnitude and angle matrices as from the :py:meth:`dense` method, or (None, None) if the file does not exist.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         lt.info(f"Loading flow from {dir}/{name_ext}")
         name_ext = self._default_save_file_name_ext(name_ext)
         dir_name_ext = os.path.join(dir, name_ext)

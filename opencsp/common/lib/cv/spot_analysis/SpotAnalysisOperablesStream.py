@@ -25,13 +25,17 @@ class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
         self, images: ImagesIterable | ImagesStream | SpotAnalysisImagesStream | Iterator[SpotAnalysisOperable]
     ):
         """
+        Initializes the SpotAnalysisOperablesStream with the provided image source.
+
         Parameters
         ----------
         images : ImagesIterable | ImagesStream | SpotAnalysisImagesStream | Iterator[SpotAnalysisOperable]
-            The images stream to be used as the primary images for the produced
-            operables. This stream will be restartable as long as the given
-            'images' stream is restartable.
+            The source of images to be processed. This will be used as the
+            primary images for the produced operables. This
+            SpotAnalysisOperablesStream stream will be restartable so long as
+            the given 'images' stream is also restartable.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.images = images
         self.images_iter = None
         self.default_support_images: dict[ImageType, CacheableImage] = None
@@ -48,14 +52,15 @@ class _SpotAnalysisOperablesStream(Iterator[SpotAnalysisOperable]):
         Parameters
         ----------
         default_support_images : dict[ImageType, CacheableImage]
-            The supporting images that will be assigned as defaults to the
-            generated operables. Can be empty.
+            A dictionary of default support images to be used as defaults
+            in the generated operables. Can be empty.
         default_data : SpotAnalysisOperable
             Additional data that can be assigned as defaults to the generated
             operables. Includes things that aren't supporting images, such as
             given_fiducials, found_fiducials, annotations,
             camera_intrinsics_characterization, light_sources.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.default_support_images = default_support_images
         self.default_data = default_data
 
