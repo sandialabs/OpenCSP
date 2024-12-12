@@ -6,6 +6,7 @@ from dataclasses import dataclass
 
 import cv2 as cv
 import matplotlib.pyplot as plt
+from matplotlib import colormaps
 import numpy as np
 from numpy import ndarray
 from scipy import interpolate
@@ -82,6 +83,9 @@ class DataCalculation:
     im_x_screen_pts: Vxyz = None
     im_y_screen_pts: Vxyz = None
     im_z_screen_pts: Vxyz = None
+    masks: list[ndarray] = None
+    x_phase_list: list[ndarray] = None
+    y_phase_list: list[ndarray] = None
 
 
 class CalibrateDisplayShape:
@@ -133,6 +137,9 @@ class CalibrateDisplayShape:
         # Create interpolation objects for each camera pose
         pts_uv_pixel_ori: list[Vxy] = []
         pts_uv_pixel_full: list[Vxy] = []
+        self.data_calculation.x_phase_list = []
+        self.data_calculation.y_phase_list = []
+        self.data_calculation.masks = []
         for idx, meas in enumerate(self.data_input.measurements_screen):
             lt.debug(f'Processing measurement: {idx:d}')
 
@@ -140,16 +147,19 @@ class CalibrateDisplayShape:
             mask1 = ip.calc_mask_raw(meas.mask_images, hist_thresh=0.2)
             mask2 = ip.keep_largest_mask_area(mask1)
             mask = np.logical_and(mask1, mask2)
+            self.data_calculation.masks.append(mask)
 
             # Unwrap x phase
             signal = meas.fringe_images_x[mask].T
             ps = meas.fringe_periods_x
             x_pos = ip.unwrap_phase(signal, ps)
+            self.data_calculation.x_phase_list.append(x_pos)
 
             # Unwrap y phase
             signal = meas.fringe_images_y[mask].T
             ps = meas.fringe_periods_y
             y_pos = ip.unwrap_phase(signal, ps)
+            self.data_calculation.y_phase_list.append(y_pos)
 
             # Assemble data in 2D array
             im_x = np.zeros(mask.shape) * np.nan
@@ -382,8 +392,15 @@ class CalibrateDisplayShape:
             for idx_point, pt in zip(
                 self.data_calculation.cal_pattern_params.index, self.data_calculation.pts_uv_pixel_orientation[idx_pose]
             ):
-                ax.scatter(*pt.data, color='k', s=20)
-                ax.text(*(pt + Vxy([5, -10])).data, idx_point, size=8, color='w')
+                if idx_point in self.data_input.screen_cal_point_pairs[:, 0]:
+                    color = 'blue'
+                else:
+                    color = 'black'
+                ax.scatter(*pt.data, color=color, s=20)
+                ax.text(*(pt + Vxy([5, -10])).data, idx_point, size=8, color='white')
+            ax.scatter([], [], color='blue', label='Point used for orientation')
+            ax.scatter([], [], color='black', label='Point unused for orientation')
+            ax.legend()
 
     def plot_ray_intersection_errors(self) -> None:
         """Plots camera ray intersection errors"""
@@ -395,7 +412,8 @@ class CalibrateDisplayShape:
         ax.set_xlabel('Point Index')
         ax.set_ylabel('Average intersection \n error (mm)')
         ax.set_title('Intersection Errors')
-        ax.set_ylim(0, 10)
+        ax.axhline(self.data_input.ray_intersection_threshold * 1000)
+        ax.set_ylim(0, self.data_input.ray_intersection_threshold * 1000 * 5)
         ax.grid()
         plt.subplots_adjust(bottom=0.21)
 
@@ -431,9 +449,10 @@ class CalibrateDisplayShape:
 
     def visualize_xyz_screen_maps(self) -> None:
         """Visualizes screen xyz coordinates as images"""
-        x = self.data_calculation.pts_xyz_screen_aligned.x
-        y = self.data_calculation.pts_xyz_screen_aligned.y
-        extent = (np.nanmin(x), np.nanmax(x), np.nanmin(y), np.nanmax(y))
+        mask_int_pts = self.data_calculation.intersection_points_mask
+        x = self.data_calculation.pts_xyz_screen_aligned[mask_int_pts].x
+        y = self.data_calculation.pts_xyz_screen_aligned[mask_int_pts].y
+        extent = (np.nanmax(x), np.nanmin(x), np.nanmax(y), np.nanmin(y))
 
         def format_image(axis: plt.Axes, im):
             axis.set_xlabel('X (meters)')
@@ -468,6 +487,53 @@ class CalibrateDisplayShape:
         im.set_clim(-self.xyz_screen_map_clim_mm, self.xyz_screen_map_clim_mm)
         ax.set_title('Z (mm)')
 
+    def visualize_unwrapped_phase(self) -> None:
+        """Visualizes x/y unwrapped phase for all poses"""
+        for idx_pose in range(self.data_calculation.num_poses):
+            # Get phase/mask data
+            im_x = self.data_input.measurements_screen[idx_pose].mask_images[..., 1].copy()
+            im_y = self.data_input.measurements_screen[idx_pose].mask_images[..., 1].copy()
+            mask = self.data_calculation.masks[idx_pose]
+            vals_x = self.data_calculation.x_phase_list[idx_pose]
+            vals_y = self.data_calculation.y_phase_list[idx_pose]
+
+            # Make x/y images RGB
+            im_x = im_x.astype(float) / im_x.max()
+            im_y = im_y.astype(float) / im_y.max()
+
+            im_x = np.stack([im_x] * 3, axis=2)
+            im_y = np.stack([im_y] * 3, axis=2)
+
+            # Add active pixels as colored pixels
+            cm = colormaps.get_cmap('jet')
+            vals_x_jet = cm(vals_x)[:, :3]  # remove alpha channel
+            vals_y_jet = cm(vals_y)[:, :3]  # remove alpha channel
+            im_x[mask, :] = vals_x_jet
+            im_y[mask, :] = vals_y_jet
+
+            # Plot and save to figures list
+            fig = plt.figure(f'CalibrationScreenShape_Unwrapped_pose_{idx_pose:d}_x_phase.png')
+            self.figures.append(fig)
+            ax = fig.gca()
+            ax.imshow(im_x)
+            ax.set_title(f'Unwrapped X Phase: Pose {idx_pose:d}')
+            # Plot orientation points
+            ax.scatter(*self.data_calculation.pts_uv_pixel_orientation[idx_pose].data, color='white')
+            # Label orientation points
+            for idx_pt, pt in enumerate(self.data_calculation.pts_uv_pixel_orientation[idx_pose]):
+                plt.text(pt.x + mask.shape[1] * 0.02, pt.y, str(idx_pt), color='white')
+
+            fig = plt.figure(f'CalibrationScreenShape_Unwrapped_pose_{idx_pose:d}_y_phase.png')
+            self.figures.append(fig)
+            ax = fig.gca()
+            ax.imshow(im_y)
+            ax.set_title(f'Unwrapped Y Phase: Pose {idx_pose:d}')
+            # Plot orientation points
+            ax.scatter(*self.data_calculation.pts_uv_pixel_orientation[idx_pose].data, color='white')
+            # Label orientation points
+            for idx_pt, pt in enumerate(self.data_calculation.pts_uv_pixel_orientation[idx_pose]):
+                plt.text(pt.x + mask.shape[1] * 0.02, pt.y, str(idx_pt), color='white')
+
     def run_calibration(self) -> None:
         """Runs a complete calibration"""
         # Run calibration
@@ -483,6 +549,7 @@ class CalibrateDisplayShape:
             self.plot_ray_intersection_errors()
             self.visualize_final_scenario()
             self.visualize_xyz_screen_maps()
+            self.visualize_unwrapped_phase()
 
 
 def interp_xy_screen_positions(im_x: np.ndarray, im_y: np.ndarray, x_sc: np.ndarray, y_sc: np.ndarray) -> Vxy:
