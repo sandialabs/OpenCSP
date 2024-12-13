@@ -6,6 +6,7 @@ import numpy as np
 
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.render.lib.AbstractPlotHandler import AbstractPlotHandler
 from opencsp.common.lib.tool import log_tools as lt
 
 
@@ -42,7 +43,7 @@ class DebugBlobIndex:
         self.name: str = ''
 
 
-class BlobIndex:
+class BlobIndex(AbstractPlotHandler):
     """Class containing blob indexing algorithms to assign indices to blobs in a rough grid pattern.
     X/Y axes correspond to image axes; +x is to right, +y is down. Class takes in points (in units
     of pixels) that have been previously found with a blob detector and attempts to assign all found
@@ -74,6 +75,8 @@ class BlobIndex:
         x_min/x_max/y_min/y_max : int
             Expected min/max of blob indices in x/y directions
         """
+        super().__init__()
+
         self._points = points
 
         self._num_pts = len(points)
@@ -435,6 +438,7 @@ class BlobIndex:
         # Plot all input blobs
         if self.debug.debug_active:
             fig = plt.figure()
+            self._register_plot(fig)
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_all_points()
@@ -447,6 +451,7 @@ class BlobIndex:
         # Plot assigned known center point
         if self.debug.debug_active:
             fig = plt.figure()
+            self._register_plot(fig)
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_assigned_points_labels(labels=True)
@@ -459,6 +464,7 @@ class BlobIndex:
         # Plot 3x3 core block
         if self.debug.debug_active:
             fig = plt.figure()
+            self._register_plot(fig)
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_assigned_points_labels(labels=True)
@@ -487,6 +493,7 @@ class BlobIndex:
         # Plot all found points
         if self.debug.debug_active:
             fig = plt.figure()
+            self._register_plot(fig)
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_points_connections()
