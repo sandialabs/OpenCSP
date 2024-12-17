@@ -140,7 +140,7 @@ class CalibrateSofastFixedDots:
         self._dot_image_points_indices: Vxy
         self._dot_image_points_indices_x: ndarray
         self._dot_image_points_indices_y: ndarray
-        self._dot_points_xyz_mat = np.ndarray((x_max - x_min + 1, y_max - y_min + 1, 3)) * np.nan
+        self._dot_points_xyz_mat = np.ndarray((y_max - y_min + 1, x_max - x_min + 1, 3)) * np.nan
         self._num_dots: int
         self._rots_cams: list[Rotation] = []
         self._vecs_cams: list[Vxyz] = []

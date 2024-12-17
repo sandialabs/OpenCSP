@@ -4,9 +4,11 @@
 from copy import deepcopy
 import json
 
+import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation
 
+from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.tool import hdf5_tools
 
@@ -163,6 +165,14 @@ class DefinitionEnsemble:
         ensemble_perimeter = data['ensemble_perimeter']
         v_centroid_ensemble = Vxyz(data['v_centroid_ensemble'])
         return cls(v_facet_locations, r_facet_ensemble, ensemble_perimeter, v_centroid_ensemble)
+
+    def plot_facet_corners_xy_proj(self, facets: list[DefinitionFacet]) -> None:
+        """Plots the xy projection of all facet corners given accompanying facet definitions"""
+        for idx_facet, (facet, R, T) in enumerate(zip(facets, self.r_facet_ensemble, self.v_facet_locations)):
+            facet: DefinitionFacet
+            corners_cur_facet = facet.v_facet_corners
+            corners_cur_ensemble: Vxyz = corners_cur_facet.rotate(R) + T
+            plt.scatter(corners_cur_ensemble.x, corners_cur_ensemble.y, label=f'Facet {idx_facet:d}')
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:

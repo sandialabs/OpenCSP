@@ -4,8 +4,10 @@
 import cv2 as cv
 import numpy as np
 from numpy import ndarray
+from scipy.spatial.transform import Rotation
 
-from opencsp.app.sofast.lib.BlobIndex import BlobIndex
+from opencsp.app.sofast.lib.BlobIndex import BlobIndex, DebugBlobIndex
+from opencsp.app.sofast.lib.calculation_data_classes import CalculationBlobAssignment
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.DotLocationsFixedPattern import DotLocationsFixedPattern
@@ -18,7 +20,9 @@ from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.deflectometry.SlopeSolver import SlopeSolver
 from opencsp.common.lib.deflectometry.Surface2DAbstract import Surface2DAbstract
+from opencsp.common.lib.geometry.LoopXY import LoopXY
 from opencsp.common.lib.geometry.Vxy import Vxy
+from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -59,28 +63,33 @@ class ProcessSofastFixed(ProcessSofastAbstract):
 
         # Instantiate other data containers
         self.slope_solvers: list[SlopeSolver] = None
-        self.blob_index: BlobIndex = None
+        self.blob_index: list[BlobIndex] = None
+        self.debug_blob_index: DebugBlobIndex = DebugBlobIndex()
+        self.data_calculation_blob_assignment: list[CalculationBlobAssignment] = None
 
-    def find_blobs(self, pts_known: Vxy, xys_known: tuple[tuple[int, int]]) -> BlobIndex:
-        """Finds blobs in image
+    def _find_blobs(self, pt_known: Vxy, xy_known: tuple[int, int], loop: LoopXY = None) -> BlobIndex:
+        # Finds and assigns indices to blobs in image
+        # Parameters:
+        # pt_known, Vxy, xy pixel location of known point in image, units of pixels.
+        # xy_known, tuple[int, int], length 2 tuple. Integer xy dot indices
+        # loop, LoopXY | None, only consider points inside this loop. If None, consider all points.
+        # Returns:
+        # BlobIndex class with found/assigned blobs
 
-        Parameters
-        ----------
-        pts_known : Vxy
-            Length N, xy pixel location of known point(s) with known xy dot index locations
-        xys_known : tuple[tuple[int]]
-            Length N integer xy dot indices
-
-        NOTE: N=number of facets
-        """
+        # Find all blobs in image
         pts_blob = ip.detect_blobs(self.measurement.image, self.blob_detector)
+
+        # Filter blobs if loop is given
+        if loop is not None:
+            mask = loop.is_inside(pts_blob)
+            pts_blob = pts_blob[mask]
 
         # Index blobs
         blob_index = BlobIndex(pts_blob, *self.fixed_pattern_dot_locs.dot_extent)
         blob_index.search_thresh = self.params.blob_search_thresh
         blob_index.search_perp_axis_ratio = self.params.search_perp_axis_ratio
-        for pt_known, xy_known in zip(pts_known, xys_known):
-            blob_index.run(pt_known, xy_known[0], xy_known[1])
+        blob_index.debug = self.debug_blob_index
+        blob_index.run(pt_known, xy_known[0], xy_known[1])
 
         return blob_index
 
@@ -96,15 +105,6 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         ]
         mask = ip.calc_mask_raw(images, *params)
 
-        if (self.optic_type == 'multi') and self.params.mask.keep_largest_area:
-            lt.warn(
-                '"keep_largest_area" mask processing option cannot be used '
-                'for multifacet ensembles. This will be turned off.'
-            )
-            self.params.mask.keep_largest_area = False
-        elif self.params.mask.keep_largest_area:
-            mask = ip.keep_largest_mask_area(mask)
-
         return mask
 
     def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
@@ -117,32 +117,14 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         """
         self.measurement = measurement
 
-    def _process_optic_singlefacet_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> dict:
-        # Process optic geometry (find mask corners, etc.)
-        (
-            self.data_geometry_general,
-            self.data_image_processing_general,
-            self.data_geometry_facet,  # list
-            self.data_image_processing_facet,  # list
-            self.data_error,
-        ) = pr.process_singlefacet_geometry(
-            self.data_facet_def[0],
-            mask_raw,
-            self.measurement.v_measure_point_facet,
-            self.measurement.dist_optic_screen,
-            self.orientation,
-            self.camera,
-            self.params.geometry,
-            self.params.debug_geometry,
-        )
+    def _process_optic_common_geometry(
+        self, rot_optic_cam: Rotation, v_cam_optic_cam: Vxyz, idx_facet: int
+    ) -> tuple[dict, CalculationBlobAssignment]:
+        # Get blob index data for current facet
+        pts_image, pts_index_xy = self.blob_index[idx_facet].get_data()
 
-        # Get image points and blob indices
-        pts_image, pts_index_xy = blob_index.get_data()
-
-        # Define optic orientation w.r.t. camera
-        rot_optic_cam = self.data_geometry_general.r_optic_cam_refine_1
-        v_cam_optic_cam = self.data_geometry_general.v_cam_optic_cam_refine_2
-        u_cam_measure_point_facet = self.data_geometry_facet[0].u_cam_measure_point_facet
+        # Get measure point unit vector
+        u_cam_measure_point_facet = self.data_geometry_facet[idx_facet].u_cam_measure_point_facet
 
         # Get screen/camera poses
         rot_cam_optic = rot_optic_cam.inv()
@@ -157,54 +139,74 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         v_screen_points_screen = self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
         v_screen_points_facet = v_optic_screen_optic + v_screen_points_screen.rotate(rot_screen_optic)
 
+        # Check for nans returning from screen point calculation
+        nan_mask = np.isnan(v_screen_points_screen.data).sum(0).astype(bool)
+        active_point_mask: np.ndarray = np.logical_not(nan_mask)
+
+        # Remove nans if any present
+        if np.any(nan_mask):
+            lt.warn(
+                'ProcessSofastFixed._process_optic_common_geometry(): '
+                f'{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined '
+                f'for facet {idx_facet:d}. These data points will be removed.'
+            )
+            # Remove nan data points from screen points
+            pts_image = pts_image[active_point_mask]
+            pts_index_xy = pts_index_xy[active_point_mask]
+            v_screen_points_facet = v_screen_points_facet[active_point_mask]
+
+        # Make 2d mask of active points (w.r.t. BlobIndex internal 2d arrays)
+        x_idx_mat, y_idx_mat = self.blob_index[idx_facet].pts_index_to_mat_index(pts_index_xy)
+        active_point_mask_mat = np.zeros(self.blob_index[idx_facet].shape_yx_data_mat, dtype=bool)
+        active_point_mask_mat[y_idx_mat, x_idx_mat] = True
+
+        # Save Sofast Fixed calculation parameters (specific to Sofast Fixed calculations)
+        data_calculation_blob_assignment = CalculationBlobAssignment(pts_image, pts_index_xy, active_point_mask_mat)
+
         # Calculate active pixel pointing
         u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
         u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_optic).as_Vxyz()
 
         # Update debug data
-        self.params.debug_slope_solver.optic_data = self.data_facet_def[0]
+        self.params.debug_slope_solver.optic_data = self.data_facet_def[idx_facet]
 
         # Construct surface kwargs
-        return {
+        kwargs = {
             'v_optic_cam_optic': v_optic_cam_optic,
             'u_active_pixel_pointing_optic': u_pixel_pointing_facet,
             'u_measure_pixel_pointing_optic': u_cam_measure_point_facet,
             'v_screen_points_facet': v_screen_points_facet,
             'v_optic_screen_optic': v_optic_screen_optic,
-            'v_align_point_optic': self.data_facet_def[0].v_facet_centroid,
-            'dist_optic_screen': self.measurement.dist_optic_screen,
+            'v_align_point_optic': self.data_geometry_facet[idx_facet].v_align_point_facet,
+            'dist_optic_screen': self.data_geometry_facet[idx_facet].measure_point_screen_distance,
             'debug': self.params.debug_slope_solver,
-            'surface': self.data_surfaces[0],
+            'surface': self.data_surfaces[idx_facet],
         }
 
-    def _process_optic_multifacet_geometry(self, blob_index: BlobIndex, mask_raw: np.ndarray) -> list[dict]:
-        # Process optic geometry (find mask corners, etc.)
-        (
-            self.data_geometry_general,
-            self.data_image_processing_general,
-            self.data_geometry_facet,  # list
-            self.data_image_processing_facet,  # list
-            self.data_error,
-        ) = pr.process_multifacet_geometry(
-            self.data_facet_def,
-            self.data_ensemble_def,
-            mask_raw,
-            self.measurement.v_measure_point_facet,
-            self.orientation,
-            self.camera,
-            self.measurement.dist_optic_screen,
-            self.params.geometry,
-            self.params.debug_geometry,
+        return kwargs, data_calculation_blob_assignment
+
+    def _process_optic_singlefacet_geometry(self) -> dict:
+        # Define optic orientation w.r.t. camera
+        rot_optic_cam = self.data_geometry_general.r_optic_cam_refine_1
+        v_cam_optic_cam = self.data_geometry_general.v_cam_optic_cam_refine_2
+
+        # Calculate optic geometry for single facet (facet index = 0)
+        kwargs, data_calculation_blob_assignment = self._process_optic_common_geometry(
+            rot_optic_cam, v_cam_optic_cam, idx_facet=0
         )
 
+        # Save blob assignment data
+        self.data_calculation_blob_assignment = [data_calculation_blob_assignment]
+
+        return kwargs
+
+    def _process_optic_multifacet_geometry(self) -> list[dict]:
+        # Clear blob assignment calculations data container
+        self.data_calculation_blob_assignment = []
+
+        # Loop through all facets and calcualte geometry data
         kwargs_list = []
         for idx_facet in range(self.num_facets):
-            # Get pixel region of current facet
-            loop = self.data_image_processing_facet[idx_facet].loop_facet_image_refine
-
-            # Get image points and blob indices
-            pts_image, pts_index_xy = blob_index.get_data_in_region(loop)
-
             # Define optic orientation w.r.t. camera
             rot_facet_ensemble = self.data_ensemble_def.r_facet_ensemble[idx_facet]
             rot_ensemble_cam = self.data_geometry_general.r_optic_cam_refine_2
@@ -215,42 +217,13 @@ class ProcessSofastFixed(ProcessSofastAbstract):
             v_ensemble_facet_cam = v_ensemble_facet_ensemble.rotate(rot_ensemble_cam)
             v_cam_facet_cam = v_cam_ensemble_cam + v_ensemble_facet_cam
 
-            u_cam_measure_point_facet = self.data_geometry_facet[idx_facet].u_cam_measure_point_facet
-
-            # Get screen/camera poses
-            rot_cam_facet = rot_facet_cam.inv()
-            rot_facet_screen = self.orientation.r_cam_screen * rot_facet_cam
-            rot_screen_facet = rot_facet_screen.inv()
-
-            v_facet_cam_facet = -v_cam_facet_cam.rotate(rot_cam_facet)
-            v_cam_screen_facet = self.orientation.v_cam_screen_cam.rotate(rot_cam_facet)
-            v_facet_screen_facet = v_facet_cam_facet + v_cam_screen_facet
-
-            # Calculate xyz screen points
-            v_screen_points_screen = self.fixed_pattern_dot_locs.xy_indices_to_screen_coordinates(pts_index_xy)
-            v_screen_points_facet = v_facet_screen_facet + v_screen_points_screen.rotate(rot_screen_facet)
-
-            # Calculate active pixel pointing
-            u_pixel_pointing_cam = self.camera.vector_from_pixel(pts_image)
-            u_pixel_pointing_facet = u_pixel_pointing_cam.rotate(rot_cam_facet).as_Vxyz()
-
-            # Update debug data
-            self.params.debug_slope_solver.optic_data = self.data_facet_def[idx_facet]
-
-            # Construct list of surface kwargs
-            kwargs_list.append(
-                {
-                    'v_optic_cam_optic': v_facet_cam_facet,
-                    'u_active_pixel_pointing_optic': u_pixel_pointing_facet,
-                    'u_measure_pixel_pointing_optic': u_cam_measure_point_facet,
-                    'v_screen_points_facet': v_screen_points_facet,
-                    'v_optic_screen_optic': v_facet_screen_facet,
-                    'v_align_point_optic': self.data_geometry_facet[idx_facet].v_align_point_facet,
-                    'dist_optic_screen': self.data_geometry_facet[idx_facet].measure_point_screen_distance,
-                    'debug': self.params.debug_slope_solver,
-                    'surface': self.data_surfaces[idx_facet],
-                }
+            # Calculate optic geometry for all facets
+            kwargs, data_calculation_blob_assignment = self._process_optic_common_geometry(
+                rot_facet_cam, v_cam_facet_cam, idx_facet
             )
+            kwargs_list.append(kwargs)
+            self.data_calculation_blob_assignment.append(data_calculation_blob_assignment)
+
         return kwargs_list
 
     def process_single_facet_optic(
@@ -281,14 +254,36 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         self.data_facet_def = [data_facet_def.copy()]
         self.data_surfaces = [surface]
 
-        # Find blobs
-        self.blob_index = self.find_blobs(pt_known, (xy_known,))
-
         # Calculate mask
         mask_raw = self._calculate_mask()
 
+        # If enabled, fill in holes in mask area
+        if self.params.mask.keep_largest_area:
+            mask_raw = ip.keep_largest_mask_area(mask_raw)
+
+        # Process optic geometry (find mask corners, etc.)
+        (
+            self.data_geometry_general,
+            self.data_image_processing_general,
+            self.data_geometry_facet,  # list
+            self.data_image_processing_facet,  # list
+            self.data_error,
+        ) = pr.process_singlefacet_geometry(
+            self.data_facet_def[0],  # 0 because there is only one facet
+            mask_raw,
+            self.measurement.v_measure_point_facet,
+            self.measurement.dist_optic_screen,
+            self.orientation,
+            self.camera,
+            self.params.geometry,
+            self.params.debug_geometry,
+        )
+
+        # Find blobs
+        self.blob_index = [self._find_blobs(pt_known, xy_known)]
+
         # Generate geometry and slope solver inputs
-        kwargs = self._process_optic_singlefacet_geometry(self.blob_index, mask_raw)
+        kwargs = self._process_optic_singlefacet_geometry()
 
         # Calculate slope
         slope_solver = SlopeSolver(**kwargs)
@@ -327,7 +322,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         if len(data_facet_def) != len(surfaces) != len(pts_known) != len(xys_known):
             lt.error_and_raise(
                 ValueError,
-                'Length of data_facet_def does not equal length of data_surfaces'
+                'ProcessSofastFixed: Length of data_facet_def does not equal length of data_surfaces'
                 + f'data_facet_def={len(data_facet_def)}, surface_data={len(surfaces)}, '
                 + f'pts_known={len(pts_known)}, xys_known={len(xys_known)}',
             )
@@ -338,14 +333,39 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         self.data_ensemble_def = data_ensemble_def.copy()
         self.data_surfaces = surfaces
 
-        # Find blobs
-        self.blob_index = self.find_blobs(pts_known, xys_known)
-
         # Calculate mask
         mask_raw = self._calculate_mask()
 
+        # Process optic geometry (find mask corners, etc.)
+        (
+            self.data_geometry_general,
+            self.data_image_processing_general,
+            self.data_geometry_facet,  # list
+            self.data_image_processing_facet,  # list
+            self.data_error,
+        ) = pr.process_multifacet_geometry(
+            self.data_facet_def,
+            self.data_ensemble_def,
+            mask_raw,
+            self.measurement.v_measure_point_facet,
+            self.orientation,
+            self.camera,
+            self.measurement.dist_optic_screen,
+            self.params.geometry,
+            self.params.mask,
+            self.params.debug_geometry,
+        )
+
+        # Find blobs
+        self.blob_index: list[BlobIndex] = []
+
+        for idx_facet, geom in enumerate(self.data_image_processing_facet):
+            loop = geom.loop_facet_image_refine
+            self.debug_blob_index.name = f' - Facet {idx_facet:d}'
+            self.blob_index.append(self._find_blobs(pts_known[idx_facet], xys_known[idx_facet], loop))
+
         # Generate geometry and slope solver inputs
-        kwargs_list = self._process_optic_multifacet_geometry(self.blob_index, mask_raw)
+        kwargs_list = self._process_optic_multifacet_geometry()
 
         # Calculate slope
         self.slope_solvers = []
@@ -359,3 +379,24 @@ class ProcessSofastFixed(ProcessSofastAbstract):
 
         # Calculate facet pointing
         self._calculate_facet_pointing()
+
+    def save_to_hdf(self, file: str, prefix: str = ''):
+        """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
+
+        Parameters
+        ----------
+        file : str
+            HDF file to save to
+        prefix : str
+            Prefix to append to folder path within HDF file (folders must be separated by "/")
+        """
+        # Save default data
+        super().save_to_hdf(file, prefix)
+
+        # Calculations, one per facet
+        for idx_facet in range(self.num_facets):
+            # Save facet blob index calcluations (specific to Sofast Fixed)
+            if self.data_calculation_blob_assignment is not None:
+                self.data_calculation_blob_assignment[idx_facet].save_to_hdf(
+                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                )
