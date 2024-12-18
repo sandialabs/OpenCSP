@@ -6,6 +6,7 @@ import numpy as np
 
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.LoopXY import LoopXY
+from opencsp.common.lib.render.lib.AbstractPlotHandler import AbstractPlotHandler
 from opencsp.common.lib.tool import log_tools as lt
 
 
@@ -19,7 +20,30 @@ class Step(Enum):
     LEFT_OR_UP = -1
 
 
-class BlobIndex:
+class DebugBlobIndex:
+    """Debug class for BlobIndex
+
+    Parameters
+    ----------
+        debug_active : bool
+            Flag to turn on debugging, default false
+        figures : list[Figure]
+            Container to hold debug figures
+        bg_image : ndarray
+            2d ndarray, by default None. Background image (i.e. the image with the blobs present)
+            to plot in debugging plots. If None, background image is not plotted.
+        name : str
+            Name of current instance to prepend to plot titles
+    """
+
+    def __init__(self):
+        self.debug_active: bool = False
+        self.figures: list = []
+        self.bg_image: np.ndarray = None
+        self.name: str = ''
+
+
+class BlobIndex(AbstractPlotHandler):
     """Class containing blob indexing algorithms to assign indices to blobs in a rough grid pattern.
     X/Y axes correspond to image axes; +x is to right, +y is down. Class takes in points (in units
     of pixels) that have been previously found with a blob detector and attempts to assign all found
@@ -51,6 +75,8 @@ class BlobIndex:
         x_min/x_max/y_min/y_max : int
             Expected min/max of blob indices in x/y directions
         """
+        super().__init__()
+
         self._points = points
 
         self._num_pts = len(points)
@@ -70,14 +96,18 @@ class BlobIndex:
         """Ratio of point distances: (perpendicular to axis) / (along axis) used to search for points. Default 3.0"""
         self.apply_filter: bool = False
         """To filter bad points (experimental, not implemented yet). Default False"""
+        self.debug: DebugBlobIndex = DebugBlobIndex()
+        """BlobIndex debug object"""
+        self.shape_yx_data_mat: tuple[int, int] = (y_max - y_min + 1, x_max - x_min + 1)
+        """The yx shape of the internal data matrix that holds the point pixel locations and xy indices"""
 
         self._offset_x = -x_min  # index
         self._offset_y = -y_min  # index
         idx_x_vec = np.arange(x_min, x_max + 1)  # index
         idx_y_vec = np.arange(y_min, y_max + 1)  # index
         self._idx_x_mat, self._idx_y_mat = np.meshgrid(idx_x_vec, idx_y_vec)  # index
-        self._points_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1, 2)) * np.nan  # pixels
-        self._point_indices_mat = np.zeros((y_max - y_min + 1, x_max - x_min + 1)) * np.nan  # index
+        self._points_mat = np.zeros(self.shape_yx_data_mat + (2,)) * np.nan  # pixels
+        self._point_indices_mat = np.zeros(self.shape_yx_data_mat) * np.nan  # index
 
     def _get_assigned_point_indices(self) -> np.ndarray[int]:
         """Returns found point indices"""
@@ -238,7 +268,6 @@ class BlobIndex:
             mask = np.logical_and(unassigned_deltas.y > 0, unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
             idx_x_out = idx_x
             idx_y_out = idx_y + 1
-        # Down
         elif direction == 'down':
             mask = np.logical_and(unassigned_deltas.y < 0, -unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
             idx_x_out = idx_x
@@ -406,10 +435,42 @@ class BlobIndex:
         x/y_known : int
             XY indies of known points
         """
+        # Plot all input blobs
+        if self.debug.debug_active:
+            fig = plt.figure()
+            self._register_plot(fig)
+            if self.debug.bg_image is not None:
+                plt.imshow(self.debug.bg_image)
+            self.plot_all_points()
+            plt.title('1: All found dots in image' + self.debug.name)
+            self.debug.figures.append(fig)
+
         # Assign center point
         self._assign_center(pt_known, x_known, y_known)
+
+        # Plot assigned known center point
+        if self.debug.debug_active:
+            fig = plt.figure()
+            self._register_plot(fig)
+            if self.debug.bg_image is not None:
+                plt.imshow(self.debug.bg_image)
+            self.plot_assigned_points_labels(labels=True)
+            plt.title('2: Locations of known, center dot' + self.debug.name)
+            self.debug.figures.append(fig)
+
         # Find 3x3 core point block
         self._find_3x3_center_block(x_known, y_known)
+
+        # Plot 3x3 core block
+        if self.debug.debug_active:
+            fig = plt.figure()
+            self._register_plot(fig)
+            if self.debug.bg_image is not None:
+                plt.imshow(self.debug.bg_image)
+            self.plot_assigned_points_labels(labels=True)
+            plt.title('3: Locations of 3x3 center block' + self.debug.name)
+            self.debug.figures.append(fig)
+
         # Extend rows
         prev_num_unassigned = self._num_unassigned()
         for idx in range(self.max_num_iters):
@@ -429,8 +490,18 @@ class BlobIndex:
                 break
             prev_num_unassigned = cur_num_unassigned
 
-    def plot_points_labels(self, labels: bool = False) -> None:
-        """Plots points and labels
+        # Plot all found points
+        if self.debug.debug_active:
+            fig = plt.figure()
+            self._register_plot(fig)
+            if self.debug.bg_image is not None:
+                plt.imshow(self.debug.bg_image)
+            self.plot_points_connections()
+            plt.title('4: Row assignments' + self.debug.name)
+            self.debug.figures.append(fig)
+
+    def plot_assigned_points_labels(self, labels: bool = False) -> None:
+        """Plots all assigned points with [optionally] labels
 
         Parameters
         ----------
@@ -443,6 +514,10 @@ class BlobIndex:
                 self._idx_x[self._is_assigned], self._idx_y[self._is_assigned], self._points[self._is_assigned]
             ):
                 plt.text(*pt.data, f'({x:.0f}, {y:.0f})')
+
+    def plot_all_points(self) -> None:
+        """Plots all points"""
+        plt.scatter(*self._points.data, color='red')
 
     def plot_points_connections(self, labels: bool = False) -> None:
         """Plots points and connections for rows/collumns
@@ -496,6 +571,22 @@ class BlobIndex:
         indices = Vxy((idx_x[mask_assigned], idx_y[mask_assigned]), int)
         points = Vxy((x_pts[mask_assigned], y_pts[mask_assigned]))
         return points, indices
+
+    def pts_index_to_mat_index(self, pts_index: Vxy) -> tuple[np.ndarray, np.ndarray]:
+        """Returns corresponding matrix indices (see self.get_data_mat) given point
+        indices (assigned x/y indies of points.)
+
+        Parameters
+        ----------
+        pts_index : Vxy
+            Assigned point xy indices, length N.
+
+        Returns
+        -------
+        x, y
+            Length N 1d arrays of corresponding data matrix indices (see self.get_data_mat)
+        """
+        return pts_index.x - self._offset_x, pts_index.y - self._offset_y
 
     def get_data_in_region(self, loop: LoopXY) -> tuple[Vxy, Vxy]:
         """Returns found points and indices within given region
