@@ -31,6 +31,24 @@ Image Acquisition Classes
    :show-inheritance:
    :member-order: groupwise
 
+.. currentmodule:: opencsp.common.lib.camera.ImageAcquisition_DCAM_mono
+
+.. automodule:: opencsp.common.lib.camera.ImageAcquisition_DCAM_mono
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+.. currentmodule:: opencsp.common.lib.camera.ImageAcquisition_MSMF
+
+.. automodule:: opencsp.common.lib.camera.ImageAcquisition_MSMF
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
 UCamera Classes and Utility Functions
 =====================================
 
