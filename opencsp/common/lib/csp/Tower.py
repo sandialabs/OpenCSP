@@ -60,6 +60,8 @@ class Tower(RayTraceable):
         x_aim: float = 0,
         y_aim: float = 6.25,
         z_aim: float = 63.5508,
+        bcs_y_aim: float = 8.8,
+        bcs_z_aim: float = 28.9,
     ):
 
         # parameters used for control tower at NSTTF
@@ -69,7 +71,21 @@ class Tower(RayTraceable):
         #             east = 8.8,
         #             west = -8.8,
         #             south = 284,
-        #             north = 300)
+        #             north = 300
+        #             x_aim: float = 0,
+        #             y_aim: float = 6.25,
+        #             z_aim: float = 63.5508,)
+        # SOFAST_calculations:
+        #             height: float = 63.5508,
+        #             east: float = 5.485,
+        #             west: float = -5.485,
+        #             south: float = -9.1186,
+        #             north: float = 6.25,
+        #             x_aim: float = 0,
+        #             y_aim: float = 6.25,
+        #             z_aim: float = 64.8008,
+        #             bcs_y_aim: float = 8.8,
+        #             bcs_z_aim: float = 28.9,
         """Create a new Tower instance.
 
         Parameters:
@@ -92,7 +108,10 @@ class Tower(RayTraceable):
         self.x_aim = x_aim
         self.y_aim = y_aim
         self.z_aim = z_aim
+        self.bcs_y_aim = bcs_y_aim
+        self.bcs_z_aim = bcs_z_aim
         self.target_loc = Pxyz([x_aim, y_aim, z_aim])
+        self.bcs = Pxyz([x_aim, bcs_y_aim, bcs_z_aim])
 
         # Tower faces, top, and bottom
         self.top = [
@@ -135,6 +154,7 @@ class Tower(RayTraceable):
         """
         The target location given the x, y, and z components. 
         """
+        self.bcs_point = [self.x_aim, self.bcs_y_aim, self.bcs_z_aim]
 
     def walls(self):
         """Returns the list of walls as top, north, south, and bottom."""
@@ -172,5 +192,8 @@ class Tower(RayTraceable):
         # target on northface of tower
         if "target" in self.parts:
             view.draw_xyz(self.point, style=tower_style.target)
+
+        if "bcs" in self.parts:
+            view.draw_xyz(self.bcs_point, style=tower_style.bcs)
 
         return
