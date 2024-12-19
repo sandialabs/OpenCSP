@@ -15,7 +15,7 @@ class ParamsOpticGeometry(hdf5_tools.HDF5_IO_Abstract):
     optic perimeter. Units pixels. (Default 50.0)"""
     facet_corns_refine_step_length: float = 10.0
     """The length of the search box (along the search direction) to use when refining facet corner
-    locations (when processing a facet ensemble). Units pixels. Default 10.0"""
+    locations (when processing a facet ensemble). Units pixels. (Default 10.0)"""
     facet_corns_refine_perpendicular_search_dist: float = 10.0
     """The half-width of the search box (perpendicular to the search direction) to use when
     refining facet corner locations (when processing a facet ensemble). Units pixels. Default 10.0"""
