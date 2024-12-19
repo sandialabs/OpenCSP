@@ -20,7 +20,7 @@ class ParamsOpticGeometry(hdf5_tools.HDF5_IO_Abstract):
     """The half-width of the search box (perpendicular to the search direction) to use when
     refining facet corner locations (when processing a facet ensemble). Units pixels. (Default 10.0)"""
     facet_corns_refine_frac_keep: float = 0.5
-    """The fraction of pixels to consider within search box when finding optic edges. Default 0.5"""
+    """The fraction of pixels to consider within search box when finding optic edges. (Default 0.5)"""
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsOpticGeometry/...
