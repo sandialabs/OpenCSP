@@ -11,7 +11,7 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
     """Defines threshold to use when calculating optic mask. Uses a histogram of pixel values
     of the mask difference image (light image - dark image). This is the fraction of the way
     from the first histogram peak (most common dark pixel value) to the the last histogram peak
-    (most common light pixel value). Default 0.5"""
+    (most common light pixel value). (Default 0.5)"""
     filt_width: int = 9
     """Side length of square kernel used to filter mask image. Default 9"""
     filt_thresh: int = 4
