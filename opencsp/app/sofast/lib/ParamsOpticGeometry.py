@@ -18,7 +18,7 @@ class ParamsOpticGeometry(hdf5_tools.HDF5_IO_Abstract):
     locations (when processing a facet ensemble). Units pixels. (Default 10.0)"""
     facet_corns_refine_perpendicular_search_dist: float = 10.0
     """The half-width of the search box (perpendicular to the search direction) to use when
-    refining facet corner locations (when processing a facet ensemble). Units pixels. Default 10.0"""
+    refining facet corner locations (when processing a facet ensemble). Units pixels. (Default 10.0)"""
     facet_corns_refine_frac_keep: float = 0.5
     """The fraction of pixels to consider within search box when finding optic edges. Default 0.5"""
 
