@@ -17,7 +17,7 @@ class SlopeSolverDataDebug:
         self.slope_solver_figures: list = []
         """List to hold figure objects once created."""
         self.slope_solver_camera_rays_length: float = 0.0
-        """The length (meters) of camera rays to draw when plotting the 3d slope solving scenario plot. Default 0.0"""
+        """The length (meters) of camera rays to draw when plotting the 3d slope solving scenario plot. (Default 0.0)"""
         self.slope_solver_plot_camera_screen_points: bool = False
         """To include scatter plot of xyz screen point locations seen by camera in slope solving scenario plot. Default False"""
         self.slope_solver_point_downsample: int = 50
