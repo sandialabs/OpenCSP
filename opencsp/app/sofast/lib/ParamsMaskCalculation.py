@@ -15,7 +15,7 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
     filt_width: int = 9
     """Side length of square kernel used to filter mask image. (Default 9)"""
     filt_thresh: int = 4
-    """Threshold (minimum number of active pixels) to use when removing small active mask areas. Default 4"""
+    """Threshold (minimum number of active pixels) to use when removing small active mask areas. (Default 4)"""
     thresh_active_pixels: float = 0.05
     """If number of active mask pixels is below this fraction of total image pixels, thow error. Default 0.05"""
     keep_largest_area: bool = False
