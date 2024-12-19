@@ -35,9 +35,11 @@ def path_components(input_dir_body_ext: str):
 
     See also: body_ext_given_file_dir_body_ext()
     """
+
     dir = os.path.dirname(input_dir_body_ext)
     body_ext = os.path.basename(input_dir_body_ext)
     body, ext = os.path.splitext(body_ext)
+
     return dir, body, ext
 
 

@@ -69,7 +69,7 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
             attributes_file = os.path.join(opath, f"{oname}.txt")
             self._previous_attr = am.AttributesManager()
             self._previous_attr.load(attributes_file)
-        except:
+        except Exception as e:
             pass
         if self._previous_attr != None:
             prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(self.__class__)
