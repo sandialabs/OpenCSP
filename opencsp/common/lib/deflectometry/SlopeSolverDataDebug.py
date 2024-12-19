@@ -13,7 +13,7 @@ class SlopeSolverDataDebug:
         """Representation of optic (Facet/Mirror) being solved for.
         The geometry data in this object is used to create visualization plots.
         This information is updated automatically during SOFAST execution and will
-        overwrite any previously user-given values. Default None"""
+        overwrite any previously user-given values. (Default None)"""
         self.slope_solver_figures: list = []
         """List to hold figure objects once created."""
         self.slope_solver_camera_rays_length: float = 0.0
