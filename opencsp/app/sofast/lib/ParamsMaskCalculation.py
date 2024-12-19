@@ -13,7 +13,7 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
     from the first histogram peak (most common dark pixel value) to the the last histogram peak
     (most common light pixel value). (Default 0.5)"""
     filt_width: int = 9
-    """Side length of square kernel used to filter mask image. Default 9"""
+    """Side length of square kernel used to filter mask image. (Default 9)"""
     filt_thresh: int = 4
     """Threshold (minimum number of active pixels) to use when removing small active mask areas. Default 4"""
     thresh_active_pixels: float = 0.05
