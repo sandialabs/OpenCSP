@@ -19,7 +19,7 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
     thresh_active_pixels: float = 0.05
     """If number of active mask pixels is below this fraction of total image pixels, throw error. (Default 0.05)"""
     keep_largest_area: bool = False
-    """Flag to apply processing step that keeps only the largest mask area. Default True"""
+    """Flag to apply processing step that keeps only the largest mask area. (Default True)"""
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsMaskCalculation/...
