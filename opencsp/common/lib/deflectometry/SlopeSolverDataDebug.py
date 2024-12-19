@@ -23,7 +23,7 @@ class SlopeSolverDataDebug:
         self.slope_solver_point_downsample: int = 50
         """The downsample factor (to save computing resources) to apply to screen points
         Only applicable if plotting screen points is enabled with the
-        `SlopeSolverDataDebug.slope_solver_plot_camera_screen_points` flag). Default 50"""
+        `SlopeSolverDataDebug.slope_solver_plot_camera_screen_points` flag). (Default 50)"""
         self.slope_solver_single_plot: bool = False
         """Flag to plot all iterations of the slope solving algorithm on one plot (True) or create a separate
         plot for each iteration (False). Default False (new plot for each iteration)"""
