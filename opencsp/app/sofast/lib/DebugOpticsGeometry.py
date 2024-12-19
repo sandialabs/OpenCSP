@@ -6,4 +6,6 @@ class DebugOpticsGeometry:
 
     def __init__(self):
         self.debug_active: bool = False
+        """To activate geometry debugging. Default False"""
         self.figures: list = []
+        """List to hold figure objects once created."""

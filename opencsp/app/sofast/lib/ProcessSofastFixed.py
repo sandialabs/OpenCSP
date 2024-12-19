@@ -105,15 +105,6 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         ]
         mask = ip.calc_mask_raw(images, *params)
 
-        if (self.optic_type == 'multi') and self.params.mask.keep_largest_area:
-            lt.warn(
-                '"keep_largest_area" mask processing option cannot be used '
-                'for multifacet ensembles. This will be turned off.'
-            )
-            self.params.mask.keep_largest_area = False
-        elif self.params.mask.keep_largest_area:
-            mask = ip.keep_largest_mask_area(mask)
-
         return mask
 
     def load_measurement_data(self, measurement: MeasurementSofastFixed) -> None:
@@ -266,6 +257,10 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         # Calculate mask
         mask_raw = self._calculate_mask()
 
+        # If enabled, fill in holes in mask area
+        if self.params.mask.keep_largest_area:
+            mask_raw = ip.keep_largest_mask_area(mask_raw)
+
         # Process optic geometry (find mask corners, etc.)
         (
             self.data_geometry_general,
@@ -357,6 +352,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
             self.camera,
             self.measurement.dist_optic_screen,
             self.params.geometry,
+            self.params.mask,
             self.params.debug_geometry,
         )
 
