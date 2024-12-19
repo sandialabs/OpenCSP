@@ -14,30 +14,73 @@ from opencsp.common.lib.csp.LightSource import LightSource
 
 
 class LightSourceSun(LightSource):
+    """
+    A class representing a point light source that simulates sunlight.
+
+    This class models the sun as a top-hat function in space, allowing for the generation
+    of incident rays based on the sun's position in the sky.
+
+    Attributes
+    ----------
+    incident_rays : list[LightPath]
+        A list of LightPath objects representing the rays incident from the sun.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self) -> None:
+        """
+        Initializes a LightSourceSun object with an empty list of incident rays.
+
+        Parameters
+        ----------
+        None
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.incident_rays: list[LightPath] = []
 
     def get_incident_rays(self, point: Pxyz) -> list[LightPath]:
+        """
+        Retrieves the incident rays from the light source.
+
+        Parameters
+        ----------
+        point : Pxyz
+            The point in space for which the incident rays are requested.
+
+        Returns
+        -------
+        list[LightPath]
+            A list of LightPath objects representing the incident rays.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         return self.incident_rays
 
     @classmethod
     def from_given_sun_position(
         cls, sun_pointing: Uxyz, resolution: int, sun_dia: float = 0.009308, verbose=False
     ) -> 'LightSourceSun':
-        """Returns LightSourceSun object initialized from a given pointing direction. Represents
-        the sun as a tophat function in space.
+        """
+        Creates a LightSourceSun object initialized from a given sun pointing direction.
+
+        Represents the sun as a top-hat function in space.
 
         Parameters
         ----------
         sun_pointing : Uxyz
-            Pointing direction of sun
-        resolution: float
-            Number of points in each direction that will be sampled.
-        sun_dia: float
-            Angular diameter of the sun, radians.
-        verbose: bool
-            To print updates.
+            The pointing direction of the sun.
+        resolution : int
+            The number of points in each direction that will be sampled.
+        sun_dia : float, optional
+            The angular diameter of the sun in radians (default is 0.009308).
+        verbose : bool, optional
+            If True, prints updates during initialization (default is False).
+
+        Returns
+        -------
+        LightSourceSun
+            A LightSourceSun object initialized with the specified sun pointing direction.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Calculate sun ray cone pointing down (z=-1)
         sun_rays = cls._calc_sun_ray_cone(resolution, sun_dia, verbose)
 
@@ -63,22 +106,29 @@ class LightSourceSun(LightSource):
         verbose=False,
     ) -> 'LightSourceSun':
         """
-        Returns LightSourceSun object initialized from a given Lat/Lon and time. Represents
-        the sun as a tophat function in space.
+        Creates a LightSourceSun object initialized from a given latitude/longitude and time.
+
+        Represents the sun as a top-hat function in space.
 
         Parameters
-        -----------
-        loc: tuple(float, float)
-            The location of the scene in form (latitude, longitude), degrees, WGS84.
-        time: datetime.datetime
-            Datetime object. Must have timezone set.
-        resolution: float
-            Number of points in each direction that will be sampled.
-        sun_dia: float
-            Angular diameter of the sun, radians.
-        verbose: bool
-            To print updates.
+        ----------
+        loc : tuple[float, float]
+            The location of the scene in the form (latitude, longitude) in degrees, WGS84.
+        time : datetime.datetime
+            A datetime object representing the time. Must have timezone set.
+        resolution : int
+            The number of points in each direction that will be sampled.
+        sun_dia : float, optional
+            The angular diameter of the sun in radians (default is 0.009308).
+        verbose : bool, optional
+            If True, prints updates during initialization (default is False).
+
+        Returns
+        -------
+        LightSourceSun
+            A LightSourceSun object initialized based on the specified location and time.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Calculate direction of sun pointing
         longitude, latitude = loc
         alt = pysolar.solar.get_altitude(latitude, longitude, time)
@@ -140,22 +190,28 @@ class LightSourceSun(LightSource):
     ) -> None:
         """
         Defines the rays that will be used from this light source for ray tracing.
-        Sets them to self.incident_rays
+
+        Sets them to self.incident_rays.
 
         Parameters
-        -----------
-        loc: tuple[float, float] | tuple(float, float)
-            two elements representing the location of the scene that will see the sun rays. (longitude, latitude)
-        time: tuple
-            tuple is in the ymdhmsz convention, (year, month, day, hour, minute, seconf, time zone)
-        resolution: float
-            (TODO update for more types of reolustion) the number of points in each direction that will
-            be sampled.
-        sun_dia: float
-            the angular diameter of the sun. Default value is recomended if your reference is on Earth
-        verbose: bool
-            If True the funciton will print updates on how many rays have been generated to console.
+        ----------
+        loc : tuple[float, float]
+            A tuple representing the location of the scene that will see the sun rays in the form (longitude, latitude).
+        time : tuple
+            A tuple in the ymdhmsz convention, representing (year, month, day, hour, minute, second, time zone).
+        resolution : int
+            The number of points in each direction that will be sampled.
+        sun_dia : float, optional
+            The angular diameter of the sun in radians (default is 0.009308).
+        verbose : bool, optional
+            If True, prints updates on how many rays have been generated to the console (default is False).
+
+        Raises
+        ------
+        DeprecationWarning
+            If this method is called, indicating it is deprecated.
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Function is deprecated
         warn(
             'LightSourceSun.set_incident_rays is deprecated. Use initialize_from_solar_position instead.',

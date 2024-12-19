@@ -1,0 +1,9 @@
+.. currentmodule:: __MODULE__
+
+.. automodule:: __MODULE__
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+

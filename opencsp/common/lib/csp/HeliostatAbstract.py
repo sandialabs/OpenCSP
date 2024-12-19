@@ -42,11 +42,12 @@ UP = Vxyz([0, 0, 1])
 class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
     """
     Heliostat representation.
-    Parameters:
-        -----------
-        facet_ensemble: FacetEnsemble
-            List of facets, in order from top-left to bottom-right (row major order).
-            The facet names should be their position in the list (1-indexed).
+
+    Parameters
+    ----------
+    facet_ensemble: FacetEnsemble
+        List of facets, in order from top-left to bottom-right (row major order).
+        The facet names should be their position in the list (1-indexed).
     """
 
     def __init__(
@@ -129,18 +130,18 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
         Example
         -------
-        ```python
-        # override movement_transform in HeliostatAbstract
-        def movement_transform(self, az_angle: float, el_angle: float):
-            '''possible movement_transform for an oversimplified
-            azimuth and elevation based heliostat.'''
-            az_rotation = Rotation.from_euler('z', az_angle)
-            transform_az = TransformXYZ.from_R(az_rotation)
-            el_rotation = # rotate about the proper vector
-            transform_el = TransformXYZ.from_R(el_rotation)
-            composite_transform = transform_el * transform_az
-            return composite_transform
-        ```
+        .. code-block:: python
+
+            # override movement_transform in HeliostatAbstract
+            def movement_transform(self, az_angle: float, el_angle: float):
+                '''possible movement_transform for an oversimplified
+                azimuth and elevation based heliostat.'''
+                az_rotation = Rotation.from_euler('z', az_angle)
+                transform_az = TransformXYZ.from_R(az_rotation)
+                el_rotation = # rotate about the proper vector
+                transform_el = TransformXYZ.from_R(el_rotation)
+                composite_transform = transform_el * transform_az
+                return composite_transform
         """
         ...
 
