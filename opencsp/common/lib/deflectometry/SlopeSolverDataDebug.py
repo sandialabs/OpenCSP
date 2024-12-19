@@ -8,7 +8,7 @@ class SlopeSolverDataDebug:
 
     def __init__(self):
         self.debug_active: bool = False
-        """To activate slope solver debugging. Default False"""
+        """To activate slope solver debugging. (Default False)"""
         self.optic_data: Any = None
         """Representation of optic (Facet/Mirror) being solved for.
         The geometry data in this object is used to create visualization plots.
