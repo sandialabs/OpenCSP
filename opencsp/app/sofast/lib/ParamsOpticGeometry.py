@@ -9,7 +9,7 @@ class ParamsOpticGeometry(hdf5_tools.HDF5_IO_Abstract):
 
     perimeter_refine_axial_search_dist: float = 50.0
     """The length of the search box (along the search direction) to use when finding optic
-    perimeter. Units pixels. Default 50.0"""
+    perimeter. Units pixels. (Default 50.0)"""
     perimeter_refine_perpendicular_search_dist: float = 50.0
     """The half-width of the search box (perpendicular to the search direction) to use when finding
     optic perimeter. Units pixels. Default 50.0"""
