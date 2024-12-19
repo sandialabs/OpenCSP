@@ -17,7 +17,7 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
     filt_thresh: int = 4
     """Threshold (minimum number of active pixels) to use when removing small active mask areas. (Default 4)"""
     thresh_active_pixels: float = 0.05
-    """If number of active mask pixels is below this fraction of total image pixels, thow error. Default 0.05"""
+    """If number of active mask pixels is below this fraction of total image pixels, throw error. (Default 0.05)"""
     keep_largest_area: bool = False
     """Flag to apply processing step that keeps only the largest mask area. Default True"""
 
