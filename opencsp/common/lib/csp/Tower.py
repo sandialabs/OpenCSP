@@ -30,15 +30,15 @@ class Tower(RayTraceable):
     parts : list[str]
         The parts that build the Tower. Includes walls (top, northface, southface, bottom), and optionl target.
     height : float
-        The height of Tower. Currently set for NSTTF Tower height of 61 m.
+        The height of Tower. Currently set for NSTTF Tower height of 63.5508 m.
     east : float
-        The East wall of the Tower. Currently set for 8.8 m. TODO, MHH find dimensions of tower (in particular width)
+        The East wall of the Tower. Currently set for 5.485 m. TODO, MHH find dimensions of tower (in particular width)
     west : float
-        The West wall of the Tower. Currently set for 8.8 m.
+        The West wall of the Tower. Currently set for 5.485 m.
     south : float
-        The South wall of the Tower. Currently set for 8.8 m.
+        The South wall of the Tower. Currently set for 9.1168 m.
     north : float
-        The North wall of the Tower. Currently set for 8.8 m.
+        The North wall of the Tower. Currently set for 6.25 m.
     x_aim : float
         The x component of the target in relation to the Tower origin.
     y_aim : float
@@ -52,14 +52,16 @@ class Tower(RayTraceable):
         name: str,
         origin: Pxyz,
         parts: list[str] = ["whole tower"],
-        height: float = 100,
-        east: float = 8.8,
-        west: float = -8.8,
-        south: float = -8.8,
-        north: float = 8.8,
+        height: float = 63.5508,
+        east: float = 5.485,
+        west: float = -5.485,
+        south: float = -9.1186,
+        north: float = 6.25,
         x_aim: float = 0,
-        y_aim: float = 8.8,
-        z_aim: float = 100,
+        y_aim: float = 6.25,
+        z_aim: float = 63.5508,
+        bcs_y_aim: float = 8.8,
+        bcs_z_aim: float = 28.9,
     ):
 
         # parameters used for control tower at NSTTF
@@ -69,7 +71,21 @@ class Tower(RayTraceable):
         #             east = 8.8,
         #             west = -8.8,
         #             south = 284,
-        #             north = 300)
+        #             north = 300
+        #             x_aim: float = 0,
+        #             y_aim: float = 6.25,
+        #             z_aim: float = 63.5508,)
+        # SOFAST_calculations:
+        #             height: float = 63.5508,
+        #             east: float = 5.485,
+        #             west: float = -5.485,
+        #             south: float = -9.1186,
+        #             north: float = 6.25,
+        #             x_aim: float = 0,
+        #             y_aim: float = 6.25,
+        #             z_aim: float = 64.8008,
+        #             bcs_y_aim: float = 8.8,
+        #             bcs_z_aim: float = 28.9,
         """Create a new Tower instance.
 
         Parameters:
@@ -92,7 +108,10 @@ class Tower(RayTraceable):
         self.x_aim = x_aim
         self.y_aim = y_aim
         self.z_aim = z_aim
+        self.bcs_y_aim = bcs_y_aim
+        self.bcs_z_aim = bcs_z_aim
         self.target_loc = Pxyz([x_aim, y_aim, z_aim])
+        self.bcs = Pxyz([x_aim, bcs_y_aim, bcs_z_aim])
 
         # Tower faces, top, and bottom
         self.top = [
@@ -135,6 +154,7 @@ class Tower(RayTraceable):
         """
         The target location given the x, y, and z components. 
         """
+        self.bcs_point = [self.x_aim, self.bcs_y_aim, self.bcs_z_aim]
 
     def walls(self):
         """Returns the list of walls as top, north, south, and bottom."""
@@ -172,5 +192,8 @@ class Tower(RayTraceable):
         # target on northface of tower
         if "target" in self.parts:
             view.draw_xyz(self.point, style=tower_style.target)
+
+        if "bcs" in self.parts:
+            view.draw_xyz(self.bcs_point, style=tower_style.bcs)
 
         return
