@@ -12,6 +12,7 @@ import opencsp.app.sofast.lib.calculation_data_classes as cdc
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.ParamsOpticGeometry import ParamsOpticGeometry
+from opencsp.app.sofast.lib.ParamsMaskCalculation import ParamsMaskCalculation
 from opencsp.app.sofast.lib.DebugOpticsGeometry import DebugOpticsGeometry
 import opencsp.app.sofast.lib.image_processing as ip
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
@@ -366,7 +367,8 @@ def process_multifacet_geometry(
     orientation: SpatialOrientation,
     camera: Camera,
     dist_optic_screen: float,
-    params: ParamsOpticGeometry = ParamsOpticGeometry(),
+    params_geometry: ParamsOpticGeometry = ParamsOpticGeometry(),
+    params_mask: ParamsMaskCalculation = ParamsMaskCalculation(),
     debug: DebugOpticsGeometry = DebugOpticsGeometry(),
 ) -> tuple[
     cdc.CalculationDataGeometryGeneral,
@@ -393,8 +395,10 @@ def process_multifacet_geometry(
         Camera object
     dist_optic_screen : float
         Optic to screen distance, meters
-    params : ParamsOpticGeometry, optional
+    params_geometry : ParamsOpticGeometry, optional
         ParamsOpticGeometry object, by default ParamsOpticGeometry()
+    params_mask : ParamsMaskCalculation, optional
+        ParamsMaskCalculation object, by default ParamsMaskCalculation()
     debug : DebugOpticsGeometry, optional
         DebugOpticsGeometry object, by default DebugOpticsGeometry()
 
@@ -512,7 +516,10 @@ def process_multifacet_geometry(
         plt.title('Expected Perimeter Points')
 
     # Refine perimeter points
-    args = [params.perimeter_refine_axial_search_dist, params.perimeter_refine_perpendicular_search_dist]
+    args = [
+        params_geometry.perimeter_refine_axial_search_dist,
+        params_geometry.perimeter_refine_perpendicular_search_dist,
+    ]
     loop_ensemble_image_refine = ip.refine_mask_perimeter(loop_ensemble_exp, v_edges_image, *args)
     data_image_processing_general.loop_optic_image_refine = loop_ensemble_image_refine
 
@@ -545,9 +552,9 @@ def process_multifacet_geometry(
 
     # Refine facet corners
     args = [
-        params.facet_corns_refine_step_length,
-        params.facet_corns_refine_perpendicular_search_dist,
-        params.facet_corns_refine_frac_keep,
+        params_geometry.facet_corns_refine_step_length,
+        params_geometry.facet_corns_refine_perpendicular_search_dist,
+        params_geometry.facet_corns_refine_frac_keep,
     ]
     loops_facets_refined: list[LoopXY] = []
     for idx in range(num_facets):
@@ -583,7 +590,11 @@ def process_multifacet_geometry(
     mask_processed *= mask_raw[..., np.newaxis]
     mask_processed = np.logical_and(mask_processed, mask_fitted)
     for idx in range(num_facets):
-        data_image_processing_facet[idx].mask_processed = mask_processed[..., idx]
+        mask = mask_processed[..., idx]
+        # If enabled, keep largest mask area (fill holes) for each individual facet
+        if params_mask.keep_largest_area:
+            mask = ip.keep_largest_mask_area(mask)
+        data_image_processing_facet[idx].mask_processed = mask
 
     # Refine R/T with all refined facet corners
     r_ensemble_cam_refine_2, v_cam_ensemble_cam_refine_2 = sp.calc_rt_from_img_pts(

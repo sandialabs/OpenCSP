@@ -11,15 +11,15 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
     """Defines threshold to use when calculating optic mask. Uses a histogram of pixel values
     of the mask difference image (light image - dark image). This is the fraction of the way
     from the first histogram peak (most common dark pixel value) to the the last histogram peak
-    (most common light pixel value)."""
+    (most common light pixel value). (Default 0.5)"""
     filt_width: int = 9
-    """Side length of square kernel used to filter mask image"""
+    """Side length of square kernel used to filter mask image. (Default 9)"""
     filt_thresh: int = 4
-    """Threshold (minimum number of active pixels) to use when removing small active mask areas."""
+    """Threshold (minimum number of active pixels) to use when removing small active mask areas. (Default 4)"""
     thresh_active_pixels: float = 0.05
-    """If number of active mask pixels is below this fraction of total image pixels, thow error."""
+    """If number of active mask pixels is below this fraction of total image pixels, throw error. (Default 0.05)"""
     keep_largest_area: bool = False
-    """Flag to apply processing step that keeps only the largest mask area"""
+    """Flag to apply processing step that keeps only the largest mask area. (Default True)"""
 
     def save_to_hdf(self, file: str, prefix: str = ''):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsMaskCalculation/...

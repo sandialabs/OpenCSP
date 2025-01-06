@@ -2,6 +2,8 @@
 to calculate surface slopes.
 """
 
+import matplotlib.pyplot as plt
+from matplotlib import colormaps
 import numpy as np
 
 from opencsp.app.sofast.lib.DefinitionEnsemble import DefinitionEnsemble
@@ -377,13 +379,6 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         ]
         mask_raw = ip.calc_mask_raw(self.measurement.mask_images, *params)
 
-        if self.params.mask.keep_largest_area:
-            lt.warn(
-                '"keep_largest_area" mask processing option cannot be used '
-                'for multifacet ensembles. This will be turned off.'
-            )
-            self.params.mask.keep_largest_area = False
-
         (
             self.data_geometry_general,
             self.data_image_processing_general,
@@ -399,6 +394,7 @@ class ProcessSofastFringe(ProcessSofastAbstract):
             self.camera,
             self.measurement.dist_optic_screen,
             self.params.geometry,
+            self.params.mask,
             self.params.debug_geometry,
         )
 
@@ -417,6 +413,17 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         x_periods = self.measurement.fringe_periods_x
         y_periods = self.measurement.fringe_periods_y
 
+        # Prepare for plotting unwrapped phase images
+        if self.params.debug_geometry.debug_active:
+            # X phase RGB image
+            im_phase_x = self.measurement.mask_images[..., 1].copy()
+            im_phase_x = np.stack((im_phase_x,) * 3, 2)
+            im_phase_x = im_phase_x / im_phase_x.max()
+            # Y phase RGB image
+            im_phase_y = self.measurement.mask_images[..., 1].copy()
+            im_phase_y = np.stack((im_phase_y,) * 3, 2)
+            im_phase_y = im_phase_y / im_phase_y.max()
+
         for idx_facet in range(self.num_facets):
             # Get current processed mask layer
             mask_processed = self.data_image_processing_facet[idx_facet].mask_processed
@@ -431,6 +438,25 @@ class ProcessSofastFringe(ProcessSofastAbstract):
             v_screen_points_fractional_screens = Vxy((screen_xs, screen_ys))
             self.data_geometry_facet[idx_facet].v_screen_points_fractional_screens = v_screen_points_fractional_screens
 
+            # Create plot of unwrapped phase (if enabled)
+            if self.params.debug_geometry.debug_active:
+                # Add active pixels as colored pixels
+                cm = colormaps.get_cmap('jet')
+                vals_x_jet = cm(screen_xs)[:, :3]  # remove alpha channel
+                im_phase_x[mask_processed, :] = vals_x_jet
+                vals_y_jet = cm(screen_ys)[:, :3]  # remove alpha channel
+                im_phase_y[mask_processed, :] = vals_y_jet
+                # Plot x image
+                fig = plt.figure(f'ProcessSofastFringe_unwrapped_phase_x_facet_{idx_facet:d}')
+                plt.imshow(im_phase_x)
+                plt.title(f'Unwrapped X Phase Facet {idx_facet:d}')
+                self.params.debug_geometry.figures.append(fig)
+                # Plot y image
+                fig = plt.figure(f'ProcessSofastFringe_unwrapped_phase_y_facet_{idx_facet:d}')
+                plt.imshow(im_phase_y)
+                plt.title(f'Unwrapped Y Phase Facet {idx_facet:d}')
+                self.params.debug_geometry.figures.append(fig)
+
             # Undistort screen points (display coordinates)
             v_screen_points_screen = self.display.interp_func(
                 v_screen_points_fractional_screens
@@ -442,8 +468,9 @@ class ProcessSofastFringe(ProcessSofastAbstract):
             mask_bad_pixels = np.zeros(mask_processed.shape, dtype=bool)
             if np.any(nan_mask):
                 lt.warn(
-                    f'{nan_mask.sum():d} / {nan_mask.size:d} points are NANs in calculated '
-                    'screen points for facet {idx_facet:d}. These data points will be removed.'
+                    'ProcessSofastFringe._process_display(): '
+                    f'{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined '
+                    f'for facet {idx_facet:d}. These data points will be removed.'
                 )
                 # Make mask of NANs
                 mask_bad_pixels[mask_processed] = nan_mask
