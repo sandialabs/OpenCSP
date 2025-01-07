@@ -30,10 +30,31 @@ def sun_position_aux(
     refraction=True,
 ) -> tuple[float, float]:  # Boolean.  If True, apply refraction correction.
     """
-    John Clark Craig's code.
-    https://levelup.gitconnected.com/python-sun-position-for-solar-energy-and-research-7a4ead801777
-    (slightly adapted)
+    Calculates the sun's position (azimuth and elevation) based on the given location and time.
+
+    This function computes the sun's apparent location in the sky using the provided
+    longitude, latitude, and time information. It can also apply a refraction correction.
+
+    Parameters
+    ----------
+    location_lon_lat : tuple[float, float]
+        A tuple containing the longitude and latitude in radians.
+    when_ymdhmsz : tuple[float, float, float, float, float, float, float]
+        A tuple containing the year, month, day, hour, minute, second, and timezone.
+    refraction : bool, optional
+        If True, applies refraction correction to the elevation angle (default is True).
+
+    Returns
+    -------
+    tuple[float, float]
+        A tuple containing the azimuth and elevation angles in degrees.
+
+    Notes
+    -----
+    The algorithm is based on John Clark Craig's implementation for calculating sun position in
+    https://levelup.gitconnected.com/python-sun-position-for-solar-energy-and-research-7a4ead801777.
     """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Extract the passed data
     year, month, day, hour, minute, second, timezone = when_ymdhmsz
     # Math typing shortcuts
@@ -81,9 +102,30 @@ def sun_position_aux(
 
 def into_range(x, range_min, range_max):
     """
-    John Clark Craig's code.
-    https://levelup.gitconnected.com/python-sun-position-for-solar-energy-and-research-7a4ead801777
+    Adjusts a value to be within a specified range.
+
+    This function takes a value and wraps it within the specified minimum and maximum range.
+
+    Parameters
+    ----------
+    x : float
+        The value to adjust.
+    range_min : float
+        The minimum value of the range.
+    range_max : float
+        The maximum value of the range.
+
+    Returns
+    -------
+    float
+        The adjusted value wrapped within the specified range.
+
+    Notes
+    -----
+    The algorithm is based on John Clark Craig's implementation for calculating sun position in
+    https://levelup.gitconnected.com/python-sun-position-for-solar-energy-and-research-7a4ead801777.
     """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     shiftedx = x - range_min
     delta = range_max - range_min
     return (((shiftedx % delta) + delta) % delta) + range_min
@@ -92,6 +134,28 @@ def into_range(x, range_min, range_max):
 def sun_position(
     location_lon_lat: tuple[float, float], when_ymdhmsz: tuple  # radians.  (longitude, lattiude) pair.
 ) -> np.ndarray:  # (year, month, day, hour, minute, second, timezone) tuple.
+    """
+    Calculates the sun's apparent location in the sky based on the given location and time.
+
+    This function retrieves the sun's azimuth and elevation angles and converts them into a unit vector.
+
+    Parameters
+    ----------
+    location_lon_lat : tuple[float, float]
+        A tuple containing the longitude and latitude in radians.
+    when_ymdhmsz : tuple[float, float, float, float, float, float, float]
+        A tuple containing the year, month, day, hour, minute, second, and timezone.
+
+    Returns
+    -------
+    np.ndarray
+        A unit vector representing the direction of the sun in 3D space.
+
+    Notes
+    -----
+    The azimuth and elevation angles are calculated using the `sun_position_aux` function.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     #  Example: (2022, 7, 4, 11, 20, 0, -6) => July 4, 2022 at 11:20 am MDT (-6 hours)
     # Get the Sun's apparent location in the sky
     azimuth_deg, elevation_deg = sun_position_aux(location_lon_lat, when_ymdhmsz, True)  # John Clark Craig's version.

@@ -30,7 +30,24 @@ from opencsp.common.lib.tool.typing_tools import strict_types
 
 
 class RayTrace:
+    """
+    A class for performing ray tracing in a given scene.
+
+    This class manages the ray tracing process, including the collection of light paths
+    and the rendering of the scene based on the light sources and objects present.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self, scene: scn.Scene = None) -> None:
+        """
+        Initializes a RayTrace object with the specified scene.
+
+        Parameters
+        ----------
+        scene : scn.Scene, optional
+            The scene in which to perform ray tracing (default is None).
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if scene == None:
             scene = scn.Scene()
         self.scene = scene
@@ -40,6 +57,15 @@ class RayTrace:
 
     @property
     def light_paths(self):
+        """
+        Retrieves the list of light paths in the ray trace.
+
+        Returns
+        -------
+        list[LightPath]
+            A list of LightPath objects representing the light paths in the scene.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         return self.light_paths_ensemble.asLightPathList()
 
     def __str__(self) -> str:
@@ -60,26 +86,95 @@ class RayTrace:
         return sum_trace
 
     def ray_count(self) -> int:
+        """
+        Returns the number of light paths in the ray trace.
+
+        Returns
+        -------
+        int
+            The number of light paths in the ensemble.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         return len(self.light_paths_ensemble)
 
     def draw(self, view: View3d, trace_style: RenderControlRayTrace = None) -> None:
+        """
+        Draws the light paths in a 3D view.
+
+        Parameters
+        ----------
+        view : View3d
+            The 3D view in which to draw the light paths.
+        trace_style : RenderControlRayTrace, optional
+            The style settings for rendering the light paths (default is None).
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         if trace_style == None:
             trace_style = RenderControlRayTrace()
         for lp in self.light_paths_ensemble:
             lp.draw(view, trace_style.light_path_control)
 
     def draw_subset(self, view: View3d, count: int, trace_style: RenderControlRayTrace = None):
+        """
+        Draws a subset of light paths in a 3D view.
+
+        Parameters
+        ----------
+        view : View3d
+            The 3D view in which to draw the light paths.
+        count : int
+            The number of light paths to draw.
+        trace_style : RenderControlRayTrace, optional
+            The style settings for rendering the light paths (default is None).
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         for i in np.floor(np.linspace(0, len(self.light_paths_ensemble) - 1, count)):
             lp = self.light_paths_ensemble[int(i)]
             lp.draw(view, trace_style.light_path_control)
 
     # @strict_types
     def add_many_light_paths(self, new_paths: list[LightPath]):
+        """
+        Adds multiple light paths to the ray trace.
+
+        Parameters
+        ----------
+        new_paths : list[LightPath]
+            A list of LightPath objects to add to the ray trace.
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self.light_paths_ensemble.concatenate_in_place(LightPathEnsemble(new_paths))
 
     @classmethod
     def from_hdf(cls, filename: str, trace_name: str = "RayTrace") -> 'RayTrace':
-        """Creates a RayTrace object from an hdf5 file."""
+        """
+        Creates a RayTrace object from an HDF5 file.
+
+        Parameters
+        ----------
+        filename : str
+            The path to the HDF5 file containing the ray trace data.
+        trace_name : str, optional
+            The name of the trace to load from the file (default is "RayTrace").
+
+        Returns
+        -------
+        RayTrace
+            A RayTrace object initialized with data from the specified HDF5 file.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         trace = RayTrace()
 
         batch_names: list[str] = list(load_hdf5_datasets([f"RayTrace_{trace_name}/Batches"], filename).values())[0]
@@ -101,19 +196,33 @@ class RayTrace:
 
 def calc_reflected_ray(normal_v: Vxyz, incoming_v: Vxyz) -> Vxyz:
     """
-    Calculates reflected ray directions given the direction of incident
-    collimated light and surface normal vectors. Note, norm_v and inc_v must
-    broadcast together.
-
-    Algorithm is explained in "/opencsp_code/doc/common/lib/csp/ReflectedRayAlgorithm.pdf".
+    Calculates the direction of the reflected ray given the incident ray direction and surface normal.
 
     Parameters
     ----------
+    normal_v : Vxyz
+        The normal vector at the surface point where the reflection occurs.
+    incoming_v : Vxyz
+        The direction of the incoming ray.
 
     Returns
     -------
+    Vxyz
+        The direction of the reflected ray.
 
+    Notes
+    -----
+    The algorithm for reflection is based on the formula:
+
+    .. code-block:: text
+
+        \[
+        \text{reflected\_ray} = \text{incoming\_ray} - 2 \cdot (\text{normal} \cdot \text{incoming\_ray}) \cdot \text{normal}
+        \]
+
+        norm_v and inc_v must broadcast together.
     """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Process input vector
     n = normal_v.normalize().data
     V0 = incoming_v.normalize().data
@@ -126,19 +235,21 @@ def calc_reflected_ray(normal_v: Vxyz, incoming_v: Vxyz) -> Vxyz:
 
 def process_vector(vec: np.ndarray, norm: bool = False) -> np.ndarray:
     """
-    Reshapes and converts inputs to floats
+    Reshapes and converts input vectors to floats.
 
     Parameters
     ----------
-    vec : array like, 3xN, length 3, 3x1
-        Input vectors
-    norm : bool
-        To normalize the vector
+    vec : array-like, shape (3, N) or (3,)
+        Input vectors to be processed.
+    norm : bool, optional
+        If True, the vector will be normalized (default is False).
 
     Returns
     -------
-    3xN numpy arrays, floats, normalized when appropriate.
+    np.ndarray
+        A 3xN array of floats, normalized if specified.
     """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Reshape and convert to float
     vec = np.array(vec).astype(float)
     vec = vec.reshape((3, -1))
@@ -159,8 +270,37 @@ def trace_scene_unvec(
     save_name: str = f"ray_trace_{time.asctime().replace(' ','_').replace(':','_')}",
     verbose: bool = False,
 ) -> RayTrace:
-    """DEPRICATED \n
-    TODO TJL:trace_scene_vec is PROBABLY BROKEN!"""
+    """
+    DEPRECATED: Traces rays through the scene using an unvectorized approach.
+
+    Parameters
+    ----------
+    scene : scn.Scene
+        The scene to trace rays through.
+    obj_resolution : int
+        The resolution for sampling points on objects.
+    random_dist : bool, optional
+        If True, random distribution of rays will be used (default is False).
+    store_in_ram : bool, optional
+        If True, the results will be stored in RAM (default is True).
+    save_in_file : bool, optional
+        If True, the results will be saved to a file (default is False).
+    save_name : str, optional
+        The name of the file to save the results (default is a timestamped name).
+    verbose : bool, optional
+        If True, prints updates during processing (default is False).
+
+    Returns
+    -------
+    RayTrace
+        A RayTrace object containing the traced rays.
+
+    Raises
+    ------
+    DeprecationWarning
+        If this function is called, indicating it is deprecated.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     warn(
         "RayTrace.trace_scene is vectorized and will be faster. This function will be phased out.",
         DeprecationWarning,
@@ -236,6 +376,43 @@ def trace_scene(
     max_ram_in_use_percent: float = 99,
     verbose: bool = False,
 ) -> RayTrace:
+    """
+    Traces rays through the scene using a vectorized approach.
+
+    Parameters
+    ----------
+    scene : scn.Scene
+        The scene to trace rays through.
+    obj_resolution : Resolution
+        The resolution for sampling points on objects.
+    store_in_ram : bool, optional
+        If True, the results will be stored in RAM (default is True).
+    save_in_file : bool, optional
+        If True, the results will be saved to a file (default is False).
+    save_name : str, optional
+        The name of the file to save the results (default is None).
+    trace_name : str, optional
+        The name of the trace for saving (default is "Default").
+    max_ram_in_use_percent : float, optional
+        The maximum percentage of RAM to use during tracing (default is 99).
+    verbose : bool, optional
+        If True, prints updates during processing (default is False).
+
+    Returns
+    -------
+    RayTrace
+        A RayTrace object containing the traced rays.
+
+    Raises
+    ------
+    UserWarning
+        If saving is requested but the flag is set to False.
+    ValueError
+        If saving is requested but no file name is provided.
+    MemoryError
+        If the maximum RAM usage is exceeded before tracing begins.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # argument validity checks
     if not save_in_file and save_name != None:
         warn(
@@ -470,6 +647,49 @@ def trace_scene_parallel(
     trace_name: str = "RayTrace",
     verbose: bool = False,
 ) -> RayTrace:
+    """
+    Traces rays through the scene using parallel processing.
+
+    This function divides the ray tracing task among multiple processes to improve performance.
+
+    Parameters
+    ----------
+    scene : scn.Scene
+        The scene to trace rays through.
+    obj_resolution : Resolution
+        The resolution for sampling points on objects.
+    processor_count : int
+        The number of processors to use for parallel processing.
+    resolution_type : str, optional
+        The type of resolution to use (default is 'pixelX').
+    store_in_ram : bool, optional
+        If True, the results will be stored in RAM (default is True).
+    max_ram_in_use_percent : float, optional
+        The maximum percentage of RAM to use during tracing (default is 99.0).
+    save_in_file : bool, optional
+        If True, the results will be saved to a file (default is False).
+    save_file_name : str, optional
+        The name of the file to save the results (default is None).
+    trace_name : str, optional
+        The name of the trace for saving (default is "RayTrace").
+    verbose : bool, optional
+        If True, prints updates during processing (default is False).
+
+    Returns
+    -------
+    RayTrace
+        A RayTrace object containing the traced rays.
+
+    Raises
+    ------
+    UserWarning
+        If saving is requested but the flag is set to False.
+    ValueError
+        If saving is requested but no file name is provided.
+    MemoryError
+        If the maximum RAM usage is exceeded before tracing begins.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     ################# argument validity checks ####################
     # if not save_in_file and save_file_name != None:
     #     warn("Saving file was specified, but 'save_in_file' flag is set to False. Trace will not be saved.",
@@ -568,49 +788,6 @@ def trace_scene_parallel(
     return ray_trace
 
 
-def plane_intersect_OLD(
-    ray_trace: RayTrace, v_plane_center: Vxyz, u_plane_norm: Uxyz, epsilon: float = 1e-6, verbose=False
-) -> Vxy:
-    """
-    TODO This was the old way of doing plane intersections. Can probably be removed safely.
-    """
-    if verbose:
-        tot = len(ray_trace.light_paths)
-        ten_percent = np.ceil(tot / 10)
-        checkpoints = [n * ten_percent for n in range(10)]
-
-    points_list = []
-
-    for idx, lp in enumerate(ray_trace.light_paths):
-        # Intersect if not parallel or hitting from behind
-        u = lp.current_direction
-        d = Vxyz.dot(u, u_plane_norm)
-        if np.abs(d) > epsilon:
-            p0 = lp.points_list[-1]
-            w = p0 - v_plane_center
-            fac = -Vxyz.dot(u_plane_norm, w) / d
-            v = u * fac
-            points_list.append(p0 + v)
-        # Print output
-        if verbose and idx in checkpoints:
-            print(f"{idx / tot:.2%} through finding intersections")
-
-    # Merge into one Vxyz object
-    if verbose:
-        print("Merging vectors.")
-    intersection_points = Vxyz.merge(points_list)
-
-    # Make relative to plane center
-    if verbose:
-        print("Rotating.")
-    intersection_points -= v_plane_center
-    intersection_points.rotate_in_place(u_plane_norm.align_to(Vxyz((0, 0, 1))))
-
-    if verbose:
-        print("Plane intersections caluculated.")
-    return intersection_points.projXY()
-
-
 def plane_intersect(
     ray_trace: RayTrace,
     v_plane_center: Vxyz,
@@ -621,25 +798,44 @@ def plane_intersect(
     save_name: str = None,
     max_ram_in_use_percent: float = 95.0,
 ):
-    """Finds all the intersections that occur at a plane from the light paths
-    in the raytrace. Output points are transformed from the global (i.e. solar field)
-    reference frame to the local plane reference frame. (3d points are transformed
-    so the XY plane is perpendicular to the target normal.)
-
-    Parameters:
-    -----------
-    ray_trace (RayTrace): the trace that contains the light paths
-    v_plane_center (Pxyz): plane center
-    u_plane_norm (Uxyz): the plane's normal vector
-    epsilon (float, optional): the threshhold for error when determining if a
-        ray is parallel to the plane. Defaults to 1e-6.
-    verbose (bool): to print execution status
-
-    Returns:
-    --------
-    Vxy: intersection points in local plane XY reference frame.
     """
+    Finds all intersections that occur at a specified plane from the light paths in the ray trace.
 
+    The output points are transformed from the global reference frame to the local plane reference frame,
+    where the XY plane is perpendicular to the target normal.
+
+    Parameters
+    ----------
+    ray_trace : RayTrace
+        The RayTrace object containing the light paths.
+    v_plane_center : Vxyz
+        The center point of the plane.
+    u_plane_norm : Uxyz
+        The normal vector of the plane.
+    epsilon : float, optional
+        The threshold for determining if a ray is parallel to the plane (default is 1e-6).
+    verbose : bool, optional
+        If True, prints execution status (default is False).
+    save_in_file : bool, optional
+        If True, saves the intersection data to a file (default is False).
+    save_name : str, optional
+        The name of the file to save the intersection data (default is None).
+    max_ram_in_use_percent : float, optional
+        The maximum percentage of RAM to use during processing (default is 95.0).
+
+    Returns
+    -------
+    Vxy
+        The intersection points in the local plane XY reference frame.
+
+    Raises
+    ------
+    ValueError
+        If the input parameters are invalid.
+    MemoryError
+        If the maximum RAM usage is exceeded during processing.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Unpack plane
 
     intersecting_points = []
@@ -718,27 +914,30 @@ def plane_intersect(
 
 def histogram_image(bin_res: float, extent: float, pts: Vxy) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
-    Creates a 2D histogram from scattered points
+    Creates a 2D histogram from scattered points.
+
+    This function generates a histogram image (point spread function) based on the provided
+    points in the XY plane, using specified bin resolution and extent.
 
     Parameters
     ----------
     bin_res : float
-        Resolution of image, meters.
+        The resolution of the histogram bins in meters.
     extent : float
-        Width of image area, meters.
+        The width of the image area in meters.
     pts : Vxy
-        Points to calculate XY histogram
+        A Vxy object containing the points to calculate the XY histogram.
 
     Returns
     -------
-    hist : 2D array
-        Histogram image (PSF).
-    x : 1d array
-        X axis, meters.
-    y : 1d array
-        Y axis, meters.
-
+    hist : np.ndarray
+        A 2D array representing the histogram image (point spread function).
+    x : np.ndarray
+        A 1D array representing the X axis in meters.
+    y : np.ndarray
+        A 1D array representing the Y axis in meters.
     """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     bins = int(extent / bin_res)
     extent = bin_res * bins
     rng = [[-extent / 2, extent / 2]] * 2
@@ -750,24 +949,29 @@ def histogram_image(bin_res: float, extent: float, pts: Vxy) -> tuple[np.ndarray
 
 
 def ensquared_energy(pts: Vxy, semi_width_max: float, res: int = 50) -> tuple[np.ndarray, np.ndarray]:
-    """Calculate ensquared energy as function of square half-width.
+    """
+    Calculate the ensquared energy as a function of square half-width.
+
+    This function computes the fraction of ensquared energy within a square defined by the
+    semi-widths, based on the provided points.
 
     Parameters
     ----------
-    ray_trace : rt.RayTrace
-        RayTrace object
+    pts : Vxy
+        A Vxy object containing the points for which to calculate ensquared energy.
     semi_width_max : float
-        Maximum semi_width
-    res : int
-        Resolution (number of data points), by defult 50.
+        The maximum semi-width of the square in meters.
+    res : int, optional
+        The resolution (number of data points) for the semi-widths (default is 50).
 
     Returns
     -------
-    ndarray
-        Fraction of ensquared energy
-    ndarray
-        Semi-widths, in meters
+    np.ndarray
+        An array containing the fraction of ensquared energy for each semi-width.
+    np.ndarray
+        An array of semi-widths in meters.
     """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Calculate widths
     ws = np.linspace(0, semi_width_max, res)
     fracs = []

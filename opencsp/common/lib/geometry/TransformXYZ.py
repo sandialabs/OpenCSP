@@ -5,16 +5,43 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 
 
 class TransformXYZ:
+    """
+    Representation of a 3D homogeneous spatial transform.
+
+    A TransformXYZ object encapsulates a 4x4 homogeneous transformation matrix,
+    which includes both rotation and translation components. This class provides methods
+    for creating transformations, applying them to vectors, and obtaining their inverse.
+
+    Properties
+    ----------
+    matrix : np.ndarray
+        The 4x4 matrix representation of the transformation.
+    R : Rotation
+        The rotation component of the transformation.
+    R_matrix : np.ndarray
+        The 3x3 rotation matrix.
+    V : Vxyz
+        The translation component of the transformation.
+    V_matrix : np.ndarray
+        The translation vector as a length 3 array.
+    """
+
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self, matrix: np.ndarray):
         """
-        Representation of a 3D homogeneous spatial transform.
+        Initializes a TransformXYZ object with the given transformation matrix.
 
         Parameters
         ----------
         matrix : np.ndarray
-            4x4 homogeneous 3D transorm matrix.
+            A 4x4 homogeneous transformation matrix.
 
+        Raises
+        ------
+        ValueError
+            If the input matrix does not have shape (4, 4).
         """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Check 4x4 shape
         if matrix.shape != (4, 4):
             raise ValueError('Input matrix must have shape 4x4.')
