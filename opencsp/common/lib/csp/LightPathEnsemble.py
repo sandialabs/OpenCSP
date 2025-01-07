@@ -190,19 +190,3 @@ class LightPathEnsemble:
         new_lpe.points_lists = self.points_lists + (lpe1.points_lists)
         new_lpe.colors = self.colors + (lpe1.colors)
         return new_lpe
-
-    def asLightPathList(self) -> list[LightPath]:
-        """
-        Converts the ensemble into a list of LightPath objects.
-
-        Returns
-        -------
-        list[LightPath]
-            A list of LightPath objects constructed from the ensemble's data.
-        """
-        # "ChatGPT 4o-mini" assisted with generating this docstring.
-        lps: list[LightPath] = []
-        for cd, id, pl in zip(self.current_directions, self.init_directions, self.points_lists):
-            lp = LightPath(pl, id, cd)
-            lps.append(lp)
-        return lps
