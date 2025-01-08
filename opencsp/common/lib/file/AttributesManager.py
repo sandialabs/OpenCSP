@@ -62,33 +62,6 @@ class AttributesManager:
     def _register_parser_class(cls, parser_class: type[aap.AbstractAttributeParser]):
         _registered_parser_classes.add(parser_class)
 
-    def get_subclass_parser_classes(self, parser_class: type[aap.AbstractAttributeParser]):
-        """
-        Returns a list of all parsers that are subclasses of the given parser_class.
-
-        Parameters
-        ----------
-        parser_class : type[aap.AbstractAttributeParser]
-            The parser class to search for.
-
-        Returns
-        -------
-        subclass_parsers : list[aap.AbstractAttributeParser]
-            If parsers are found, a list of all parsers that are subclasses of the given parser_class. Otherwise, None.
-        """
-        subclass_parsers: list[aap.AbstractAttributeParser] = []
-        for parser in self.parsers:
-            if isinstance(parser, parser_class):
-                subclass_parsers.append(parser)
-
-        if len(subclass_parsers) == 0:
-            lt.debug(
-                f"In AttributesManager.get_parser(): found no subclass parsers matching parser class {parser_class}"
-            )
-            return None
-        else:
-            return subclass_parsers
-
     def get_parser(
         self, parser_class: type[aap.AbstractAttributeParser], error_on_not_found=True
     ) -> aap.AbstractAttributeParser:
