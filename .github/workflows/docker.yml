@@ -22,7 +22,10 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Build image
-        run: echo UBI8_IMAGE=$UBI8_IMAGE && docker build . --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
+        run: |
+          echo UBI8_IMAGE=$UBI8_IMAGE
+          cp requirements.txt ./docker
+          docker build ./docker --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
