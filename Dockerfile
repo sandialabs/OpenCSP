@@ -3,7 +3,7 @@ FROM ${BASE_IMAGE_ARG}
 
 COPY xvfb-rpms /tmp
 
-RUN yum -y install python3.11 \
+RUN yum -y --nobest install python3.11 \
     python3.11-devel \
     python3.11-pip \
     mesa-libGL \
