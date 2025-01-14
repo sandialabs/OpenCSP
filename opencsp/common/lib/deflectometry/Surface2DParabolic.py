@@ -9,6 +9,8 @@ from opencsp.common.lib.tool.hdf5_tools import save_hdf5_datasets, load_hdf5_dat
 
 
 class Surface2DParabolic(Surface2DAbstract):
+    """Representation of 2D fit parabolic surface."""
+
     def __init__(self, initial_focal_lengths_xy: tuple[float, float], robust_least_squares: bool, downsample: int):
         """
         Representation of 2D fit parabolic surface.
