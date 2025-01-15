@@ -23,7 +23,7 @@ import opencsp.common.lib.tool.log_tools as lt
 class _OptionsSlopeVis:
     resolution: float = 0.01
     """Plot x/y sample resolution (meters) (default 0.01)"""
-    clim: float = 5
+    clim: float | tuple[float, float, float] = 5
     """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope magnitude plots.
     Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
     (default 5)"""
@@ -47,7 +47,7 @@ class _OptionsSlopeVis:
 class _OptionsSlopeDeviationVis:
     resolution: float = 0.01
     """Plot x/y sample resolution (meters) (default 0.01)"""
-    clim: float = 5
+    clim: float | tuple[float, float, float] = 5
     """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope magnitude plots.
     Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
     (default 5)"""
@@ -71,7 +71,7 @@ class _OptionsSlopeDeviationVis:
 class _OptionsCurvatureVis:
     resolution: float = 0.01
     """Plot x/y sample resolution (meters) (default 0.01)"""
-    clim: float = 50
+    clim: float | tuple[float, float, float] = 50
     """Sets colorbar limits (mrad/meter). Plot limits set to [-clim, clim].
     Can be single value of tuple of three values to map to [x, y, combined] plots individually. (default 50)"""
     processing: list[str] | tuple[list[str], list[str], list[str]] = field(default_factory=list)
