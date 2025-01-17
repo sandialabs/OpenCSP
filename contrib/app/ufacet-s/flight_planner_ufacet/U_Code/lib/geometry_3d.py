@@ -36,6 +36,30 @@ def direction_uxyz_given_azimuth_elevation(azimuth: float, elevation: float):  #
         Indicates that this function is deprecated and should be migrated to another library.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
+    """
+    DEPRECATED: Calculates the direction vector in 3D space given azimuth and elevation angles.
+
+    This function converts azimuth and elevation angles (in radians) into a unit vector
+    in 3D space.
+
+    Parameters
+    ----------
+    azimuth : float
+        The azimuth angle in radians, measured from the positive x-axis.
+    elevation : float
+        The elevation angle in radians, measured from the xy-plane.
+
+    Returns
+    -------
+    np.ndarray
+        A 3D unit vector representing the direction corresponding to the given azimuth and elevation.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_3d.direction_uxyz_given_azimuth_elevation is deprecated. This function should be migrated to another library.',
         DeprecationWarning,
@@ -54,6 +78,27 @@ def direction_uxyz_given_azimuth_elevation(azimuth: float, elevation: float):  #
 
 
 def distance_between_xyz_points(xyz_1, xyz_2):
+    """
+    DEPRECATED: Calculates the Euclidean distance between two points in 3D space.
+
+    Parameters
+    ----------
+    xyz_1 : np.ndarray
+        The coordinates of the first point (x1, y1, z1).
+    xyz_2 : np.ndarray
+        The coordinates of the second point (x2, y2, z2).
+
+    Returns
+    -------
+    float
+        The Euclidean distance between the two points.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should use Vxyz subtraction/magnitude instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     """
     DEPRECATED: Calculates the Euclidean distance between two points in 3D space.
 
@@ -116,6 +161,27 @@ def vector_3d_cross_product(vxyz_1, vxyz_2):
         Indicates that this function is deprecated and should use Vxyz.cross() instead.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
+    """
+    DEPRECATED: Calculates the cross product of two 3D vectors.
+
+    Parameters
+    ----------
+    vxyz_1 : np.ndarray
+        The first vector represented as an array-like object [x1, y1, z1].
+    vxyz_2 : np.ndarray
+        The second vector represented as an array-like object [x2, y2, z2].
+
+    Returns
+    -------
+    list[float]
+        The resulting vector from the cross product, represented as [x, y, z].
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should use Vxyz.cross() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_3d.vector_3d_cross_product is deprecated. Use Vxyz.cross() instead.', DeprecationWarning, stacklevel=2
     )
@@ -144,11 +210,49 @@ def vector_3d_norm(vxyz):
         Indicates that this function is deprecated and should use Vxyz.magnitude() instead.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
+    """
+    DEPRECATED: Calculates the norm (magnitude) of a 3D vector.
+
+    Parameters
+    ----------
+    vxyz : np.ndarray
+        The vector represented as an array-like object [x, y, z].
+
+    Returns
+    -------
+    float
+        The magnitude of the vector.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should use Vxyz.magnitude() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn('geometry_3d.vector_3d_norm is deprecated. Use Vxyz.magnitude() instead.', DeprecationWarning, stacklevel=2)
     return np.sqrt(vxyz[0] ** 2 + vxyz[1] ** 2 + vxyz[2] ** 2)
 
 
 def normalize_vector_3d(vxyz):
+    """
+    DEPRECATED: Normalizes a 3D vector to unit length.
+
+    Parameters
+    ----------
+    vxyz : np.ndarray
+        The vector represented as an array-like object [x, y, z].
+
+    Returns
+    -------
+    list[float]
+        The normalized vector represented as [x', y', z'].
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should use Vxyz.normalize() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     """
     DEPRECATED: Normalizes a 3D vector to unit length.
 
@@ -243,6 +347,31 @@ def best_fit_plane_B(xs, ys, zs):
         Indicates that this function is deprecated and should be migrated to another library.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
+    """
+    DEPRECATED: Calculates the coefficients of the best-fit plane for a set of 3D points.
+
+    This function computes the best-fit plane that minimizes the distance to a set of points in 3D space.
+
+    Parameters
+    ----------
+    xs : list[float]
+        A list of x-coordinates of the points.
+    ys : list[float]
+        A list of y-coordinates of the points.
+    zs : list[float]
+        A list of z-coordinates of the points.
+
+    Returns
+    -------
+    list[float]
+        A list containing the coefficients [A, B, C] of the plane equation Ax + By + Cz + D = 0.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_3d.best_fit_plane_B is deprecated. Should be migrated to another library.',
         DeprecationWarning,
@@ -303,6 +432,28 @@ def best_fit_plane(xyz_list):
         Indicates that this function is deprecated and should be migrated to another library.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
+    """
+    DEPRECATED: Calculates the coefficients of the best-fit plane for a sequence of 3D points.
+
+    This function converts the list of 3D points into separate coordinate lists and
+    computes the best-fit plane coefficients.
+
+    Parameters
+    ----------
+    xyz_list : list[list[float]]
+        A list of points where each point is represented as [x, y, z].
+
+    Returns
+    -------
+    list[float]
+        A list containing the coefficients [A, B, C] of the plane equation Ax + By + Cz + D = 0.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_3d.best_fit_plane is deprecated. Should be migrated to another library.',
         DeprecationWarning,
@@ -341,6 +492,25 @@ def flip_homogeneous_plane(plane):
         Indicates that this function is deprecated and should be migrated to another library.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
+    """
+    Reverses the sense of the homogeneous plane.
+
+    Parameters
+    ----------
+    plane : list[float]
+        The coefficients of the plane in homogeneous coordinates [A, B, C, D].
+
+    Returns
+    -------
+    list[float]
+        The coefficients of the flipped plane.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_3d.flip_homogeneous_plane is deprecated. Should be migrated to another library.',
         DeprecationWarning,
@@ -351,6 +521,27 @@ def flip_homogeneous_plane(plane):
 
 
 def homogeneous_plane_signed_distance_to_xyz(xyz, plane):
+    """
+    DEPRECATED: Calculates the signed distance from a point to a homogeneous plane.
+
+    Parameters
+    ----------
+    xyz : list[float]
+        The coordinates of the point (x, y, z).
+    plane : list[float]
+        The coefficients of the plane in homogeneous coordinates [A, B, C, D].
+
+    Returns
+    -------
+    float
+        The signed distance from the point to the plane.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     """
     DEPRECATED: Calculates the signed distance from a point to a homogeneous plane.
 
@@ -421,7 +612,33 @@ def construct_line_3d_given_two_points(
 
     DeprecationWarning
         Indicates that this function is deprecated and should be migrated to another library.
+    DEPRECATED: Constructs a 3D line from two points.
+
+    This function creates a representation of an infinite line defined by two points in 3D space.
+
+    Parameters
+    ----------
+    xyz_1 : list[float]
+        The coordinates of the first point (x1, y1, z1).
+    xyz_2 : list[float]
+        The coordinates of the second point (x2, y2, z2).
+    tolerance : float, optional
+        A tolerance value to determine if the two points are considered the same. Defaults to 0.0.
+
+    Returns
+    -------
+    dict
+        A dictionary containing attributes of the line, including its length, midpoint, and direction.
+
+    Raises
+    ------
+    AssertionError
+        If the two points are the same or too close to each other.
+
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_3d.construct_line_3d_given_two_points is deprecated.  Should be migrated to another library.',
@@ -469,6 +686,28 @@ def construct_line_3d_given_two_points(
 
 def closest_point_on_line_3d(xyz, line_3d):  # ?? SCAFFOLDING RCB -- THE 3-D LINE SHOULD BE A CLASS.
     """
+    DEPRECATED: Finds the closest point on a 3D line to a given point.
+
+    This function calculates the point on the infinite line that is closest to the specified point in 3D space.
+
+    Parameters
+    ----------
+    xyz : list[float]
+        The coordinates of the point (x, y, z).
+    line_3d : dict
+        A dictionary representing the line, containing attributes such as 'mid_xyz' and 'uxyz'.
+
+    Returns
+    -------
+    list[float]
+        The coordinates of the closest point on the line to the given point.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     DEPRECATED: Finds the closest point on a 3D line to a given point.
 
     This function calculates the point on the infinite line that is closest to the specified point in 3D space.
@@ -544,7 +783,26 @@ def distance_to_line_3d(xyz, line_3d):  # ?? SCAFFOLDING RCB -- THE 3-D LINE SHO
     ------
     DeprecationWarning
         Indicates that this function is deprecated and should be migrated to another library.
+    DEPRECATED: Calculates the shortest distance from a point to an infinite 3D line.
+
+    Parameters
+    ----------
+    xyz : list[float]
+        The coordinates of the point (x, y, z).
+    line_3d : dict
+        A dictionary representing the line, containing attributes such as 'mid_xyz' and 'uxyz'.
+
+    Returns
+    -------
+    float
+        The shortest distance from the point to the line.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_3d.distance_to_line_3d is deprecated. Should be migrated to another library.',
