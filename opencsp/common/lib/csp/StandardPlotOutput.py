@@ -1,4 +1,4 @@
-"""Class used to display/save the suite of standard output plots after measuring a CSP Mirror/FacetEnsemble.
+"""Class used to display/save the suite of standard output plots after measuring a CSP Optic object.
 """
 
 from dataclasses import dataclass, field
@@ -22,88 +22,108 @@ import opencsp.common.lib.tool.log_tools as lt
 @dataclass
 class _OptionsSlopeVis:
     resolution: float = 0.01
-    """Resolution in meters"""
-    clim: float = 5
-    """Colorbar limits set to [-clim, clim] for x/y plots and [0, clim] for magnitude plots"""
+    """Plot x/y sample resolution (meters) (default 0.01)"""
+    clim: float | tuple[float, float, float] = 5
+    """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope magnitude plots.
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 5)"""
     quiver_density: float | tuple[float, float, float] = 0.1
-    """The density of the quiver arrows in meters. Can be single value of tuple of three values for [x, y, magnitude]."""
+    """The density of the quiver arrows (meters).
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 0.1)"""
     quiver_scale: float | tuple[float, float, float] = 25
-    """The scale of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
+    """The scale of the quiver arrows.
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 25)"""
     quiver_color: str | tuple[str, str, str] = 'white'
-    """The color of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
+    """The color of the quiver arrows.
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 'white')"""
     to_plot: bool = True
-    """Flag to produce plots or not"""
+    """Flag to produce plots or not. (default True)"""
 
 
 @dataclass
 class _OptionsSlopeDeviationVis:
     resolution: float = 0.01
-    """Resolution in meters"""
-    clim: float = 5
-    """Colorbar limits set to [-clim, clim] for x/y plots and [0, clim] for magnitude plots"""
+    """Plot x/y sample resolution (meters) (default 0.01)"""
+    clim: float | tuple[float, float, float] = 5
+    """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope magnitude plots.
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 5)"""
     quiver_density: float | tuple[float, float, float] = 0.1
-    """The density of the quiver arrows in meters. Can be single value of tuple of three values for [x, y, magnitude]."""
+    """The density of the quiver arrows (meters).
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 0.1)"""
     quiver_scale: float | tuple[float, float, float] = 25
-    """The scale of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
+    """The scale of the quiver arrows.
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 25)"""
     quiver_color: str | tuple[str, str, str] = 'white'
-    """The color of the quiver arrows. Can be single value of tuple of three values for [x, y, magnitude]."""
+    """The color of the quiver arrows.
+    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    (default 'white')"""
     to_plot: bool = True
-    """Flag to produce plots or not"""
+    """Flag to produce plots or not. (default True)"""
 
 
 @dataclass
 class _OptionsCurvatureVis:
     resolution: float = 0.01
-    """Resolution in meters"""
-    clim: float = 50
-    """Colorbar limits set to [-clim, clim]"""
+    """Plot x/y sample resolution (meters) (default 0.01)"""
+    clim: float | tuple[float, float, float] = 50
+    """Sets colorbar limits (mrad/meter). Plot limits set to [-clim, clim].
+    Can be single value of tuple of three values to map to [x, y, combined] plots individually. (default 50)"""
     processing: list[str] | tuple[list[str], list[str], list[str]] = field(default_factory=list)
     """Processing string to apply when in MirrorAbstract.plot_orthorectified_curvature().
-    Can be single value of tuple of three values for [x, y, combined]."""
+    Can be single value of tuple of three values to map to [x, y, combined] plots individually.
+    (default [])"""
     smooth_kernel_width: float | tuple[float, float, float] = 1
-    """Width of square smoothing kernel to apply to curvature images in MirrorAbstract.plot_orthorectified_curvature()."""
+    """Width of square smoothing kernel (pixels) to apply to curvature images in MirrorAbstract.plot_orthorectified_curvature().
+    Can be single value of tuple of three values to map to [x, y, combined] plots individually.
+    (default 1)"""
     to_plot: bool = True
-    """Flag to produce plots or not"""
+    """Flag to produce plots or not. (default True)"""
 
 
 @dataclass
 class _OptionsRayTraceVis:
     ray_trace_optic_res: float = 0.05
-    """Sampling resolution of optic in meters"""
+    """Raytracing sampling resolution of optic in meters. (default 0.05)"""
     hist_bin_res: float = 0.07
-    """Bin resolution when creating 2d histogram images"""
+    """Bin resolution (meters) when creating 2d histogram images. (default 0.07)"""
     hist_extent: float = 3
-    """Width of histogram image in meters"""
+    """Width of histogram image in meters. (default 3)"""
     enclosed_energy_max_semi_width: float = 2
-    """The max semi-width of aperture when computing enclosed energy plots"""
+    """The max semi-width of square aperture (meters) used when computing enclosed energy plots. (default 2)"""
     to_plot: bool = True
-    """Flag to produce plots or not"""
+    """Flag to produce plots or not. (default True)"""
 
 
 @dataclass
 class _OptionsFileOutput:
     to_save: bool = False
-    """Flag to save figures or not"""
+    """Flag to save figures or not. (default False)"""
     output_dir: str = ''
-    """Output path to save directory"""
+    """Output path to save directory. (default '')"""
     save_dpi: int = 200
-    """DPI of saved figures"""
+    """Dots Per Inch (DPI) of saved figures. (default 200)"""
     save_format: str = 'png'
-    """Saved figure format"""
+    """Saved figure format. (default 'png')"""
     close_after_save: bool = False
-    """To close figures after save"""
+    """To close figures after save. (default False)"""
     number_in_name: bool = True
-    """To keep figure number in save name"""
+    """To keep figure number in save name. (default True)"""
 
 
 @dataclass
 class _RayTraceParameters:
     source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=20)
-    """Source to use when producing ray trace image"""
+    """Light Source to use when producing ray trace image. (default `LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=20)`)"""
     v_target_center = Vxyz((0, 0, 50))
-    """Location of target in scene"""
+    """Location of target in scene (meters). (default `Vxyz((0, 0, 50))`)"""
     v_target_normal = Vxyz((0, 0, -1))
-    """Orientation of target in scene"""
+    """Orientation of target in scene. (default `Vxyz((0, 0, -1))`)"""
 
 
 @dataclass
@@ -123,7 +143,7 @@ class StandardPlotOutput:
         self.options_slope_vis = _OptionsSlopeVis()
         """Slope visualization options"""
         self.options_slope_deviation_vis = _OptionsSlopeDeviationVis()
-        """Slope defiation visualization options"""
+        """Slope deviation visualization options"""
         self.options_curvature_vis = _OptionsCurvatureVis()
         """Curvature visualization options"""
         self.options_ray_trace_vis = _OptionsRayTraceVis()
