@@ -1,8 +1,5 @@
 """
-Trransforms, Included Rotation and Translation
-
-
-
+Transforms, Included Rotation and Translation
 """
 
 import math
@@ -11,6 +8,32 @@ from warnings import warn
 
 
 def axisrotation(unit_vector, angle):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BETWEEN "AXIS" AND "ROTATION"
+    """
+    DEPRECATED: Calculates the rotation matrix for a given angle around a specified axis.
+
+    This function uses the right-hand rule to compute the rotation matrix based on
+    the provided unit vector and angle. The angle is expected to be in radians.
+
+    Parameters
+    ----------
+    unit_vector : np.ndarray
+        A 3D unit vector representing the axis of rotation.
+    angle : float
+        The angle of rotation in radians.
+
+    Returns
+    -------
+    np.ndarray
+        A 3x3 rotation matrix corresponding to the rotation around the specified axis.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be replaced with scipy.spatial.transform.Rotation.
+    AssertionError
+        If the input unit_vector is not of unit length.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'transform_3d.axisrotation is deprecated. Replace with scipy.spatial.transform.Rotation',
         DeprecationWarning,
@@ -47,13 +70,33 @@ def axisrotation(unit_vector, angle):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BE
 
 def rotation_matrix_to_euler_angles(R):
     """
-    Calculates rotation matrix to Euler angles.
-    The result is the same as MATLAB except the order
-    of the Euler angles (x and z are swapped).
+    DEPRECATED: Converts a rotation matrix to Euler angles.
 
+    This function computes the Euler angles corresponding to the given rotation matrix.
+    The order of the angles is such that the x and z angles are swapped compared to MATLAB.
+
+    Parameters
+    ----------
+    R : np.ndarray
+        A 3x3 rotation matrix.
+
+    Returns
+    -------
+    tuple[float, float, float]
+        A tuple containing the Euler angles (rot_x, rot_y, rot_z) in radians.
+
+    Raises
+    ------
+    AssertionError
+        If the input matrix is not a valid rotation matrix.
+    DeprecationWarning
+        Indicates that this function is deprecated and should be replaced with scipy.spatial.transform.Rotation.
+
+    Notes
+    -----
     See https://learnopencv.com/rotation-matrix-to-euler-angles/
-
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'transform_3d.rotation_matrix_to_euler_angles is deprecated. Replace with scipy.spatial.transform.Rotation.',
         DeprecationWarning,
@@ -77,11 +120,30 @@ def rotation_matrix_to_euler_angles(R):
 
 def is_rotation_matrix(R):
     """
-    Checks if a matrix is a valid rotation matrix.
+    DEPRECATED: Checks if a matrix is a valid rotation matrix.
 
+    A valid rotation matrix must be orthogonal and have a determinant of 1.
+
+    Parameters
+    ----------
+    R : np.ndarray
+        A 3x3 matrix to check.
+
+    Returns
+    -------
+    bool
+        True if the matrix is a valid rotation matrix, False otherwise.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be replaced with scipy.spatial.transform.Rotation.
+
+    Notes
+    -----
     See https://learnopencv.com/rotation-matrix-to-euler-angles/
-
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'transform_3d.is_rotation_matrix is deprecated. Replace with scipy.spatial.transform.Rotation.',
         DeprecationWarning,

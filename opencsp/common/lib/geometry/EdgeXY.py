@@ -4,6 +4,10 @@ from opencsp.common.lib.geometry.Pxy import Vxy
 
 
 class EdgeXY:
+    """
+    Representation of a 2D edge.
+    """
+
     def __init__(self, vertices: Vxy, curve_data: dict = {'type': 'line'}, closed: bool = False):
         """
         Representation of a 2D edge.

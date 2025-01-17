@@ -1,8 +1,5 @@
 """
 Angle Management
-
-
-
 """
 
 import math
@@ -18,12 +15,45 @@ from typing import Iterable, overload
 
 
 def coord2deg_aux(xy_or_xyz, idx):
+    """
+    Converts the specified coordinate (x, y, or z) from radians to degrees.
+
+    Parameters
+    ----------
+    xy_or_xyz : np.ndarray
+        A 1D array representing a point in 2D or 3D space.
+    idx : int
+        The index of the coordinate to convert (0 for x, 1 for y, 2 for z).
+
+    Returns
+    -------
+    np.ndarray
+        A copy of the input array with the specified coordinate converted to degrees.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     pt = xy_or_xyz.copy()
     pt[idx] = np.rad2deg(pt[idx])
     return pt
 
 
 def coord2deg(xy_or_xyz_or_xy_seq_or_xyz_seq, idx):
+    """
+    Converts the specified coordinate from radians to degrees for a single point or a sequence of points.
+
+    Parameters
+    ----------
+    xy_or_xyz_or_xy_seq_or_xyz_seq : np.ndarray or Iterable[np.ndarray]
+        A single point (2D or 3D) or a sequence of points to convert.
+    idx : int
+        The index of the coordinate to convert (0 for x, 1 for y, 2 for z).
+
+    Returns
+    -------
+    list[np.ndarray]
+        A list of points with the specified coordinate converted to degrees.
+        Returns an empty list if the input is empty.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     if len(xy_or_xyz_or_xy_seq_or_xyz_seq) == 0:
         # Then the input xy_or_xyz_or_xy_seq_or_xyz_seq can be interpreted
         # as an input sequence, that has zero length.
@@ -41,40 +71,127 @@ def coord2deg(xy_or_xyz_or_xy_seq_or_xyz_seq, idx):
 
 
 def x2deg(xy_or_xyz_or_xy_seq_or_xyz_seq):
+    """
+    Converts the x-coordinates of a point or sequence of points from radians to degrees.
+
+    Parameters
+    ----------
+    xy_or_xyz_or_xy_seq_or_xyz_seq : np.ndarray or Iterable[np.ndarray]
+        A single point (2D or 3D) or a sequence of points.
+
+    Returns
+    -------
+    list[np.ndarray]
+        A list of points with the x-coordinates converted to degrees.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return coord2deg(xy_or_xyz_or_xy_seq_or_xyz_seq, 0)
 
 
 def y2deg(xy_or_xyz_or_xy_seq_or_xyz_seq):
+    """
+    Converts the y-coordinates of a point or sequence of points from radians to degrees.
+
+    Parameters
+    ----------
+    xy_or_xyz_or_xy_seq_or_xyz_seq : np.ndarray or Iterable[np.ndarray]
+        A single point (2D or 3D) or a sequence of points.
+
+    Returns
+    -------
+    list[np.ndarray]
+        A list of points with the y-coordinates converted to degrees.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return coord2deg(xy_or_xyz_or_xy_seq_or_xyz_seq, 1)
 
 
 def z2deg(xyz_or_xyz_seq):
+    """
+    Converts the z-coordinates of a point or sequence of points from radians to degrees.
+
+    Parameters
+    ----------
+    xyz_or_xyz_seq : np.ndarray or Iterable[np.ndarray]
+        A single point (3D) or a sequence of points.
+
+    Returns
+    -------
+    list[np.ndarray]
+        A list of points with the z-coordinates converted to degrees.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return coord2deg(xyz_or_xyz_seq, 2)
 
 
 def p2deg(pq_or_pq_seq):
+    """
+    Converts the p-coordinates of a point or sequence of points from radians to degrees.
+
+    Parameters
+    ----------
+    pq_or_pq_seq : np.ndarray or Iterable[np.ndarray]
+        A single point (2D) or a sequence of points.
+
+    Returns
+    -------
+    list[np.ndarray]
+        A list of points with the p-coordinates converted to degrees.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return coord2deg(pq_or_pq_seq, 0)
 
 
 def q2deg(pq_or_pq_seq):
+    """
+    Converts the q-coordinates of a point or sequence of points from radians to degrees.
+
+    Parameters
+    ----------
+    pq_or_pq_seq : np.ndarray or Iterable[np.ndarray]
+        A single point (2D) or a sequence of points.
+
+    Returns
+    -------
+    list[np.ndarray]
+        A list of points with the q-coordinates converted to degrees.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return coord2deg(pq_or_pq_seq, 1)
 
 
 @overload
 def normalize(angle: float) -> float:
+    """Normalizes a single angle to the range [0, 2π]."""
+    # "ChatGPT 4o" assisted with generating this docstring.
     pass
 
 
 @overload
 def normalize(angles: npt.NDArray[np.float_] | Iterable) -> npt.NDArray[np.float_]:
+    """Normalizes an array of angles to the range [0, 2π]."""
+    # "ChatGPT 4o" assisted with generating this docstring.
     pass
 
 
 def normalize(angle_or_angles: float | npt.NDArray[np.float_] | Iterable) -> float | npt.NDArray[np.float_]:
-    """Adjusts the given angle_or_angles to be in the range 0-2π.
+    """
+    Adjusts the given angle or angles to be in the range [0, 2π].
+
     Note that because this function operates on floating point math,
-    your answer is not guaranteed to be exact (for example, a value
-    of -1e-16 could return 2π)."""
+    the result may not be exact (e.g., a value of -1e-16 could return 2π).
+
+    Parameters
+    ----------
+    angle_or_angles : float or npt.NDArray[np.float_] or Iterable
+        A single angle or an array/iterable of angles to normalize.
+
+    Returns
+    -------
+    float or npt.NDArray[np.float_]
+        The normalized angle or array of normalized angles.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     if isinstance(angle_or_angles, np.ndarray):
         angles: np.ndarray = angle_or_angles
         # limit to the range +-pi
@@ -96,14 +213,28 @@ def normalize(angle_or_angles: float | npt.NDArray[np.float_] | Iterable) -> flo
 
 def angle2_minus_angle_1(angle_1, angle_2):
     """
-    Returns the signed small angle between the two input angles.
-    In most cases, this will simply be (angle_2 - angle_1).
-    However, we correct for cases where the angles wrap around 2pi.
-    Examples:
-        angle 1 =   5deg, angle_2 =  10 deg  ==>   5 deg.
-        angle 1 = 355deg, angle_2 =  10 deg  ==>  15 deg.
-        angle 1 =  -5deg, angle_2 = -10 deg  ==>  -5 deg.
-        angle 1 =   5deg, angle_2 = -10 deg  ==> -15 deg.
+    Calculates the signed small angle between two input angles.
+
+    This function corrects for cases where the angles wrap around 2π.
+
+    Parameters
+    ----------
+    angle_1 : float
+        The first angle in radians.
+    angle_2 : float
+        The second angle in radians.
+
+    Returns
+    -------
+    float
+        The signed angle difference between angle_2 and angle_1, adjusted for wrapping.
+
+    Examples
+    --------
+    - angle_1 = 5 degrees, angle_2 = 10 degrees  ==>  5 degrees
+    - angle_1 = 355 degrees, angle_2 = 10 degrees  ==>  15 degrees
+    - angle_1 = -5 degrees, angle_2 = -10 degrees  ==>  -5 degrees
+    - angle_1 = 5 degrees, angle_2 = -10 degrees  ==>  -15 degrees
     """
     two_pi = 2 * math.pi
     diff = angle_2 - angle_1
