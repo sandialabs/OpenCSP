@@ -61,6 +61,7 @@ class Vxy:
 
         """
         # Check input shape
+        data_tmp = None
         if isinstance(data_in, Vxy):
             data_tmp = data_in.data
         if type(data_in) is np.ndarray:

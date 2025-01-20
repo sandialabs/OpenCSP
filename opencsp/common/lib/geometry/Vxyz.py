@@ -76,6 +76,7 @@ class Vxyz:
 
         """
         # Check input shape
+        data_tmp = None
         if isinstance(data_in, np.ndarray):
             data_tmp = data_in.squeeze()
             if np.ndim(data_in) not in [1, 2]:
