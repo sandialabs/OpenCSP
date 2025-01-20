@@ -15,3 +15,4 @@ This section describes the OpenCSP classes and interfaces.
    common/lib/camera/index.rst
    common/lib/csp/index.rst
    common/lib/file/index.rst
+   common/lib/geometry/index.rst

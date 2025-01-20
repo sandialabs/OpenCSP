@@ -18,25 +18,16 @@ class Vxy:
 
     The vectors can be initialized from various data formats, including
     NumPy arrays, tuples, lists, or other instances of the Vxy class.
-
-    Attributes
-    ----------
-    data : np.ndarray
-        An array with shape (2, N), where N is the number of 2D vectors.
-    dtype : np.dtype
-        The data type of the vector elements.
-    x : np.ndarray
-        The x-coordinates of the vectors.
-    y : np.ndarray
-        The y-coordinates of the vectors.
     """
 
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    def __init__(self, data: Union[np.ndarray, tuple[float, float], tuple[list, list], "Vxy"], dtype=float):
+    def __init__(self, data_in: Union[np.ndarray, tuple[float, float], tuple[list, list], "Vxy"], dtype=float):
         """
         2D vector class to represent 2D points/vectors.
 
-        To represent a single vector::
+        To represent a single vector:
+
+        .. code-block:: python
 
             x = 1
             y = 2
@@ -44,7 +35,9 @@ class Vxy:
             print(vec.x) # [1.]
             print(vec.y) # [2.]
 
-        To represent a set of vectors::
+        To represent a set of vectors:
+
+        .. code-block:: python
 
             vec1 = [1, 2]
             vec2 = [4, 5]
@@ -61,7 +54,7 @@ class Vxy:
 
         Parameters
         ----------
-        data : array-like
+        data_in : array-like
             The 2d point data: 2xN array, length 2 tuple, length 2 list
         dtype : data type, optional
             Data type. The default is float.
@@ -69,18 +62,18 @@ class Vxy:
         """
         # Check input shape
         if isinstance(data, Vxy):
-            data = data.data
-        if type(data) is np.ndarray:
-            data = data.squeeze()
-            if np.ndim(data) not in [1, 2]:
+            data = data_in.data
+        if type(data_in) is np.ndarray:
+            data = data_in.squeeze()
+            if np.ndim(data_in) not in [1, 2]:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
-            elif np.ndim(data) == 2 and data.shape[0] != 2:
+            elif np.ndim(data_in) == 2 and data_in.shape[0] != 2:
                 raise ValueError('First dimension of 2-dimensional data must be length 2 if ndarray.')
-        elif len(data) != 2:
+        elif len(data_in) != 2:
             raise ValueError('Input data must have length 2.')
 
         # Save and format data
-        self._data = np.array(data, dtype=dtype).reshape((2, -1))
+        self._data = np.array(data_in, dtype=dtype).reshape((2, -1))
 
     @property
     def data(self):
@@ -95,10 +88,12 @@ class Vxy:
 
     @property
     def x(self):
+        """The x-coordinates of the vectors."""
         return self._data[0, :]
 
     @property
     def y(self):
+        """The y-coordinates of the vectors."""
         return self._data[1, :]
 
     @classmethod

@@ -18,21 +18,26 @@ class Vxyz:
     3D vector class to represent 3D points/vectors. Contains N 3D vectors where len == N.
 
     The values for the contained vectors can be retrieved with
-    :py:meth:`data`(), or individual vectors can be retrieved with the indexing
+    :py:meth:`data`, or individual vectors can be retrieved with the indexing
     or x/y/z methods. For example, the following can both be used to get the first contained vector::
+
+    .. code-block:: python
 
         vec = v3.Vxyz([[0, 1, 2], [3, 4, 5], [6, 7, 8]])
         v0 = Vxyz([vec.x()[0], vec.y()[0], vec.z()[0]])
         # v0 == Vxyz([0, 3, 6])
         v0 = vec[0]
         # v0 == Vxyz([0, 3, 6])
+
     """
 
     def __init__(
         self, data: Union[np.ndarray, tuple[float, float, float], tuple[list, list, list], Vxy, "Vxyz"], dtype=float
     ):
         """
-        To represent a single vector::
+        To represent a single vector:
+
+        .. code-block:: python
 
             x = 1
             y = 2
@@ -42,7 +47,9 @@ class Vxyz:
             print(vec.y) # [2.]
             print(vec.z) # [3.]
 
-        To represent a set of vectors::
+        To represent a set of vectors:
+
+        .. code-block:: python
 
             vec1 = [1, 2, 3]
             vec2 = [4, 5, 6]
@@ -98,14 +105,17 @@ class Vxyz:
 
     @property
     def x(self) -> np.ndarray:
+        """The x-coordinates of the vectors."""
         return self._data[0, :]
 
     @property
     def y(self) -> np.ndarray:
+        """The y-coordinates of the vectors."""
         return self._data[1, :]
 
     @property
     def z(self) -> np.ndarray:
+        """The z-coordinates of the vectors."""
         return self._data[2, :]
 
     def as_Vxyz(self) -> "Vxyz":
@@ -568,15 +578,15 @@ class Vxyz:
 
         Parameters
         ----------
-        figure : rcfr.RenderControlFigureRecord | v3d.View3d
+        figure : rcfr.RenderControlFigureRecord or v3d.View3d
             The figure to draw to.
         close : bool, optional
             True to add the first point again at the end of the plot, thereby
             drawing this set of points as a closed polygon. None or False to not
-            add another point at the end (draw_xyz_list's default)
+            add another point at the end (draw_xyz_list default)
         style : rcps.RenderControlPointSeq, optional
             The style to use for the points and lines, or None for
-            :py:method:`RenderControlPointSequence.default`().
+            :py:meth:`RenderControlPointSequence.default`.
         label : str, optional
             A string used to label this plot in the legend, or None for no label.
         """
@@ -606,10 +616,10 @@ class Vxyz:
         close : bool, optional
             True to add the first point again at the end of the plot, thereby
             drawing this set of points as a closed polygon. None or False to not
-            add another point at the end (draw_xyz_list's default).
+            add another point at the end (draw_xyz_list default).
         style : rcps.RenderControlPointSeq, optional
             The style to use for the points and lines, or None for
-            :py:method:`RenderControlPointSequence.default`().
+            :py:meth:`RenderControlPointSequence.default`.
         label : str, optional
             A string used to label this plot in the legend, or None for no label.
         """
