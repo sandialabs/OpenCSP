@@ -32,7 +32,7 @@ class Vxyz:
     """
 
     def __init__(
-        self, data: Union[np.ndarray, tuple[float, float, float], tuple[list, list, list], Vxy, "Vxyz"], dtype=float
+        self, data_in: Union[np.ndarray, tuple[float, float, float], tuple[list, list, list], Vxy, "Vxyz"], dtype=float
     ):
         """
         To represent a single vector:
@@ -68,7 +68,7 @@ class Vxyz:
 
         Parameters
         ----------
-        data : array-like
+        data_in : array-like
             The 3d point data: 3xN array, length 3 tuple, length 3 list. If a Vxy, then the data will be padded with 0s
             for 'z'.
         dtype : data type, optional
@@ -76,21 +76,21 @@ class Vxyz:
 
         """
         # Check input shape
-        if isinstance(data, np.ndarray):
-            data = data.squeeze()
-            if np.ndim(data) not in [1, 2]:
+        if isinstance(data_in, np.ndarray):
+            data_tmp = data.squeeze()
+            if np.ndim(data_in) not in [1, 2]:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
-            elif np.ndim(data) == 2 and data.shape[0] != 3:
+            elif np.ndim(data_in) == 2 and data_in.shape[0] != 3:
                 raise ValueError('First dimension of 2-dimensional data must be length 3 if ndarray.')
-        elif isinstance(data, Vxy):
-            data = np.pad(data.data, ((0, 1), (0, 0)))
-        elif isinstance(data, Vxyz):
-            data = data.data
-        elif len(data) != 3:
+        elif isinstance(data_in, Vxy):
+            data_tmp = np.pad(data_in.data, ((0, 1), (0, 0)))
+        elif isinstance(data_in, Vxyz):
+            data_tmp = data_in.data
+        elif len(data_in) != 3:
             raise ValueError('Input data must have length 3.')
 
         # Save and format data
-        self._data = np.array(data, dtype=dtype).reshape((3, -1))
+        self._data = np.array(data_tmp, dtype=dtype).reshape((3, -1))
 
     @property
     def data(self) -> np.ndarray:
