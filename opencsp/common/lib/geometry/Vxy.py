@@ -61,10 +61,10 @@ class Vxy:
 
         """
         # Check input shape
-        if isinstance(data, Vxy):
-            data = data_in.data
+        if isinstance(data_in, Vxy):
+            data_tmp = data_in.data
         if type(data_in) is np.ndarray:
-            data = data_in.squeeze()
+            data_tmp = data_in.squeeze()
             if np.ndim(data_in) not in [1, 2]:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
             elif np.ndim(data_in) == 2 and data_in.shape[0] != 2:
@@ -73,7 +73,7 @@ class Vxy:
             raise ValueError('Input data must have length 2.')
 
         # Save and format data
-        self._data = np.array(data_in, dtype=dtype).reshape((2, -1))
+        self._data = np.array(data_tmp, dtype=dtype).reshape((2, -1))
 
     @property
     def data(self):
