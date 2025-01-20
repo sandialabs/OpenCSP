@@ -77,7 +77,7 @@ class Vxyz:
         """
         # Check input shape
         if isinstance(data_in, np.ndarray):
-            data_tmp = data.squeeze()
+            data_tmp = data_in.squeeze()
             if np.ndim(data_in) not in [1, 2]:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
             elif np.ndim(data_in) == 2 and data_in.shape[0] != 3:
