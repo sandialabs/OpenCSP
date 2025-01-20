@@ -76,12 +76,12 @@ class Vxyz:
 
         """
         # Check input shape
-        data_tmp = None
+        data_tmp = data_in
         if isinstance(data_in, np.ndarray):
             data_tmp = data_in.squeeze()
-            if np.ndim(data_in) not in [1, 2]:
+            if np.ndim(data_tmp) not in [1, 2]:
                 raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
-            elif np.ndim(data_in) == 2 and data_in.shape[0] != 3:
+            elif np.ndim(data_tmp) == 2 and data_tmp.shape[0] != 3:
                 raise ValueError('First dimension of 2-dimensional data must be length 3 if ndarray.')
         elif isinstance(data_in, Vxy):
             data_tmp = np.pad(data_in.data, ((0, 1), (0, 0)))
