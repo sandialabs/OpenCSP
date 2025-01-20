@@ -35,6 +35,8 @@ class SimpleCsv:
         Example
         -------
 
+        .. code-block:: python
+
             parser = scsv.SimpleCsv("example file", file_path, file_name_ext)
             for row_dict in parser:
                 print(row_dict)

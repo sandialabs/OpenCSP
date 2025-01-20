@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/bash -x
 echo "Usage example: "
 echo "    ./gen_library_ref_rst_from_class_list.sh \\"
 echo "    ./source/library_reference/common/lib/csp \\"

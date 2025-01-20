@@ -27,6 +27,9 @@ class CsvColumns:
 
         Example
         -------
+
+        .. code-block:: python
+
             cols = cc.CsvColumns({
                 'latitude': ['lat'],
                 'datetime': ['UTC', 'localtime', re.compile(r"^dt")]
