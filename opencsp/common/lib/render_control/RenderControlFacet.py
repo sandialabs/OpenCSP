@@ -2,6 +2,10 @@
 
 """
 
+import copy
+
+import numpy as np
+
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
@@ -24,6 +28,8 @@ class RenderControlFacet:
         centroid_style=rcps.marker(),
         draw_outline=True,
         outline_style=rcps.outline(),
+        draw_fill=False,
+        fill_color=None,
         draw_surface_normal=False,
         surface_normal_length=4,
         surface_normal_style=rcps.outline(),
@@ -44,6 +50,8 @@ class RenderControlFacet:
         self.centroid_style = centroid_style
         self.draw_outline = draw_outline
         self.outline_style = outline_style
+        self._draw_fill = draw_fill
+        self._fill_color = fill_color
         self.draw_surface_normal = draw_surface_normal
         self.surface_normal_length = surface_normal_length
         self.surface_normal_style = surface_normal_style
@@ -56,6 +64,39 @@ class RenderControlFacet:
         self.name_style = name_style
         self.draw_mirror_curvature = draw_mirror_curvature
         self.mirror_styles = mirror_styles
+
+        self._update_fill_color()
+
+    @property
+    def draw_fill(self):
+        return self._draw_fill
+
+    @draw_fill.setter
+    def draw_fill(self, val: bool):
+        self._draw_fill = val
+        self._update_fill_color()
+
+    @property
+    def fill_color(self):
+        if self._fill_color is not None:
+            return self._fill_color
+        else:
+            return self.outline_style.color
+
+    @fill_color.setter
+    def fill_color(self, val):
+        self._fill_color = val
+        self._update_fill_color()
+
+    def _update_fill_color(self):
+        if self._draw_fill:
+            if self.outline_style.color is None or np.any(self.outline_style.color != self.fill_color):
+                self.outline_style = copy.copy(self.outline_style)
+                self.outline_style.color = self.fill_color
+        else:
+            if self.outline_style.color is not None:
+                self.outline_style = copy.copy(self.outline_style)
+                self.outline_style.color = None
 
     def style(self, imput_name: str):
         return self
@@ -73,16 +114,6 @@ def outline(color='k'):
         draw_centroid=False,
         draw_outline=True,
         outline_style=rcps.outline(color=color),
-        draw_surface_normal=False,
-        draw_name=False,
-    )
-
-
-def outline_thin(color='k', linewidth=0.5):
-    return RenderControlFacet(
-        draw_centroid=False,
-        draw_outline=True,
-        outline_style=rcps.outline(color=color, linewidth=linewidth),
         draw_surface_normal=False,
         draw_name=False,
     )
