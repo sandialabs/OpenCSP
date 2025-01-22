@@ -44,9 +44,13 @@ jobs:
 
       - name: Build image
         run: |
-          echo UBI8_IMAGE=$UBI8_IMAGE
           cp requirements.txt ./docker
-          docker build ./docker --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
+          echo "FULL_TAG=$FULL_TAG"
+          docker build ./docker \
+            --build-arg="TARGET_ARCH=${{matrix.ARCH}}"
+            --file "${{matrix.dockerfile}}" \
+            --tag "$FULL_TAG" \
+            --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
