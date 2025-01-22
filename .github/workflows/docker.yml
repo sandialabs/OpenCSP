@@ -20,9 +20,6 @@ env:
 jobs:
   container_build_matrix:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
     strategy:
       matrix:
         dockerfile: [Dockerfile, Dockerfile_x11]
@@ -67,3 +64,7 @@ jobs:
         run: |
           echo "FULL_TAG=$FULL_TAG"
           docker push "$FULL_TAG"
+
+    permissions:
+      packages: write
+      contents: read
