@@ -166,6 +166,37 @@ How to install OpenCSP's dependencies
 
 With python version 3.10 or greater, run the following:
 
+Docker (Headless)
+^^^^^^^^^^^^^^^^^
+
+::
+    $ cd /path/to/OpenCSP/
+    $ export ARCH=arm64 # set this to amd64 for amd64 hardware
+    $ docker build -build-arg="TARGET_ARG=$ARCH" --arch $ARCH -t opencsp-dev-ubi8-$ARCH -f Dockerfile ./docker
+
+Docker (Xorg)
+^^^^^^^^^^^^^
+
+For MacOS, install xquartz. Open the xquartz xterm and run `xhost +localhost`. Open the xquartz preferences, and, in the security tab, select "Allow connections from network clients".
+
+For Windows, install vcxsrv. Open vcxsrv and select 'Multiple Windows', set display number to 0, enable start no client, disable access control. Click finish to start the server.
+
+::
+    $ cd /path/to/OpenCSP/
+    $ export ARCH=arm64 # set this to amd64 for amd64 hardware
+    $ docker build --build-arg="TARGET_ARG=$ARCH" --arch $ARCH -t opencsp-dev-ubi8-x11-$ARCH -f Dockerfile_x11 ./docker
+    # For podman desktop:
+    $ podman run -it --rm --env DISPLAY=host.docker.internal:0 --volume /tmp/.X11-unix:/tmp/.X11-unix -v$PWD:/code opencsp-dev-ubi8-x11-$ARCH "/bin/bash"
+    # Otherwise:
+    $ docker run -it --rm --env DISPLAY=$DISPLAY --volume /tmp/.X11-unix:/tmp/.X11-unix -v$PWD:/code opencsp-dev-ubi8-x11-$ARCH "/bin/bash"
+
+To expose a device such as a camera in docker, use:
+
+::
+    docker run --device /path/to/device ...
+
+On linux, the device is typically in /dev/.
+
 Linux
 ^^^^^
 
