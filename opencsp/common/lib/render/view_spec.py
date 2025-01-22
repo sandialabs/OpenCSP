@@ -43,6 +43,24 @@ def view_spec_yz() -> dict:
     return spec
 
 
+def view_spec_xyz() -> dict:
+    spec = {}
+    spec['type'] = 'xyz'
+    return spec
+
+
+def view_spec_pq() -> dict:
+    spec = {}
+    spec['type'] = 'xy'
+    return spec
+
+
+def view_spec_pqw() -> dict:
+    spec = {}
+    spec['type'] = 'xyz'
+    return spec
+
+
 def view_spec_im() -> dict:
     spec = {}
     spec['type'] = 'image'
