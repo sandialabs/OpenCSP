@@ -7,10 +7,28 @@ _ColumnHeader = namedtuple('ColumnHeader', ['name', 'aliases', 'idx'])
 
 
 class CsvColumns:
-    def __init__(self, columns: dict[str, list[str | re.Pattern]]):
-        """Helps to parse csv files that have a tentative structure to them by finding column name matches.
+    """
+    A class to help parse CSV files with a tentative structure by finding column name matches.
 
-        Example::
+    This class allows for the definition of expected column names and their aliases,
+    and provides methods to parse the header and data rows of a CSV file.
+    """
+
+    # "ChatGPT 4o" assisted with generating this docstring.
+    def __init__(self, columns: dict[str, list[str | re.Pattern]]):
+        """
+        Initializes the CsvColumns instance with the provided column definitions.
+        Helps to parse csv files that have a tentative structure to them by finding column name matches.
+
+        Parameters
+        ----------
+        columns : dict[str, list[str | re.Pattern]]
+            The anticipated column names and their corresponding aliases or regex patterns.
+
+        Example
+        -------
+
+        .. code-block:: python
 
             cols = cc.CsvColumns({
                 'latitude': ['lat'],
@@ -20,21 +38,50 @@ class CsvColumns:
             cols.parse_header(rows[0])
             lat = float(rows[1][cols['latitude']])
             dt = datetime.fromisoformat(rows[1][cols['datetime']])
-
-        Args:
-            columns (dict[str,list[str | re.Pattern]]): The anticipated column names to patterns to match those column names.
         """
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.columns = {k: _ColumnHeader(k, columns[k], -1) for k in columns}
 
     @classmethod
     def SimpleColumns(cls, header_row: list[str]):
-        """Simple constructor that creates columns and column names from the header."""
+        """
+        Creates a CsvColumns instance from a simple header row.
+
+        This method initializes the columns using the header row as both the names and aliases.
+
+        Parameters
+        ----------
+        header_row : list[str]
+            A list of column names from the CSV header.
+
+        Returns
+        -------
+        CsvColumns
+            An instance of CsvColumns initialized with the provided header row.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         columns = {v: [v] for v in header_row}
         ret = cls(columns)
         ret.parse_header(header_row)
         return ret
 
     def parse_data_row(self, data_row: list[str], row_idx=-1):
+        """
+        Parses a data row and extracts values based on the matched column indices.
+
+        Parameters
+        ----------
+        data_row : list[str]
+            A list of values from a single row of the CSV file.
+        row_idx : int, optional
+            The index of the row being parsed, used for logging. Defaults to -1.
+
+        Returns
+        -------
+        dict[str, str]
+            A dictionary mapping column names to their corresponding values from the data row.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         ret: dict[str, str] = {}
         last_matched_idx = -1
 
@@ -61,6 +108,24 @@ class CsvColumns:
         ok_if_not_found: list[str] = None,
         alternatives: dict[str, list[str]] = None,
     ):
+        """
+        Parses the header row to find matches for the defined columns.
+
+        This method updates the column indices based on the header row and checks for
+        any missing columns, logging warnings or raising errors as specified.
+
+        Parameters
+        ----------
+        header_row : list[str]
+            A list of column names from the CSV header.
+        error_on_not_found : bool | list[str], optional
+            If True, raises an error for any missing columns. If a list, raises an error for columns in that list. Defaults to True.
+        ok_if_not_found : list[str], optional
+            A list of column names that are acceptable to be missing. Defaults to None.
+        alternatives : dict[str, list[str]], optional
+            A dictionary mapping column names to lists of alternative names. Defaults to None.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # add reverse values for the alternatives, if any
         if alternatives != None:
             ks = list(alternatives.keys())
