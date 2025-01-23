@@ -25,7 +25,6 @@ import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano
 import opencsp.common.lib.geometry.ReferenceFrame
-import opencsp.common.lib.geometry.matrix_geometry_3d
 import opencsp.common.lib.opencsp_path.optical_analysis_data_path
 import opencsp.common.lib.process.ServerSynchronizer
 import opencsp.common.lib.process.parallel_video_tools
@@ -308,7 +307,6 @@ class test_Docstrings(unittest.TestCase):
         opencsp.common.lib.geometry.angle,
         opencsp.common.lib.geometry.geometry_2d,
         opencsp.common.lib.geometry.geometry_3d,
-        opencsp.common.lib.geometry.matrix_geometry_3d,
         opencsp.common.lib.geometry.transform_3d,
     ]
 
