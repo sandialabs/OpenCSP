@@ -1,36 +1,17 @@
-import os
-import time
-from functools import reduce
-from multiprocessing.pool import Pool
-from typing import Iterable
-from warnings import warn
-
 import numpy as np
-import psutil
-from scipy.spatial.transform import Rotation
 
 import opencsp.common.lib.tool.log_tools as lt
 
-from opencsp.common.lib.csp import LightPath as lp
-from opencsp.common.lib.csp.LightPath import LightPath
-from opencsp.common.lib.csp.LightPathEnsemble import LightPathEnsemble
-from opencsp.common.lib.csp.LightSource import LightSource
 from opencsp.common.lib.csp.RayTrace import RayTrace
-from opencsp.common.lib.csp.RayTraceable import RayTraceable
-from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.geometry.FunctionXYGrid import FunctionXYGrid
 
-# from opencsp.common.lib.geometry.Plane import Plane
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
-from opencsp.common.lib.render_control.RenderControlRayTrace import RenderControlRayTrace
-from opencsp.common.lib.render_control.RenderControlIntersection import RenderControlIntersection
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
-from opencsp.common.lib.tool.typing_tools import strict_types
 
 
 class Intersection:
@@ -58,10 +39,8 @@ class Intersection:
         cls,
         ray_trace: RayTrace,
         plane: tuple[Pxyz, Uxyz],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
-        epsilon: float = 1e-6,
         save_in_file: bool = False,
         save_name: str = None,
-        max_ram_in_use_percent: float = 95.0,
         verbose: bool = False,
     ):
         """
@@ -102,25 +81,8 @@ class Intersection:
         # Unpack plane
         plane_point, plane_normal_vector = plane
 
-        intersecting_points = []
         lpe = ray_trace.light_paths_ensemble
         batch = 0
-
-        # ################# TODO TJL:draft for saving traces ######################
-        # # TODO: add deletion if save_in_ram = False
-        # if save_in_file:
-        #     datasets = [
-        #         f"Intersection/Information/PlaneLocation",
-        #         f"Intersection/Information/PlaneNormalVector",
-        #     ]
-        #     data = [plane_point.data, plane_normal_vector.data]
-        #     print("saving general information...")
-        #     save_hdf5_datasets(data, datasets, save_name)
-        # ##############################################################################
-
-        # finds where the light intersects the plane
-        # algorithm explained at \opencsp\doc\IntersectionWithPlaneAlgorithm.pdf
-        # TODO TJL:upload explicitly vectorized algorithm proof
 
         plane_normal_vector = plane_normal_vector.normalize()
         plane_vectorV = plane_normal_vector.data  # column vector
@@ -135,32 +97,22 @@ class Intersection:
         if verbose:
             print("finding intersections...")
 
-        ########## Intersection Algorithm ###########
-        # .op means to do the 'op' element wise
+        # Intersection Algorithm
         d = np.matmul(plane_vectorV.T, V)  # (1 x N) <- (1 x 3)(3 x N)
         W = P - plane_pointV  # (3 x N) <- (3 x N) -[broadcast] (3 x 1)
         f = -np.matmul(plane_vectorV.T, W) / d  # (1 x N) <- (1 x 3)(3 x N) ./ (1 x N)
         F = f * V  # (3 x N) <- (1 x N) .* (3 x N)
         intersection_matrix = P + F  # (3 x N) <- (3 x N) .- (3 x N)
-        #############################################
+
         intersection_points = Pxyz(intersection_matrix)
 
         # filter out points that miss the plane
         if verbose:
             print("filtering out missed vectors")
         filtered_intersec_points = Pxyz.merge(list(filter(lambda vec: not vec.hasnan(), intersection_points)))
-
-        # if verbose:
-        #     print("Rotating.")
-        # TODO: Do we want the inverse that takes that vector back into the up vector
-        # up_vec = Vxyz([0, 0, 1])
-        # rot = Vxyz.align_to(plane_normal_vector, up_vec)  # .inv()
-        # rotated_intersec_points: Pxyz = filtered_intersec_points.rotate(rot)
-
         if verbose:
             print("Plane intersections caluculated.")
 
-        ################# TODO TJL:draft for saving traces ######################
         if save_in_file:
             datasets = [f"Intersection/Batches/Batch{batch:08}"]
             if verbose:
@@ -169,23 +121,16 @@ class Intersection:
             if verbose:
                 print(f"saving to {save_name}...")
             save_hdf5_datasets(data, datasets, save_name)
-        ##############################################################################
 
         return Intersection(filtered_intersec_points)
-        # return np.histogram2d(xyz[:,0], xyz[:,1], bins)
-        # TODO TJL:create the histogram from this or bin these results
 
     plane_intersec_vec = plane_intersect_from_ray_trace
-
-    # TODO TJL:for maddie, make this better
 
     @classmethod
     def plane_lines_intersection(
         cls,
         lines: tuple[Pxyz, Vxyz],
         plane: tuple[Pxyz, Uxyz],  # used to be --> plane_point: Pxyz, plane_normal_vector: Uxyz,
-        epsilon: float = 1e-6,
-        verbose: bool = False,
     ) -> Pxyz:
         """
         Calculates intersection points of multiple lines with a specified plane.
@@ -230,7 +175,6 @@ class Intersection:
         points, directions = lines
 
         # normalize inputs
-        lines_validate = np.squeeze(points.data), np.squeeze(directions.data)
         plane_validate = np.squeeze(plane_point.data), np.squeeze(plane_normal_vector.data)
 
         # validate inputs
@@ -248,7 +192,7 @@ class Intersection:
             if Vxyz.dot(plane_normal_vector, directions[i]) == 0:
                 lt.error_and_raise(
                     ValueError,
-                    f"Error in plane_lines_intersection(): the 'plane' parameter and 'line(s)' parameter(s) are parallel.",
+                    "Error in plane_lines_intersection(): the 'plane' parameter and 'line(s)' parameter(s) are parallel.",
                 )
 
         plane_normal_vector = plane_normal_vector.normalize()
@@ -262,19 +206,16 @@ class Intersection:
 
         lt.debug("finding intersections...")
 
-        ########## Intersection Algorithm ###########
-        # .+ means add element wise
+        # Intersection Algorithm
         d = np.matmul(plane_vectorV.T, V)  # (1 x N) <- (1 x 3)(3 x N)
         W = P - plane_pointV  # (3 x N) <- (3 x N) -[broadcast] (3 x 1)
         f = -np.matmul(plane_vectorV.T, W) / d  # (1 x N) <- (1 x 3)(3 x N) ./ (1 x N)
         F = f * V  # (3 x N) <- (1 x N) .* (3 x N)
         intersection_matrix = P + F  # (3 x N) <- (3 x N) .- (3 x N)
-        #############################################
+
         intersection_points = Pxyz(intersection_matrix)
 
         return intersection_points
-        # return np.histogram2d(xyz[:,0], xyz[:,1], bins)
-        # TODO TJL:create the histogram from this or bin these results
 
     @classmethod
     def from_hdf(cls, filename: str, intersection_name: str = "000"):
@@ -353,7 +294,7 @@ class Intersection:
 
     # flux maps
 
-    def to_flux_mapXY(self, bins: int, resolution_type: str = None) -> FunctionXYGrid:
+    def to_flux_mapXY(self, bins: int) -> FunctionXYGrid:
         """
         Generates a flux map in the XY plane from the intersection points.
 
@@ -361,8 +302,6 @@ class Intersection:
         ----------
         bins : int
             The number of bins to use for the histogram.
-        resolution_type : str, optional
-            The type of resolution to use for the flux map. Defaults to None.
 
         Returns
         -------
@@ -371,9 +310,9 @@ class Intersection:
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         pxy = Pxy([self.intersection_points.x, self.intersection_points.y])
-        return Intersection._Pxy_to_flux_map(pxy, bins, resolution_type)
+        return Intersection._Pxy_to_flux_map(pxy, bins)
 
-    def to_flux_mapXZ(self, bins: int, resolution_type: str = None) -> FunctionXYGrid:
+    def to_flux_mapXZ(self, bins: int) -> FunctionXYGrid:
         """
         Generates a flux map in the XZ plane from the intersection points.
 
@@ -381,8 +320,6 @@ class Intersection:
         ----------
         bins : int
             The number of bins to use for the histogram.
-        resolution_type : str, optional
-            The type of resolution to use for the flux map. Defaults to None.
 
         Returns
         -------
@@ -391,9 +328,9 @@ class Intersection:
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         pxz = Pxy([self.intersection_points.x, self.intersection_points.z])
-        return Intersection._Pxy_to_flux_map(pxz, bins, resolution_type)
+        return Intersection._Pxy_to_flux_map(pxz, bins)
 
-    def to_flux_mapYZ(self, bins: int, resolution_type: str = None) -> FunctionXYGrid:
+    def to_flux_mapYZ(self, bins: int) -> FunctionXYGrid:
         """
         Generates a flux map in the YZ plane from the intersection points.
 
@@ -401,8 +338,6 @@ class Intersection:
         ----------
         bins : int
             The number of bins to use for the histogram.
-        resolution_type : str, optional
-            The type of resolution to use for the flux map. Defaults to None.
 
         Returns
         -------
@@ -411,9 +346,10 @@ class Intersection:
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         pyz = Pxy([self.intersection_points.y, self.intersection_points.z])
-        return Intersection._Pxy_to_flux_map(pyz, bins, resolution_type)
+        return Intersection._Pxy_to_flux_map(pyz, bins)
 
-    def _Pxy_to_flux_map(points: Pxy, bins: int, resolution_type: str = "pixelX") -> FunctionXYGrid:
+    @staticmethod
+    def _Pxy_to_flux_map(points: Pxy, bins: int) -> FunctionXYGrid:
 
         xbins = bins
         x_low, x_high = min(points.x), max(points.x)
@@ -434,8 +370,6 @@ class Intersection:
 
         return FunctionXYGrid(h, (x_mid_low, x_mid_high, y_mid_low, y_mid_high))
 
-    # drawing
-
     def draw(self, view: View3d, style: RenderControlPointSeq = None):
         """
         Draws the intersection points in a 3D view.
@@ -452,7 +386,7 @@ class Intersection:
             style = RenderControlPointSeq()
         self.intersection_points.draw_points(view, style)
 
-    def draw_subset(self, view: View3d, count: int, points_style: RenderControlPointSeq = None):
+    def draw_subset(self, view: View3d, count: int):
         """
         Draws a subset of intersection points in a 3D view.
 
@@ -462,8 +396,6 @@ class Intersection:
             The 3D view in which to draw the intersection points.
         count : int
             The number of points to draw from the intersection points.
-        points_style : RenderControlPointSeq, optional
-            The style to use for rendering the points. Defaults to None.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         for i in np.floor(np.linspace(0, len(self.intersection_points) - 1, count)):
