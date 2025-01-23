@@ -1,14 +1,10 @@
-"""
-Demonstrate Solar Field Plotting Routines
-
-
-
+"""Demonstrate Solar Field Plotting Routines
 """
 
 import numpy as np
 
 import opencsp.common.lib.csp.SolarField as sf
-import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
+import opencsp.common.lib.csp.sun_track as sun_track
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
 import opencsp.common.lib.render.figure_management as fm
@@ -31,8 +27,7 @@ NORTH = Vxyz([0, 1, 0])
 SOUTH = -NORTH
 EAST = Vxyz([1, 0, 0])
 WEST = -EAST
-STOW = Vxyz([-1, 0, -11.4]).normalize()  # !!!!!
-# (az=np.deg2rad(270), el=np.deg2rad(-85))
+STOW = Vxyz([-1, 0, -11.4]).normalize()
 
 
 class TestSolarFieldOutput(to.TestOutput):
@@ -150,62 +145,6 @@ class TestSolarFieldOutput(to.TestOutput):
         )
         heliostat.draw(fig_record.view, heliostat_style)
         # heliostat.draw(fig_record.view, heliostat_style)
-
-        # Output.
-        self.show_save_and_check_figure(fig_record)
-
-    def old_annotated_heliostat(self) -> None:
-        """
-        Draws annotated heliostat.
-        """
-        # Initialize test.
-        self.start_test()
-
-        # Heliostat selection
-        heliostat_name = '5E10'
-
-        # View setup
-        title = 'Heliostat ' + heliostat_name + ', with Highlighting'
-        caption = 'A single Sandia NSTTF heliostat with rendering options ' + heliostat_name + '.'
-        comments = []
-
-        # Tracking setup.
-        aimpoint_xyz = Pxyz([60.0, 8.8, 28.9])
-        # [year, month, day, hour, minute, second, zone]
-        when_ymdhmsz = (2021, 5, 13, 13, 2, 0, -6)  # NSTTF solar noon
-        heliostat = self.solar_field.lookup_heliostat(heliostat_name)
-        heliostat.set_tracking_configuration(aimpoint_xyz, self.solar_field.origin_lon_lat, when_ymdhmsz)
-
-        # Style setup
-        default_heliostat_style = rch.normal_facet_outlines()
-        default_heliostat_style.facet_ensemble_style.add_special_style('16', rcf.corner_normals_outline_name(color='c'))
-        default_heliostat_style.facet_ensemble_style.add_special_style(
-            ['1', '4', '7', '24', '25'], rcf.normal_outline(color='r')
-        )
-        heliostat_styles = default_heliostat_style
-
-        # Comment
-        comments.append("Demonstration of example heliostat annotations.")
-        comments.append("Black:   Facet outlines.")
-        comments.append("Black:   Overall heliostat surface normal.")
-        comments.append("Red:     Highlighted facets and their surface normals.")
-        comments.append("Cyan:    Highlighted facet with facet name and facet surface normal drawn at corners.")
-
-        # Draw
-        fig_record = fm.setup_figure_for_3d_data(
-            self.figure_control,
-            self.axis_control_m,
-            vs.view_spec_3d(),
-            number_in_name=False,
-            input_prefix=self.figure_prefix(
-                2
-            ),  # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
-            title=title,
-            caption=caption,
-            comments=comments,
-            code_tag=self.code_tag,
-        )
-        heliostat.draw(fig_record.view, heliostat_styles)
 
         # Output.
         self.show_save_and_check_figure(fig_record)
@@ -543,9 +482,6 @@ class TestSolarFieldOutput(to.TestOutput):
         # Define fixed heliostat orientation.
         synch_az = np.deg2rad(205)
         synch_el = np.deg2rad(30)
-        # Define upward-facing heliostat orientation.
-        up_az = np.deg2rad(180)
-        up_el = np.deg2rad(90)
 
         # Configuration setup
         solar_field = self.solar_field
@@ -644,9 +580,6 @@ class TestSolarFieldOutput(to.TestOutput):
         # Define fixed heliostat orientation.
         synch_az = np.deg2rad(205)
         synch_el = np.deg2rad(30)
-        # Define upward-facing heliostat orientation.
-        up_az = np.deg2rad(180)
-        up_el = np.deg2rad(90)
 
         # Configuration setup
         solar_field = self.solar_field
