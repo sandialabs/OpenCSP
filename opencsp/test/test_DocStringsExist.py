@@ -38,6 +38,7 @@ import opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d
 import opencsp.common.lib.render_control.RenderControlFramesNoDuplicates
 import opencsp.common.lib.render_control.RenderControlHeliostatTracks
 import opencsp.common.lib.render_control.RenderControlHeliostats3d
+import opencsp.common.lib.render_control.RenderControlIntersection
 import opencsp.common.lib.render_control.RenderControlKeyCorners
 import opencsp.common.lib.render_control.RenderControlKeyFramesGivenManual
 import opencsp.common.lib.render_control.RenderControlKeyTracks
@@ -45,6 +46,9 @@ import opencsp.common.lib.render_control.RenderControlPowerpointPresentation
 import opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
 import opencsp.common.lib.render_control.RenderControlVideoTracks
 import opencsp.common.lib.tool.dict_tools
+import opencsp.common.lib.uas.Scan
+import opencsp.common.lib.uas.ScanPass
+import opencsp.common.lib.uas.WayPoint
 
 
 class test_Docstrings(unittest.TestCase):
