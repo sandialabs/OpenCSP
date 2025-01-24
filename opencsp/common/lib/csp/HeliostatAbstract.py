@@ -382,20 +382,6 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
         If there are no facets that match the given name it throws a KeyError."""
         return self.facet_ensemble.lookup_facet(facet_name)
 
-    # @property
-    # def aimpoint_xyz(self):
-    #     if self._aimpoint_xyz == None:
-    #         print('ERROR: In Heliostat.aimpoint_xyz(), attempt to fetch unset _aimpoint_xyz.')
-    #         assert False
-    #     return self._aimpoint_xyz
-
-    # @property
-    # def when_ymdhmsz(self):
-    #     if self._when_ymdhmsz == None:
-    #         print('ERROR: In Heliostat.when_ymdhmsz(), attempt to fetch unset _when_ymdhmsz.')
-    #         assert False
-    #     return self._when_ymdhmsz
-
     # RENDERING
 
     def survey_of_points(self, resolution: Resolution) -> tuple[Pxyz, Vxyz]:
@@ -413,53 +399,3 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
             resolution, self.facet_ensemble._self_to_parent_transform.inv()
         )
         return (facet_points, facet_normals)
-
-
-# GENERATOR
-
-
-# # TODO TJL:update this to be a class method
-# def h_from_facet_centroids(name: str, origin: np.ndarray, num_facets: int, num_rows: int = 0, num_cols: int = 0,
-#                            file_centroids_offsets=None, pivot_height: float = 0, pivot_offset: float = 0,
-#                            facet_width: float = 0, facet_height: float = 0, default_mirror_shape: Callable[[float, float], float] = lambda x, y: x * 0) -> 'Heliostat':
-
-#     # Facets
-#     facets, _ = facets_read_file(file_centroids_offsets, facet_height, facet_width, default_mirror_shape)
-
-#     return Heliostat(name, origin, num_facets, num_rows, num_cols, facets, pivot_height, pivot_offset)
-
-
-# # TODO TJL:update this to be a class method
-# def facets_read_file(file: str, facet_width: float, facet_height: float,
-#                      default_mirror_shape: Callable[[float, float], float] = lambda x, y: 0 * x * y) -> tuple[list[Facet], dict[str, Facet]]:
-#     """ Read in a list of facets (and their relative positions on a standard heliostat) from a csv file.
-
-#     Arguments:
-#         file: one facet per row, with the format:
-#             name, x, y, z """
-
-#     with open(file) as csvfile:
-#         readCSV = csv.reader(csvfile, delimiter=',')
-#         id_row = 0
-#         id_facet = 0
-#         facets: list[Facet] = []
-#         facet_dict: dict[str, Facet] = {}
-#         for row in readCSV:
-#             if not id_row:
-#                 id_row += 1  # ignore the header
-#                 continue
-#             name = str(row[0])
-#             x, y, z = (float(row[1]), float(row[2]), float(row[3]))
-
-#             # creating facet and mirror
-#             fn = default_mirror_shape  # flat surface
-#             mirror = MirrorParametricRectangular(fn, (facet_width, facet_height))
-#             facet = Facet(name=name, centroid_offset=[x, y, z],
-#                           mirror=mirror)
-
-#             # storing
-#             facets.append(facet)
-#             facet_dict[name] = id_facet
-#             id_facet += 1
-
-#     return facets, facet_dict
