@@ -18,8 +18,6 @@ import math
 
 import numpy as np
 
-import opencsp.common.lib.geometry.geometry_3d as g3d
-
 
 def sun_position_aux(
     location_lon_lat: tuple[float, float],  # radians.  (longitude, lattiude) pair.
@@ -163,10 +161,47 @@ def sun_position(
     elevation = np.deg2rad(elevation_deg)
 
     # Convert to a unit vector.
-    sun_uxyz = g3d.direction_uxyz_given_azimuth_elevation(azimuth, elevation)
+    sun_uxyz = direction_uxyz_given_azimuth_elevation(azimuth, elevation)
 
     # Return this routine's result.
     return sun_uxyz
+
+
+def direction_uxyz_given_azimuth_elevation(azimuth: float, elevation: float):  # Both radians.
+    """
+    DEPRECATED: Calculates the direction vector in 3D space given azimuth and elevation angles.
+
+    This function converts azimuth and elevation angles (in radians) into a unit vector
+    in 3D space.
+
+    Parameters
+    ----------
+    azimuth : float
+        The azimuth angle in radians, measured from the positive x-axis.
+    elevation : float
+        The elevation angle in radians, measured from the xy-plane.
+
+    Returns
+    -------
+    np.ndarray
+        A 3D unit vector representing the direction corresponding to the given azimuth and elevation.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
+    # Convert to degrees ccw from East.
+    nu = (np.pi / 2.0) - azimuth
+    # Construct the vector.
+    z: float = np.sin(elevation)
+    r: float = np.cos(elevation)
+    x: float = r * np.cos(nu)
+    y: float = r * np.sin(nu)
+    uxyz = np.array([x, y, z])
+    # Return.
+    return uxyz
 
 
 if __name__ == "__main__":
