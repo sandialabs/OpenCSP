@@ -7,7 +7,7 @@ Convenience functions for manipulating time and dates.
 """
 
 import dateutil.tz as dtz
-from datetime import datetime, timezone, timedelta
+from datetime import date, time, datetime, timezone, timedelta
 import pytz
 import time
 
@@ -30,40 +30,61 @@ def print_current_time() -> None:
 
 def current_date_time_string() -> str:
     """%Y-%m-%d %H:%M:%S"""
-    return current_date_string() + ' ' + current_time_string()
-
-
-def current_date_string() -> str:
-    """%Y-%m-%d"""
     now = datetime.now()
+    return current_date_string(now.date()) + ' ' + current_time_string(now.time())
+
+
+def current_date_string(now: date = None) -> str:
+    """%Y-%m-%d"""
+    if now is None:
+        now = datetime.now().date()
     current_date_str = now.strftime('%Y-%m-%d')
     return current_date_str
 
 
-def current_time_string() -> str:
+def current_time_string(now: time = None) -> str:
     """%H:%M:%S"""
-    now = datetime.now()
+    if now is None:
+        now = datetime.now().time()
     current_time_str = now.strftime('%H:%M:%S')
     return current_time_str
+
+
+def date_string_forfile(d: date) -> str:
+    """%Y%m%d"""
+    date_str = d.strftime('%Y%m%d')
+    return date_str
 
 
 def current_date_string_forfile() -> str:
     """%Y%m%d"""
     now = datetime.now()
-    current_date_str = now.strftime('%Y%m%d')
+    current_date_str = date_string_forfile(now.date())
     return current_date_str
+
+
+def time_string_forfile(t: time) -> str:
+    """%H%M%S"""
+    time_str = t.strftime('%H%M%S')
+    return time_str
 
 
 def current_time_string_forfile() -> str:
     """%H%M%S"""
     now = datetime.now()
-    current_time_str = now.strftime('%H%M%S')
+    current_time_str = time_string_forfile(now.time())
     return current_time_str
+
+
+def date_time_string_forfile(dt: datetime) -> str:
+    """%Y%m%d_%H%M%S"""
+    return date_string_forfile(dt.date()) + '_' + time_string_forfile(dt.time())
 
 
 def current_date_time_string_forfile() -> str:
     """%Y%m%d_%H%M%S"""
-    return current_date_string_forfile() + '_' + current_time_string_forfile()
+    now = datetime.now()
+    return date_time_string_forfile(now)
 
 
 def current_time() -> float:

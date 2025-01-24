@@ -4,6 +4,7 @@ import unittest
 import matplotlib.pyplot as plt
 import numpy as np
 
+import opencsp.common.lib.geometry.angle as geo_angle
 from opencsp.common.lib.geometry.Vxy import Vxy
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.tool.file_tools as ft
@@ -176,6 +177,23 @@ class TestVxy(unittest.TestCase):
         norm_exp = array / np.sqrt(np.sum(array**2))
 
         np.testing.assert_almost_equal(norm.data.squeeze(), norm_exp)
+
+    def test_angle(self):
+        angles2vecs = {
+            0: Vxy([1e6, 1]),
+            45: Vxy([1, 1]),
+            90: Vxy([0, 1]),
+            135: Vxy([-1, 1]),
+            180: Vxy([-1e6, 1]),
+            225: Vxy([-1, -1]),
+            270: Vxy([0, -1]),
+            315: Vxy([1, -1]),
+        }
+
+        for expected_deg, vec in angles2vecs.items():
+            actual_rad = geo_angle.normalize(vec.angle()[0])
+            actual_deg = actual_rad / (2 * np.pi) * 360
+            self.assertAlmostEqual(expected_deg, actual_deg, places=3)
 
     def test_normalize_in_place(self):
         # Normalize in place

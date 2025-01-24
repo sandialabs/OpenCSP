@@ -6,6 +6,9 @@ Utilities for image processing.
 """
 
 import sys
+from typing import Callable, TypeVar
+
+import exiftool
 import numpy as np
 from PIL import Image
 
@@ -23,7 +26,11 @@ pil_image_formats_readable = pil_image_formats_rw + ["cur", "dcx", "fits", "fli"
 """ A list of all image image formats that can be read by the Python Imaging Library (PIL). Note that not all of these formats can be written by PIL. """
 pil_image_formats_writable = pil_image_formats_rw + ["palm", "pdf", "xv"]
 """ A list of all image image formats that can be written by the Python Imaging Library (PIL). Note that not all of these formats can be read by PIL. """
+pil_image_formats_supporting_exif = ["jpg", "jpeg", "png", "tiff", "webp"]
 # fmt: on
+
+
+T = TypeVar('T')
 
 
 def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
@@ -108,7 +115,7 @@ def images_are_identical(image_1: np.ndarray, image_2: np.ndarray, tolerance_pix
 
 
 def dims_and_nchannels(image: np.ndarray):
-    """Get the (x,y) dimensions of the image, and the number of color channels.
+    """Get the (y,x) dimensions of the image, and the number of color channels.
 
     Raises:
     -------
@@ -127,9 +134,9 @@ def dims_and_nchannels(image: np.ndarray):
             f"Error in image_tools.dims_and_nchannels(): expected image to have 2-3 dimensions (x, y, and color), but {shape=}!",
         )
 
-    xdim = shape[0]
-    ydim = shape[1]
-    return (xdim, ydim), nchannels
+    ydim = shape[0]
+    xdim = shape[1]
+    return (ydim, xdim), nchannels
 
 
 def min_max_colors(image: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
@@ -220,7 +227,7 @@ def range_for_threshold(image: np.ndarray, threshold: int) -> tuple[int, int, in
     return tuple(ret)
 
 
-def image_files_in_directory(dir: str, allowable_extensions: list[str] = None) -> list[str]:
+def image_files_in_directory(dir: str, allowable_extensions: list[str] = None, recursive=False) -> list[str]:
     """
     Get a list of all image files in the given directory, as determined by the file extension.
 
@@ -230,6 +237,10 @@ def image_files_in_directory(dir: str, allowable_extensions: list[str] = None) -
         The directory to get files from.
     allowable_extensions : list[str], optional
         The allowed extensions, such as ["png"]. By default pil_image_formats_rw.
+    recursive: bool
+        If true, then walk through all files in the given directory and all
+        subdirectories. Does not follow symbolic links to directories. Default
+        False.
 
     Returns
     -------
@@ -246,7 +257,7 @@ def image_files_in_directory(dir: str, allowable_extensions: list[str] = None) -
             allowable_extensions[i] = "." + ext
 
     # get all matching files
-    files_per_ext = ft.files_in_directory_by_extension(dir, allowable_extensions)
+    files_per_ext = ft.files_in_directory_by_extension(dir, allowable_extensions, recursive=recursive)
 
     # condense into a single list
     files: list[str] = []
@@ -289,3 +300,83 @@ def getsizeof_approx(img: Image) -> int:
         image_data_size = width * height * mode_size
 
     return object_size + image_data_size
+
+
+def get_exif_value(
+    data_dir: str, image_path_name_exts: str | list[str], exif_val: str = "EXIF:ISO", parser: Callable[[str], T] = int
+) -> T | list[T]:
+    """Returns the exif_val Exif information on the given images, if they have such
+    information. If not, then None is returned for those images."""
+    # build the list of files
+    if isinstance(image_path_name_exts, str):
+        files = [ft.join(data_dir, image_path_name_exts)]
+    else:
+        files = [ft.join(data_dir, image_path_name_ext) for image_path_name_ext in image_path_name_exts]
+
+    # verify the files exist
+    for file in files:
+        if not ft.file_exists(file):
+            lt.error_and_raise(
+                FileNotFoundError, "Error in image_tools.get_exif_value: " + f"image file {file} does not exist!"
+            )
+
+    # get the exif tags
+    with exiftool.ExifToolHelper() as et:
+        tags = et.get_tags(files, tags=[exif_val])
+
+    # parse the value
+    has_val = [exif_val in image_tags for image_tags in tags]
+    parsed_exif_values: list[T | None] = []
+    for i in range(len(has_val)):
+        if has_val[i]:
+            exif_str = tags[i][exif_val]
+            try:
+                parsed = parser(exif_str)
+            except Exception as ex:
+                lt.error(
+                    "Error in image_tools.get_exif_value: "
+                    + f"{type(ex)} encountered while parsing exif value {exif_str} for image {files[i]}"
+                )
+                raise
+            parsed_exif_values.append(parsed)
+        else:
+            parsed_exif_values.append(None)
+
+    # return a singular value if we were given a singular value
+    if isinstance(image_path_name_exts, str):
+        return parsed_exif_values[0]
+    return parsed_exif_values
+
+
+def set_exif_value(data_dir: str, image_path_name_ext: str, exif_val: str, exif_name: str = "EXIF:ISO"):
+    with exiftool.ExifToolHelper() as et:
+        et.set_tags(
+            ft.join(data_dir, image_path_name_ext),
+            tags={exif_name: str(exif_val)},
+            params=["-P", "-overwrite_original"],
+        )
+
+    with exiftool.ExifToolHelper() as et:
+        try:
+            et.set_tags(
+                ft.join(data_dir, image_path_name_ext),
+                tags={exif_name: str(exif_val)},
+                params=["-P", "-overwrite_original"],
+            )
+        except exiftool.exceptions.ExifToolExecuteError:
+
+            # # The image may have been poorly formatted the first time around
+            # TODO
+            # for image_pne in image_path_name_exts:
+
+            #     # Save the image to a new file with a trusted program (Pillow)
+            #     p, n, e = ft.path_components(image_pne)
+            #     rewrite = ft.join(p, n + " - rewrite" + e)
+            #     Image.open(image_pne).save(rewrite)
+            #     shutil.copystat(image_pne, rewrite)
+            #     ft.delete_file(image_pne)
+            #     ft.rename_file(rewrite, image_pne)
+
+            #     # Try to set the gain EXIF information again
+            #     et.set_tags(image_pne, tags={"EXIF:ISO": str(gain)}, params=["-P", "-overwrite_original"])
+            raise

@@ -9,7 +9,9 @@ import os
 import re
 import socket
 import sys
-from typing import Callable
+from typing import Callable, Literal
+
+import numpy as np
 
 # Don't import any other opencsp libraries here. Log tools _must_ be able to be
 # imported before any other opencsp code. Instead, if there are other
@@ -327,12 +329,18 @@ def critical(*vargs, **kwargs) -> int:
     return 0
 
 
-def error_and_raise(exception_class: Exception.__class__, msg: str) -> None:
+def error_and_raise(exception_class: Exception.__class__, msg: str, base_exception: Exception = None) -> None:
     """Logs the given message at the "error" level and raises the given exception, also with this message.
 
-    Args:
-        exception_class (Exception.__class__): An exception class. See below for built-in exception types.
-        msg (str): The message to go along with the exception.
+    Parameters
+    ----------
+    exception_class: Exception.__class__
+        An exception class. See below for built-in exception types.
+    msg: str
+        The message to go along with the exception.
+    base_exception: Exception
+        The exception that caused this code to be called, if any. This will be
+        added onto the newly created exception_class' history.
 
     Example::
 
@@ -411,19 +419,30 @@ def error_and_raise(exception_class: Exception.__class__, msg: str) -> None:
     """
     msg = str(msg)  # Ensure that message is a string, to enable concatenation.
     error(msg)
+
     try:
         e = exception_class(msg)
     except Exception as exc:
         raise RuntimeError(msg) from exc
-    raise e
+
+    if base_exception is not None:
+        raise e from base_exception
+    else:
+        raise e
 
 
-def critical_and_raise(exception_class: Exception.__class__, msg: str) -> None:
+def critical_and_raise(exception_class: Exception.__class__, msg: str, base_exception: Exception = None) -> None:
     """Logs the given message at the "critical" level and raises the given exception, also with this message.
 
-    Args:
-        exception_class (Exception.__class__): An exception class. See error_and_raise() for a description of built-in exceptions.
-        msg (str): The message to go along with the exception.
+    Parameters
+    ----------
+    exception_class: Exception.__class__
+        An exception class. See error_and_raise() for a description of built-in exceptions.
+    msg: str
+        The message to go along with the exception.
+    base_exception: Exception
+        The exception that caused this code to be called, if any. This will be
+        added onto the newly created exception_class' history.
 
     Example::
 
@@ -433,11 +452,16 @@ def critical_and_raise(exception_class: Exception.__class__, msg: str) -> None:
     """
     msg = str(msg)  # Ensure that message is a string, to enable concatenation.
     critical(msg)
+
     try:
         e = exception_class(msg)
     except Exception as exc:
         raise RuntimeError(msg) from exc
-    raise e
+
+    if base_exception is not None:
+        raise e from base_exception
+    else:
+        raise e
 
 
 def log_and_raise_value_error(local_logger, msg) -> None:
@@ -452,3 +476,52 @@ def log_and_raise_value_error(local_logger, msg) -> None:
     """
     error(msg)
     raise ValueError(msg)
+
+
+def log_progress(
+    percentage: int | float, carriage_return: bool | Literal['auto'] = 'auto', prev_percentage: int = None
+):
+    """Prints the current progress as a progress bar and number.
+
+    Parameters
+    ----------
+    percentage : int | float
+        The current progress. If an integer, than the range is clipped to 0-100.
+        If a float, then the range is clipped to 0-1, unless >1 then it is cast
+        to an integer.
+    carriage_return : bool | 'auto', optional
+        If True, then a carriage return '\r' is printed instead of a newline, which will cause the next line printed to overwrite this line.
+        This can be used to "draw" the progress interactively in the terminal.
+        If 'auto', then this will be True when percentage != 100.
+        By default 'auto'.
+    prev_percentage: int, optional
+        If not None, then this is compared to the given percentage. If they are the same then nothing is printed.
+
+    Returns
+    -------
+    percentage: int
+        The value printed, in the range 0-100. Can be passed into the next call as prev_percentage.
+    """
+    if isinstance(percentage, int):
+        percentage = int(np.clip(percentage, 0, 100))
+        if prev_percentage is not None:
+            if prev_percentage == percentage:
+                # don't print again
+                return percentage
+
+        if carriage_return == 'auto':
+            carriage_return = percentage != 100
+
+        sval = "|" + ("=" * percentage) + (" " * (100 - percentage)) + f"| {percentage}%"
+        if carriage_return:
+            info(sval, end='\r')
+        else:
+            info(sval)
+
+        return percentage
+
+    else:  # isinstance(percentage, float)
+        if percentage > 1.0:
+            return log_progress(int(np.round(percentage)), carriage_return, prev_percentage)
+        else:
+            return log_progress(int(np.round(percentage * 100)), carriage_return, prev_percentage)
