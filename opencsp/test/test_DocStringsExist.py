@@ -14,7 +14,6 @@ from opencsp.app.select_image_points import SelectImagePoints
 import opencsp.common.lib.cv.SpotAnalysis
 
 
-import opencsp.common.lib.camera.CameraTransform as CameraTransform
 import opencsp.common.lib.camera.ImageAcquisition_DCAM_color
 import opencsp.common.lib.camera.ImageAcquisition_MSMF
 import opencsp.common.lib.camera.UCamera
@@ -24,7 +23,6 @@ import opencsp.common.lib.deflectometry.ParamsSlopeSolver
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano
-import opencsp.common.lib.geometry.ReferenceFrame
 import opencsp.common.lib.opencsp_path.optical_analysis_data_path
 import opencsp.common.lib.process.ServerSynchronizer
 import opencsp.common.lib.process.parallel_video_tools
@@ -221,7 +219,6 @@ class test_Docstrings(unittest.TestCase):
     ]
     camera_class_list = [
         opencsp.common.lib.camera.Camera.Camera,
-        CameraTransform,
         opencsp.common.lib.camera.ImageAcquisitionAbstract.ImageAcquisitionAbstract,
         opencsp.common.lib.camera.ImageAcquisition_DCAM_color.ImageAcquisition,
         opencsp.common.lib.camera.ImageAcquisition_DCAM_mono.ImageAcquisition,
@@ -297,7 +294,6 @@ class test_Docstrings(unittest.TestCase):
         opencsp.common.lib.geometry.LoopXY,
         opencsp.common.lib.geometry.Pxy,
         opencsp.common.lib.geometry.Pxyz,
-        opencsp.common.lib.geometry.ReferenceFrame,
         opencsp.common.lib.geometry.RegionXY,
         opencsp.common.lib.geometry.TransformXYZ,
         opencsp.common.lib.geometry.Uxy,
@@ -305,7 +301,6 @@ class test_Docstrings(unittest.TestCase):
         opencsp.common.lib.geometry.Vxy,
         opencsp.common.lib.geometry.Vxyz,
         opencsp.common.lib.geometry.angle,
-        opencsp.common.lib.geometry.geometry_3d,
         opencsp.common.lib.geometry.transform_3d,
     ]
 
