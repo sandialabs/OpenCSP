@@ -164,14 +164,12 @@ def q2deg(pq_or_pq_seq):
 def normalize(angle: float) -> float:
     """Normalizes a single angle to the range [0, 2π]."""
     # "ChatGPT 4o" assisted with generating this docstring.
-    pass
 
 
 @overload
 def normalize(angles: npt.NDArray[np.float_] | Iterable) -> npt.NDArray[np.float_]:
     """Normalizes an array of angles to the range [0, 2π]."""
     # "ChatGPT 4o" assisted with generating this docstring.
-    pass
 
 
 def normalize(angle_or_angles: float | npt.NDArray[np.float_] | Iterable) -> float | npt.NDArray[np.float_]:
