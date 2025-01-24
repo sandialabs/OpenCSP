@@ -35,9 +35,11 @@ def path_components(input_dir_body_ext: str):
 
     See also: body_ext_given_file_dir_body_ext()
     """
+
     dir = os.path.dirname(input_dir_body_ext)
     body_ext = os.path.basename(input_dir_body_ext)
     body, ext = os.path.splitext(body_ext)
+
     return dir, body, ext
 
 
@@ -591,6 +593,13 @@ def create_directories_if_necessary(input_dir):
         except FileExistsError:
             # probably just created this directory in another thread
             pass
+        except Exception as ex:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in file_tools.create_directories_if_necessary(): "
+                + f"failed to create directory '{input_dir}' with error {ex}",
+                ex,
+            )
 
 
 def create_subdir_path(base_dir: str, dir_name: str):
@@ -841,8 +850,7 @@ def rename_directory(input_dir: str, output_dir: str):
 
 def copy_and_delete_file(input_dir_body_ext: str, output_dir_body_ext: str, copystat=True):
     """
-    Like rename_file(), but with more surety that the file will still exist in
-    case the computer crashes while the file is in the process of being moved.
+    Like rename_file(), but it works across file systems.
 
     See also: copy_file(), rename_file()
 

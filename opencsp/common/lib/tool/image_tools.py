@@ -8,6 +8,7 @@ Utilities for image processing.
 import sys
 from typing import Callable, TypeVar
 
+import exiftool
 import numpy as np
 from PIL import Image
 
@@ -301,28 +302,11 @@ def getsizeof_approx(img: Image) -> int:
     return object_size + image_data_size
 
 
-def _import_exiftool():
-    # TODO should exiftool be added to requirements.txt?
-    # This also requires the installation of Phil Harvey's ExifTool.
-    # https://pypi.org/project/PyExifTool/
-    # https://exiftool.org/
-    try:
-        import exiftool
-    except ImportError:
-        lt.error_and_raise(ImportError, "Error in image_tools._import_exiftool(): " +
-                 "exiftool is not currently installed as a standard part of OpenCSP." +
-                 " To use exif information with OpenCSP, please follow the installation instructions at " + 
-                 "https://pypi.org/project/PyExifTool/#getting-pyexiftool.")
-
-
 def get_exif_value(
     data_dir: str, image_path_name_exts: str | list[str], exif_val: str = "EXIF:ISO", parser: Callable[[str], T] = int
 ) -> T | list[T]:
     """Returns the exif_val Exif information on the given images, if they have such
     information. If not, then None is returned for those images."""
-    _import_exiftool()
-    import exiftool
-
     # build the list of files
     if isinstance(image_path_name_exts, str):
         files = [ft.join(data_dir, image_path_name_exts)]
@@ -365,10 +349,6 @@ def get_exif_value(
 
 
 def set_exif_value(data_dir: str, image_path_name_ext: str, exif_val: str, exif_name: str = "EXIF:ISO"):
-    # TODO should exiftool be added to requirements.txt?
-    _import_exiftool()
-    import exiftool
-    
     with exiftool.ExifToolHelper() as et:
         et.set_tags(
             ft.join(data_dir, image_path_name_ext),
