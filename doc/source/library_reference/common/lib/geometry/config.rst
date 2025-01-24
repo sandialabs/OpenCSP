@@ -91,15 +91,6 @@ Utility Classes
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.geometry.ReferenceFrame
-
-.. automodule:: opencsp.common.lib.geometry.ReferenceFrame
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
 .. currentmodule:: opencsp.common.lib.geometry.RegionXY
 
 .. automodule:: opencsp.common.lib.geometry.RegionXY
@@ -112,15 +103,6 @@ Utility Classes
 .. currentmodule:: opencsp.common.lib.geometry.TransformXYZ
 
 .. automodule:: opencsp.common.lib.geometry.TransformXYZ
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.geometry.TranslationXYZ
-
-.. automodule:: opencsp.common.lib.geometry.TranslationXYZ
    :members:
    :special-members: __init__
    :undoc-members:
@@ -169,18 +151,6 @@ Angle Utility Functions
 .. currentmodule:: opencsp.common.lib.geometry.angle
 
 .. automodule:: opencsp.common.lib.geometry.angle
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-3D Matrix Geometry Utility Functions
-====================================
-
-.. currentmodule:: opencsp.common.lib.geometry.matrix_geometry_3d
-
-.. automodule:: opencsp.common.lib.geometry.matrix_geometry_3d
    :members:
    :special-members: __init__
    :undoc-members:
