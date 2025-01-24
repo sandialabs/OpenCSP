@@ -101,7 +101,7 @@ class Color:
         -------
         Color
             The new Color instance for the given value.
-        """        
+        """
         if isinstance(val, Color):
             return val
         elif isinstance(val, str):
