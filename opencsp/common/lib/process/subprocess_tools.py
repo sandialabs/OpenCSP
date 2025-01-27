@@ -45,6 +45,28 @@ def get_executable_path(executable_name: str, dont_match: str = None) -> str:
 
 
 def filter_lines(lines: list[pol.ProcessOutputLine], keep_stdout=True, keep_stderr=True):
+    """
+    Filters a list of process output lines based on specified criteria.
+
+    This function allows you to filter out standard output (stdout) or standard error (stderr) lines
+    from a list of process output lines. You can choose to keep only the stdout lines, only the stderr
+    lines, or both.
+
+    Parameters
+    ----------
+    lines : list[pol.ProcessOutputLine]
+        A list of process output lines to filter.
+    keep_stdout : bool, optional
+        If True, keeps the stdout lines. If False, removes them. Defaults to True.
+    keep_stderr : bool, optional
+        If True, keeps the stderr lines. If False, removes them. Defaults to True.
+
+    Returns
+    -------
+    list[pol.ProcessOutputLine]
+        A list of filtered process output lines based on the specified criteria.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     ret: list[pol.ProcessOutputLine] = list(lines)
 
     if not keep_stdout:
@@ -58,6 +80,22 @@ def filter_lines(lines: list[pol.ProcessOutputLine], keep_stdout=True, keep_stde
 
 
 def print_lines(lines: list[pol.ProcessOutputLine]):
+    """
+    Prints the process output lines to the console.
+
+    This function iterates through a list of process output lines and prints each line to the console.
+    If the line is an error line, it uses the error logging function; otherwise, it uses the info logging function.
+
+    Parameters
+    ----------
+    lines : list[pol.ProcessOutputLine]
+        A list of process output lines to print.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     for line in lines:
         if line.is_err:
             lt.error(line.val)

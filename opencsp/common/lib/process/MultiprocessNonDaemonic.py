@@ -4,26 +4,29 @@ from typing import Callable, Iterable
 
 
 class MultiprocessNonDaemonic:
+    """
+    A class for managing a pool of non-daemonic processes for parallel execution.
+
+    This class is similar to `multiprocessing.Pool`, but it allows for the creation of non-daemonic
+    processes, which can spawn child processes. This is useful in scenarios where grandchild processes
+    need to be created from the child processes.
+    """
+
+    # "ChatGPT 4o" assisted with generating this docstring.
     def __init__(self, num_processes: int):
-        """This class is like multiprocessing.Pool, but the processes it uses aren't daemonic.
+        """Initializes the MultiprocessNonDaemonic instance.
 
-        Some properties of daemonic processes include:
-            - When a process exits, it attempts to terminate all of its daemonic child processes.
-            - Note that a daemonic process is not allowed to create child processes. Otherwise a
-              daemonic process would leave its children orphaned if it gets terminated when its
-              parent process exits. Additionally, these are not Unix daemons or services, they
-              are normal processes that will be terminated (and not joined) if non-daemonic
-              processes have exited.
+        Parameters
+        ----------
+        num_processes : int
+            The number of processes in this pool.
 
-        The second point (not being able to spawn child processes) is why this class exists.
-        Sometimes you want to be able to spawn grandchild processes from the child processes
-        started with Multiprocessing.starmap(). One example use case is to spawn a grandchild
-        process that handles rendering for the child process.
-
-        Args:
+        Notes
         -----
-            num_processes (int): The number of processes in this pool.
+        Daemonic processes have certain limitations, such as not being able to create child processes.
+        This class allows for the creation of non-daemonic processes to facilitate such use cases.
         """
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.procs: list[multiprocessing.Process] = []
         self.num_processes = num_processes
         self.queue = multiprocessing.Queue()
@@ -52,8 +55,30 @@ class MultiprocessNonDaemonic:
         queue.put([i, ret])
 
     def starmap(self, func: Callable, args: Iterable[Iterable]):
-        results = []
+        """
+        Distributes the execution of a function across multiple processes.
 
+        This method takes a function and a sequence of argument tuples, and executes the function
+        in parallel using the specified number of processes.
+
+        Parameters
+        ----------
+        func : Callable
+            The function to execute in parallel.
+        args : Iterable[Iterable]
+            An iterable of argument tuples to pass to the function.
+
+        Returns
+        -------
+        list
+            A list of results returned by the function, in the order of the input arguments.
+
+        Raises
+        ------
+        AssertionError
+            If the number of processes exceeds the specified limit.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         for proc_idx, proc_args in enumerate(args):
             # wait for a process slot to become available
             while len(self.procs) >= self.num_processes:
