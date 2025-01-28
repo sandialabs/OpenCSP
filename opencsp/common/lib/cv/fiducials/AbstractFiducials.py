@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Callable
 
 import matplotlib.axes
+import matplotlib.figure
 import matplotlib.pyplot as plt
 import numpy as np
 import scipy.spatial
@@ -9,9 +10,16 @@ import scipy.spatial
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.geometry.RegionXY as reg
 import opencsp.common.lib.geometry.Vxyz as v3
+import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render.figure_management as fm
+import opencsp.common.lib.render.view_spec as vs
+import opencsp.common.lib.render_control.RenderControlAxis as rca
+import opencsp.common.lib.render_control.RenderControlFigure as rcfg
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
+import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.string_tools as st
 
 
 class AbstractFiducials(ABC):
@@ -27,8 +35,9 @@ class AbstractFiducials(ABC):
 
         Parameters
         ----------
-        style : rcps.RenderControlPointSeq, optional
-            How to render this fiducial when using the default render_to_plot() method. Defaults to rcps.default().
+        style : RenderControlPointSeq, optional
+            How to render this fiducial when using the default
+            :py:meth:`render_to_plot` method. By default rcps.default().
         pixels_to_meters : Callable[[p2.Pxy], v3.Vxyz], optional
             Conversion function to get the physical point in space for the given x/y position information. Used in the
             default self.scale implementation. A good implementation of this function will correct for many factors such
@@ -156,45 +165,64 @@ class AbstractFiducials(ABC):
 
         return ret
 
-    def _render(self, axes: matplotlib.axes.Axes):
-        # Render the fiducial on the given axes.
-        #
-        # Parameters
-        # ----------
-        # axes : matplotlib.axes.Axes
-        #    The axes on which to render the fiducial.
-
-        axes.scatter(
-            self.origin.x,
-            self.origin.y,
-            linewidth=self.style.linewidth,
-            marker=self.style.marker,
-            s=self.style.markersize,
-            c=self.style.markerfacecolor,
-            edgecolor=self.style.markeredgecolor,
-        )
-
-    def render(self, axes: matplotlib.axes.Axes = None):
+    def get_label(self, include_label=False) -> str | None:
         """
-        Renders this fiducial to the active matplotlib.pyplot plot.
+        Get the label either from self.label (if set) or from the class name.
+        Returns None if include_label is False.
+        """
+        if not include_label:
+            label = None
+        if hasattr(self, "label"):
+            label = self.label
+        else:
+            class_name = self.__class__.__name__
 
-        The default implementation uses plt.scatter().
+            class_name_endings = ["Fiducial", "Fiducials", "Annotation", "Annotations"]
+            for class_name_ending in class_name_endings:
+                if class_name.endswith(class_name_ending):
+                    class_name = class_name[: -len(class_name_ending)]
+
+            label = " ".join(st.camel_case_split(class_name))
+
+        return label
+
+    def render_to_figure(
+        self, fig_record: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False
+    ):
+        """
+        Renders a visual representation of this fiducial to the given fig_record.
+
+        The given image should have already been rendered to the figure record
+        if it is set. If this has been called from :py:meth:`render_to_image`
+        then image is guaranteed to be set.
+
+        The default version of this method renders the origin point. Overwrite
+        this method for a custom implementation.
 
         Parameters
         ----------
-        axes : matplotlib.axes.Axes, optional
-            The plot to render to. Uses the active plot if None. Defaults to None.
+        fig_record : rcfr.RenderControlFigureRecord
+            The record to render with. Most render methods should be available
+            via fig_record.view.draw_*().
+        image : np.ndarray, optional
+            The image that was already rendered to the figure record, or None if
+            there hasn't been an image rendered or that data just isn't
+            available. By default None, or the image passed in to
+            :py:meth:`render_to_image` if being called from that method.
+        include_label: bool, optional
+            True if this fiducial should add a label during it's plot method. By
+            default False.
         """
-        # "ChatGPT 4o" assisted with generating this docstring.
-        if axes is None:
-            axes = plt.gca()
-        self._render(axes)
+        label = self.get_label(include_label)
+        fig_record.view.draw_pq(([self.origin.x[0]], [self.origin.y[0]]), style=self.style, label=label)
 
     def render_to_image(self, image: np.ndarray) -> np.ndarray:
         """
         Renders this fiducial to a new image on top of the given image.
 
-        The default implementation creates a new matplotlib plot, and then renders to it with self.render().
+        The default implementation creates a new matplotlib plot, and then
+        renders to it with either :py:meth:`render_to_figure` or
+        :py:meth:`render_to_plot`, depending on which has been implemented.
 
         Parameters
         ----------
@@ -213,43 +241,42 @@ class AbstractFiducials(ABC):
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         # Create the figure to plot to
-        dpi = 300
-        width = image.shape[1]
-        height = image.shape[0]
-        fig = fm.mpl_pyplot_figure(figsize=(width / dpi, height / dpi), dpi=dpi)
+        (height_px, width_px), nchannel = it.dims_and_nchannels(image)
+        figsize = rcfg.RenderControlFigure.pixel_resolution_inches(width_px, height_px)
+        figure_control = rcfg.RenderControlFigure(
+            tile=False, figsize=figsize, grid=False, draw_whitespace_padding=False
+        )
+        view_spec_2d = vs.view_spec_im()
+
+        fig_record = fm.setup_figure_for_3d_data(
+            figure_control,
+            rca.image(draw_axes=False, grid=False),
+            view_spec_2d,
+            equal=False,
+            name="Fiducials and Annotations",
+            code_tag=f"{__file__}.render_fiducials_to_image()",
+        )
 
         try:
             # A portion of this code is from:
             # https://stackoverflow.com/questions/35355930/figure-to-image-as-a-numpy-array
 
-            # Get the axis and canvas
-            axes = fig.gca()
-            canvas = fig.canvas
+            # Prepare the image
+            fig_record.view.imshow(image)
 
-            # Image from plot
-            axes.axis('off')
-            fig.tight_layout(pad=0)
-
-            # To remove the huge white borders
-            axes.margins(0)
-
-            # Prepare the image and the feature points
-            axes.imshow(image)
-            self.render(axes)
-
-            # Render
-            canvas.draw()
+            # render
+            self.render_to_figure(fig_record, image)
 
             # Convert back to a numpy array
-            new_image = np.asarray(canvas.buffer_rgba())
+            new_image = fig_record.to_array()
             new_image = new_image.astype(image.dtype)
 
             # Return the updated image
             return new_image
 
         except Exception as ex:
-            lt.error("Error in AnnotationImageProcessor.render_points(): " + repr(ex))
+            lt.error("Error in AbstractFiducials.render_to_image(): " + repr(ex))
             raise
 
         finally:
-            plt.close(fig)
+            plt.close(fig_record.figure)

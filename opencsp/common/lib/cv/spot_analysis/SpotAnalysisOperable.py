@@ -4,7 +4,7 @@ import numpy as np
 import numpy.typing as npt
 import os
 import sys
-from typing import TYPE_CHECKING, Optional, Union
+from typing import TYPE_CHECKING
 
 import opencsp.common.lib.csp.LightSource as ls
 import opencsp.common.lib.cv.annotations.AbstractAnnotations as aa
@@ -19,7 +19,7 @@ if TYPE_CHECKING:
     # Use the TYPE_CHECKING magic value to avoid cyclic imports at runtime.
     # This import is only here for type annotations.
     from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
-        AbstractSpotAnalysisImagesProcessor,
+        AbstractSpotAnalysisImageProcessor,
     )
 
 
@@ -44,16 +44,42 @@ class SpotAnalysisOperable:
     """
     The supporting images, if any, that were provided with the associated input
     primary image. These images will be used as part of the computation.
+
+    See Also
+    --------
+    algorithm_images
+    visualization_images
+    """
+    visualization_images: dict["AbstractSpotAnalysisImageProcessor", list[CacheableImage]] = field(default_factory=dict)
+    """
+    The images produced by the image processors as they operate on this
+    instance. These images are used for visualization, debugging, and automatic
+    powerpoint generation.
+
+    See Also
+    --------
+    algorithm_images
+    supporting_images
+    """
+    algorithm_images: dict["AbstractSpotAnalysisImageProcessor", list[CacheableImage]] = field(default_factory=dict)
+    """
+    The images produced by the image processors to explain how certain values
+    were determined.
+
+    See Also
+    --------
+    supporting_images
+    visualization_images
     """
     previous_operables: (
-        tuple[list['SpotAnalysisOperable'], "AbstractSpotAnalysisImagesProcessor"] | tuple[None, None]
+        tuple[list['SpotAnalysisOperable'], "AbstractSpotAnalysisImageProcessor"] | tuple[None, None]
     ) = (None, None)
     """
     The operable(s) that were used to generate this operable, and the image
     processor that they came from, if any. If this operable has no previous
     operables registered with it, then this will have the value (None, None).
-    Does not include no-nothing image processors such as
-    :py:class:`.EchoImageProcessor`.
+    Does not include do-nothing image processors such as
+    :py:class:`.EchoImageProcessor` or :py:class:`.SaveToFileImageProcessor`.
     """
     given_fiducials: list[af.AbstractFiducials] = field(default_factory=list)
     """ Any fiducials handed to us in the currently processing image. """
@@ -122,6 +148,8 @@ class SpotAnalysisOperable:
                 primary_image,
                 primary_image_source_path,
                 supporting_images,
+                self.visualization_images,
+                self.algorithm_images,
                 self.previous_operables,
                 self.given_fiducials,
                 self.found_fiducials,
@@ -166,6 +194,14 @@ class SpotAnalysisOperable:
         if supporting:
             for image_type in self.supporting_images:
                 ret.append(self.supporting_images[image_type])
+
+        if visualization:
+            for processor in self.visualization_images:
+                ret += self.visualization_images[processor]
+
+        if algorithm:
+            for processor in self.algorithm_images:
+                ret += self.algorithm_images[processor]
 
         return ret
 
@@ -213,7 +249,7 @@ class SpotAnalysisOperable:
         Finds the best source path/name.ext for the primary image of this operable.
 
         The source path is chosen from among the primary_image's .source_path,
-        the primary_image_source_path, and the primary_image's .cache_path.
+        the primary_image_source_path, and the primary_image's .cache_path_name_ext.
 
         Returns
         -------
@@ -289,14 +325,14 @@ class SpotAnalysisOperable:
     def is_ancestor_of(self, other: "SpotAnalysisOperable") -> bool:
         """
         Returns true if this operable is in the other operable's
-        previous_operables tree. Does not match for equality between this and
-        the other operable.
+        previous_operables tree. Does not check if this operable is the other
+        operable.
         """
         if other.previous_operables[0] is None:
             return False
 
         for prev in other.previous_operables[0]:
-            if prev == self:
+            if prev is self:
                 return True
             elif self.is_ancestor_of(prev):
                 return True
