@@ -11,7 +11,7 @@ class EchoImageProcessor(AbstractSpotAnalysisImageProcessor):
     """
 
     def __init__(self, log_level=lt.log.INFO, prefix=""):
-        super().__init__(self.__class__.__name__)
+        super().__init__()
 
         self.log_level = log_level
         self.prefix = prefix

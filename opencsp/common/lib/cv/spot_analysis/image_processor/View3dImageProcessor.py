@@ -1,3 +1,4 @@
+import copy
 from typing import Callable
 
 import cv2 as cv
@@ -5,6 +6,8 @@ import matplotlib.axes
 import matplotlib.backend_bases
 import numpy as np
 
+from opencsp.common.lib.cv.CacheableImage import CacheableImage
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractVisualizationImageProcessor import (
     AbstractVisualizationImageProcessor,
@@ -28,24 +31,23 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
     def __init__(
         self,
         label: str | rca.RenderControlAxis = 'Light Intensity',
-        interactive: bool | Callable[[SpotAnalysisOperable], bool] = False,
         max_resolution: tuple[int, int] | None = None,
         crop_to_threshold: int | None = None,
+        interactive: bool | Callable[[SpotAnalysisOperable], bool] = False,
+        base_image_selector: str | ImageType = None,
     ):
         """
         Parameters
         ----------
         label : str | rca.RenderControlAxis, optional
             The label to use for the window title, by default 'Light Intensity'
-        interactive : bool | Callable[[SpotAnalysisOperable], bool], optional
-            If True then the spot analysis pipeline is paused until the user presses the "enter" key, by default False
         max_resolution : tuple[int, int] | None, optional
             Limits the resolution along the x and y axes to the given values. No limit if None. By default None.
         crop_to_threshold : int | None, optional
             Crops the image on the x and y axis to the first/last value >= the given threshold. None to not crop the
             image. Useful when trying to inspect hot spots on images with very concentrated values. By default None.
         """
-        super().__init__(self.__class__.__name__, interactive)
+        super().__init__(interactive, base_image_selector)
 
         self.max_resolution = max_resolution
         self.crop_to_threshold = crop_to_threshold
@@ -66,22 +68,24 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
     def num_figures(self) -> int:
         return 1
 
-    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
+    def init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
         self.fig_record = fm.setup_figure_for_3d_data(
             render_control_fig,
             self.rca,
             equal=False,
             number_in_name=False,
             name=self.rca.z_label,
-            code_tag=f"{__file__}._init_figure_records()",
+            code_tag=f"{__file__}.init_figure_records()",
         )
         self.view = self.fig_record.view
         self.axes = self.fig_record.figure.gca()
 
         return [self.fig_record]
 
-    def visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool):
-        image = operable.primary_image.nparray
+    def visualize_operable(
+        self, operable: SpotAnalysisOperable, is_last: bool, base_image: CacheableImage
+    ) -> list[CacheableImage | rcfr.RenderControlFigureRecord]:
+        image = base_image.nparray
 
         # reduce data based on threshold
         y_start, y_end, x_start, x_end = 0, image.shape[0], 0, image.shape[1]
@@ -114,6 +118,8 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
 
         # draw
         self.view.show(block=False)
+
+        return self.fig_record
 
     def close_figures(self):
         with et.ignored(Exception):

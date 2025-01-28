@@ -45,7 +45,7 @@ class ExposureDetectionImageProcessor(AbstractSpotAnalysisImageProcessor):
         log_level : int, optional
             The level to print out warnings at, by default log.WARN
         """
-        super().__init__(self.__class__.__name__)
+        super().__init__()
 
         # validate the inputs
         val_err = lambda s: lt.error_and_raise(ValueError, "Error in ExposureDetectionImageProcessor: " + s)

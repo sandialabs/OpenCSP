@@ -26,7 +26,7 @@ class TestCroppingImageProcessor(unittest.TestCase):
 
         processor = CroppingImageProcessor(x1=1, x2=9, y1=2, y2=4)
         operable = SpotAnalysisOperable(tenbyfive, "tenbyfive")
-        result = processor.process_image(operable)[0]
+        result = processor.process_operable(operable)[0]
         cropped_image = result.primary_image.nparray
 
         expected = np.array([[21, 22, 23, 24, 25, 26, 27, 28], [31, 32, 33, 34, 35, 36, 37, 38]])
@@ -38,7 +38,7 @@ class TestCroppingImageProcessor(unittest.TestCase):
 
         processor = CroppingImageProcessor(x1=1, x2=90, y1=2, y2=40)
         with self.assertRaises(ValueError):
-            processor.process_image(SpotAnalysisOperable(tenbyfive))
+            processor.process_operable(SpotAnalysisOperable(tenbyfive))
 
 
 if __name__ == '__main__':

@@ -1,12 +1,20 @@
 from abc import ABC, abstractmethod
+import copy
+import dataclasses
 from typing import Callable
 
+import numpy as np
+
+from opencsp.common.lib.cv.CacheableImage import CacheableImage
+from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
+import opencsp.common.lib.tool.image_tools as it
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, ABC):
@@ -16,7 +24,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
     By convention subclasses are named "View*ImageProcessor" (their name starts
     with "View" and ends with "ImageProcessor"). Note that subclasses should not
     implement their own _execute() methods, but should instead implement
-    num_figures, _init_figure_records(), visualize_operable(), and
+    num_figures, init_figure_records(), visualize_operable(), and
     close_figures().
 
     The visualizations that these processors create can be used either for
@@ -59,19 +67,20 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
             def num_figures(self):
                 return 1
 
-            def _init_figure_records(self, render_control_fig):
+            def init_figure_records(self, render_control_fig):
                 self.fig_record = fm.setup_figure(
                     render_control_fig,
                     rca.image(),
                     equal=False,
                     name=self.name,
-                    code_tag=f"{__file__}._init_figure_records()",
+                    code_tag=f"{__file__}.init_figure_records()",
                 )
                 return [self.fig_record]
 
             def visualize_operable(self, operable, is_last):
                 image = operable.primary_image.nparray
                 self.fig_record.view.imshow(image)
+                return [self.fig_record]
 
             def close_figures(self):
                 with exception_tools.ignored(Exception):
@@ -79,22 +88,49 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
                 self.fig_record = None
     """
 
-    def __init__(self, name: str, interactive: bool | Callable[[SpotAnalysisOperable], bool]):
+    def __init__(
+        self,
+        interactive: bool | Callable[[SpotAnalysisOperable], bool],
+        base_image_selector: str | ImageType = None,
+        name: str = None,
+    ):
         """
         Parameters
         ----------
-        name : str
-            Passed through to AbstractSpotAnalysisImageProcessor.__init__()
         interactive : bool | Callable[[SpotAnalysisOperable], bool], optional
             If True then the spot analysis pipeline is paused until the user presses the "enter" key, by default False
+        base_image_selector : ImageType, optional
+            Which image to draw the visualization on top of. The latest
+            available of the given type is used. Can also be one of None,
+            'Visualization', or 'Algorithm'. Default is the latest primary
+            image.
+        name : str
+            Passed through to AbstractSpotAnalysisImageProcessor.__init__()
         """
         # import here to avoid circular dependencies
         from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
 
         super().__init__(name)
 
+        # validate arguments
+        if isinstance(base_image_selector, str):
+            acceptable_values = ["visualization", "algorithm"]
+            if base_image_selector.lower() not in acceptable_values:
+                lt.error_and_raise(
+                    ValueError,
+                    "Error in AbstractVisualizationImageProcessor(): "
+                    + f"base_image_selector must be either an ImageType or one of {acceptable_values}, "
+                    + "but it is '{base_image_selector}'",
+                )
+
         # register arguments
         self.interactive = interactive
+        self.base_image_selector = base_image_selector
+        """
+        Determines the image returned from
+        :py:meth:`_get_image_for_visualizing`. Typically this will be one of
+        None/ImageType.PRIMARY or 'visualization'.
+        """
 
         # internal values
         self.visualization_coordinator: VisualizationCoordinator = None
@@ -116,7 +152,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         pass
 
     @abstractmethod
-    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
+    def init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
         """
         Initializes the figure windows (via figure_management.setup_figure*) for
         this instance and returns the list of initialized figures. The length of
@@ -135,10 +171,67 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         """
         pass
 
+    def _get_image_for_visualizing(self, operable: SpotAnalysisOperable) -> CacheableImage:
+        """
+        Chooses one of the operable's images to use to draw visualizations on
+        top of based on self.:py:attr:`base_image_selector`. The returned value
+        will be passed through to :py:meth:`visualize_operable` as the
+        base_image.
+        """
+        if self.base_image_selector is None or self.base_image_selector == ImageType.PRIMARY:
+            return operable.primary_image
+        elif isinstance(self.base_image_selector, str):
+            if self.base_image_selector.lower() == 'visualization':
+                return list(operable.visualization_images.values())[-1][0]
+            elif self.base_image_selector.lower() == 'algorithm':
+                return list(operable.algorithm_images.values())[-1][0]
+            else:
+                lt.error_and_raise(
+                    RuntimeError,
+                    "Error in AbstractVisualizationImageProcessor._get_image_for_visualization(): "
+                    + f"unknown base_image_selector string value '{self.base_image_selector}'",
+                )
+        elif self.base_image_selector in [
+            ImageType.REFERENCE,
+            ImageType.NULL,
+            ImageType.COMPARISON,
+            ImageType.BACKGROUND_MASK,
+        ]:
+            return operable.supporting_images[self.base_image_selector]
+        else:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in AbstractVisualizationImageProcessor._get_image_for_visualization(): "
+                + f"unknown base_image_selector of type {type(self.base_image_selector)}: {self.base_image_selector}",
+            )
+
     @abstractmethod
-    def visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool) -> None:
+    def visualize_operable(
+        self, operable: SpotAnalysisOperable, is_last: bool, base_image: CacheableImage
+    ) -> list[CacheableImage | rcfr.RenderControlFigureRecord]:
         """
         Updates the figures for this instance with the data from the given operable.
+
+        The implementing visualization image processor has the option of
+        returning visualizations as cacheable images, figure records, or a mix
+        of both.
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            The operable to draw the visualization for.
+        is_last : bool
+            True if this is the last operable to be drawn by this processor.
+        base_image : CacheableImage
+            The base image on which to draw the visualization. Value is
+            determined by :py:attr:`base_image_selector` and retrieved with
+            :py:meth:`_get_image_for_visualizing`.
+
+        Returns
+        -------
+        visualizations: list[CacheableImage|rcfr.RenderControlFigureRecord]
+            Visualizations from this image processor as cacheable images or as
+            figure records. Empty list if there aren't any.
         """
         pass
 
@@ -169,7 +262,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         # Note: no type hint for coordinator to avoid a circular import dependency
         self.visualization_coordinator = coordinator
 
-    def init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
+    def _init_figure_records(self, render_control_fig: rcf.RenderControlFigure) -> list[rcfr.RenderControlFigureRecord]:
         """
         Called by the registered coordinator to create any necessary
         visualization windows. If there is no registered coordinator by the time
@@ -186,17 +279,81 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         list[rcfr.RenderControlFigureRecord]
             The list of newly created visualization windows.
         """
-        ret = self._init_figure_records(render_control_fig)
+        ret = self.init_figure_records(render_control_fig)
         self.initialized_figure_records = True
         return ret
 
-    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
-        if self.has_visualization_coordinator:
-            if self.visualization_coordinator.is_visualize(self, operable, is_last):
-                self.visualization_coordinator.visualize(self, operable, is_last)
-        else:
-            if not self.initialized_figure_records:
-                self.init_figure_records(rcf.RenderControlFigure(tile=False))
-            self.visualize_operable(operable, is_last)
+    @staticmethod
+    def default_render_control_figure_for_operable(operable: SpotAnalysisOperable):
+        (height_px, width_px), nchannel = it.dims_and_nchannels(operable.primary_image.nparray)
+        figsize = rcf.RenderControlFigure.pixel_resolution_inches(width_px, height_px)
+        figure_control = rcf.RenderControlFigure(tile=False, figsize=figsize, grid=False, draw_whitespace_padding=False)
+        return figure_control
 
-        return [operable]
+    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
+        ret: SpotAnalysisOperable = None
+
+        if self.has_visualization_coordinator:
+            # Visualize the operable and block (if interactive).
+            op_with_vis = self.visualization_coordinator.visualize(self, operable, is_last)
+            if op_with_vis is not None:
+                ret = op_with_vis
+            else:
+                ret = dataclasses.replace(operable)
+        else:
+            # no coordinator for synchronized visualization, always visualize
+            # the operable immediately
+            if not self.initialized_figure_records:
+                # Create the figure to plot to
+                render_control = self.default_render_control_figure_for_operable(operable)
+                self._init_figure_records(render_control)
+            new_visualizations = self._visualize_operable(operable, is_last)
+
+            # get the visualization images list
+            visualization_images = copy.copy(ret.visualization_images)
+            if self not in visualization_images:
+                visualization_images[self] = []
+            else:
+                visualization_images[self] = copy.copy(visualization_images[self])
+            visualization_images[self] += new_visualizations
+
+            # update the return value
+            ret = dataclasses.replace(operable, visualization_images=visualization_images)
+
+        return [ret]
+
+    def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool) -> list[CacheableImage]:
+        """
+        Calls :py:meth:`visualize_operable` and collects the visualziation images.
+
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            The operable to visualize.
+        is_last : bool
+            True if this is the last operable that this method will be evaluated for.
+
+        Returns
+        -------
+        list[CacheableImage]
+            This processor's visualizations.
+        """
+        # visualize the operable
+        base_image = self._get_image_for_visualizing(operable)
+        visualizations = self.visualize_operable(operable, is_last, base_image)
+
+        # build the list of visualization images
+        all_vis_images: list[CacheableImage] = []
+        for cacheable_or_figure_rec in visualizations:
+            if isinstance(cacheable_or_figure_rec, CacheableImage):
+                all_vis_images.append(cacheable_or_figure_rec)
+
+            else:
+                # get the figure as an numpy array, using the standard 8 inches figure height
+                np_image = cacheable_or_figure_rec.to_array(8.0)
+
+                # add the image
+                cacheable_image = CacheableImage(np_image)
+                all_vis_images.append(cacheable_image)
+
+        return all_vis_images
