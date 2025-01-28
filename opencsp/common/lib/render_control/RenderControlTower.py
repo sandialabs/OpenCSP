@@ -17,6 +17,7 @@ class RenderControlTower:
         point_styles: RenderControlPointSeq = None,
         wire_frame: RenderControlPointSeq = None,
         target: RenderControlPointSeq = None,
+        bcs: RenderControlPointSeq = None,
     ) -> None:
         """
         Controls for rendering a tower.
@@ -48,6 +49,8 @@ class RenderControlTower:
             wire_frame = rcps.outline()
         if target is None:
             target = rcps.marker(marker='x', color='r', markersize=6)
+        if bcs is None:
+            bcs = rcps.marker(marker='+', color='b', markersize=6)
 
         super(RenderControlTower, self).__init__()
 
@@ -58,6 +61,7 @@ class RenderControlTower:
         self.point_styles = point_styles
         self.wire_frame = wire_frame
         self.target = target
+        self.bcs = bcs
 
     def style(self, any):
         """ "style" is a method commonly used by RenderControlEnsemble.
@@ -75,3 +79,8 @@ def normal_tower():
 def no_target():
     # tower outline with no target.
     return RenderControlTower(wire_frame=rcps.outline(color='g'), target=False)
+
+
+def no_bcs():
+    # tower outline with not bcs.
+    return RenderControlTower(wire_frame=rcps.outline(color='g'), bcs=False)
