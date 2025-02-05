@@ -10,7 +10,7 @@ from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets
+from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, get_groups_and_datasets
 
 
 def load_mirror_ideal(file: str, focal_length: float) -> MirrorParametric:
@@ -52,17 +52,44 @@ def load_mirror(file: str) -> MirrorPoint:
     Facet
         Representation of Facet
     """
-    data = load_hdf5_datasets(
-        [
-            'DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners',
-            'DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy',
-            'DataSofastCalculation/facet/facet_000/SlopeSolverData/v_surf_points_facet',
-        ],
-        file,
-    )
+    v_facet_corners_str = 'DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners'
+    if v_facet_corners_str not in get_groups_and_datasets(file):
+        # Undefined mirror type
+        data = load_hdf5_datasets(
+            [
+                'DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy',
+                'DataSofastCalculation/facet/facet_000/SlopeSolverData/v_surf_points_facet',
+            ],
+            file,
+        )
+
+        # Get facet bounding box
+        xs = (
+            data['v_surf_points_facet'][0].max(),
+            data['v_surf_points_facet'][0].min(),
+            data['v_surf_points_facet'][0].min(),
+            data['v_surf_points_facet'][0].max(),
+        )
+        ys = (
+            data['v_surf_points_facet'][1].min(),
+            data['v_surf_points_facet'][1].min(),
+            data['v_surf_points_facet'][1].max(),
+            data['v_surf_points_facet'][1].max(),
+        )
+        v_facet_corners = Vxy((xs, ys))
+    else:
+        # Non-undefined mirror type
+        data = load_hdf5_datasets(
+            [
+                v_facet_corners_str,
+                'DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy',
+                'DataSofastCalculation/facet/facet_000/SlopeSolverData/v_surf_points_facet',
+            ],
+            file,
+        )
+        v_facet_corners = Vxy(data['v_facet_corners'][:2])
 
     # Create facet region
-    v_facet_corners = Vxy(data['v_facet_corners'][:2])
     region_facet = RegionXY.from_vertices(v_facet_corners)
 
     # Get mirror data
