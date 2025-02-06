@@ -1,18 +1,17 @@
-# Sun Position Calculation
-#
-# Adapted from John Clark Craig's post, "Python Sun Position for Solar Energy and Research."
-# https://levelup.gitconnected.com/python-sun-position-for-solar-energy-and-research-7a4ead801777
-#
-# See also:
-#
-#    Pysolar: staring directly at the sun since 2007
-#    https://pysolar.readthedocs.io/en/latest/
-#
-#    Source code for pvlib.solarposition
-#    https://pvlib-python.readthedocs.io/en/stable/_modules/pvlib/solarposition.html
-#
+"""
+Sun Position Calculation
 
-# sunpos.py
+Adapted from John Clark Craig's post, "Python Sun Position for Solar Energy and Research."
+https://levelup.gitconnected.com/python-sun-position-for-solar-energy-and-research-7a4ead801777
+
+See also:
+
+    Pysolar: staring directly at the sun since 2007
+    https://pysolar.readthedocs.io/en/latest/
+
+    Source code for pvlib.solarposition
+    https://pvlib-python.readthedocs.io/en/stable/_modules/pvlib/solarposition.html
+"""
 
 import math
 
@@ -169,8 +168,6 @@ def sun_position(
 
 def direction_uxyz_given_azimuth_elevation(azimuth: float, elevation: float):  # Both radians.
     """
-    DEPRECATED: Calculates the direction vector in 3D space given azimuth and elevation angles.
-
     This function converts azimuth and elevation angles (in radians) into a unit vector
     in 3D space.
 
@@ -202,22 +199,3 @@ def direction_uxyz_given_azimuth_elevation(azimuth: float, elevation: float):  #
     uxyz = np.array([x, y, z])
     # Return.
     return uxyz
-
-
-if __name__ == "__main__":
-    # Close Encounters latitude, longitude
-    location = (40.602778, -104.741667)
-    # Fourth of July, 2022 at 11:20 am MDT (-6 hours)
-    when = (2022, 7, 4, 11, 20, 0, -6)
-    # Get the Sun's apparent location in the sky
-    azimuth, elevation = sun_position_aux(when, location, True)
-    # Output the results
-    print("\nWhen: ", when)
-    print("Where: ", location)
-    print("Azimuth: ", azimuth)
-    print("Elevation: ", elevation)
-
-# When:  (2022, 7, 4, 11, 20, 0, -6)
-# Where:  (40.602778, -104.741667)
-# Azimuth:  121.38
-# Elevation:  61.91
