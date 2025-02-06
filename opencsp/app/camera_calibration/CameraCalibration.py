@@ -40,10 +40,7 @@ class CalibrationGUI:
 
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     def __init__(self):
-        """
-        GUI for calibrating machine vision Camera
-
-        """
+        """Initializes GUI window"""
         # Create tkinter object
         self._root = tkt.window()
 
