@@ -1,5 +1,4 @@
-"""Demonstrate Solar Field Plotting Routines
-"""
+"""Demonstrate Solar Field Plotting Routines"""
 
 import numpy as np
 
