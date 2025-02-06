@@ -629,5 +629,5 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         img_2d = np.ones((width, width), dtype='uint8') * self.display_data.projector_max_int
 
         # Create marker image
-        aruco.drawMarker(self.aruco_dictionary, id_, width, img_2d)
+        aruco.generateImageMarker(self.aruco_dictionary, id_, width, img_2d)
         return np.concatenate([img_2d[:, :, None]] * 3, axis=2)
