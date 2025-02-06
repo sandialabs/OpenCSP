@@ -157,14 +157,3 @@ Angle Utility Functions
    :show-inheritance:
    :member-order: groupwise
 
-3D Transformation Utility Functions
-===================================
-.. currentmodule:: opencsp.common.lib.geometry.transform_3d
-
-.. automodule:: opencsp.common.lib.geometry.transform_3d
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-

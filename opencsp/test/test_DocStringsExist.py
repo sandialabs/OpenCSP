@@ -305,7 +305,6 @@ class test_Docstrings(unittest.TestCase):
         opencsp.common.lib.geometry.Vxy,
         opencsp.common.lib.geometry.Vxyz,
         opencsp.common.lib.geometry.angle,
-        opencsp.common.lib.geometry.transform_3d,
     ]
 
     opencsp_path_class_list = [
