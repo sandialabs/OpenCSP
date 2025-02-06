@@ -357,10 +357,10 @@ class CalibrationGUI:
 
             # Calculate reprojection error for each image
             self._reproj_errors = []
-            for R_cam, V_cam, P_object, P_image in zip(
+            for r_cam, v_cam, p_object, p_image in zip(
                 self._r_cam_object, self._v_cam_object_cam, self._p_object, self._p_image
             ):
-                error = sp.reprojection_error(self._camera, P_object, P_image, R_cam, V_cam)  # RMS pixels
+                error = sp.reprojection_error(self._camera, p_object, p_image, r_cam, v_cam)  # RMS pixels
                 self._reproj_errors.append(error)  # RMS pixels
 
             # Find five images with highest reprojection errors
