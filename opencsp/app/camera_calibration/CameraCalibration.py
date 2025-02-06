@@ -6,12 +6,13 @@ machine vision camera.
 import os
 import tkinter
 from tkinter.filedialog import askopenfilename, asksaveasfilename
-from warnings import warn
+from tkinter import messagebox
 
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation
+from scipy.signal import convolve2d
 
 import opencsp.app.camera_calibration.lib.calibration_camera as cc
 import opencsp.app.camera_calibration.lib.image_processing as ip
@@ -83,9 +84,14 @@ class CalibrationGUI:
         self.create_layout()
 
         # Set flags
+        self.max_image_dimension = 2000
+        """Maximum size of any one dimension of an input image. If input
+        image has a dimension larger than this, image will be downsampled
+        prior to processing."""
         self.files_slected = False
         self.images_loaded = False
         self.camera_calibrated = False
+        self._downsample_factor: int = None  # Downsample factor for images that are too large for OpenCV
 
         # Initialize variables
         self.files: list[str]
@@ -146,7 +152,7 @@ class CalibrationGUI:
         r += 1
 
         # Find corners button
-        self.btn_find_corns = tkinter.Button(self.root, text='Find Corners', command=self.find_corners)
+        self.btn_find_corns = tkinter.Button(self.root, text='Find Corners', command=self._find_corners)
         self.btn_find_corns.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
@@ -156,7 +162,7 @@ class CalibrationGUI:
         r += 1
 
         # Calibrate button
-        self.btn_calibrate = tkinter.Button(self.root, text='Calibrate Camera', command=self.calibrate_camera)
+        self.btn_calibrate = tkinter.Button(self.root, text='Calibrate Camera', command=self._calibrate_camera)
         self.btn_calibrate.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
@@ -265,55 +271,74 @@ class CalibrationGUI:
     def get_npts(self):
         return (self.var_pts_x.get(), self.var_pts_y.get())
 
-    def find_corners(self):
-        # Get number checkerboard points
-        npts = self.get_npts()
+    def _find_corners(self):
+        try:
+            # Get number checkerboard points
+            npts = self.get_npts()
 
-        # Find corners
-        self.p_object = []
-        self.p_image = []
-        self.images = []
-        self.used_file_names = []
+            # Reset data objects
+            self.p_object = []
+            self.p_image = []
+            self.images = []
+            self.used_file_names = []
+            self._downsample_factor = None
+            self.img_size_xy = None
 
-        for file in self.files:
-            # Get file name
-            file_name = os.path.basename(file)
+            # Find corners
+            for file in self.files:
+                # Get file name
+                file_name = os.path.basename(file)
 
-            # Update progress
-            print('Processing:', file_name, flush=True)
+                # Update progress
+                print('Processing:', file_name, flush=True)
 
-            # Load images
-            img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
+                # Load images
+                img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
 
-            # Find checkerboard corners
-            p_object, p_image = ip.find_checkerboard_corners(npts, img)
-            if p_object is None or p_image is None:
-                warn(f'Could not find corners in image: {file_name:s}.', stacklevel=2)
-                continue
+                # Check that image shape is consistent
+                if self.img_size_xy is None:
+                    self.img_size_xy = (img.shape[1], img.shape[0])
+                    # Calculate downsample factor if image is too large for OpenCV algorithm
+                    if max(self.img_size_xy) > self.max_image_dimension:
+                        self._downsample_factor = int(np.ceil(max(self.img_size_xy) / self.max_image_dimension))
+                else:
+                    if self.img_size_xy != (img.shape[1], img.shape[0]):
+                        raise ValueError('Input images do not have consistent xy shapes.')
 
-            # Save image, filename, and found corners
-            self.images.append(img)
-            self.used_file_names.append(file_name)
+                # Downsample if necessary
+                if self._downsample_factor is not None:
+                    img = self.downsample_image(img)
 
-            self.p_object.append(p_object)
-            self.p_image.append(p_image)
+                # Find checkerboard corners
+                p_object, p_image = ip.find_checkerboard_corners(npts, img)
+                if p_object is None or p_image is None:
+                    print(f'Could not find corners in image: {file_name:s}.')
+                    continue
 
-        # Update flags
-        self.images_loaded = True
-        self.camera_calibrated = False
+                # Save image, filename, and found corners
+                self.images.append(img)
+                self.used_file_names.append(file_name)
 
-        # Save image size
-        self.img_size_xy = np.flip(self.images[0].shape)
+                self.p_object.append(p_object)
+                self.p_image.append(p_image)
 
-        # Clear any calibrated camera
-        self.camera = None
-        self.r_cam_object = []
-        self.v_cam_object_cam = []
-        self.avg_reproj_error = []
-        self.reproj_errors = []
+            # Update flags
+            self.images_loaded = True
+            self.camera_calibrated = False
 
-        # Format buttons
-        self.enable_btns()
+            # Clear any calibrated camera
+            self.camera = None
+            self.r_cam_object = []
+            self.v_cam_object_cam = []
+            self.avg_reproj_error = []
+            self.reproj_errors = []
+
+            # Format buttons
+            self.enable_btns()
+
+        # Handle errors
+        except Exception as error:
+            messagebox.showerror('Find Corners Error', str(error))
 
     def view_found_corners(self):
         # Create new window
@@ -335,34 +360,52 @@ class CalibrationGUI:
         # View corners
         ViewAnnotatedImages(root_corns, ims, self.used_file_names)
 
-    def calibrate_camera(self):
-        # Get camera name
-        cam_name = self.var_cam_name.get()
+    def _calibrate_camera(self):
+        try:
+            # Get camera name
+            cam_name = self.var_cam_name.get()
 
-        # Calibrate camera
-        (self.camera, self.r_cam_object, self.v_cam_object_cam, self.avg_reproj_error) = cc.calibrate_camera(
-            self.p_object, self.p_image, self.img_size_xy, cam_name
-        )
+            # Calibrate camera
+            (self.camera, self.r_cam_object, self.v_cam_object_cam, self.avg_reproj_error) = cc.calibrate_camera(
+                self.p_object, self.p_image, self.img_size_xy, cam_name
+            )
 
-        # Calculate reprojection error for each image
-        self.reproj_errors = []
-        for R_cam, V_cam, P_object, P_image in zip(
-            self.r_cam_object, self.v_cam_object_cam, self.p_object, self.p_image
-        ):
-            error = sp.reprojection_error(self.camera, P_object, P_image, R_cam, V_cam)  # RMS pixels
-            self.reproj_errors.append(error)  # RMS pixels
+            # Calculate reprojection error for each image
+            self.reproj_errors = []
+            for R_cam, V_cam, P_object, P_image in zip(
+                self.r_cam_object, self.v_cam_object_cam, self.p_object, self.p_image
+            ):
+                error = sp.reprojection_error(self.camera, P_object, P_image, R_cam, V_cam)  # RMS pixels
+                self.reproj_errors.append(error)  # RMS pixels
 
-        # Find five images with highest reprojection errors
-        idxs = np.flip(np.argsort(self.reproj_errors))[: len(self.var_reproj_name)]
-        for idx, name, val in zip(idxs, self.var_reproj_name, self.var_reproj_val):
-            name.set(self.used_file_names[idx])
-            val.set(f'{self.reproj_errors[idx]:.2f}')
+            # Find five images with highest reprojection errors
+            idxs = np.flip(np.argsort(self.reproj_errors))[: len(self.var_reproj_name)]
+            for idx, name, val in zip(idxs, self.var_reproj_name, self.var_reproj_val):
+                name.set(self.used_file_names[idx])
+                val.set(f'{self.reproj_errors[idx]:.2f}')
 
-        # Update flags
-        self.camera_calibrated = True
+            # Account for downsampling if downsampling occured
+            if self._downsample_factor is not None:
+                # Update image shape
+                self.camera.image_shape_xy = (
+                    self.camera.image_shape_xy[0] * self._downsample_factor,
+                    self.camera.image_shape_xy[1] * self._downsample_factor,
+                )
+                # Update intrinsic matrix non-zero and non-unity values
+                self.camera.intrinsic_mat[0, 0] *= self._downsample_factor
+                self.camera.intrinsic_mat[1, 1] *= self._downsample_factor
+                self.camera.intrinsic_mat[2, 0] *= self._downsample_factor
+                self.camera.intrinsic_mat[2, 1] *= self._downsample_factor
 
-        # Format buttons
-        self.enable_btns()
+            # Update flags
+            self.camera_calibrated = True
+
+            # Format buttons
+            self.enable_btns()
+
+        # Handle errors
+        except Exception as error:
+            messagebox.showerror('Error calibrating camera', str(error))
 
     def show_reproj_error(self):
         fig = plt.figure()
@@ -450,6 +493,38 @@ class CalibrationGUI:
         for name, val in zip(self.var_reproj_name, self.var_reproj_val):
             name.set('')
             val.set('')
+
+    def downsample_image(self, image: np.ndarray) -> np.ndarray:
+        """Downsamples input image by self._downsample_factor
+
+        Parameters
+        ----------
+        image : np.ndarray
+            Input image (n, m) or (n, m, 3)
+
+        Returns
+        -------
+        np.ndarray
+            Output image (n', m') or (n', m', 3)
+        """
+        # Create square anti-aliasing filter
+        n = self._downsample_factor
+        ker = np.ones((n, n)) / (n**2)
+
+        # Convert to grayscale
+        if np.ndim(image) == 3:
+            image = image.mean(2)
+        elif np.ndim(image) != 2:
+            raise ValueError(f'Input image shape must be 2 or 3 dimensions but was shape, {image.shape}')
+
+        # Apply anti-aliasing filter
+        image = convolve2d(image, ker)
+
+        # Downsample
+        image = image[::n, ::n]
+
+        # Convert to input dtype
+        return image.astype(image.dtype)
 
     def close(self):
         """
