@@ -1,4 +1,5 @@
-"""Example script that finds blobs in image and saves annotated image."""
+"""Example script that finds blobs in image and saves annotated image.
+"""
 
 from os.path import join, dirname
 

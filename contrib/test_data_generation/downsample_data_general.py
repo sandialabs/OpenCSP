@@ -1,4 +1,5 @@
-"""Library of functions to downsample high-res image and other data"""
+"""Library of functions to downsample high-res image and other data
+"""
 
 import numpy as np
 from scipy.signal import convolve2d

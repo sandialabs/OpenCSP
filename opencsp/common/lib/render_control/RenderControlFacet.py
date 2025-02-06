@@ -1,4 +1,6 @@
-""" """
+"""
+
+"""
 
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps

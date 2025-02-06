@@ -1,4 +1,5 @@
-"""Contains functions to save downsampled sofast measurement file"""
+"""Contains functions to save downsampled sofast measurement file
+"""
 
 import os
 import sys

@@ -1,4 +1,5 @@
-"""Example script that performs dot location calibration using photogrammetry."""
+"""Example script that performs dot location calibration using photogrammetry.
+"""
 
 from os.path import join
 import unittest

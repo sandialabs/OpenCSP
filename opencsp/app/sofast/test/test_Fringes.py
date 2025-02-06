@@ -1,4 +1,5 @@
-"""Unit test suite to test Fringes class"""
+"""Unit test suite to test Fringes class
+"""
 
 from opencsp.app.sofast.lib.Fringes import Fringes
 

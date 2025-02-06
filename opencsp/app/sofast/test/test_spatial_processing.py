@@ -1,4 +1,5 @@
-"""Unit test suite to test the spatial_processing library"""
+"""Unit test suite to test the spatial_processing library
+"""
 
 import os
 import unittest

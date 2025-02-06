@@ -1,4 +1,5 @@
-"""Unit test suite to test image_processing library"""
+"""Unit test suite to test image_processing library
+"""
 
 from os.path import join
 import unittest

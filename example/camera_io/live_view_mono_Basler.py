@@ -1,4 +1,5 @@
-"""Example script that connects to and shows a live view from a 12 bit Basler monochrome camera."""
+"""Example script that connects to and shows a live view from a 12 bit Basler monochrome camera.
+"""
 
 import argparse
 

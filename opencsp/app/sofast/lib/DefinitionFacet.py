@@ -1,4 +1,5 @@
-"""Data class to store single facet optic definition"""
+"""Data class to store single facet optic definition
+"""
 
 import json
 

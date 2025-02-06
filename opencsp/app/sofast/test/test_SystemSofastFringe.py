@@ -1,4 +1,5 @@
-"""Unit test suite to test the System class"""
+"""Unit test suite to test the System class
+"""
 
 import os
 import unittest

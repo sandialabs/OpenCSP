@@ -1,4 +1,5 @@
-"""Unit test suite to test SlopeSolver class"""
+"""Unit test suite to test SlopeSolver class
+"""
 
 from os.path import join
 import unittest

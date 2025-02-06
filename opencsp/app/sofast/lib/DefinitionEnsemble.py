@@ -1,4 +1,5 @@
-"""Data class to store facet ensemble optic definition for sofast"""
+"""Data class to store facet ensemble optic definition for sofast
+"""
 
 from copy import deepcopy
 import json

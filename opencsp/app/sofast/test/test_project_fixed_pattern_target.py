@@ -1,4 +1,5 @@
-"""Tests projecting a test dot pattern onto a screen"""
+"""Tests projecting a test dot pattern onto a screen
+"""
 
 import os
 import unittest

@@ -1,4 +1,5 @@
-"""Measurement class for SofastFringe"""
+"""Measurement class for SofastFringe
+"""
 
 from abc import ABC
 import datetime as dt

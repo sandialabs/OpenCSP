@@ -1,4 +1,5 @@
-"""Integration test. Testing processing of an 'undefined' type optic."""
+"""Integration test. Testing processing of an 'undefined' type optic.
+"""
 
 import os
 import unittest
