@@ -55,14 +55,10 @@ class Intersection:
             The RayTrace object containing the light paths to be analyzed.
         plane : tuple[Pxyz, Uxyz]
             A tuple containing a point on the plane (Pxyz) and the normal vector to the plane (Uxyz).
-        epsilon : float, optional
-            A small value to determine the precision of the intersection calculation. Defaults to 1e-6.
         save_in_file : bool, optional
             If True, saves the intersection data to a file. Defaults to False.
         save_name : str, optional
             The name of the file to save the intersection data. Required if save_in_file is True.
-        max_ram_in_use_percent : float, optional
-            The maximum percentage of RAM to use for processing. Defaults to 95.0.
         verbose : bool, optional
             If True, enables verbose output for debugging purposes. Defaults to False.
 
@@ -147,10 +143,6 @@ class Intersection:
             A tuple containing a point on the plane (Pxyz) and the normal vector to the plane (Uxyz).
             Each index in the points should correspond to the same index in the directions. Note that
             only one Pxyz and Vxyz is needed to represent multiple lines.
-        epsilon : float, optional
-            A small value to determine the precision of the intersection calculation. Defaults to 1e-6.
-        verbose : bool, optional
-            If True, enables verbose output for debugging purposes. Defaults to False.
 
         Returns
         -------
