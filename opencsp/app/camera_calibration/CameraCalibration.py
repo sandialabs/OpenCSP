@@ -100,6 +100,7 @@ class CalibrationGUI:
         self.p_object: list[Vxyz]
         self.p_image: list[Vxy]
         self.img_size_xy: tuple[int, int]
+        self._img_size_xy_native: tuple[int, int]
         self.camera: Camera
         self.r_cam_object: list[Rotation]
         self.v_cam_object_cam: list[Vxyz]
@@ -283,6 +284,7 @@ class CalibrationGUI:
             self.used_file_names = []
             self._downsample_factor = None
             self.img_size_xy = None
+            self._img_size_xy_native = None
 
             # Find corners
             for file in self.files:
@@ -295,23 +297,37 @@ class CalibrationGUI:
                 # Load images
                 img = cv2.imread(file, cv2.IMREAD_GRAYSCALE)
 
-                # Check that image shape is consistent
-                if self.img_size_xy is None:
-                    self.img_size_xy = (img.shape[1], img.shape[0])
-                    # Calculate downsample factor if image is too large for OpenCV algorithm
-                    if max(self.img_size_xy) > self.max_image_dimension:
-                        self._downsample_factor = int(np.ceil(max(self.img_size_xy) / self.max_image_dimension))
-                else:
-                    if self.img_size_xy != (img.shape[1], img.shape[0]):
-                        raise ValueError('Input images do not have consistent xy shapes.')
+                # Convert to uint8 for OpenCV camera calibration function
+                img = img.astype('uint8')
 
-                # Downsample if necessary
-                if self._downsample_factor is not None:
+                if self._img_size_xy_native is None:
+                    # Define native xy shape
+                    self._img_size_xy_native = (img.shape[1], img.shape[0])
+                else:
+                    # Check that image shape is consistent with first image
+                    if self._img_size_xy_native != (img.shape[1], img.shape[0]):
+                        raise ValueError(
+                            f'Image {file_name:s} has (x,y) shape ({img.shape[1]},{img.shape[0]}) but was expecting shape {self._img_size_xy_native}'
+                        )
+
+                if self._downsample_factor is None:
+                    # Calculate downsample factor if image is too large for OpenCV algorithm
+                    if max(img.shape) > self.max_image_dimension:
+                        self._downsample_factor = int(np.ceil(max(img.shape) / self.max_image_dimension))
+                    else:
+                        self._downsample_factor = int(1)
+
+                if self._downsample_factor != 1:
+                    # Downsample if necessary
                     img = self.downsample_image(img)
+
+                if self.img_size_xy is None:
+                    # Define first image downsampled shape
+                    self.img_size_xy = (img.shape[1], img.shape[0])
 
                 # Find checkerboard corners
                 p_object, p_image = ip.find_checkerboard_corners(npts, img)
-                if p_object is None or p_image is None:
+                if (p_object is None) or (p_image is None):
                     print(f'Could not find corners in image: {file_name:s}.')
                     continue
 
@@ -384,18 +400,14 @@ class CalibrationGUI:
                 name.set(self.used_file_names[idx])
                 val.set(f'{self.reproj_errors[idx]:.2f}')
 
-            # Account for downsampling if downsampling occured
-            if self._downsample_factor is not None:
-                # Update image shape
-                self.camera.image_shape_xy = (
-                    self.camera.image_shape_xy[0] * self._downsample_factor,
-                    self.camera.image_shape_xy[1] * self._downsample_factor,
-                )
-                # Update intrinsic matrix non-zero and non-unity values
-                self.camera.intrinsic_mat[0, 0] *= self._downsample_factor
-                self.camera.intrinsic_mat[1, 1] *= self._downsample_factor
-                self.camera.intrinsic_mat[2, 0] *= self._downsample_factor
-                self.camera.intrinsic_mat[2, 1] *= self._downsample_factor
+            # NOTE: self._downsample_factor = 1 if no downsampling occured
+            # Update image shape
+            self.camera.image_shape_xy = self._img_size_xy_native
+            # Update intrinsic matrix non-zero and non-unity values
+            self.camera.intrinsic_mat[0, 0] *= self._downsample_factor
+            self.camera.intrinsic_mat[1, 1] *= self._downsample_factor
+            self.camera.intrinsic_mat[0, 2] *= self._downsample_factor
+            self.camera.intrinsic_mat[1, 2] *= self._downsample_factor
 
             # Update flags
             self.camera_calibrated = True
@@ -509,6 +521,7 @@ class CalibrationGUI:
         """
         # Create square anti-aliasing filter
         n = self._downsample_factor
+        dtype = image.dtype
         ker = np.ones((n, n)) / (n**2)
 
         # Convert to grayscale
@@ -524,7 +537,7 @@ class CalibrationGUI:
         image = image[::n, ::n]
 
         # Convert to input dtype
-        return image.astype(image.dtype)
+        return image.astype(dtype)
 
     def close(self):
         """
