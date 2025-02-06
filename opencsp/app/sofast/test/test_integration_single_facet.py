@@ -1,5 +1,4 @@
-"""Integration test. Testing processing of a 'single_facet' type optic.
-"""
+"""Integration test. Testing processing of a 'single_facet' type optic."""
 
 import glob
 import os

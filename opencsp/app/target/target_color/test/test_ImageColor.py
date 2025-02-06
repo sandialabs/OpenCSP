@@ -1,5 +1,4 @@
-"""Unit test for ImageColor class
-"""
+"""Unit test for ImageColor class"""
 
 import matplotlib.pyplot as plt
 import numpy as np

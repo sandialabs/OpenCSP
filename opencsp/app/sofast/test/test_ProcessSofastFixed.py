@@ -1,5 +1,4 @@
-"""Test script that runs fixed pattern deflectometry analysis on saved data
-"""
+"""Test script that runs fixed pattern deflectometry analysis on saved data"""
 
 from os.path import join
 import unittest

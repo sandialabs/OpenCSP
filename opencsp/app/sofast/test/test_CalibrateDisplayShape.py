@@ -1,5 +1,4 @@
-"""Tests Sofast screen distortion calibration
-"""
+"""Tests Sofast screen distortion calibration"""
 
 import os
 from os.path import join

@@ -1,5 +1,4 @@
-"""Class that handles the processing of fixed pattern deflectometry data.
-"""
+"""Class that handles the processing of fixed pattern deflectometry data."""
 
 import cv2 as cv
 import numpy as np

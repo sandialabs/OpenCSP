@@ -1,5 +1,4 @@
-"""Unit test suite to test ImageCalibrationGlobal class
-"""
+"""Unit test suite to test ImageCalibrationGlobal class"""
 
 import datetime as dt
 import os

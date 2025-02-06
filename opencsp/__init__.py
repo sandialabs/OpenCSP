@@ -1,5 +1,5 @@
 """
-OpenCSP: 
+OpenCSP:
 ========
 Open source python libraies for concentrating solar power reserach and development
 

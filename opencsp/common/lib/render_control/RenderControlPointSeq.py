@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import matplotlib.colors
 
@@ -67,7 +64,7 @@ class RenderControlPointSeq:
         '|' 	   vline marker
         '_' 	   hline marker
         'None'     no marker
-        '$\u266B$' two quarter notes
+        '$\u266b$' two quarter notes
         'arrow'    draws an arrow at the end of every line
 
         For more markers, see:

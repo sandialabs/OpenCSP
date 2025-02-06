@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import opencsp.common.lib.render.Color as cl
 

@@ -1,5 +1,4 @@
-"""Fixed pattern dot location calibration.
-"""
+"""Fixed pattern dot location calibration."""
 
 import os
 

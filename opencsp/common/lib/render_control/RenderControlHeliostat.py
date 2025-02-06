@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
 import opencsp.common.lib.render_control.RenderControlFacet as rcf

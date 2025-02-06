@@ -1,5 +1,4 @@
-"""Unit test suite to test Surface2D type classes
-"""
+"""Unit test suite to test Surface2D type classes"""
 
 from os.path import join
 import unittest

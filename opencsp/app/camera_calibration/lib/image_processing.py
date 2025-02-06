@@ -1,5 +1,4 @@
-"""Library of image processing functions used for camera calibration
-"""
+"""Library of image processing functions used for camera calibration"""
 
 import cv2 as cv
 import numpy as np

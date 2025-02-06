@@ -1,5 +1,5 @@
 """
-A data structure for estimating a heliostat's 3d shape given an ideal heliostat model and 
+A data structure for estimating a heliostat's 3d shape given an ideal heliostat model and
 a series of frame observations with associated tracked corners.
 
 

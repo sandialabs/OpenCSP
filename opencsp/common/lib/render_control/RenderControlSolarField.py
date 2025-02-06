@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 from warnings import warn
 import opencsp.common.lib.render_control.RenderControlEnsemble as rce

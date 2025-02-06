@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import opencsp.app.ufacets.flight_planner_ufacet.U_Code.lib.RenderControlFlightPlan as rcfp
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf

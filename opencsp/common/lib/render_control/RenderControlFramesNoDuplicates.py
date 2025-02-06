@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import opencsp.common.lib.render_control.RenderControlVideoFrames as rcvf
 

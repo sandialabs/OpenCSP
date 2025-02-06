@@ -1,5 +1,4 @@
-"""Generates downsampled dataset for dot_location_calibration
-"""
+"""Generates downsampled dataset for dot_location_calibration"""
 
 from glob import glob
 from os.path import join, basename, abspath

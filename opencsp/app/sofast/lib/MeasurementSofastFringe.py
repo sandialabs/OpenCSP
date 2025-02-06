@@ -1,5 +1,4 @@
-"""Measurement class for SofastFringe
-"""
+"""Measurement class for SofastFringe"""
 
 import datetime as dt
 

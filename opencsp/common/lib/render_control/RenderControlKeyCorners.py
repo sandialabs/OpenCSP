@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 
 class RenderControlKeyCorners:

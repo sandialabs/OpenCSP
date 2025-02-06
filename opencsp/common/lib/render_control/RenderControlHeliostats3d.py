@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 
 class RenderControlHeliostats3d:

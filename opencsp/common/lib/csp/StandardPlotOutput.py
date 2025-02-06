@@ -1,5 +1,4 @@
-"""Class used to display/save the suite of standard output plots after measuring a CSP Optic object.
-"""
+"""Class used to display/save the suite of standard output plots after measuring a CSP Optic object."""
 
 from dataclasses import dataclass, field
 

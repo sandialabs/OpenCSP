@@ -1,8 +1,8 @@
 """
 Render Control Container.
 
-Provides a single container to pass around display parameters, such as line width, color, 
-figure size, etc.  This eliminates the need to pass many parameters through a series of 
+Provides a single container to pass around display parameters, such as line width, color,
+figure size, etc.  This eliminates the need to pass many parameters through a series of
 routine signatures.
 
 Implemented as a dictionary, so applications can add dresised fields without modifying this code.
