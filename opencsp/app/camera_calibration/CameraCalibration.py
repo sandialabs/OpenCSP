@@ -36,33 +36,6 @@ class CalibrationGUI:
     The GUI includes options to select images, find corners, view found
     corners, calibrate the camera, visualize distortion, and save the camera
     configuration.
-
-    Attributes
-    ----------
-    root : tkinter.Tk
-        The main window of the GUI.
-    files : list[str]
-        List of selected image file paths.
-    images : list[np.ndarray]
-        List of loaded images as NumPy arrays.
-    used_file_names : list[str]
-        List of file names of the loaded images.
-    p_object : list[Vxyz]
-        List of object points in 3D space corresponding to the checkerboard corners.
-    p_image : list[Vxy]
-        List of image points in 2D space corresponding to the detected corners.
-    img_size_xy : tuple[int, int]
-        Size of the images (width, height).
-    camera : Camera
-        The calibrated camera object.
-    r_cam_object : list[Rotation]
-        List of rotation matrices for each calibration image.
-    v_cam_object_cam : list[Vxyz]
-        List of camera position vectors for each calibration image.
-    avg_reproj_error : list[float]
-        Average reprojection error for the calibration.
-    reproj_errors : list[float]
-        List of reprojection errors for each calibration image.
     """
 
     # "ChatGPT 4o-mini" assisted with generating this docstring.
@@ -88,18 +61,18 @@ class CalibrationGUI:
         self._downsample_factor: int = None  # Downsample factor for images that are too large for OpenCV
 
         # Initialize variables
-        self.files: list[str]
-        self.images: list[np.ndarray]
-        self.used_file_names: list[str]
-        self.p_object: list[Vxyz]
-        self.p_image: list[Vxy]
-        self.img_size_xy: tuple[int, int]
+        self._files: list[str]
+        self._images: list[np.ndarray]
+        self._used_file_names: list[str]
+        self._p_object: list[Vxyz]
+        self._p_image: list[Vxy]
+        self._img_size_xy: tuple[int, int]
         self._img_size_xy_native: tuple[int, int]
-        self.camera: Camera
-        self.r_cam_object: list[Rotation]
-        self.v_cam_object_cam: list[Vxyz]
-        self.avg_reproj_error: list[float]
-        self.reproj_errors: list[float]
+        self._camera: Camera
+        self._r_cam_object: list[Rotation]
+        self._v_cam_object_cam: list[Vxyz]
+        self._avg_reproj_error: list[float]
+        self._reproj_errors: list[float]
 
         # Format buttons
         self._enable_btns()
@@ -113,9 +86,9 @@ class CalibrationGUI:
 
         # Name of camera input
         self.var_cam_name = tkinter.StringVar(value='Camera')
-        lbl_cam_name = tkinter.Label(self.root, text='Camera Name:', font=('calibre', 10, 'bold'))
+        lbl_cam_name = tkinter.Label(self._root, text='Camera Name:', font=('calibre', 10, 'bold'))
         entry_cam_name = tkinter.Entry(
-            self.root, textvariable=self.var_cam_name, font=('calibre', 10, 'normal'), width=40
+            self._root, textvariable=self.var_cam_name, font=('calibre', 10, 'normal'), width=40
         )
 
         lbl_cam_name.grid(row=r, column=0, pady=2, padx=2, sticky='nsw')
@@ -125,10 +98,10 @@ class CalibrationGUI:
         # Number of points input
         self.var_pts_x = tkinter.IntVar(value=18)
         self.var_pts_y = tkinter.IntVar(value=23)
-        lbl_pts_x = tkinter.Label(self.root, text='Number of grid x points:', font=('calibre', 10, 'bold'))
-        lbl_pts_y = tkinter.Label(self.root, text='Number of grid y points:', font=('calibre', 10, 'bold'))
-        entry_pts_x = tkinter.Entry(self.root, textvariable=self.var_pts_x, font=('calibre', 10, 'normal'), width=10)
-        entry_pts_y = tkinter.Entry(self.root, textvariable=self.var_pts_y, font=('calibre', 10, 'normal'), width=10)
+        lbl_pts_x = tkinter.Label(self._root, text='Number of grid x points:', font=('calibre', 10, 'bold'))
+        lbl_pts_y = tkinter.Label(self._root, text='Number of grid y points:', font=('calibre', 10, 'bold'))
+        entry_pts_x = tkinter.Entry(self._root, textvariable=self.var_pts_x, font=('calibre', 10, 'normal'), width=10)
+        entry_pts_y = tkinter.Entry(self._root, textvariable=self.var_pts_y, font=('calibre', 10, 'normal'), width=10)
 
         lbl_pts_x.grid(row=r, column=0, pady=2, padx=2, sticky='nsw')
         entry_pts_x.grid(row=r, column=1, pady=2, padx=2, sticky='nsw')
@@ -138,44 +111,44 @@ class CalibrationGUI:
         r += 1
 
         # Select images button
-        self.btn_select_ims = tkinter.Button(self.root, text='Select Images', command=self.select_images)
+        self.btn_select_ims = tkinter.Button(self._root, text='Select Images', command=self._select_images)
         self.btn_select_ims.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Find corners button
-        self.btn_find_corns = tkinter.Button(self.root, text='Find Corners', command=self._find_corners)
+        self.btn_find_corns = tkinter.Button(self._root, text='Find Corners', command=self._find_corners)
         self.btn_find_corns.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # View annotated images button
-        self.btn_view_corns = tkinter.Button(self.root, text='View Found Corners', command=self.view_found_corners)
+        self.btn_view_corns = tkinter.Button(self._root, text='View Found Corners', command=self._view_found_corners)
         self.btn_view_corns.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Calibrate button
-        self.btn_calibrate = tkinter.Button(self.root, text='Calibrate Camera', command=self._calibrate_camera)
+        self.btn_calibrate = tkinter.Button(self._root, text='Calibrate Camera', command=self._calibrate_camera)
         self.btn_calibrate.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Show reprojection error button
         self.btn_vis_reproj_error = tkinter.Button(
-            self.root, text='Show reprojection error', command=self.show_reproj_error
+            self._root, text='Show reprojection error', command=self._show_reproj_error
         )
         self.btn_vis_reproj_error.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Visualize distortion
-        self.btn_vis_dist = tkinter.Button(self.root, text='Visualize distortion', command=self.visualize_dist)
+        self.btn_vis_dist = tkinter.Button(self._root, text='Visualize distortion', command=self._visualize_dist)
         self.btn_vis_dist.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Save camera button
-        self.btn_save = tkinter.Button(self.root, text='Save Camera', command=self.save_camera)
+        self.btn_save = tkinter.Button(self._root, text='Save Camera', command=self._save_camera)
         self.btn_save.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
         # Close button
-        self.btn_close = tkinter.Button(self.root, text='Close', command=self.close)
+        self.btn_close = tkinter.Button(self._root, text='Close', command=self._close)
         self.btn_close.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
         r += 1
 
@@ -209,75 +182,78 @@ class CalibrationGUI:
         r = 3
 
         # Selected files label
-        self.lbl_num_files = tkinter.Label(self.root, font=('calibre', 10, 'bold'))
+        self.lbl_num_files = tkinter.Label(self._root, font=('calibre', 10, 'bold'))
         self.lbl_num_files.grid(row=r, column=1, pady=2, padx=2, sticky='nsw')
         r += 1
 
         # Corners found label
-        self.lbl_corns_found = tkinter.Label(self.root, font=('calibre', 10, 'bold'))
+        self.lbl_corns_found = tkinter.Label(self._root, font=('calibre', 10, 'bold'))
         self.lbl_corns_found.grid(row=r, column=1, pady=2, padx=2, sticky='nsw')
         r += 1
 
         # Camera calibrated label
         r += 1
-        self.lbl_cam_calibrated = tkinter.Label(self.root, font=('calibre', 10, 'bold'))
+        self.lbl_cam_calibrated = tkinter.Label(self._root, font=('calibre', 10, 'bold'))
         self.lbl_cam_calibrated.grid(row=r, column=1, pady=2, padx=2, sticky='nsw')
         r += 1
 
-    def select_images(self):
-        # Asks user to select files
-        filetypes = [
-            ('all files', '.*'),
-            ('PNG files', '*.png'),
-            ('JPG files', ('*.jpg', '*.jpeg')),
-            ('TIF files', ('*.tif', '*.tiff')),
-            ('GIF files', '*.gif'),
-        ]
-        files = askopenfilename(filetypes=filetypes, title="Select image files", multiple=True)
+    def _select_images(self):
+        try:
+            # Asks user to select files
+            filetypes = [
+                ('all files', '.*'),
+                ('PNG files', '*.png'),
+                ('JPG files', ('*.jpg', '*.jpeg')),
+                ('TIF files', ('*.tif', '*.tiff')),
+                ('GIF files', '*.gif'),
+            ]
+            files = askopenfilename(filetypes=filetypes, title="Select image files", multiple=True)
 
-        if len(files) != '':
-            # Save files
-            self.files = files
+            if len(files) != '':
+                # Save files
+                self._files = files
 
-            # Update flags
-            self.files_slected = True
-            self.images_loaded = False
-            self.camera_calibrated = False
+                # Update flags
+                self._files_slected = True
+                self._images_loaded = False
+                self._camera_calibrated = False
 
-            # Clear data
-            self.images = []
-            self.used_file_names = []
-            self.p_object = []
-            self.p_image = []
-            self.img_size_xy = []
-            self.camera = None
-            self.r_cam_object = []
-            self.v_cam_object_cam = []
-            self.avg_reproj_error = []
-            self.reproj_errors = []
+                # Clear data
+                self._images = []
+                self._used_file_names = []
+                self._p_object = []
+                self._p_image = []
+                self._img_size_xy = []
+                self._camera = None
+                self._r_cam_object = []
+                self._v_cam_object_cam = []
+                self._avg_reproj_error = []
+                self._reproj_errors = []
 
-            # Format buttons
-            self.enable_btns()
+                # Format buttons
+                self._enable_btns()
+        except Exception as error:
+            messagebox.showerror('Error with Selecting images', str(error))
 
-    def get_npts(self):
+    def _get_n_checkerboard_pts(self):
         return (self.var_pts_x.get(), self.var_pts_y.get())
 
     def _find_corners(self):
         try:
             # Get number checkerboard points
-            npts = self.get_npts()
+            npts = self._get_n_checkerboard_pts()
 
             # Reset data objects
-            self.p_object = []
-            self.p_image = []
-            self.images = []
-            self.used_file_names = []
+            self._p_object = []
+            self._p_image = []
+            self._images = []
+            self._used_file_names = []
             self._downsample_factor = None
-            self.img_size_xy = None
+            self._img_size_xy = None
             self._img_size_xy_native = None
 
             # Find corners
-            for file in self.files:
+            for file in self._files:
                 # Get file name
                 file_name = os.path.basename(file)
 
@@ -302,18 +278,18 @@ class CalibrationGUI:
 
                 if self._downsample_factor is None:
                     # Calculate downsample factor if image is too large for OpenCV algorithm
-                    if max(img.shape) > self.max_image_dimension:
-                        self._downsample_factor = int(np.ceil(max(img.shape) / self.max_image_dimension))
+                    if max(img.shape) > self._max_image_dimension:
+                        self._downsample_factor = int(np.ceil(max(img.shape) / self._max_image_dimension))
                     else:
                         self._downsample_factor = int(1)
 
                 if self._downsample_factor != 1:
                     # Downsample if necessary
-                    img = self.downsample_image(img)
+                    img = self._downsample_image(img)
 
-                if self.img_size_xy is None:
+                if self._img_size_xy is None:
                     # Define first image downsampled shape
-                    self.img_size_xy = (img.shape[1], img.shape[0])
+                    self._img_size_xy = (img.shape[1], img.shape[0])
 
                 # Find checkerboard corners
                 p_object, p_image = ip.find_checkerboard_corners(npts, img)
@@ -322,49 +298,52 @@ class CalibrationGUI:
                     continue
 
                 # Save image, filename, and found corners
-                self.images.append(img)
-                self.used_file_names.append(file_name)
+                self._images.append(img)
+                self._used_file_names.append(file_name)
 
-                self.p_object.append(p_object)
-                self.p_image.append(p_image)
+                self._p_object.append(p_object)
+                self._p_image.append(p_image)
 
             # Update flags
-            self.images_loaded = True
-            self.camera_calibrated = False
+            self._images_loaded = True
+            self._camera_calibrated = False
 
             # Clear any calibrated camera
-            self.camera = None
-            self.r_cam_object = []
-            self.v_cam_object_cam = []
-            self.avg_reproj_error = []
-            self.reproj_errors = []
+            self._camera = None
+            self._r_cam_object = []
+            self._v_cam_object_cam = []
+            self._avg_reproj_error = []
+            self._reproj_errors = []
 
             # Format buttons
-            self.enable_btns()
+            self._enable_btns()
 
         # Handle errors
         except Exception as error:
             messagebox.showerror('Find Corners Error', str(error))
 
-    def view_found_corners(self):
-        # Create new window
-        root_corns = tkt.window(self.root, TopLevel=True)
+    def _view_found_corners(self):
+        try:
+            # Create new window
+            root_corns = tkt.window(self._root, TopLevel=True)
 
-        # Get number checkerboard points
-        npts = self.get_npts()
+            # Get number checkerboard points
+            npts = self._get_n_checkerboard_pts()
 
-        # Annotate images
-        ims = []
-        for idx, image in enumerate(self.images):
-            # Create RGB image
-            im3 = np.concatenate([image[..., np.newaxis]] * 3, axis=2)
-            # Annotate image
-            ip.annotate_found_corners(npts, im3, self.p_image[idx])
-            # Save image
-            ims.append(im3)
+            # Annotate images
+            ims = []
+            for idx, image in enumerate(self._images):
+                # Create RGB image
+                im3 = np.concatenate([image[..., np.newaxis]] * 3, axis=2)
+                # Annotate image
+                ip.annotate_found_corners(npts, im3, self._p_image[idx])
+                # Save image
+                ims.append(im3)
 
-        # View corners
-        ViewAnnotatedImages(root_corns, ims, self.used_file_names)
+            # View corners
+            ViewAnnotatedImages(root_corns, ims, self._used_file_names)
+        except Exception as error:
+            messagebox.showerror('Error with viewing found corners', str(error))
 
     def _calibrate_camera(self):
         try:
@@ -372,71 +351,77 @@ class CalibrationGUI:
             cam_name = self.var_cam_name.get()
 
             # Calibrate camera
-            (self.camera, self.r_cam_object, self.v_cam_object_cam, self.avg_reproj_error) = cc.calibrate_camera(
-                self.p_object, self.p_image, self.img_size_xy, cam_name
+            (self._camera, self._r_cam_object, self._v_cam_object_cam, self._avg_reproj_error) = cc.calibrate_camera(
+                self._p_object, self._p_image, self._img_size_xy, cam_name
             )
 
             # Calculate reprojection error for each image
-            self.reproj_errors = []
+            self._reproj_errors = []
             for R_cam, V_cam, P_object, P_image in zip(
-                self.r_cam_object, self.v_cam_object_cam, self.p_object, self.p_image
+                self._r_cam_object, self._v_cam_object_cam, self._p_object, self._p_image
             ):
-                error = sp.reprojection_error(self.camera, P_object, P_image, R_cam, V_cam)  # RMS pixels
-                self.reproj_errors.append(error)  # RMS pixels
+                error = sp.reprojection_error(self._camera, P_object, P_image, R_cam, V_cam)  # RMS pixels
+                self._reproj_errors.append(error)  # RMS pixels
 
             # Find five images with highest reprojection errors
-            idxs = np.flip(np.argsort(self.reproj_errors))[: len(self.var_reproj_name)]
+            idxs = np.flip(np.argsort(self._reproj_errors))[: len(self.var_reproj_name)]
             for idx, name, val in zip(idxs, self.var_reproj_name, self.var_reproj_val):
-                name.set(self.used_file_names[idx])
-                val.set(f'{self.reproj_errors[idx]:.2f}')
+                name.set(self._used_file_names[idx])
+                val.set(f'{self._reproj_errors[idx]:.2f}')
 
             # NOTE: self._downsample_factor = 1 if no downsampling occured
             # Update image shape
-            self.camera.image_shape_xy = self._img_size_xy_native
+            self._camera.image_shape_xy = self._img_size_xy_native
             # Update intrinsic matrix non-zero and non-unity values
-            self.camera.intrinsic_mat[0, 0] *= self._downsample_factor
-            self.camera.intrinsic_mat[1, 1] *= self._downsample_factor
-            self.camera.intrinsic_mat[0, 2] *= self._downsample_factor
-            self.camera.intrinsic_mat[1, 2] *= self._downsample_factor
+            self._camera.intrinsic_mat[0, 0] *= self._downsample_factor
+            self._camera.intrinsic_mat[1, 1] *= self._downsample_factor
+            self._camera.intrinsic_mat[0, 2] *= self._downsample_factor
+            self._camera.intrinsic_mat[1, 2] *= self._downsample_factor
 
             # Update flags
-            self.camera_calibrated = True
+            self._camera_calibrated = True
 
             # Format buttons
-            self.enable_btns()
+            self._enable_btns()
 
         # Handle errors
         except Exception as error:
             messagebox.showerror('Error calibrating camera', str(error))
 
-    def show_reproj_error(self):
-        fig = plt.figure()
-        ax = fig.gca()
-        ax.plot(self.reproj_errors, 'o-')
-        ax.set_xlim(-0.5, len(self.reproj_errors) + 0.5)
-        ax.xaxis.set_ticks(np.arange(len(self.reproj_errors)))
-        ax.grid()
-        ax.set_ylabel('Reprojection Error (Pixels RMS)')
-        ax.set_xlabel('Image Index Number')
-        plt.show(block=False)
+    def _show_reproj_error(self):
+        try:
+            fig = plt.figure()
+            ax = fig.gca()
+            ax.plot(self._reproj_errors, 'o-')
+            ax.set_xlim(-0.5, len(self._reproj_errors) + 0.5)
+            ax.xaxis.set_ticks(np.arange(len(self._reproj_errors)))
+            ax.grid()
+            ax.set_ylabel('Reprojection Error (Pixels RMS)')
+            ax.set_xlabel('Image Index Number')
+            plt.show(block=False)
+        except Exception as error:
+            messagebox.showerror('Error with showing reprojection errors', str(error))
 
-    def visualize_dist(self):
-        ax1 = plt.subplot(131)
-        ax2 = plt.subplot(132)
-        ax3 = plt.subplot(133)
+    def _visualize_dist(self):
+        try:
+            ax1 = plt.subplot(131)
+            ax2 = plt.subplot(132)
+            ax3 = plt.subplot(133)
+            cc.view_distortion(self._camera, ax1, ax2, ax3)
+            plt.show(block=False)
+        except Exception as error:
+            messagebox.showerror('Error with visualizing distortion', str(error))
 
-        cc.view_distortion(self.camera, ax1, ax2, ax3)
+    def _save_camera(self):
+        try:
+            file = asksaveasfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
+            if file != '':
+                self._camera.save_to_hdf(file)
+        except Exception as error:
+            messagebox.showerror('Error with saving camera', str(error))
 
-        plt.show(block=False)
-
-    def save_camera(self):
-        file = asksaveasfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
-
-        if file != '':
-            self.camera.save_to_hdf(file)
-
-    def enable_btns(self):
-        if not self.files_slected:
+    def _enable_btns(self):
+        if not self._files_slected:
             # No files selected
             self.btn_find_corns.config(state="disabled")
             self.btn_view_corns.config(state="disabled")
@@ -449,8 +434,8 @@ class CalibrationGUI:
             self.lbl_corns_found.config(text='Corners not found')
             self.lbl_cam_calibrated.config(text='Not calibrated')
 
-            self.clear_reproj_errors()
-        elif not self.images_loaded:
+            self._clear_reproj_errors()
+        elif not self._images_loaded:
             # Files selected, but not not loaded/processed
             self.btn_find_corns.config(state="normal")
             self.btn_view_corns.config(state="disabled")
@@ -459,12 +444,12 @@ class CalibrationGUI:
             self.btn_vis_dist.config(state="disabled")
             self.btn_save.config(state="disabled")
 
-            self.lbl_num_files.config(text=f'{len(self.files):d} files')
+            self.lbl_num_files.config(text=f'{len(self._files):d} files')
             self.lbl_corns_found.config(text='Corners not found')
             self.lbl_cam_calibrated.config(text='Not calibrated')
 
-            self.clear_reproj_errors()
-        elif self.camera is None:
+            self._clear_reproj_errors()
+        elif self._camera is None:
             # Files selected and processed, but camera not calibrated
             self.btn_find_corns.config(state="normal")
             self.btn_view_corns.config(state="normal")
@@ -473,11 +458,11 @@ class CalibrationGUI:
             self.btn_vis_dist.config(state="disabled")
             self.btn_save.config(state="disabled")
 
-            self.lbl_num_files.config(text=f'{len(self.files):d} files')
+            self.lbl_num_files.config(text=f'{len(self._files):d} files')
             self.lbl_corns_found.config(text='All corners found')
             self.lbl_cam_calibrated.config(text='Not calibrated')
 
-            self.clear_reproj_errors()
+            self._clear_reproj_errors()
         else:
             # Camera calibrated
             self.btn_find_corns.config(state="normal")
@@ -487,28 +472,16 @@ class CalibrationGUI:
             self.btn_vis_dist.config(state="normal")
             self.btn_save.config(state="normal")
 
-            self.lbl_num_files.config(text=f'{len(self.files):d} files')
+            self.lbl_num_files.config(text=f'{len(self._files):d} files')
             self.lbl_corns_found.config(text='All corners found')
-            self.lbl_cam_calibrated.config(text=f'Average reprojection error: {self.avg_reproj_error:.2f} pixels')
+            self.lbl_cam_calibrated.config(text=f'Average reprojection error: {self._avg_reproj_error:.2f} pixels')
 
-    def clear_reproj_errors(self):
+    def _clear_reproj_errors(self):
         for name, val in zip(self.var_reproj_name, self.var_reproj_val):
             name.set('')
             val.set('')
 
-    def downsample_image(self, image: np.ndarray) -> np.ndarray:
-        """Downsamples input image by self._downsample_factor
-
-        Parameters
-        ----------
-        image : np.ndarray
-            Input image (n, m) or (n, m, 3)
-
-        Returns
-        -------
-        np.ndarray
-            Output image (n', m') or (n', m', 3)
-        """
+    def _downsample_image(self, image: np.ndarray) -> np.ndarray:
         # Create square anti-aliasing filter
         n = self._downsample_factor
         dtype = image.dtype
@@ -529,12 +502,9 @@ class CalibrationGUI:
         # Convert to input dtype
         return image.astype(dtype)
 
-    def close(self):
-        """
-        Closes all windows
-        """
+    def _close(self):
         # Close Sofast window
-        self.root.destroy()
+        self._root.destroy()
 
 
 if __name__ == '__main__':
