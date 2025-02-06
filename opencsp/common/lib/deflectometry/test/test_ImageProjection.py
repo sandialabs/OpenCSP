@@ -49,6 +49,22 @@ class test_ImageProjection(unittest.TestCase):
         image_projection.close()
         self.assertIsNone(ip.ImageProjection.instance())
 
+    def test_marker_images(self):
+        """Tests showing the cal marker images"""
+        # Load from HDF
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
+        image_projection.show_calibration_marker_image()
+        image_projection.root.after(500, image_projection.close)
+        image_projection.run()
+
+    def test_fiducial_images(self):
+        """Tests showing the fiducial image"""
+        # Load from HDF
+        image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
+        image_projection.show_calibration_fiducial_image()
+        image_projection.root.after(500, image_projection.close)
+        image_projection.run()
+
     def test_on_close(self):
         """Tests closing callback"""
         global close_count
