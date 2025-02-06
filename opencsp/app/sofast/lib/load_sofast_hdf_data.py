@@ -52,8 +52,8 @@ def load_mirror(file: str) -> MirrorPoint:
     Facet
         Representation of Facet
     """
-    v_facet_corners_str = 'DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners'
-    if v_facet_corners_str not in get_groups_and_datasets(file):
+    v_facet_corners_str = 'DataSofastInput/optic_definition/facet_000/DefinitionFacet'
+    if v_facet_corners_str not in get_groups_and_datasets(file)[0]:
         # Undefined mirror type
         data = load_hdf5_datasets(
             [
@@ -78,10 +78,10 @@ def load_mirror(file: str) -> MirrorPoint:
         )
         v_facet_corners = Vxy((xs, ys))
     else:
-        # Non-undefined mirror type
+        # Defined mirror type
         data = load_hdf5_datasets(
             [
-                v_facet_corners_str,
+                'DataSofastInput/optic_definition/facet_000/DefinitionFacet/v_facet_corners',
                 'DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy',
                 'DataSofastCalculation/facet/facet_000/SlopeSolverData/v_surf_points_facet',
             ],
