@@ -5,10 +5,12 @@ Color Management
 
 """
 
-from typing import Iterator, Iterable, Union
+from typing import Callable, Iterator, Iterable, Union
 
 import numpy as np
 import matplotlib.colors
+
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class Color:
@@ -79,6 +81,64 @@ class Color:
         rgb = matplotlib.colors.to_rgb(sval)
 
         return cls(rgb[0], rgb[1], rgb[2], longhand, sval)
+
+    @classmethod
+    def from_generic(cls, val: Union[str, tuple, 'Color', Callable]) -> 'Color':
+        """
+        Create a color instance from any of the possible input methods.
+
+        Parameters
+        ----------
+        val : str, tuple, Color, Callable
+            The value to create the color from. Can be any of:
+            - hex string such as "0x1f77b4"
+            - name of a color such as "blue"
+            - a tuple of floating point values such as (.12, .47, .71)
+            - a tuple of integer values in the range 0-255 such as (31, 119, 180)
+            - a function that, when called, generates a Color instance
+
+        Returns
+        -------
+        Color
+            The new Color instance for the given value.
+        """
+        if isinstance(val, Color):
+            return val
+        elif isinstance(val, str):
+            return cls.from_str(val)
+        elif isinstance(val, tuple):
+            if len(val) != 3:
+                lt.error_and_raise(
+                    ValueError,
+                    "Error in Color.from_generic(): " + f"val of type tuple must have three values, but {val=}",
+                )
+            if np.any([v > 255 for v in val]):
+                lt.error_and_raise(
+                    ValueError,
+                    "Error in Color.from_generic(): "
+                    + f"val of type tuple must have values between 0-1 or 0-255, but {val=}",
+                )
+            # floating point values in the range 0-1
+            if np.all([isinstance(v, float) for v in val]):
+                if np.all([v <= 1.0 for v in val]):
+                    hexval = [f"{int(np.round(v*255)):02x}" for v in val]
+                    name = "0x" + "".join(hexval)
+                    return Color(val[0], val[1], val[2], name, name)
+            # integer values in the range 0-255
+            name = f"0x{val[0]:02x}{val[1]:02x}{val[2]:02x}"
+            return cls.from_i255(val[0], val[1], val[2], name, name)
+        elif isinstance(val, Callable):
+            ret = val()
+            if not isinstance(ret, Color):
+                lt.error_and_raise(
+                    ValueError,
+                    "Error in Color.from_generic(): " + f"val of type Callable must return a Color, but {type(ret)=}",
+                )
+            return ret
+        else:
+            lt.error_and_raise(
+                ValueError, "Error in Color.from_generic(): " + f"no handler for type {type(val)}, {val=}"
+            )
 
     @classmethod
     def convert(cls, val: Union["Color", str, tuple, None]) -> "Color":
@@ -219,16 +279,16 @@ class _PlotColors(Iterable[Color]):
 
     def __init__(self):
         self._color_hexes = [
-            '#1f77b4',
-            '#ff7f0e',
-            '#2ca02c',
-            '#d62728',
-            '#9467bd',
-            '#8c564b',
-            '#e377c2',
-            '#7f7f7f',
-            '#bcbd22',
-            '#17becf',
+            '#1f77b4',  # blue
+            '#ff7f0e',  # orange
+            '#2ca02c',  # green
+            '#d62728',  # red
+            '#9467bd',  # purple
+            '#8c564b',  # brown
+            '#e377c2',  # pink
+            '#7f7f7f',  # gray
+            '#bcbd22',  # yellow
+            '#17becf',  # cyan
         ]
         self.blue = Color.from_hex(self._color_hexes[0], "blue", "b")
         self.orange = Color.from_hex(self._color_hexes[1], "orange", "o")
