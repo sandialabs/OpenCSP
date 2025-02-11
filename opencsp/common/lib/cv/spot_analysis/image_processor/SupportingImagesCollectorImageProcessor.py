@@ -52,7 +52,7 @@ class SupportingImagesCollectorImageProcessor(AbstractSpotAnalysisImageProcessor
             then the image will be assigned as a primary image. Otherwise it will be grouped with another primary image
             as a supporting image.
         """
-        super().__init__(self.__class__.__name__)
+        super().__init__()
 
         # register inputs
         self.supporting_images_map = supporting_images_map

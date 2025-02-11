@@ -1,6 +1,9 @@
 import os
 from typing import Callable, Iterable
 
+import numpy as np
+from PIL import Image
+
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.render.VideoHandler as vh
 import opencsp.common.lib.tool.file_tools as ft
@@ -10,7 +13,7 @@ import opencsp.common.lib.tool.log_tools as lt
 class _IndexableIterable(Iterable[CacheableImage]):
     """A restartable iterable (via an iter() call) that piggybacks off of an indexable object."""
 
-    def __init__(self, src: list[str | CacheableImage] | Callable[[int], CacheableImage]):
+    def __init__(self, src: list[str | Image.Image | np.ndarray | CacheableImage] | Callable[[int], CacheableImage]):
         self.src = src
         self.idx = 0
 

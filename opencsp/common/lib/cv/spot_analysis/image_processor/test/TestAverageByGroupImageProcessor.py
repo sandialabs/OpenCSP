@@ -45,29 +45,29 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
     def test_single_image(self):
         processor_always_trigger = AverageByGroupImageProcessor(self.assigner, self.always_trigger)
 
-        operables = processor_always_trigger.process_image(self.a1)
+        operables = processor_always_trigger.process_operable(self.a1)
         self.assertEqual(1, len(operables))
 
         operable = operables[0]
         np.testing.assert_array_equal(operable.primary_image.nparray, self.a1_img.nparray.astype(np.float_))
 
     def test_two_images_one_group(self):
-        operables = self.processor.process_image(self.a1)
+        operables = self.processor.process_operable(self.a1)
         self.assertEqual(0, len(operables))
-        operables = self.processor.process_image(self.a2)
+        operables = self.processor.process_operable(self.a2)
         self.assertEqual(0, len(operables))
-        operables = self.processor.process_image(self.b1)  # changing names should trigger an execution
+        operables = self.processor.process_operable(self.b1)  # changing names should trigger an execution
         self.assertEqual(1, len(operables))
 
         operable = operables[0]
         np.testing.assert_array_equal(operable.primary_image.nparray, np.array([15], dtype=np.float_))
 
     def test_two_images_two_groups(self):
-        operables = self.processor.process_image(self.a1)
+        operables = self.processor.process_operable(self.a1)
         self.assertEqual(0, len(operables))
-        operables_a = self.processor.process_image(self.b1)  # changing names should trigger an execution
+        operables_a = self.processor.process_operable(self.b1)  # changing names should trigger an execution
         self.assertEqual(1, len(operables_a))
-        operables_b = self.processor.process_image(self.a2)  # trigger again, to get a second pair of results
+        operables_b = self.processor.process_operable(self.a2)  # trigger again, to get a second pair of results
         self.assertEqual(1, len(operables_b))
 
         operable = operables_a[0]
@@ -76,13 +76,13 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float_))
 
     def test_three_images_two_groups(self):
-        operables = self.processor.process_image(self.a1)
+        operables = self.processor.process_operable(self.a1)
         self.assertEqual(0, len(operables))
-        operables = self.processor.process_image(self.a2)
+        operables = self.processor.process_operable(self.a2)
         self.assertEqual(0, len(operables))
-        operables_a = self.processor.process_image(self.b1)  # changing names should trigger an execution
+        operables_a = self.processor.process_operable(self.b1)  # changing names should trigger an execution
         self.assertEqual(1, len(operables_a))
-        operables_b = self.processor.process_image(self.a1)  # trigger again, to get a second pair of results
+        operables_b = self.processor.process_operable(self.a1)  # trigger again, to get a second pair of results
         self.assertEqual(1, len(operables_b))
 
         operable = operables_a[0]
@@ -91,15 +91,15 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float_))
 
     def test_four_images_two_groups(self):
-        operables = self.processor.process_image(self.a1)
+        operables = self.processor.process_operable(self.a1)
         self.assertEqual(0, len(operables))
-        operables = self.processor.process_image(self.a2)
+        operables = self.processor.process_operable(self.a2)
         self.assertEqual(0, len(operables))
-        operables_a = self.processor.process_image(self.b1)  # changing names should trigger an execution
+        operables_a = self.processor.process_operable(self.b1)  # changing names should trigger an execution
         self.assertEqual(1, len(operables_a))
-        operables = self.processor.process_image(self.b2)
+        operables = self.processor.process_operable(self.b2)
         self.assertEqual(0, len(operables))
-        operables_b = self.processor.process_image(self.a1)  # trigger again, to get a second pair of results
+        operables_b = self.processor.process_operable(self.a1)  # trigger again, to get a second pair of results
         self.assertEqual(1, len(operables_b))
 
         operable = operables_a[0]
@@ -108,15 +108,15 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         np.testing.assert_array_equal(operable.primary_image.nparray, np.array([35], dtype=np.float_))
 
     def test_four_images_alternating_group(self):
-        operables = self.processor.process_image(self.a1)
+        operables = self.processor.process_operable(self.a1)
         self.assertEqual(0, len(operables))
-        operables_a1 = self.processor.process_image(self.b1)
+        operables_a1 = self.processor.process_operable(self.b1)
         self.assertEqual(1, len(operables_a1))
-        operables_b1 = self.processor.process_image(self.a2)
+        operables_b1 = self.processor.process_operable(self.a2)
         self.assertEqual(1, len(operables_b1))
-        operables_a2 = self.processor.process_image(self.b2)
+        operables_a2 = self.processor.process_operable(self.b2)
         self.assertEqual(1, len(operables_a2))
-        operables_b2 = self.processor.process_image(self.a1)  # trigger again, to get a second pair of results
+        operables_b2 = self.processor.process_operable(self.a1)  # trigger again, to get a second pair of results
         self.assertEqual(1, len(operables_b2))
 
         operable = operables_a1[0]

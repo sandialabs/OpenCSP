@@ -1,3 +1,5 @@
+import copy
+import dataclasses
 import weakref
 
 import matplotlib
@@ -18,7 +20,6 @@ class VisualizationCoordinator:
     This class coordinates the following common visualization activities:
 
         - automatic tiling scaling for many visualization figures/windows
-        - display of visualizations for one operable at a time
         - "enter", "shift+enter", and close operations on visualizations
     """
 
@@ -30,7 +31,9 @@ class VisualizationCoordinator:
     def __init__(self):
         # visualization handlers
         self.visualization_processors: list[AbstractVisualizationImageProcessor] = []
-        """ List of all visualization processors registered with this instance. """
+        """ List of all visualization processors registered with this instance.
+        They will be in the same order as given in
+        :py:meth:`register_visualization_processors`. """
         self.figures: list[weakref.ref[rcfr.RenderControlFigureRecord]] = []
         """
         List of figures returned from init_figure_records() for each of the
@@ -49,10 +52,15 @@ class VisualizationCoordinator:
         # used to ensure a valid internal state
         self.has_registered_visualization_processors = False
         """ True if register_visualization_processors() has been evaluated. """
+        self.has_initialized_vis_processors = False
+        """ True if initialize_vis_processors() has been evaluated. """
 
         # user interaction
         self.shift_down = False
-        """ Monitors the state of the shift key """
+        """
+        Monitors the state of the shift key.
+        Only used in interactive mode.
+        """
         self.enter_pressed = False
         """
         True if enter has been pressed since the latest call to visualize().
@@ -60,13 +68,13 @@ class VisualizationCoordinator:
         """
         self.enter_shift_pressed = False
         """
-        True if shift+enter has been pressed an odd number of times. Only used
-        in interactive mode.
+        True if shift+enter has been pressed an odd number of times.
+        Only used in interactive mode.
         """
         self.closed = False
         """
-        True if any visualization window has ever been closed. Only used in
-        interactive mode.
+        True if any visualization window has ever been closed.
+        Only used in interactive mode.
         """
 
     def clear(self):
@@ -74,8 +82,9 @@ class VisualizationCoordinator:
         Closes all visualization windows, and resets the state for this coordinator.
         """
         # close all visualization windows
-        for processor in self.visualization_processors:
-            processor.close_figures()
+        if self.has_initialized_vis_processors:
+            for processor in self.visualization_processors:
+                processor.close_figures()
 
         # reset internal state
         self.visualization_processors.clear()
@@ -83,7 +92,13 @@ class VisualizationCoordinator:
         self.figures.clear()
 
         self.has_registered_visualization_processors = False
+        self.has_initialized_vis_processors = False
+
+        self.shift_down = False
+        self.enter_pressed = False
         self.enter_shift_pressed = False
+
+        self.closed = False
 
     def on_key_release(self, event: matplotlib.backend_bases.KeyEvent):
         """
@@ -130,7 +145,8 @@ class VisualizationCoordinator:
             Processors to search through for visualization processors, some of
             which may be visualization processor and some not.
         """
-        # this method is not safe to be called multiple times
+        # Developer's note: this method is not safe to be called multiple times
+
         if self.has_registered_visualization_processors:
             lt.warning(
                 "Warning in VisualizationCoordinator.register_visualization_processors(): "
@@ -146,38 +162,33 @@ class VisualizationCoordinator:
                 visualization_processor.register_visualization_coordinator(self)
                 self.visualization_processors.append(visualization_processor)
 
+    def initialize_vis_processors(self, operable: SpotAnalysisOperable):
+        if self.has_initialized_vis_processors:
+            return
+        self.has_initialized_vis_processors = True
+
         # determine the tiling arangement
         num_figures_dict: dict[AbstractVisualizationImageProcessor, int] = {}
         for processor in self.visualization_processors:
             num_figures_dict[processor] = processor.num_figures
         num_figures_total = sum(num_figures_dict.values())
-        if num_figures_total <= 1:
-            tiles_x = 1
-            tiles_y = 1
-        elif num_figures_total <= 2:
-            tiles_x = 2
-            tiles_y = 1
-        elif num_figures_total <= 8:
-            tiles_x = int(np.ceil(num_figures_total / 2))
-            tiles_y = 2
-        elif num_figures_total <= 12:
-            tiles_x = int(np.ceil(num_figures_total / 3))
-            tiles_y = 3
-        else:
-            tiles_y = int(np.floor(np.sqrt(num_figures_total)))
-            tiles_x = int(np.ceil(num_figures_total / tiles_y))
+        tiles_y, tiles_x = rcf.RenderControlFigure.num_tiles_4x3aspect(num_figures_total)
         tiles_x = np.min([tiles_x, self.max_tiles_x])
         tiles_y = np.min([tiles_y, self.max_tiles_y])
 
         # build the figure manager
+        self.render_control_fig = AbstractVisualizationImageProcessor.default_render_control_figure_for_operable(
+            operable
+        )
         if tiles_x == 1 and tiles_y == 1:
-            self.render_control_fig = rcf.RenderControlFigure(tile=False)
+            pass
         else:
-            self.render_control_fig = rcf.RenderControlFigure(tile=True, tile_array=(tiles_x, tiles_y))
+            self.render_control_fig.tile = True
+            self.render_control_fig.tile_array = (tiles_x, tiles_y)
 
         # initialize the visualizers
         for processor in self.visualization_processors:
-            processor_figures = processor.init_figure_records(self.render_control_fig)
+            processor_figures = processor._init_figure_records(self.render_control_fig)
             if len(processor_figures) != num_figures_dict[processor]:
                 lt.warning(
                     "Warning in VisualizationCoordinator.register_visualization_processors(): "
@@ -185,9 +196,12 @@ class VisualizationCoordinator:
                     + f" Expected {num_figures_dict[processor]} but received {len(processor_figures)}!"
                 )
             for fig_record in processor_figures:
+                # register callbacks for figures
                 fig_record.figure.canvas.mpl_connect('close_event', self.on_close)
                 fig_record.figure.canvas.mpl_connect('key_release_event', self.on_key_release)
                 fig_record.figure.canvas.mpl_connect('key_press_event', self.on_key_press)
+
+                # register this figure for coordinated management
                 self.figures.append(weakref.ref(fig_record))
 
     def _get_figures(self) -> list[rcfr.RenderControlFigureRecord]:
@@ -209,38 +223,42 @@ class VisualizationCoordinator:
 
         return alive
 
-    def is_visualize(
-        self,
-        visualization_processor: AbstractVisualizationImageProcessor,
-        operable: SpotAnalysisOperable,
-        is_last: bool,
+    def is_last_visualization_processor(self, visualization_processor: AbstractVisualizationImageProcessor) -> bool:
+        """
+        Returns True if the given processor is the last visualization processor
+        in the list of :py:attr:`visualization_processors`.
+        """
+        return visualization_processor is self.visualization_processors[-1]
+
+    def is_interactive(self, operable: SpotAnalysisOperable) -> bool:
+        """
+        Returns False if interactive mode was disabled by pressing shift+enter.
+        Otherwise returns True if any of the registered
+        :py:attr:`visualization_processors` is interactive.
+        """
+        for processor in self.visualization_processors:
+            if isinstance(processor.interactive, bool):
+                if processor.interactive:
+                    return True
+            else:
+                if processor.interactive(operable):
+                    return True
+
+        return False
+
+    def wait_after_visualization(
+        self, visualization_processor: AbstractVisualizationImageProcessor, operable: SpotAnalysisOperable
     ) -> bool:
         """
-        Checks if now is an appropriate time to trigger visualizing for all
-        registered visualization handlers. Typically called from each
-        AbstractVisualizationImageProcessor's _execute() method.
-
-        Parameters
-        ----------
-        visualization_processor : AbstractVisualizationImageProcessor
-            The processor that is calling this method.
-        operable : SpotAnalysisOperable
-            The "operable" value in the calling processor's _execute() method,
-            passed through to here.
-        is_last : bool
-            The "is_last" value in the calling processor's _execute() method,
-            passed through to here.
-
-        Returns
-        -------
-        bool
-            True if now is a good time to trigger visualization of the given
-            operable, False to skip visualization.
+        Returns True if image processing should be blocked after the given
+        visualization_processor has rendered the given operable.
         """
-        if self.closed:
-            return False
-        elif visualization_processor == self.visualization_processors[-1]:
-            return True
+        if self.is_interactive(operable):
+            if self.is_last_visualization_processor(visualization_processor):
+                if not self.closed:
+                    if not self.enter_shift_pressed:
+                        return True
+
         return False
 
     def visualize(
@@ -248,17 +266,12 @@ class VisualizationCoordinator:
         visualization_processor: AbstractVisualizationImageProcessor,
         operable: SpotAnalysisOperable,
         is_last: bool,
-    ):
+    ) -> SpotAnalysisOperable:
         """
-        Calls visualize_operable() on each of the registered visualization
-        processors.
-
-        This method is typically called from the _execute() method of a
-        AbstractVisualizationImageProcessor after a call to is_visualize().
-
-        After all visualizations have been updated, if interactive, then we
-        block until the user has either pressed "enter" or closed the
-        visualization windows.
+        Calls :py:meth:`visualize_operable` on the given visualization_processor
+        and assigns the returned images as visualization_images on the returned
+        operable. Then, if interactive, continued execution is blocked until
+        "enter" is pressed or any visualization windows is closed.
 
         Parameters
         ----------
@@ -270,31 +283,46 @@ class VisualizationCoordinator:
         is_last : bool
             The "is_last" value in the calling processor's _execute() method,
             passed through to here.
+
+        Returns
+        -------
+        operable: SpotAnalysisOperable
+            A copy of the given operable with all visualization images (if any)
+            appended to the operable.
         """
-        for processor in self.visualization_processors:
-            processor.visualize_operable(operable, is_last)
+        # initialize the visualization processors, as necessary
+        self.initialize_vis_processors(operable)
+
+        # render the visualization image processor
+        processor_visualizations = visualization_processor._visualize_operable(operable, is_last)
+
+        # compile all visualizations together into a single operable to be returned
+        if len(processor_visualizations) > 0:
+            # make a copy of the latest operable's visualizations
+            all_vis_images: dict[AbstractSpotAnalysisImageProcessor, list] = {}
+            for processor2 in operable.visualization_images:
+                all_vis_images[processor2] = copy.copy(operable.visualization_images[processor2])
+
+            # append the new visualizations
+            if visualization_processor not in all_vis_images:
+                all_vis_images[visualization_processor] = []
+            all_vis_images[visualization_processor] += processor_visualizations
+
+            # update the operable
+            operable = dataclasses.replace(operable, visualization_images=all_vis_images)
+        else:
+            # update the operable
+            operable = dataclasses.replace(operable)
 
         # if interactive, then block until the user presses "enter" or closes one or more visualizations
-        interactive = False
-        for processor in self.visualization_processors:
-            if isinstance(processor.interactive, bool):
-                interactive |= processor.interactive
-            else:
-                interactive |= processor.interactive(operable)
-        if interactive:
+        if self.wait_after_visualization(visualization_processor, operable):
+            lt.info(
+                "Starting interactive visualization. Press 'enter' on any visualization window to continue...", end=''
+            )
             self.enter_pressed = False
-            self.closed = False
 
             first_iteration = True
             while True:
-                # if shift+enter was ever pressed, that will disable interactive mode
-                if self.enter_shift_pressed:
-                    break
-
-                # if any plot is closed, then every plot was closed, and we can just continue
-                if self.closed:
-                    break
-
                 # wait for up to total_wait_time for the user to interact with the visualizations
                 old_raise = matplotlib.rcParams["figure.raise_window"]
                 matplotlib.rcParams["figure.raise_window"] = first_iteration
@@ -307,7 +335,7 @@ class VisualizationCoordinator:
                 matplotlib.rcParams["figure.raise_window"] = old_raise
 
                 # check for interaction
-                if self.enter_pressed:
+                if self.enter_pressed or self.enter_shift_pressed:
                     break
                 if self.closed:
                     # UI design decision: it feels more natural to me (Ben) for
@@ -317,3 +345,7 @@ class VisualizationCoordinator:
                         processor.close_figures()
 
                 first_iteration = False
+
+            lt.info("continuing execution")
+
+        return operable
