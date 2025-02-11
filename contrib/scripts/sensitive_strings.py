@@ -40,6 +40,7 @@ class SensitiveStringsSearcher:
         self.sensitive_strings_csv = sensitive_strings_csv
         self.allowed_binary_files_csv = allowed_binary_files_csv
         self.cache_file_csv = cache_file_csv
+        self.print_progress = False
         self.verbose = False
         self._interactive = False
         self.verify_all_on_behalf_of_user = False
@@ -444,9 +445,12 @@ class SensitiveStringsSearcher:
 
         # Search for sensitive strings in files
         matches: dict[str, list[ssm.Match]] = {}
-        for file_path_name_ext in files:
+        prev_progress = None
+        for file_idx, file_path_name_ext in enumerate(files):
             if self.verbose:
                 lt.info(f"Searching file {file_path_name_ext}")
+            elif self.print_progress:
+                prev_progress = lt.log_progress(file_idx / len(files), prev_percentage=prev_progress)
             rel_file_path, file_name, file_ext = ft.path_components(file_path_name_ext)
             file_name_ext = file_name + file_ext
             if self._is_file_in_cleared_cache(rel_file_path, file_name_ext):
@@ -490,9 +494,11 @@ class SensitiveStringsSearcher:
         # Deal with unknown binary files
         if len(self.unknown_binary_files) > 0:
             unknowns_copy = copy.copy(self.unknown_binary_files)
-            for file_ff in unknowns_copy:
+            for file_idx, file_ff in enumerate(unknowns_copy):
                 if self.verbose:
                     lt.info(f"Searching binary file {file_ff.relpath_name_ext}")
+                elif self.print_progress:
+                    lt.log_progress(file_idx / len(unknowns_copy), carriage_return=False)
                 lt.info("")
                 lt.info(os.path.join(file_ff.relative_path, file_ff.name_ext))
                 num_signed_binary_files = 0
@@ -608,11 +614,20 @@ if __name__ == "__main__":
         help="Don't fail because of unfound expected binary files. Instead remove the expected files from the list of allowed binaries. "
         + "This can be useful when you're confident that the only changes have been that the binary files have moved but not changed.",
     )
-    parser.add_argument('--verbose', action='store_true', dest="verbose", help="Print more information while running")
+    parser.add_argument(
+        '--progress', action='store_true', dest="print_progress", help="Draw the progress while scanning."
+    )
+    parser.add_argument(
+        '--verbose',
+        action='store_true',
+        dest="verbose",
+        help="Print more information while running. Overrides '--progress'.",
+    )
     args = parser.parse_args()
     not_interactive: bool = args.ninteractive
     accept_all: bool = args.acceptall
     remove_unfound_binaries: bool = args.acceptunfound
+    print_progress: bool = args.print_progress
     verbose: bool = args.verbose
 
     ss_log_dir = ft.norm_path(opencsp_settings['sensitive_strings']['sensitive_strings_dir'])
@@ -632,6 +647,7 @@ if __name__ == "__main__":
     searcher.interactive = not not_interactive
     searcher.verify_all_on_behalf_of_user = accept_all
     searcher.remove_unfound_binaries = remove_unfound_binaries
+    searcher.print_progress = print_progress
     searcher.verbose = verbose
     searcher.date_time_str = date_time_str
     num_errors = searcher.search_files()

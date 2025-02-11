@@ -41,7 +41,7 @@ class MirrorParametric(MirrorAbstract):
         """
         super().__init__(shape)  # initalizes the attributes universal to all mirrors
 
-        # Define surface z and surface normal vector functions
+        # Define surface z and surface normal vector functions.
         self._surface_function = surface_function
         self._normals_function = self._define_normals_function(surface_function)
 

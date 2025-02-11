@@ -1,33 +1,65 @@
 name: github-DOCKER
 
 on:
-  workflow_dispatch:
   push:
     branches:
-      - main      
+      - main
+      - develop
 
 permissions:
   contents: none
 
 env:
-  UBI8_IMAGE: "ghcr.io/sandialabs/opencsp:latest-ubi8"
+  IMAGE_REGISTRY: "ghcr.io/sandialabs/opencsp"
 
 jobs:
-  ubi8-image:
+  container_build_matrix:
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
+    strategy:
+      matrix:
+        dockerfile: [Dockerfile, Dockerfile_x11]
+        include:
+        - dockerfile: Dockerfile
+          ARCH: amd64
+          TAG: ubi8
+
+        - dockerfile: Dockerfile_x11
+          ARCH: amd64
+          TAG: ubi8-x11
+          
+        - dockerfile: Dockerfile_x11
+          ARCH: arm64
+          TAG: ubi8-x11
     steps:
       - uses: actions/checkout@v4
 
+      - name: Set vars
+        run: |
+          export REV=$(echo "${GITHUB_SHA}" | cut -c1-7)
+          if [[ "$GITHUB_REF" == "refs/heads/main" ]]; then
+            export REV=latest
+          fi
+          
+          echo "FULL_TAG=$IMAGE_REGISTRY:${{matrix.TAG }}-${{matrix.ARCH}}-$REV" >> $GITHUB_ENV
+
       - name: Build image
-        run: echo UBI8_IMAGE=$UBI8_IMAGE && docker build . --file Dockerfile --tag $UBI8_IMAGE --label "runnumber=${GITHUB_RUN_ID}"
+        run: |
+          cp requirements.txt ./docker
+          echo "FULL_TAG=$FULL_TAG"
+          docker build ./docker \
+            --build-arg="TARGET_ARCH=${{matrix.ARCH}}" \
+            --file "${{matrix.dockerfile}}" \
+            --tag "$FULL_TAG" \
+            --label "runnumber=${GITHUB_RUN_ID}"
 
       - name: Log in to registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u $ --password-stdin
 
       - name: Push image
         run: |
-          echo UBI8_IMAGE=$UBI8_IMAGE
-          docker push $UBI8_IMAGE
+          echo "FULL_TAG=$FULL_TAG"
+          docker push "$FULL_TAG"
+
+    permissions:
+      packages: write
+      contents: read
