@@ -1,7 +1,7 @@
 ARG BASE_IMAGE_ARG=registry.access.redhat.com/ubi8:latest
 FROM ${BASE_IMAGE_ARG}
 
-COPY docker/xvfb-rpms /tmp
+COPY xvfb-rpms /tmp
 
 RUN yum -y install python3.11 \
     python3.11-devel \
