@@ -9,10 +9,11 @@ from opencsp.common.lib.geometry.Vxy import Vxy
 class LoopXY:
     """Representation of 2D loop. The loop created by the given edges must
     satisfy the following:
-        - Closed geometry (currently checked)
-        - Must be convex (currently not checked)
-        - Linear boundary types (only linear is supported)
-        - The orientation of the edges must be consistent (all CCW/CW)
+
+     * Closed geometry (currently checked)
+     * Must be convex (currently not checked)
+     * Linear boundary types (only linear is supported)
+     * The orientation of the edges must be consistent (all CCW/CW)
     """
 
     def __init__(self, edges: list[EdgeXY]):
@@ -20,6 +21,7 @@ class LoopXY:
 
         Parameters
         ----------
+
         edges : list[EdgesXY, ...]
             Oriented edges of loop.
 

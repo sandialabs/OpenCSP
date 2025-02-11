@@ -34,7 +34,23 @@ from opencsp.common.lib.tool.typing_tools import strict_types
 
 
 class Intersection:
+    """
+    A class representing the intersection points of light paths with a plane.
+
+    This class provides methods for calculating intersections of light paths with planes,
+    as well as utilities for managing and analyzing these intersection points.
+    """
+
+    # "ChatGPT 4o" assisted with generating this docstring.
     def __init__(self, intersection_points: Pxyz):
+        """Initializes the Intersection instance with the given intersection points.
+
+        Parameters
+        ----------
+        intersection_points : Pxyz
+            The intersection points to be stored in this instance.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.intersection_points = intersection_points
 
     @classmethod
@@ -48,8 +64,40 @@ class Intersection:
         max_ram_in_use_percent: float = 95.0,
         verbose: bool = False,
     ):
-        """Vectorized plane intersection algorithm
-        place = (plane_point, plane_normal_vector)"""
+        """
+        Calculates intersection points of light paths with a specified plane.
+
+        This method uses a vectorized algorithm to find where light paths intersect with a plane
+        defined by a point and a normal vector.
+
+        Parameters
+        ----------
+        ray_trace : RayTrace
+            The RayTrace object containing the light paths to be analyzed.
+        plane : tuple[Pxyz, Uxyz]
+            A tuple containing a point on the plane (Pxyz) and the normal vector to the plane (Uxyz).
+        epsilon : float, optional
+            A small value to determine the precision of the intersection calculation. Defaults to 1e-6.
+        save_in_file : bool, optional
+            If True, saves the intersection data to a file. Defaults to False.
+        save_name : str, optional
+            The name of the file to save the intersection data. Required if save_in_file is True.
+        max_ram_in_use_percent : float, optional
+            The maximum percentage of RAM to use for processing. Defaults to 95.0.
+        verbose : bool, optional
+            If True, enables verbose output for debugging purposes. Defaults to False.
+
+        Returns
+        -------
+        Intersection
+            An Intersection object containing the calculated intersection points.
+
+        Raises
+        ------
+        ValueError
+            If the intersection calculation fails or if the input parameters are invalid.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
 
         # Unpack plane
         plane_point, plane_normal_vector = plane
@@ -139,27 +187,41 @@ class Intersection:
         epsilon: float = 1e-6,
         verbose: bool = False,
     ) -> Pxyz:
-        """Vectorized plane intersection algorithm
+        """
+        Calculates intersection points of multiple lines with a specified plane.
+
+        This method determines where each line intersects with the plane defined by a point and a normal vector.
 
         Parameters
         ----------
         lines : tuple[Pxyz, Vxyz]
-            The lines to find intersections for with the given plane. The lines
-            consist of two parts: a point (Pxyz) and a direction (Vxyz). Each
-            index in the points should correspond to the same index in the
-            directions. Note that only one Pxyz and Vxyz is needed to represent
-            multiple lines.
+            A tuple containing a point (Pxyz) and a direction vector (Vxyz) for the lines. Each
+            index in the points should correspond to the same index in the directions. Note that
+            only one Pxyz and Vxyz is needed to represent multiple lines.
         plane : tuple[Pxyz, Uxyz]
-            The plane to find the intersections of. The plane definition
-            consists of a point Pxyz that the plane goes through, and the normal
-            vector to the plane Uxyz.
+            A tuple containing a point on the plane (Pxyz) and the normal vector to the plane (Uxyz).
+            Each index in the points should correspond to the same index in the directions. Note that
+            only one Pxyz and Vxyz is needed to represent multiple lines.
+        epsilon : float, optional
+            A small value to determine the precision of the intersection calculation. Defaults to 1e-6.
+        verbose : bool, optional
+            If True, enables verbose output for debugging purposes. Defaults to False.
 
         Returns
         -------
-        intersection_points: Pxyz
-            The intersection (x,y,z) locations for each of the lines with the plane, one per line. Shape (3,N), where N is the number of lines.
-            Disregards direction of line.
+        Pxyz
+            The intersection points (x, y, z) for each line with the plane. Shape (3, N), where N is the number of lines.
+
+        Raises
+        ------
+        ValueError
+            If the lines are parallel to the plane or if the input parameters are invalid.
+
+        Notes
+        -----
+        Disregards direction of line.
         """
+        # "ChatGPT 4o" assisted with generating this docstring.
 
         # Unpack plane
         plane_point, plane_normal_vector = plane
@@ -216,6 +278,22 @@ class Intersection:
 
     @classmethod
     def from_hdf(cls, filename: str, intersection_name: str = "000"):
+        """
+        Loads intersection points from an HDF5 file.
+
+        Parameters
+        ----------
+        filename : str
+            The path to the HDF5 file containing intersection data.
+        intersection_name : str, optional
+            The name of the intersection dataset to load. Defaults to "000".
+
+        Returns
+        -------
+        Intersection
+            An Intersection object containing the loaded intersection points.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # get the names of the batches to loop through
         intersection_points = Pxyz(
             list(load_hdf5_datasets([f"Intersection_{intersection_name}/Points"], filename).values())[0]
@@ -224,6 +302,15 @@ class Intersection:
 
     @classmethod
     def empty_intersection(cls):
+        """
+        Creates an empty Intersection object.
+
+        Returns
+        -------
+        Intersection
+            An Intersection object with no intersection points.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         return cls(Pxyz.empty())
 
     def __add__(self, intersection: 'Intersection'):
@@ -233,11 +320,31 @@ class Intersection:
         return len(self.intersection_points)
 
     def save_to_hdf(self, hdf_filename: str, intersection_name: str = "000"):
+        """
+        Saves the intersection points to an HDF5 file.
+
+        Parameters
+        ----------
+        hdf_filename : str
+            The path to the HDF5 file where the intersection data will be saved.
+        intersection_name : str, optional
+            The name of the intersection dataset to save. Defaults to "000".
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         datasets = [f"Intersection_{intersection_name}/Points", f"Intersection_{intersection_name}/Metatdata"]
         data = [self.intersection_points.data, "Placeholder"]
         save_hdf5_datasets(data, datasets, hdf_filename)
 
     def get_centroid(self) -> Pxyz:
+        """
+        Calculates the centroid of the intersection points.
+
+        Returns
+        -------
+        Pxyz
+            The centroid of the intersection points as a Pxyz object.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         N = len(self)
         x = sum(self.intersection_points.x) / N
         y = sum(self.intersection_points.y) / N
@@ -247,14 +354,62 @@ class Intersection:
     # flux maps
 
     def to_flux_mapXY(self, bins: int, resolution_type: str = None) -> FunctionXYGrid:
+        """
+        Generates a flux map in the XY plane from the intersection points.
+
+        Parameters
+        ----------
+        bins : int
+            The number of bins to use for the histogram.
+        resolution_type : str, optional
+            The type of resolution to use for the flux map. Defaults to None.
+
+        Returns
+        -------
+        FunctionXYGrid
+            A FunctionXYGrid object representing the flux map in the XY plane.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         pxy = Pxy([self.intersection_points.x, self.intersection_points.y])
         return Intersection._Pxy_to_flux_map(pxy, bins, resolution_type)
 
     def to_flux_mapXZ(self, bins: int, resolution_type: str = None) -> FunctionXYGrid:
+        """
+        Generates a flux map in the XZ plane from the intersection points.
+
+        Parameters
+        ----------
+        bins : int
+            The number of bins to use for the histogram.
+        resolution_type : str, optional
+            The type of resolution to use for the flux map. Defaults to None.
+
+        Returns
+        -------
+        FunctionXYGrid
+            A FunctionXYGrid object representing the flux map in the XZ plane.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         pxz = Pxy([self.intersection_points.x, self.intersection_points.z])
         return Intersection._Pxy_to_flux_map(pxz, bins, resolution_type)
 
     def to_flux_mapYZ(self, bins: int, resolution_type: str = None) -> FunctionXYGrid:
+        """
+        Generates a flux map in the YZ plane from the intersection points.
+
+        Parameters
+        ----------
+        bins : int
+            The number of bins to use for the histogram.
+        resolution_type : str, optional
+            The type of resolution to use for the flux map. Defaults to None.
+
+        Returns
+        -------
+        FunctionXYGrid
+            A FunctionXYGrid object representing the flux map in the YZ plane.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         pyz = Pxy([self.intersection_points.y, self.intersection_points.z])
         return Intersection._Pxy_to_flux_map(pyz, bins, resolution_type)
 
@@ -282,11 +437,35 @@ class Intersection:
     # drawing
 
     def draw(self, view: View3d, style: RenderControlPointSeq = None):
+        """
+        Draws the intersection points in a 3D view.
+
+        Parameters
+        ----------
+        view : View3d
+            The 3D view in which to draw the intersection points.
+        style : RenderControlPointSeq, optional
+            The style to use for rendering the points. Defaults to None.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if style is None:
             style = RenderControlPointSeq()
         self.intersection_points.draw_points(view, style)
 
     def draw_subset(self, view: View3d, count: int, points_style: RenderControlPointSeq = None):
+        """
+        Draws a subset of intersection points in a 3D view.
+
+        Parameters
+        ----------
+        view : View3d
+            The 3D view in which to draw the intersection points.
+        count : int
+            The number of points to draw from the intersection points.
+        points_style : RenderControlPointSeq, optional
+            The style to use for rendering the points. Defaults to None.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         for i in np.floor(np.linspace(0, len(self.intersection_points) - 1, count)):
             p = Pxyz(self.intersection_points[int(i)])
             p.draw_points(view)

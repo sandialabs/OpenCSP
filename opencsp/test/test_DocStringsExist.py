@@ -445,6 +445,7 @@ class test_Docstrings(unittest.TestCase):
     class_list = app_class_list + common_class_list
 
     def test_docstrings_exist_for_methods(self):
+        n_docstrings = 0
         for class_module in self.class_list:
             print(class_module)
             method_list = []
@@ -478,12 +479,16 @@ class test_Docstrings(unittest.TestCase):
                 print(f"doc_exists({method_name}): " f"{doc_exists}")
                 if not doc_exists:
                     undocumented_methods.append(method)
+                else:
+                    n_docstrings += 1
 
             if len((undocumented_methods)) != 0:
                 print(f"Found undocumented methods in {class_module}:")
                 for name in undocumented_methods:
                     print(f"\t{name}")
             assert len((undocumented_methods)) == 0
+
+        print(f"n_docstrings: {n_docstrings}")
 
 
 if __name__ == '__main__':

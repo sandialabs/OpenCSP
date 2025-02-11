@@ -14,16 +14,17 @@ class FunctionXYAbstract(ABC):
 
     Abstract Methods
     ----------------
-    ```python
-    value_at(self, x: float, y: float) -> float:
-        "Returns the value of the function at the given x and y values."
-    __getstate__(self):
-        "Returns a serializable object for pickleing."
-    __setstate__(self, d):
-        "Takes in __getstate__(self)'s output to recreate the object `self` that was passed into __getstate__"
-    in_domain(x, y) -> bool:
-        "Returns True if the (x,y) pair is in the domain, otherwise False."
-    ```
+
+    .. code-block:: python
+
+        value_at(self, x: float, y: float) -> float:
+            # "Returns the value of the function at the given x and y values."
+        __getstate__(self):
+            # "Returns a serializable object for pickleing."
+        __setstate__(self, d):
+            # "Takes in __getstate__(self)'s output to recreate the object `self` that was passed into __getstate__"
+        in_domain(x, y) -> bool:
+            # "Returns True if the (x,y) pair is in the domain, otherwise False."
 
     """
 

@@ -48,6 +48,7 @@ extensions = [
     "sphinxarg.ext",
     "sphinx_rtd_theme",
     "nbsphinx",
+    "doc.count_docstrings",
 ]
 
 # Add any paths that contain templates here, relative to this directory.

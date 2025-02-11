@@ -1,8 +1,5 @@
 """
 2-d Geometry Utiltiies
-
-
-
 """
 
 import math
@@ -18,6 +15,32 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 
 def homogeneous_line(xy1, xy2):
+    """
+    DEPRECATED: Calculates the homogeneous line coefficients from two points.
+
+    This function returns the coefficients of the line in homogeneous coordinates,
+    normalized to ensure the coefficients are in a standard form.
+
+    Parameters
+    ----------
+    xy1 : np.ndarray
+        The coordinates of the first point (x1, y1).
+    xy2 : np.ndarray
+        The coordinates of the second point (x2, y2).
+
+    Returns
+    -------
+    list[float]
+        A list containing the normalized coefficients [A, B, C] of the line equation Ax + By + C = 0.
+
+    Raises
+    ------
+    AssertionError
+        If the two points are the same, resulting in a degenerate case.
+    DeprecationWarning
+        geometry_2d.homogeneous_line is deprecated. Use LineXY instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn('geometry_2d.homogeneous_line is deprecated. Use LineXY instead.', DeprecationWarning, stacklevel=2)
     # Returns homogeneous line coeffcients, in normalized form.
     x1 = xy1[0]
@@ -41,6 +64,25 @@ def homogeneous_line(xy1, xy2):
 
 
 def flip_homogeneous_line(line):
+    """
+    DEPRECATED: Reverses the sense of the homogeneous line.
+
+    Parameters
+    ----------
+    line : list[float]
+        The coefficients of the line in homogeneous coordinates [A, B, C].
+
+    Returns
+    -------
+    list[float]
+        The coefficients of the flipped line.
+
+    Raises
+    ------
+    DeprecationWarning
+        geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.', DeprecationWarning, stacklevel=2
     )
@@ -49,6 +91,27 @@ def flip_homogeneous_line(line):
 
 
 def homogeneous_line_signed_distance_to_xy(xy, line):
+    """
+    DEPRECATED: Calculates the signed distance from a point to a homogeneous line.
+
+    Parameters
+    ----------
+    xy : np.ndarray
+        The coordinates of the point (x, y).
+    line : list[float]
+        The coefficients of the line in homogeneous coordinates [A, B, C].
+
+    Returns
+    -------
+    float
+        The signed distance from the point to the line.
+
+    Raises
+    ------
+    DeprecationWarning
+        geometry_2d.homogeneous_line_signed_distance_to_xy is deprecated. Use LineXY.dist_from_line_signed() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.homogeneous_line_signed_distance_to_xy is deprecated. Use LineXY.dist_from_line_signed() instead.',
         DeprecationWarning,
@@ -63,6 +126,28 @@ def homogeneous_line_signed_distance_to_xy(xy, line):
 
 
 def homogeneous_line_y_given_x(x, line):
+    """
+    DEPRECATED: Calculates the y-coordinate on a homogeneous line given an x-coordinate.
+
+    Parameters
+    ----------
+    x : float
+        The x-coordinate for which to find the corresponding y-coordinate on the line.
+    line : list[float]
+        The coefficients of the line in homogeneous coordinates [A, B, C].
+
+    Returns
+    -------
+    float
+        The y-coordinate corresponding to the given x-coordinate on the line.
+        Returns NaN if the line is vertical (B = 0).
+
+    Raises
+    ------
+    DeprecationWarning
+        geometry_2d.homogeneous_line_y_given_x is deprecated. Use LineXY.y_from_x() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.homogeneous_line_y_given_x is deprecated. Use LineXY.y_from_x() instead.',
         DeprecationWarning,
@@ -78,6 +163,28 @@ def homogeneous_line_y_given_x(x, line):
 
 
 def homogeneous_line_x_given_y(y, line):
+    """
+    DEPRECATED: Calculates the x-coordinate on a homogeneous line given a y-coordinate.
+
+    Parameters
+    ----------
+    y : float
+        The y-coordinate for which to find the corresponding x-coordinate on the line.
+    line : list[float]
+        The coefficients of the line in homogeneous coordinates [A, B, C].
+
+    Returns
+    -------
+    float
+        The x-coordinate corresponding to the given y-coordinate on the line.
+        Returns NaN if the line is horizontal (A = 0).
+
+    Raises
+    ------
+    DeprecationWarning
+        geometry_2d.homogeneous_line_x_given_y is deprecated. Use LineXY.x_from_y() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.homogeneous_line_x_given_y is deprecated. Use LineXY.x_from_y() instead.',
         DeprecationWarning,
@@ -93,6 +200,29 @@ def homogeneous_line_x_given_y(y, line):
 
 
 def intersect_lines(line1, line2):
+    """
+    DEPRECATED: Calculates the intersection point of two homogeneous lines.
+
+    Parameters
+    ----------
+    line1 : list[float]
+        The coefficients of the first line in homogeneous coordinates [A1, B1, C1].
+    line2 : list[float]
+        The coefficients of the second line in homogeneous coordinates [A2, B2, C2].
+
+    Returns
+    -------
+    list[float]
+        The intersection point (x, y) of the two lines. Returns [NaN, NaN] if the lines are parallel.
+
+    Raises
+    ------
+    ValueError
+        If the lines are parallel and do not intersect.
+    DeprecationWarning
+        geometry_2d.intersect_lines is deprecated. Use LineXY.intersect_with() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.intersect_lines is deprecated. Use LineXY.intersect_with() instead.',
         DeprecationWarning,
@@ -122,6 +252,27 @@ def intersect_lines(line1, line2):
 
 
 def shift_x(ray, dx):
+    """
+    DEPRECATED: Shifts a ray in the x-direction by a specified amount.
+
+    Parameters
+    ----------
+    ray : list[list[float]]
+        A list containing two points that define the ray, each represented as [x, y].
+    dx : float
+        The amount to shift the ray in the x-direction.
+
+    Returns
+    -------
+    list[list[float]]
+        A new ray represented by two points shifted in the x-direction.
+
+    Raises
+    ------
+    DeprecationWarning
+        geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn('geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.', DeprecationWarning, stacklevel=2)
     x0 = ray[0][0]
     y0 = ray[0][1]
@@ -131,6 +282,27 @@ def shift_x(ray, dx):
 
 
 def intersect_rays(ray1, ray2):
+    """
+    DEPRECATED: Calculates the intersection point of two rays.
+
+    Parameters
+    ----------
+    ray1 : list[list[float]]
+        A list containing two points that define the first ray, each represented as [x, y].
+    ray2 : list[list[float]]
+        A list containing two points that define the second ray, each represented as [x, y].
+
+    Returns
+    -------
+    list[float]
+        The intersection point (x, y) of the two rays. Returns [NaN, NaN] if the rays do not intersect.
+
+    Raises
+    ------
+    DeprecationWarning
+        geometry_2d.intersect_rays is deprecated. Use LineXY.intersect_with() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.intersect_rays is deprecated. Use LineXY.intersect_with() instead.',
         DeprecationWarning,
@@ -147,6 +319,22 @@ def intersect_rays(ray1, ray2):
 
 
 def draw_clip_xy_box(view, clip_xy_box):
+    """
+    DEPRECATED: Draws a clipping box in the XY plane.
+
+    Parameters
+    ----------
+    view : object
+        The view object in which to draw the clipping box.
+    clip_xy_box : tuple[tuple[float, float], tuple[float, float]]
+        A tuple defining the clipping box as ((xmin, xmax), (ymin, ymax)).
+
+    Raises
+    ------
+    DeprecationWarning
+        geometry_2d.draw_clip_xy_box is deprecated. Should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.draw_clip_xy_box is deprecated. Should be migrated to another library.',
         DeprecationWarning,
@@ -163,6 +351,27 @@ def draw_clip_xy_box(view, clip_xy_box):
 
 
 def clip_line_to_xy_box(line, clip_xy_box):
+    """
+    DEPRECATED: Clips a line to the specified XY clipping box.
+
+    Parameters
+    ----------
+    line : list[float]
+        The coefficients of the line in homogeneous coordinates [A, B, C].
+    clip_xy_box : tuple[tuple[float, float], tuple[float, float]]
+        A tuple defining the clipping box as ((xmin, xmax), (ymin, ymax)).
+
+    Returns
+    -------
+    list[list[float]]
+        A list of points where the line intersects the clipping box edges.
+        Returns an empty list if the line is completely outside the clipping box.
+
+    Raises
+    ------
+        geometry_2d.clip_line_to_xy_box is deprecated. Should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.clip_line_to_xy_box is deprecated. Should be migrated to another library.',
         DeprecationWarning,
@@ -207,6 +416,32 @@ def clip_line_to_xy_box(line, clip_xy_box):
 
 
 def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
+    """
+    DEPRECATED: Extends a ray to intersect with the specified clipping box.
+
+    Parameters
+    ----------
+    ray : list[list[float]]
+        A list containing two points that define the ray, each represented as [x, y].
+    clip_xy_box : tuple[tuple[float, float], tuple[float, float]]
+        A tuple defining the clipping box as ((xmin, xmax), (ymin, ymax)).
+    fail_if_null_result : bool, optional
+        If True, raises an error if the ray does not intersect the clipping box. Defaults to True.
+
+    Returns
+    -------
+    list[list[float]]
+        A new ray represented by two points that extend to the clipping box.
+        Returns None if the ray is completely outside the clipping box and fail_if_null_result is False.
+
+    Raises
+    ------
+    AssertionError
+        If the ray is completely outside the clipping box and fail_if_null_result is True.
+    DeprecationWarning
+        geometry_2d.extend_ray is deprecated. Should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.extend_ray is deprecated. Should be migrated to another library.', DeprecationWarning, stacklevel=2
     )
@@ -280,6 +515,30 @@ def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
 # this allows code to work if data are a vertical or horizontal line.
 #
 def best_fit_line_segment_A(xy_seq):
+    """
+    DEPRECATED: Calculates the best-fit line segment for a sequence of 2D points.
+
+    This function determines the best-fit line segment that minimizes the distance
+    to a set of points in 2D space.
+
+    Parameters
+    ----------
+    xy_seq : list[list[float]]
+        A list of points where each point is represented as [x, y].
+
+    Returns
+    -------
+    list[list[float]]
+        A list containing two points that define the best-fit line segment.
+
+    Raises
+    ------
+    AssertionError
+        If the input points are ill-conditioned (all points are the same).
+    DeprecationWarning
+        geometry_2d.best_fit_line_segment_A is deprecated. Use LineXY.fit_from_points() instead.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.best_fit_line_segment_A is deprecated. Use LineXY.fit_from_points() instead.',
         DeprecationWarning,
@@ -345,6 +604,28 @@ def best_fit_line_segment_A(xy_seq):
 
 
 def best_fit_line_segment(xy_list):
+    """
+    DEPRECATED: Calculates the best-fit line segment for a sequence of 2D points.
+
+    This function determines the best-fit line segment that minimizes the distance
+    to a set of points in 2D space. This is a deprecated function; use LineXY.fit_from_points() instead.
+
+    Parameters
+    ----------
+    xy_list : list[list[float]]
+        A list of points where each point is represented as [x, y].
+
+    Returns
+    -------
+    list[list[float]]
+        A list containing two points that define the best-fit line segment.
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be replaced with LineXY.fit_from_points().
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.best_fit_line_segment is deprecated. Use LineXY.fit_from_points() instead.',
         DeprecationWarning,
@@ -359,6 +640,30 @@ def best_fit_line_segment(xy_list):
 
 
 def rotate_about_origin(xy, theta):
+    """
+    DEPRECATED: Rotates a point around the origin by a specified angle.
+
+    This function rotates the point (x, y) by the angle theta (in radians) around the origin (0, 0).
+    This is a deprecated function; use Vxy.rotate() or TransformXY instead.
+
+    Parameters
+    ----------
+    xy : list[float]
+        The coordinates of the point to rotate, represented as [x, y].
+    theta : float
+        The angle of rotation in radians.
+
+    Returns
+    -------
+    list[float]
+        The new coordinates of the point after rotation, represented as [x', y'].
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be replaced with Vxy.rotate() or TransformXY.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.rotate_about_origin is deprecated. Use Vxy.rotate() or TransformXY instead.',
         DeprecationWarning,
@@ -374,6 +679,32 @@ def rotate_about_origin(xy, theta):
 
 
 def rotate_about_center(xy, theta, center_xy):
+    """
+    DEPRECATED: Rotates a point around a specified center by a specified angle.
+
+    This function rotates the point (x, y) around the point (cx, cy) by the angle theta (in radians).
+    This is a deprecated function; use TransformXY instead.
+
+    Parameters
+    ----------
+    xy : list[float]
+        The coordinates of the point to rotate, represented as [x, y].
+    theta : float
+        The angle of rotation in radians.
+    center_xy : list[float]
+        The coordinates of the center point around which to rotate, represented as [cx, cy].
+
+    Returns
+    -------
+    list[float]
+        The new coordinates of the point after rotation, represented as [x', y'].
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be replaced with TransformXY.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn('geometry_2d.rotate_about_center is deprecated. Use TransformXY instead.', DeprecationWarning, stacklevel=2)
     x = xy[0]
     y = xy[1]
@@ -391,8 +722,31 @@ def rotate_about_center(xy, theta, center_xy):
 
 def rotate_xyz_about_center_xy(xyz, theta, center_xy):
     """
-    A planar rotation.  That is, the rotation axis is parallel to the z axis.
+    DEPRECATED: Rotates a 3D point around a specified center in the XY plane.
+
+    This function performs a planar rotation of the point (x, y, z) around the center (cx, cy)
+    by the angle theta (in radians). The z-coordinate remains unchanged.
+
+    Parameters
+    ----------
+    xyz : list[float]
+        The coordinates of the point to rotate, represented as [x, y, z].
+    theta : float
+        The angle of rotation in radians.
+    center_xy : list[float]
+        The coordinates of the center point around which to rotate, represented as [cx, cy].
+
+    Returns
+    -------
+    list[float]
+        The new coordinates of the point after rotation, represented as [x', y', z].
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be replaced with TransformXYZ, TransformXY, Vxyz.rotate(), or Vxy.rotate().
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.rotate_xyz_about_center_xy is deprecated. Use TransformXYZ, TransformXY, Vxyz.rotate() oro Vxy.rotate() instead.',
         DeprecationWarning,
@@ -419,6 +773,28 @@ def rotate_xyz_about_center_xy(xyz, theta, center_xy):
 
 
 def label_point(xy_list):
+    """
+    DEPRECATED: Calculates a central label point for a list of 2D points.
+
+    This function computes a reasonable central label point for a given list of points.
+    It calculates the mean of the x and y coordinates of the points.
+
+    Parameters
+    ----------
+    xy_list : list[list[float]]
+        A list of points where each point is represented as [x, y].
+
+    Returns
+    -------
+    list[float]
+        The coordinates of the central label point, represented as [x_mean, y_mean].
+
+    Raises
+    ------
+    DeprecationWarning
+        Indicates that this function is deprecated and should be migrated to another library.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
         'geometry_2d.label_point is deprecated. Should be migrated to another library.',
         DeprecationWarning,
