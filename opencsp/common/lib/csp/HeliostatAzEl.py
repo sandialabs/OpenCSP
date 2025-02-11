@@ -1,6 +1,5 @@
 import copy
 import csv
-from typing import Iterable
 import numpy as np
 
 from scipy.spatial.transform import Rotation
@@ -10,13 +9,9 @@ from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.HeliostatAbstract import HeliostatAbstract
 from opencsp.common.lib.csp.HeliostatConfiguration import HeliostatConfiguration
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
-import opencsp.common.lib.csp.sun_track as st
-from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
-from opencsp.common.lib.tool.typing_tools import strict_types
-import pandas as pd
 
 EAST = Vxyz([1, 0, 0])
 WEST = -EAST
