@@ -17,3 +17,4 @@ This section describes the OpenCSP classes and interfaces.
    common/lib/file/index.rst
    common/lib/geometry/index.rst
    common/lib/opencsp_path/index.rst
+   common/lib/process/index.rst
