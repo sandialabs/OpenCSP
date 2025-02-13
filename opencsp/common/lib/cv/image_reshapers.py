@@ -77,8 +77,8 @@ def _map_jet_human_rgb(input_color: int):
 def false_color_reshaper(
     from_image: np.ndarray,
     input_max_value: int = 255,
-    map_name: str = 'jet',
-    map_type: Literal['large'] | Literal['human'] = 'human',
+    map_name: str = "jet",
+    map_type: Literal["large"] | Literal["human"] = "human",
 ) -> np.ndarray:
     """Updates the primary image to use the jet color map plus black and
     white (black->blue->cyan->green->yellow->red->white).
@@ -112,7 +112,7 @@ def false_color_reshaper(
     # green_to_yellow = 127/255
     # yellow_to_red = 128/255
     # red_to_white = 127/255
-    representable_colors = 255 * 6 if map_type == 'large' else 255 * 4
+    representable_colors = 255 * 6 if map_type == "large" else 255 * 4
     new_image: np.ndarray = from_image * ((representable_colors - 1) / input_max_value)
     new_image = np.clip(new_image, 0, representable_colors - 1).astype(np.int32)
     if len(new_image.shape) == 3:
@@ -126,7 +126,7 @@ def false_color_reshaper(
     assert it.dims_and_nchannels(color_image)[1] == 3
 
     # apply the mapping
-    map_func = _map_jet_large_rgb if map_type == 'large' else _map_jet_human_rgb
+    map_func = _map_jet_large_rgb if map_type == "large" else _map_jet_human_rgb
     mapping = {k: map_func(k) for k in range(representable_colors)}
     new_image = np.vectorize(mapping.__getitem__)(new_image)
     color_image[:, :, 0] = new_image >> 16

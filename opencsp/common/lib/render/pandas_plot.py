@@ -42,9 +42,9 @@ def dataframe_plot(
     plt.xlabel(x_axis_label)
     plt.ylabel(y_axis_label)
     if x_axis_grid:
-        plt.grid(axis='x')
+        plt.grid(axis="x")
     if y_axis_grid:
-        plt.grid(axis='y')
+        plt.grid(axis="y")
     if legend:
         plt.legend()
     plt.show()

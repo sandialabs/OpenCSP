@@ -482,5 +482,5 @@ class test_Docstrings(unittest.TestCase):
         print(f"n_docstrings: {n_docstrings}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

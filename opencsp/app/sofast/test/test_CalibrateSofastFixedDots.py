@@ -21,32 +21,32 @@ class TestFixedPatternSetupCalibrate(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Tests dot-location calibration"""
-        cls.dir_save = join(opencsp_code_dir(), 'app/sofast/test/data/output/dot_location_calibration')
+        cls.dir_save = join(opencsp_code_dir(), "app/sofast/test/data/output/dot_location_calibration")
         ft.create_directories_if_necessary(cls.dir_save)
 
         # Set up logger
-        lt.logger(log_dir_body_ext=join(cls.dir_save, 'log.txt'), level=lt.log.ERROR)
+        lt.logger(log_dir_body_ext=join(cls.dir_save, "log.txt"), level=lt.log.ERROR)
 
         # Define dot location images and origins
-        dir_meas = join(opencsp_code_dir(), 'test/data/dot_location_calibration/data_measurement')
-        dir_exp = join(opencsp_code_dir(), 'test/data/dot_location_calibration/data_expected')
+        dir_meas = join(opencsp_code_dir(), "test/data/dot_location_calibration/data_measurement")
+        dir_exp = join(opencsp_code_dir(), "test/data/dot_location_calibration/data_expected")
         files = [
-            join(dir_meas, 'images/DSC03992.JPG'),
-            join(dir_meas, 'images/DSC03993.JPG'),
-            join(dir_meas, 'images/DSC03994.JPG'),
-            join(dir_meas, 'images/DSC03995.JPG'),
-            join(dir_meas, 'images/DSC03996.JPG'),
+            join(dir_meas, "images/DSC03992.JPG"),
+            join(dir_meas, "images/DSC03993.JPG"),
+            join(dir_meas, "images/DSC03994.JPG"),
+            join(dir_meas, "images/DSC03995.JPG"),
+            join(dir_meas, "images/DSC03996.JPG"),
         ]
         origins = np.array(([1201, 1120, 1135, 964, 918], [828, 857, 852, 851, 862]))
         origins = Vxy(origins)
 
         # Define other files
-        file_camera_calibration = join(dir_meas, 'camera_calibration.h5')
-        file_xyz_points = join(dir_meas, 'aruco_corner_locations.csv')
-        cls.file_fpd_dot_locs_exp = join(dir_exp, 'fixed_pattern_dot_locations.h5')
+        file_camera_calibration = join(dir_meas, "camera_calibration.h5")
+        file_xyz_points = join(dir_meas, "aruco_corner_locations.csv")
+        cls.file_fpd_dot_locs_exp = join(dir_exp, "fixed_pattern_dot_locations.h5")
 
         # Load marker corner locations
-        data = np.loadtxt(file_xyz_points, delimiter=',')
+        data = np.loadtxt(file_xyz_points, delimiter=",")
         pts_xyz_corners = Vxyz(data[:, 2:5].T)
         ids_corners = data[:, 1]
 
@@ -69,7 +69,7 @@ class TestFixedPatternSetupCalibrate(unittest.TestCase):
     def test_save_dot_location_hdf(self):
         """Tests saving dot location data"""
         dot_locs = self.cal.get_dot_location_object()
-        dot_locs.save_to_hdf(join(self.dir_save, 'fixed_pattern_dot_locations.h5'))
+        dot_locs.save_to_hdf(join(self.dir_save, "fixed_pattern_dot_locations.h5"))
 
     def test_save_figures(self):
         """Tests saving figures"""
@@ -89,8 +89,8 @@ class TestFixedPatternSetupCalibrate(unittest.TestCase):
 
     def tearDown(self) -> None:
         # Make sure we release all matplotlib resources.
-        plt.close('all')
+        plt.close("all")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

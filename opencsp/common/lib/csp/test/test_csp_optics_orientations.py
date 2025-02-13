@@ -237,7 +237,7 @@ class TestCSPOpticsOrientation:
         self._check_rotation(mirror, facet, ensemble, heliostat, a1, a2, a3, a4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     test = TestCSPOpticsOrientation()
 
     test.test_rotation_2()

@@ -26,7 +26,7 @@ class Pxyz(Vxyz):
         super().__init__(data, dtype)
 
     def __repr__(self):
-        return '3D Point:\n' + self._data.__repr__()
+        return "3D Point:\n" + self._data.__repr__()
 
     def distance(self, data_in: "Pxyz") -> float:
         """

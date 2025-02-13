@@ -4,7 +4,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class TkToolTip(object):
-    def __init__(self, widget, text='widget info'):
+    def __init__(self, widget, text="widget info"):
         self.waittime = 500  # miliseconds
         self.wraplength = 180  # pixels
         self.widget = widget
@@ -44,9 +44,9 @@ class TkToolTip(object):
         label = tk.Label(
             self.tw,
             text=self.text,
-            justify='left',
+            justify="left",
             background="#ffffff",
-            relief='solid',
+            relief="solid",
             borderwidth=1,
             wraplength=self.wraplength,
         )

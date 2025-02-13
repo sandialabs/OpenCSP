@@ -185,9 +185,9 @@ class VisualizationCoordinator:
                     + f" Expected {num_figures_dict[processor]} but received {len(processor_figures)}!"
                 )
             for fig_record in processor_figures:
-                fig_record.figure.canvas.mpl_connect('close_event', self.on_close)
-                fig_record.figure.canvas.mpl_connect('key_release_event', self.on_key_release)
-                fig_record.figure.canvas.mpl_connect('key_press_event', self.on_key_press)
+                fig_record.figure.canvas.mpl_connect("close_event", self.on_close)
+                fig_record.figure.canvas.mpl_connect("key_release_event", self.on_key_release)
+                fig_record.figure.canvas.mpl_connect("key_press_event", self.on_key_press)
                 self.figures.append(weakref.ref(fig_record))
 
     def _get_figures(self) -> list[rcfr.RenderControlFigureRecord]:

@@ -66,7 +66,7 @@ class RenderControlPowerpointPresentation:
             if not overwrite:
                 lt.error_and_raise(
                     FileExistsError,
-                    f"Error: in RenderControlPowerpointPresentation.save: trying to save presentation to \"{dest_path_name_ext}\" but the file already exists",
+                    f'Error: in RenderControlPowerpointPresentation.save: trying to save presentation to "{dest_path_name_ext}" but the file already exists',
                 )
 
         dest_path, _, _ = ft.path_components(dest_path_name_ext)
@@ -74,7 +74,7 @@ class RenderControlPowerpointPresentation:
         if not ft.directory_exists(dest_path):
             lt.error_and_raise(
                 FileNotFoundError,
-                f"Error: in RenderControlPowerpointPresentation.save: destination directory \"{dest_path}\" doesn't exist",
+                f'Error: in RenderControlPowerpointPresentation.save: destination directory "{dest_path}" doesn\'t exist',
             )
 
         # setup

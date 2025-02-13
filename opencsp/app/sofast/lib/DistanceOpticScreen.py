@@ -19,7 +19,7 @@ class DistanceOpticScreen(h5.HDF5_IO_Abstract):
     dist_optic_screen: float = 0
     """ Optic-screen distance, meters. """
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
@@ -30,14 +30,14 @@ class DistanceOpticScreen(h5.HDF5_IO_Abstract):
             Prefix to append to folder path within HDF file (folders must be separated by "/").
             Default is empty string ''.
         """
-        datasets = [prefix + 'v_measure_point_facet', prefix + 'dist_optic_screen']
+        datasets = [prefix + "v_measure_point_facet", prefix + "dist_optic_screen"]
         data = [self.v_measure_point_facet.data.squeeze(), self.dist_optic_screen]
 
         # Save data
         h5.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = ''):
+    def load_from_hdf(cls, file: str, prefix: str = ""):
         """Loads data from given file. Assumes data is stored as: PREFIX + Folder/Field_1
 
         Parameters
@@ -48,10 +48,10 @@ class DistanceOpticScreen(h5.HDF5_IO_Abstract):
             Prefix to append to folder path within HDF file (folders must be separated by "/").
             Default is empty string ''.
         """
-        datasets = [prefix + 'v_measure_point_facet', prefix + 'dist_optic_screen']
+        datasets = [prefix + "v_measure_point_facet", prefix + "dist_optic_screen"]
 
         # Load data
         kwargs = h5.load_hdf5_datasets(datasets, file)
-        kwargs['v_measure_point_facet'] = Vxyz(kwargs['v_measure_point_facet'])
+        kwargs["v_measure_point_facet"] = Vxyz(kwargs["v_measure_point_facet"])
 
         return cls(**kwargs)

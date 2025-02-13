@@ -71,7 +71,7 @@ class BcsLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             circle_arr = circles[0][0]
             center = p2.Pxy([circle_arr[0], circle_arr[1]])
             radius = circle_arr[2]
-            circle = BcsFiducial(center, radius, style=rcb.thin(color='m'))
+            circle = BcsFiducial(center, radius, style=rcb.thin(color="m"))
 
         # assign to the operable
         new_found_fiducials = copy.copy(operable.found_fiducials)
@@ -95,7 +95,7 @@ if __name__ == "__main__":
     style = rcps.RenderControlPointSeq(markersize=10)
     operable = SpotAnalysisOperable(CacheableImage(source_path=image_file))
 
-    processor0 = ConvolutionImageProcessor(kernel='gaussian', diameter=3)
+    processor0 = ConvolutionImageProcessor(kernel="gaussian", diameter=3)
     processor1 = BcsLocatorImageProcessor()
     processor2 = AnnotationImageProcessor()
 

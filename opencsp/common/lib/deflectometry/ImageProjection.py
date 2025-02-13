@@ -26,7 +26,7 @@ class CalParams:
         x/y fiducial coordinates in screen pixels
     """
 
-    def __init__(self, size_x: int, size_y: int) -> 'CalParams':
+    def __init__(self, size_x: int, size_y: int) -> "CalParams":
         """Instantiates CalParams given size of active screen area.
         Measured from upper left corner of screen. Screen fractions
         measured from edges of screen, pixels measured from centers
@@ -119,36 +119,36 @@ class ImageProjectionData(hdf5_tools.HDF5_IO_Abstract):
     shift_blue_y: int
     """The blue channel y shift in an RGB display relative to green in pixels. Down is positive."""
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         datasets = []
         data = []
         for name, value in self.__dict__.items():
-            datasets.append(prefix + 'ImageProjection/' + name)
+            datasets.append(prefix + "ImageProjection/" + name)
             data.append(value)
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = ''):
+    def load_from_hdf(cls, file: str, prefix: str = ""):
         # Load data
         datasets = [
-            'ImageProjection/name',
-            'ImageProjection/main_window_size_x',
-            'ImageProjection/main_window_size_y',
-            'ImageProjection/main_window_position_x',
-            'ImageProjection/main_window_position_y',
-            'ImageProjection/active_area_size_x',
-            'ImageProjection/active_area_size_y',
-            'ImageProjection/active_area_position_x',
-            'ImageProjection/active_area_position_y',
-            'ImageProjection/projector_data_type',
-            'ImageProjection/projector_max_int',
-            'ImageProjection/image_delay_ms',
-            'ImageProjection/shift_red_x',
-            'ImageProjection/shift_red_y',
-            'ImageProjection/shift_blue_x',
-            'ImageProjection/shift_blue_y',
+            "ImageProjection/name",
+            "ImageProjection/main_window_size_x",
+            "ImageProjection/main_window_size_y",
+            "ImageProjection/main_window_position_x",
+            "ImageProjection/main_window_position_y",
+            "ImageProjection/active_area_size_x",
+            "ImageProjection/active_area_size_y",
+            "ImageProjection/active_area_position_x",
+            "ImageProjection/active_area_position_y",
+            "ImageProjection/projector_data_type",
+            "ImageProjection/projector_max_int",
+            "ImageProjection/image_delay_ms",
+            "ImageProjection/shift_red_x",
+            "ImageProjection/shift_red_y",
+            "ImageProjection/shift_blue_x",
+            "ImageProjection/shift_blue_y",
         ]
         for dataset in datasets:
             dataset = prefix + dataset
@@ -161,9 +161,9 @@ class ImageProjectionData(hdf5_tools.HDF5_IO_Abstract):
 class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
     """Controls projecting an image on a computer display (projector, monitor, etc.)"""
 
-    _instance: 'ImageProjection' = None
+    _instance: "ImageProjection" = None
 
-    def __init__(self, root: tkinter.Tk, display_data: ImageProjectionData) -> 'ImageProjection':
+    def __init__(self, root: tkinter.Tk, display_data: ImageProjectionData) -> "ImageProjection":
         """Instantiates class
 
         Parameters
@@ -188,7 +188,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         # Create drawing canvas
         self.canvas = tkinter.Canvas(self.root)
         self.canvas.pack()
-        self.canvas.configure(background='black', highlightthickness=0)
+        self.canvas.configure(background="black", highlightthickness=0)
 
         # Save aruco marker dictionary for calibration image generation
         self.aruco_dictionary = aruco.getPredefinedDictionary(aruco.DICT_4X4_1000)
@@ -220,7 +220,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
                 dtype=self.display_data.projector_data_type,
             )
         )
-        self.canvas_image = self.canvas.create_image(0, 0, image=image, anchor='nw')
+        self.canvas_image = self.canvas.create_image(0, 0, image=image, anchor="nw")
 
         # Show crosshairs
         self.show_crosshairs()
@@ -243,7 +243,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         self.root.mainloop()
 
     @classmethod
-    def in_new_window(cls, display_data: ImageProjectionData) -> 'ImageProjection':
+    def in_new_window(cls, display_data: ImageProjectionData) -> "ImageProjection":
         """
         Instantiates ImageProjection object in new window.
 
@@ -276,8 +276,8 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
 
         # Resize window
         self.root.geometry(
-            f'{self.display_data.main_window_size_x:d}x{self.display_data.main_window_size_y:d}'
-            + f'+{self.display_data.main_window_position_x:d}+{self.display_data.main_window_position_y:d}'
+            f"{self.display_data.main_window_size_x:d}x{self.display_data.main_window_size_y:d}"
+            + f"+{self.display_data.main_window_position_x:d}+{self.display_data.main_window_position_y:d}"
         )
 
         # Resize canvas size
@@ -349,7 +349,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         font = cv.FONT_HERSHEY_PLAIN
         array = cv.putText(
             array,
-            'X',
+            "X",
             (self._x_active_mid - width - 20, self._y_active_mid + 20),
             font,
             6,
@@ -362,7 +362,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         font = cv.FONT_HERSHEY_PLAIN
         array = cv.putText(
             array,
-            'Y',
+            "Y",
             (self._x_active_mid + 20, self._y_active_mid + width + 20),
             font,
             6,
@@ -402,7 +402,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
             else:
                 dy = -10
             # Draw text
-            cv.putText(array, f'{idx:d}', (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
+            cv.putText(array, f"{idx:d}", (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 255, 0))
 
         # Display with black border
         self.display_image_in_active_area(array)
@@ -449,7 +449,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
                 dy = -int(w / 2)
                 dx = -w - 15
             # Draw text
-            cv.putText(array, f'{idx:d}', (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
+            cv.putText(array, f"{idx:d}", (x_loc + dx, y_loc + dy), cv.FONT_HERSHEY_PLAIN, 1, (0, 0, 0))
 
         # Display with black border
         self.display_image_in_active_area(array)
@@ -484,7 +484,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         """
         # Check image is RGB
         if np.ndim(array) != 3 or array.shape[2] != 3:
-            raise ValueError('Input array must have 3 dimensions and dimension 2 must be length 3.')
+            raise ValueError("Input array must have 3 dimensions and dimension 2 must be length 3.")
 
         # Check array is correct xy shape
         if (
@@ -492,9 +492,9 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
             or array.shape[1] != self.display_data.main_window_size_x
         ):
             raise ValueError(
-                f'Input image incorrect size. Input image size is {array.shape[:2]:d},'
-                + f' but frame size is {self.display_data.main_window_size_y:d}x'
-                + f'{self.display_data.main_window_size_x:d}.'
+                f"Input image incorrect size. Input image size is {array.shape[:2]:d},"
+                + f" but frame size is {self.display_data.main_window_size_y:d}x"
+                + f"{self.display_data.main_window_size_x:d}."
             )
 
         # Format image
@@ -518,7 +518,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         """
         # Check image is RGB
         if np.ndim(array) != 3 or array.shape[2] != 3:
-            raise ValueError('Input array must have 3 dimensions and dimension 2 must be length 3.')
+            raise ValueError("Input array must have 3 dimensions and dimension 2 must be length 3.")
 
         # Check array is correct xy shape
         if (
@@ -526,9 +526,9 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
             or array.shape[1] != self.display_data.active_area_size_x
         ):
             raise ValueError(
-                f'Input image incorrect size. Input image size is {array.shape[:2]:d},'
-                + f' but frame size is {self.display_data.active_area_size_y:d}x'
-                + f'{self.display_data.active_area_size_x:d}.'
+                f"Input image incorrect size. Input image size is {array.shape[:2]:d},"
+                + f" but frame size is {self.display_data.active_area_size_y:d}x"
+                + f"{self.display_data.active_area_size_x:d}."
             )
 
         # Create black image and place array in correct position
@@ -565,11 +565,11 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         array[..., 2] = np.roll(array[..., 2], self.display_data.shift_blue_y, 0)
 
         # Format array into tkinter format
-        image = Image.fromarray(array, 'RGB')
+        image = Image.fromarray(array, "RGB")
         return ImageTk.PhotoImage(image)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = '') -> 'ImageProjection':
+    def load_from_hdf(cls, file: str, prefix: str = "") -> "ImageProjection":
         """Loads display_data from the given file into a new image_projection window. Assumes data is stored as: PREFIX + Folder/Field_1
 
         Parameters
@@ -591,7 +591,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
         # Open window
         return cls.in_new_window(display_data)
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """Saves image projection display_data parameters to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
@@ -626,7 +626,7 @@ class ImageProjection(hdf5_tools.HDF5_IO_Abstract):
     def _make_aruco_marker(self, width: int, id_: int) -> np.ndarray:
         """Returns NxMx3 aruco marker array"""
         # Define marker image
-        img_2d = np.ones((width, width), dtype='uint8') * self.display_data.projector_max_int
+        img_2d = np.ones((width, width), dtype="uint8") * self.display_data.projector_max_int
 
         # Create marker image
         aruco.generateImageMarker(self.aruco_dictionary, id_, width, img_2d)

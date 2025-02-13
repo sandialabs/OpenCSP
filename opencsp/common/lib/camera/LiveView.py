@@ -41,7 +41,7 @@ class LiveView(aph.AbstractPlotHandler):
         self.ax = self.fig.gca()
 
         # Create image object
-        self.im = self.ax.imshow(self.grab_frame(), cmap='gray')
+        self.im = self.ax.imshow(self.grab_frame(), cmap="gray")
 
         # Create animation object (must be defined to variable)
         self.anim = FuncAnimation(self.fig, self.update, interval=update_ms, cache_frame_data=False)
@@ -57,8 +57,8 @@ class LiveView(aph.AbstractPlotHandler):
         Closes window
 
         """
-        if event.key == 'escape':
-            print('Closing window')
+        if event.key == "escape":
+            print("Closing window")
         # always free the maptlotlib plot
         super().close()
 

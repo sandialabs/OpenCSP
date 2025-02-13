@@ -13,15 +13,15 @@ class test_CacheableImage(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         path, name, _ = ft.path_components(__file__)
-        cls.in_dir = ft.join(path, 'data/input', name.split('test_')[-1])
-        cls.out_dir = ft.join(path, 'data/output', name.split('test_')[-1])
+        cls.in_dir = ft.join(path, "data/input", name.split("test_")[-1])
+        cls.out_dir = ft.join(path, "data/output", name.split("test_")[-1])
         ft.create_directories_if_necessary(cls.in_dir)
         ft.create_directories_if_necessary(cls.out_dir)
-        ft.delete_files_in_directory(cls.out_dir, '*')
+        ft.delete_files_in_directory(cls.out_dir, "*")
         return super().setUpClass()
 
     def setUp(self) -> None:
-        self.test_name = self.id().split('.')[-1]
+        self.test_name = self.id().split(".")[-1]
 
         # example image with color quadrants r, g, b, y
         self.example_array = np.zeros((40, 40, 3), dtype=np.uint8)
@@ -353,5 +353,5 @@ class test_CacheableImage(unittest.TestCase):
         self.assertAlmostEqual(0, sys.getsizeof(ci1), delta=ci1._expected_cached_size)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

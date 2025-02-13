@@ -72,7 +72,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImageProcessor):
         # validate the input
         # if valid, then percentile_filter won't raise any issues
         if isinstance(desired_shape, tuple):
-            test_img = np.zeros(desired_shape, dtype='uint8')
+            test_img = np.zeros(desired_shape, dtype="uint8")
         else:
             test_img = np.zeros((desired_shape, desired_shape))
         filters.percentile_filter(test_img, 100, desired_shape)
@@ -259,7 +259,7 @@ class HotspotImageProcessor(AbstractSpotAnalysisImageProcessor):
 
                     self.has_scikit_image = True
 
-                    continuity_image = np.zeros(image.shape, 'uint8')
+                    continuity_image = np.zeros(image.shape, "uint8")
                     continuity_image[filtered_image == maxval] = 2
                     flooded_image = skimage.morphology.flood_fill(continuity_image, tuple(match_idxs[0]), 1)
                     if np.max(flooded_image) > 1:

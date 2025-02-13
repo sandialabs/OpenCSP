@@ -31,7 +31,7 @@ class CalibrationCameraPosition:
 
     def __init__(
         self, camera: Camera, pts_xyz_corners: Vxyz, ids_corners: ndarray, cal_image: ndarray
-    ) -> 'CalibrationCameraPosition':
+    ) -> "CalibrationCameraPosition":
         """Instantiates class
 
         Parameters
@@ -93,7 +93,7 @@ class CalibrationCameraPosition:
             self.pts_xyz_active_corner_locations.data.T, pts_img, self.camera.intrinsic_mat, self.camera.distortion_coef
         )
         if not ret:
-            raise ValueError('Camera calibration was not successful.')
+            raise ValueError("Camera calibration was not successful.")
 
         rvec: ndarray = rvec.squeeze()
         tvec: ndarray = tvec.squeeze()
@@ -102,9 +102,9 @@ class CalibrationCameraPosition:
         self.v_cam_screen_cam = Vxyz(tvec)
         self.v_cam_screen_screen = self.v_cam_screen_cam.rotate(self.rot_screen_cam.inv())
 
-        lt.info('Camera pose calculated:')
-        lt.info(f'rvec: {self.rot_screen_cam.as_rotvec()}')
-        lt.info(f'tvec: {self.v_cam_screen_screen.data.squeeze()}')
+        lt.info("Camera pose calculated:")
+        lt.info(f"rvec: {self.rot_screen_cam.as_rotvec()}")
+        lt.info(f"tvec: {self.v_cam_screen_screen.data.squeeze()}")
 
     def get_data(self) -> tuple[ndarray, ndarray]:
         """Returns rvec and tvec orienting camera to screen coordinates
@@ -124,9 +124,9 @@ class CalibrationCameraPosition:
         """Saves rvec/tvec as csv file"""
         rvec, tvec = self.get_data()
         data = np.vstack((rvec, tvec))
-        np.savetxt(file, data, delimiter=',', fmt='%.8f')
+        np.savetxt(file, data, delimiter=",", fmt="%.8f")
 
-        lt.info(f'Saved camera rvec and tvec to: {os.path.abspath(file):s}')
+        lt.info(f"Saved camera rvec and tvec to: {os.path.abspath(file):s}")
 
     def calculate_reprojection_error(self) -> None:
         """Calculates reprojection error"""
@@ -141,37 +141,37 @@ class CalibrationCameraPosition:
         )
 
         errors_mag: ndarray = np.sqrt((self.errors_reprojection_xy.data.T**2).sum(axis=1))
-        lt.info('Camera pose reprojection errors:')
-        lt.info(f'Mean error: {errors_mag.mean():.3f} pixels')
-        lt.info(f'STDEV of errors (N={errors_mag.size}): {errors_mag.std():.4f} pixels')
+        lt.info("Camera pose reprojection errors:")
+        lt.info(f"Mean error: {errors_mag.mean():.3f} pixels")
+        lt.info(f"STDEV of errors (N={errors_mag.size}): {errors_mag.std():.4f} pixels")
 
     def plot_found_corners(self) -> None:
         """Plots camera image and found corners"""
-        fig = plt.figure('CalibrationCameraPosition_Found_Markers')
+        fig = plt.figure("CalibrationCameraPosition_Found_Markers")
         self.figures.append(fig)
         ax = fig.gca()
 
-        ax.imshow(self.image, cmap='gray')
+        ax.imshow(self.image, cmap="gray")
         for id_, pts in zip(self.ids_marker, self.pts_xy_marker_corners_list):
-            plt.scatter(*pts.T, marker='+')
-            plt.text(*pts.mean(0).T + np.array([60, 0]), id_, backgroundcolor='white')
+            plt.scatter(*pts.T, marker="+")
+            plt.text(*pts.mean(0).T + np.array([60, 0]), id_, backgroundcolor="white")
 
     def plot_reprojection_error(self) -> None:
         """Plots reprojection error"""
-        fig = plt.figure('CalibrationCameraPosition_Reprojection_Error')
+        fig = plt.figure("CalibrationCameraPosition_Reprojection_Error")
         self.figures.append(fig)
         ax = fig.gca()
 
         pts_img = np.vstack(self.pts_xy_marker_corners_list)
 
-        ax.imshow(self.image, cmap='gray')
-        ax.scatter(*pts_img.T, edgecolor='green', facecolor='none', label='Image Points')
-        ax.scatter(*self.pts_xy_marker_corners_reprojected.data, marker='.', color='blue', label='Reprojected')
+        ax.imshow(self.image, cmap="gray")
+        ax.scatter(*pts_img.T, edgecolor="green", facecolor="none", label="Image Points")
+        ax.scatter(*self.pts_xy_marker_corners_reprojected.data, marker=".", color="blue", label="Reprojected")
         dx = self.errors_reprojection_xy.x
         dy = -self.errors_reprojection_xy.y
-        ax.quiver(*self.pts_xy_marker_corners_reprojected.data, dx, dy, label='Error', color='red')
+        ax.quiver(*self.pts_xy_marker_corners_reprojected.data, dx, dy, label="Error", color="red")
         ax.legend()
-        ax.axis('off')
+        ax.axis("off")
 
     def run_calibration(self) -> None:
         """Runs calibration sequence"""

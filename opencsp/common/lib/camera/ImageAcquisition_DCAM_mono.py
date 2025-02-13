@@ -11,7 +11,7 @@ import opencsp.common.lib.tool.log_tools as lt
 class ImageAcquisition(ImageAcquisitionAbstract):
     _has_checked_pypylon_version = False
 
-    def __init__(self, instance: int = 0, pixel_format: str = 'Mono8'):
+    def __init__(self, instance: int = 0, pixel_format: str = "Mono8"):
         """
         Class to control a Basler DCAM monochromatic camera. Grabs one frame
         at a time. The gain is initially set to the lowest possible value.
@@ -36,19 +36,19 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
         # Check that at least one camera is available
         if len(devices) == 0:
-            raise pylon.RuntimeException('No cameras found.')
+            raise pylon.RuntimeException("No cameras found.")
         else:
-            print(f'{len(devices):d} devices found.')
+            print(f"{len(devices):d} devices found.")
             for idx, device in enumerate(devices):
                 if idx == instance:
-                    print('--> ', end='')
+                    print("--> ", end="")
                 else:
-                    print('    ', end='')
+                    print("    ", end="")
                 print(device.GetFriendlyName())
 
         # Check number of instances
         if instance >= len(devices):
-            raise ValueError(f'Cannot load instance {instance:d}. Only {len(devices):d} devices found.')
+            raise ValueError(f"Cannot load instance {instance:d}. Only {len(devices):d} devices found.")
 
         # Connect to camera
         self.basler_index = instance
@@ -64,7 +64,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         super().__init__()
 
         # Set up device to single frame acquisition
-        self.cap.AcquisitionMode.SetValue('SingleFrame')
+        self.cap.AcquisitionMode.SetValue("SingleFrame")
 
         # Set pixel format
         self.cap.PixelFormat.SetValue(pixel_format)
@@ -79,14 +79,14 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         self._shutter_cal_values: np.ndarray = np.linspace(shutter_min, shutter_max, 2**13).astype(int)
 
         # Apply model-specific processing for Basler mono cameras
-        if devices[instance].GetModelName() == 'acA3088-16gm':
+        if devices[instance].GetModelName() == "acA3088-16gm":
             # If type acA3088-16gm, make sure shutter values are multiple of 25
             self._shutter_cal_values = (self._shutter_cal_values.astype(float) / 25).astype(int) * 25
 
     @classmethod
     def _check_pypylon_version(cls):
         if not cls._has_checked_pypylon_version:
-            pypylon_version = version('pypylon')
+            pypylon_version = version("pypylon")
             suggested_pypylon_version = "3.0"  # latest release as of 2024/03/21
 
             if pypylon_version < suggested_pypylon_version:
@@ -94,7 +94,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
                     "Warning in ImageAcquisition_DCAM_mono.py: "
                     + f"pypylon version {pypylon_version} is behind the suggested version {suggested_pypylon_version}. "
                     + "If you have trouble grabbing frames with the basler camera, try upgrading your version of pypylon "
-                    + "with \"python -m pip install --upgrade pypylon\"."
+                    + 'with "python -m pip install --upgrade pypylon".'
                 )
 
             cls._has_checked_pypylon_version = True
@@ -119,9 +119,9 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         for camera in possible_matches:
-            if not hasattr(camera, 'basler_index'):
+            if not hasattr(camera, "basler_index"):
                 continue
-            if getattr(camera, 'basler_index') == self.basler_index:
+            if getattr(camera, "basler_index") == self.basler_index:
                 return True
         return False
 
@@ -164,7 +164,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         if grabResult.GrabSucceeded():
             img = grabResult.Array
         else:
-            raise pylon.RuntimeException('Frame grab unsuccessful.')
+            raise pylon.RuntimeException("Frame grab unsuccessful.")
 
         # Wait for capturing to finish
         grabResult.Release()

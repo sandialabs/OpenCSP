@@ -22,7 +22,7 @@ class ParamsOpticGeometry(hdf5_tools.HDF5_IO_Abstract):
     facet_corns_refine_frac_keep: float = 0.5
     """The fraction of pixels to consider within search box when finding optic edges. (Default 0.5)"""
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsOpticGeometry/...
 
         Parameters
@@ -40,16 +40,16 @@ class ParamsOpticGeometry(hdf5_tools.HDF5_IO_Abstract):
             self.facet_corns_refine_frac_keep,
         ]
         datasets = [
-            prefix + 'ParamsOpticGeometry/perimeter_refine_axial_search_dist',
-            prefix + 'ParamsOpticGeometry/perimeter_refine_perpendicular_search_dist',
-            prefix + 'ParamsOpticGeometry/facet_corns_refine_step_length',
-            prefix + 'ParamsOpticGeometry/facet_corns_refine_perpendicular_search_dist',
-            prefix + 'ParamsOpticGeometry/facet_corns_refine_frac_keep',
+            prefix + "ParamsOpticGeometry/perimeter_refine_axial_search_dist",
+            prefix + "ParamsOpticGeometry/perimeter_refine_perpendicular_search_dist",
+            prefix + "ParamsOpticGeometry/facet_corns_refine_step_length",
+            prefix + "ParamsOpticGeometry/facet_corns_refine_perpendicular_search_dist",
+            prefix + "ParamsOpticGeometry/facet_corns_refine_frac_keep",
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = ''):
+    def load_from_hdf(cls, file: str, prefix: str = ""):
         """Loads data from given file. Assumes data is stored as: PREFIX + ParamsOpticGeometry/Field_1
 
         Parameters
@@ -61,11 +61,11 @@ class ParamsOpticGeometry(hdf5_tools.HDF5_IO_Abstract):
             Default is empty string ''.
         """
         datasets = [
-            prefix + 'ParamsOpticGeometry/perimeter_refine_axial_search_dist',
-            prefix + 'ParamsOpticGeometry/perimeter_refine_perpendicular_search_dist',
-            prefix + 'ParamsOpticGeometry/facet_corns_refine_step_length',
-            prefix + 'ParamsOpticGeometry/facet_corns_refine_perpendicular_search_dist',
-            prefix + 'ParamsOpticGeometry/facet_corns_refine_frac_keep',
+            prefix + "ParamsOpticGeometry/perimeter_refine_axial_search_dist",
+            prefix + "ParamsOpticGeometry/perimeter_refine_perpendicular_search_dist",
+            prefix + "ParamsOpticGeometry/facet_corns_refine_step_length",
+            prefix + "ParamsOpticGeometry/facet_corns_refine_perpendicular_search_dist",
+            prefix + "ParamsOpticGeometry/facet_corns_refine_frac_keep",
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         return cls(**data)

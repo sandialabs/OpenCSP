@@ -11,7 +11,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 def save_hdf5_datasets(data: list, datasets: list, file: str):
     """Saves data to HDF5 file"""
-    with h5py.File(file, 'a') as f:
+    with h5py.File(file, "a") as f:
         # Loop through datasets
         for d, dataset in zip(data, datasets):
             if dataset in f:
@@ -23,13 +23,13 @@ def save_hdf5_datasets(data: list, datasets: list, file: str):
 
 def load_hdf5_datasets(datasets: list, file: str):
     """Loads datasets from HDF5 file"""
-    with h5py.File(file, 'r') as f:
+    with h5py.File(file, "r") as f:
         kwargs: dict[str, str | h5py.Dataset] = {}
         # Loop through fields to retreive
         for dataset in datasets:
             # Get data and get dataset name
             data = f[dataset]
-            name = dataset.split('/')[-1]
+            name = dataset.split("/")[-1]
 
             # Format data shape
             if np.ndim(data) == 0 and np.size(data) == 1:
@@ -101,7 +101,7 @@ def get_groups_and_datasets(hdf5_path_name_ext: str | h5py.File):
 
     if isinstance(hdf5_path_name_ext, str):
         hdf5_path_name_ext = ft.norm_path(hdf5_path_name_ext)
-        with h5py.File(hdf5_path_name_ext, 'r') as fin:
+        with h5py.File(hdf5_path_name_ext, "r") as fin:
             fin.visititems(visitor)
     else:
         fin: h5py.File = hdf5_path_name_ext
@@ -125,7 +125,7 @@ def _create_dataset_path(base_dir: str, h5_dataset_path_name: str, dataset_ext: 
     return ft.norm_path(os.path.join(dataset_path, dataset_name + dataset_ext))
 
 
-def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format='npy'):
+def unzip(hdf5_path_name_ext: str, destination_dir: str, dataset_format="npy"):
     """Unpacks the given HDF5 file into the given destination directory.
 
     Unpacks the given HDF5 file into the given destination directory. A new
@@ -247,7 +247,7 @@ class HDF5_SaveAbstract(ABC):
     """Abstract class for saving to HDF5 format"""
 
     @abstractmethod
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
@@ -265,7 +265,7 @@ class HDF5_IO_Abstract(HDF5_SaveAbstract):
 
     @classmethod
     @abstractmethod
-    def load_from_hdf(cls, file: str, prefix: str = ''):
+    def load_from_hdf(cls, file: str, prefix: str = ""):
         """Loads data from given file. Assumes data is stored as: PREFIX + Folder/Field_1
 
         Parameters

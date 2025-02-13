@@ -17,7 +17,7 @@ class TestSystemSofastFixed(unittest.TestCase):
     @pytest.mark.no_xvfb
     def test_system(self):
         # Get test data location
-        file_im_proj = join(opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5')
+        file_im_proj = join(opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5")
 
         # Instantiate image projection class
         im_proj = ImageProjection.load_from_hdf(file_im_proj)
@@ -55,9 +55,9 @@ class TestSystemSofastFixed(unittest.TestCase):
         measurement = system.get_measurement(v_measure_point_facet, dist_optic_screen, origin)
 
 
-if __name__ == '__main__':
-    save_dir = join(dirname(__file__), 'data/output/system_fixed')
+if __name__ == "__main__":
+    save_dir = join(dirname(__file__), "data/output/system_fixed")
     ft.create_directories_if_necessary(save_dir)
-    lt.logger(join(save_dir, 'log.txt'), level=lt.log.DEBUG)
+    lt.logger(join(save_dir, "log.txt"), level=lt.log.DEBUG)
 
     unittest.main()

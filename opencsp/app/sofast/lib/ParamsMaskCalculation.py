@@ -21,7 +21,7 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
     keep_largest_area: bool = False
     """Flag to apply processing step that keeps only the largest mask area. (Default True)"""
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsMaskCalculation/...
 
         Parameters
@@ -33,16 +33,16 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
         """
         data = [self.hist_thresh, self.filt_width, self.filt_thresh, self.thresh_active_pixels, self.keep_largest_area]
         datasets = [
-            prefix + 'ParamsMaskCalculation/hist_thresh',
-            prefix + 'ParamsMaskCalculation/filt_width',
-            prefix + 'ParamsMaskCalculation/filt_thresh',
-            prefix + 'ParamsMaskCalculation/thresh_active_pixels',
-            prefix + 'ParamsMaskCalculation/keep_largest_area',
+            prefix + "ParamsMaskCalculation/hist_thresh",
+            prefix + "ParamsMaskCalculation/filt_width",
+            prefix + "ParamsMaskCalculation/filt_thresh",
+            prefix + "ParamsMaskCalculation/thresh_active_pixels",
+            prefix + "ParamsMaskCalculation/keep_largest_area",
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = ''):
+    def load_from_hdf(cls, file: str, prefix: str = ""):
         """Loads data from given file. Assumes data is stored as: PREFIX + ParamsMaskCalculation/Field_1
 
         Parameters
@@ -56,13 +56,13 @@ class ParamsMaskCalculation(hdf5_tools.HDF5_IO_Abstract):
 
         # Load sofast parameters
         datasets = [
-            prefix + 'ParamsMaskCalculation/hist_thresh',
-            prefix + 'ParamsMaskCalculation/filt_width',
-            prefix + 'ParamsMaskCalculation/filt_thresh',
-            prefix + 'ParamsMaskCalculation/thresh_active_pixels',
-            prefix + 'ParamsMaskCalculation/keep_largest_area',
+            prefix + "ParamsMaskCalculation/hist_thresh",
+            prefix + "ParamsMaskCalculation/filt_width",
+            prefix + "ParamsMaskCalculation/filt_thresh",
+            prefix + "ParamsMaskCalculation/thresh_active_pixels",
+            prefix + "ParamsMaskCalculation/keep_largest_area",
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
-        data['keep_largest_area'] = bool(data['keep_largest_area'])
+        data["keep_largest_area"] = bool(data["keep_largest_area"])
 
         return cls(**data)

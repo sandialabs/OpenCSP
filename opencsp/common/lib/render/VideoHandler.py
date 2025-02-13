@@ -246,7 +246,7 @@ class VideoHandler:
             cmd = self._build_ffmpeg_cmd(f"{time_arg}-i %INFILE% {ffmpeg_args}", paths)
 
             # Execute the ffmpeg command and create the frames.
-            lt.debug('In ConstructExtractedFrames.extract_frames()')
+            lt.debug("In ConstructExtractedFrames.extract_frames()")
             subt.run(cmd)
 
             # Count the number of extracted frames.
@@ -389,13 +389,13 @@ class VideoHandler:
             self.src_frames_dir, previous_frame_file
         )  # Already includes the extension.
         this_dir_body_ext = os.path.join(self.src_frames_dir, this_frame_file)  # Already includes the extension.
-        lt.debug('\nIn frames_are_identical(), loading image:', previous_dir_body_ext)
+        lt.debug("\nIn frames_are_identical(), loading image:", previous_dir_body_ext)
         previous_img = cv.imread(previous_dir_body_ext)
-        lt.debug('In frames_are_identical(), loading image:', this_dir_body_ext)
+        lt.debug("In frames_are_identical(), loading image:", this_dir_body_ext)
         this_img = cv.imread(this_dir_body_ext)
-        lt.debug('In frames_are_identical(), comparing images...')
+        lt.debug("In frames_are_identical(), comparing images...")
         identical = it.images_are_identical(previous_img, this_img, tolerance_image_pixel)
-        lt.debug('In frames_are_identical(), Done.  identical =', identical)
+        lt.debug("In frames_are_identical(), Done.  identical =", identical)
         # Return.
         return identical
 
@@ -428,9 +428,9 @@ class VideoHandler:
             str: The name of the temporary file.
         """
         fd, path_name_ext = ft.get_temporary_file(suffix=".txt", dir=tmp_dir)
-        with open(fd, 'w') as fout:
+        with open(fd, "w") as fout:
             fout.writelines(s + "\n" for s in str_vals)
-        with open(path_name_ext, 'r') as fin:
+        with open(path_name_ext, "r") as fin:
             lt.info("Temp file contents: " + fin.read())
         return path_name_ext
 
@@ -512,7 +512,7 @@ class VideoHandler:
                 lt.error_and_raise(RuntimeError, f"Could not find the frames directory '{self.src_frames_dir}'!")
             if len(frame_names) == 0:
                 return None
-            frame_names_msg = f" from frames [\"{frame_names[0]}\", ...]"
+            frame_names_msg = f' from frames ["{frame_names[0]}", ...]'
 
             # get the example image for determining width/height
             img0_dir_path_ext = os.path.join(self.src_frames_dir, frame_names[0])
@@ -525,7 +525,7 @@ class VideoHandler:
             return self.dst_video_dir_name_ext
         except Exception:
             lt.error(
-                f"Error: in VideoHandler.frames_to_video: failed to create video \"{self.dst_video_dir_name_ext}\"{frame_names_msg}"
+                f'Error: in VideoHandler.frames_to_video: failed to create video "{self.dst_video_dir_name_ext}"{frame_names_msg}'
             )
             raise
 

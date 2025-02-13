@@ -54,7 +54,7 @@ class LightPathEnsemble:
     def __len__(self):
         return len(self.points_lists)
 
-    def __iadd__(self, lpe: 'LightPathEnsemble'):
+    def __iadd__(self, lpe: "LightPathEnsemble"):
         """Alias for concatenate-in_place."""
         return self.concatenate_in_place(lpe)
 
@@ -128,7 +128,7 @@ class LightPathEnsemble:
 
         self.current_directions = new_current_directions  # update the current directions
 
-    def concatenate_in_place(self: 'LightPathEnsemble', lpe1: 'LightPathEnsemble'):
+    def concatenate_in_place(self: "LightPathEnsemble", lpe1: "LightPathEnsemble"):
         """
         Concatenates another LightPathEnsemble into this one in place.
 
@@ -165,11 +165,11 @@ class LightPathEnsemble:
             lps.append(lp)
         return lps
 
-    def __add__(self, lpe: 'LightPathEnsemble'):
+    def __add__(self, lpe: "LightPathEnsemble"):
         """Alias for concatenate-in_place."""
         return self.concatenate(lpe)
 
-    def concatenate(self: 'LightPathEnsemble', lpe1: 'LightPathEnsemble'):
+    def concatenate(self: "LightPathEnsemble", lpe1: "LightPathEnsemble"):
         """
         Concatenates another LightPathEnsemble and returns a new instance.
 

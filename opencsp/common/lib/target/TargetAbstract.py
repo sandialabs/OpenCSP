@@ -29,7 +29,7 @@ class TargetAbstract(ABC):
         self.image = ti.construct_target_image(self.image_width, self.image_height, self.dpm)
         # Set initial pattern.
         # ?? SCAFFOLDING RCB -- RENAME THIS VARIABLE TO "NAME"?  SEE splice_targets_above_below() FOR MAYBE REASON WHY
-        self.pattern_description = 'blank'
+        self.pattern_description = "blank"
 
     # ACCESS
 
@@ -45,25 +45,25 @@ class TargetAbstract(ABC):
         return n_rows, n_cols, n_bands
 
     def image_size_str_meter(self) -> str:
-        return 'w{w:.3f}m_h{h:.3f}m_{dpm:.1f}dpm'.format(w=self.image_width, h=self.image_height, dpm=round(self.dpm))
+        return "w{w:.3f}m_h{h:.3f}m_{dpm:.1f}dpm".format(w=self.image_width, h=self.image_height, dpm=round(self.dpm))
 
     def image_size_str_inch(self) -> str:
-        return 'w{w:.3f}in_h{h:.3f}in_{dpi:d}dpi'.format(
+        return "w{w:.3f}in_h{h:.3f}in_{dpi:d}dpi".format(
             w=uc.meter_to_inch(self.image_width),
             h=uc.meter_to_inch(self.image_height),
             dpi=round(uc.dpm_to_dpi(self.dpm)),
         )
 
     def description_meter(self) -> str:
-        return self.pattern_description + '__' + self.image_size_str_meter()
+        return self.pattern_description + "__" + self.image_size_str_meter()
 
     def description_inch(self) -> str:
-        return self.pattern_description + '__' + self.image_size_str_inch()
+        return self.pattern_description + "__" + self.image_size_str_inch()
 
     # MODIFICATION
 
     def set_pattern_description(self, description: str) -> None:
-        self.pattern_description = 'blank'
+        self.pattern_description = "blank"
 
     # ?? SCAFFOLDING RCB -- ASK TRISTAN ABOUT THIS
     # @abstractmethod   # ?? SCAFFOLDING RCB -- FILL THIS IN

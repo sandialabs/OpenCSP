@@ -8,54 +8,54 @@ import opencsp.common.lib.process.ParallelPartitioner as ppart
 class TestParallelPartitioner(unittest.TestCase):
     def test_S1s0C1c0_list1(self):
         partitioner = ppart.ParallelPartitioner(nservers=1, server_idx=0, ncpus=1, cpu_idx=0)
-        data = ['a']
+        data = ["a"]
         portion = partitioner.get_my_portion(data)
         self.assertEqual(portion, data)
 
     def test_S1s0C1c0_list1000(self):
         partitioner = ppart.ParallelPartitioner(nservers=1, server_idx=0, ncpus=1, cpu_idx=0)
-        data = ['a'] * 1000
+        data = ["a"] * 1000
         portion = partitioner.get_my_portion(data)
         self.assertEqual(len(portion), 1000)
         self.assertEqual(portion, data)
 
     def test_S2s0C1c0_list1(self):
         partitioner = ppart.ParallelPartitioner(nservers=2, server_idx=0, ncpus=1, cpu_idx=0)
-        data = ['a']
+        data = ["a"]
         portion = partitioner.get_my_portion(data)
         self.assertEqual(portion, [])
 
     def test_S2s1C1c0_list1(self):
         partitioner = ppart.ParallelPartitioner(nservers=2, server_idx=1, ncpus=1, cpu_idx=0)
-        data = ['a']
+        data = ["a"]
         portion = partitioner.get_my_portion(data)
         self.assertEqual(portion, data)
 
     def test_S2s0C1c0_list2(self):
         partitioner = ppart.ParallelPartitioner(nservers=2, server_idx=0, ncpus=1, cpu_idx=0)
-        data = ['a', 'b']
+        data = ["a", "b"]
         portion = partitioner.get_my_portion(data)
-        self.assertEqual(portion, ['a'])
+        self.assertEqual(portion, ["a"])
 
     def test_S2s1C1c0_list2(self):
         partitioner = ppart.ParallelPartitioner(nservers=2, server_idx=1, ncpus=1, cpu_idx=0)
-        data = ['a', 'b']
+        data = ["a", "b"]
         portion = partitioner.get_my_portion(data)
-        self.assertEqual(portion, ['b'])
+        self.assertEqual(portion, ["b"])
 
     def test_S2s0C1c0_list1000(self):
         partitioner = ppart.ParallelPartitioner(nservers=2, server_idx=0, ncpus=1, cpu_idx=0)
-        data = (['a'] * 500) + (['b'] * 500)
+        data = (["a"] * 500) + (["b"] * 500)
         portion = partitioner.get_my_portion(data)
         self.assertEqual(len(portion), 500)
-        self.assertEqual(portion, ['a'] * 500)
+        self.assertEqual(portion, ["a"] * 500)
 
     def test_S2s1C1c0_list1000(self):
         partitioner = ppart.ParallelPartitioner(nservers=2, server_idx=1, ncpus=1, cpu_idx=0)
-        data = (['a'] * 500) + (['b'] * 500)
+        data = (["a"] * 500) + (["b"] * 500)
         portion = partitioner.get_my_portion(data)
         self.assertEqual(len(portion), 500)
-        self.assertEqual(portion, ['b'] * 500)
+        self.assertEqual(portion, ["b"] * 500)
 
     def test_S50ssC1c0_list25000(self):
         alphabet = []
@@ -96,5 +96,5 @@ class TestParallelPartitioner(unittest.TestCase):
             self.assertListEqual(data, data_portioned)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

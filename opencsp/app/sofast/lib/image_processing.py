@@ -66,7 +66,7 @@ def calc_mask_raw(
             if len(peaks) == 2:
                 break
         if len(peaks) != 2:
-            raise ValueError('Not enough distinction between dark and light pixels in mask images.')
+            raise ValueError("Not enough distinction between dark and light pixels in mask images.")
 
         # Calculate minimum between two peaks
         idx_hist_min = np.argmin(hist[peaks[0] : peaks[1]]) + peaks[0]
@@ -89,7 +89,7 @@ def calc_mask_raw(
     # Check for enough active pixels
     thresh_active_pixels = int(mask_raw.size * thresh_active_pixels)
     if mask_raw.sum() < thresh_active_pixels:
-        lt.error_and_raise(ValueError, f'Mask contains less than {thresh_active_pixels:d} active pixels.')
+        lt.error_and_raise(ValueError, f"Mask contains less than {thresh_active_pixels:d} active pixels.")
 
     # Return raw, unprocessed mask
     return mask_raw

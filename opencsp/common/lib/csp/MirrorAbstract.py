@@ -210,7 +210,7 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
 
     # TODO this should use the Resolution class not an int and a string
     def survey_of_points_local(
-        self, resolution: int, resolution_type: str = 'pixelX', random_seed: int | None = None
+        self, resolution: int, resolution_type: str = "pixelX", random_seed: int | None = None
     ) -> tuple[Pxyz, Vxyz]:
         """Returns a set of points sampled from inside the optic region in
         the mirror's base coordinate reference frame.
@@ -247,7 +247,7 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
         """
         # Check vectors are 1 dimensional
         if (np.ndim(x_vec) != 1) or (np.ndim(y_vec) != 1):
-            raise ValueError(f'X and Y vectors must be 1d, but had shapes: {x_vec.shape}, {y_vec.shape}.')
+            raise ValueError(f"X and Y vectors must be 1d, but had shapes: {x_vec.shape}, {y_vec.shape}.")
 
         # Create interpolation axes
         x_mat, y_mat = np.meshgrid(x_vec, y_vec)  # meters
@@ -312,7 +312,7 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
         # Draw surface normals
         if mirror_style.surface_normals:
             # Get sample points and normals
-            points, normals = self.survey_of_points_local(mirror_style.norm_res, 'pixelX', None)  # mirror coordinates
+            points, normals = self.survey_of_points_local(mirror_style.norm_res, "pixelX", None)  # mirror coordinates
             points = transform.apply(points)  # current reference frame
             normals.rotate_in_place(transform.R)  # current reference frame
 

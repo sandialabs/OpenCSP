@@ -8,7 +8,7 @@ class EdgeXY:
     Representation of a 2D edge.
     """
 
-    def __init__(self, vertices: Vxy, curve_data: dict = {'type': 'line'}, closed: bool = False):
+    def __init__(self, vertices: Vxy, curve_data: dict = {"type": "line"}, closed: bool = False):
         """
         Representation of a 2D edge.
 
@@ -28,9 +28,9 @@ class EdgeXY:
         """
         # Check inputs
         if len(vertices) != 2:
-            raise ValueError('Input vertices must have length 2, not {:d}.'.format(len(vertices)))
+            raise ValueError("Input vertices must have length 2, not {:d}.".format(len(vertices)))
         if closed is True:
-            raise NotImplementedError('Curves that are not closed are not currently supported.')
+            raise NotImplementedError("Curves that are not closed are not currently supported.")
 
         # Save properties
         self._vertices = vertices
@@ -38,10 +38,10 @@ class EdgeXY:
         self._closed = closed
 
         # Create curve objects
-        if curve_data['type'] == 'line':
+        if curve_data["type"] == "line":
             self._curve = LineXY.from_two_points(vertices[0], vertices[1])
         else:
-            raise ValueError('Curve type {:s} not currently supported.'.format(curve_data['type']))
+            raise ValueError("Curve type {:s} not currently supported.".format(curve_data["type"]))
 
     @property
     def vertices(self) -> Vxy:
@@ -73,16 +73,16 @@ class EdgeXY:
 
         count must be greater than or equal to 2. egde.sample(2) should be the same as edge.vertices
         """
-        if self._curve_data['type'] == 'line':
+        if self._curve_data["type"] == "line":
             if count <= 2:
-                raise ValueError('count must an integer greater than or equal to 2.')
+                raise ValueError("count must an integer greater than or equal to 2.")
             v = self._vertices
             xs, ys = v.x, v.y
             xs = np.linspace(xs[0], xs[1], count)
             ys = np.linspace(ys[0], ys[1], count)
             return Vxy(np.array([xs, ys]))
         else:
-            raise NotImplementedError('EdgeXY.sample only supports line edges.')
+            raise NotImplementedError("EdgeXY.sample only supports line edges.")
 
     def flip(self):
         """

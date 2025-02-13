@@ -18,7 +18,7 @@ import opencsp.common.lib.tool.log_tools as lt
 class SofastConfiguration:
     """Class for analyzing the configuration of a Sofast setup/measurement."""
 
-    def __init__(self) -> 'SofastConfiguration':
+    def __init__(self) -> "SofastConfiguration":
         self.data_sofast_object: ProcessSofastFringe | ProcessSofastFixed = None
         self._is_fringe = None
         self._is_fixed = None
@@ -101,10 +101,10 @@ class SofastConfiguration:
 
             stats.append(
                 {
-                    'delta_x_sample_points_average': dx_avg,
-                    'delta_y_sample_points_average': dy_avg,
-                    'number_samples': num_samps,
-                    'focal_lengths_parabolic_xy': focal_lengths_xy,
+                    "delta_x_sample_points_average": dx_avg,
+                    "delta_y_sample_points_average": dy_avg,
+                    "number_samples": num_samps,
+                    "focal_lengths_parabolic_xy": focal_lengths_xy,
                 }
             )
 
@@ -143,8 +143,8 @@ class SofastConfiguration:
 
         # Get axes
         if ax is None:
-            ax = plt.figure().add_subplot(projection='3d')
-        ax.view_init(-15, 135, roll=180, vertical_axis='y')
+            ax = plt.figure().add_subplot(projection="3d")
+        ax.view_init(-15, 135, roll=180, vertical_axis="y")
 
         # Calculate camera position
         v_screen_cam_screen = -orientation.v_cam_screen_screen
@@ -222,60 +222,60 @@ class SofastConfiguration:
         y = p_screen_cent.y[0]
         z = p_screen_cent.z[0]
         # Screen X axis
-        ax.plot([x, x + lx1], [y, y], [z, z], color='red')
-        ax.plot([x, x + lx2], [y, y], [z, z], color='black')
-        ax.text(x + lx1, y, z, 'x')
+        ax.plot([x, x + lx1], [y, y], [z, z], color="red")
+        ax.plot([x, x + lx2], [y, y], [z, z], color="black")
+        ax.text(x + lx1, y, z, "x")
         # Screen Y axis
-        ax.plot([x, x], [y, y + ly1], [z, z], color='green')
-        ax.plot([x, x], [y, y + ly2], [z, z], color='black')
-        ax.text(x, y + ly1, z, 'y')
+        ax.plot([x, x], [y, y + ly1], [z, z], color="green")
+        ax.plot([x, x], [y, y + ly2], [z, z], color="black")
+        ax.text(x, y + ly1, z, "y")
         # Screen Z axis
-        ax.plot([x, x], [y, y], [z, z + lz1], color='blue')
-        ax.plot([x, x], [y, y], [z, z + lz2], color='black')
-        ax.text(x, y, z + lz1, 'z')
+        ax.plot([x, x], [y, y], [z, z + lz1], color="blue")
+        ax.plot([x, x], [y, y], [z, z + lz2], color="black")
+        ax.text(x, y, z + lz1, "z")
 
         if self._is_fixed:
             # Add screen points
-            ax.scatter(*p_screen_outline.data, marker='.', alpha=0.5, color='blue', label='Screen Points')
+            ax.scatter(*p_screen_outline.data, marker=".", alpha=0.5, color="blue", label="Screen Points")
         else:
             # Add screen outline
-            ax.plot(*p_screen_outline.data, color='red', label='Screen Outline')
+            ax.plot(*p_screen_outline.data, color="red", label="Screen Outline")
 
         # Add camera position origin
-        ax.scatter(*v_screen_cam_screen.data, color='black')
-        ax.text(*v_screen_cam_screen.data.squeeze(), 'camera')
+        ax.scatter(*v_screen_cam_screen.data, color="black")
+        ax.text(*v_screen_cam_screen.data.squeeze(), "camera")
 
         # Add camera XYZ axes
-        ax.plot(*v_cam_x_screen.data, color='red')
-        ax.text(*v_cam_x_screen[1].data.squeeze(), 'x', color='blue')
-        ax.plot(*v_cam_y_screen.data, color='green')
-        ax.text(*v_cam_y_screen[1].data.squeeze(), 'y', color='blue')
-        ax.plot(*v_cam_z_screen.data, color='blue')
-        ax.text(*v_cam_z_screen[1].data.squeeze(), 'z', color='blue')
+        ax.plot(*v_cam_x_screen.data, color="red")
+        ax.text(*v_cam_x_screen[1].data.squeeze(), "x", color="blue")
+        ax.plot(*v_cam_y_screen.data, color="green")
+        ax.text(*v_cam_y_screen[1].data.squeeze(), "y", color="blue")
+        ax.plot(*v_cam_z_screen.data, color="blue")
+        ax.text(*v_cam_z_screen[1].data.squeeze(), "z", color="blue")
 
         # Add camera FOV bounding box
         ax.plot(*v_cam_fov_screen.data)
 
         if v_screen_object_screen is not None:
             # Add object position origin
-            ax.scatter(*v_screen_object_screen.data, color='black')
-            ax.text(*v_screen_object_screen.data.squeeze(), 'object')
+            ax.scatter(*v_screen_object_screen.data, color="black")
+            ax.text(*v_screen_object_screen.data.squeeze(), "object")
 
             # Add object XYZ axes
-            ax.plot(*v_obj_x_screen.data, color='red')
-            ax.text(*v_obj_x_screen[1].data.squeeze(), 'x', color='blue')
-            ax.plot(*v_obj_y_screen.data, color='green')
-            ax.text(*v_obj_y_screen[1].data.squeeze(), 'y', color='blue')
-            ax.plot(*v_obj_z_screen.data, color='blue')
-            ax.text(*v_obj_z_screen[1].data.squeeze(), 'z', color='blue')
+            ax.plot(*v_obj_x_screen.data, color="red")
+            ax.text(*v_obj_x_screen[1].data.squeeze(), "x", color="blue")
+            ax.plot(*v_obj_y_screen.data, color="green")
+            ax.text(*v_obj_y_screen[1].data.squeeze(), "y", color="blue")
+            ax.plot(*v_obj_z_screen.data, color="blue")
+            ax.text(*v_obj_z_screen[1].data.squeeze(), "z", color="blue")
 
         # Format and show
-        plt.title('SOFAST Physical Setup\n(Screen Coordinates)')
-        ax.set_xlabel('X (meters)')
-        ax.set_ylabel('Y (meters)')
-        ax.set_zlabel('Z (meters)')
-        plt.axis('equal')
+        plt.title("SOFAST Physical Setup\n(Screen Coordinates)")
+        ax.set_xlabel("X (meters)")
+        ax.set_ylabel("Y (meters)")
+        ax.set_zlabel("Z (meters)")
+        plt.axis("equal")
 
     def _check_sofast_object_loaded(self) -> bool:
         if self.data_sofast_object is None:
-            lt.error_and_raise(ValueError, 'ProcessSofast object not loaded. Use self.load_sofast_object() first.')
+            lt.error_and_raise(ValueError, "ProcessSofast object not loaded. Use self.load_sofast_object() first.")

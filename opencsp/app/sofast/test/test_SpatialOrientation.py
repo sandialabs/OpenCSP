@@ -17,22 +17,22 @@ class TestSpatialOrientation(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        base_dir = join(opencsp_code_dir(), 'test/data/sofast_fringe')
+        base_dir = join(opencsp_code_dir(), "test/data/sofast_fringe")
 
         # Define test data files for single facet processing
-        data_file_facet = join(base_dir, 'data_expected_facet/data.h5')
+        data_file_facet = join(base_dir, "data_expected_facet/data.h5")
 
         # Load data
         datasets = [
-            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
-            'DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2',
+            "DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1",
+            "DataSofastCalculation/general/CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2",
         ]
 
         ori = SpatialOrientation.load_from_hdf(data_file_facet)
 
         data = load_hdf5_datasets(datasets, data_file_facet)
-        r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1']).inv()
-        v_cam_optic_cam = Vxyz(data['v_cam_optic_cam_refine_2'])
+        r_cam_optic = Rotation.from_rotvec(data["r_optic_cam_refine_1"]).inv()
+        v_cam_optic_cam = Vxyz(data["v_cam_optic_cam_refine_2"])
 
         ori.orient_optic_cam(r_cam_optic, v_cam_optic_cam)
 
@@ -40,7 +40,7 @@ class TestSpatialOrientation(unittest.TestCase):
         cls.so = ori
 
         # Set up save path
-        cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/spatial_orientation')
+        cls.save_dir = join(opencsp_code_dir(), "app/sofast/test/data/output/spatial_orientation")
         ft.create_directories_if_necessary(cls.save_dir)
 
     def test_translation_ring_1(self):
@@ -72,7 +72,7 @@ class TestSpatialOrientation(unittest.TestCase):
         np.testing.assert_allclose(I_exp, I_calc.as_matrix(), atol=1e-9, rtol=0)
 
     def test_io_oriented_optic(self):
-        file = join(self.save_dir, 'test_spatial_orientation_oriented_optic.h5')
+        file = join(self.save_dir, "test_spatial_orientation_oriented_optic.h5")
         # Save
         self.so.save_to_hdf(file)
         # Load
@@ -81,7 +81,7 @@ class TestSpatialOrientation(unittest.TestCase):
         self.assertEqual(ori.optic_oriented, True)
 
     def test_io_unoriented_optic(self):
-        file = join(self.save_dir, 'test_spatial_orientation_unoriented_optic.h5')
+        file = join(self.save_dir, "test_spatial_orientation_unoriented_optic.h5")
         # Save
         r_cam_screen = self.so.r_cam_screen
         v_cam_screen_cam = self.so.v_cam_screen_cam
@@ -94,5 +94,5 @@ class TestSpatialOrientation(unittest.TestCase):
         self.assertEqual(ori_2.optic_oriented, False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

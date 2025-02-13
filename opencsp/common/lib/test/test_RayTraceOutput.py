@@ -63,8 +63,8 @@ class TestRayTraceOutput(to.TestOutput):
     @classmethod
     def setUpClass(
         cls,
-        source_file_body: str = 'TestRayTraceOutput',  # Set these here, because pytest calls
-        figure_prefix_root: str = 'trto',  # setup_class() with no arguments.
+        source_file_body: str = "TestRayTraceOutput",  # Set these here, because pytest calls
+        figure_prefix_root: str = "trto",  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
@@ -86,34 +86,34 @@ class TestRayTraceOutput(to.TestOutput):
         self.m1_len_y = 3.0  # m
         self.m1_rectangle_xy = (self.m1_len_x, self.m1_len_y)
         self.m1 = MirrorParametricRectangular(self.m1_fxn, self.m1_rectangle_xy)
-        self.m1_shape_description = 'rectangle ' + str(self.m1_len_x) + 'm x ' + str(self.m1_len_y) + 'm'
-        self.m1_title = 'Mirror (' + self.m1_shape_description + ', f=' + str(self.m1_focal_length) + 'm), Face Up'
+        self.m1_shape_description = "rectangle " + str(self.m1_len_x) + "m x " + str(self.m1_len_y) + "m"
+        self.m1_title = "Mirror (" + self.m1_shape_description + ", f=" + str(self.m1_focal_length) + "m), Face Up"
         self.m1_caption = (
-            'A single mirror of shape ('
+            "A single mirror of shape ("
             + self.m1_shape_description
-            + '), analytically defined with focal length f='
+            + "), analytically defined with focal length f="
             + str(self.m1_focal_length)
-            + 'm.'
+            + "m."
         )
         self.m1_comments = []
 
         # Facet, based on a parameteric mirror.
-        self.f1 = Facet(self.m1, '1')
-        self.f1_title = 'Facet, from ' + self.m1_title
+        self.f1 = Facet(self.m1, "1")
+        self.f1_title = "Facet, from " + self.m1_title
         self.f1_caption = (
-            'A facet defined from a parameteric mirror of shape ('
+            "A facet defined from a parameteric mirror of shape ("
             + self.m1_shape_description
-            + '), with focal length f='
+            + "), with focal length f="
             + str(self.m1_focal_length)
-            + 'm.'
+            + "m."
         )
         self.f1_comments = []
 
         # Simple 2x2 heliostat, with parameteric facets.
-        self.h2x2_f1 = Facet(copy.deepcopy(self.m1), '1')
-        self.h2x2_f2 = Facet(copy.deepcopy(self.m1), '2')
-        self.h2x2_f3 = Facet(copy.deepcopy(self.m1), '3')
-        self.h2x2_f4 = Facet(copy.deepcopy(self.m1), '4')
+        self.h2x2_f1 = Facet(copy.deepcopy(self.m1), "1")
+        self.h2x2_f2 = Facet(copy.deepcopy(self.m1), "2")
+        self.h2x2_f3 = Facet(copy.deepcopy(self.m1), "3")
+        self.h2x2_f4 = Facet(copy.deepcopy(self.m1), "4")
 
         # Set canting angles.
         cos5 = np.cos(np.deg2rad(8))
@@ -131,30 +131,30 @@ class TestRayTraceOutput(to.TestOutput):
         fe2x2_positions = Pxyz([[-1.1, 1.1, -1.1, 1.1], [1.6, 1.6, -1.6, -1.6], [0, 0, 0, 0]])
         self.fe2x2.set_facet_positions(fe2x2_positions)
         self.fe2x2.set_facet_cantings(self.h2x2_canting)
-        self.h2x2 = HeliostatAzEl(self.fe2x2, 'Simple 2x2 Heliostat')
+        self.h2x2 = HeliostatAzEl(self.fe2x2, "Simple 2x2 Heliostat")
         self.h2x2.pivot = 0
-        self.h2x2_title = 'Heliostat with Parametrically Defined Facets'
+        self.h2x2_title = "Heliostat with Parametrically Defined Facets"
         self.h2x2_caption = (
-            'Heliostat with four facets ('
+            "Heliostat with four facets ("
             + self.m1_shape_description
-            + '), with focal length f='
+            + "), with focal length f="
             + str(self.m1_focal_length)
-            + 'm.'
+            + "m."
         )
         self.h2x2_comments = []
 
         # Simple solar field, with two simple heliostats.
         # self.sf2x2_h1 = HeliostatAzEl('Heliostat 1', [0, 0, 0], 4, 2, 2, copy.deepcopy(self.h2x2_facets), 4.02, 0.1778)
         # self.sf2x2_h2 = HeliostatAzEl('Heliostat 2', [0, 10, 0], 4, 2, 2, copy.deepcopy(self.h2x2_facets), 4.02, 0.1778)
-        self.sf2x2_h1 = HeliostatAzEl(copy.deepcopy(self.fe2x2), 'Heliostat 1')
-        self.sf2x2_h2 = HeliostatAzEl(copy.deepcopy(self.fe2x2), 'Heliostat 2')
+        self.sf2x2_h1 = HeliostatAzEl(copy.deepcopy(self.fe2x2), "Heliostat 1")
+        self.sf2x2_h2 = HeliostatAzEl(copy.deepcopy(self.fe2x2), "Heliostat 2")
         self.sf2x2_heliostats = [self.sf2x2_h1, self.sf2x2_h2]
-        self.sf2x2 = SolarField(self.sf2x2_heliostats, [-106.509606, 34.962276], 'Test Field', 'test')
+        self.sf2x2 = SolarField(self.sf2x2_heliostats, [-106.509606, 34.962276], "Test Field", "test")
         h1_pos = Pxyz([0, 0, 0])
         h2_pos = Pxyz([0, 10, 0])
         self.sf2x2.set_heliostat_positions(Pxyz.merge([h1_pos, h2_pos]))
-        self.sf2x2_title = 'Two Heliostats'
-        self.sf2x2_caption = 'Two 4-facet heliostats, tracking.'
+        self.sf2x2_title = "Two Heliostats"
+        self.sf2x2_caption = "Two 4-facet heliostats, tracking."
         self.sf2x2_comments = []
 
     def lambda_symmetric_paraboloid(self, focal_length: float) -> Callable[[float, float], float]:
@@ -192,7 +192,7 @@ class TestRayTraceOutput(to.TestOutput):
         incoming_vector = Vxyz([0, 1, -1])
         ref_vec = rt.calc_reflected_ray(normal_vector, incoming_vector)
         ray = LightPath(points, incoming_vector, ref_vec)
-        light_path_control = RenderControlLightPath(line_render_control=rcps.RenderControlPointSeq(color='y'))
+        light_path_control = RenderControlLightPath(line_render_control=rcps.RenderControlPointSeq(color="y"))
         ray.draw(view, light_path_control)
 
         # Output.
@@ -208,7 +208,7 @@ class TestRayTraceOutput(to.TestOutput):
         m1 = MirrorParametricRectangular(fn, (2, 2))
 
         rot_id = Rotation.identity()
-        rot_45_deg = Rotation.from_euler('x', 45, degrees=True)
+        rot_45_deg = Rotation.from_euler("x", 45, degrees=True)
 
         light_path_control = RenderControlLightPath(current_length=4)
         mirror_control = rcm.RenderControlMirror()
@@ -442,7 +442,7 @@ class TestRayTraceOutput(to.TestOutput):
             def _draw_helper(view: View3d) -> None:
                 sf1.draw(view, solar_field_style)
                 trace.draw(view, trace_control)
-                aimpoint_xyz.draw_points(view, style=rcps.marker(color='tab:orange'))
+                aimpoint_xyz.draw_points(view, style=rcps.marker(color="tab:orange"))
 
                 # debug
                 heliostat_origin = sf1.heliostats[0].self_to_global_tranformation.apply(Pxyz.origin())
@@ -513,21 +513,21 @@ class TestRayTraceOutput(to.TestOutput):
         view = fig_record.view
 
         heliostat_list = [
-            '5E10',
-            '5E9',
-            '5E8',
-            '5E7',
-            '5E6',
-            '5E5',
-            '5E4',
-            '5E3',
-            '5E2',
-            '5E1',
-            '5W1',
-            '5W2',
-            '5W3',
-            '5W4',
-            '5W5',
+            "5E10",
+            "5E9",
+            "5E8",
+            "5E7",
+            "5E6",
+            "5E5",
+            "5E4",
+            "5E3",
+            "5E2",
+            "5E1",
+            "5W1",
+            "5W2",
+            "5W3",
+            "5W4",
+            "5W5",
         ]
 
         # SOLAR FIELD SETUP
@@ -573,7 +573,7 @@ class TestRayTraceOutput(to.TestOutput):
         trace = rt.trace_scene(scene, Resolution.center(), verbose=False)
         trace.draw(view, RenderControlRayTrace(RenderControlLightPath(15, 200)))
 
-        aimpoint_xyz.draw_points(view, rcps.RenderControlPointSeq(color='orange', marker='.'))
+        aimpoint_xyz.draw_points(view, rcps.RenderControlPointSeq(color="orange", marker="."))
 
         self.show_save_and_check_figure(fig_record)
 
@@ -592,14 +592,14 @@ if __name__ == "__main__":
     test_object.setUpClass(interactive=interactive, verify=verify)
     test_object.setUp()
     # Tests.
-    lt.info('Beginning tests...')
+    lt.info("Beginning tests...")
     test_object.test_draw_simple_ray()
     test_object.test_mirror_trace()
     test_object.test_heliostat_trace()
     test_object.test_changing_time_of_day()
     test_object.test_partial_field_trace()
 
-    lt.info('All tests complete.')
+    lt.info("All tests complete.")
     # Cleanup.
     if interactive:
         input("Press Enter...")

@@ -24,7 +24,7 @@ def opencsp_code_dir():
 def opencsp_doc_dir():
     """The directory containing the opencsp documentation."""
     return os.path.join(
-        opencsp_code_dir(), '..', 'doc'
+        opencsp_code_dir(), "..", "doc"
     )  # TODO BGB: will this always live next to the 'opencsp' directory?
 
 
@@ -33,7 +33,7 @@ def opencsp_large_data_example_dir():
     example_data_dir: str = opencsp_settings["opencsp_root_path"]["large_data_example_dir"]
     if example_data_dir != None:
         return example_data_dir
-    return os.path.join(opencsp_code_dir(), '..', 'opencsp_data_example')
+    return os.path.join(opencsp_code_dir(), "..", "opencsp_data_example")
 
 
 def opencsp_example_dir():
@@ -41,7 +41,7 @@ def opencsp_example_dir():
     example_data_dir: str = opencsp_settings["opencsp_root_path"]["example_dir"]
     if example_data_dir != None:
         return example_data_dir
-    return os.path.join(opencsp_code_dir(), '..', 'example')
+    return os.path.join(opencsp_code_dir(), "..", "example")
 
 
 def opencsp_data_test_dir():
@@ -65,7 +65,7 @@ def opencsp_scratch_dir(project_dir=None) -> str:
     if os.name == "nt":
         # Check for a scratch mirror directory on the user's computer.
         actual_scratch_dir = os.path.join(
-            opencsp_code_dir(), '..', opencsp_settings["opencsp_root_path"]["scratch_name"]
+            opencsp_code_dir(), "..", opencsp_settings["opencsp_root_path"]["scratch_name"]
         )
         actual_scratch_dir = (
             actual_scratch_dir if project_dir == None else os.path.join(actual_scratch_dir, project_dir)

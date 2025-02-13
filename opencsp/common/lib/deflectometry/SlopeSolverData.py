@@ -19,7 +19,7 @@ class SlopeSolverData:
     v_surf_points_facet: Vxyz = None
     slopes_facet_xy: ndarray = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + SlopeSolverData/...
 
         Parameters
@@ -37,10 +37,10 @@ class SlopeSolverData:
             self.slopes_facet_xy,
         ]
         datasets = [
-            prefix + 'SlopeSolverData/surf_coefs_facet',
-            prefix + 'SlopeSolverData/slope_coefs_facet',
-            prefix + 'SlopeSolverData/trans_alignment',
-            prefix + 'SlopeSolverData/v_surf_points_facet',
-            prefix + 'SlopeSolverData/slopes_facet_xy',
+            prefix + "SlopeSolverData/surf_coefs_facet",
+            prefix + "SlopeSolverData/slope_coefs_facet",
+            prefix + "SlopeSolverData/trans_alignment",
+            prefix + "SlopeSolverData/v_surf_points_facet",
+            prefix + "SlopeSolverData/slopes_facet_xy",
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)

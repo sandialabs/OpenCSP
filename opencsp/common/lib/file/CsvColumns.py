@@ -3,7 +3,7 @@ import re
 
 import opencsp.common.lib.tool.log_tools as lt
 
-_ColumnHeader = namedtuple('ColumnHeader', ['name', 'aliases', 'idx'])
+_ColumnHeader = namedtuple("ColumnHeader", ["name", "aliases", "idx"])
 
 
 class CsvColumns:

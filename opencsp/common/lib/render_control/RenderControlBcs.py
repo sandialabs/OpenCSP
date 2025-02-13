@@ -4,10 +4,10 @@ from opencsp.common.lib.render_control.RenderControlPointSeq import RenderContro
 class RenderControlBcs(RenderControlPointSeq):
     def __init__(
         self,
-        linestyle: str | None = '-',
+        linestyle: str | None = "-",
         linewidth: float = 1,
-        color: str = 'b',
-        marker: str | None = '.',
+        color: str = "b",
+        marker: str | None = ".",
         markersize: float = 8,
         markeredgecolor: str | None = None,
         markeredgewidth: float | None = None,
@@ -52,12 +52,12 @@ class RenderControlBcs(RenderControlPointSeq):
 # COMMON CASES
 
 
-def default(marker='.', color='b', linewidth=1, markersize=8) -> RenderControlBcs:
+def default(marker=".", color="b", linewidth=1, markersize=8) -> RenderControlBcs:
     """
     What to draw if no particular preference is expressed.
     """
     return RenderControlBcs(linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
-def thin(marker='.', color='b', linewidth=0.3, markersize=5) -> RenderControlBcs:
+def thin(marker=".", color="b", linewidth=0.3, markersize=5) -> RenderControlBcs:
     return RenderControlBcs(color=color, marker=marker, linewidth=linewidth, markersize=markersize)

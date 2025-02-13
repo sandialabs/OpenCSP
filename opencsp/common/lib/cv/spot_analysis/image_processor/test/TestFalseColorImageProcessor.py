@@ -27,11 +27,11 @@ class TestFalseColorImageProcessor(unittest.TestCase):
         self.assertEqual(large_grayscale_image[1529, 0], 1529)
         self.assertEqual(large_grayscale_image[1529, 1529], 1529)
 
-        processor = FalseColorImageProcessor(map_type='large')
+        processor = FalseColorImageProcessor(map_type="large")
         operable = processor.process_image(SpotAnalysisOperable(large_grayscale_image))[0]
         actual_result = operable.primary_image.nparray
         actual_path_name_ext = os.path.join(self.out_dir, "test_jet_large.png")
-        it.numpy_to_image(actual_result, 'clip').save(actual_path_name_ext)
+        it.numpy_to_image(actual_result, "clip").save(actual_path_name_ext)
 
         expected_path_name_ext = os.path.join(self.data_dir, "test_jet_large.png")
         expected_result = np.asarray(Image.open(expected_path_name_ext))
@@ -49,11 +49,11 @@ class TestFalseColorImageProcessor(unittest.TestCase):
         self.assertEqual(large_grayscale_image[1019, 0], 1019)
         self.assertEqual(large_grayscale_image[1019, 1019], 1019)
 
-        processor = FalseColorImageProcessor(map_type='human')
+        processor = FalseColorImageProcessor(map_type="human")
         operable = processor.process_image(SpotAnalysisOperable(large_grayscale_image))[0]
         actual_result = operable.primary_image.nparray
         actual_path_name_ext = os.path.join(self.out_dir, "test_jet_human.png")
-        it.numpy_to_image(actual_result, 'clip').save(actual_path_name_ext)
+        it.numpy_to_image(actual_result, "clip").save(actual_path_name_ext)
 
         expected_path_name_ext = os.path.join(self.data_dir, "test_jet_human.png")
         expected_result = np.asarray(Image.open(expected_path_name_ext))
@@ -63,5 +63,5 @@ class TestFalseColorImageProcessor(unittest.TestCase):
         nptest.assert_array_equal(actual_result, expected_result)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

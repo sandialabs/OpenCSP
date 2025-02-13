@@ -29,7 +29,7 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
     debug_geometry: DebugOpticsGeometry = field(default_factory=DebugOpticsGeometry)
     """Debug options for geometry processing"""
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + ParamsSofastFixed/...
 
         Parameters
@@ -41,16 +41,16 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
         """
         data = [self.blob_search_thresh, self.search_perp_axis_ratio]
         datasets = [
-            prefix + 'ParamsSofastFixed/blob_search_thresh',
-            prefix + 'ParamsSofastFixed/search_perp_axis_ratio',
+            prefix + "ParamsSofastFixed/blob_search_thresh",
+            prefix + "ParamsSofastFixed/search_perp_axis_ratio",
         ]
         ht.save_hdf5_datasets(data, datasets, file)
 
-        self.geometry.save_to_hdf(file, prefix + 'ParamsSofastFixed/')
-        self.mask.save_to_hdf(file, prefix + 'ParamsSofastFixed/')
+        self.geometry.save_to_hdf(file, prefix + "ParamsSofastFixed/")
+        self.mask.save_to_hdf(file, prefix + "ParamsSofastFixed/")
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = ''):
+    def load_from_hdf(cls, file: str, prefix: str = ""):
         """Loads data from given file. Assumes data is stored as: PREFIX + ParamsSofastFixed/Field_1
 
         Parameters
@@ -62,17 +62,17 @@ class ParamsSofastFixed(ht.HDF5_IO_Abstract):
             Default is empty string ''.
         """
         datasets = [
-            prefix + 'ParamsSofastFixed/blob_search_thresh',
-            prefix + 'ParamsSofastFixed/search_perp_axis_ratio',
+            prefix + "ParamsSofastFixed/blob_search_thresh",
+            prefix + "ParamsSofastFixed/search_perp_axis_ratio",
         ]
         data = ht.load_hdf5_datasets(datasets, file)
 
         # Load geometry parameters
-        params_mask = ParamsMaskCalculation.load_from_hdf(file, prefix + 'ParamsSofastFixed/')
-        params_geometry = ParamsOpticGeometry.load_from_hdf(file, prefix + 'ParamsSofastFixed/')
+        params_mask = ParamsMaskCalculation.load_from_hdf(file, prefix + "ParamsSofastFixed/")
+        params_geometry = ParamsOpticGeometry.load_from_hdf(file, prefix + "ParamsSofastFixed/")
 
         # Load sofast parameters
-        data['geometry'] = params_geometry
-        data['mask'] = params_mask
+        data["geometry"] = params_geometry
+        data["mask"] = params_mask
 
         return cls(**data)

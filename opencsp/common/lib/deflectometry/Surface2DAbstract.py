@@ -98,7 +98,7 @@ class Surface2DAbstract(HDF5_IO_Abstract):
         """
         # Plot intersection points surface
         axes.plot_trisurf(
-            *self.v_surf_int_pts_optic[::downsample].data, edgecolor='none', alpha=0.5, linewidth=0, antialiased=False
+            *self.v_surf_int_pts_optic[::downsample].data, edgecolor="none", alpha=0.5, linewidth=0, antialiased=False
         )
 
         # Plot camera rays
@@ -107,27 +107,27 @@ class Surface2DAbstract(HDF5_IO_Abstract):
                 x = [self.v_optic_cam_optic.x, self.v_optic_cam_optic.x + ray.x * camera_ray_length]
                 y = [self.v_optic_cam_optic.y, self.v_optic_cam_optic.y + ray.y * camera_ray_length]
                 z = [self.v_optic_cam_optic.z, self.v_optic_cam_optic.z + ray.z * camera_ray_length]
-                axes.plot(x, y, z, color='gray', alpha=0.3)
+                axes.plot(x, y, z, color="gray", alpha=0.3)
 
         # Plot fit normal at align point
         v_fit = self.normal_fit_at_align_point()
         pt1 = self.v_align_point_optic
         pt2 = self.v_align_point_optic + v_fit
-        axes.plot([pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color='k', linestyle='-')
+        axes.plot([pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color="k", linestyle="-")
         # Plot design normal at align point
         v_des = self.normal_design_at_align_point()
         pt1 = self.v_align_point_optic
         pt2 = self.v_align_point_optic + v_des
-        axes.plot([pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color='k', linestyle='--')
+        axes.plot([pt1.x, pt2.x], [pt1.y, pt2.y], [pt1.z, pt2.z], color="k", linestyle="--")
 
         # Plot other points
-        axes.scatter(*self.v_align_point_optic.data, marker='o', color='r', label='Align Point')
+        axes.scatter(*self.v_align_point_optic.data, marker="o", color="r", label="Align Point")
         if plot_camera_screen_points:
-            axes.scatter(*self.v_optic_cam_optic.data, marker='*', color='k', label='Camera')
-            axes.scatter(*self.v_optic_screen_optic.data, marker='+', color='b', label='Screen Center')
+            axes.scatter(*self.v_optic_cam_optic.data, marker="*", color="k", label="Camera")
+            axes.scatter(*self.v_optic_screen_optic.data, marker="+", color="b", label="Screen Center")
 
         # Format
-        axes.axis('equal')
-        axes.set_xlabel('x (meter)')
-        axes.set_ylabel('y (meter)')
-        axes.set_zlabel('z (meter)')
+        axes.axis("equal")
+        axes.set_xlabel("x (meter)")
+        axes.set_ylabel("y (meter)")
+        axes.set_zlabel("z (meter)")

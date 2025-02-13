@@ -103,7 +103,7 @@ class CalibrateDisplayShape:
         List containing generated figures, if not figures generated, empty list.
     """
 
-    def __init__(self, data_input: DataInput) -> 'CalibrateDisplayShape':
+    def __init__(self, data_input: DataInput) -> "CalibrateDisplayShape":
         """Instantiates CalibrateDisplayShape object
 
         Parameters
@@ -141,7 +141,7 @@ class CalibrateDisplayShape:
         self.data_calculation.y_phase_list = []
         self.data_calculation.masks = []
         for idx, meas in enumerate(self.data_input.measurements_screen):
-            lt.debug(f'Processing measurement: {idx:d}')
+            lt.debug(f"Processing measurement: {idx:d}")
 
             # Calculate mask
             mask1 = ip.calc_mask_raw(meas.mask_images, hist_thresh=0.2)
@@ -217,7 +217,7 @@ class CalibrateDisplayShape:
                 self.data_input.camera.distortion_coef,
             )
             if not ret:
-                lt.error_and_raise(ValueError, 'Camera position did not solve correctly.')
+                lt.error_and_raise(ValueError, "Camera position did not solve correctly.")
             rvecs_0.append(rvec.squeeze())
             tvecs_0.append(tvec.squeeze())
         rvecs_0 = np.array(rvecs_0)
@@ -233,13 +233,13 @@ class CalibrateDisplayShape:
             rvecs_0, tvecs_0, pts_obj_ori_0, self.data_input.camera, camera_indices, point_indices, points_2d
         )
         error_0 = np.sqrt(np.mean(errors_0**2))
-        lt.info(f'Reprojection error stage 1 rough alignment: {error_0:.2f} pixels')
+        lt.info(f"Reprojection error stage 1 rough alignment: {error_0:.2f} pixels")
 
         # Bundle adjustment optimizing points and camera poses
         if self.data_input.assume_located_points:
-            type_ = 'camera'  # only optimize camera location
+            type_ = "camera"  # only optimize camera location
         else:
-            type_ = 'both'  # optimize camera and point locations
+            type_ = "both"  # optimize camera and point locations
         rvecs_1, tvecs_1, pts_obj_ori_1 = ba.bundle_adjust(
             rvecs_0,
             tvecs_0,
@@ -258,7 +258,7 @@ class CalibrateDisplayShape:
             rvecs_1, tvecs_1, pts_obj_ori_1, self.data_input.camera, camera_indices, point_indices, points_2d
         )
         error_1 = np.sqrt(np.mean(errors_1**2))
-        lt.info(f'Reprojection error stage 2 bundle adjustment: {error_1:.2f} pixels')
+        lt.info(f"Reprojection error stage 2 bundle adjustment: {error_1:.2f} pixels")
 
         # Save data in class
         self.data_calculation.rvecs = [Rotation.from_rotvec(v).inv() for v in rvecs_1]
@@ -293,7 +293,7 @@ class CalibrateDisplayShape:
         v_screen_pt_screen_mat = np.zeros((self.data_calculation.num_points_screen, 3))
         intersection_dists = np.zeros((self.data_calculation.num_points_screen, self.data_calculation.num_poses))
 
-        for idx_pt in tqdm(range(self.data_calculation.num_points_screen), desc='Intersecting rays'):
+        for idx_pt in tqdm(range(self.data_calculation.num_points_screen), desc="Intersecting rays"):
             # Intersect points
             pt, dists = ph.nearest_ray_intersection(
                 v_screen_cam_screen, Vxyz(u_cam_pt_screen_mat[idx_pt].T)  # length N  # length N
@@ -346,7 +346,7 @@ class CalibrateDisplayShape:
             self.data_calculation.pts_xyz_screen_aligned.data[:, self.data_calculation.intersection_points_mask]
         )
 
-        return {'xy_screen_fraction': pts_xy_screen_fraction, 'xyz_screen_coords': pts_xyz_screen}
+        return {"xy_screen_fraction": pts_xy_screen_fraction, "xyz_screen_coords": pts_xyz_screen}
 
     def as_DisplayShape(self, name: str) -> DisplayShape:
         """Returns calibrated DisplayShape object.
@@ -357,15 +357,15 @@ class CalibrateDisplayShape:
             Name of DisplayShape.
         """
         grid_data = self.get_data()
-        grid_data.update({'screen_model': 'distorted3D'})
+        grid_data.update({"screen_model": "distorted3D"})
         return DisplayShape(grid_data, name)
 
     def visualize_located_cameras(self) -> None:
         """Plots cameras and alignment points"""
         # Visualize located cameras
-        fig = plt.figure('CalibrationScreenShape_Located_Cameras')
+        fig = plt.figure("CalibrationScreenShape_Located_Cameras")
         self.figures.append(fig)
-        ax = fig.add_subplot(111, projection='3d')
+        ax = fig.add_subplot(111, projection="3d")
 
         ph.plot_pts_3d(
             ax,
@@ -374,44 +374,44 @@ class CalibrateDisplayShape:
             self.data_calculation.tvecs,
             2,
         )
-        plt.title('Calculated Camera Positions')
-        ax.axis('equal')
+        plt.title("Calculated Camera Positions")
+        ax.axis("equal")
 
     def visualize_annotated_camera_images(self) -> None:
         """Annotates images of screen with screen points"""
         # Visualize each camera pose
         for idx_pose in range(self.data_calculation.num_poses):
-            fig = plt.figure(f'CalibrationScreenShape_Annotated_Camera_{idx_pose:d}_Images')
+            fig = plt.figure(f"CalibrationScreenShape_Annotated_Camera_{idx_pose:d}_Images")
             self.figures.append(fig)
             ax = fig.gca()
             # Get measurement
             meas = self.data_input.measurements_screen[idx_pose]
             # Plot all white mask image
-            ax.imshow(meas.mask_images[..., 1], cmap='gray')
+            ax.imshow(meas.mask_images[..., 1], cmap="gray")
             # Plot points
             for idx_point, pt in zip(
                 self.data_calculation.cal_pattern_params.index, self.data_calculation.pts_uv_pixel_orientation[idx_pose]
             ):
                 if idx_point in self.data_input.screen_cal_point_pairs[:, 0]:
-                    color = 'blue'
+                    color = "blue"
                 else:
-                    color = 'black'
+                    color = "black"
                 ax.scatter(*pt.data, color=color, s=20)
-                ax.text(*(pt + Vxy([5, -10])).data, idx_point, size=8, color='white')
-            ax.scatter([], [], color='blue', label='Point used for orientation')
-            ax.scatter([], [], color='black', label='Point unused for orientation')
+                ax.text(*(pt + Vxy([5, -10])).data, idx_point, size=8, color="white")
+            ax.scatter([], [], color="blue", label="Point used for orientation")
+            ax.scatter([], [], color="black", label="Point unused for orientation")
             ax.legend()
 
     def plot_ray_intersection_errors(self) -> None:
         """Plots camera ray intersection errors"""
-        fig = plt.figure('CalibrationScreenShape_Ray_Intersection_Errors', figsize=(9, 3))
+        fig = plt.figure("CalibrationScreenShape_Ray_Intersection_Errors", figsize=(9, 3))
         self.figures.append(fig)
         ax = fig.gca()
 
         ax.plot(self.data_calculation.intersection_dists_mean * 1000)
-        ax.set_xlabel('Point Index')
-        ax.set_ylabel('Average intersection \n error (mm)')
-        ax.set_title('Intersection Errors')
+        ax.set_xlabel("Point Index")
+        ax.set_ylabel("Average intersection \n error (mm)")
+        ax.set_title("Intersection Errors")
         ax.axhline(self.data_input.ray_intersection_threshold * 1000)
         ax.set_ylim(0, self.data_input.ray_intersection_threshold * 1000 * 5)
         ax.grid()
@@ -419,7 +419,7 @@ class CalibrateDisplayShape:
 
     def visualize_final_scenario(self) -> None:
         """Plots alignment points and screen points"""
-        fig = plt.figure('CalibrationScreenShape_Scenario_Summary', figsize=(7, 5))
+        fig = plt.figure("CalibrationScreenShape_Scenario_Summary", figsize=(7, 5))
         self.figures.append(fig)
         ax = fig.gca()
 
@@ -433,17 +433,17 @@ class CalibrateDisplayShape:
         x = pts_screen[mask_int_pts].x
         y = pts_screen[mask_int_pts].y
 
-        ax.scatter(*pts_screen[mask_int_pts].data[:2], marker='.', c='r', s=1, alpha=0.3)  # Intersection points
+        ax.scatter(*pts_screen[mask_int_pts].data[:2], marker=".", c="r", s=1, alpha=0.3)  # Intersection points
         ax.scatter(
-            *pts_screen_orientation.data[:2], marker='s', s=20, label='Calibration Points'
+            *pts_screen_orientation.data[:2], marker="s", s=20, label="Calibration Points"
         )  # Screen calibration points
-        ax.set_title('Screen Points Summary')
+        ax.set_title("Screen Points Summary")
         ax.grid()
         ax.set_xlim(x.max() * 1.05, x.min() * 1.05)
         ax.set_ylim(y.max() * 1.05, y.min() * 1.05)
-        ax.set_xlabel('X (meters)')
-        ax.set_ylabel('Y (meters)')
-        ax.axis('equal')
+        ax.set_xlabel("X (meters)")
+        ax.set_ylabel("Y (meters)")
+        ax.axis("equal")
         ax.legend(loc=2, bbox_to_anchor=(1, 1))
         fig.tight_layout()
 
@@ -455,37 +455,37 @@ class CalibrateDisplayShape:
         extent = (np.nanmax(x), np.nanmin(x), np.nanmax(y), np.nanmin(y))
 
         def format_image(axis: plt.Axes, im):
-            axis.set_xlabel('X (meters)')
-            axis.set_ylabel('Y (meters)')
-            axis.axis('image')
+            axis.set_xlabel("X (meters)")
+            axis.set_ylabel("Y (meters)")
+            axis.axis("image")
             axis.set_xlim(np.nanmax(x), np.nanmin(x))
             axis.set_ylim(np.nanmax(y), np.nanmin(y))
             plt.colorbar(im)
 
         # Show processed x image
-        fig = plt.figure('CalibrationScreenShape_Screen_Map_X')
+        fig = plt.figure("CalibrationScreenShape_Screen_Map_X")
         self.figures.append(fig)
         ax = fig.gca()
-        im = ax.imshow(self.data_calculation.im_x_screen_pts, extent=extent, cmap='jet')
+        im = ax.imshow(self.data_calculation.im_x_screen_pts, extent=extent, cmap="jet")
         format_image(ax, im)
-        ax.set_title('X (m)')
+        ax.set_title("X (m)")
 
         # Show processed y image
-        fig = plt.figure('CalibrationScreenShape_Screen_Map_Y')
+        fig = plt.figure("CalibrationScreenShape_Screen_Map_Y")
         self.figures.append(fig)
         ax = fig.gca()
-        im = ax.imshow(self.data_calculation.im_y_screen_pts, extent=extent, cmap='jet')
+        im = ax.imshow(self.data_calculation.im_y_screen_pts, extent=extent, cmap="jet")
         format_image(ax, im)
-        ax.set_title('Y (m)')
+        ax.set_title("Y (m)")
 
         # Show processed z image
-        fig = plt.figure('CalibrationScreenShape_Screen_Map_Z')
+        fig = plt.figure("CalibrationScreenShape_Screen_Map_Z")
         self.figures.append(fig)
         ax = fig.gca()
-        im = ax.imshow(self.data_calculation.im_z_screen_pts * 1000, extent=extent, cmap='jet')
+        im = ax.imshow(self.data_calculation.im_z_screen_pts * 1000, extent=extent, cmap="jet")
         format_image(ax, im)
         im.set_clim(-self.xyz_screen_map_clim_mm, self.xyz_screen_map_clim_mm)
-        ax.set_title('Z (mm)')
+        ax.set_title("Z (mm)")
 
     def visualize_unwrapped_phase(self) -> None:
         """Visualizes x/y unwrapped phase for all poses"""
@@ -505,34 +505,34 @@ class CalibrateDisplayShape:
             im_y = np.stack([im_y] * 3, axis=2)
 
             # Add active pixels as colored pixels
-            cm = colormaps.get_cmap('jet')
+            cm = colormaps.get_cmap("jet")
             vals_x_jet = cm(vals_x)[:, :3]  # remove alpha channel
             vals_y_jet = cm(vals_y)[:, :3]  # remove alpha channel
             im_x[mask, :] = vals_x_jet
             im_y[mask, :] = vals_y_jet
 
             # Plot and save to figures list
-            fig = plt.figure(f'CalibrationScreenShape_Unwrapped_pose_{idx_pose:d}_x_phase.png')
+            fig = plt.figure(f"CalibrationScreenShape_Unwrapped_pose_{idx_pose:d}_x_phase.png")
             self.figures.append(fig)
             ax = fig.gca()
             ax.imshow(im_x)
-            ax.set_title(f'Unwrapped X Phase: Pose {idx_pose:d}')
+            ax.set_title(f"Unwrapped X Phase: Pose {idx_pose:d}")
             # Plot orientation points
-            ax.scatter(*self.data_calculation.pts_uv_pixel_orientation[idx_pose].data, color='white')
+            ax.scatter(*self.data_calculation.pts_uv_pixel_orientation[idx_pose].data, color="white")
             # Label orientation points
             for idx_pt, pt in enumerate(self.data_calculation.pts_uv_pixel_orientation[idx_pose]):
-                plt.text(pt.x + mask.shape[1] * 0.02, pt.y, str(idx_pt), color='white')
+                plt.text(pt.x + mask.shape[1] * 0.02, pt.y, str(idx_pt), color="white")
 
-            fig = plt.figure(f'CalibrationScreenShape_Unwrapped_pose_{idx_pose:d}_y_phase.png')
+            fig = plt.figure(f"CalibrationScreenShape_Unwrapped_pose_{idx_pose:d}_y_phase.png")
             self.figures.append(fig)
             ax = fig.gca()
             ax.imshow(im_y)
-            ax.set_title(f'Unwrapped Y Phase: Pose {idx_pose:d}')
+            ax.set_title(f"Unwrapped Y Phase: Pose {idx_pose:d}")
             # Plot orientation points
-            ax.scatter(*self.data_calculation.pts_uv_pixel_orientation[idx_pose].data, color='white')
+            ax.scatter(*self.data_calculation.pts_uv_pixel_orientation[idx_pose].data, color="white")
             # Label orientation points
             for idx_pt, pt in enumerate(self.data_calculation.pts_uv_pixel_orientation[idx_pose]):
-                plt.text(pt.x + mask.shape[1] * 0.02, pt.y, str(idx_pt), color='white')
+                plt.text(pt.x + mask.shape[1] * 0.02, pt.y, str(idx_pt), color="white")
 
     def run_calibration(self) -> None:
         """Runs a complete calibration"""
@@ -662,8 +662,8 @@ def interp_xy_screen_positions(im_x: np.ndarray, im_y: np.ndarray, x_sc: np.ndar
 
     # Return screen points
     if np.any(np.isnan(y_px_y_sc_x_sc)):
-        raise ValueError('Nans present in y pixel interpolation array')
+        raise ValueError("Nans present in y pixel interpolation array")
     if np.any(np.isnan(x_px_y_sc_x_sc)):
-        raise ValueError('Nans present in x pixel interpolation array')
+        raise ValueError("Nans present in x pixel interpolation array")
 
     return Vxy((x_px_y_sc_x_sc.flatten(), y_px_y_sc_x_sc.flatten()))

@@ -83,13 +83,13 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
         # Check frame was captured successfully
         if not ret:
-            raise Exception('Frame was not captured successfully.')
+            raise Exception("Frame was not captured successfully.")
 
         # Format image
         if np.ndim(frame) == 3:
             frame = frame.mean(axis=2)
         elif np.ndim(frame) != 2:
-            raise ValueError(f'Output frame must have 2 or 3 dimensions, not {np.ndim(frame):d}.')
+            raise ValueError(f"Output frame must have 2 or 3 dimensions, not {np.ndim(frame):d}.")
 
         return frame
 
@@ -134,7 +134,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
     @property
     def shutter_cal_values(self) -> np.ndarray:
-        raise ValueError('exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.')
+        raise ValueError("exposure_time cannot be adjusted with MSMF camera; adjust screen brightness instead.")
 
     def close(self):
         """Closes the camera connection"""

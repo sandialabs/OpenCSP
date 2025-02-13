@@ -26,9 +26,9 @@ def propagate_rays_to_plane(u_ray: Uxyz, v_origin: Vxyz, v_plane: Vxyz, u_plane:
 
     """
     if type(u_ray) is not Uxyz:
-        raise TypeError('u_ray must be type {} not type {}.'.format(Uxyz, type(u_ray)))
+        raise TypeError("u_ray must be type {} not type {}.".format(Uxyz, type(u_ray)))
     if type(u_plane) is not Uxyz:
-        raise TypeError('u_plane must be type {} not type {}.'.format(Uxyz, type(u_plane)))
+        raise TypeError("u_plane must be type {} not type {}.".format(Uxyz, type(u_plane)))
 
     v_origin_plane = v_plane - v_origin
     w_dot = u_plane.dot(v_origin_plane)
@@ -107,7 +107,7 @@ def fit_slope_robust_ls(
     # Check lengths match
     if slope.size != weights.size or slope.size != len(v_surf_int_pts_optic):
         raise ValueError(
-            f'Input data lengths must be same size, but sizes were {slope.size:d}, {weights.size:d}, {len(v_surf_int_pts_optic):d}.'
+            f"Input data lengths must be same size, but sizes were {slope.size:d}, {weights.size:d}, {len(v_surf_int_pts_optic):d}."
         )
 
     # Calculate number of points
@@ -152,7 +152,7 @@ def fit_slope_robust_ls(
         weights[np.abs(res_sta) >= 1] = 0
 
     if loop_idx == max_iter:
-        raise ValueError('Robust least squares slope fitting could not converge.')
+        raise ValueError("Robust least squares slope fitting could not converge.")
 
     return coefficients, weights
 
@@ -215,7 +215,7 @@ def poly_terms(poly_order: int, x: np.ndarray, y: np.ndarray):
     """
     # Check input sizes are the same
     if x.size != y.size:
-        raise ValueError('X and Y sizes must be equal.')
+        raise ValueError("X and Y sizes must be equal.")
 
     # Build array to contain terms
     n = np.arange(1, poly_order + 2).sum()

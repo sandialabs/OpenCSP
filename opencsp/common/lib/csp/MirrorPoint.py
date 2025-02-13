@@ -32,7 +32,7 @@ class MirrorPoint(MirrorAbstract):
         surface_points: Pxyz,
         normal_vectors: Uxyz,
         shape: RegionXY,
-        interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest'] = 'nearest',
+        interpolation_type: Literal["given", "bilinear", "clough_tocher", "nearest"] = "nearest",
     ) -> None:
         """
         Initializes a MirrorPoint object with the specified surface points and normal vectors.
@@ -69,7 +69,7 @@ class MirrorPoint(MirrorAbstract):
         self._define_interpolation(interpolation_type)
 
     def _define_interpolation(
-        self, interpolation_type: Literal['given', 'bilinear', 'clough_tocher', 'nearest']
+        self, interpolation_type: Literal["given", "bilinear", "clough_tocher", "nearest"]
     ) -> None:
         """Defines the interpolation type to use
 
@@ -88,7 +88,7 @@ class MirrorPoint(MirrorAbstract):
             If given interpolation type is not supported.
         """
         # Interpolate
-        if interpolation_type == 'bilinear':
+        if interpolation_type == "bilinear":
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
@@ -96,7 +96,7 @@ class MirrorPoint(MirrorAbstract):
             # Normal vector interpolation object
             Z_N = self.normal_vectors.data.T
             self.normals_function = interp.LinearNDInterpolator(points_xy, Z_N, np.nan)
-        elif interpolation_type == 'clough_tocher':
+        elif interpolation_type == "clough_tocher":
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
@@ -104,7 +104,7 @@ class MirrorPoint(MirrorAbstract):
             # Normal vector interpolation object
             Z_N = self.normal_vectors.data.T
             self.normals_function = interp.CloughTocher2DInterpolator(points_xy, Z_N, np.nan)
-        elif interpolation_type == 'nearest':
+        elif interpolation_type == "nearest":
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
@@ -112,7 +112,7 @@ class MirrorPoint(MirrorAbstract):
             # Normal vector interpolatin object
             Z_N = self.normal_vectors.data.T
             self.normals_function = interp.NearestNDInterpolator(points_xy, Z_N)
-        elif interpolation_type == 'given':
+        elif interpolation_type == "given":
             # Z coordinate lookup function
             points_lookup = {
                 (x, y): z for x, y, z in zip(self.surface_points.x, self.surface_points.y, self.surface_points.z)
@@ -207,7 +207,7 @@ class MirrorPoint(MirrorAbstract):
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         # If using "given" type samping
-        if self.interpolation_type == 'given':
+        if self.interpolation_type == "given":
             if resolution_type != "given":
                 warn(
                     "Resolution type becomes 'given' when using type 'given' interpolation.", UserWarning, stacklevel=2
@@ -241,7 +241,7 @@ class MirrorPoint(MirrorAbstract):
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         # If no interpolation
-        if self.interpolation_type == 'given':
+        if self.interpolation_type == "given":
             resolution = mirror_style.resolution
             edge_values = self.region.edge_sample(resolution)
             if transform is None:

@@ -248,7 +248,7 @@ class OpticalFlow:
         if not ft.file_exists(path_name_ext_frame):
             lt.error_and_raise(
                 FileNotFoundError,
-                f"Error: in OpticalFlow._load_image(), Can't find the frame file \"{path_name_ext_frame}\" for frame {f1_or_f2}",
+                f'Error: in OpticalFlow._load_image(), Can\'t find the frame file "{path_name_ext_frame}" for frame {f1_or_f2}',
             )
 
         # load
@@ -556,16 +556,16 @@ class OpticalFlow:
         fig_record.view.draw_image(square_rgb)
 
         fig_record.view.draw_pq_text(
-            (1, 0.5), "0", style=rct.RenderControlText(color='k', fontsize=20, horizontalalignment='right')
+            (1, 0.5), "0", style=rct.RenderControlText(color="k", fontsize=20, horizontalalignment="right")
         )
         fig_record.view.draw_pq_text(
-            (0.5, 1), "π/2", style=rct.RenderControlText(color='k', fontsize=20, verticalalignment='top')
+            (0.5, 1), "π/2", style=rct.RenderControlText(color="k", fontsize=20, verticalalignment="top")
         )
         fig_record.view.draw_pq_text(
-            (0, 0.5), "π", style=rct.RenderControlText(color='k', fontsize=20, horizontalalignment='left')
+            (0, 0.5), "π", style=rct.RenderControlText(color="k", fontsize=20, horizontalalignment="left")
         )
         fig_record.view.draw_pq_text(
-            (0.5, 0), "3π/2", style=rct.RenderControlText(color='k', fontsize=20, verticalalignment='bottom')
+            (0.5, 0), "3π/2", style=rct.RenderControlText(color="k", fontsize=20, verticalalignment="bottom")
         )
 
         ang = 0
@@ -580,7 +580,7 @@ class OpticalFlow:
                 sang = "." + sang.split(".")[1]
             else:
                 sang = "%d" % int(ang)
-            fig_record.view.draw_pq_text((x, y), sang, style=rct.RenderControlText(color='k', fontsize=20))
+            fig_record.view.draw_pq_text((x, y), sang, style=rct.RenderControlText(color="k", fontsize=20))
             prev_ang = ang
 
         fig_record.view.show(block=True)
@@ -661,7 +661,7 @@ class OpticalFlow:
             else:
                 lt.error_and_raise(
                     RuntimeError,
-                    f"Error: in OpticalFlow.save: unable to save to file \"{dir_name_ext}\", file already exists!",
+                    f'Error: in OpticalFlow.save: unable to save to file "{dir_name_ext}", file already exists!',
                 )
 
         # save!
@@ -721,7 +721,7 @@ class OpticalFlow:
         # check that the file exists
         if not ft.file_exists(dir_name_ext):
             if error_on_not_exist:
-                lt.error_and_raise(RuntimeError, f"Error: in OpticalFlow.load: file \"{dir_name_ext}\" doesn't exist!")
+                lt.error_and_raise(RuntimeError, f'Error: in OpticalFlow.load: file "{dir_name_ext}" doesn\'t exist!')
             return None, None
 
         # load!

@@ -60,7 +60,7 @@ class TargetColor(TargetAbstract):
         n_cols = self.image.shape[1]
         n_bands = self.image.shape[2]
         if n_bands != 3:
-            print('ERROR: In TargetAbstract.row_cols(), number of input image bands is not 3.')
+            print("ERROR: In TargetAbstract.row_cols(), number of input image bands is not 3.")
             assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION
         return n_rows, n_cols
 
@@ -99,7 +99,7 @@ class TargetColor(TargetAbstract):
         color_above_max: cl,
         discrete_or_continuous: str,
         # Defines scheme for modulating saturation from left to right.  Values: None, 'saturated_to_white' or 'light_to_saturated'
-        lateral_gradient_type: str = 'saturated_to_white',
+        lateral_gradient_type: str = "saturated_to_white",
         # Dimensionless.  Applies if lateral_gradient_type == 'saturated_to_white'.
         saturated_to_white_exponent: float = 1.5,
         # Dimensionless.  Applies if lateral_gradient_type == 'light_to_saturated'.
@@ -172,7 +172,7 @@ class TargetColor(TargetAbstract):
                         this_blue = 255
                 else:
                     print(
-                        'ERROR: In TargetColor.set_image_to_linear_color_bar_y(), encountered unexpected lateral_gradient_type = '
+                        "ERROR: In TargetColor.set_image_to_linear_color_bar_y(), encountered unexpected lateral_gradient_type = "
                         + str(lateral_gradient_type)
                     )
                     assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
@@ -191,12 +191,12 @@ class TargetColor(TargetAbstract):
         color_bar=tcc.O_color_bar(),
         color_above_max: cl = cl.white(),  # Color to use for values of max limit of color bar.
         # 'discrete' or 'continuous'  # ?? SCAFFOLDING RCB -- RENAME TO "color_interpolation_type" ?
-        discrete_or_continuous: str = 'continuous',
+        discrete_or_continuous: str = "continuous",
         # Modulating saturation with radius.
         # Defines range for saturation modulation as a function of radius.  Values: 'circle' or 'image_boundary'
-        pattern_boundary: str = 'image_boundary',
+        pattern_boundary: str = "image_boundary",
         # Defines scheme for modulating saturation as a function of radius.  Values: 'saturated_center_to_white' or 'light_center_to_saturated'
-        radial_gradient_type: str = 'saturated_center_to_white',
+        radial_gradient_type: str = "saturated_center_to_white",
         # Dimensionless.  Applies if radial_gradient_type == 'saturated_center_to_white'.
         saturated_center_to_white_exponent: float = 1.5,
         # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
@@ -239,10 +239,10 @@ class TargetColor(TargetAbstract):
                 )
                 # Compute saturation adjustment.
                 # Determine the radius to use for scaling the saturation.
-                if pattern_boundary == 'circle':
+                if pattern_boundary == "circle":
                     # Circle
                     radius_for_this_angle = radius
-                elif pattern_boundary == 'image_boundary':
+                elif pattern_boundary == "image_boundary":
                     # Rectangle
                     if math.sin(this_angle) == 0:
                         radius_for_this_angle = abs(half_width / math.cos(this_angle))
@@ -316,7 +316,7 @@ class TargetColor(TargetAbstract):
                         this_blue = 255
                 else:
                     print(
-                        'ERROR: In TargetColor.set_image_to_polar_color_bar(), encountered unexpected radial_gradient_type = '
+                        "ERROR: In TargetColor.set_image_to_polar_color_bar(), encountered unexpected radial_gradient_type = "
                         + str(radial_gradient_type)
                     )
                     assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
@@ -362,7 +362,7 @@ class TargetColor(TargetAbstract):
                         self.set_fiducial_pixel(this_row, this_col, center_fiducial_color)
         else:
             print(
-                'ERROR: In TargetColor.set_center_fiducial(), unexpected negative center_fiducial_half_margin_pix = '
+                "ERROR: In TargetColor.set_center_fiducial(), unexpected negative center_fiducial_half_margin_pix = "
                 + str(center_fiducial_half_margin_pix)
             )
             assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION.
@@ -395,7 +395,7 @@ class TargetColor(TargetAbstract):
                             self.set_fiducial_pixel(this_row_from_bottom, this_col, tick_color)
                 else:
                     print(
-                        'ERROR: In TargetColor.set_ticks_along_top_and_bottom_edges(), unexpected negative tick_half_margin_pix = '
+                        "ERROR: In TargetColor.set_ticks_along_top_and_bottom_edges(), unexpected negative tick_half_margin_pix = "
                         + str(tick_half_margin_pix)
                     )
                     assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION.
@@ -428,7 +428,7 @@ class TargetColor(TargetAbstract):
                             self.set_fiducial_pixel(this_row, this_col_from_right, tick_color)
                 else:
                     print(
-                        'ERROR: In TargetColor.set_ticks_along_left_and_right_edges(), unexpected negative tick_half_margin_pix = '
+                        "ERROR: In TargetColor.set_ticks_along_left_and_right_edges(), unexpected negative tick_half_margin_pix = "
                         + str(tick_half_margin_pix)
                     )
                     assert False  # ?? SCAFFOLDING RCB -- CONVERT TO EXCEPTION.
@@ -520,11 +520,11 @@ def construct_target_linear_color_bar(
     # Blank target.
     target = tc.TargetColor(image_width, image_height, dpm, color_below_min)
     # Set colors.
-    if x_or_y == 'x':
+    if x_or_y == "x":
         target.set_image_to_linear_color_bar_x(
             color_below_min, color_bar, color_above_max, discrete_or_continuous
         )  # ?? SCAFFOLDING RCB -- UPDATE COLOR BAR X TO MATCH Y.
-    elif x_or_y == 'y':
+    elif x_or_y == "y":
         target.set_image_to_linear_color_bar_y(
             color_below_min,
             color_bar,
@@ -543,11 +543,11 @@ def construct_target_linear_color_bar(
     include_above_below_in_pattern_name = True
     if include_above_below_in_pattern_name:
         color_pattern_name = (
-            color_below_min.short_name + '.' + color_bar_name + '_linear.' + color_above_max.short_name
+            color_below_min.short_name + "." + color_bar_name + "_linear." + color_above_max.short_name
         )  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
     else:
         color_pattern_name = color_bar_name  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
-    target.set_pattern_description(color_pattern_name + '_' + x_or_y + '_' + discrete_or_continuous)
+    target.set_pattern_description(color_pattern_name + "_" + x_or_y + "_" + discrete_or_continuous)
     # Return.
     return target
 
@@ -559,16 +559,16 @@ def construct_target_polar_color_bar(  # Target dimensions.
     # Control color by angle.
     color_below_min: cl = cl.black(),  # Color to use for values below min limit of color bar.
     color_bar=tcc.O_color_bar(),  # Color bar for angular values in [0,2pi).  # ?? SCAFFOLDING RCB -- TYPE TIP NEEDED.
-    color_bar_name: str = 'O',  # Terse name of color bar, for output filename.  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
+    color_bar_name: str = "O",  # Terse name of color bar, for output filename.  # ?? SCAFFOLDING RCB -- REPLACE "color_bar_name" WITH CLASS FETCH
     color_above_max: cl = cl.white(),  # Color to use for values of max limit of color bar.
     # Indicates whether to interpolate colors between segments. Values 'discrete' or 'continuous'  # ?? SCAFFOLDING RCB -- RENAME TO "color_interpolation_type" ?
-    discrete_or_continuous: str = 'continuous',
+    discrete_or_continuous: str = "continuous",
     # Modulating saturation with radius.
     # Defines range for saturation modulation as a function of radius. Values 'circle' or 'image_boundary'
-    pattern_boundary: str = 'image_boundary',
+    pattern_boundary: str = "image_boundary",
     # Defines scheme for modulatiing saturation as a function of radius. Values 'saturated_center_to_white' or 'light_center_to_saturated'
-    radial_gradient_type: str = 'saturated_center_to_white',
-    radial_gradient_name: str = 's2w',  # Terse name of radial intensity function, for output filename. Values 's2w' or 'l2s'
+    radial_gradient_type: str = "saturated_center_to_white",
+    radial_gradient_name: str = "s2w",  # Terse name of radial intensity function, for output filename. Values 's2w' or 'l2s'
     # Dimensionless.  Applies if radial_gradient_type == 'saturated_center_to_white'.
     saturated_center_to_white_exponent: float = 1.5,
     # Dimensionless.  Applies if radial_gradient_type == 'light_center_to_saturated'.
@@ -613,52 +613,52 @@ def construct_target_polar_color_bar(  # Target dimensions.
     )
     # Set pattern description.
     # Color bar.
-    pattern_description = color_below_min.short_name + '.' + color_bar_name + '.' + color_above_max.short_name
+    pattern_description = color_below_min.short_name + "." + color_bar_name + "." + color_above_max.short_name
     # Linear vs. polar.
-    pattern_description += '_polar_' + radial_gradient_name
+    pattern_description += "_polar_" + radial_gradient_name
     # Color interpolation.
-    if discrete_or_continuous == 'discrete':
-        pattern_description += '_disc'
-    elif discrete_or_continuous == 'continuous':
-        pattern_description += '_cont'
+    if discrete_or_continuous == "discrete":
+        pattern_description += "_disc"
+    elif discrete_or_continuous == "continuous":
+        pattern_description += "_cont"
     else:
         print(
-            'ERROR: In TargetColor.construct_target_polar_color_bar(), encountered unexpected discrete_or_continuous = '
+            "ERROR: In TargetColor.construct_target_polar_color_bar(), encountered unexpected discrete_or_continuous = "
             + str(discrete_or_continuous)
         )
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     # Radial gradient.
     if radial_gradient_type == "saturated_center_to_white":
-        pattern_description += '_exp' + '{0:.2f}'.format(saturated_center_to_white_exponent)
+        pattern_description += "_exp" + "{0:.2f}".format(saturated_center_to_white_exponent)
     elif radial_gradient_type == "light_center_to_saturated":
         pattern_description += (
-            '_sat'
-            + '{0:.2f}'.format(light_center_to_saturated_saturation_min)
-            + 'to'
-            + '{0:.2f}'.format(light_center_to_saturated_saturation_max)
+            "_sat"
+            + "{0:.2f}".format(light_center_to_saturated_saturation_min)
+            + "to"
+            + "{0:.2f}".format(light_center_to_saturated_saturation_max)
         )
     else:
         print(
-            'ERROR: In TargetColor.construct_target_polar_color_bar(), encountered unexpected radial_gradient_type = '
+            "ERROR: In TargetColor.construct_target_polar_color_bar(), encountered unexpected radial_gradient_type = "
             + str(radial_gradient_type)
         )
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     # Radial boundary.
     if pattern_boundary == "circle":
-        pattern_description += '_circ'
+        pattern_description += "_circ"
     elif pattern_boundary == "image_boundary":
-        pattern_description += '_box'
+        pattern_description += "_box"
     else:
         print(
-            'ERROR: In TargetColor.construct_target_polar_color_bar(), encountered unexpected pattern_boundary = '
+            "ERROR: In TargetColor.construct_target_polar_color_bar(), encountered unexpected pattern_boundary = "
             + str(pattern_boundary)
         )
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     # Fiducials.
     if draw_center_fiducial:
-        pattern_description += '_cf.' + center_fiducial_color.short_name
+        pattern_description += "_cf." + center_fiducial_color.short_name
     if draw_edge_fiducials:
-        pattern_description += '_ef.' + tick_color.short_name
+        pattern_description += "_ef." + tick_color.short_name
     # Set result.
     target.set_pattern_description(pattern_description)
 
@@ -677,7 +677,7 @@ def construct_target_blue_under_red_cross_green(
     target.set_image_to_blue_under_red_cross_green()
     # Set pattern description.
     color_pattern_name_root = (
-        'blue_under_red_cross_green'  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
+        "blue_under_red_cross_green"  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
     )
     color_pattern_name = color_pattern_name_root
     target.set_pattern_description(color_pattern_name)
@@ -696,12 +696,12 @@ def construct_target_rgb_cube_inscribed_square(
     target.set_image_to_rgb_cube_inscribed_square(project_to_cube)
     # Set pattern description.
     color_pattern_name_root = (
-        'rgb_cube_inscribed_square'  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
+        "rgb_cube_inscribed_square"  # ?? SCAFFOLDING RCB -- REPLACE "color_pattern_name_root" WITH CLASS FETCH?
     )
     if project_to_cube:
-        color_pattern_name_root += '_projected'
+        color_pattern_name_root += "_projected"
     else:
-        color_pattern_name_root += '_unprojected'
+        color_pattern_name_root += "_unprojected"
     color_pattern_name = color_pattern_name_root
     target.set_pattern_description(color_pattern_name)
     # Return.
@@ -784,7 +784,7 @@ def extend_target_left(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            'l' + str(new_pixels) + new_color.short_name + 'px_' + target.pattern_description
+            "l" + str(new_pixels) + new_color.short_name + "px_" + target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -858,7 +858,7 @@ def extend_target_right(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            target.pattern_description + '_r' + str(new_pixels) + new_color.short_name + 'px'
+            target.pattern_description + "_r" + str(new_pixels) + new_color.short_name + "px"
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -939,7 +939,7 @@ def extend_target_top(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            't' + str(new_pixels) + new_color.short_name + 'px_' + target.pattern_description
+            "t" + str(new_pixels) + new_color.short_name + "px_" + target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1019,7 +1019,7 @@ def extend_target_bottom(
     # Set description.
     if new_target_name == None:
         new_target.set_pattern_description(
-            target.pattern_description + '_b' + str(new_pixels) + new_color.short_name + 'px'
+            target.pattern_description + "_b" + str(new_pixels) + new_color.short_name + "px"
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1055,7 +1055,7 @@ def extend_target_all(
     if new_target_name == None:
         # Add to target pattern_description to discard per-side description changes.
         new_target.set_pattern_description(
-            'bord' + str(new_pixels) + new_color.short_name + 'px_' + target.pattern_description
+            "bord" + str(new_pixels) + new_color.short_name + "px_" + target.pattern_description
         )
     else:
         new_target.set_pattern_description(new_target_name)
@@ -1074,18 +1074,18 @@ def extend_target_all(
 def extend_target_for_splice_left_right(
     target: TargetColor, n_extend: int, fill_color: cl.Color, auto_expand: str
 ) -> TargetColor:
-    if auto_expand == 'fill_top':
+    if auto_expand == "fill_top":
         new_target = extend_target_top(target, n_extend, fill_color, new_target_name=target.pattern_description)
         return new_target
-    elif auto_expand == 'fill_bottom':
+    elif auto_expand == "fill_bottom":
         new_target = extend_target_bottom(target, n_extend, fill_color, new_target_name=target.pattern_description)
         return new_target
-    elif auto_expand == 'fill_even':
+    elif auto_expand == "fill_even":
         n_extend_top = int(n_extend / 2)
         n_extend_bottom = n_extend - n_extend_top
         if (n_extend_top == 0) and (n_extend_bottom == 0):
             print(
-                'ERROR: In extend_target_for_splice_left_right(), encountered unexpected situation where n_extend_top and n_extend_bottom are both zero.'
+                "ERROR: In extend_target_for_splice_left_right(), encountered unexpected situation where n_extend_top and n_extend_bottom are both zero."
             )
             assert False  # ?? SCAFFOLDING -- CONVERT TO EXCEPTION.
         if n_extend_top > 0:
@@ -1124,7 +1124,7 @@ def splice_targets_left_right(
     right_target: TargetColor,  # Target to place at right of new target.
     gap: int,  # Pixels.  Gap to leave between targets.
     initial_color: cl.Color,  # Color to fill canvas before adding patterns.
-    auto_expand: str = 'fill_even',  # Whether to expand smaller target if sizes don't match.
+    auto_expand: str = "fill_even",  # Whether to expand smaller target if sizes don't match.
     # Values: None, 'fill_top', 'fill_bottom', 'fill_even'.
     new_target_name: str = None,  # If none, new target name will combine left/right names.
 ) -> TargetColor:
@@ -1154,7 +1154,7 @@ def splice_targets_left_right(
             right_target = extend_target_for_splice_left_right(right_target, n_extend, initial_color, auto_expand)
             right_n_rows, right_n_cols, right_n_bands = right_target.rows_cols_bands()
         else:
-            print('ERROR: In splice_targets_left_right(), unexpected situation encountered.')
+            print("ERROR: In splice_targets_left_right(), unexpected situation encountered.")
             assert False  # ?? SCAFFOLDING -- CONVERT TO EXCEPTION.
 
     # Check input.
@@ -1395,27 +1395,27 @@ def construct_stacked_linear_color_bar(
 ) -> tc.TargetColor:
     # Check input.
     if n_stack < 1:
-        print('ERROR: In stack_linear_color_bar(), encountered non-positive n_stack = ' + str(n_stack))
+        print("ERROR: In stack_linear_color_bar(), encountered non-positive n_stack = " + str(n_stack))
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     if n_stack != len(discrete_or_continuous_list):
         print(
-            'ERROR: In stack_linear_color_bar(), encountered mismatched n_stack='
+            "ERROR: In stack_linear_color_bar(), encountered mismatched n_stack="
             + str(n_stack)
-            + ' and len(discrete_or_continuous_list)='
+            + " and len(discrete_or_continuous_list)="
             + len(discrete_or_continuous_list)
         )
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     if n_stack != len(saturation_spec_list):
         print(
-            'ERROR: In stack_linear_color_bar(), encountered mismatched n_stack='
+            "ERROR: In stack_linear_color_bar(), encountered mismatched n_stack="
             + str(n_stack)
-            + ' and len(saturation_spec_list)='
+            + " and len(saturation_spec_list)="
             + len(saturation_spec_list)
         )
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
 
     # Construct final color bar name.
-    target_name = color_bar_name + '_' + str(n_stack) + 'x'
+    target_name = color_bar_name + "_" + str(n_stack) + "x"
 
     # First saturation spec.
     first_saturation_spec = saturation_spec_list[0]
@@ -1434,7 +1434,7 @@ def construct_stacked_linear_color_bar(
         color_bar_name,
         color_above_max,
         x_or_y,
-        'discrete',
+        "discrete",
         lateral_gradient_type=first_lateral_gradient_type,
         saturated_to_white_exponent=first_saturated_to_white_exponent,
         light_to_saturated_min=first_light_to_saturated_min,
@@ -1450,7 +1450,7 @@ def construct_stacked_linear_color_bar(
         color_bar_name,
         color_above_max,
         x_or_y,
-        'continuous',
+        "continuous",
         lateral_gradient_type=first_lateral_gradient_type,
         saturated_to_white_exponent=first_saturated_to_white_exponent,
         light_to_saturated_min=first_light_to_saturated_min,
@@ -1458,9 +1458,9 @@ def construct_stacked_linear_color_bar(
     )
 
     # Initial target.
-    if discrete_or_continuous_list[0] == 'discrete':
+    if discrete_or_continuous_list[0] == "discrete":
         single_bar_target = single_bar_target_discrete
-    elif discrete_or_continuous_list[0] == 'continuous':
+    elif discrete_or_continuous_list[0] == "continuous":
         single_bar_target = single_bar_target_continuous
     else:
         print(
@@ -1484,7 +1484,7 @@ def construct_stacked_linear_color_bar(
             this_saturated_to_white_exponent = this_saturation_spec[1]
             this_light_to_saturated_min = this_saturation_spec[2]
             this_light_to_saturated_max = this_saturation_spec[3]
-            if discrete_or_continuous_list[idx] == 'discrete':
+            if discrete_or_continuous_list[idx] == "discrete":
                 this_bar_target_discrete = tc.construct_target_linear_color_bar(
                     color_bar_width,
                     color_total_height / n_stack,
@@ -1494,7 +1494,7 @@ def construct_stacked_linear_color_bar(
                     color_bar_name,
                     color_above_max,
                     x_or_y,
-                    'discrete',
+                    "discrete",
                     lateral_gradient_type=this_lateral_gradient_type,
                     saturated_to_white_exponent=this_saturated_to_white_exponent,
                     light_to_saturated_min=this_light_to_saturated_min,
@@ -1503,7 +1503,7 @@ def construct_stacked_linear_color_bar(
                 stacked_target = tc.splice_targets_above_below(
                     this_bar_target_discrete, stacked_target, gap, initial_color=gap_color, new_target_name=target_name
                 )
-            elif discrete_or_continuous_list[idx] == 'continuous':
+            elif discrete_or_continuous_list[idx] == "continuous":
                 this_bar_target_continuous = tc.construct_target_linear_color_bar(
                     color_bar_width,
                     color_total_height / n_stack,
@@ -1513,7 +1513,7 @@ def construct_stacked_linear_color_bar(
                     color_bar_name,
                     color_above_max,
                     x_or_y,
-                    'continuous',
+                    "continuous",
                     lateral_gradient_type=this_lateral_gradient_type,
                     saturated_to_white_exponent=this_saturated_to_white_exponent,
                     light_to_saturated_min=this_light_to_saturated_min,
@@ -1528,7 +1528,7 @@ def construct_stacked_linear_color_bar(
                 )
             else:
                 print(
-                    'ERROR: In construct_stacked_linear_color_bar(2), encountered unexpected discrete_or_continuous_list['
+                    "ERROR: In construct_stacked_linear_color_bar(2), encountered unexpected discrete_or_continuous_list["
                     + str(idx)
                     + '] = "'
                     + str(discrete_or_continuous_list[idx])
@@ -1539,7 +1539,7 @@ def construct_stacked_linear_color_bar(
 
 
 def stacked_color_bar_name(n_stack: int, color_bar_name: str) -> str:
-    return color_bar_name + '_stacked' + str(n_stack) + 'x'
+    return color_bar_name + "_stacked" + str(n_stack) + "x"
 
 
 # ?? SCAFFOLDING RCB -- ADD TOOL TIPS TO THIS ROUTINE.
@@ -1576,22 +1576,22 @@ def construct_linear_color_bar_cascade(  # Dimensions.
 ) -> tc.TargetColor:
     # Check input.
     if len(stack_sequence) == 0:
-        print('ERROR: In construct_linear_color_bar_cascade(), encountered len(stack_sequence) == 0.')
+        print("ERROR: In construct_linear_color_bar_cascade(), encountered len(stack_sequence) == 0.")
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
     if len(list_of_discrete_or_continuous_lists) != len(stack_sequence):
         print(
-            'ERROR: In construct_linear_color_bar_cascade(), mismatched len(stack_sequence)='
+            "ERROR: In construct_linear_color_bar_cascade(), mismatched len(stack_sequence)="
             + str(len(stack_sequence))
-            + ' and len(list_of_discrete_or_continuous_lists)='
+            + " and len(list_of_discrete_or_continuous_lists)="
             + str(len(list_of_discrete_or_continuous_lists))
         )
         assert False  # ?? SCAFFOLDING RCB -- USE EXCEPTION
 
     # Construct target name.
-    cascade_target_name = color_bar_name + '_cascade'
+    cascade_target_name = color_bar_name + "_cascade"
 
     # Reference linear color bar.
-    print('In construct_linear_color_bar_cascade(), generating reference linear bar...')
+    print("In construct_linear_color_bar_cascade(), generating reference linear bar...")
     ref_target = tc.construct_target_linear_color_bar(
         color_bar_width,
         color_total_height,
@@ -1601,7 +1601,7 @@ def construct_linear_color_bar_cascade(  # Dimensions.
         ref_color_bar_name,
         ref_color_above_max,
         x_or_y,
-        'discrete',
+        "discrete",
     )
     cascade_target = ref_target
     cascade_target.set_pattern_description = tc.stacked_color_bar_name(1, cascade_target_name)
@@ -1617,7 +1617,7 @@ def construct_linear_color_bar_cascade(  # Dimensions.
         color_bar_name,
         color_above_max,
         x_or_y,
-        'discrete',
+        "discrete",
     )
     cascade_target = tc.splice_targets_left_right(
         cascade_target, main_color_target, gap=ref_gap_pix, initial_color=gap_color, new_target_name=cascade_target_name
@@ -1628,7 +1628,7 @@ def construct_linear_color_bar_cascade(  # Dimensions.
         stack_sequence, list_of_discrete_or_continuous_lists, list_of_saturation_spec_lists
     ):
         # Status update.
-        print('In construct_linear_color_bar_cascade(), generating stacked bar ' + str(n_bars_in_stack) + '...')
+        print("In construct_linear_color_bar_cascade(), generating stacked bar " + str(n_bars_in_stack) + "...")
 
         # Generate color bar stack and its neighbors.
         stacked_color_target = tc.construct_stacked_linear_color_bar(
@@ -1658,7 +1658,7 @@ def construct_linear_color_bar_cascade(  # Dimensions.
             ]  # ?? SCAFFOLDING RCB -- IF COLOR_BAR BECOMES A CLASS, UPDATE THIS.
             grey_below_min = cl.black()
             grey_above_max = cl.white()
-            grey_bar_name = 'grey_' + str(len(grey_scale_list))
+            grey_bar_name = "grey_" + str(len(grey_scale_list))
             grey_target = tc.construct_target_linear_color_bar(
                 grey_bar_width,
                 color_total_height,
@@ -1668,7 +1668,7 @@ def construct_linear_color_bar_cascade(  # Dimensions.
                 grey_bar_name,
                 grey_above_max,
                 x_or_y,
-                'discrete',
+                "discrete",
             )  # Always discrete.
             stacked_target = tc.splice_targets_left_right(
                 grey_target, stacked_color_target, gap=0, initial_color=gap_color, new_target_name=cascade_target_name

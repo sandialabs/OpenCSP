@@ -41,5 +41,5 @@ class TestCroppingImageProcessor(unittest.TestCase):
             processor.process_image(SpotAnalysisOperable(tenbyfive))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -24,95 +24,95 @@ class TestImageProcessing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        dir_sofast_fringe = join(opencsp_code_dir(), 'test/data/sofast_fringe')
-        dir_sofast_common = join(opencsp_code_dir(), 'test/data/sofast_common')
+        dir_sofast_fringe = join(opencsp_code_dir(), "test/data/sofast_fringe")
+        dir_sofast_common = join(opencsp_code_dir(), "test/data/sofast_common")
 
         # Define calculation data files
-        cls.data_file_facet = join(dir_sofast_fringe, 'data_expected_facet/data.h5')
-        cls.data_file_undefined = join(dir_sofast_fringe, 'data_expected_undefined_mirror/data.h5')
-        cls.data_file_multi = join(dir_sofast_fringe, 'data_expected_facet_ensemble/data.h5')
+        cls.data_file_facet = join(dir_sofast_fringe, "data_expected_facet/data.h5")
+        cls.data_file_undefined = join(dir_sofast_fringe, "data_expected_undefined_mirror/data.h5")
+        cls.data_file_multi = join(dir_sofast_fringe, "data_expected_facet_ensemble/data.h5")
 
         # Define component files
-        cls.data_file_camera = join(dir_sofast_common, 'camera_sofast_downsampled.h5')
-        cls.data_file_measurement_facet = join(dir_sofast_fringe, 'data_measurement/measurement_facet.h5')
-        cls.data_file_measurement_ensemble = join(dir_sofast_fringe, 'data_measurement/measurement_ensemble.h5')
-        cls.data_file_calibration = join(dir_sofast_fringe, 'data_measurement/image_calibration.h5')
+        cls.data_file_camera = join(dir_sofast_common, "camera_sofast_downsampled.h5")
+        cls.data_file_measurement_facet = join(dir_sofast_fringe, "data_measurement/measurement_facet.h5")
+        cls.data_file_measurement_ensemble = join(dir_sofast_fringe, "data_measurement/measurement_ensemble.h5")
+        cls.data_file_calibration = join(dir_sofast_fringe, "data_measurement/image_calibration.h5")
 
         # Sofast fixed dot image
         cls.sofast_fixed_meas = MeasurementSofastFixed.load_from_hdf(
-            join(opencsp_code_dir(), 'test/data/sofast_fixed/data_measurement/measurement_facet.h5')
+            join(opencsp_code_dir(), "test/data/sofast_fixed/data_measurement/measurement_facet.h5")
         )
 
     def test_calc_mask_raw(self):
         """Tests image_processing.calc_mask_raw()"""
 
         # Load test data
-        datasets = ['MeasurementSofastFringe/mask_images']
+        datasets = ["MeasurementSofastFringe/mask_images"]
         data = load_hdf5_datasets(datasets, self.data_file_measurement_facet)
 
         # Perform calculation
-        mask_raw = ip.calc_mask_raw(data['mask_images'])
+        mask_raw = ip.calc_mask_raw(data["mask_images"])
 
         # Test
-        datasets = ['DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw']
+        datasets = ["DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw"]
         data = load_hdf5_datasets(datasets, self.data_file_facet)
-        np.testing.assert_allclose(data['mask_raw'], mask_raw)
+        np.testing.assert_allclose(data["mask_raw"], mask_raw)
 
     def test_mask_centroid(self):
         """Tests image_processing.centroid_mask()"""
         datasets = [
-            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_mask_centroid_image',
-            'DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw',
+            "DataSofastCalculation/general/CalculationImageProcessingGeneral/v_mask_centroid_image",
+            "DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw",
         ]
 
         # Load test data
         data = load_hdf5_datasets(datasets, self.data_file_facet)
 
         # Perform calculation
-        v_mask_cent = ip.centroid_mask(data['mask_raw']).data.squeeze()
+        v_mask_cent = ip.centroid_mask(data["mask_raw"]).data.squeeze()
 
         # Test
-        np.testing.assert_allclose(data['v_mask_centroid_image'], v_mask_cent)
+        np.testing.assert_allclose(data["v_mask_centroid_image"], v_mask_cent)
 
     def test_keep_largest_mask_area(self):
         """Tests image_processing.keep_largest_mask_area()"""
         datasets = [
-            'DataSofastCalculation/image_processing/facet_000/mask_processed',
-            'DataSofastCalculation/image_processing/general/mask_raw',
+            "DataSofastCalculation/image_processing/facet_000/mask_processed",
+            "DataSofastCalculation/image_processing/general/mask_raw",
         ]
 
         # Load test data
         data = load_hdf5_datasets(datasets, self.data_file_undefined)
 
         # Perform calculation
-        mask_processed = ip.keep_largest_mask_area(data['mask_raw'])
-        mask_processed = np.logical_and(mask_processed, data['mask_raw'])
+        mask_processed = ip.keep_largest_mask_area(data["mask_raw"])
+        mask_processed = np.logical_and(mask_processed, data["mask_raw"])
 
         # Test
-        np.testing.assert_allclose(data['mask_processed'], mask_processed)
+        np.testing.assert_allclose(data["mask_processed"], mask_processed)
 
     def test_edges_from_mask(self):
         """Tests image_processing.edges_from_mask()"""
         datasets = [
-            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image',
-            'DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw',
+            "DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image",
+            "DataSofastCalculation/general/CalculationImageProcessingGeneral/mask_raw",
         ]
 
         # Load test data
         data = load_hdf5_datasets(datasets, self.data_file_facet)
 
         # Perform calculation
-        v_edges = ip.edges_from_mask(data['mask_raw']).data.squeeze()
+        v_edges = ip.edges_from_mask(data["mask_raw"]).data.squeeze()
 
         # Test
-        np.testing.assert_allclose(data['v_edges_image'], v_edges)
+        np.testing.assert_allclose(data["v_edges_image"], v_edges)
 
     def test_refine_mask_perimeter(self):
         """Tests image_processing.refine_mask_perimeter()"""
         datasets = [
-            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image',
-            'DataSofastCalculation/general/CalculationImageProcessingGeneral/loop_optic_image_exp',
-            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/loop_facet_image_refine',
+            "DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image",
+            "DataSofastCalculation/general/CalculationImageProcessingGeneral/loop_optic_image_exp",
+            "DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/loop_facet_image_refine",
         ]
 
         # Get default parameters from Sofast class
@@ -126,24 +126,24 @@ class TestImageProcessing(unittest.TestCase):
         data = load_hdf5_datasets(datasets, self.data_file_facet)
 
         # Perform calculation
-        loop_facet_exp = LoopXY.from_vertices(Vxy(data['loop_optic_image_exp']))
+        loop_facet_exp = LoopXY.from_vertices(Vxy(data["loop_optic_image_exp"]))
         loop_facet_refine = ip.refine_mask_perimeter(
-            loop_facet_exp, Vxy(data['v_edges_image']), *args
+            loop_facet_exp, Vxy(data["v_edges_image"]), *args
         ).vertices.data.squeeze()
 
         # Test
-        np.testing.assert_allclose(data['loop_facet_image_refine'], loop_facet_refine)
+        np.testing.assert_allclose(data["loop_facet_image_refine"], loop_facet_refine)
 
     def test_refine_facet_corners(self):
         """Tests image_processing.refine_facet_corners()"""
         # Load edge data
         datasets = [
-            'DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image',
-            'DataSofastInput/optic_definition/DefinitionEnsemble/r_facet_ensemble',
+            "DataSofastCalculation/general/CalculationImageProcessingGeneral/v_edges_image",
+            "DataSofastInput/optic_definition/DefinitionEnsemble/r_facet_ensemble",
         ]
         data = load_hdf5_datasets(datasets, self.data_file_multi)
-        num_facets = data['r_facet_ensemble'].shape[0]
-        v_edges_image = Vxy(data['v_edges_image'])
+        num_facets = data["r_facet_ensemble"].shape[0]
+        v_edges_image = Vxy(data["v_edges_image"])
 
         # Loop through facets
         data_exp = []
@@ -151,29 +151,29 @@ class TestImageProcessing(unittest.TestCase):
         for facet_idx in range(num_facets):
             # Get sofast parameters
             datasets = [
-                'DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_step_length',
-                'DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_perpendicular_search_dist',
-                'DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_frac_keep',
+                "DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_step_length",
+                "DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_perpendicular_search_dist",
+                "DataSofastInput/ParamsSofastFringe/ParamsOpticGeometry/facet_corns_refine_frac_keep",
             ]
             data = load_hdf5_datasets(datasets, self.data_file_multi)
             args = [
-                data['facet_corns_refine_step_length'],
-                data['facet_corns_refine_perpendicular_search_dist'],
-                data['facet_corns_refine_frac_keep'],
+                data["facet_corns_refine_step_length"],
+                data["facet_corns_refine_perpendicular_search_dist"],
+                data["facet_corns_refine_frac_keep"],
             ]
 
             # Load input and expected output data
             datasets = [
-                f'DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/loop_facet_image_refine',
-                f'DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/v_facet_corners_image_exp',
-                f'DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/v_facet_centroid_image_exp',
+                f"DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/loop_facet_image_refine",
+                f"DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/v_facet_corners_image_exp",
+                f"DataSofastCalculation/facet/facet_{facet_idx:03d}/CalculationImageProcessingFacet/v_facet_centroid_image_exp",
             ]
             data = load_hdf5_datasets(datasets, self.data_file_multi)
-            v_facet_corners_image_exp = Vxy(data['v_facet_corners_image_exp'])
-            v_facet_centroid_image_exp = Vxy(data['v_facet_centroid_image_exp'])
+            v_facet_corners_image_exp = Vxy(data["v_facet_corners_image_exp"])
+            v_facet_centroid_image_exp = Vxy(data["v_facet_centroid_image_exp"])
 
             # Save expected data
-            data_exp.append(data['loop_facet_image_refine'])
+            data_exp.append(data["loop_facet_image_refine"])
 
             # Perform calculation
             reg = ip.refine_facet_corners(v_facet_corners_image_exp, v_facet_centroid_image_exp, v_edges_image, *args)
@@ -190,8 +190,8 @@ class TestImageProcessing(unittest.TestCase):
 
         # Load test data
         datasets = [
-            'DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/v_screen_points_fractional_screens',
-            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/mask_processed',
+            "DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/v_screen_points_fractional_screens",
+            "DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/mask_processed",
         ]
         data = load_hdf5_datasets(datasets, self.data_file_facet)
         measurement = MeasurementSofastFringe.load_from_hdf(self.data_file_measurement_facet)
@@ -203,7 +203,7 @@ class TestImageProcessing(unittest.TestCase):
         y_ims = measurement.fringe_images_y_calibrated
         x_periods = measurement.fringe_periods_x
         y_periods = measurement.fringe_periods_y
-        mask = data['mask_processed']
+        mask = data["mask_processed"]
 
         # Perform calculation
         screen_xs = ip.unwrap_phase(x_ims[mask, :].T, x_periods)
@@ -212,14 +212,14 @@ class TestImageProcessing(unittest.TestCase):
         v_display_pts = np.array([screen_xs, screen_ys])
 
         # Test
-        np.testing.assert_allclose(data['v_screen_points_fractional_screens'], v_display_pts, rtol=1e-06)
+        np.testing.assert_allclose(data["v_screen_points_fractional_screens"], v_display_pts, rtol=1e-06)
 
     def test_calculate_active_pixel_pointing_vectors(self):
         """Tests image_processing.calculate_active_pixel_pointing_vectors()"""
         datasets = [
-            'DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/u_pixel_pointing_facet',
-            'DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1',
-            'DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/mask_processed',
+            "DataSofastCalculation/facet/facet_000/CalculationDataGeometryFacet/u_pixel_pointing_facet",
+            "DataSofastCalculation/general/CalculationDataGeometryGeneral/r_optic_cam_refine_1",
+            "DataSofastCalculation/facet/facet_000/CalculationImageProcessingFacet/mask_processed",
         ]
 
         # Load test data
@@ -227,13 +227,13 @@ class TestImageProcessing(unittest.TestCase):
         camera = Camera.load_from_hdf(self.data_file_camera)
 
         # Perform calculation
-        mask = data['mask_processed']
-        r_cam_optic = Rotation.from_rotvec(data['r_optic_cam_refine_1']).inv()
+        mask = data["mask_processed"]
+        r_cam_optic = Rotation.from_rotvec(data["r_optic_cam_refine_1"]).inv()
         u_pixel_pointing_cam = ip.calculate_active_pixels_vectors(mask, camera)
         u_pixel_pointing_optic = u_pixel_pointing_cam.rotate(r_cam_optic).data.squeeze()
 
         # Test
-        np.testing.assert_allclose(data['u_pixel_pointing_facet'], u_pixel_pointing_optic)
+        np.testing.assert_allclose(data["u_pixel_pointing_facet"], u_pixel_pointing_optic)
 
     def test_detect_blobs(self):
         params = cv.SimpleBlobDetector_Params()
@@ -248,13 +248,13 @@ class TestImageProcessing(unittest.TestCase):
 
         blobs = ip.detect_blobs(self.sofast_fixed_meas.image, params)
 
-        self.assertEqual(len(blobs), 3761, 'Test number of blobs')
+        self.assertEqual(len(blobs), 3761, "Test number of blobs")
         np.testing.assert_allclose(
             blobs[0].data.squeeze(),
             np.array([672.20654297, 1138.20654297]),
             rtol=0,
             atol=1e-6,
-            err_msg='First blob pixel location does not match expected',
+            err_msg="First blob pixel location does not match expected",
         )
 
     def test_detect_blobs_inverse(self):
@@ -270,15 +270,15 @@ class TestImageProcessing(unittest.TestCase):
 
         blobs = ip.detect_blobs_inverse(self.sofast_fixed_meas.image, params)
 
-        self.assertEqual(len(blobs), 1, 'Test number of blobs')
+        self.assertEqual(len(blobs), 1, "Test number of blobs")
         np.testing.assert_allclose(
             blobs[0].data.squeeze(),
             np.array([960.590515, 796.387695]),
             rtol=0,
             atol=1e-6,
-            err_msg='blob pixel location does not match expected',
+            err_msg="blob pixel location does not match expected",
         )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -29,14 +29,14 @@ class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         path, name, _ = ft.path_components(__file__)
-        cls.in_dir = ft.join(path, 'data/input', name.split('test_')[-1])
-        cls.out_dir = ft.join(path, 'data/output', name.split('test_')[-1])
+        cls.in_dir = ft.join(path, "data/input", name.split("test_")[-1])
+        cls.out_dir = ft.join(path, "data/output", name.split("test_")[-1])
         ft.create_directories_if_necessary(cls.out_dir)
-        ft.delete_files_in_directory(cls.out_dir, '*')
+        ft.delete_files_in_directory(cls.out_dir, "*")
         return super().setUpClass()
 
     def setUp(self) -> None:
-        self.test_name = self.id().split('.')[-1]
+        self.test_name = self.id().split(".")[-1]
 
         self.example_cache_path = ft.join(self.in_dir, "example_image.npy")
         self.cacheable_image = ci.CacheableImage(cache_path=self.example_cache_path)
@@ -247,5 +247,5 @@ class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
         self.assertEqual(operable_4.previous_operables[1], processor_2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

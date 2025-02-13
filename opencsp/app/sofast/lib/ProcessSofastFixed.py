@@ -31,7 +31,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
 
     def __init__(
         self, orientation: SpatialOrientation, camera: Camera, fixed_pattern_dot_locs: DotLocationsFixedPattern
-    ) -> 'ProcessSofastFixed':
+    ) -> "ProcessSofastFixed":
         """Instantiates class
 
         Parameters
@@ -146,9 +146,9 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         # Remove nans if any present
         if np.any(nan_mask):
             lt.warn(
-                'ProcessSofastFixed._process_optic_common_geometry(): '
-                f'{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined '
-                f'for facet {idx_facet:d}. These data points will be removed.'
+                "ProcessSofastFixed._process_optic_common_geometry(): "
+                f"{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined "
+                f"for facet {idx_facet:d}. These data points will be removed."
             )
             # Remove nan data points from screen points
             pts_image = pts_image[active_point_mask]
@@ -172,15 +172,15 @@ class ProcessSofastFixed(ProcessSofastAbstract):
 
         # Construct surface kwargs
         kwargs = {
-            'v_optic_cam_optic': v_optic_cam_optic,
-            'u_active_pixel_pointing_optic': u_pixel_pointing_facet,
-            'u_measure_pixel_pointing_optic': u_cam_measure_point_facet,
-            'v_screen_points_facet': v_screen_points_facet,
-            'v_optic_screen_optic': v_optic_screen_optic,
-            'v_align_point_optic': self.data_geometry_facet[idx_facet].v_align_point_facet,
-            'dist_optic_screen': self.data_geometry_facet[idx_facet].measure_point_screen_distance,
-            'debug': self.params.debug_slope_solver,
-            'surface': self.data_surfaces[idx_facet],
+            "v_optic_cam_optic": v_optic_cam_optic,
+            "u_active_pixel_pointing_optic": u_pixel_pointing_facet,
+            "u_measure_pixel_pointing_optic": u_cam_measure_point_facet,
+            "v_screen_points_facet": v_screen_points_facet,
+            "v_optic_screen_optic": v_optic_screen_optic,
+            "v_align_point_optic": self.data_geometry_facet[idx_facet].v_align_point_facet,
+            "dist_optic_screen": self.data_geometry_facet[idx_facet].measure_point_screen_distance,
+            "debug": self.params.debug_slope_solver,
+            "surface": self.data_surfaces[idx_facet],
         }
 
         return kwargs, data_calculation_blob_assignment
@@ -246,10 +246,10 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         # Check inputs
         if len(pt_known) != 1:
             lt.error_and_raise(
-                ValueError, f'Only 1 pt_known can be given for single facet processing but {len(pt_known):d} were given'
+                ValueError, f"Only 1 pt_known can be given for single facet processing but {len(pt_known):d} were given"
             )
 
-        self.optic_type = 'single'
+        self.optic_type = "single"
         self.num_facets = 1
         self.data_facet_def = [data_facet_def.copy()]
         self.data_surfaces = [surface]
@@ -322,12 +322,12 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         if len(data_facet_def) != len(surfaces) != len(pts_known) != len(xys_known):
             lt.error_and_raise(
                 ValueError,
-                'ProcessSofastFixed: Length of data_facet_def does not equal length of data_surfaces'
-                + f'data_facet_def={len(data_facet_def)}, surface_data={len(surfaces)}, '
-                + f'pts_known={len(pts_known)}, xys_known={len(xys_known)}',
+                "ProcessSofastFixed: Length of data_facet_def does not equal length of data_surfaces"
+                + f"data_facet_def={len(data_facet_def)}, surface_data={len(surfaces)}, "
+                + f"pts_known={len(pts_known)}, xys_known={len(xys_known)}",
             )
 
-        self.optic_type = 'multi'
+        self.optic_type = "multi"
         self.num_facets = len(data_facet_def)
         self.data_facet_def = [d.copy() for d in data_facet_def]
         self.data_ensemble_def = data_ensemble_def.copy()
@@ -361,7 +361,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
 
         for idx_facet, geom in enumerate(self.data_image_processing_facet):
             loop = geom.loop_facet_image_refine
-            self.debug_blob_index.name = f' - Facet {idx_facet:d}'
+            self.debug_blob_index.name = f" - Facet {idx_facet:d}"
             self.blob_index.append(self._find_blobs(pts_known[idx_facet], xys_known[idx_facet], loop))
 
         # Generate geometry and slope solver inputs
@@ -380,7 +380,7 @@ class ProcessSofastFixed(ProcessSofastAbstract):
         # Calculate facet pointing
         self._calculate_facet_pointing()
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
@@ -398,5 +398,5 @@ class ProcessSofastFixed(ProcessSofastAbstract):
             # Save facet blob index calcluations (specific to Sofast Fixed)
             if self.data_calculation_blob_assignment is not None:
                 self.data_calculation_blob_assignment[idx_facet].save_to_hdf(
-                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                    file, f"{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/"
                 )

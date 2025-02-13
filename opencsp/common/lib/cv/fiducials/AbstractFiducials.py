@@ -227,7 +227,7 @@ class AbstractFiducials(ABC):
             canvas = fig.canvas
 
             # Image from plot
-            axes.axis('off')
+            axes.axis("off")
             fig.tight_layout(pad=0)
 
             # To remove the huge white borders

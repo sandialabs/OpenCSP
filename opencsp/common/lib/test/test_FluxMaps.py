@@ -64,8 +64,8 @@ class TestFluxMaps(to.TestOutput):
     @classmethod
     def setUpClass(
         self,
-        source_file_body: str = 'TestFluxMaps',  # Set these here, because pytest calls
-        figure_prefix_root: str = 'tfm',  # setup_class() with no arguments.
+        source_file_body: str = "TestFluxMaps",  # Set these here, because pytest calls
+        figure_prefix_root: str = "tfm",  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
@@ -103,7 +103,7 @@ class TestFluxMaps(to.TestOutput):
             lln.NSTTF_ORIGIN,
             dpft.sandia_nsttf_test_heliostats_origin_file(),
             dpft.sandia_nsttf_test_facet_centroidsfile(),
-            'Sandia NSTTF',
+            "Sandia NSTTF",
         )
 
     def test_parabolic_mirror_bullet(self) -> None:
@@ -118,8 +118,8 @@ class TestFluxMaps(to.TestOutput):
         MIRROR_DIM = (1.2, 1.2)  # meters
 
         # View setup
-        title = 'Mirror Facing Up'
-        caption = f'A mirror with focal length {FOCAL_LENGTH} facing up for a ray trace.'
+        title = "Mirror Facing Up"
+        caption = f"A mirror with focal length {FOCAL_LENGTH} facing up for a ray trace."
         comments = []
 
         # Configuration setup
@@ -175,9 +175,9 @@ class TestFluxMaps(to.TestOutput):
         mirror.draw(fig_record.view, mirror_style)
         trace_style = rcrt.init_current_lengths(current_len=6)
         trace.draw(fig_record.view, trace_style)
-        square(4).draw_line(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color='b', marker=','))
-        square(5).draw_line(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color='g', marker=','))
-        square(6).draw_line(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color='r', marker=','))
+        square(4).draw_line(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color="b", marker=","))
+        square(5).draw_line(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color="g", marker=","))
+        square(6).draw_line(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color="r", marker=","))
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=4
@@ -196,7 +196,7 @@ class TestFluxMaps(to.TestOutput):
         )
         fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
         fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
-        bullet4.draw(fig_record.view, rcps.RenderControlPointSeq(color='b'))
+        bullet4.draw(fig_record.view, rcps.RenderControlPointSeq(color="b"))
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=5
@@ -215,7 +215,7 @@ class TestFluxMaps(to.TestOutput):
         )
         fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
         fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
-        bullet5.draw(fig_record.view, rcps.RenderControlPointSeq(color='g'))
+        bullet5.draw(fig_record.view, rcps.RenderControlPointSeq(color="g"))
         self.show_save_and_check_figure(fig_record)
 
         # Draw z=6
@@ -234,7 +234,7 @@ class TestFluxMaps(to.TestOutput):
         )
         fig_record.x_limits = (-sqaure_half_side, sqaure_half_side)
         fig_record.y_limits = (-sqaure_half_side, sqaure_half_side)
-        bullet6.draw(fig_record.view, rcps.RenderControlPointSeq(color='r'))
+        bullet6.draw(fig_record.view, rcps.RenderControlPointSeq(color="r"))
         self.show_save_and_check_figure(fig_record)
 
     def test_parabolic_mirror_flux_map(self) -> None:
@@ -357,10 +357,10 @@ if __name__ == "__main__":
     test_object = TestFluxMaps()
     test_object.setUpClass(interactive=interactive, verify=verify)
     # Tests.
-    lt.info('Beginning tests...')
+    lt.info("Beginning tests...")
     test_object.test_parabolic_mirror_bullet()
     test_object.test_parabolic_mirror_flux_map()
-    lt.info('All tests complete.')
+    lt.info("All tests complete.")
     # Cleanup.
     if interactive:
         input("Press Enter...")

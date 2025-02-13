@@ -64,7 +64,7 @@ class FacetEnsemble(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOri
             points_z = facet.mirror.surface_displacement_at(points_xy)  # mirror frame
             # If the corners aren't in range of the mirror's interpolation function, set to 0
             if np.any(np.isnan(points_z)):
-                lt.warn(f'Could not find corner z values for facet number {facet_idx:3d}; filling with zeros.')
+                lt.warn(f"Could not find corner z values for facet number {facet_idx:3d}; filling with zeros.")
                 points_z = np.nan_to_num(points_z, nan=0)
             # Translate xyz points to their locations in the ensemble
             points_xyz = Pxyz((points_xy.x, points_xy.y, points_z))  # mirror frame

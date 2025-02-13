@@ -47,7 +47,7 @@ def path_to_cmd_line(path: str):
     """Normalizes and surrounds a path with quotes, as necessary."""
     ret = os.path.normpath(path)
     if " " in ret:
-        ret = "\"" + ret + "\""
+        ret = '"' + ret + '"'
     return ret
 
 
@@ -75,7 +75,7 @@ def norm_path(path: str, allow_extended_length_path=True):
                 if allow_extended_length_path:
                     path = extended_path_prefix + path
                 else:
-                    lt.warn(f"Long path name \"{path}\" detected.")
+                    lt.warn(f'Long path name "{path}" detected.')
 
     return path
 
@@ -121,7 +121,7 @@ def file_exists(input_dir_body_ext: str, error_if_exists_as_dir=True, follow_sym
         if error_if_exists_as_dir == True:
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In file_exists(), requested input path exists and is a directory: ' + str(input_dir_body_ext),
+                "ERROR: In file_exists(), requested input path exists and is a directory: " + str(input_dir_body_ext),
             )
         else:
             return False
@@ -145,7 +145,7 @@ def directory_exists(input_dir: str, error_if_exists_as_file=True, follow_symlin
         if error_if_exists_as_file == True:
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In directory_exists(), requested input path exists and is a file: ' + str(input_dir),
+                "ERROR: In directory_exists(), requested input path exists and is a file: " + str(input_dir),
             )
         else:
             return False
@@ -165,11 +165,11 @@ def directory_is_empty(input_dir):
     # Check input.
     if os.path.isfile(input_dir):
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In directory_is_empty(), requested input path exists and is a file: ' + str(input_dir)
+            RuntimeError, "ERROR: In directory_is_empty(), requested input path exists and is a file: " + str(input_dir)
         )
     if not os.path.isdir(input_dir):
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In directory_is_empty(), requested input directory does not exist: ' + str(input_dir)
+            RuntimeError, "ERROR: In directory_is_empty(), requested input directory does not exist: " + str(input_dir)
         )
     # Probe the directory contents to determine whether any contents are there.
     # The standard Unix files "." and ".." don't count as contents.
@@ -177,7 +177,7 @@ def directory_is_empty(input_dir):
     # list of all the filenames, etc, and thus is faster than using os.listdir().
     with os.scandir(input_dir) as it:
         for entry in it:
-            if (entry.name == '.') or (entry.name == '..'):
+            if (entry.name == ".") or (entry.name == ".."):
                 # Ignore these files.
                 continue
             # We found an entry, so the directory is not empty.
@@ -199,17 +199,17 @@ def count_items_in_directory(
     if not os.path.exists(input_dir):
         lt.error_and_raise(
             RuntimeError,
-            'ERROR: In count_items_in_directory(), requested input directory does not exist: ' + str(input_dir),
+            "ERROR: In count_items_in_directory(), requested input directory does not exist: " + str(input_dir),
         )
     if not os.path.isdir(input_dir):
         if os.path.isfile(input_dir):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In count_items_in_directory(), requested input path exists and is a file: ' + str(input_dir),
+                "ERROR: In count_items_in_directory(), requested input path exists and is a file: " + str(input_dir),
             )
         lt.error_and_raise(
             RuntimeError,
-            'ERROR: In count_items_in_directory(), requested input directory is not a directory: ' + str(input_dir),
+            "ERROR: In count_items_in_directory(), requested input directory is not a directory: " + str(input_dir),
         )
     # Walk the directory contents to determine whether any contents are there.
     # The standard Unix files "." and ".." don't count as contents.
@@ -219,7 +219,7 @@ def count_items_in_directory(
     with os.scandir(input_dir) as it:
         for entry in it:
             # Ignore standard Unix files.
-            if (entry.name == '.') or (entry.name == '..'):
+            if (entry.name == ".") or (entry.name == ".."):
                 # Ignore these files.
                 continue
             # Check prefix and suffix.
@@ -288,8 +288,8 @@ def file_size(input_dir_body_ext, error_if_exists_as_dir=True):
     if not file_exists(input_dir_body_ext, error_if_exists_as_dir):
         lt.error_and_raise(
             FileNotFoundError,
-            'ERROR: In file_size(), input_dir_body_ext '
-            + 'was not found.\n\tinput_dir_body_ext ='
+            "ERROR: In file_size(), input_dir_body_ext "
+            + "was not found.\n\tinput_dir_body_ext ="
             + input_dir_body_ext,
         )
     return os.path.getsize(input_dir_body_ext)
@@ -363,7 +363,7 @@ def files_in_directory(input_dir, sort=True, files_only=False, recursive=False):
     # Ignore standard Unix files.
     for file_relpath_name_ext in scanned_files:
         relpath, name, ext = path_components(file_relpath_name_ext)
-        if (name == '.') or (name == '..'):
+        if (name == ".") or (name == ".."):
             # Ignore these files.
             continue
         file_list.append(file_relpath_name_ext)
@@ -388,7 +388,7 @@ def files_in_directory_with_associated_sizes(input_dir, sort=True, follow_symlin
     with os.scandir(input_dir) as it:
         for entry in it:
             # Ignore standard Unix files.
-            if (entry.name == '.') or (entry.name == '..'):
+            if (entry.name == ".") or (entry.name == ".."):
                 # Ignore these files.
                 continue
             # Valid entry.
@@ -498,19 +498,19 @@ def delete_file(input_dir_body_ext, error_on_not_exists=True):
             if error_on_not_exists:
                 lt.error_and_raise(
                     RuntimeError,
-                    'ERROR: In delete_file(), requested input path is not an existing file: ' + str(input_dir_body_ext),
+                    "ERROR: In delete_file(), requested input path is not an existing file: " + str(input_dir_body_ext),
                 )
             return
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In delete_file(), requested input path is not a file: ' + str(input_dir_body_ext)
+            RuntimeError, "ERROR: In delete_file(), requested input path is not a file: " + str(input_dir_body_ext)
         )
     try:
         os.remove(input_dir_body_ext)
     except OSError as e:
         print(
-            'ERROR: In delete_file()), attempt to delete file '
+            "ERROR: In delete_file()), attempt to delete file "
             + input_dir_body_ext
-            + ' resulted in error: '
+            + " resulted in error: "
             + e.strerror
         )
         raise  # if this should NOT raise an exception then that should be documented, as well as the reason why it shouldn't ~BGB230119
@@ -546,13 +546,13 @@ def delete_files_in_directory(input_dir: str, globexp: str, error_on_dir_not_exi
     if os.path.isfile(input_dir):
         lt.error_and_raise(
             RuntimeError,
-            'ERROR: In delete_items_in_directory(), requested input path exists and is a file: ' + str(input_dir),
+            "ERROR: In delete_items_in_directory(), requested input path exists and is a file: " + str(input_dir),
         )
     if not os.path.isdir(input_dir):
         if error_on_dir_not_exists:
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In delete_items_in_directory(), requested input directory does not exist: ' + str(input_dir),
+                "ERROR: In delete_items_in_directory(), requested input directory does not exist: " + str(input_dir),
             )
     # Delete the files.
     localized_globexp = os.path.join(input_dir, globexp)
@@ -567,9 +567,9 @@ def delete_files_in_directory(input_dir: str, globexp: str, error_on_dir_not_exi
                 pass
             else:
                 print(
-                    'ERROR: In delete_files_in_directory(), attempt to delete file '
+                    "ERROR: In delete_files_in_directory(), attempt to delete file "
                     + f
-                    + ' resulted in error: '
+                    + " resulted in error: "
                     + e.strerror
                 )
 
@@ -584,7 +584,7 @@ def create_directories_if_necessary(input_dir):
     if os.path.isfile(input_dir):
         lt.error_and_raise(
             RuntimeError,
-            'ERROR: In create_directories_if_necessary(), requested input path exists and is a file: ' + str(input_dir),
+            "ERROR: In create_directories_if_necessary(), requested input path exists and is a file: " + str(input_dir),
         )
     # Create the directory and its parents, if they do not exist.
     if not os.path.isdir(input_dir):
@@ -613,19 +613,19 @@ def create_subdir(base_dir: str, dir_name: str, error_if_exists=True):
     # Check input.
     if not os.path.exists(base_dir):
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In create_subdir(): Containing directory does not exist:\n\t' + base_dir
+            RuntimeError, "ERROR: In create_subdir(): Containing directory does not exist:\n\t" + base_dir
         )
     result_dir = os.path.join(base_dir, dir_name)
     if os.path.exists(result_dir):
         if error_if_exists:
-            lt.error_and_raise('ERROR: In create_subdir(), Result directory exists:\n\t' + result_dir)
+            lt.error_and_raise("ERROR: In create_subdir(), Result directory exists:\n\t" + result_dir)
         else:
             pass
     else:
         try:
             os.mkdir(result_dir)
         except:
-            lt.error_and_raise(RuntimeError, 'ERROR: In create_subdir(): Could not create directory: ' + result_dir)
+            lt.error_and_raise(RuntimeError, "ERROR: In create_subdir(): Could not create directory: " + result_dir)
     return result_dir
 
 
@@ -645,7 +645,7 @@ def directories_with_no_leading_underscore(directory, sort=True):
     which do not begin with a  leading underscore.
     """
     dir_list = directories_in_directory(directory, sort=sort)
-    return [d for d in dir_list if not d.startswith('_')]
+    return [d for d in dir_list if not d.startswith("_")]
 
 
 def convert_string_to_file_body(txt):
@@ -654,18 +654,18 @@ def convert_string_to_file_body(txt):
     # Create output variable to modify.
     output_file_body = txt
     # Eliminate special characters.
-    output_file_body = output_file_body.replace(',', '_')
-    output_file_body = output_file_body.replace('/', '_div_')
-    output_file_body = output_file_body.replace(':', '_')
-    output_file_body = output_file_body.replace('^', '')
-    output_file_body = output_file_body.replace('=', '_eq_')
-    output_file_body = output_file_body.replace('(', '_')
-    output_file_body = output_file_body.replace(')', '_')
+    output_file_body = output_file_body.replace(",", "_")
+    output_file_body = output_file_body.replace("/", "_div_")
+    output_file_body = output_file_body.replace(":", "_")
+    output_file_body = output_file_body.replace("^", "")
+    output_file_body = output_file_body.replace("=", "_eq_")
+    output_file_body = output_file_body.replace("(", "_")
+    output_file_body = output_file_body.replace(")", "_")
     # Replace blanks with underscores.
-    output_file_body = output_file_body.replace(' ', '_')
+    output_file_body = output_file_body.replace(" ", "_")
     # Eliminate double underscores.
-    while '__' in output_file_body:
-        output_file_body = output_file_body.replace('__', '_')
+    while "__" in output_file_body:
+        output_file_body = output_file_body.replace("__", "_")
     # Return.
     return output_file_body
 
@@ -698,18 +698,18 @@ def default_output_path(file_path_name_ext: Optional[str] = None) -> str:
         return _output_paths[file_path_name_ext]
 
     # generate a new output path
-    output_dir_name = 'output_' + datetime.now().strftime('%Y_%m_%d_%H%M')
+    output_dir_name = "output_" + datetime.now().strftime("%Y_%m_%d_%H%M")
     if file_path_name_ext != None and os.path.exists(file_path_name_ext):
         file_dir = file_path_name_ext if os.path.isdir(file_path_name_ext) else os.path.dirname(file_path_name_ext)
         if file_dir != "":
             _output_paths[file_path_name_ext] = os.path.join(file_dir, output_dir_name)
         else:
             _output_paths[file_path_name_ext] = os.path.join(
-                'common', 'lib', 'tool', 'test', 'data', 'output', 'file_tools', output_dir_name
+                "common", "lib", "tool", "test", "data", "output", "file_tools", output_dir_name
             )
     else:
         _output_paths[file_path_name_ext] = os.path.join(
-            'common', 'lib', 'tool', 'test', 'data', 'output', 'file_tools', output_dir_name
+            "common", "lib", "tool", "test", "data", "output", "file_tools", output_dir_name
         )
 
     return _output_paths[file_path_name_ext]
@@ -739,34 +739,34 @@ def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check
         if os.path.isdir(input_dir_body_ext):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In rename_file(), requested input path exists and is a directory: ' + str(input_dir_body_ext),
+                "ERROR: In rename_file(), requested input path exists and is a directory: " + str(input_dir_body_ext),
             )
     if not os.path.isfile(input_dir_body_ext):
         lt.error_and_raise(
             RuntimeError,
-            'ERROR: In rename_file(), requested input file to rename does not exist: ' + str(input_dir_body_ext),
+            "ERROR: In rename_file(), requested input file to rename does not exist: " + str(input_dir_body_ext),
         )
     if not is_file_check_only:
         if os.path.isfile(output_dir_body_ext):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In rename_file(), requested output file exists and is a file: ' + str(output_dir_body_ext),
+                "ERROR: In rename_file(), requested output file exists and is a file: " + str(output_dir_body_ext),
             )
         if os.path.isdir(output_dir_body_ext):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In rename_file(), requested output file exists as a directory: ' + str(output_dir_body_ext),
+                "ERROR: In rename_file(), requested output file exists as a directory: " + str(output_dir_body_ext),
             )
         if os.path.exists(output_dir_body_ext):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In rename_file(), requested output file exists as something besides a file or directory: '
+                "ERROR: In rename_file(), requested output file exists as something besides a file or directory: "
                 + str(output_dir_body_ext),
             )
         if not os.path.isdir(os.path.dirname(output_dir_body_ext)):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In rename_file(), requested output path does not exist or is not a directory: '
+                "ERROR: In rename_file(), requested output path does not exist or is not a directory: "
                 + str(os.path.dirname(output_dir_body_ext)),
             )
     # Rename the file.
@@ -820,20 +820,20 @@ def copy_file(input_dir_body_ext: str, output_dir: str, output_body_ext: str = N
     if os.path.isdir(input_dir_body_ext):
         lt.error_and_raise(
             RuntimeError,
-            'ERROR: In copy_file(), requested input path exists and is a directory: ' + str(input_dir_body_ext),
+            "ERROR: In copy_file(), requested input path exists and is a directory: " + str(input_dir_body_ext),
         )
     if not os.path.isfile(input_dir_body_ext):
         lt.error_and_raise(
             RuntimeError,
-            'ERROR: In copy_file(), requested input file to copy does not exist: ' + str(input_dir_body_ext),
+            "ERROR: In copy_file(), requested input file to copy does not exist: " + str(input_dir_body_ext),
         )
     if os.path.isfile(output_dir):
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In copy_file(), requested output path exists and is a file: ' + str(output_dir)
+            RuntimeError, "ERROR: In copy_file(), requested output path exists and is a file: " + str(output_dir)
         )
     if not os.path.isdir(output_dir):
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In copy_file(), requested output directory does not exist: ' + str(output_dir)
+            RuntimeError, "ERROR: In copy_file(), requested output directory does not exist: " + str(output_dir)
         )
     # Assemble the output file path.
     if output_body_ext == None:
@@ -844,7 +844,7 @@ def copy_file(input_dir_body_ext: str, output_dir: str, output_body_ext: str = N
     # Check output.
     if file_exists(output_dir_body_ext):
         lt.error_and_raise(
-            FileExistsError, 'ERROR: In copy_file(), requested output file already exists: ' + str(output_dir_body_ext)
+            FileExistsError, "ERROR: In copy_file(), requested output file already exists: " + str(output_dir_body_ext)
         )
 
     # Copy the file.
@@ -890,7 +890,7 @@ def get_temporary_file(suffix: str = None, dir: str = None, text: bool = True) -
     import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
     import opencsp.common.lib.tool.system_tools as st
 
-    default_possible_dirs = [orp.opencsp_temporary_dir(), os.path.expanduser('~'), tempfile.gettempdir()]
+    default_possible_dirs = [orp.opencsp_temporary_dir(), os.path.expanduser("~"), tempfile.gettempdir()]
     possible_dirs = [dir] if dir != None else default_possible_dirs
     success = False
 
@@ -921,11 +921,11 @@ def merge_files(in_files: list[str], out_file: str, overwrite=False, remove_in_f
     if not overwrite:
         if file_exists(out_file):
             lt.error_and_raise(
-                RuntimeError, f"Error: in file_tools.merge_files: output file already exists \"{out_file}\""
+                RuntimeError, f'Error: in file_tools.merge_files: output file already exists "{out_file}"'
             )
-    with open(out_file, 'wb') as wfd:
+    with open(out_file, "wb") as wfd:
         for f in in_files:
-            with open(f, 'rb') as fd:
+            with open(f, "rb") as fd:
                 shutil.copyfileobj(fd, wfd)
             if remove_in_files:
                 os.remove(f)
@@ -1026,26 +1026,26 @@ def write_text_file(
     if os.path.isfile(output_dir):
         lt.error_and_raise(
             FileExistsError,
-            'ERROR: In write_text_file(), requested output path exists and is a file: ' + str(output_dir),
+            "ERROR: In write_text_file(), requested output path exists and is a file: " + str(output_dir),
         )
     if error_if_dir_not_exist == True:
         if not directory_exists(output_dir):
             lt.error_and_raise(
                 FileNotFoundError,
-                'ERROR: In write_text_file(), requested output directory does not exist: ' + str(output_dir),
+                "ERROR: In write_text_file(), requested output directory does not exist: " + str(output_dir),
             )
     else:
         create_directories_if_necessary(output_dir)
     # Write output file.
-    output_body_ext = convert_string_to_file_body(output_file_body) + '.txt'
+    output_body_ext = convert_string_to_file_body(output_file_body) + ".txt"
     output_dir_body_ext = os.path.join(output_dir, output_body_ext)
     if description is not None:
-        print('Saving ' + description + ': ', output_dir_body_ext)
-    with open(output_dir_body_ext, 'w') as output_stream:
+        print("Saving " + description + ": ", output_dir_body_ext)
+    with open(output_dir_body_ext, "w") as output_stream:
         # Write strings.
         for output_str in output_string_list:
             output_stream.write(
-                str(output_str) + '\n'
+                str(output_str) + "\n"
             )  # Call str, just in case somebody passes in a list of ints, etc.
     # Return.
     return output_dir_body_ext
@@ -1060,9 +1060,9 @@ def read_text_file(input_dir_body_ext):
     """
     # Check input.
     if not file_exists(input_dir_body_ext):
-        lt.error_and_raise(IOError, 'ERROR: In read_text_file(), file does not exist: ' + str(input_dir_body_ext))
+        lt.error_and_raise(IOError, "ERROR: In read_text_file(), file does not exist: " + str(input_dir_body_ext))
     # Open and read the file.
-    with open(input_dir_body_ext, newline='') as input_stream:
+    with open(input_dir_body_ext, newline="") as input_stream:
         lines = input_stream.readlines()
     return lines
 
@@ -1112,19 +1112,19 @@ def to_csv(
         error_if_dir_not_exist: bool
                                 If True, error if not exist.  If False, create dir if necessary.
     """
-    output_body_ext = convert_string_to_file_body(output_file_body) + '.csv'
+    output_body_ext = convert_string_to_file_body(output_file_body) + ".csv"
     output_dir_body_ext = join(output_dir, output_body_ext)
 
     # Check status of output_dir.
     if os.path.isfile(output_dir):
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In write_csv_file(), requested output path exists and is a file: ' + str(output_dir)
+            RuntimeError, "ERROR: In write_csv_file(), requested output path exists and is a file: " + str(output_dir)
         )
     if error_if_dir_not_exist == True:
         if not directory_exists(output_dir):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In write_csv_file(), requested output directory does not exist: ' + str(output_dir),
+                "ERROR: In write_csv_file(), requested output directory does not exist: " + str(output_dir),
             )
     else:
         create_directories_if_necessary(output_dir)
@@ -1138,25 +1138,25 @@ def to_csv(
 
     # Write output file.
     if description is not None:
-        lt.info('Saving ' + description + ': ' + output_dir_body_ext)
-    output_stream = open(output_dir_body_ext, 'w')
+        lt.info("Saving " + description + ": " + output_dir_body_ext)
+    output_stream = open(output_dir_body_ext, "w")
     # Write heading lines.
     if heading_line == None:
         pass
     elif heading_line == True:
         if len(data_lines) > 0 and isinstance(data_lines[0], csvi.CsvInterface):
-            output_stream.write(data_lines[0].csv_header() + '\n')
+            output_stream.write(data_lines[0].csv_header() + "\n")
         else:
             output_stream.write("empty_csv_header\n")
     else:
-        output_stream.write(heading_line + '\n')
+        output_stream.write(heading_line + "\n")
     # Write data rows.
     if len(data_lines) > 0 and isinstance(data_lines[0], csvi.CsvInterface):
         for data_line in data_lines:
-            output_stream.write(data_line.to_csv_line() + '\n')
+            output_stream.write(data_line.to_csv_line() + "\n")
     else:
         for data_line in data_lines:
-            output_stream.write(data_line + '\n')
+            output_stream.write(data_line + "\n")
     output_stream.close()
     # Return.
     return output_dir_body_ext
@@ -1204,11 +1204,11 @@ def from_csv(description: str | None, input_path: str, input_file_name_ext: str)
     # Consruct input file path and name.
     input_path_file = os.path.join(input_path, input_file_name_ext)
     if description is not None:
-        lt.info('Reading ' + description + ': ' + input_path_file + ' ...')
+        lt.info("Reading " + description + ": " + input_path_file + " ...")
     # Read csv file.
     data_rows: list[list[str]] = []
     with open(input_path_file) as csvfile:
-        readCSV = csv.reader(csvfile, delimiter=',')
+        readCSV = csv.reader(csvfile, delimiter=",")
         for row in readCSV:
             data_rows.append(row)
     return data_rows
@@ -1234,32 +1234,32 @@ def write_dict_file(
     # Check status of output_dir.
     if os.path.isfile(output_dir):
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In write_dict_file(), requested output path exists and is a file: ' + str(output_dir)
+            RuntimeError, "ERROR: In write_dict_file(), requested output path exists and is a file: " + str(output_dir)
         )
     if error_if_dir_not_exist == True:
         if not directory_exists(output_dir):
             lt.error_and_raise(
                 RuntimeError,
-                'ERROR: In write_dict_file(), requested output directory does not exist: ' + str(output_dir),
+                "ERROR: In write_dict_file(), requested output directory does not exist: " + str(output_dir),
             )
     else:
         create_directories_if_necessary(output_dir)
 
     # Write output file.
-    output_body_ext = convert_string_to_file_body(output_body) + '.csv'
+    output_body_ext = convert_string_to_file_body(output_body) + ".csv"
     output_dir_body_ext = os.path.join(output_dir, output_body_ext)
     if description != None:
-        print('Saving ' + description + ': ', output_dir_body_ext)
-    output_stream = open(output_dir_body_ext, 'w')
+        print("Saving " + description + ": ", output_dir_body_ext)
+    output_stream = open(output_dir_body_ext, "w")
     # Write dictionary data.
     for key in output_dict.keys():
         value = output_dict[key]
         if isinstance(value, float):
-            format_str = '.' + str(decimal_places) + 'f'
-            value_str = ('{0:' + format_str + '}').format(value)
+            format_str = "." + str(decimal_places) + "f"
+            value_str = ("{0:" + format_str + "}").format(value)
         else:
             value_str = str(value)
-        output_stream.write(str(key) + ',' + value_str + '\n')
+        output_stream.write(str(key) + "," + value_str + "\n")
     output_stream.close()
     # Return.
     return output_dir_body_ext
@@ -1276,7 +1276,7 @@ def add_row_to_output_dict(input_row: tuple[any, any], output_dict: dict):
     # Check input.
     if len(input_row) != 2:
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In add_row_to_output_dict(), input row is not of length 2: ', input_row
+            RuntimeError, "ERROR: In add_row_to_output_dict(), input row is not of length 2: ", input_row
         )
     # Fetch key and value strings read from file.
     key_str = input_row[0]
@@ -1308,17 +1308,17 @@ def read_dict(input_dict_dir_body_ext):
     """
     # Check input.
     if not file_exists(input_dict_dir_body_ext):
-        lt.error_and_raise(RuntimeError, 'ERROR: In read_dict(), file does not exist: ' + str(input_dict_dir_body_ext))
+        lt.error_and_raise(RuntimeError, "ERROR: In read_dict(), file does not exist: " + str(input_dict_dir_body_ext))
     input_dir, input_body, input_ext = path_components(input_dict_dir_body_ext)
-    if input_ext.lower() != '.csv':
+    if input_ext.lower() != ".csv":
         lt.error_and_raise(
-            RuntimeError, 'ERROR: In read_dict(), input file is not a csv file: ' + str(input_dict_dir_body_ext)
+            RuntimeError, "ERROR: In read_dict(), input file is not a csv file: " + str(input_dict_dir_body_ext)
         )
 
     # Open and read the file.
     output_dict = {}
-    with open(input_dict_dir_body_ext, newline='') as input_stream:
-        reader = csv.reader(input_stream, delimiter=',')
+    with open(input_dict_dir_body_ext, newline="") as input_stream:
+        reader = csv.reader(input_stream, delimiter=",")
         for input_row in reader:
             add_row_to_output_dict(input_row, output_dict)
     return output_dict
@@ -1362,7 +1362,7 @@ def write_json(
 
     # save the file
     if description != None:
-        print('Saving ' + description + ': ', output_path_name_ext)
+        print("Saving " + description + ": ", output_path_name_ext)
     with open(output_path_name_ext, "w") as fout:
         json.dump(output_object, fout)
 
@@ -1399,8 +1399,8 @@ def read_json(description: str | None, input_dir: str, input_file_body_ext: str)
 
     # read the file
     if description is not None:
-        lt.info('Reading ' + description + ': ' + input_path_name_ext + ' ...')
-    with open(input_path_name_ext, 'r') as fin:
+        lt.info("Reading " + description + ": " + input_path_name_ext + " ...")
+    with open(input_path_name_ext, "r") as fin:
         lines = fin.readlines()
     lines = map(lambda l: "" if l.strip().startswith("//") else l, lines)
     return json.loads("\n".join(lines))
@@ -1457,5 +1457,5 @@ def read_json(description: str | None, input_dir: str, input_file_body_ext: str)
 #     return object
 
 
-if __name__ == '__main__':
-    print("directories_with_no_leading_underscore('.') = ", directories_with_no_leading_underscore('.'))
+if __name__ == "__main__":
+    print("directories_with_no_leading_underscore('.') = ", directories_with_no_leading_underscore("."))

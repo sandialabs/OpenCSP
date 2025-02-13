@@ -55,13 +55,13 @@ class RenderControlText:
 
     def __init__(
         self,  # See above for details:
-        horizontalalignment: str = 'center',  # center, right, left
-        verticalalignment: str = 'center',  # center, top, bottom, baseline, center_baseline
-        fontsize: str | float = 'medium',  # float or xx-small, x-small, small, medium, large, x-large, xx-large
-        fontstyle: str = 'normal',  # normal, italic, oblique
-        fontweight: int | str = 'normal',  # 0-1000, or light, normal, bold (see above for full list)
+        horizontalalignment: str = "center",  # center, right, left
+        verticalalignment: str = "center",  # center, top, bottom, baseline, center_baseline
+        fontsize: str | float = "medium",  # float or xx-small, x-small, small, medium, large, x-large, xx-large
+        fontstyle: str = "normal",  # normal, italic, oblique
+        fontweight: int | str = "normal",  # 0-1000, or light, normal, bold (see above for full list)
         zdir: str | tuple[int, int, int] | None = None,  # None, 'x', 'y', 'z', (1,1,0), (1,1,1), ...
-        color: str | cl.Color = 'b',  # bgrcmykw (see above)
+        color: str | cl.Color = "b",  # bgrcmykw (see above)
         rotation: float = 0,  # radians, 0=horizontal, pi/2=vertical
     ):
         """
@@ -114,15 +114,15 @@ class RenderControlText:
         self._color = cl.Color.convert(self._color)
 
 
-def default(fontsize='medium', color='b'):
+def default(fontsize="medium", color="b"):
     """
     What to draw if no particular preference is expressed.
     """
-    return RenderControlText(fontsize=fontsize, fontstyle='normal', fontweight='normal', zdir=None, color=color)
+    return RenderControlText(fontsize=fontsize, fontstyle="normal", fontweight="normal", zdir=None, color=color)
 
 
-def bold(fontsize='medium', color='b'):
+def bold(fontsize="medium", color="b"):
     """
     What to draw for emphasis.
     """
-    return RenderControlText(fontsize=fontsize, fontstyle='normal', fontweight='bold', zdir=None, color=color)
+    return RenderControlText(fontsize=fontsize, fontstyle="normal", fontweight="bold", zdir=None, color=color)

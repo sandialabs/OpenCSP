@@ -246,7 +246,7 @@ class Intersection:
         # "ChatGPT 4o" assisted with generating this docstring.
         return cls(Pxyz.empty())
 
-    def __add__(self, intersection: 'Intersection'):
+    def __add__(self, intersection: "Intersection"):
         return Intersection(self.intersection_points.concatenate(intersection.intersection_points))
 
     def __len__(self):

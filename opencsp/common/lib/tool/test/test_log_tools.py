@@ -23,7 +23,7 @@ class TestLogTools(unittest.TestCase):
 
     @classmethod
     def setUpClass(cls) -> None:
-        cls.out_dir = os.path.join('common', 'lib', 'test', 'data', 'output', 'tool', 'log_tools')
+        cls.out_dir = os.path.join("common", "lib", "test", "data", "output", "tool", "log_tools")
         ft.create_directories_if_necessary(cls.out_dir)
         ft.delete_files_in_directory(cls.out_dir, "*")
         super().setUpClass()
@@ -47,10 +47,10 @@ class TestLogTools(unittest.TestCase):
                     pass
 
                     if proc2 is not None and proc2.stdout is not None:
-                        stdout2 = proc2.stdout.read().decode('utf-8')
+                        stdout2 = proc2.stdout.read().decode("utf-8")
 
             if proc1 is not None and proc1.stdout is not None:
-                stdout1 = proc1.stdout.read().decode('utf-8')
+                stdout1 = proc1.stdout.read().decode("utf-8")
 
         return stdout1 + stdout2
 
@@ -67,7 +67,7 @@ class TestLogTools(unittest.TestCase):
     def test_single_process_logger(self):
         self.proc_exec("_log_single_process_logger")
         log_contents = self.get_log_contents()
-        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
+        self.assertTrue("Hello, world!" in log_contents, f'Can\'t find hello log in log contents:\n\t"{log_contents}"')
 
     def _log_single_process_dont_delete(self, logname):
         lt.logger(logname, delete_existing_log=False)
@@ -79,9 +79,9 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_single_process_dont_delete")
 
         log_contents = self.get_log_contents()
-        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
+        self.assertTrue("Hello, world!" in log_contents, f'Can\'t find hello log in log contents:\n\t"{log_contents}"')
         self.assertTrue(
-            "Goodbye, world!" in log_contents, f"Can't find goodbye log in log contents:\n\t\"{log_contents}\""
+            "Goodbye, world!" in log_contents, f'Can\'t find goodbye log in log contents:\n\t"{log_contents}"'
         )
 
     def _log_multiprocess_logger1(self, logname):
@@ -99,10 +99,10 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_multiprocess_logger1", "_log_multiprocess_logger2")
 
         log_contents = self.get_log_contents()
-        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
-        self.assertTrue("other process" in log_contents, f"Can't find other log in log contents:\n\t\"{log_contents}\"")
+        self.assertTrue("Hello, world!" in log_contents, f'Can\'t find hello log in log contents:\n\t"{log_contents}"')
+        self.assertTrue("other process" in log_contents, f'Can\'t find other log in log contents:\n\t"{log_contents}"')
         self.assertTrue(
-            "Goodbye, world!" in log_contents, f"Can't find goodbye log in log contents:\n\t\"{log_contents}\""
+            "Goodbye, world!" in log_contents, f'Can\'t find goodbye log in log contents:\n\t"{log_contents}"'
         )
 
     def _log_log_level_screening(self, logname):
@@ -114,7 +114,7 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_log_level_screening")
 
         log_contents = self.get_log_contents()
-        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
+        self.assertTrue("Hello, world!" in log_contents, f'Can\'t find hello log in log contents:\n\t"{log_contents}"')
         self.assertFalse(
             "Goodbye, world!" in log_contents, "Found goodbye log in log contents when it shouldn't be there"
         )
@@ -128,9 +128,9 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_set_log_level")
 
         log_contents = self.get_log_contents()
-        self.assertTrue("Hello, world!" in log_contents, f"Can't find hello log in log contents:\n\t\"{log_contents}\"")
+        self.assertTrue("Hello, world!" in log_contents, f'Can\'t find hello log in log contents:\n\t"{log_contents}"')
         self.assertTrue(
-            "Goodbye, world!" in log_contents, f"Can't find goodbye log in log contents:\n\t\"{log_contents}\""
+            "Goodbye, world!" in log_contents, f'Can\'t find goodbye log in log contents:\n\t"{log_contents}"'
         )
 
     def _log_error_and_raise(self, logname):
@@ -144,10 +144,10 @@ class TestLogTools(unittest.TestCase):
         self.proc_exec("_log_error_and_raise")
 
         log_contents = self.get_log_contents()
-        self.assertTrue("Error, world!" in log_contents, f"Can't find error log in log contents:\n\t\"{log_contents}\"")
+        self.assertTrue("Error, world!" in log_contents, f'Can\'t find error log in log contents:\n\t"{log_contents}"')
         self.assertTrue(
             "RuntimeError encountered" in log_contents,
-            f"Can't find evidence of RuntimeError in log contents:\n\t\"{log_contents}\"",
+            f'Can\'t find evidence of RuntimeError in log contents:\n\t"{log_contents}"',
         )
 
     def _log_end_str(self, _):
@@ -158,16 +158,16 @@ class TestLogTools(unittest.TestCase):
 
     def test_end_str(self):
         stdout = self.proc_exec("_log_end_str")
-        self.assertTrue("Hello, world!" in stdout, f"Can't find hello log in log contents:\n\t\"{stdout}\"")
-        self.assertTrue("Goodbye world!" in stdout, f"Can't find goodbye log in log contents:\n\t\"{stdout}\"")
+        self.assertTrue("Hello, world!" in stdout, f'Can\'t find hello log in log contents:\n\t"{stdout}"')
+        self.assertTrue("Goodbye world!" in stdout, f'Can\'t find goodbye log in log contents:\n\t"{stdout}"')
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description='Testing log tools')
-    parser.add_argument('--logname', help="The name of the log file to log to.")
-    parser.add_argument('--funcname', help="Calls the given function")
+    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description="Testing log tools")
+    parser.add_argument("--logname", help="The name of the log file to log to.")
+    parser.add_argument("--funcname", help="Calls the given function")
     args = parser.parse_args()
     log_name = args.logname
     func_name = args.funcname

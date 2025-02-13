@@ -91,7 +91,7 @@ class TestVxyz(unittest.TestCase):
         with np.testing.assert_raises(TypeError):
             self.V1 + 1.0
         with np.testing.assert_raises(TypeError):
-            self.V1 + '1'
+            self.V1 + "1"
 
     def test_sub(self):
         # Vxyz
@@ -105,7 +105,7 @@ class TestVxyz(unittest.TestCase):
         with np.testing.assert_raises(TypeError):
             self.V1 - 1.0
         with np.testing.assert_raises(TypeError):
-            self.V1 - '1'
+            self.V1 - "1"
 
     def test_mul(self):
         # Vxyz
@@ -125,7 +125,7 @@ class TestVxyz(unittest.TestCase):
 
         # String
         with np.testing.assert_raises(TypeError):
-            self.V2 * '2'
+            self.V2 * "2"
 
     def test_len(self):
         # Length > 3

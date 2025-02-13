@@ -21,13 +21,13 @@ class test_ImageProjection(unittest.TestCase):
 
         # Load display data
         self.file_image_projection_input = os.path.join(
-            opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
+            opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5"
         )
         self.image_projection_data = ip.ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
         # Load display data
         self.file_image_projection_input = os.path.join(
-            opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
+            opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5"
         )
         self.image_projection_data = ip.ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
@@ -133,5 +133,5 @@ class test_ImageProjection(unittest.TestCase):
         image_projection.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

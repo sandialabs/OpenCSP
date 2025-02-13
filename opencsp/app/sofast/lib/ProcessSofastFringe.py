@@ -151,7 +151,7 @@ class ProcessSofastFringe(ProcessSofastAbstract):
 
     def __init__(
         self, measurement: MeasurementSofastFringe, orientation: SpatialOrientation, camera: Camera, display: Display
-    ) -> 'ProcessSofastFringe':
+    ) -> "ProcessSofastFringe":
         """
         SOFAST processing class.
 
@@ -238,8 +238,8 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         if len(facet_data) != len(surfaces):
             lt.error_and_raise(
                 ValueError,
-                'Length of facet_data does not equal length of surfaces'
-                f'facet_data={len(facet_data)}, surface_data={len(surfaces)}',
+                "Length of facet_data does not equal length of surfaces"
+                f"facet_data={len(facet_data)}, surface_data={len(surfaces)}",
             )
 
         # Process optic/setup geometry
@@ -261,7 +261,7 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         """
         # Save number of facets
         self.num_facets = 1
-        self.optic_type = 'undefined'
+        self.optic_type = "undefined"
 
         # Calculate raw mask
         params = [
@@ -304,12 +304,12 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         """
         # Save number of facets
         self.num_facets = 1
-        self.optic_type = 'single'
+        self.optic_type = "single"
 
         if self.params.debug_geometry.debug_active:
-            lt.info('Sofast image processing debug on.')
+            lt.info("Sofast image processing debug on.")
         if self.params.debug_slope_solver.debug_active:
-            lt.info('SlopeSolver debug on.')
+            lt.info("SlopeSolver debug on.")
 
         # Calculate raw mask
         params = [
@@ -360,14 +360,14 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         """
         # Get number of facets
         self.num_facets = ensemble_data.num_facets
-        self.optic_type = 'multi'
+        self.optic_type = "multi"
 
         # Check inputs
         if len(facet_data) != self.num_facets:
             lt.error_and_raise(
                 ValueError,
-                f'Given length of facet data is {len(facet_data):d}'
-                f'but ensemble_data expects {ensemble_data.num_facets:d} facets.',
+                f"Given length of facet data is {len(facet_data):d}"
+                f"but ensemble_data expects {ensemble_data.num_facets:d} facets.",
             )
 
         # Calculate mask
@@ -441,20 +441,20 @@ class ProcessSofastFringe(ProcessSofastAbstract):
             # Create plot of unwrapped phase (if enabled)
             if self.params.debug_geometry.debug_active:
                 # Add active pixels as colored pixels
-                cm = colormaps.get_cmap('jet')
+                cm = colormaps.get_cmap("jet")
                 vals_x_jet = cm(screen_xs)[:, :3]  # remove alpha channel
                 im_phase_x[mask_processed, :] = vals_x_jet
                 vals_y_jet = cm(screen_ys)[:, :3]  # remove alpha channel
                 im_phase_y[mask_processed, :] = vals_y_jet
                 # Plot x image
-                fig = plt.figure(f'ProcessSofastFringe_unwrapped_phase_x_facet_{idx_facet:d}')
+                fig = plt.figure(f"ProcessSofastFringe_unwrapped_phase_x_facet_{idx_facet:d}")
                 plt.imshow(im_phase_x)
-                plt.title(f'Unwrapped X Phase Facet {idx_facet:d}')
+                plt.title(f"Unwrapped X Phase Facet {idx_facet:d}")
                 self.params.debug_geometry.figures.append(fig)
                 # Plot y image
-                fig = plt.figure(f'ProcessSofastFringe_unwrapped_phase_y_facet_{idx_facet:d}')
+                fig = plt.figure(f"ProcessSofastFringe_unwrapped_phase_y_facet_{idx_facet:d}")
                 plt.imshow(im_phase_y)
-                plt.title(f'Unwrapped Y Phase Facet {idx_facet:d}')
+                plt.title(f"Unwrapped Y Phase Facet {idx_facet:d}")
                 self.params.debug_geometry.figures.append(fig)
 
             # Undistort screen points (display coordinates)
@@ -468,9 +468,9 @@ class ProcessSofastFringe(ProcessSofastAbstract):
             mask_bad_pixels = np.zeros(mask_processed.shape, dtype=bool)
             if np.any(nan_mask):
                 lt.warn(
-                    'ProcessSofastFringe._process_display(): '
-                    f'{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined '
-                    f'for facet {idx_facet:d}. These data points will be removed.'
+                    "ProcessSofastFringe._process_display(): "
+                    f"{nan_mask.sum():d} / {nan_mask.size:d} screen points are undefined "
+                    f"for facet {idx_facet:d}. These data points will be removed."
                 )
                 # Make mask of NANs
                 mask_bad_pixels[mask_processed] = nan_mask
@@ -509,7 +509,7 @@ class ProcessSofastFringe(ProcessSofastAbstract):
         """
         # Check inputs
         if self.data_geometry_facet is None:
-            lt.error_and_raise(ValueError, 'Not all facets geometrically processed; cannot solve slopes.')
+            lt.error_and_raise(ValueError, "Not all facets geometrically processed; cannot solve slopes.")
 
         # Loop through all input facets and solve slopes
         self.data_calculation_facet = []
@@ -520,15 +520,15 @@ class ProcessSofastFringe(ProcessSofastAbstract):
 
             # Instantiate slope solver object
             kwargs = {
-                'v_optic_cam_optic': self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_cam_optic,
-                'u_active_pixel_pointing_optic': self.data_geometry_facet[facet_idx].u_pixel_pointing_facet,
-                'u_measure_pixel_pointing_optic': self.data_geometry_facet[facet_idx].u_cam_measure_point_facet,
-                'v_screen_points_facet': self.data_geometry_facet[facet_idx].v_screen_points_facet,
-                'v_optic_screen_optic': self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_screen_optic,
-                'v_align_point_optic': self.data_geometry_facet[facet_idx].v_align_point_facet,
-                'dist_optic_screen': self.data_geometry_facet[facet_idx].measure_point_screen_distance,
-                'surface': surfaces[facet_idx],
-                'debug': self.params.debug_slope_solver,
+                "v_optic_cam_optic": self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_cam_optic,
+                "u_active_pixel_pointing_optic": self.data_geometry_facet[facet_idx].u_pixel_pointing_facet,
+                "u_measure_pixel_pointing_optic": self.data_geometry_facet[facet_idx].u_cam_measure_point_facet,
+                "v_screen_points_facet": self.data_geometry_facet[facet_idx].v_screen_points_facet,
+                "v_optic_screen_optic": self.data_geometry_facet[facet_idx].spatial_orientation.v_optic_screen_optic,
+                "v_align_point_optic": self.data_geometry_facet[facet_idx].v_align_point_facet,
+                "dist_optic_screen": self.data_geometry_facet[facet_idx].measure_point_screen_distance,
+                "surface": surfaces[facet_idx],
+                "debug": self.params.debug_slope_solver,
             }
 
             # Instantiate slope solver

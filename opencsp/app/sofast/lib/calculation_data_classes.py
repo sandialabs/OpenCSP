@@ -29,7 +29,7 @@ class CalculationDataGeometryGeneral(hdf5_tools.HDF5_SaveAbstract):
     v_cam_optic_cam_refine_2: Vxyz = None
     v_cam_optic_cam_refine_3: Vxyz = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationDataGeometryGeneral/...
 
         Parameters
@@ -50,14 +50,14 @@ class CalculationDataGeometryGeneral(hdf5_tools.HDF5_SaveAbstract):
             self.v_cam_optic_cam_refine_3,
         ]
         datasets = [
-            prefix + 'CalculationDataGeometryGeneral/v_cam_optic_centroid_cam_exp',
-            prefix + 'CalculationDataGeometryGeneral/r_optic_cam_exp',
-            prefix + 'CalculationDataGeometryGeneral/v_cam_optic_cam_exp',
-            prefix + 'CalculationDataGeometryGeneral/r_optic_cam_refine_1',
-            prefix + 'CalculationDataGeometryGeneral/r_optic_cam_refine_2',
-            prefix + 'CalculationDataGeometryGeneral/v_cam_optic_cam_refine_1',
-            prefix + 'CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2',
-            prefix + 'CalculationDataGeometryGeneral/v_cam_optic_cam_refine_3',
+            prefix + "CalculationDataGeometryGeneral/v_cam_optic_centroid_cam_exp",
+            prefix + "CalculationDataGeometryGeneral/r_optic_cam_exp",
+            prefix + "CalculationDataGeometryGeneral/v_cam_optic_cam_exp",
+            prefix + "CalculationDataGeometryGeneral/r_optic_cam_refine_1",
+            prefix + "CalculationDataGeometryGeneral/r_optic_cam_refine_2",
+            prefix + "CalculationDataGeometryGeneral/v_cam_optic_cam_refine_1",
+            prefix + "CalculationDataGeometryGeneral/v_cam_optic_cam_refine_2",
+            prefix + "CalculationDataGeometryGeneral/v_cam_optic_cam_refine_3",
         ]
         _save_data_in_file(data, datasets, file)
 
@@ -77,7 +77,7 @@ class CalculationDataGeometryFacet(hdf5_tools.HDF5_SaveAbstract):
     u_pixel_pointing_facet: Uxyz = None
     v_screen_points_facet: Vxyz = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationDataGeometryFacet/...
 
         Parameters
@@ -97,15 +97,15 @@ class CalculationDataGeometryFacet(hdf5_tools.HDF5_SaveAbstract):
             self.v_screen_points_facet,
         ]
         datasets = [
-            prefix + 'CalculationDataGeometryFacet/u_cam_measure_point_facet',
-            prefix + 'CalculationDataGeometryFacet/measure_point_screen_distance',
-            prefix + 'CalculationDataGeometryFacet/v_align_point_facet',
-            prefix + 'CalculationDataGeometryFacet/v_screen_points_fractional_screens',
-            prefix + 'CalculationDataGeometryFacet/v_screen_points_screen',
-            prefix + 'CalculationDataGeometryFacet/u_pixel_pointing_facet',
-            prefix + 'CalculationDataGeometryFacet/v_screen_points_facet',
+            prefix + "CalculationDataGeometryFacet/u_cam_measure_point_facet",
+            prefix + "CalculationDataGeometryFacet/measure_point_screen_distance",
+            prefix + "CalculationDataGeometryFacet/v_align_point_facet",
+            prefix + "CalculationDataGeometryFacet/v_screen_points_fractional_screens",
+            prefix + "CalculationDataGeometryFacet/v_screen_points_screen",
+            prefix + "CalculationDataGeometryFacet/u_pixel_pointing_facet",
+            prefix + "CalculationDataGeometryFacet/v_screen_points_facet",
         ]
-        self.spatial_orientation.save_to_hdf(file, prefix + 'CalculationDataGeometryFacet/')
+        self.spatial_orientation.save_to_hdf(file, prefix + "CalculationDataGeometryFacet/")
         _save_data_in_file(data, datasets, file)
 
 
@@ -122,7 +122,7 @@ class CalculationError(hdf5_tools.HDF5_SaveAbstract):
     error_reprojection_2: float = None
     error_reprojection_3: float = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationError/...
 
         Parameters
@@ -141,12 +141,12 @@ class CalculationError(hdf5_tools.HDF5_SaveAbstract):
             self.error_reprojection_3,
         ]
         datasets = [
-            prefix + 'CalculationError/error_dist_optic_screen_1',
-            prefix + 'CalculationError/error_dist_optic_screen_2',
-            prefix + 'CalculationError/error_dist_optic_screen_3',
-            prefix + 'CalculationError/error_reprojection_1',
-            prefix + 'CalculationError/error_reprojection_2',
-            prefix + 'CalculationError/error_reprojection_3',
+            prefix + "CalculationError/error_dist_optic_screen_1",
+            prefix + "CalculationError/error_dist_optic_screen_2",
+            prefix + "CalculationError/error_dist_optic_screen_3",
+            prefix + "CalculationError/error_reprojection_1",
+            prefix + "CalculationError/error_reprojection_2",
+            prefix + "CalculationError/error_reprojection_3",
         ]
         _save_data_in_file(data, datasets, file)
 
@@ -164,7 +164,7 @@ class CalculationImageProcessingFacet(hdf5_tools.HDF5_SaveAbstract):
     v_facet_centroid_image_exp: Vxy = None
     mask_bad_pixels: ndarray = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationImageProcessingFacet/...
 
         Parameters
@@ -183,12 +183,12 @@ class CalculationImageProcessingFacet(hdf5_tools.HDF5_SaveAbstract):
             self.mask_bad_pixels,
         ]
         datasets = [
-            prefix + 'CalculationImageProcessingFacet/loop_facet_image_refine',
-            prefix + 'CalculationImageProcessingFacet/mask_fitted',
-            prefix + 'CalculationImageProcessingFacet/mask_processed',
-            prefix + 'CalculationImageProcessingFacet/v_facet_corners_image_exp',
-            prefix + 'CalculationImageProcessingFacet/v_facet_centroid_image_exp',
-            prefix + 'CalculationImageProcessingFacet/mask_bad_pixels',
+            prefix + "CalculationImageProcessingFacet/loop_facet_image_refine",
+            prefix + "CalculationImageProcessingFacet/mask_fitted",
+            prefix + "CalculationImageProcessingFacet/mask_processed",
+            prefix + "CalculationImageProcessingFacet/v_facet_corners_image_exp",
+            prefix + "CalculationImageProcessingFacet/v_facet_centroid_image_exp",
+            prefix + "CalculationImageProcessingFacet/mask_bad_pixels",
         ]
         _save_data_in_file(data, datasets, file)
 
@@ -205,7 +205,7 @@ class CalculationImageProcessingGeneral(hdf5_tools.HDF5_SaveAbstract):
     loop_optic_image_exp: LoopXY = None
     loop_optic_image_refine: LoopXY = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationImageProcessingGeneral/...
 
         Parameters
@@ -223,11 +223,11 @@ class CalculationImageProcessingGeneral(hdf5_tools.HDF5_SaveAbstract):
             self.loop_optic_image_refine,
         ]
         datasets = [
-            prefix + 'CalculationImageProcessingGeneral/mask_raw',
-            prefix + 'CalculationImageProcessingGeneral/v_edges_image',
-            prefix + 'CalculationImageProcessingGeneral/v_mask_centroid_image',
-            prefix + 'CalculationImageProcessingGeneral/loop_optic_image_exp',
-            prefix + 'CalculationImageProcessingGeneral/loop_optic_image_refine',
+            prefix + "CalculationImageProcessingGeneral/mask_raw",
+            prefix + "CalculationImageProcessingGeneral/v_edges_image",
+            prefix + "CalculationImageProcessingGeneral/v_mask_centroid_image",
+            prefix + "CalculationImageProcessingGeneral/loop_optic_image_exp",
+            prefix + "CalculationImageProcessingGeneral/loop_optic_image_refine",
         ]
         _save_data_in_file(data, datasets, file)
 
@@ -243,7 +243,7 @@ class CalculationBlobAssignment(hdf5_tools.HDF5_SaveAbstract):
     active_point_mask: ndarray[bool] = None
     """2d ndarray, mask of active points"""
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationBlobAssignment/...
 
         Parameters
@@ -255,9 +255,9 @@ class CalculationBlobAssignment(hdf5_tools.HDF5_SaveAbstract):
         """
         data = [self.pts_image.data, self.pts_index_xy.data, self.active_point_mask]
         datasets = [
-            prefix + 'CalculationBlobAssignment/pts_image',
-            prefix + 'CalculationBlobAssignment/pts_index_xy.data',
-            prefix + 'CalculationBlobAssignment/active_point_mask',
+            prefix + "CalculationBlobAssignment/pts_image",
+            prefix + "CalculationBlobAssignment/pts_index_xy.data",
+            prefix + "CalculationBlobAssignment/active_point_mask",
         ]
         _save_data_in_file(data, datasets, file)
 
@@ -273,7 +273,7 @@ class CalculationFacetEnsemble(hdf5_tools.HDF5_SaveAbstract):
     v_surf_points_ensemble: Vxyz = None
     v_facet_pointing_ensemble: Vxyz = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given HDF5 file. Data is stored in PREFIX + CalculationEnsemble/...
 
         Parameters
@@ -290,10 +290,10 @@ class CalculationFacetEnsemble(hdf5_tools.HDF5_SaveAbstract):
             self.v_facet_pointing_ensemble.data,
         ]
         datasets = [
-            prefix + 'CalculationEnsemble/trans_facet_ensemble',
-            prefix + 'CalculationEnsemble/slopes_ensemble_xy',
-            prefix + 'CalculationEnsemble/v_surf_points_ensemble',
-            prefix + 'CalculationEnsemble/v_facet_pointing_ensemble',
+            prefix + "CalculationEnsemble/trans_facet_ensemble",
+            prefix + "CalculationEnsemble/slopes_ensemble_xy",
+            prefix + "CalculationEnsemble/v_surf_points_ensemble",
+            prefix + "CalculationEnsemble/v_facet_pointing_ensemble",
         ]
         _save_data_in_file(data, datasets, file)
 
@@ -314,7 +314,7 @@ def _save_data_in_file(data_in: list, datasets_in: list, file: str) -> None:
             elif isinstance(d, float) or isinstance(d, int) or isinstance(d, ndarray):
                 data.append(d)
             else:
-                raise ValueError(f'Unrecognized data type {type(d)} could not be saved.')
+                raise ValueError(f"Unrecognized data type {type(d)} could not be saved.")
             datasets.append(ds)
 
     if len(data) > 0:

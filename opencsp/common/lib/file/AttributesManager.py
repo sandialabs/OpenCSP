@@ -146,7 +146,7 @@ class AttributesManager:
         # save the attributes file
         path, name, ext = ft.path_components(attributes_file_path_name_ext)
         ft.create_directories_if_necessary(path)
-        with open(attributes_file_path_name_ext, 'w') as fout:
+        with open(attributes_file_path_name_ext, "w") as fout:
             fout.write(contents)
 
     def load(self, attributes_file_path_name_ext: str):
@@ -168,7 +168,7 @@ class AttributesManager:
             )
             lt.debug(errstr)
             raise FileNotFoundError(errstr)
-        with open(attributes_file_path_name_ext, 'r') as fin:
+        with open(attributes_file_path_name_ext, "r") as fin:
             str_contents = fin.read()
 
         # parse the file contents

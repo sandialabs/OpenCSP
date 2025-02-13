@@ -22,7 +22,7 @@ def plot_image_figure(
     context_str=None,  # Explanatory string to include in status output line.
     save=True,  # Whether to write to disk.
     output_dir=None,  # Where to write.
-    output_body='image',  # Filename base.
+    output_body="image",  # Filename base.
     dpi=200,  # Resolution to write.
     include_figure_idx_in_filename=True,
 ):  # Whether to auto-index the filenames.
@@ -44,13 +44,13 @@ def plot_image_figure(
 
     # Save.
     if save:
-        output_body_ext = output_body + '.png'
+        output_body_ext = output_body + ".png"
         if include_figure_idx_in_filename:
             global global_figure_idx
-            output_body_ext = '{0:03d}'.format(global_figure_idx) + '_' + output_body_ext
+            output_body_ext = "{0:03d}".format(global_figure_idx) + "_" + output_body_ext
             global_figure_idx += 1
         output_dir_body_ext = os.path.join(output_dir, output_body_ext)
-        print('In plot_image_figure(), called from ' + context_str + ', writing ' + output_dir_body_ext)
+        print("In plot_image_figure(), called from " + context_str + ", writing " + output_dir_body_ext)
         plt.savefig(output_dir_body_ext, dpi=dpi)
     # Close plot to free up resources.
     plt.close()

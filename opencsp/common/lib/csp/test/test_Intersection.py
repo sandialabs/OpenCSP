@@ -205,5 +205,5 @@ class TestIntersection(unittest.TestCase):
         self.assertEqual(3, intersection_points.data.shape[1])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

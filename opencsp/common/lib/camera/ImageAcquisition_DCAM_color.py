@@ -9,7 +9,7 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class ImageAcquisition(ImageAcquisitionAbstract):
-    def __init__(self, instance: int = 0, pixel_format: str = 'BayerRG12'):
+    def __init__(self, instance: int = 0, pixel_format: str = "BayerRG12"):
         """
         Class to control a Basler DCAM color camera. Grabs one frame
         at a time. Assumes the color camera is in a Bayer pattern. The
@@ -34,19 +34,19 @@ class ImageAcquisition(ImageAcquisitionAbstract):
 
         # Check that at least one camera is available
         if len(devices) == 0:
-            raise pylon.RuntimeException('No cameras found.')
+            raise pylon.RuntimeException("No cameras found.")
         else:
-            print(f'{len(devices):d} devices found.')
+            print(f"{len(devices):d} devices found.")
             for idx, device in enumerate(devices):
                 if idx == instance:
-                    print('--> ', end='')
+                    print("--> ", end="")
                 else:
-                    print('    ', end='')
+                    print("    ", end="")
                 print(device.GetFriendlyName())
 
         # Check number of instances
         if instance >= len(devices):
-            raise ValueError(f'Cannot load instance {instance:d}. Only {len(devices):d} devices found.')
+            raise ValueError(f"Cannot load instance {instance:d}. Only {len(devices):d} devices found.")
 
         # Connect to camera
         self.basler_index = instance
@@ -62,7 +62,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         super().__init__()
 
         # Set up device to single frame acquisition
-        self.cap.AcquisitionMode.SetValue('SingleFrame')
+        self.cap.AcquisitionMode.SetValue("SingleFrame")
 
         # Set pixel format
         self.cap.PixelFormat.SetValue(pixel_format)
@@ -95,9 +95,9 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         for camera in possible_matches:
-            if not hasattr(camera, 'basler_index'):
+            if not hasattr(camera, "basler_index"):
                 continue
-            if getattr(camera, 'basler_index') == self.basler_index:
+            if getattr(camera, "basler_index") == self.basler_index:
                 return True
         return False
 
@@ -139,7 +139,7 @@ class ImageAcquisition(ImageAcquisitionAbstract):
         if grabResult.GrabSucceeded():
             img = grabResult.Array
         else:
-            raise pylon.RuntimeException('Frame grab unsuccessful.')
+            raise pylon.RuntimeException("Frame grab unsuccessful.")
 
         # Wait for capturing to finish
         grabResult.Release()

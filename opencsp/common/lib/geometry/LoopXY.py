@@ -56,7 +56,7 @@ class LoopXY:
             P_2 = self._edges[idx2].vertices[0]
             if P_1.x != P_2.x or P_1.y != P_2.y:
                 raise ValueError(
-                    'The second vertex of line index {:d} does not match the first vertex of line index {:d}.'.format(
+                    "The second vertex of line index {:d} does not match the first vertex of line index {:d}.".format(
                         idx1, idx2
                     )
                 )
@@ -69,7 +69,7 @@ class LoopXY:
         vertex_angles = self._vertex_to_vertex_angles()
         vertex_positive = np.unique(vertex_angles > 0)
         if vertex_positive.size > 1:
-            raise ValueError('Loop may not be convex or edges cross within loop.')
+            raise ValueError("Loop may not be convex or edges cross within loop.")
 
     def _vertex_to_vertex_angles(self):
         """
@@ -125,7 +125,7 @@ class LoopXY:
         edges = []
         for idx1 in range(len(vertices)):
             idx2 = np.mod(idx1 + 1, len(vertices))
-            edges.append(EdgeXY(vertices=vertices[[idx1, idx2]], curve_data={'type': 'line'}, closed=False))
+            edges.append(EdgeXY(vertices=vertices[[idx1, idx2]], curve_data={"type": "line"}, closed=False))
 
         return cls(edges=edges)
 
@@ -153,12 +153,12 @@ class LoopXY:
         edges = []
         for idx1 in range(len(vertices)):
             idx2 = np.mod(idx1 + 1, len(vertices))
-            edges.append(EdgeXY(vertices=vertices[[idx1, idx2]], curve_data={'type': 'line'}, closed=False))
+            edges.append(EdgeXY(vertices=vertices[[idx1, idx2]], curve_data={"type": "line"}, closed=False))
 
         return cls(edges=edges)
 
     @classmethod
-    def from_rectangle(cls, x: float, y: float, width: float, height: float) -> 'LoopXY':
+    def from_rectangle(cls, x: float, y: float, width: float, height: float) -> "LoopXY":
         """Returns rectangular loop
 
         Parameters
@@ -302,7 +302,7 @@ class LoopXY:
 
         return mask
 
-    def draw(self, ax: plt.Axes = None, linecolor: str = 'black') -> None:
+    def draw(self, ax: plt.Axes = None, linecolor: str = "black") -> None:
         """
         Draws lines as arrows and marks starting point.
 
@@ -346,7 +346,7 @@ class LoopXY:
             )
 
         # Plot starting point as green dot
-        ax.scatter(*self.vertices.data[:, 0:1], color='green')
+        ax.scatter(*self.vertices.data[:, 0:1], color="green")
 
     def edge_sample(self, count: int) -> Vxy:
         """Returns a Vxy of count points per edge= defining the loop"""

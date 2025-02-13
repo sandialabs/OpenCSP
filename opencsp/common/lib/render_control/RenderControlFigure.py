@@ -73,7 +73,7 @@ class RenderControlFigure:
         self.maximize = maximize
 
         # Axis control.
-        self.x_label = 'x (m)'
-        self.y_label = 'y (m)'
-        self.z_label = 'z (m)'
+        self.x_label = "x (m)"
+        self.y_label = "y (m)"
+        self.z_label = "z (m)"
         self.grid = grid

@@ -13,7 +13,7 @@ class TestSubprocess(unittest.TestCase):
     def test_echo(self):
         output = subt.run(f"echo 'hello, world!'")
         self.assertEqual(len(output), 1, f"Unexpected output:\n\t{output}")
-        self.assertEqual(output[0].val.strip().strip("'"), 'hello, world!', f"Unexpected output:\n\t{output}")
+        self.assertEqual(output[0].val.strip().strip("'"), "hello, world!", f"Unexpected output:\n\t{output}")
 
     def test_success(self):
         subt.run(f"{sys.executable} {helper.__file__} --retcode=0")
@@ -68,8 +68,8 @@ class TestSubprocess(unittest.TestCase):
         )
         self.assertLess(time.time() - start_time, 4.9)
         self.assertEqual(len(output), 2, f"Unexpected output:\n\t{output}")
-        self.assertEqual(output[0].val.strip().strip("'"), 'Hello', f"Unexpected output:\n\t{output}")
-        self.assertEqual(output[1].val.strip().strip("'"), 'world!', f"Unexpected output:\n\t{output}")
+        self.assertEqual(output[0].val.strip().strip("'"), "Hello", f"Unexpected output:\n\t{output}")
+        self.assertEqual(output[1].val.strip().strip("'"), "world!", f"Unexpected output:\n\t{output}")
 
     def test_timeout_timesout(self):
         """Test that a program that executes in 0.9 seconds is killed by a 0.4s timeout."""
@@ -85,5 +85,5 @@ class TestSubprocess(unittest.TestCase):
             self.assertEqual(len(output), 0, f"Unexpected output:\n\t{output}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

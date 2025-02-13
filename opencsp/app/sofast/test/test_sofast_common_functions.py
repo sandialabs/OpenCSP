@@ -27,7 +27,7 @@ class test_sofast_common_functions(unittest.TestCase):
 
         # Load ImageProjectionData
         self.file_image_projection_input = os.path.join(
-            opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
+            opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5"
         )
         self.image_projection_data = ip.ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
@@ -54,30 +54,30 @@ class test_sofast_common_functions(unittest.TestCase):
     def test_check_projector_loaded(self):
         # No instance loaded yet, should throw an error
         with self.assertRaises(RuntimeError):
-            scf.check_projector_loaded('test_check_projector_loaded')
+            scf.check_projector_loaded("test_check_projector_loaded")
 
         # Create a mock ImageProjection object
         image_projection = ip.ImageProjection.in_new_window(self.image_projection_data)
 
         # No more error!
-        self.assertTrue(scf.check_projector_loaded('test_check_projector_loaded'))
+        self.assertTrue(scf.check_projector_loaded("test_check_projector_loaded"))
 
     def test_check_acquisition_loaded(self):
         # No instance loaded yet, should throw an error
         with self.assertRaises(RuntimeError):
-            scf.check_camera_loaded('test_check_acquisition_loaded')
+            scf.check_camera_loaded("test_check_acquisition_loaded")
 
         # Create a mock ImageAcquisition object
         image_acquisition = ianc.ImageAcquisition()
 
         # No more error!
-        self.assertTrue(scf.check_camera_loaded('test_check_acquisition_loaded'))
+        self.assertTrue(scf.check_camera_loaded("test_check_acquisition_loaded"))
 
     @pytest.mark.no_xvfb
     def test_check_system_loaded(self):
         # No instance loaded yet, should throw an error
         with self.assertRaises(RuntimeError):
-            scf.check_system_fringe_loaded(None, 'test_check_projector_loaded')
+            scf.check_system_fringe_loaded(None, "test_check_projector_loaded")
 
         # Create the prerequisites
         im_proj = ip.ImageProjection.in_new_window(self.image_projection_data)
@@ -85,25 +85,25 @@ class test_sofast_common_functions(unittest.TestCase):
 
         # Still no instance loaded, should throw an error
         with self.assertRaises(RuntimeError):
-            scf.check_system_fringe_loaded(None, 'test_check_projector_loaded')
+            scf.check_system_fringe_loaded(None, "test_check_projector_loaded")
 
         # Create a system instance
         sys = ssf.SystemSofastFringe()
 
         # No more error!
-        self.assertTrue(scf.check_system_fringe_loaded(sys, 'test_check_projector_loaded'))
+        self.assertTrue(scf.check_system_fringe_loaded(sys, "test_check_projector_loaded"))
 
         # Release the prerequisites, should throw an error again
         im_proj.close()
         ia.close()
         with self.assertRaises(RuntimeError):
-            scf.check_system_fringe_loaded(None, 'test_check_projector_loaded')
+            scf.check_system_fringe_loaded(None, "test_check_projector_loaded")
 
     @pytest.mark.no_xvfb
     def test_check_calibration_loaded(self):
         # No instance loaded yet, should throw an error
         with self.assertRaises(RuntimeError):
-            scf.check_calibration_loaded(None, 'test_check_calibration_loaded')
+            scf.check_calibration_loaded(None, "test_check_calibration_loaded")
 
         # Create the prerequisites and system instance
         im_proj = ip.ImageProjection.in_new_window(self.image_projection_data)
@@ -116,7 +116,7 @@ class test_sofast_common_functions(unittest.TestCase):
         sys._calibration = cal
 
         # No more error!
-        self.assertTrue(scf.check_calibration_loaded(sys, 'test_check_calibration_loaded'))
+        self.assertTrue(scf.check_calibration_loaded(sys, "test_check_calibration_loaded"))
 
     def test_run_exposure_cal(self):
         global sys
@@ -145,5 +145,5 @@ class test_sofast_common_functions(unittest.TestCase):
             scf.get_exposure()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

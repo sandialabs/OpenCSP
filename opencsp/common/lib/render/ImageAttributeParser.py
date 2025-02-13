@@ -90,7 +90,7 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
     def attributes_key(self) -> str:
         return "image attributes"
 
-    def set_defaults(self, other: 'ImageAttributeParser'):
+    def set_defaults(self, other: "ImageAttributeParser"):
         # Specifically for image attributes, for original image source, we
         # really want to maintain the absolute original image source throughout
         # all processing steps and files.
@@ -111,22 +111,22 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
         )
 
     def parse_my_contents(self, file_path_name_ext: str, raw_contents: str, my_contents: any):
-        self.current_image_source = my_contents['current_image_source']
-        self.original_image_source = my_contents['original_image_source']
+        self.current_image_source = my_contents["current_image_source"]
+        self.original_image_source = my_contents["original_image_source"]
         self.date_collected = None
-        if my_contents['date_collected'] != None:
-            self.date_collected = datetime.datetime.fromisoformat(my_contents['date_collected'])
-        self.experiment_name = my_contents['experiment_name']
-        self.notes = my_contents['notes']
+        if my_contents["date_collected"] != None:
+            self.date_collected = datetime.datetime.fromisoformat(my_contents["date_collected"])
+        self.experiment_name = my_contents["experiment_name"]
+        self.notes = my_contents["notes"]
 
     def my_contents_to_json(self, file_path_name_ext: str) -> any:
         date_collected_str = tt.default(lambda: self.date_collected.isoformat(), None)
         ret = {
-            'current_image_source': self.current_image_source,
-            'original_image_source': self.original_image_source,
-            'date_collected': date_collected_str,
-            'experiment_name': self.experiment_name,
-            'notes': self.notes,
+            "current_image_source": self.current_image_source,
+            "original_image_source": self.original_image_source,
+            "date_collected": date_collected_str,
+            "experiment_name": self.experiment_name,
+            "notes": self.notes,
         }
         return ret
 

@@ -35,7 +35,7 @@ class SpotAnalysisImagesStream(Iterator[dict[ImageType, CacheableImage]]):
         self.other_iterators = other_iterators
         if ImageType.PRIMARY in other_iterators:
             lt.warn(
-                "Warning in SpotAnalysisImagesStream: the other_iterators \"PRIMARY\" type will be ignored in favor of the primary_iterator"
+                'Warning in SpotAnalysisImagesStream: the other_iterators "PRIMARY" type will be ignored in favor of the primary_iterator'
             )
             del other_iterators[ImageType.PRIMARY]
 

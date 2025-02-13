@@ -16,40 +16,40 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
     def __init__(self):
         # Define data names
         self.data_names = [
-            'name',
-            'main_window_size_x',
-            'main_window_size_y',
-            'main_window_position_x',
-            'main_window_position_y',
-            'active_area_size_x',
-            'active_area_size_y',
-            'active_area_position_x',
-            'active_area_position_y',
-            'projector_data_type',
-            'projector_max_int',
-            'image_delay_ms',
-            'shift_red_x',
-            'shift_red_y',
-            'shift_blue_x',
-            'shift_blue_y',
+            "name",
+            "main_window_size_x",
+            "main_window_size_y",
+            "main_window_position_x",
+            "main_window_position_y",
+            "active_area_size_x",
+            "active_area_size_y",
+            "active_area_position_x",
+            "active_area_position_y",
+            "projector_data_type",
+            "projector_max_int",
+            "image_delay_ms",
+            "shift_red_x",
+            "shift_red_y",
+            "shift_blue_x",
+            "shift_blue_y",
         ]
         self.data_labels = [
-            'Name',
-            'Window X Size',
-            'Window Y Size',
-            'Window X Position',
-            'Window Y Position',
-            'Active Area X Size',
-            'Active Area Y Size',
-            'Active Area X Position',
-            'Active Area Y Position',
-            'Projector Image Data Type',
-            'Projector Max Integer Value',
-            'Image Delay (ms)',
-            'Red Shift X',
-            'Red Shift Y',
-            'Blue Shift X',
-            'Blue Shift Y',
+            "Name",
+            "Window X Size",
+            "Window Y Size",
+            "Window X Position",
+            "Window Y Position",
+            "Active Area X Size",
+            "Active Area Y Size",
+            "Active Area X Position",
+            "Active Area Y Position",
+            "Projector Image Data Type",
+            "Projector Max Integer Value",
+            "Image Delay (ms)",
+            "Red Shift X",
+            "Red Shift Y",
+            "Blue Shift X",
+            "Blue Shift Y",
         ]
         self.data_types = [str, int, int, int, int, int, int, int, int, str, int, int, int, int, int, int]
 
@@ -61,7 +61,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         self.root = tkt.window()
 
         # Set title
-        self.root.title('ImageProjection Setup')
+        self.root.title("ImageProjection Setup")
 
         # Add all buttons/widgets to window
         self.create_layout()
@@ -81,7 +81,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
     def set_window_size(self):
         """Updates the window size to current set value"""
         # Set size and position of window
-        self.root.geometry('500x670+100+100')
+        self.root.geometry("500x670+100+100")
 
     def create_layout(self):
         """Creates GUI widgets"""
@@ -95,58 +95,58 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
             self.data_cells.append(e)
 
         # Show projector button
-        self.btn_show_proj = tkinter.Button(self.root, text='Show Display', command=self.show_projection_window)
+        self.btn_show_proj = tkinter.Button(self.root, text="Show Display", command=self.show_projection_window)
         r += 1
-        self.btn_show_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_show_proj.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Update projector button
-        self.btn_update_proj = tkinter.Button(self.root, text='Update All', command=self.update_projection_window)
+        self.btn_update_proj = tkinter.Button(self.root, text="Update All", command=self.update_projection_window)
         r += 1
-        self.btn_update_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_update_proj.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Close display button
-        self.btn_close_proj = tkinter.Button(self.root, text='Close Display', command=self.close_projector)
+        self.btn_close_proj = tkinter.Button(self.root, text="Close Display", command=self.close_projector)
         r += 1
-        self.btn_close_proj.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_close_proj.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Show crosshairs
-        self.btn_crosshairs = tkinter.Button(self.root, text='Show Crosshairs', command=self.update_projection_window)
+        self.btn_crosshairs = tkinter.Button(self.root, text="Show Crosshairs", command=self.update_projection_window)
         r += 1
-        self.btn_crosshairs.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_crosshairs.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Show axes button
-        self.btn_axes = tkinter.Button(self.root, text='Show Display Axes', command=self.show_axes)
+        self.btn_axes = tkinter.Button(self.root, text="Show Display Axes", command=self.show_axes)
         r += 1
-        self.btn_axes.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_axes.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Show calibration image button
         self.btn_calib_fid = tkinter.Button(
-            self.root, text='Show calibration fiducial image', command=self.show_calibration_fiducial_image
+            self.root, text="Show calibration fiducial image", command=self.show_calibration_fiducial_image
         )
         r += 1
-        self.btn_calib_fid.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_calib_fid.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Show calibration image button
         self.btn_calib_mkr = tkinter.Button(
-            self.root, text='Show calibration marker image', command=self.show_calibration_marker_image
+            self.root, text="Show calibration marker image", command=self.show_calibration_marker_image
         )
         r += 1
-        self.btn_calib_mkr.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_calib_mkr.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Save as button
-        self.btn_save = tkinter.Button(self.root, text='Save as HDF...', command=self.save_as)
+        self.btn_save = tkinter.Button(self.root, text="Save as HDF...", command=self.save_as)
         r += 1
-        self.btn_save.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_save.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Load button
-        self.btn_load = tkinter.Button(self.root, text='Load from HDF...', command=self.load_from)
+        self.btn_load = tkinter.Button(self.root, text="Load from HDF...", command=self.load_from)
         r += 1
-        self.btn_load.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_load.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
         # Close window button
-        self.btn_close = tkinter.Button(self.root, text='Close All', command=self.close)
+        self.btn_close = tkinter.Button(self.root, text="Close All", command=self.close)
         r += 1
-        self.btn_close.grid(row=r, column=0, pady=2, padx=2, sticky='nesw')
+        self.btn_close.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
 
     def activate_btns(self, active: bool):
         """
@@ -161,21 +161,21 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         """
         if active:
             # States if projector is active
-            active_projector = 'normal'
-            inactive_projector = 'disabled'
+            active_projector = "normal"
+            inactive_projector = "disabled"
         else:
             # States if projector is inactive
-            active_projector = 'disabled'
-            inactive_projector = 'normal'
+            active_projector = "disabled"
+            inactive_projector = "normal"
 
         # Enable/disable buttons
-        self.btn_show_proj['state'] = inactive_projector
-        self.btn_update_proj['state'] = active_projector
-        self.btn_close_proj['state'] = active_projector
-        self.btn_axes['state'] = active_projector
-        self.btn_crosshairs['state'] = active_projector
-        self.btn_calib_fid['state'] = active_projector
-        self.btn_calib_mkr['state'] = active_projector
+        self.btn_show_proj["state"] = inactive_projector
+        self.btn_update_proj["state"] = active_projector
+        self.btn_close_proj["state"] = active_projector
+        self.btn_axes["state"] = active_projector
+        self.btn_crosshairs["state"] = active_projector
+        self.btn_calib_fid["state"] = active_projector
+        self.btn_calib_mkr["state"] = active_projector
 
     def show_projection_window(self):
         """Opens the ImageProjection window."""
@@ -242,10 +242,10 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
 
         """
         # Get save file name
-        file = asksaveasfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
+        file = asksaveasfilename(defaultextension=".h5", filetypes=[("HDF5 File", "*.h5")])
 
         # Save file as HDF
-        if file != '':
+        if file != "":
             self.save_to_hdf(file)
 
     def load_from(self):
@@ -254,10 +254,10 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
 
         """
         # Get file name
-        file = askopenfilename(defaultextension='.h5', filetypes=[("HDF5 File", "*.h5")])
+        file = askopenfilename(defaultextension=".h5", filetypes=[("HDF5 File", "*.h5")])
 
         # Load file
-        if file != '':
+        if file != "":
             self.load_from_hdf(file)
 
     def get_user_data(self):
@@ -289,7 +289,7 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
             try:
                 dtype(entry.get())
             except ValueError:
-                messagebox.showerror('Invalid input', f'Input for "{name:s}" must be {dtype}')
+                messagebox.showerror("Invalid input", f'Input for "{name:s}" must be {dtype}')
                 return False
         return True
 
@@ -302,34 +302,34 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
     def load_defaults(self):
         """Sets default values."""
         kwargs = {
-            'name': 'Default Image Projection',
-            'main_window_size_x': 800,
-            'main_window_size_y': 500,
-            'main_window_position_x': 0,
-            'main_window_position_y': 0,
-            'active_area_size_x': 700,
-            'active_area_size_y': 400,
-            'active_area_position_x': 50,
-            'active_area_position_y': 50,
-            'projector_data_type': 'uint8',
-            'projector_max_int': 255,
-            'image_delay_ms': 400,
-            'shift_red_x': 0,
-            'shift_red_y': 0,
-            'shift_blue_x': 0,
-            'shift_blue_y': 0,
+            "name": "Default Image Projection",
+            "main_window_size_x": 800,
+            "main_window_size_y": 500,
+            "main_window_position_x": 0,
+            "main_window_position_y": 0,
+            "active_area_size_x": 700,
+            "active_area_size_y": 400,
+            "active_area_position_x": 50,
+            "active_area_position_y": 50,
+            "projector_data_type": "uint8",
+            "projector_max_int": 255,
+            "image_delay_ms": 400,
+            "shift_red_x": 0,
+            "shift_red_y": 0,
+            "shift_blue_x": 0,
+            "shift_blue_y": 0,
         }
         self.display_data = ImageProjectionData(**kwargs)
         self.set_user_data()
 
-    def load_from_hdf(self, file: str, prefix: str = ''):
+    def load_from_hdf(self, file: str, prefix: str = ""):
         # Load data
         self.display_data = ImageProjectionData.load_from_hdf(file, prefix)
 
         # Set data in input fields
         self.set_user_data()
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         # Load user data
         self.get_user_data()
 
@@ -344,5 +344,5 @@ class ImageProjectionGUI(HDF5_IO_Abstract):
         self.root.destroy()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     ImageProjectionGUI()

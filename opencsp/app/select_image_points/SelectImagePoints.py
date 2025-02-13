@@ -26,7 +26,7 @@ class SelectImagePoints:
 
     """
 
-    def __init__(self, root: tk.Tk, file_name: str) -> 'SelectImagePoints':
+    def __init__(self, root: tk.Tk, file_name: str) -> "SelectImagePoints":
         """
         Select file to show
 
@@ -47,7 +47,7 @@ class SelectImagePoints:
         screen_height = root.winfo_screenheight()
         self.win_size_max = (int(screen_width * frac_window), int(screen_height * frac_window))
         self.roi_width = int(min(screen_height, screen_width) * frac_roi)  # pixels
-        self.save_name = os.path.basename(file_name).split('.')[-2]
+        self.save_name = os.path.basename(file_name).split(".")[-2]
         self.image_file_name = file_name
         self.rough = True
 
@@ -57,13 +57,13 @@ class SelectImagePoints:
         self.root.bind("<Escape>", lambda e: self.close())
         self.root.bind("s", lambda e: self.save())
         self.root.geometry(
-            f'+{int(screen_width * (1 - frac_window) / 2):d}+{int(screen_height * (1 - frac_window) / 2):d}'
+            f"+{int(screen_width * (1 - frac_window) / 2):d}+{int(screen_height * (1 - frac_window) / 2):d}"
         )
 
         # Create canvas
         self.canvas = tk.Canvas(self.root)
         self.canvas.pack()
-        self.canvas.configure(background='black', highlightthickness=0)
+        self.canvas.configure(background="black", highlightthickness=0)
         self.canvas.bind("<Button 1>", self.click)
 
         # Initialize points
@@ -85,7 +85,7 @@ class SelectImagePoints:
         """
         Updates the current displayed image to current loaded image
         """
-        self.image_display = self.canvas.create_image(0, 0, anchor='nw', image=self.image_tk)
+        self.image_display = self.canvas.create_image(0, 0, anchor="nw", image=self.image_tk)
 
     def click(self, event) -> None:
         """
@@ -136,7 +136,7 @@ class SelectImagePoints:
         Loads image into class from ndarray
         """
         # Create PIL image from array
-        image_pil = Image.fromarray(image.copy(), 'RGB')
+        image_pil = Image.fromarray(image.copy(), "RGB")
 
         # Resize image
         size_x = float(self.win_size_max[0]) / image_pil.size[0]  # window pixels / image pixels
@@ -159,7 +159,7 @@ class SelectImagePoints:
         Loads image into class given filename
         """
         # Load image
-        if file.split('.')[-1] in ['NEF', 'RAW', 'nef', 'raw']:
+        if file.split(".")[-1] in ["NEF", "RAW", "nef", "raw"]:
             im_array = self._load_raw_image(file)
         else:
             im_array = imageio.imread(file)
@@ -170,17 +170,17 @@ class SelectImagePoints:
         if np.ndim(im_array) == 2:
             im_array = np.concatenate([im_array[..., None]] * 3, axis=2)
 
-        self.image_array_main = im_array.astype('uint8')
+        self.image_array_main = im_array.astype("uint8")
         self.load_image_from_array(self.image_array_main)
 
     def save(self) -> None:
         """
         Saves corner data then closes
         """
-        with open(f'points_{self.save_name}.txt', 'w', encoding='UTF-8') as file:
-            file.write(f'{self.image_file_name:s}\n')
+        with open(f"points_{self.save_name}.txt", "w", encoding="UTF-8") as file:
+            file.write(f"{self.image_file_name:s}\n")
             for point in self.pts:
-                file.write(f'{point[0]:.1f}, {point[1]:.1f}\n')
+                file.write(f"{point[0]:.1f}, {point[1]:.1f}\n")
         self.close()
 
     def close(self) -> None:
@@ -195,12 +195,12 @@ class SelectImagePoints:
             return raw.postprocess(gamma=(1, 1), no_auto_bright=True, output_bps=16)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Select file name
     file_selected = askopenfilename(
-        title='Select file to open', filetypes=[('RAW', '*.NEF'), ('RAW', '*.RAW'), ('All Files', '*.*')]
+        title="Select file to open", filetypes=[("RAW", "*.NEF"), ("RAW", "*.RAW"), ("All Files", "*.*")]
     )
-    if file_selected != '':
+    if file_selected != "":
         # Create window
         win = SelectImagePoints(tkt.window(), file_selected)
         win.run()

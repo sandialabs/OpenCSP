@@ -8,7 +8,7 @@ class ImageCalibrationGlobal(ImageCalibrationAbstract):
     @staticmethod
     def get_calibration_name() -> str:
         """The name of this calibration class type"""
-        return 'ImageCalibrationGlobal'
+        return "ImageCalibrationGlobal"
 
     def apply_to_images(self, measurement: Measurement) -> ndarray:
         """

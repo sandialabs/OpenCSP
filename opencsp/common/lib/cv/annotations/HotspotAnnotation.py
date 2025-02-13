@@ -49,5 +49,5 @@ class HotspotAnnotation(PointAnnotations):
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         if style is None:
-            style = rcps.RenderControlPointSeq(color='blue', marker='x', markersize=1)
+            style = rcps.RenderControlPointSeq(color="blue", marker="x", markersize=1)
         super().__init__(style, point)

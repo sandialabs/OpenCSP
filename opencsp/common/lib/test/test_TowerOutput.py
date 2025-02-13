@@ -28,8 +28,8 @@ class TestTowerOutput(to.TestOutput):
     @classmethod
     def setUpClass(
         self,
-        source_file_body: str = 'TestTowerOutput',  # Set these here, because pytest calls
-        figure_prefix_root: str = 'tto',  # setup_class() with no arguments.
+        source_file_body: str = "TestTowerOutput",  # Set these here, because pytest calls
+        figure_prefix_root: str = "tto",  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
@@ -68,12 +68,12 @@ class TestTowerOutput(to.TestOutput):
         self.start_test()
 
         # View setup
-        title = 'Single Tower'
-        caption = 'A single Sandia NSTTF tower.'
+        title = "Single Tower"
+        caption = "A single Sandia NSTTF tower."
         comments = []
 
         # Configuration setup
-        tower = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        tower = Tower(name="Sandia NSTTF", origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
 
         # Setup render control.
         # Style setup
@@ -109,14 +109,14 @@ class TestTowerOutput(to.TestOutput):
         self.start_test()
 
         # View setup
-        title = 'Multiple Towers'
-        caption = 'Sandia NSTTF reciever and control tower.'
+        title = "Multiple Towers"
+        caption = "Sandia NSTTF reciever and control tower."
         comments = []
 
         # Configuration setup
-        tower_receiver = Tower(name='Sandia NSTTF', origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        tower_receiver = Tower(name="Sandia NSTTF", origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
         tower_control = Tower(
-            name='Sandia NSTTF Control Tower',
+            name="Sandia NSTTF Control Tower",
             origin=np.array([0, 0, 0]),
             height=50,
             east=8.8,
@@ -169,11 +169,11 @@ if __name__ == "__main__":
     test_object = TestTowerOutput()
     test_object.setUpClass(interactive=interactive, verify=verify)
     # Tests.
-    lt.info('Beginning tests...')
+    lt.info("Beginning tests...")
     test_object.test_single_tower()
     test_object.test_multiple_towers()
 
-    lt.info('All tests complete.')
+    lt.info("All tests complete.")
     # Cleanup.
     if interactive:
         input("Press Enter...")

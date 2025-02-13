@@ -24,22 +24,22 @@ class TestStandardPlotOutput(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         # Create output directory
-        cls.dir_output = join(dirname(__file__), 'data/output/StandardPlotOutput')
+        cls.dir_output = join(dirname(__file__), "data/output/StandardPlotOutput")
         ft.create_directories_if_necessary(cls.dir_output)
 
         # Create and clear output facet directory
-        cls.dir_output_facet = join(cls.dir_output, 'facet')
+        cls.dir_output_facet = join(cls.dir_output, "facet")
         ft.create_directories_if_necessary(cls.dir_output_facet)
-        ft.delete_files_in_directory(cls.dir_output_facet, '*.*')
+        ft.delete_files_in_directory(cls.dir_output_facet, "*.*")
 
         # Define input directory
-        cls.dir_input = join(dirname(__file__), 'data/input/StandardPlotOutput')
+        cls.dir_input = join(dirname(__file__), "data/input/StandardPlotOutput")
 
         # Define input facet directory
-        cls.dir_input_facet = join(cls.dir_input, 'facet')
+        cls.dir_input_facet = join(cls.dir_input, "facet")
         ft.create_directories_if_necessary(cls.dir_input_facet)
 
-        lt.logger(join(cls.dir_output, 'log.txt'), level=lt.log.WARN)
+        lt.logger(join(cls.dir_output, "log.txt"), level=lt.log.WARN)
 
     def test_facet(self):
         """Generates figures for single facet"""
@@ -48,7 +48,7 @@ class TestStandardPlotOutput(unittest.TestCase):
         dir_out = self.dir_output_facet
 
         # Define data file
-        file_data = join(opencsp_code_dir(), 'test/data/sofast_fringe/data_expected_facet/data.h5')
+        file_data = join(opencsp_code_dir(), "test/data/sofast_fringe/data_expected_facet/data.h5")
 
         # Load Sofast measurement data
         optic_meas = lsd.load_mirror(file_data)
@@ -65,20 +65,20 @@ class TestStandardPlotOutput(unittest.TestCase):
         # Update slope visualization parameters
         output.options_slope_vis.resolution = 0.05
         output.options_slope_vis.clim = 7
-        output.options_slope_vis.quiver_color = ['white', 'green', 'blue']
+        output.options_slope_vis.quiver_color = ["white", "green", "blue"]
         output.options_slope_vis.quiver_density = 0.2
         output.options_slope_vis.quiver_scale = 55
 
         # Update slope deviation visualization parameters
         output.options_slope_deviation_vis.resolution = 0.05
         output.options_slope_deviation_vis.clim = 1.5
-        output.options_slope_vis.quiver_color = ['magenta', 'blue', 'red']
+        output.options_slope_vis.quiver_color = ["magenta", "blue", "red"]
         output.options_slope_vis.quiver_density = [0.3, 0.2, 0.1]
         output.options_slope_vis.quiver_scale = [10, 10, 10]
 
         # Update curvature visualization parameters
         output.options_curvature_vis.resolution = 0.05
-        output.options_curvature_vis.processing = ['smooth']
+        output.options_curvature_vis.processing = ["smooth"]
         output.options_curvature_vis.smooth_kernel_width = 5
         output.options_curvature_vis.clim = 30
 
@@ -99,8 +99,8 @@ class TestStandardPlotOutput(unittest.TestCase):
 
         # Test no plots are made with no optics loaded but with plotting turned on
         output.plot()
-        files = ft.files_in_directory_by_extension(self.dir_output_facet, ['.png'])
-        if len(files['.png']) != 0:
+        files = ft.files_in_directory_by_extension(self.dir_output_facet, [".png"])
+        if len(files[".png"]) != 0:
             raise AssertionError(f'There should be no files, but the following exist: {files[".png"]}')
 
         # Test no plots are made when all plotting is turned off but optics loaded
@@ -113,8 +113,8 @@ class TestStandardPlotOutput(unittest.TestCase):
         output.options_slope_deviation_vis.to_plot = False
 
         output.plot()
-        files = ft.files_in_directory_by_extension(self.dir_output_facet, ['.png'])
-        if len(files['.png']) != 0:
+        files = ft.files_in_directory_by_extension(self.dir_output_facet, [".png"])
+        if len(files[".png"]) != 0:
             raise AssertionError(f'There should be no files, but the following exist: {files[".png"]}')
 
         # Create standard output plots with plotting turned on and optics loaded
@@ -159,8 +159,8 @@ class TestStandardPlotOutput(unittest.TestCase):
 
     @classmethod
     def tearDownClass(cls) -> None:
-        plt.close('all')
+        plt.close("all")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -36,7 +36,7 @@ class RenderControlDeflectometryInstrument:
         draw_facets=False,
         facet_styles=rce.RenderControlEnsemble(rcf.outline()),
         draw_name=False,
-        name_style=rctxt.default(color='k'),
+        name_style=rctxt.default(color="k"),
     ):
         super(RenderControlDeflectometryInstrument, self).__init__()
 
@@ -77,11 +77,11 @@ def blank():
     )
 
 
-def name(color='k', fontsize='medium'):
+def name(color="k", fontsize="medium"):
     # Name only.
     return RenderControlDeflectometryInstrument(
         draw_centroid=True,  # Draw a tiny point to ensure that things will draw.
-        centroid_style=rcps.marker(color=color, marker='.', markersize=0.1),
+        centroid_style=rcps.marker(color=color, marker=".", markersize=0.1),
         draw_outline=False,
         draw_surface_normal=False,
         draw_surface_normal_at_corners=False,
@@ -91,7 +91,7 @@ def name(color='k', fontsize='medium'):
     )
 
 
-def centroid(color='k'):
+def centroid(color="k"):
     # Centroid only.
     return RenderControlDeflectometryInstrument(
         draw_centroid=True,
@@ -104,7 +104,7 @@ def centroid(color='k'):
     )
 
 
-def centroid_name(color='k'):
+def centroid_name(color="k"):
     # Centroid and name.
     return RenderControlDeflectometryInstrument(
         draw_centroid=True,
@@ -114,12 +114,12 @@ def centroid_name(color='k'):
         draw_surface_normal_at_corners=False,
         draw_facets=False,
         draw_name=True,
-        name_style=rctxt.RenderControlText(color=color, horizontalalignment='left'),
+        name_style=rctxt.RenderControlText(color=color, horizontalalignment="left"),
     )
 
 
 def centroid_name_outline(
-    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
+    color="k", horizontalalignment="center", verticalalignment="center"  # center, right, left
 ):  # center, top, bottom, baseline, center_baseline
     # Name and overall outline.
     return RenderControlDeflectometryInstrument(
@@ -137,7 +137,7 @@ def centroid_name_outline(
     )
 
 
-def outline(color='k'):
+def outline(color="k"):
     # Overall outline only.
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
@@ -151,7 +151,7 @@ def outline(color='k'):
 
 
 def name_outline(
-    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
+    color="k", horizontalalignment="center", verticalalignment="center"  # center, right, left
 ):  # center, top, bottom, baseline, center_baseline
     # Name and overall outline.
     return RenderControlDeflectometryInstrument(
@@ -168,7 +168,7 @@ def name_outline(
     )
 
 
-def facet_outlines(color='k'):
+def facet_outlines(color="k"):
     # Facet outline only.
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
@@ -181,7 +181,7 @@ def facet_outlines(color='k'):
     )
 
 
-def facet_outlines_names(color='k'):
+def facet_outlines_names(color="k"):
     # Facet outlines and facet name labels.
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
@@ -194,7 +194,7 @@ def facet_outlines_names(color='k'):
     )
 
 
-def normal(color='k', surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGTH):
+def normal(color="k", surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGTH):
     # Overall surface normal only.
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
@@ -209,7 +209,7 @@ def normal(color='k', surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGTH):
     )
 
 
-def normal_outline(color='k', surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGTH):
+def normal_outline(color="k", surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGTH):
     # Overall surface normal and overall outline.
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
@@ -225,7 +225,7 @@ def normal_outline(color='k', surface_normal_length=DEFAULT_SURFACE_NORMAL_LENGT
     )
 
 
-def normal_facet_outlines_names(color='k'):
+def normal_facet_outlines_names(color="k"):
     # Facet outlines and facet name labels.
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
@@ -241,7 +241,7 @@ def normal_facet_outlines_names(color='k'):
     )
 
 
-def corner_normals_outline(color='k'):
+def corner_normals_outline(color="k"):
     # Overall outline, and overall surface normal drawn at each overall corner.
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
@@ -257,7 +257,7 @@ def corner_normals_outline(color='k'):
     )
 
 
-def normal_facet_outlines(color='k'):
+def normal_facet_outlines(color="k"):
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
         draw_outline=False,
@@ -272,7 +272,7 @@ def normal_facet_outlines(color='k'):
     )
 
 
-def facet_outlines_normals(color='k'):
+def facet_outlines_normals(color="k"):
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
         draw_outline=False,
@@ -284,7 +284,7 @@ def facet_outlines_normals(color='k'):
     )
 
 
-def facet_outlines_corner_normals(color='k'):
+def facet_outlines_corner_normals(color="k"):
     return RenderControlDeflectometryInstrument(
         draw_centroid=False,
         draw_outline=False,
@@ -299,7 +299,7 @@ def facet_outlines_corner_normals(color='k'):
     )
 
 
-def highlight(color='b'):
+def highlight(color="b"):
     return RenderControlDeflectometryInstrument(
         centroid_style=rcps.marker(color=color),
         outline_style=rcps.outline(color=color),

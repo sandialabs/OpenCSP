@@ -32,17 +32,17 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
     jpg_quality = 75
 
     # Copy files that don't need downsampling
-    print('Copying files with no downsampling...')
+    print("Copying files with no downsampling...")
     files = ["point_pair_distances.csv", "known_point_locations.csv", "alignment_points.csv"]
     for file in files:
         shutil.copy(join(dir_input, file), join(dir_output, file))
 
     # Downsample aruco marker images
-    print('Downsampling aruco images...')
-    dir_output_aruco_images = join(dir_output, 'aruco_marker_images')
+    print("Downsampling aruco images...")
+    dir_output_aruco_images = join(dir_output, "aruco_marker_images")
     if not os.path.exists(dir_output_aruco_images):
         os.makedirs(dir_output_aruco_images)
-    files = glob(join(dir_input, 'aruco_marker_images/*.JPG'))
+    files = glob(join(dir_input, "aruco_marker_images/*.JPG"))
     for file in tqdm(files):
         file_name = os.path.basename(file)
         im = imageio.imread(file)
@@ -52,13 +52,13 @@ def downsample_dataset(dir_input: str, dir_output: str) -> None:
         imageio.imwrite(join(dir_output_aruco_images, file_name), im_ds, quality=jpg_quality)
 
     # Downsample aruco marker camera
-    print('Downsampling camera...')
-    camera_aruco_ds = dd.downsample_camera(join(dir_input, 'camera.h5'), n_aruco)
-    camera_aruco_ds.save_to_hdf(join(dir_output, 'camera.h5'))
+    print("Downsampling camera...")
+    camera_aruco_ds = dd.downsample_camera(join(dir_input, "camera.h5"), n_aruco)
+    camera_aruco_ds.save_to_hdf(join(dir_output, "camera.h5"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     downsample_dataset(
-        dir_input=join(opencsp_code_dir(), '../../sample_data/scene_reconstruction/data_measurement'),
-        dir_output=join(os.path.dirname(__file__), 'data/data_measurement'),
+        dir_input=join(opencsp_code_dir(), "../../sample_data/scene_reconstruction/data_measurement"),
+        dir_output=join(os.path.dirname(__file__), "data/data_measurement"),
     )

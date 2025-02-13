@@ -36,7 +36,7 @@ class TestImageColor(unittest.TestCase):
 
     def tearDown(self) -> None:
         # Make sure we release all matplotlib resources.
-        plt.close('all')
+        plt.close("all")
 
     def test_normalize(self) -> None:
         """Tests image color normalization of all patches"""

@@ -84,7 +84,7 @@ class RenderControlFigureRecord:
         # Register data to be re-assigned
         xlabel = self.axis.get_xlabel()
         ylabel = self.axis.get_ylabel()
-        if hasattr(self.axis, 'get_zlabel'):
+        if hasattr(self.axis, "get_zlabel"):
             zlabel = self.axis.get_zlabel()
 
         # Clear the previous graph
@@ -100,7 +100,7 @@ class RenderControlFigureRecord:
         # Re-assign necessary data
         self.axis.set_xlabel(xlabel)
         self.axis.set_ylabel(ylabel)
-        if hasattr(self.axis, 'get_zlabel'):
+        if hasattr(self.axis, "get_zlabel"):
             self.axis.set_zlabel(zlabel)
 
     def add_metadata_line(self, metadata_line: str) -> None:
@@ -140,7 +140,7 @@ class RenderControlFigureRecord:
         """
         try:
             if format is None:
-                format = 'svg'  # Default format was previously 'png'.
+                format = "svg"  # Default format was previously 'png'.
             orig_format = format
             if format.lower() == "gif":
                 format = "png"
@@ -166,13 +166,13 @@ class RenderControlFigureRecord:
                 # Make the figure current.
                 plt.figure(self.name)
                 # Save the current figure.
-                output_figure_dir_body_ext = output_figure_dir_body + '.' + format
+                output_figure_dir_body_ext = output_figure_dir_body + "." + format
                 # TODO RCB: THIS CODE IS DEPRECATED AS OF 11/20/2022.  ONCE IT'S CLEAR WE DON'T WANT IT, DELETE THE FOLLOWING COMMENTED-OUT LINES.
                 # if ft.file_exists(output_figure_dir_body_ext):
                 #     print('Skipping save of existing figure: ' + output_figure_dir_body_ext)
                 # else:
-                output_figure_dir_body_ext = output_figure_dir_body + '.' + format
-                lt.info('In RenderControlFigureRecord.save(), saving figure: ' + output_figure_dir_body_ext)
+                output_figure_dir_body_ext = output_figure_dir_body + "." + format
+                lt.info("In RenderControlFigureRecord.save(), saving figure: " + output_figure_dir_body_ext)
                 plt.savefig(output_figure_dir_body_ext, format=format, dpi=dpi)
         finally:
             # Close figure if desired.
@@ -191,35 +191,35 @@ class RenderControlFigureRecord:
 
         # Save the figure explanation.
         output_figure_dir, output_figure_body, output_figure_ext = ft.path_components(output_figure_dir_body_ext)
-        output_figure_text_body_ext = output_figure_body + '.txt'
+        output_figure_text_body_ext = output_figure_body + ".txt"
         output_figure_text_dir_body_ext = os.path.join(output_figure_dir, output_figure_text_body_ext)
-        lt.info('Saving figure text: ' + output_figure_text_dir_body_ext)
-        with open(output_figure_text_dir_body_ext, 'w') as output_stream:
+        lt.info("Saving figure text: " + output_figure_text_dir_body_ext)
+        with open(output_figure_text_dir_body_ext, "w") as output_stream:
             # Save the figure metadata.
             if len(self.metadata) > 0:
-                output_stream.write('Metadata:\n')
+                output_stream.write("Metadata:\n")
                 for metadata_line in self.metadata:
-                    output_stream.write(metadata_line + '\n')
-                output_stream.write('\n')
+                    output_stream.write(metadata_line + "\n")
+                output_stream.write("\n")
 
             # Save the figure title.
             if self.title is not None:
-                output_stream.write('Title:\n')
-                output_stream.write(self.title + '\n')
-                output_stream.write('\n')
+                output_stream.write("Title:\n")
+                output_stream.write(self.title + "\n")
+                output_stream.write("\n")
 
             # Save the figure caption.
             if self.caption is not None:
-                output_stream.write('Caption:\n')
-                output_stream.write(self.caption + '\n')
-                output_stream.write('\n')
+                output_stream.write("Caption:\n")
+                output_stream.write(self.caption + "\n")
+                output_stream.write("\n")
 
             # Save the figure comments.
             if len(self.comments) > 0:
-                output_stream.write('Comments:\n')
+                output_stream.write("Comments:\n")
                 for comment_line in self.comments:
-                    output_stream.write(comment_line + '\n')
-                output_stream.write('\n')
+                    output_stream.write(comment_line + "\n")
+                output_stream.write("\n")
 
         # Return the files created.
         return output_figure_dir_body_ext, output_figure_text_dir_body_ext

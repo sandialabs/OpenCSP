@@ -100,12 +100,12 @@ class FunctionXYDiscrete(FunctionXYAbstract):
         None
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
-        if view.view_spec['type'] == 'image':
+        if view.view_spec["type"] == "image":
             arr = np.zeros((len(self.y_domain), len(self.x_domain)))
             for ix, x in enumerate(sorted(self.x_domain)):
                 for iy, y in enumerate(sorted(self.y_domain)):
                     arr[iy, ix] = self.value_at(x, y)
-            view.imshow(arr, colorbar=True, cmap='jet')
+            view.imshow(arr, colorbar=True, cmap="jet")
 
     @classmethod
     def from_array(cls, x_domain: np.ndarray, y_domain: np.ndarray, values: np.ndarray):

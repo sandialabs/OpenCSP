@@ -46,15 +46,15 @@ class HeliostatConfiguration:
             The elevation angle in radians (default is None).
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
-        self.valid_heliostat_types = ['az-el']
+        self.valid_heliostat_types = ["az-el"]
         self.heliostat_type = heliostat_type
 
         if heliostat_type not in self.valid_heliostat_types:
             raise ValueError(
-                f'Invalid type of heliostat. {self.heliostat_type} is ' f'not one of: {self.valid_heliostat_types}.'
+                f"Invalid type of heliostat. {self.heliostat_type} is " f"not one of: {self.valid_heliostat_types}."
             )
 
-        if heliostat_type == 'az-el':
+        if heliostat_type == "az-el":
             if (az is None) or (el is None):
                 raise ValueError(f"Cannot have a HeliostatAzEl configuration" f" without az and el arguments")
             self.az = az
@@ -75,10 +75,10 @@ class HeliostatConfiguration:
             If the heliostat type is invalid.
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
-        if self.heliostat_type == 'az-el':
+        if self.heliostat_type == "az-el":
             return self.az, self.el
         raise ValueError(
-            f'Invalid type of heliostat. {self.heliostat_type} is ' f'not one of: {self.valid_heliostat_types}.'
+            f"Invalid type of heliostat. {self.heliostat_type} is " f"not one of: {self.valid_heliostat_types}."
         )
 
 
@@ -138,7 +138,7 @@ def face_north() -> HeliostatConfiguration:
         A HeliostatConfiguration object with azimuth set to 0 radians and elevation set to 0 radians.
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    return HeliostatConfiguration('az-el', az=np.deg2rad(0), el=np.deg2rad(0))
+    return HeliostatConfiguration("az-el", az=np.deg2rad(0), el=np.deg2rad(0))
 
 
 def face_south() -> HeliostatConfiguration:
@@ -151,7 +151,7 @@ def face_south() -> HeliostatConfiguration:
         A HeliostatConfiguration object with azimuth set to 180 radians and elevation set to 0 radians.
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    return HeliostatConfiguration('az-el', az=np.deg2rad(180), el=np.deg2rad(0))
+    return HeliostatConfiguration("az-el", az=np.deg2rad(180), el=np.deg2rad(0))
 
 
 def face_east() -> HeliostatConfiguration:
@@ -164,7 +164,7 @@ def face_east() -> HeliostatConfiguration:
         A HeliostatConfiguration object with azimuth set to 90 radians and elevation set to 0 radians.
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    return HeliostatConfiguration('az-el', az=np.deg2rad(90), el=np.deg2rad(0))
+    return HeliostatConfiguration("az-el", az=np.deg2rad(90), el=np.deg2rad(0))
 
 
 def face_west() -> HeliostatConfiguration:
@@ -177,7 +177,7 @@ def face_west() -> HeliostatConfiguration:
         A HeliostatConfiguration object with azimuth set to 270 radians and elevation set to 0 radians.
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    return HeliostatConfiguration('az-el', az=np.deg2rad(270), el=np.deg2rad(0))
+    return HeliostatConfiguration("az-el", az=np.deg2rad(270), el=np.deg2rad(0))
 
 
 def face_up() -> HeliostatConfiguration:
@@ -191,7 +191,7 @@ def face_up() -> HeliostatConfiguration:
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Azinumth for UFACET scans.
-    return HeliostatConfiguration('az-el', az=np.deg2rad(180), el=np.deg2rad(90))
+    return HeliostatConfiguration("az-el", az=np.deg2rad(180), el=np.deg2rad(90))
 
 
 def NSTTF_stow() -> HeliostatConfiguration:
@@ -204,4 +204,4 @@ def NSTTF_stow() -> HeliostatConfiguration:
         A HeliostatConfiguration object with azimuth set to 270 radians and elevation set to -85 radians.
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    return HeliostatConfiguration('az-el', az=np.deg2rad(270), el=np.deg2rad(-85))
+    return HeliostatConfiguration("az-el", az=np.deg2rad(270), el=np.deg2rad(-85))

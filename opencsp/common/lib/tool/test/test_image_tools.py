@@ -21,10 +21,10 @@ class TestImageTools(unittest.TestCase):
         arr8f = arr8i.astype(np.float16)
         arr16f = arr16i.astype(np.float16)
 
-        im8i = it.numpy_to_image(arr8i, rescale_or_clip='truncate')
-        im16i = it.numpy_to_image(arr16i, rescale_or_clip='truncate')
-        im8f = it.numpy_to_image(arr8f, rescale_or_clip='truncate')
-        im16f = it.numpy_to_image(arr16f, rescale_or_clip='truncate')
+        im8i = it.numpy_to_image(arr8i, rescale_or_clip="truncate")
+        im16i = it.numpy_to_image(arr16i, rescale_or_clip="truncate")
+        im8f = it.numpy_to_image(arr8f, rescale_or_clip="truncate")
+        im16f = it.numpy_to_image(arr16f, rescale_or_clip="truncate")
 
         nptest.assert_array_equal(np.asarray(im8i), np.array([[0, 125, 255]]))
         nptest.assert_array_equal(np.asarray(im16i), np.array([[0, 255, 255]]))
@@ -37,10 +37,10 @@ class TestImageTools(unittest.TestCase):
         arr8f = arr8i.astype(np.float16)
         arr16f = arr16i.astype(np.float16)
 
-        im8i = it.numpy_to_image(arr8i, rescale_or_clip='rescale')
-        im16i = it.numpy_to_image(arr16i, rescale_or_clip='rescale')
-        im8f = it.numpy_to_image(arr8f, rescale_or_clip='rescale')
-        im16f = it.numpy_to_image(arr16f, rescale_or_clip='rescale')
+        im8i = it.numpy_to_image(arr8i, rescale_or_clip="rescale")
+        im16i = it.numpy_to_image(arr16i, rescale_or_clip="rescale")
+        im8f = it.numpy_to_image(arr8f, rescale_or_clip="rescale")
+        im16f = it.numpy_to_image(arr16f, rescale_or_clip="rescale")
 
         nptest.assert_array_equal(np.asarray(im8i), np.array([[0, 125, 255]]))
         nptest.assert_array_equal(np.asarray(im16i), np.array([[0, 127, 255]]))
@@ -105,7 +105,7 @@ class TestImageTools(unittest.TestCase):
         # implementation-specific number is, so let's just make the buffer a
         # little bigger.
 
-        img = Image.new('RGB', (40, 40))
+        img = Image.new("RGB", (40, 40))
         self.assertAlmostEqual(it.getsizeof_approx(img), 40 * 40 * 3, delta=delta)
         if 40 * 40 * 3 + implementation_overhead != it.getsizeof_approx(img):
             lt.warn(
@@ -115,5 +115,5 @@ class TestImageTools(unittest.TestCase):
             )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

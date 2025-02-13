@@ -13,15 +13,15 @@ class RenderControlVideoTracks:
         self,
         clear_previous=True,  # Remove any existing files in the designated output directory.
         draw_video_tracks=True,  # Whether to draw the video track figures.
-        video_tracks_points_marker='o',  # Marker for video tracks.
+        video_tracks_points_marker="o",  # Marker for video tracks.
         video_tracks_points_markersize=1.5,  # Marker size for video tracks.
-        video_tracks_points_color='m',  # Color for video track points.
-        video_tracks_label_horizontalalignment='center',  # Horizontal alignment for heliostat label.
-        video_tracks_label_verticalalignment='center',  # Vertical alignment for heliostat label.
+        video_tracks_points_color="m",  # Color for video track points.
+        video_tracks_label_horizontalalignment="center",  # Horizontal alignment for heliostat label.
+        video_tracks_label_verticalalignment="center",  # Vertical alignment for heliostat label.
         video_tracks_label_fontsize=6,  # Font size for heliostat label.
-        video_tracks_label_fontstyle='normal',  # Font style for heliostat label.
-        video_tracks_label_fontweight='bold',  # Font weight for heliostat label.
-        video_tracks_label_color='m',  # Color for heliostat label.
+        video_tracks_label_fontstyle="normal",  # Font style for heliostat label.
+        video_tracks_label_fontweight="bold",  # Font weight for heliostat label.
+        video_tracks_label_color="m",  # Color for heliostat label.
         video_tracks_dpi=200,  # Dpi for saving figure to disk.
         video_tracks_crop=True,  # Whether to crop annotations outside image frame.
     ):
@@ -45,7 +45,7 @@ class RenderControlVideoTracks:
 # COMMON CASES
 
 
-def default(color='m'):
+def default(color="m"):
     return RenderControlVideoTracks(video_tracks_points_color=color, video_tracks_label_color=color)
 
 

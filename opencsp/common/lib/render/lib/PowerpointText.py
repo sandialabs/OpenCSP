@@ -113,8 +113,8 @@ class PowerpointText(pps.PowerpointShape):
             )
         dims = cls._str_to_dims(None, slines[2])
         cell_dims = cls._str_to_dims(None, slines[3])
-        is_title = slines[4] == 'True'
-        has_val = slines[5] == 'True'
+        is_title = slines[4] == "True"
+        has_val = slines[5] == "True"
         val = None if not has_val else "\n".join(lines[6:])
 
         return cls(val, dims, cell_dims, is_title)

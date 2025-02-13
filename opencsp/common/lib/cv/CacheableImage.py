@@ -347,8 +347,8 @@ class CacheableImage:
 
     @classmethod
     def from_single_source(
-        cls, array_or_path: Union[np.ndarray, str, 'CacheableImage', Image.Image]
-    ) -> 'CacheableImage':
+        cls, array_or_path: Union[np.ndarray, str, "CacheableImage", Image.Image]
+    ) -> "CacheableImage":
         """Generates a CacheableImage from the given numpy array, numpy '.npy' file, or image file."""
         if isinstance(array_or_path, CacheableImage):
             return array_or_path

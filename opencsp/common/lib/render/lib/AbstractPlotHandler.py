@@ -41,7 +41,7 @@ class AbstractPlotHandler(ABC):
     def _register_plot(self, fig: matplotlib.figure.Figure):
         """Registers the given figure, to be closed when this instance is closed or destructed."""
         self._open_plots.append(fig)
-        fig.canvas.mpl_connect('close_event', self._on_plot_closed)
+        fig.canvas.mpl_connect("close_event", self._on_plot_closed)
 
     def _free_plots(self):
         for fig in copy.copy(self._open_plots):

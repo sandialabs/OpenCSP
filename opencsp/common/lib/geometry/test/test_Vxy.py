@@ -95,7 +95,7 @@ class TestVxy(unittest.TestCase):
         with np.testing.assert_raises(TypeError):
             self.V1 + 1.0
         with np.testing.assert_raises(TypeError):
-            self.V1 + '1'
+            self.V1 + "1"
 
     def test_sub(self):
         # Vxy
@@ -109,7 +109,7 @@ class TestVxy(unittest.TestCase):
         with np.testing.assert_raises(TypeError):
             self.V1 - 1.0
         with np.testing.assert_raises(TypeError):
-            self.V1 - '1'
+            self.V1 - "1"
 
     def test_mul(self):
         # Vxy
@@ -129,7 +129,7 @@ class TestVxy(unittest.TestCase):
 
         # String
         with np.testing.assert_raises(TypeError):
-            self.V2 * '2'
+            self.V2 * "2"
 
     def test_len(self):
         # Length > 2
@@ -328,5 +328,5 @@ class TestVxy(unittest.TestCase):
         np.testing.assert_array_equal(actual_values, np.array([0, 4, 6]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

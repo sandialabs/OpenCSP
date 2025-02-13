@@ -34,13 +34,13 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         self._create_response_function()
 
     @staticmethod
-    def get_cal_options() -> dict[str, type['ImageCalibrationAbstract']]:
+    def get_cal_options() -> dict[str, type["ImageCalibrationAbstract"]]:
         """Available calibration objects that can be instantiated with load_from_hdf_guess_type()"""
         # import here to avoid circular references
         from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
         from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 
-        return {'Global': ImageCalibrationGlobal, 'Scaling': ImageCalibrationScaling}
+        return {"Global": ImageCalibrationGlobal, "Scaling": ImageCalibrationScaling}
 
     @staticmethod
     @abstractmethod
@@ -87,7 +87,7 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
     @classmethod
     def from_data(
         cls, images_cal: ndarray, display_values: ndarray, mask: ndarray | None = None, num_samps: int = 1000
-    ) -> 'ImageCalibrationAbstract':
+    ) -> "ImageCalibrationAbstract":
         """
         Calculates camera values from calibration images. Returns
         ImageCalibration object.
@@ -124,7 +124,7 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         idx_0 = idx_1 - num_samps
         if idx_0 < 0:
             idx_0 = 0
-            warn(f'Number of samples smaller than n_samps. Using {idx_1:d} samples instead.', stacklevel=2)
+            warn(f"Number of samples smaller than n_samps. Using {idx_1:d} samples instead.", stacklevel=2)
 
         # Get brightness values corresponding to indices
         vals_sort = np.sort(im_1.flatten())
@@ -181,16 +181,16 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         """
         Shows plot of gray levels calibration data. When the close() method of this instance is called (or this
         instance is destructed), the plot will be closed automatically."""
-        title = 'Projector-Camera Calibration Curve'
+        title = "Projector-Camera Calibration Curve"
 
         # Plot figure
         fig = fm.mpl_pyplot_figure()
         ax = fig.gca()
         ax.plot(self.display_values, self.camera_values)
-        ax.set_xlabel('Display Values')
-        ax.set_ylabel('Camera Values')
+        ax.set_xlabel("Display Values")
+        ax.set_ylabel("Camera Values")
         ax.grid(True)
-        ax.set_title('Projector-Camera Calibration Curve')
+        ax.set_title("Projector-Camera Calibration Curve")
 
         # Track this figure, to be closed eventually
         self._register_plot(fig)
@@ -217,7 +217,7 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         # return fig_record
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = '') -> 'ImageCalibrationAbstract':
+    def load_from_hdf(cls, file: str, prefix: str = "") -> "ImageCalibrationAbstract":
         """
         Loads from HDF5 file
 
@@ -228,21 +228,21 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
 
         """
         # Check calibration type
-        datasets = [prefix + 'ImageCalibration/calibration_type']
+        datasets = [prefix + "ImageCalibration/calibration_type"]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         calibration_name = cls.get_calibration_name()
 
-        if data['calibration_type'] != calibration_name:
-            raise ValueError(f'ImageCalibration file is not of type {calibration_name:s}')
+        if data["calibration_type"] != calibration_name:
+            raise ValueError(f"ImageCalibration file is not of type {calibration_name:s}")
 
         # Load grid data
-        datasets = [prefix + 'ImageCalibration/camera_values', prefix + 'ImageCalibration/display_values']
+        datasets = [prefix + "ImageCalibration/camera_values", prefix + "ImageCalibration/display_values"]
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
 
         return cls(**kwargs)
 
     @staticmethod
-    def load_from_hdf_guess_type(hdf5_file_path_name_ext: str, prefix: str = '') -> 'ImageCalibrationAbstract':
+    def load_from_hdf_guess_type(hdf5_file_path_name_ext: str, prefix: str = "") -> "ImageCalibrationAbstract":
         """Loads saved results of a projector-camera intensity calibration, returning a calibration instance whose type
         is based on information stored in the given file.
 
@@ -253,24 +253,24 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         ValueError:
             If the type of the calibration instance in the given file is unknown"""
         # Load file
-        datasets = [prefix + 'ImageCalibration/calibration_type']
-        cal_type = hdf5_tools.load_hdf5_datasets(datasets, hdf5_file_path_name_ext)['calibration_type']
+        datasets = [prefix + "ImageCalibration/calibration_type"]
+        cal_type = hdf5_tools.load_hdf5_datasets(datasets, hdf5_file_path_name_ext)["calibration_type"]
 
         # import here to avoid circular references
         from opencsp.app.sofast.lib.ImageCalibrationGlobal import ImageCalibrationGlobal
         from opencsp.app.sofast.lib.ImageCalibrationScaling import ImageCalibrationScaling
 
         # build a return value based on the information found in the file
-        if cal_type == 'ImageCalibrationGlobal':
+        if cal_type == "ImageCalibrationGlobal":
             calibration = ImageCalibrationGlobal.load_from_hdf(hdf5_file_path_name_ext, prefix)
-        elif cal_type == 'ImageCalibrationScaling':
+        elif cal_type == "ImageCalibrationScaling":
             calibration = ImageCalibrationScaling.load_from_hdf(hdf5_file_path_name_ext, prefix)
         else:
-            lt.error_and_raise(ValueError, f'Selected calibration type, {cal_type}, not supported.')
+            lt.error_and_raise(ValueError, f"Selected calibration type, {cal_type}, not supported.")
 
         return calibration
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """
         Saves to HDF file
 
@@ -281,9 +281,9 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
 
         """
         datasets = [
-            prefix + 'ImageCalibration/camera_values',
-            prefix + 'ImageCalibration/display_values',
-            prefix + 'ImageCalibration/calibration_type',
+            prefix + "ImageCalibration/camera_values",
+            prefix + "ImageCalibration/display_values",
+            prefix + "ImageCalibration/calibration_type",
         ]
         data = [self.camera_values, self.display_values, self.get_calibration_name()]
 

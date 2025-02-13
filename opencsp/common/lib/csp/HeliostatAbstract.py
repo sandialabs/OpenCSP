@@ -200,8 +200,8 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
 
         """
         # equation for canting angles
-        x_s = Symbol('x')
-        y_s = Symbol('y')
+        x_s = Symbol("x")
+        y_s = Symbol("y")
 
         sym_func = func(x_s, y_s)
 

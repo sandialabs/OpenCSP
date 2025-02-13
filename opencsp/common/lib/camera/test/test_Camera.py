@@ -17,8 +17,8 @@ class TestVxyz:
         distortion_coef_real = np.array([0.01, 0.02, 0.001, 0.002])
         image_shape_xy = (1000, 500)
 
-        cls.camera_ideal = Camera(intrinsic_mat, distortion_coef_zeros, image_shape_xy, 'Test Ideal Camera')
-        cls.camera_real = Camera(intrinsic_mat, distortion_coef_real, image_shape_xy, 'Test Real Camera')
+        cls.camera_ideal = Camera(intrinsic_mat, distortion_coef_zeros, image_shape_xy, "Test Ideal Camera")
+        cls.camera_real = Camera(intrinsic_mat, distortion_coef_real, image_shape_xy, "Test Real Camera")
 
         # Define upper left 3D point and image location
         cls.Vxyz_ul = Vxyz((-1, -0.5, 2))
@@ -111,7 +111,7 @@ class TestVxyz:
         np.testing.assert_(im_shape_xy == im_shape_yx[::-1])
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Test = TestVxyz()
     Test.setup_class()
 

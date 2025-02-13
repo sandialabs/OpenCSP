@@ -43,23 +43,23 @@ class TestOutput(unittest.TestCase):
         cls.output_path = output_path
 
         # Set the location to save files.
-        cls.expected_output_dir = os.path.join(cls.output_path, 'data', 'input', cls.source_file_body)
-        cls.actual_output_dir = os.path.join(cls.output_path, 'data', 'output', cls.source_file_body)
+        cls.expected_output_dir = os.path.join(cls.output_path, "data", "input", cls.source_file_body)
+        cls.actual_output_dir = os.path.join(cls.output_path, "data", "output", cls.source_file_body)
 
         # Setup log reporting.
-        log_file_dir_body_ext = os.path.join(cls.actual_output_dir, cls.source_file_body + '.log')
-        print('log_file_dir_body_ext = ', log_file_dir_body_ext)
+        log_file_dir_body_ext = os.path.join(cls.actual_output_dir, cls.source_file_body + ".log")
+        print("log_file_dir_body_ext = ", log_file_dir_body_ext)
         lt.logger(log_file_dir_body_ext, delete_existing_log=True)
 
         # Clear actual output directory, so we don't interpret previously-written files as being output from this run.
         if ft.directory_exists(cls.actual_output_dir):
             lt.info('Clearing files in directory "' + cls.actual_output_dir + '"...')
-            ft.delete_files_in_directory(cls.actual_output_dir, '*')
+            ft.delete_files_in_directory(cls.actual_output_dir, "*")
         else:
             ft.create_directories_if_necessary(cls.actual_output_dir)
 
         # Set the figure and axis control for all figures.
-        lt.info('Initializing render control structures...')
+        lt.info("Initializing render control structures...")
         cls.figure_control: RenderControlFigure = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
         cls.figure_control_large: RenderControlFigure = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=False)
         cls.axis_control_m: RenderControlAxis = rca.meters()
@@ -69,22 +69,22 @@ class TestOutput(unittest.TestCase):
         # will run low/out of memory, causing adverse effectes on the plots.
 
     def tearDown(self) -> None:
-        lt.info('Closing created plot windows...')
-        plt.close('all')
+        lt.info("Closing created plot windows...")
+        plt.close("all")
 
     def start_test(self, close=True):
         # Tag to enable users inspecting the output data to find the calling routine, based on the saved metadata.
         test_routine_name = inspect.stack()[1][
             3
         ]  # See https://stackoverflow.com/questions/5067604/determine-function-name-from-within-that-function-without-using-traceback
-        self.code_tag = self.source_file_body + '.' + test_routine_name + '()'
-        lt.info('\n\nStarting ' + self.code_tag + '...')
+        self.code_tag = self.source_file_body + "." + test_routine_name + "()"
+        lt.info("\n\nStarting " + self.code_tag + "...")
 
         # Reset rendering.
-        lt.info('Closing existing plot windows...')
+        lt.info("Closing existing plot windows...")
         if close:
-            plt.close('all')
-        lt.info('Resetting figure management structure...')
+            plt.close("all")
+        lt.info("Resetting figure management structure...")
         fm.reset_figure_management()
 
     def figure_prefix(self, figure_num: int) -> None:
@@ -110,7 +110,7 @@ class TestOutput(unittest.TestCase):
         # regardless of test execution order.  The solution I chose is to hard-code figure numbers,
         # relying on the calling code to keep them unique.
         #
-        return self.figure_prefix_root + '{0:03d}'.format(figure_num)
+        return self.figure_prefix_root + "{0:03d}".format(figure_num)
 
     def show_save_and_check_figure(self, fig_record: RenderControlFigureRecord, dpi=600) -> None:
         """
@@ -122,7 +122,7 @@ class TestOutput(unittest.TestCase):
         )
         # Clear.
         if not self.interactive:
-            plt.close('all')
+            plt.close("all")
 
     def save_and_check_image(self, image, dpm, output_file_body, output_ext) -> None:
         """
@@ -134,4 +134,4 @@ class TestOutput(unittest.TestCase):
         )
         # Clear.
         if not self.interactive:
-            plt.close('all')
+            plt.close("all")

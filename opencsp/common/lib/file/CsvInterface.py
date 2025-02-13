@@ -56,7 +56,7 @@ class CsvInterface:
         # get the data lines
         row_strs: list[str | "CsvInterface"] = []
         if rows == None:
-            if hasattr(self, 'rows'):
+            if hasattr(self, "rows"):
                 if callable(self.rows):
                     rows = self.rows()
                 else:

@@ -80,15 +80,15 @@ class Vxyz:
         if isinstance(data_in, np.ndarray):
             data_tmp = data_in.squeeze()
             if np.ndim(data_tmp) not in [1, 2]:
-                raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
+                raise ValueError("Input data must have 1 or 2 dimensions if ndarray.")
             elif np.ndim(data_tmp) == 2 and data_tmp.shape[0] != 3:
-                raise ValueError('First dimension of 2-dimensional data must be length 3 if ndarray.')
+                raise ValueError("First dimension of 2-dimensional data must be length 3 if ndarray.")
         elif isinstance(data_in, Vxy):
             data_tmp = np.pad(data_in.data, ((0, 1), (0, 0)))
         elif isinstance(data_in, Vxyz):
             data_tmp = data_in.data
         elif len(data_in) != 3:
-            raise ValueError('Input data must have length 3.')
+            raise ValueError("Input data must have length 3.")
 
         # Save and format data
         self._data = np.array(data_tmp, dtype=dtype).reshape((3, -1))
@@ -164,7 +164,7 @@ class Vxyz:
             If the input v_in is not a Vxyz type object.
         """
         if not isinstance(v_in, Vxyz):
-            raise TypeError(f'Input operand must be {Vxyz}, not {type(v_in)}')
+            raise TypeError(f"Input operand must be {Vxyz}, not {type(v_in)}")
 
     def __add__(self, v_in):
         """
@@ -191,17 +191,17 @@ class Vxyz:
         elif type(data_in) is np.ndarray:
             return self._from_data(self._data * data_in)
         else:
-            raise TypeError(f'Vxyz cannot be multipled by type, {type(data_in)}.')
+            raise TypeError(f"Vxyz cannot be multipled by type, {type(data_in)}.")
 
-    def __getitem__(self, key) -> 'Vxyz':
+    def __getitem__(self, key) -> "Vxyz":
         # Check that only one dimension is being indexed
         if np.size(key) > 1 and any(isinstance(x, slice) for x in key):
-            raise ValueError('Can only index over one dimension.')
+            raise ValueError("Can only index over one dimension.")
 
         return self._from_data(self._data[:, key], dtype=self.dtype)
 
     def __repr__(self):
-        return '3D Vector:\n' + self._data.__repr__()
+        return "3D Vector:\n" + self._data.__repr__()
 
     def __len__(self):
         return self._data.shape[1]
@@ -226,7 +226,7 @@ class Vxyz:
         mag = self.magnitude()
 
         if np.any(mag == 0):
-            raise ValueError('Vector contains zero vector, cannot normalize.')
+            raise ValueError("Vector contains zero vector, cannot normalize.")
 
         return mag
 
@@ -281,7 +281,7 @@ class Vxyz:
         """
         # Check inputs
         if not isinstance(R, Rotation):
-            raise TypeError(f'Rotation must be type {Rotation}, not {type(R)}')
+            raise TypeError(f"Rotation must be type {Rotation}, not {type(R)}")
 
         V_out = self._from_data(self._data.copy())
         V_out.rotate_in_place(R)
@@ -309,7 +309,7 @@ class Vxyz:
         """
         # Check inputs
         if not isinstance(R, Rotation):
-            raise TypeError(f'Rotaion must be type {Rotation}, not {type(R)}')
+            raise TypeError(f"Rotaion must be type {Rotation}, not {type(R)}")
         self._check_is_Vxyz(V_pivot)
 
         V_out = self._from_data(self._data.copy())
@@ -334,7 +334,7 @@ class Vxyz:
         """
         # Check inputs
         if not isinstance(R, Rotation):
-            raise TypeError(f'Rotation must be type {Rotation}, not {type(R)}')
+            raise TypeError(f"Rotation must be type {Rotation}, not {type(R)}")
 
         self._data = R.apply(self._data.T).T
 
@@ -360,7 +360,7 @@ class Vxyz:
         """
         # Check inputs
         if not isinstance(R, Rotation):
-            raise TypeError(f'Rotaion must be type {Rotation}, not {type(R)}')
+            raise TypeError(f"Rotaion must be type {Rotation}, not {type(R)}")
         self._check_is_Vxyz(V_pivot)
 
         # Center pivot to origin
@@ -415,7 +415,7 @@ class Vxyz:
         # Check inputs
         self._check_is_Vxyz(V)
         if not (len(self) == 1 or len(V) == 1 or len(self) == len(V)):
-            raise ValueError('Operands must be same same length, or at least one must have length 1.')
+            raise ValueError("Operands must be same same length, or at least one must have length 1.")
 
         # Calculate
         return self._from_data(np.cross(self._data.T, V.data.T).T)
@@ -450,7 +450,7 @@ class Vxyz:
         # Check inputs
         self._check_is_Vxyz(V)
         if len(self) != 1 or len(V) != 1:
-            raise ValueError('Can only align vectors with length 1.')
+            raise ValueError("Can only align vectors with length 1.")
 
         # Normlize
         A = self.normalize()
@@ -464,7 +464,7 @@ class Vxyz:
         Rmat = np.eye(3) + Vx + np.matmul(Vx, Vx) * C
         return Rotation.from_matrix(Rmat)
 
-    def concatenate(self, V: 'Vxyz') -> 'Vxyz':
+    def concatenate(self, V: "Vxyz") -> "Vxyz":
         """
         Concatenates Vxyz to the end of current vector. Returns a copy as the
         new vector.
@@ -485,7 +485,7 @@ class Vxyz:
         z = np.concatenate((self.z, V.z))
         return Vxyz(np.array([x, y, z]))
 
-    def copy(self) -> 'Vxyz':
+    def copy(self) -> "Vxyz":
         """Returns copy of vector"""
         return Vxyz(self.data.copy())
 
@@ -502,7 +502,7 @@ class Vxyz:
         return Vxy([self.x.copy(), self.y.copy()])
 
     @classmethod
-    def from_lifted_points(cls, v: Vxy, func: Callable) -> 'Vxyz':
+    def from_lifted_points(cls, v: Vxy, func: Callable) -> "Vxyz":
         """Returns Vxyz from a Vxy and a function of form: z = func(x, y).
 
         Parameters
@@ -543,7 +543,7 @@ class Vxyz:
         return np.isnan(self.data).any()
 
     @classmethod
-    def merge(cls, V_list: list['Vxyz']):
+    def merge(cls, V_list: list["Vxyz"]):
         """Merges list of multiple Vxyz objects into one Vxyz.
 
         Parameters
@@ -592,7 +592,7 @@ class Vxyz:
             A string used to label this plot in the legend, or None for no label.
         """
         kwargs = dict()
-        for key, val in [('close', close), ('style', style), ('label', label)]:
+        for key, val in [("close", close), ("style", style), ("label", label)]:
             if val is not None:
                 kwargs[key] = val
 

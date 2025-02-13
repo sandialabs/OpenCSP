@@ -17,16 +17,16 @@ from opencsp.common.lib.photogrammetry import photogrammetry as ph
 def get_test_camera() -> Camera:
     """Creates a test camera with focal length of 1 pixel"""
     mat = np.array([[1, 0, 0], [0, 1, 0], [0, 1, 1]], dtype=float)
-    return Camera(mat, np.zeros(4), (100, 100), 'Test Camera')
+    return Camera(mat, np.zeros(4), (100, 100), "Test Camera")
 
 
 def test_load_grayscale():
-    img = ph.load_image_grayscale(join(os.path.dirname(__file__), 'data/image.png'))
+    img = ph.load_image_grayscale(join(os.path.dirname(__file__), "data/image.png"))
     np.testing.assert_equal(np.ndim(img), 2)
 
 
 def test_find_aruco_marker():
-    img = ph.load_image_grayscale(join(os.path.dirname(__file__), 'data/image.png'))
+    img = ph.load_image_grayscale(join(os.path.dirname(__file__), "data/image.png"))
     ids, corners = ph.find_aruco_marker(img, 7, 0.01)
 
     # Test IDs

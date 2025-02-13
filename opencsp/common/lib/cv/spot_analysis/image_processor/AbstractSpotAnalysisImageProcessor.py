@@ -133,7 +133,7 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
     def assign_inputs(
         self,
         operables: Union[
-            'AbstractSpotAnalysisImageProcessor', list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
+            "AbstractSpotAnalysisImageProcessor", list[SpotAnalysisOperable], Iterator[SpotAnalysisOperable]
         ],
     ):
         """
@@ -241,7 +241,7 @@ class AbstractSpotAnalysisImageProcessor(Iterator[SpotAnalysisOperable]):
             | SpotAnalysisImagesStream
             | list[SpotAnalysisOperable]
             | Iterator[SpotAnalysisOperable]
-            | Union['AbstractSpotAnalysisImageProcessor']
+            | Union["AbstractSpotAnalysisImageProcessor"]
         ),
     ) -> list[SpotAnalysisOperable]:
         """

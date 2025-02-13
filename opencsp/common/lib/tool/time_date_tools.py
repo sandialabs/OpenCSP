@@ -30,40 +30,40 @@ def print_current_time() -> None:
 
 def current_date_time_string() -> str:
     """%Y-%m-%d %H:%M:%S"""
-    return current_date_string() + ' ' + current_time_string()
+    return current_date_string() + " " + current_time_string()
 
 
 def current_date_string() -> str:
     """%Y-%m-%d"""
     now = datetime.now()
-    current_date_str = now.strftime('%Y-%m-%d')
+    current_date_str = now.strftime("%Y-%m-%d")
     return current_date_str
 
 
 def current_time_string() -> str:
     """%H:%M:%S"""
     now = datetime.now()
-    current_time_str = now.strftime('%H:%M:%S')
+    current_time_str = now.strftime("%H:%M:%S")
     return current_time_str
 
 
 def current_date_string_forfile() -> str:
     """%Y%m%d"""
     now = datetime.now()
-    current_date_str = now.strftime('%Y%m%d')
+    current_date_str = now.strftime("%Y%m%d")
     return current_date_str
 
 
 def current_time_string_forfile() -> str:
     """%H%M%S"""
     now = datetime.now()
-    current_time_str = now.strftime('%H%M%S')
+    current_time_str = now.strftime("%H%M%S")
     return current_time_str
 
 
 def current_date_time_string_forfile() -> str:
     """%Y%m%d_%H%M%S"""
-    return current_date_string_forfile() + '_' + current_time_string_forfile()
+    return current_date_string_forfile() + "_" + current_time_string_forfile()
 
 
 def current_time() -> float:
@@ -138,7 +138,7 @@ def add_seconds_to_ymdhmsz(
     ignore_legacy = tdt_ignore_legacy if (ignore_legacy == None) else ignore_legacy
     if ignore_legacy == False:
         print(
-            "subtract_seconds_from_ymdhmsz is a legacy function. Consider using \"to_datetime() + datetime.timedelta(0,s)\" instead"
+            'subtract_seconds_from_ymdhmsz is a legacy function. Consider using "to_datetime() + datetime.timedelta(0,s)" instead'
         )
     # Parse the ymdhmsz object.
     year = ymdhmsz[0]
@@ -164,7 +164,7 @@ def add_seconds_to_ymdhmsz(
                 second -= 60
                 second += time_sec
             else:
-                print('ERROR: In add_seconds_to_ymdhms(), rolling over a day boundary not implemented yet.')
+                print("ERROR: In add_seconds_to_ymdhms(), rolling over a day boundary not implemented yet.")
                 assert False
     # Return.
     return [year, month, day, hour, minute, second, zone]
@@ -176,7 +176,7 @@ def subtract_seconds_from_ymdhmsz(
     ignore_legacy = tdt_ignore_legacy if (ignore_legacy == None) else ignore_legacy
     if ignore_legacy == False:
         print(
-            "subtract_seconds_from_ymdhmsz is a legacy function. Consider using \"to_datetime() - datetime.timedelta(0,s)\" instead"
+            'subtract_seconds_from_ymdhmsz is a legacy function. Consider using "to_datetime() - datetime.timedelta(0,s)" instead'
         )
     # Parse the ymdhmsz object.
     year = ymdhmsz[0]
@@ -212,7 +212,7 @@ def subtract_seconds_from_ymdhmsz(
                     second -= time_sec
                 else:
                     print(
-                        'ERROR: In subtract_seconds_from_ymdhms(), rolling over a month boundary not implemented yet.'
+                        "ERROR: In subtract_seconds_from_ymdhms(), rolling over a month boundary not implemented yet."
                     )
                     assert False
     # Return.

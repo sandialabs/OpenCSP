@@ -33,7 +33,7 @@ class RenderControlFacet:
         # corner_normal_style=rcps.outline(),   # Unimplemented
         # corner_normal_base_style=rcps.marker(), # Unimplemented
         draw_name=False,
-        name_style=rctxt.default(color='k'),
+        name_style=rctxt.default(color="k"),
         draw_mirror_curvature=False,
         mirror_styles=rcm.RenderControlMirror(),
     ):
@@ -68,7 +68,7 @@ def default():
     return RenderControlFacet()
 
 
-def outline(color='k'):
+def outline(color="k"):
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=True,
@@ -78,7 +78,7 @@ def outline(color='k'):
     )
 
 
-def outline_thin(color='k', linewidth=0.5):
+def outline_thin(color="k", linewidth=0.5):
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=True,
@@ -88,7 +88,7 @@ def outline_thin(color='k', linewidth=0.5):
     )
 
 
-def outline_name(color='k'):
+def outline_name(color="k"):
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=True,
@@ -99,7 +99,7 @@ def outline_name(color='k'):
     )
 
 
-def normal_mirror_surface(color='k'):
+def normal_mirror_surface(color="k"):
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=False,
@@ -112,7 +112,7 @@ def normal_mirror_surface(color='k'):
     )
 
 
-def normal_outline(color='k'):
+def normal_outline(color="k"):
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=True,
@@ -125,7 +125,7 @@ def normal_outline(color='k'):
     )
 
 
-def corner_normals_outline_NOTWORKING(color='k'):
+def corner_normals_outline_NOTWORKING(color="k"):
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=True,
@@ -139,7 +139,7 @@ def corner_normals_outline_NOTWORKING(color='k'):
     )
 
 
-def corner_normals_outline_name_NOTWORKING(color='k'):
+def corner_normals_outline_name_NOTWORKING(color="k"):
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=True,
@@ -154,7 +154,7 @@ def corner_normals_outline_name_NOTWORKING(color='k'):
     )
 
 
-def highlight_NOTWORKING(color='b'):
+def highlight_NOTWORKING(color="b"):
     return RenderControlFacet(
         centroid_style=rcps.marker(color=color),
         outline_style=rcps.outline(color=color),

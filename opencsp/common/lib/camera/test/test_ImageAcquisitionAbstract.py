@@ -95,5 +95,5 @@ class test_ImageAcquisitionAbstract(unittest.TestCase):
         self.assertEqual(1e6, image_acquisition.exposure_time)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

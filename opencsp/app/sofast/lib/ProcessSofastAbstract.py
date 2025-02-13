@@ -78,7 +78,7 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
 
     def __init__(self):
         self.num_facets: int = None
-        self.optic_type: Literal['undefined', 'single', 'multi'] = None
+        self.optic_type: Literal["undefined", "single", "multi"] = None
         self.data_facet_def: list[DefinitionFacet] = None
         self.data_ensemble_def: DefinitionEnsemble = None
 
@@ -95,7 +95,7 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
 
         self.params: HDF5_SaveAbstract = None
 
-    def save_to_hdf(self, file: str, prefix: str = ''):
+    def save_to_hdf(self, file: str, prefix: str = ""):
         """Saves data to given file. Data is stored as: PREFIX + Folder/Field_1
 
         Parameters
@@ -110,50 +110,50 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
 
         # One per measurement
         if self.data_error is not None:
-            self.data_error.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-        self.data_geometry_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
-        self.data_image_processing_general.save_to_hdf(file, f'{prefix:s}DataSofastCalculation/general/')
+            self.data_error.save_to_hdf(file, f"{prefix:s}DataSofastCalculation/general/")
+        self.data_geometry_general.save_to_hdf(file, f"{prefix:s}DataSofastCalculation/general/")
+        self.data_image_processing_general.save_to_hdf(file, f"{prefix:s}DataSofastCalculation/general/")
 
         # Sofast parameters
-        self.params.save_to_hdf(file, f'{prefix:s}DataSofastInput/')
+        self.params.save_to_hdf(file, f"{prefix:s}DataSofastInput/")
 
         # Facet definition
         if self.data_facet_def is not None:
             for idx_facet, facet_data in enumerate(self.data_facet_def):
-                facet_data.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
+                facet_data.save_to_hdf(file, f"{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/")
 
         # Ensemble definition
         if self.data_ensemble_def is not None:
-            self.data_ensemble_def.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/')
+            self.data_ensemble_def.save_to_hdf(file, f"{prefix:s}DataSofastInput/optic_definition/")
 
         # Surface definition
         for idx_facet, surface in enumerate(self.data_surfaces):
-            surface.save_to_hdf(file, f'{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/')
+            surface.save_to_hdf(file, f"{prefix:s}DataSofastInput/optic_definition/facet_{idx_facet:03d}/")
 
         # Calculations, one per facet
         for idx_facet in range(self.num_facets):
             # Save facet slope data
             if self.data_calculation_facet is not None:
                 self.data_calculation_facet[idx_facet].save_to_hdf(
-                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                    file, f"{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/"
                 )
             # Save facet geometry data
             if self.data_geometry_facet is not None:
                 self.data_geometry_facet[idx_facet].save_to_hdf(
-                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                    file, f"{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/"
                 )
             # Save facet image processing data
             if self.data_image_processing_facet is not None:
                 self.data_image_processing_facet[idx_facet].save_to_hdf(
-                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                    file, f"{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/"
                 )
             # Save ensemle data
             if self.data_calculation_ensemble is not None:
                 self.data_calculation_ensemble[idx_facet].save_to_hdf(
-                    file, f'{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/'
+                    file, f"{prefix:s}DataSofastCalculation/facet/facet_{idx_facet:03d}/"
                 )
 
-    def _calculate_facet_pointing(self, reference: Literal['average'] | int = 'average') -> None:
+    def _calculate_facet_pointing(self, reference: Literal["average"] | int = "average") -> None:
         """
         Calculates facet pointing relative to the given reference.
 
@@ -166,11 +166,11 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
         """
         if self.data_calculation_facet is None:
             lt.error_and_raise(ValueError, 'Slopes must be solved first by running "solve_slopes".')
-        if reference != 'average' and not isinstance(reference, int):
+        if reference != "average" and not isinstance(reference, int):
             lt.error_and_raise(ValueError, 'Given reference must be int or "average".')
         if isinstance(reference, int) and reference >= self.num_facets:
             lt.error_and_raise(
-                ValueError, f'Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}.'
+                ValueError, f"Given facet index, {reference:d}, is out of range of 0-{self.num_facets - 1:d}."
             )
 
         # Instantiate data list
@@ -196,7 +196,7 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
         # Calculate reference pointing direction
         if isinstance(reference, int):
             v_pointing_ref = Vxyz(v_pointing_matrix[:, reference])
-        elif reference == 'average':
+        elif reference == "average":
             v_pointing_ref = Vxyz(v_pointing_matrix.mean(1))
         # Calculate rotation to align pointing vectors
         r_align_pointing = v_pointing_ref.align_to(Vxyz((0, 0, 1)))
@@ -235,7 +235,7 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
             self.data_calculation_ensemble.append(data)
 
     def get_optic(
-        self, interp_type: Literal['bilinear', 'clough_tocher', 'nearest'] = 'nearest'
+        self, interp_type: Literal["bilinear", "clough_tocher", "nearest"] = "nearest"
     ) -> FacetEnsemble | Facet:
         """Returns the OpenCSP representation of the optic under test. Returns either
         a Facet or FacetEnsemble object depending on the optic type. Each mirror is
@@ -253,7 +253,7 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
             Optic object
         """
         if self.data_calculation_facet is None:
-            lt.error_and_raise(ValueError, 'Sofast data must be processed before optic is available.')
+            lt.error_and_raise(ValueError, "Sofast data must be processed before optic is available.")
 
         facets = []
         trans_list = []
@@ -267,7 +267,7 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
             norm_data[:2] = -slopes
             norm_vecs = Uxyz(norm_data)
             # Get mirror shape
-            if self.optic_type == 'undefined':
+            if self.optic_type == "undefined":
                 # Find bounding box
                 x1 = pts.x.min()
                 x2 = pts.x.max()
@@ -283,14 +283,14 @@ class ProcessSofastAbstract(HDF5_SaveAbstract):
             # Create facet
             facet = Facet(mirror)
             # Locate facet within ensemble
-            if self.optic_type == 'multi':
+            if self.optic_type == "multi":
                 trans: TransformXYZ = self.data_calculation_ensemble[idx_mirror].trans_facet_ensemble
                 trans_list.append(trans)
             # Save facets
             facets.append(facet)
 
         # Return optics
-        if self.optic_type == 'multi':
+        if self.optic_type == "multi":
             ensemble = FacetEnsemble(facets)
             ensemble.set_facet_transform_list(trans_list)
             return ensemble

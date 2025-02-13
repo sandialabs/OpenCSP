@@ -101,5 +101,5 @@ class TestExposureDetectionImageProcessor(unittest.TestCase):
         processor.process_image(self.operable)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

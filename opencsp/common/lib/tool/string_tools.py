@@ -19,7 +19,7 @@ def add_to_last_sentence(base: str, add: str) -> str:
     """
     if len(base) == 0:
         return add
-    elif base[-1] != '.':
+    elif base[-1] != ".":
         return base + add
     else:
-        return base[0:-1] + add + '.'
+        return base[0:-1] + add + "."

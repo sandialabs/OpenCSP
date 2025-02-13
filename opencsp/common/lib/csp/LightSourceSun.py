@@ -58,7 +58,7 @@ class LightSourceSun(LightSource):
     @classmethod
     def from_given_sun_position(
         cls, sun_pointing: Uxyz, resolution: int, sun_dia: float = 0.009308, verbose=False
-    ) -> 'LightSourceSun':
+    ) -> "LightSourceSun":
         """
         Creates a LightSourceSun object initialized from a given sun pointing direction.
 
@@ -104,7 +104,7 @@ class LightSourceSun(LightSource):
         resolution: int,
         sun_dia: float = 0.009308,
         verbose=False,
-    ) -> 'LightSourceSun':
+    ) -> "LightSourceSun":
         """
         Creates a LightSourceSun object initialized from a given latitude/longitude and time.
 
@@ -133,7 +133,7 @@ class LightSourceSun(LightSource):
         longitude, latitude = loc
         alt = pysolar.solar.get_altitude(latitude, longitude, time)
         azm = pysolar.solar.get_azimuth(latitude, longitude, time)
-        sun_pointing = -Vxyz((0, 1, 0)).rotate(Rotation.from_euler('xz', [alt, -azm], degrees=True))
+        sun_pointing = -Vxyz((0, 1, 0)).rotate(Rotation.from_euler("xz", [alt, -azm], degrees=True))
 
         # Calculate sun ray cone pointing down (z=-1)
         sun_rays = cls._calc_sun_ray_cone(resolution, sun_dia, verbose)
@@ -181,7 +181,7 @@ class LightSourceSun(LightSource):
             if verbose and (i % 100 == 0):
                 print(f"{i / resolution * 100}% sun rays initalized")
         if verbose:
-            print(r'100% sun rays initialized')
+            print(r"100% sun rays initialized")
 
         return sun_rays
 
@@ -214,7 +214,7 @@ class LightSourceSun(LightSource):
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Function is deprecated
         warn(
-            'LightSourceSun.set_incident_rays is deprecated. Use initialize_from_solar_position instead.',
+            "LightSourceSun.set_incident_rays is deprecated. Use initialize_from_solar_position instead.",
             DeprecationWarning,
             stacklevel=2,
         )
@@ -237,11 +237,11 @@ class LightSourceSun(LightSource):
 
         sun_rays = Vxyz.empty()
         for i, x in enumerate(xs):
-            x_rotation = Rotation.from_euler('x', x)
+            x_rotation = Rotation.from_euler("x", x)
             for y in ys:
                 if np.sqrt(x**2 + y**2) > sun_radius:
                     continue  # only runs on points in the circle defined by sun_radius
-                y_rotation = Rotation.from_euler('y', y)
+                y_rotation = Rotation.from_euler("y", y)
                 full_rot = x_rotation * y_rotation
                 sun_rays = sun_rays.concatenate(center.rotate(full_rot))
             if verbose:

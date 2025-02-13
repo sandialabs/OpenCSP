@@ -21,14 +21,14 @@ class test_View3d(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         path, name, _ = ft.path_components(__file__)
-        cls.in_dir = ft.join(path, 'data/input', name.split('test_')[-1])
-        cls.out_dir = ft.join(path, 'data/output', name.split('test_')[-1])
+        cls.in_dir = ft.join(path, "data/input", name.split("test_")[-1])
+        cls.out_dir = ft.join(path, "data/output", name.split("test_")[-1])
         ft.create_directories_if_necessary(cls.out_dir)
-        ft.delete_files_in_directory(cls.out_dir, '*')
+        ft.delete_files_in_directory(cls.out_dir, "*")
         return super().setUpClass()
 
     def setUp(self) -> None:
-        self.test_name = self.id().split('.')[-1]
+        self.test_name = self.id().split(".")[-1]
 
     def setup_figure(self) -> rcfr.RenderControlFigureRecord:
         # clear existing figures
@@ -93,7 +93,7 @@ class test_View3d(unittest.TestCase):
 
         # with single points
         fig_record = self.setup_figure()
-        fig_record.view.draw_heatmap_2d(square, style=rcheat.RenderControlHeatmap(cmap='inferno'))
+        fig_record.view.draw_heatmap_2d(square, style=rcheat.RenderControlHeatmap(cmap="inferno"))
         fig_record.view.show(equal=True)
         image_heatmap = fig_record.to_array()
         fig_record.close()
@@ -112,38 +112,38 @@ class test_View3d(unittest.TestCase):
         fig_record.view.draw_pq_list([(-1, -1), (1, -1), (1, 1), (-1, 1)], close=True)
 
         # basic text drawing
-        fig_record.view.draw_xyz_text((0, 0, 0), "center", style=rctxt.default(color='black'))
-        fig_record.view.draw_xyz_text((-1, -1, 0), "south-west", style=rctxt.default(color='black'))
-        fig_record.view.draw_xyz_text((1, -1, 0), "south-east", style=rctxt.default(color='black'))
-        fig_record.view.draw_xyz_text((1, 1, 0), "north-east", style=rctxt.default(color='black'))
-        fig_record.view.draw_xyz_text((-1, 1, 0), "north-west", style=rctxt.default(color='black'))
+        fig_record.view.draw_xyz_text((0, 0, 0), "center", style=rctxt.default(color="black"))
+        fig_record.view.draw_xyz_text((-1, -1, 0), "south-west", style=rctxt.default(color="black"))
+        fig_record.view.draw_xyz_text((1, -1, 0), "south-east", style=rctxt.default(color="black"))
+        fig_record.view.draw_xyz_text((1, 1, 0), "north-east", style=rctxt.default(color="black"))
+        fig_record.view.draw_xyz_text((-1, 1, 0), "north-west", style=rctxt.default(color="black"))
 
         # text options
         fig_record.view.draw_xyz_text(
-            (-1, 0, 0), "vertical", style=rctxt.RenderControlText(color='orange', rotation=np.pi / 2)
+            (-1, 0, 0), "vertical", style=rctxt.RenderControlText(color="orange", rotation=np.pi / 2)
         )
         fig_record.view.draw_xyz_text(
-            (1, 0, 0), "upside-down", style=rctxt.RenderControlText(color='orange', rotation=np.pi)
+            (1, 0, 0), "upside-down", style=rctxt.RenderControlText(color="orange", rotation=np.pi)
         )
         fig_record.view.draw_xyz_text(
             (0, 0.1, 0),
             "left aligned",
-            style=rctxt.RenderControlText(color='orange', horizontalalignment='left', fontsize='small'),
+            style=rctxt.RenderControlText(color="orange", horizontalalignment="left", fontsize="small"),
         )
         fig_record.view.draw_xyz_text(
             (0, -0.1, 0),
             "right aligned",
-            style=rctxt.RenderControlText(color='orange', horizontalalignment='right', fontsize='large'),
+            style=rctxt.RenderControlText(color="orange", horizontalalignment="right", fontsize="large"),
         )
         fig_record.view.draw_xyz_text(
             (-0.5, 0, 0),
             "top aligned",
-            style=rctxt.RenderControlText(color='orange', verticalalignment='top', fontstyle='italic'),
+            style=rctxt.RenderControlText(color="orange", verticalalignment="top", fontstyle="italic"),
         )
         fig_record.view.draw_xyz_text(
             (0.5, 0, 0),
             "bottom aligned",
-            style=rctxt.RenderControlText(color='orange', verticalalignment='bottom', fontweight='bold'),
+            style=rctxt.RenderControlText(color="orange", verticalalignment="bottom", fontweight="bold"),
         )
 
         # render
@@ -160,7 +160,7 @@ class test_View3d(unittest.TestCase):
 
     def test_draw_xyz(self):
         """Verify that the various accepted input arguments produce the same output."""
-        style = rcps.RenderControlPointSeq('None', marker='.')
+        style = rcps.RenderControlPointSeq("None", marker=".")
 
         # with single points
         fig_record = self.setup_figure()
@@ -203,14 +203,14 @@ class test_View3d(unittest.TestCase):
     def test_draw_xyz_list_style_options(self):
         """Tests all the various render options for RenderControlPointSeq."""
         kwargs_default_other = {
-            "linestyle": ('-', '--'),
+            "linestyle": ("-", "--"),
             "linewidth": (1, 2),
-            "color": ('b', 'r'),
-            "marker": ('X', '+'),
+            "color": ("b", "r"),
+            "marker": ("X", "+"),
             "markersize": (6, 10),
-            "markeredgecolor": (None, 'r'),
+            "markeredgecolor": (None, "r"),
             "markeredgewidth": (None, 3),
-            "markerfacecolor": (None, 'r'),
+            "markerfacecolor": (None, "r"),
             "markeralpha": (1.0, 0.5),
         }
         defaults = {kwarg: kwargs_default_other[kwarg][0] for kwarg in kwargs_default_other}
@@ -228,7 +228,7 @@ class test_View3d(unittest.TestCase):
             fig_record.view.draw_xyz_text(
                 (i, -0.5, 0),
                 kwarg,
-                rctxt.RenderControlText(verticalalignment='top', fontsize='small', color='black', rotation=np.pi / 2),
+                rctxt.RenderControlText(verticalalignment="top", fontsize="small", color="black", rotation=np.pi / 2),
             )
         fig_record.view.show(equal=True)
         image_style_options = fig_record.to_array()
@@ -248,38 +248,38 @@ class test_View3d(unittest.TestCase):
         fig_record.view.draw_pq_list([(-1, -1), (1, -1), (1, 1), (-1, 1)], close=True)
 
         # basic text drawing
-        fig_record.view.draw_pq_text((0, 0), "center", style=rctxt.default(color='black'))
-        fig_record.view.draw_pq_text((-1, -1), "south-west", style=rctxt.default(color='black'))
-        fig_record.view.draw_pq_text((1, -1), "south-east", style=rctxt.default(color='black'))
-        fig_record.view.draw_pq_text((1, 1), "north-east", style=rctxt.default(color='black'))
-        fig_record.view.draw_pq_text((-1, 1), "north-west", style=rctxt.default(color='black'))
+        fig_record.view.draw_pq_text((0, 0), "center", style=rctxt.default(color="black"))
+        fig_record.view.draw_pq_text((-1, -1), "south-west", style=rctxt.default(color="black"))
+        fig_record.view.draw_pq_text((1, -1), "south-east", style=rctxt.default(color="black"))
+        fig_record.view.draw_pq_text((1, 1), "north-east", style=rctxt.default(color="black"))
+        fig_record.view.draw_pq_text((-1, 1), "north-west", style=rctxt.default(color="black"))
 
         # text options
         fig_record.view.draw_pq_text(
-            (-1, 0), "vertical", style=rctxt.RenderControlText(color='orange', rotation=np.pi / 2)
+            (-1, 0), "vertical", style=rctxt.RenderControlText(color="orange", rotation=np.pi / 2)
         )
         fig_record.view.draw_pq_text(
-            (1, 0), "upside-down", style=rctxt.RenderControlText(color='orange', rotation=np.pi)
+            (1, 0), "upside-down", style=rctxt.RenderControlText(color="orange", rotation=np.pi)
         )
         fig_record.view.draw_pq_text(
             (0, 0.1),
             "left aligned",
-            style=rctxt.RenderControlText(color='orange', horizontalalignment='left', fontsize='small'),
+            style=rctxt.RenderControlText(color="orange", horizontalalignment="left", fontsize="small"),
         )
         fig_record.view.draw_pq_text(
             (0, -0.1),
             "right aligned",
-            style=rctxt.RenderControlText(color='orange', horizontalalignment='right', fontsize='large'),
+            style=rctxt.RenderControlText(color="orange", horizontalalignment="right", fontsize="large"),
         )
         fig_record.view.draw_pq_text(
             (-0.5, 0),
             "top aligned",
-            style=rctxt.RenderControlText(color='orange', verticalalignment='top', fontstyle='italic'),
+            style=rctxt.RenderControlText(color="orange", verticalalignment="top", fontstyle="italic"),
         )
         fig_record.view.draw_pq_text(
             (0.5, 0),
             "bottom aligned",
-            style=rctxt.RenderControlText(color='orange', verticalalignment='bottom', fontweight='bold'),
+            style=rctxt.RenderControlText(color="orange", verticalalignment="bottom", fontweight="bold"),
         )
 
         # render
@@ -299,7 +299,7 @@ class test_View3d(unittest.TestCase):
 
         # draw
         square_corners = [(0, 0), (1, 0), (1, 1), (0, 1)]
-        arrow_style = rcps.RenderControlPointSeq(marker='arrow', markersize=0.1)
+        arrow_style = rcps.RenderControlPointSeq(marker="arrow", markersize=0.1)
         fig_record.view.draw_pq_list(square_corners, close=True, style=arrow_style)
         fig_record.view.show(equal=True, block=False)
         actual = fig_record.to_array()
@@ -337,5 +337,5 @@ class test_View3d(unittest.TestCase):
         np.testing.assert_array_equal(expected, image_gradient)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

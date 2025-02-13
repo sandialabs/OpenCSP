@@ -16,7 +16,7 @@ class Scan:
 
         # Check input.
         if len(scan_passes) == 0:
-            print('In Scan constructor, empty list of scan passes encountered.')
+            print("In Scan constructor, empty list of scan passes encountered.")
             assert False
 
         # Input parameters.
@@ -56,7 +56,7 @@ class Scan:
 
 def construct_scan_given_segments_of_interest(list_of_xyz_segments, scan_parameters):
     # Notify progress.
-    print('Constructing scan given segments of interest...')
+    print("Constructing scan given segments of interest...")
 
     # We assume the input segment list is parallel in the sense that each segment points
     # from p0 --> p1 in the same direction.
@@ -77,7 +77,7 @@ def construct_scan_given_segments_of_interest(list_of_xyz_segments, scan_paramet
     passes = []
     idx = 0
     for segment_xyz in list_of_xyz_segments_2:
-        if (not scan_parameters['fly_forward_backward']) or ((idx % 2) == 0):
+        if (not scan_parameters["fly_forward_backward"]) or ((idx % 2) == 0):
             fly_backward = False
         else:
             fly_backward = True
@@ -91,7 +91,7 @@ def construct_scan_given_segments_of_interest(list_of_xyz_segments, scan_paramet
 
 def construct_scan_given_UFACET_scan_passes(ufacet_scan_pass_list, scan_parameters):
     # Notify progress.
-    print('Constructing scan given UFACET scan passes...')
+    print("Constructing scan given UFACET scan passes...")
 
     # UFACET scans are always specified by line segments that are "parallel" in the sense
     # that each segment points from p0 --> p1 in roughly the same direction.

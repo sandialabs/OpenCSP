@@ -5,7 +5,7 @@ class RenderControlVideo:
         width=None,
         height=None,
         min_scale=False,
-        codec: str = 'H.264',
+        codec: str = "H.264",
         low_bitrate: bool = False,
     ):
         """_summary_
@@ -26,7 +26,7 @@ class RenderControlVideo:
         self.low_bitrate = low_bitrate
         self._original_video_width_height = None
 
-        if codec not in ['undefined', 'H.264', 'H.265', 'copy']:
+        if codec not in ["undefined", "H.264", "H.265", "copy"]:
             raise RuntimeError(f"Unrecognized codec option '{self.codec}'")
         if low_bitrate and codec in ["undefined", "copy"]:
             raise RuntimeError("Codec must be specified in order to use low_bitrate=True")
@@ -50,7 +50,7 @@ class RenderControlVideo:
         """
         ret: list[str] = []
 
-        if self.codec != 'undefined':
+        if self.codec != "undefined":
             if self.codec == "copy":
                 ret.append("-c copy")
             elif self.codec == "H.264":
@@ -86,7 +86,7 @@ class RenderControlVideo:
                     width = int(owidth() * (height / oheight()))
                 if height == None:
                     height = int(oheight() * (width / owidth()))
-            ret.append(f"-vf \"scale={width}:{height}\"")
+            ret.append(f'-vf "scale={width}:{height}"')
             self._original_video_width_height = None
 
         # pixel format: not necessary, let ffmpeg choose
@@ -112,7 +112,7 @@ class RenderControlVideo:
         return cls()
 
     @classmethod
-    def power_point(cls, framerate=10, width=320, height=None, codec='H.264', low_bitrate=False):
+    def power_point(cls, framerate=10, width=320, height=None, codec="H.264", low_bitrate=False):
         """Returns a set of defaults suitable for embedding videos into powerpoint."""
         return cls(
             framerate=framerate, width=width, height=height, min_scale=True, codec=codec, low_bitrate=low_bitrate

@@ -14,13 +14,13 @@ class RenderControlKeyFramesGivenManual:
         clear_previous=True,  # Remove any existing files in the designated output directory.
         draw_key_frames=True,  # Whether to draw the key frame figures.
         key_frame_polygon_linewidth=3,  # Linewidth for expected heliostat polygon.
-        key_frame_polygon_color='m',  # Color for expected heliostat polygon.
-        key_frame_label_horizontalalignment='center',  # Horizontal alignment for heliostat label.
-        key_frame_label_verticalalignment='center',  # Vertical alignment for heliostat label.
+        key_frame_polygon_color="m",  # Color for expected heliostat polygon.
+        key_frame_label_horizontalalignment="center",  # Horizontal alignment for heliostat label.
+        key_frame_label_verticalalignment="center",  # Vertical alignment for heliostat label.
         key_frame_label_fontsize=10,  # Font size for heliostat label.
-        key_frame_label_fontstyle='normal',  # Font style for heliostat label.
-        key_frame_label_fontweight='bold',  # Font weight for heliostat label.
-        key_frame_label_color='m',  # Color for heliostat label.
+        key_frame_label_fontstyle="normal",  # Font style for heliostat label.
+        key_frame_label_fontweight="bold",  # Font weight for heliostat label.
+        key_frame_label_color="m",  # Color for heliostat label.
         key_frame_dpi=200,  # Dpi for saving figure to disk.
         key_frame_crop=False,  # Whether to crop annotations outside image frame.
     ):

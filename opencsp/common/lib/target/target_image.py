@@ -28,7 +28,7 @@ def rows_cols(img):
     n_cols = img.shape[1]
     n_bands = img.shape[2]
     if n_bands != 3:
-        print('ERROR: Number of input image bands is not 3.')
+        print("ERROR: Number of input image bands is not 3.")
         assert False
     return n_rows, n_cols
 
@@ -36,8 +36,8 @@ def rows_cols(img):
 def save_image(img, output_dpm, output_dir, output_file_body, output_ext):
     ft.create_directories_if_necessary(output_dir)
     output_file_dir_body_ext = os.path.join(output_dir, output_file_body + output_ext)
-    print('Saving file:', output_file_dir_body_ext)
+    print("Saving file:", output_file_dir_body_ext)
     output_dpi = round(uc.dpm_to_dpi(output_dpm))
     plt.imsave(output_file_dir_body_ext, img, dpi=output_dpi)
-    print('Done.')
+    print("Done.")
     return output_file_dir_body_ext

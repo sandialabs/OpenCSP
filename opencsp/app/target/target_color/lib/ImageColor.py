@@ -18,7 +18,7 @@ class ImageColor:
 
     """
 
-    def __init__(self, image: np.ndarray) -> 'ImageColor':
+    def __init__(self, image: np.ndarray) -> "ImageColor":
         """
         Provide input 3D image
 
@@ -35,7 +35,7 @@ class ImageColor:
         self.image_norm, self.rgbs, self.shape = self._get_normalized_image_data()
 
     @classmethod
-    def from_file(cls, file: str) -> 'ImageColor':
+    def from_file(cls, file: str) -> "ImageColor":
         """Creates instance by directly loading image file.
 
         Parameters
@@ -43,7 +43,7 @@ class ImageColor:
         file : str
             File name
         """
-        if file.split('.')[-1] in ['NEF', 'RAW', 'nef', 'raw']:
+        if file.split(".")[-1] in ["NEF", "RAW", "nef", "raw"]:
             # Load image if raw
             with rawpy.imread(file) as raw:
                 im_array = raw.postprocess(gamma=(1, 1), no_auto_bright=True, output_bps=16)
@@ -108,7 +108,7 @@ class ImageColor:
             If input vector is not size 3
         """
         if rgb.size != 3:
-            raise ValueError(f'rgb must be size 3, not shape {rgb.shape}')
+            raise ValueError(f"rgb must be size 3, not shape {rgb.shape}")
 
         # Normalize input rgb
         rgb = rgb / np.sqrt(np.sum(rgb**2))

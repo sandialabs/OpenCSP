@@ -26,13 +26,13 @@ class TestSofastConfiguration(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Setup paths
-        cls.dir_input = join(dirname(__file__), 'data/input/SofastConfiguration')
+        cls.dir_input = join(dirname(__file__), "data/input/SofastConfiguration")
         ft.create_directories_if_necessary(cls.dir_input)
-        cls.dir_output = join(dirname(__file__), 'data/output/SofastConfiguration')
+        cls.dir_output = join(dirname(__file__), "data/output/SofastConfiguration")
         ft.create_directories_if_necessary(cls.dir_output)
 
         # Set up logger
-        lt.logger(join(cls.dir_output, 'log.txt'), lt.log.INFO)
+        lt.logger(join(cls.dir_output, "log.txt"), lt.log.INFO)
 
         # Create sofast fringe instance
         cls.process_sofast_fringe = cls._get_process_sofast_fringe()
@@ -43,15 +43,15 @@ class TestSofastConfiguration(unittest.TestCase):
     @staticmethod
     def _get_process_sofast_fixed():
         # Define sample data directory
-        dir_data_sofast = join(opencsp_code_dir(), 'test/data/sofast_fixed')
-        dir_data_common = join(opencsp_code_dir(), 'test/data/sofast_common')
+        dir_data_sofast = join(opencsp_code_dir(), "test/data/sofast_fixed")
+        dir_data_common = join(opencsp_code_dir(), "test/data/sofast_common")
 
         # Directory setup
-        file_meas = join(dir_data_sofast, 'data_measurement/measurement_facet.h5')
-        file_camera = join(dir_data_common, 'camera_sofast.h5')
-        file_dot_locs = join(dir_data_sofast, 'data_measurement/fixed_pattern_dot_locations.h5')
-        file_ori = join(dir_data_common, 'spatial_orientation.h5')
-        file_facet = join(dir_data_common, 'Facet_NSTTF.json')
+        file_meas = join(dir_data_sofast, "data_measurement/measurement_facet.h5")
+        file_camera = join(dir_data_common, "camera_sofast.h5")
+        file_dot_locs = join(dir_data_sofast, "data_measurement/fixed_pattern_dot_locations.h5")
+        file_ori = join(dir_data_common, "spatial_orientation.h5")
+        file_facet = join(dir_data_common, "Facet_NSTTF.json")
 
         # Load saved single facet SofastFixed collection data
         camera = Camera.load_from_hdf(file_camera)
@@ -79,16 +79,16 @@ class TestSofastConfiguration(unittest.TestCase):
     @staticmethod
     def _get_process_sofast_fringe():
         # Define sample data directory
-        dir_data_sofast = join(opencsp_code_dir(), 'test/data/sofast_fringe')
-        dir_data_common = join(opencsp_code_dir(), 'test/data/sofast_common')
+        dir_data_sofast = join(opencsp_code_dir(), "test/data/sofast_fringe")
+        dir_data_common = join(opencsp_code_dir(), "test/data/sofast_common")
 
         # Directory Setup
-        file_measurement = join(dir_data_sofast, 'data_measurement/measurement_facet.h5')
-        file_camera = join(dir_data_common, 'camera_sofast_downsampled.h5')
-        file_display = join(dir_data_common, 'display_distorted_2d.h5')
-        file_orientation = join(dir_data_common, 'spatial_orientation.h5')
-        file_calibration = join(dir_data_sofast, 'data_measurement/image_calibration.h5')
-        file_facet = join(dir_data_common, 'Facet_NSTTF.json')
+        file_measurement = join(dir_data_sofast, "data_measurement/measurement_facet.h5")
+        file_camera = join(dir_data_common, "camera_sofast_downsampled.h5")
+        file_display = join(dir_data_common, "display_distorted_2d.h5")
+        file_orientation = join(dir_data_common, "spatial_orientation.h5")
+        file_calibration = join(dir_data_sofast, "data_measurement/image_calibration.h5")
+        file_facet = join(dir_data_common, "Facet_NSTTF.json")
 
         # Load saved single facet Sofast collection data
         camera = Camera.load_from_hdf(file_camera)
@@ -123,7 +123,7 @@ class TestSofastConfiguration(unittest.TestCase):
 
         # Create figures
         fig = plt.figure()
-        ax = fig.add_subplot(projection='3d')
+        ax = fig.add_subplot(projection="3d")
         config.visualize_setup(
             ax=ax,
             v_screen_object_screen=self.process_sofast_fringe.data_geometry_facet[
@@ -131,11 +131,11 @@ class TestSofastConfiguration(unittest.TestCase):
             ].spatial_orientation.v_screen_optic_screen,
             r_object_screen=self.process_sofast_fringe.data_geometry_facet[0].spatial_orientation.r_optic_screen,
         )
-        file_out = join(self.dir_output, 'fringe_setup_visualize.png')
+        file_out = join(self.dir_output, "fringe_setup_visualize.png")
         fig.savefig(file_out)
 
         # Compare
-        file_in = join(self.dir_input, 'fringe_setup_visualize.png')
+        file_in = join(self.dir_input, "fringe_setup_visualize.png")
         self.compare_actual_expected_images(file_out, file_in)
 
     def test_measurement_stats_fringe(self):
@@ -147,19 +147,19 @@ class TestSofastConfiguration(unittest.TestCase):
         stats = config.get_measurement_stats()
 
         # Get expected stats
-        file_stats_in = join(self.dir_input, 'stats_fringe.json')
-        with open(file_stats_in, 'r', encoding='utf-8') as f:
+        file_stats_in = join(self.dir_input, "stats_fringe.json")
+        with open(file_stats_in, "r", encoding="utf-8") as f:
             stats_in = json.load(f)
 
         # Compare
-        self.assertAlmostEqual(stats[0]['delta_x_sample_points_average'], stats_in[0]['delta_x_sample_points_average'])
-        self.assertAlmostEqual(stats[0]['delta_y_sample_points_average'], stats_in[0]['delta_y_sample_points_average'])
-        self.assertAlmostEqual(stats[0]['number_samples'], stats_in[0]['number_samples'])
+        self.assertAlmostEqual(stats[0]["delta_x_sample_points_average"], stats_in[0]["delta_x_sample_points_average"])
+        self.assertAlmostEqual(stats[0]["delta_y_sample_points_average"], stats_in[0]["delta_y_sample_points_average"])
+        self.assertAlmostEqual(stats[0]["number_samples"], stats_in[0]["number_samples"])
         self.assertAlmostEqual(
-            stats[0]['focal_lengths_parabolic_xy'][0], stats_in[0]['focal_lengths_parabolic_xy'][0], 3
+            stats[0]["focal_lengths_parabolic_xy"][0], stats_in[0]["focal_lengths_parabolic_xy"][0], 3
         )
         self.assertAlmostEqual(
-            stats[0]['focal_lengths_parabolic_xy'][1], stats_in[0]['focal_lengths_parabolic_xy'][1], 3
+            stats[0]["focal_lengths_parabolic_xy"][1], stats_in[0]["focal_lengths_parabolic_xy"][1], 3
         )
 
     def test_visualize_setup_fixed(self):
@@ -169,7 +169,7 @@ class TestSofastConfiguration(unittest.TestCase):
 
         # Create figures
         fig = plt.figure()
-        ax = fig.add_subplot(projection='3d')
+        ax = fig.add_subplot(projection="3d")
         config.visualize_setup(
             ax=ax,
             v_screen_object_screen=self.process_sofast_fixed.data_geometry_facet[
@@ -177,11 +177,11 @@ class TestSofastConfiguration(unittest.TestCase):
             ].spatial_orientation.v_screen_optic_screen,
             r_object_screen=self.process_sofast_fixed.data_geometry_facet[0].spatial_orientation.r_optic_screen,
         )
-        file_out = join(self.dir_output, 'fixed_setup_visualize.png')
+        file_out = join(self.dir_output, "fixed_setup_visualize.png")
         fig.savefig(file_out)
 
         # Compare
-        file_in = join(self.dir_input, 'fixed_setup_visualize.png')
+        file_in = join(self.dir_input, "fixed_setup_visualize.png")
         self.compare_actual_expected_images(file_out, file_in)
 
     def test_measurement_stats_fixed(self):
@@ -193,19 +193,19 @@ class TestSofastConfiguration(unittest.TestCase):
         stats = config.get_measurement_stats()
 
         # Get expected stats
-        file_stats_in = join(self.dir_input, 'stats_fixed.json')
-        with open(file_stats_in, 'r', encoding='utf-8') as f:
+        file_stats_in = join(self.dir_input, "stats_fixed.json")
+        with open(file_stats_in, "r", encoding="utf-8") as f:
             stats_in = json.load(f)
 
         # Compare
-        self.assertAlmostEqual(stats[0]['delta_x_sample_points_average'], stats_in[0]['delta_x_sample_points_average'])
-        self.assertAlmostEqual(stats[0]['delta_y_sample_points_average'], stats_in[0]['delta_y_sample_points_average'])
-        self.assertAlmostEqual(stats[0]['number_samples'], stats_in[0]['number_samples'])
+        self.assertAlmostEqual(stats[0]["delta_x_sample_points_average"], stats_in[0]["delta_x_sample_points_average"])
+        self.assertAlmostEqual(stats[0]["delta_y_sample_points_average"], stats_in[0]["delta_y_sample_points_average"])
+        self.assertAlmostEqual(stats[0]["number_samples"], stats_in[0]["number_samples"])
         self.assertAlmostEqual(
-            stats[0]['focal_lengths_parabolic_xy'][0], stats_in[0]['focal_lengths_parabolic_xy'][0], 3
+            stats[0]["focal_lengths_parabolic_xy"][0], stats_in[0]["focal_lengths_parabolic_xy"][0], 3
         )
         self.assertAlmostEqual(
-            stats[0]['focal_lengths_parabolic_xy'][1], stats_in[0]['focal_lengths_parabolic_xy'][1], 3
+            stats[0]["focal_lengths_parabolic_xy"][1], stats_in[0]["focal_lengths_parabolic_xy"][1], 3
         )
 
     def compare_actual_expected_images(self, actual_location: str, expected_location: str, tolerance=0.2):
@@ -214,8 +214,8 @@ class TestSofastConfiguration(unittest.TestCase):
             raise AssertionError(output)
 
     def tearDown(self) -> None:
-        plt.close('all')
+        plt.close("all")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

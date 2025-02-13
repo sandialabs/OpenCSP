@@ -27,6 +27,6 @@ class RayTraceable:
         """
 
     @abstractmethod
-    def most_basic_ray_tracable_objects(self) -> list['RayTraceable']:
+    def most_basic_ray_tracable_objects(self) -> list["RayTraceable"]:
         """Return the list of the smallest Ray Traceable that makes up the larger object."""
         pass

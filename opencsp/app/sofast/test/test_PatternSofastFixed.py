@@ -19,9 +19,9 @@ class TestPatternSofastFixed(unittest.TestCase):
         np.testing.assert_equal(pattern.y_indices, np.array([-2, -1, 0, 1, 2]))
 
         # Calculate image
-        im = pattern.get_image('uint8', 255)
+        im = pattern.get_image("uint8", 255)
         np.testing.assert_array_equal([100, 100, 3], im.shape)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

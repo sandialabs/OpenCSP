@@ -132,15 +132,15 @@ def _tile_figure(
     # Turn off the axis around the plot drawing area.  This leads to confusing duplicate, mismatched,
     # axis information.  Why this suddenly appeared is beyond me. - RCB
     # The command below does not suppress the actual plot axes.
-    plt.axis('off')
+    plt.axis("off")
 
     # Set the x,y offset of the figure
     # matplotlib.use('tkagg') # BGB I don't think we should depend on this
     mnger = plt.get_current_fig_manager()
-    if hasattr(mnger, 'window'):
-        if hasattr(mnger.window, 'wm_geometry'):
+    if hasattr(mnger, "window"):
+        if hasattr(mnger.window, "wm_geometry"):
             mnger.window.wm_geometry(f"+{ul_x}+{ul_y}")
-        elif hasattr(mnger.window, 'geometry'):
+        elif hasattr(mnger.window, "geometry"):
             curr_dims = mnger.window.geometry().getRect()  # x, y, w, h
             mnger.window.setGeometry(curr_dims[0], curr_dims[1], ul_x, ul_y)
 
@@ -216,8 +216,8 @@ def _setup_figure(
     if number_in_name:
         # Add a figure number, so that figure name is a unique key even if the input figure name is re-used.
         # May be suppressed by an input parameter.
-        prefix += '{0:03d}'.format(figure_num)
-    prefix = (prefix + '_') if (prefix != "") else ""
+        prefix += "{0:03d}".format(figure_num)
+    prefix = (prefix + "_") if (prefix != "") else ""
     name = prefix + name
     figure_control.figure_names.append(name)
 
@@ -242,7 +242,7 @@ def _setup_figure(
             else:
                 window.state("zoomed")  # tkinter
         # Copying this command, as from Randy, which suppresses duplicate axes in tile_figure(). ~ BGB
-        plt.axis('off')
+        plt.axis("off")
 
     # Add title and grid
     if title and len(title) != 0:
@@ -260,10 +260,10 @@ def _setup_figure(
 
     # Initialize comments.
     # Standard comments.
-    fig_record.add_metadata_line('Figure number: ' + str(fig_record.figure_num))
-    fig_record.add_metadata_line('Name: ' + str(name))
-    fig_record.add_metadata_line('Title: ' + str(title))
-    fig_record.add_metadata_line('Code tag: ' + str(code_tag))
+    fig_record.add_metadata_line("Figure number: " + str(fig_record.figure_num))
+    fig_record.add_metadata_line("Name: " + str(name))
+    fig_record.add_metadata_line("Title: " + str(title))
+    fig_record.add_metadata_line("Code tag: " + str(code_tag))
     # Input comments.
     for comment_line in comments:
         fig_record.add_comment_line(comment_line)
@@ -323,29 +323,29 @@ def setup_figure(
 
     # Setup the axes.
     ax = plt.axes()
-    if view_spec['type'] == 'xy':
+    if view_spec["type"] == "xy":
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.y_label)
-    elif view_spec['type'] == 'xz':
+    elif view_spec["type"] == "xz":
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.z_label)
-    elif view_spec['type'] == 'yz':
+    elif view_spec["type"] == "yz":
         ax.set_xlabel(axis_control.y_label)
         ax.set_ylabel(axis_control.z_label)
-    elif view_spec['type'] == 'vplane':
+    elif view_spec["type"] == "vplane":
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif view_spec['type'] == 'camera':
+    elif view_spec["type"] == "camera":
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif view_spec['type'] == 'image':
+    elif view_spec["type"] == "image":
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
     else:
         lt.error_and_raise(
             RuntimeError,
             "ERROR: In setup_figure_for_3d_data(), unrecognized view_spec['type'] = '"
-            + str(view_spec['type'])
+            + str(view_spec["type"])
             + "' encountered.",
         )
 
@@ -354,7 +354,7 @@ def setup_figure(
     # Add view to log data.
     fig_record.axis = ax
     fig_record.view = view
-    fig_record.add_metadata_line('View spec: ' + str(view_spec['type']))
+    fig_record.add_metadata_line("View spec: " + str(view_spec["type"]))
 
     return fig_record
 
@@ -405,32 +405,32 @@ def setup_figure_for_3d_data(
     axis_control = fig_record.axis_control
 
     # Setup the axes.
-    if view_spec['type'] == '3d':
-        ax = plt.axes(projection='3d')
+    if view_spec["type"] == "3d":
+        ax = plt.axes(projection="3d")
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.y_label)
         ax.set_zlabel(axis_control.z_label)
-    elif view_spec['type'] == 'xy':
+    elif view_spec["type"] == "xy":
         ax = plt.axes()
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.y_label)
-    elif view_spec['type'] == 'xz':
+    elif view_spec["type"] == "xz":
         ax = plt.axes()
         ax.set_xlabel(axis_control.x_label)
         ax.set_ylabel(axis_control.z_label)
-    elif view_spec['type'] == 'yz':
+    elif view_spec["type"] == "yz":
         ax = plt.axes()
         ax.set_xlabel(axis_control.y_label)
         ax.set_ylabel(axis_control.z_label)
-    elif view_spec['type'] == 'vplane':
+    elif view_spec["type"] == "vplane":
         ax = plt.axes()
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif view_spec['type'] == 'camera':
+    elif view_spec["type"] == "camera":
         ax = plt.axes()
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
-    elif view_spec['type'] == 'image':
+    elif view_spec["type"] == "image":
         ax = plt.axes()
         ax.set_xlabel(axis_control.p_label)
         ax.set_ylabel(axis_control.q_label)
@@ -438,7 +438,7 @@ def setup_figure_for_3d_data(
         lt.error_and_raise(
             RuntimeError,
             "ERROR: In setup_figure_for_3d_data(), unrecognized view_spec['type'] = '"
-            + str(view_spec['type'])
+            + str(view_spec["type"])
             + "' encountered.",
         )
 
@@ -447,7 +447,7 @@ def setup_figure_for_3d_data(
     # Add view to log data.
     fig_record.axis = ax
     fig_record.view = view
-    fig_record.add_metadata_line('View spec: ' + str(view_spec['type']))
+    fig_record.add_metadata_line("View spec: " + str(view_spec["type"]))
 
     # Return.
     return fig_record
@@ -465,9 +465,9 @@ def _display_plot(
     tile_array: tuple[float, float] = (3, 2),  # (n_x, n_y)
     upper_left_xy: tuple[float, float] = None,  # pixel.  (0,0) --> Upper left corner of screen.
     legend: bool = True,  # Whether to draw a legend.
-    color='k',
+    color="k",
     linewidth: float = 1,
-    marker='.',
+    marker=".",
     markersize: float = 2,
 ) -> plt.Figure:
     if tile:
@@ -552,7 +552,7 @@ def save_all_figures(output_path: str, format: str = None):
             figs.append(fig_file)
             txts.append(txt_file)
     except Exception as ex:
-        err_msg = f"RuntimeError: figure_management.save_all_figures: failed to save figure {fig_record.figure_num} \"{fig_record.name}\""
+        err_msg = f'RuntimeError: figure_management.save_all_figures: failed to save figure {fig_record.figure_num} "{fig_record.name}"'
         lt.error(err_msg)
         failed.append(fig_record)
         raise (ex)

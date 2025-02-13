@@ -194,7 +194,7 @@ def natural_sort(values: list[str]):
 
     Adapted from https://stackoverflow.com/questions/11150239/natural-sorting"""
     convert = lambda text: int(text) if text.isdigit() else text.lower()
-    alphanum_key = lambda key: [convert(c) for c in re.split('([0-9]+)', key)]
+    alphanum_key = lambda key: [convert(c) for c in re.split("([0-9]+)", key)]
     return sorted(values, key=alphanum_key)
 
 
@@ -212,7 +212,7 @@ def print_list(
     """
     # Check input.
     if not isinstance(input_list, list):
-        print('ERROR: In print_list(), Non-list input_list:', input_list)
+        print("ERROR: In print_list(), Non-list input_list:", input_list)
         assert False
     # Content.
     for item in input_list[0:max_items]:
@@ -220,13 +220,13 @@ def print_list(
         item_str = str(item)
         trimmed_item_str = item_str[0:max_item_length]
         if len(item_str) > len(trimmed_item_str):
-            trimmed_item_str += '...'
+            trimmed_item_str += "..."
         # Print item.
         if indent == None:
-            indent_str = ''
+            indent_str = ""
         else:
-            indent_str = ' ' * indent
+            indent_str = " " * indent
         print(indent_str + trimmed_item_str)
     # Postamble.
     if max_items < len(input_list):
-        print(indent_str + '...')
+        print(indent_str + "...")

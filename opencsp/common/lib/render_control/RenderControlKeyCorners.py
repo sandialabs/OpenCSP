@@ -13,15 +13,15 @@ class RenderControlKeyCorners:
         self,
         clear_previous=True,  # Remove any existing files in the designated output directory.
         draw_key_corners=True,  # Whether to draw the key corner figures.
-        key_corners_points_marker='o',  # Marker for key corners.
+        key_corners_points_marker="o",  # Marker for key corners.
         key_corners_points_markersize=1.5,  # Marker size for key corners.
-        key_corners_points_color='m',  # Color for key corner points.
-        key_corners_label_horizontalalignment='center',  # Horizontal alignment for heliostat label.
-        key_corners_label_verticalalignment='center',  # Vertical alignment for heliostat label.
+        key_corners_points_color="m",  # Color for key corner points.
+        key_corners_label_horizontalalignment="center",  # Horizontal alignment for heliostat label.
+        key_corners_label_verticalalignment="center",  # Vertical alignment for heliostat label.
         key_corners_label_fontsize=6,  # Font size for heliostat label.
-        key_corners_label_fontstyle='normal',  # Font style for heliostat label.
-        key_corners_label_fontweight='bold',  # Font weight for heliostat label.
-        key_corners_label_color='m',  # Color for heliostat label.
+        key_corners_label_fontstyle="normal",  # Font style for heliostat label.
+        key_corners_label_fontweight="bold",  # Font weight for heliostat label.
+        key_corners_label_color="m",  # Color for heliostat label.
         key_corners_dpi=200,  # Dpi for saving figure to disk.
         key_corners_crop=False,  # Whether to crop annotations outside image frame.
     ):

@@ -26,11 +26,11 @@ class TestImageCalibrationGlobal(unittest.TestCase):
         ft.create_directories_if_necessary(cls.out_dir)
 
         # Create data
-        cls.camera_values = np.concatenate(([0.0, 0.0], np.linspace(1, 255, 8))).astype('uint8')
-        cls.display_values = np.linspace(0, 255, 10).astype('uint8')
+        cls.camera_values = np.concatenate(([0.0, 0.0], np.linspace(1, 255, 8))).astype("uint8")
+        cls.display_values = np.linspace(0, 255, 10).astype("uint8")
 
         # Create frames
-        frames = np.ones((100, 200, 10)).astype('uint8')
+        frames = np.ones((100, 200, 10)).astype("uint8")
         frames *= cls.camera_values.reshape((1, 1, -1))
 
         # Create calibration object
@@ -38,7 +38,7 @@ class TestImageCalibrationGlobal(unittest.TestCase):
 
     def tearDown(self):
         # Make sure we release all matplotlib resources.
-        plt.close('all')
+        plt.close("all")
 
     def test_min_display_camera_values(self):
         disp_min, cam_min = self.calibration.calculate_min_display_camera_values()
@@ -50,11 +50,11 @@ class TestImageCalibrationGlobal(unittest.TestCase):
         mask_images = np.zeros((100, 200, 2))
         mask_images[..., 0] = 0
         mask_images[..., 1] = 255
-        mask_images = mask_images.astype('uint8')
+        mask_images = mask_images.astype("uint8")
 
         # Create fringe images
         fringe_images = np.ones((100, 200, 8)) * self.camera_values[2:].reshape((1, 1, -1))
-        fringe_images = fringe_images.astype('uint8')
+        fringe_images = fringe_images.astype("uint8")
 
         # Expected fringe images are same as display values
         fringe_images_calibrated_exp = np.ones((100, 200, 8)) * self.display_values[2:].astype(float).reshape(
@@ -70,7 +70,7 @@ class TestImageCalibrationGlobal(unittest.TestCase):
             np.array([0.0]),
             dist_optic_screen_measure,
             dt.datetime.now(),
-            'Test',
+            "Test",
         )
 
         # Calibrate
@@ -111,5 +111,5 @@ class TestImageCalibrationGlobal(unittest.TestCase):
         cal.plot_gray_levels()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()
