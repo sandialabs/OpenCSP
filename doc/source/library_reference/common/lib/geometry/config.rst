@@ -145,8 +145,8 @@ Utility Classes
    :show-inheritance:
    :member-order: groupwise
 
-Angle Utility Functions
-=======================
+Angle Utility Classes
+=====================
 
 .. currentmodule:: opencsp.common.lib.geometry.angle
 
