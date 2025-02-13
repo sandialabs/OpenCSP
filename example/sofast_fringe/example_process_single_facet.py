@@ -107,7 +107,7 @@ def example_process_single_facet():
     # 2. Save projected sinusoidal fringe images to PNG format
     # ========================================================
     fringes = Fringes(measurement.fringe_periods_x, measurement.fringe_periods_y)
-    images = fringes.get_frames(640, 320, 'uint8', [0, 255])
+    images = fringes.get_frames(640, 320, 'uint8', [0, 255]) # writes images we projected from sofast projector to disk
     dir_save_cur = join(dir_save, '1_images_fringes_projected')
     ft.create_directories_if_necessary(dir_save_cur)
     # Save y images
@@ -124,15 +124,15 @@ def example_process_single_facet():
     dir_save_cur = join(dir_save, '2_images_captured')
     ft.create_directories_if_necessary(dir_save_cur)
 
-    # Save mask images
+    # Save mask (like a pixel mask value (all 0s, all 255s)) images
     for idx_image in [0, 1]:
         image = measurement.mask_images[..., idx_image]
         imageio.imwrite(join(dir_save_cur, f'mask_{idx_image:02d}.png'), image)
-    # Save y images
+    # Save y images (when lines were vertical, e.g.)
     for idx_image in range(measurement.num_y_ims):
         image = measurement.fringe_images_y[..., idx_image]
         imageio.imwrite(join(dir_save_cur, f'y_{idx_image:02d}.png'), image)
-    # Save x images
+    # Save x images (when lines were horizontal, e.g.)
     for idx_image in range(measurement.num_x_ims):
         image = measurement.fringe_images_x[..., idx_image]
         imageio.imwrite(join(dir_save_cur, f'x_{idx_image:02d}.png'), image)
@@ -142,10 +142,10 @@ def example_process_single_facet():
     dir_save_cur = join(dir_save, '3_processed_data')
     ft.create_directories_if_necessary(dir_save_cur)
 
-    # Define surface definition (parabolic surface)
+    # Define surface definition (parabolic surface), this is the mirror
     surface = Surface2DParabolic(initial_focal_lengths_xy=(300.0, 300.0), robust_least_squares=True, downsample=10)
 
-    # Calibrate fringes
+    # Calibrate fringes - (aka sinosoidal image)
     measurement.calibrate_fringe_images(calibration)
 
     # Instantiate sofast object
