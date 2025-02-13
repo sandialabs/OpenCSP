@@ -90,23 +90,23 @@ class Heliostat3dInfer:
 
         # Create output directory for frame figures.
         # Projected.
-        self.output_projected_corners_dir = os.path.join(self.output_construction_dir, 'projected')
+        self.output_projected_corners_dir = os.path.join(self.output_construction_dir, "projected")
         self.output_frame_projected_corners_dir = os.path.join(
             self.output_projected_corners_dir, self.key_frame_id_str_1
         )
         print(
-            'In KeyFrameTracksSearch.__init__(), self.output_frame_projected_corners_dir =',
+            "In KeyFrameTracksSearch.__init__(), self.output_frame_projected_corners_dir =",
             self.output_frame_projected_corners_dir,
         )
         if self.draw_track_images:
             ft.create_directories_if_necessary(self.output_frame_projected_corners_dir)
         # Confirmed.
-        self.output_confirmed_corners_dir = os.path.join(self.output_construction_dir, 'confirmed')
+        self.output_confirmed_corners_dir = os.path.join(self.output_construction_dir, "confirmed")
         self.output_frame_confirmed_corners_dir = os.path.join(
             self.output_confirmed_corners_dir, self.key_frame_id_str_1
         )
         print(
-            'In KeyFrameTracksSearch.__init__(), self.output_frame_confirmed_corners_dir =',
+            "In KeyFrameTracksSearch.__init__(), self.output_frame_confirmed_corners_dir =",
             self.output_frame_confirmed_corners_dir,
         )
         if self.draw_track_images:
@@ -117,8 +117,8 @@ class Heliostat3dInfer:
         self.key_frame_confirmed_track_fnxl = fnxl.FrameNameXyList()
 
         # Perform the tracking in both directions.
-        self.PredictConfirm(tracking_direction='forward')
-        self.PredictConfirm(tracking_direction='backward')
+        self.PredictConfirm(tracking_direction="forward")
+        self.PredictConfirm(tracking_direction="backward")
 
     def PredictConfirm(self, tracking_direction):
         print('In Heliostat3dInfer.PredictConfirm(tracking_direction="' + tracking_direction + '")...')
@@ -127,7 +127,7 @@ class Heliostat3dInfer:
         all_frame_id_str_list = [
             upf.frame_id_str_given_frame_file_body_ext(body_ext) for body_ext in self.all_frame_body_ext_list
         ]
-        if tracking_direction == 'forward':
+        if tracking_direction == "forward":
             # Velocity is from 1 --> 2.
             velocity, latest_projected_corners = self.velocity_and_initial_corners(
                 self.key_frame_1_projected_list_of_name_xy_lists, self.key_frame_2_projected_list_of_name_xy_lists
@@ -135,7 +135,7 @@ class Heliostat3dInfer:
             # The image name list proceeds forward from key_frame 1.
             key_frame_id_str_1_idx = all_frame_id_str_list.index(self.key_frame_id_str_1)
             frame_id_str_sequence = all_frame_id_str_list[key_frame_id_str_1_idx:]
-        elif tracking_direction == 'backward':
+        elif tracking_direction == "backward":
             # Velocity is from 2 --> 1.
             velocity, latest_projected_corners = self.velocity_and_initial_corners(
                 self.key_frame_2_projected_list_of_name_xy_lists, self.key_frame_1_projected_list_of_name_xy_lists
@@ -158,7 +158,7 @@ class Heliostat3dInfer:
         skip_flag = []
 
         # If this is a forward track, add and draw the seed images and corners.
-        if tracking_direction == 'forward':
+        if tracking_direction == "forward":
             # Key frame 1.
             self.key_frame_projected_track_fnxl.add_list_of_name_xy_lists(
                 self.key_frame_id_1, self.key_frame_1_projected_list_of_name_xy_lists
@@ -167,10 +167,10 @@ class Heliostat3dInfer:
                 self.key_frame_id_1, self.key_frame_1_confirmed_list_of_name_xy_lists
             )
             self.draw_frame_with_points_if_desired(
-                self.key_frame_id_str_1, self.key_frame_1_projected_list_of_name_xy_lists, 'Projected', point_color='g'
+                self.key_frame_id_str_1, self.key_frame_1_projected_list_of_name_xy_lists, "Projected", point_color="g"
             )
             self.draw_frame_with_points_if_desired(
-                self.key_frame_id_str_1, self.key_frame_1_confirmed_list_of_name_xy_lists, 'Confirmed', point_color='b'
+                self.key_frame_id_str_1, self.key_frame_1_confirmed_list_of_name_xy_lists, "Confirmed", point_color="b"
             )
             # Key frame 2.
             self.key_frame_projected_track_fnxl.add_list_of_name_xy_lists(
@@ -182,14 +182,14 @@ class Heliostat3dInfer:
             self.draw_frame_with_points_if_desired(
                 self.key_frame_id_str_2,
                 self.key_frame_2_projected_list_of_name_xy_lists,
-                'Projected',
-                point_color='orange',
+                "Projected",
+                point_color="orange",
             )
             self.draw_frame_with_points_if_desired(
                 self.key_frame_id_str_2,
                 self.key_frame_2_confirmed_list_of_name_xy_lists,
-                'Confirmed',
-                point_color='yellow',
+                "Confirmed",
+                point_color="yellow",
             )
 
         """Tracking"""
@@ -276,10 +276,10 @@ class Heliostat3dInfer:
             )
             # Draw.
             self.draw_frame_with_points_if_desired_aux(
-                img, frame_id_str, projected_list_of_name_xy_lists, 'Projected', point_color='m'
+                img, frame_id_str, projected_list_of_name_xy_lists, "Projected", point_color="m"
             )
             self.draw_frame_with_points_if_desired_aux(
-                img, frame_id_str, confirmed_list_of_name_xy_lists, 'Confirmed', point_color='c'
+                img, frame_id_str, confirmed_list_of_name_xy_lists, "Confirmed", point_color="c"
             )
 
     def velocity_and_initial_corners(self, key_frame_A_list_of_name_xy_lists, key_frame_B_list_of_name_xy_lists):
@@ -303,7 +303,7 @@ class Heliostat3dInfer:
                     + str(name_B)
                     + '".'
                 )
-                print('ERROR: ' + msg)
+                print("ERROR: " + msg)
                 raise ValueError(msg)
             vxy_list = []
             for xy_A, xy_B in zip(xy_list_A, xy_list_B):
@@ -336,21 +336,21 @@ class Heliostat3dInfer:
                         plt.scatter(corner[0], corner[1], facecolor=point_color, s=1)
             plt.title(
                 Confirmed_or_Projected_str
-                + ' Points for Key Frame '
+                + " Points for Key Frame "
                 + self.key_frame_id_str_1
-                + ', Frame: '
+                + ", Frame: "
                 + frame_id_str
             )
             fig_file_body_ext = (
-                self.input_video_body + '_' + frame_id_str + '_' + Confirmed_or_Projected_str.lower() + '.png'
+                self.input_video_body + "_" + frame_id_str + "_" + Confirmed_or_Projected_str.lower() + ".png"
             )
-            if Confirmed_or_Projected_str == 'Projected':
+            if Confirmed_or_Projected_str == "Projected":
                 figure_output_dir = self.output_frame_projected_corners_dir
-            elif Confirmed_or_Projected_str == 'Confirmed':
+            elif Confirmed_or_Projected_str == "Confirmed":
                 figure_output_dir = self.output_frame_confirmed_corners_dir
             else:
                 msg = (
-                    'In Heliostat3dInfer.draw_frame_with_points(), encountered unexpected Confirmed_or_Projected_str = '
+                    "In Heliostat3dInfer.draw_frame_with_points(), encountered unexpected Confirmed_or_Projected_str = "
                     + str(Confirmed_or_Projected_str)
                 )
                 print(msg)
@@ -410,7 +410,7 @@ class Heliostat3dInfer:
         return cnt
 
     def confirm_corners(
-        self, img, predicted_corners, canny_levels, iterations, confirm_type='', tolerance=3, pixels=100
+        self, img, predicted_corners, canny_levels, iterations, confirm_type="", tolerance=3, pixels=100
     ):
         def confirm_facets(expected_corners, edges, tolerance, pixels):
             confirmed_facets = {}
@@ -421,7 +421,7 @@ class Heliostat3dInfer:
                     corner = corners[corner_indx]
                     if corner[0] >= max_col or corner[0] < 0 or corner[1] >= max_row or corner[1] < 0:
                         corners[corner_indx] = None
-                confirmed_facets[facet_id] = {'edges': confirm_facet_edges(corners, edges, tolerance, pixels)}
+                confirmed_facets[facet_id] = {"edges": confirm_facet_edges(corners, edges, tolerance, pixels)}
             return confirmed_facets
 
         def confirm_facet_edges(corners, edges, tolerance, pixels):
@@ -466,7 +466,7 @@ class Heliostat3dInfer:
             hel_corners = [None for _ in range(0, self.specifications.corners_per_heliostat)]
             for facet_indx, facet in confirmed_facets.items():
                 corners = []
-                edges = facet['edges']
+                edges = facet["edges"]
                 edges.append(edges[0])  # cyclic
                 for edge_indx in range(0, len(edges) - 1):
                     edge0 = edges[edge_indx]
@@ -492,8 +492,8 @@ class Heliostat3dInfer:
                     imgcorners.append(confirmed_corners[indx])
                     objcorners.append(corners3d[indx])
 
-            points3d = np.array(objcorners).astype('float32')
-            points2d = np.array(imgcorners).astype('float32')
+            points3d = np.array(objcorners).astype("float32")
+            points2d = np.array(imgcorners).astype("float32")
 
             return points3d, points2d
 
@@ -506,7 +506,7 @@ class Heliostat3dInfer:
         previous_confirmed_corners = []
         previous_expected_corners = []
 
-        if confirm_type == 'iterative':
+        if confirm_type == "iterative":
             upper_downlimit, upper_uplimit = 50, 100
             lower_downlimit, lower_uplimit = 25, 50
             canny_steps = 5
@@ -520,12 +520,12 @@ class Heliostat3dInfer:
                 lower = lower - step * lower_step
                 edges_list.append(CannyImg(img, lower=lower, upper=upper))
         for ite in range(0, iterations):
-            if confirm_type == 'iterative':
+            if confirm_type == "iterative":
                 inner_loop_range = len(edges_list)
             else:
                 inner_loop_range = len(canny_types)
             for i in range(0, inner_loop_range):  # levels of canny
-                if confirm_type == 'iterative':
+                if confirm_type == "iterative":
                     edges = edges_list[i]
                 else:
                     edges = CannyImg(img, canny_type=canny_types[i])
@@ -563,14 +563,14 @@ class Heliostat3dInfer:
                     dist_coeff=self.dist_coeff,
                 )
 
-                expected_corners, _ = cv.projectPoints(np.array(corners3d).astype('float32'), rvec, tvec, mtx, dist)
+                expected_corners, _ = cv.projectPoints(np.array(corners3d).astype("float32"), rvec, tvec, mtx, dist)
                 expected_corners = expected_corners.reshape(-1, 2)
                 expected_corners = expected_corners.tolist()
                 previous_expected_corners = expected_corners.copy()
                 previous_confirmed_corners = confirmed_corners.copy()
 
-            if self.solvePnPtype == 'calib' and ite == 0:
-                self.solvePnPtype = 'pnp'  # change of mode
+            if self.solvePnPtype == "calib" and ite == 0:
+                self.solvePnPtype = "pnp"  # change of mode
                 self.cam_matrix, self.dist_coeff = (
                     mtx,
                     dist,

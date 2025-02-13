@@ -25,7 +25,7 @@ class BackgroundColorSubtractionImageProcessor(AbstractSpotAnalysisImageProcesso
     A simple background color detection and removal image processor.
     """
 
-    def __init__(self, color_detection_method: str = 'solid', constant_color_value: tuple[int] = (0)):
+    def __init__(self, color_detection_method: str = "solid", constant_color_value: tuple[int] = (0)):
         """
         Parameters
         ----------
@@ -424,8 +424,8 @@ class BackgroundColorSubtractionImageProcessor(AbstractSpotAnalysisImageProcesso
             tl_corner, tr_corner, bm_corner = corners[0], corners[1], corners[2]
             bl_corner, br_corner = p2.Pxy([[0], [height]]), p2.Pxy([[width], [height]])
             gradient_color_params: list[dict] = [
-                {'gi': 3, 'top': tl_corner, 'opp': tr_corner, 'tar': br_corner, 'topc': tl, 'oppc': tr},
-                {'gi': 2, 'top': tr_corner, 'opp': tl_corner, 'tar': bl_corner, 'topc': tr, 'oppc': tl},
+                {"gi": 3, "top": tl_corner, "opp": tr_corner, "tar": br_corner, "topc": tl, "oppc": tr},
+                {"gi": 2, "top": tr_corner, "opp": tl_corner, "tar": bl_corner, "topc": tr, "oppc": tl},
             ]
             for gc in gradient_color_params:
                 gradient_idx, top_corner, opposite_corner, target_corner, top_color, opposite_color = tuple(gc.values())
@@ -445,7 +445,7 @@ class BackgroundColorSubtractionImageProcessor(AbstractSpotAnalysisImageProcesso
             lt.info(f"Building gradient image for corner colors {tl=}, {tr=}, {bl=}, {br=}")
             data = np.array([[tl, tr], [bl, br]])
             interp = scipy.interpolate.RegularGridInterpolator((y, x), data)
-            yg, xg = np.meshgrid(range(height), range(width), indexing='ij')
+            yg, xg = np.meshgrid(range(height), range(width), indexing="ij")
             ret = interp((yg, xg))
         elif solid_background_color is not None:
             ret[:, :] = solid_background_color[0]

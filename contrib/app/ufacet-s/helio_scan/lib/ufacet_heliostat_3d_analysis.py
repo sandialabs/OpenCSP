@@ -50,8 +50,8 @@ def read_txt_file_to_heliostat(filename, specifications):
     with open(filename, "r") as f:
         all_corners = []
         for line in f:
-            line = line.split('\n')[0]
-            corner = line.split(',')
+            line = line.split("\n")[0]
+            corner = line.split(",")
             corner = [float(x) for x in corner]
             all_corners.append(corner)
         if len(all_corners) != specifications.corners_per_heliostat:
@@ -70,7 +70,7 @@ def read_txt_file_to_heliostat(filename, specifications):
 
 
 def surface_normal_heliostat(heliostat, option, specifications):
-    if option == 'normalFacet':
+    if option == "normalFacet":
         # Surface Normal of centered Facet
         centered_facet_corners = heliostat[specifications.centered_facet]
         top_right = centered_facet_corners[TOP_RIGHT_CORNER_INDX]
@@ -79,7 +79,7 @@ def surface_normal_heliostat(heliostat, option, specifications):
         a = np.array(top_right) - np.array(bottom_right)
         b = np.array(bottom_left) - np.array(bottom_right)
         surface_normal = np.cross(a, b)
-    elif option == 'normalHel':
+    elif option == "normalHel":
         # Surface Normal of heliostat
         top_right = heliostat[TOP_RIGHT_FACET_INDX][TOP_RIGHT_CORNER_INDX]
         bottom_right = heliostat[BOTTOM_RIGHT_FACET_INDX][BOTTOM_RIGHT_CORNER_INDX]
@@ -87,7 +87,7 @@ def surface_normal_heliostat(heliostat, option, specifications):
         a = np.array(top_right) - np.array(bottom_right)
         b = np.array(bottom_left) - np.array(bottom_right)
         surface_normal = np.cross(a, b)
-    elif option == 'normalOptical':
+    elif option == "normalOptical":
         # Average Surface Normal
         surf_normals = []
         for _, corners in sorted(heliostat.items()):
@@ -191,7 +191,7 @@ def translation(heliostat, specifications, confirm=False):
         translated_heliostat[specifications.centered_facet][BOTTOM_LEFT_CORNER_INDX],
     )
     if confirm:
-        print('new center after translation: ', center)
+        print("new center after translation: ", center)
     return translated_heliostat
 
 
@@ -260,7 +260,7 @@ def rotation(heliostat, surface_normal, confirm=False):
 
     if confirm:
         surface_normal = np.matmul(R, surface_normal)
-        print('new surface normal after rotation :', surface_normal)
+        print("new surface normal after rotation :", surface_normal)
 
     return rotated_heliostat
 
@@ -417,16 +417,16 @@ def plot_heliostat_3d(
     specifications,
     heliostat_theoretical_dict=None,
     theoretical_flag=False,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     frame_camera_pose_dict=None,
     camera_suffix=None,
 ):
-    figure_name = hel_name + '_3d_' + option
+    figure_name = hel_name + "_3d_" + option
     if theoretical_flag:
-        figure_name += '_displayed_with_flat'
+        figure_name += "_displayed_with_flat"
     if frame_camera_pose_dict != None:
         figure_name += camera_suffix
     # figure_name += '.png'
@@ -450,7 +450,7 @@ def plot_heliostat_3d(
 
     fig = plt.figure()
     #    ax = plt.axes(projection='3d')  # Perspective projection
-    ax = plt.axes(projection='3d', proj_type='ortho')  # Orthographic projection
+    ax = plt.axes(projection="3d", proj_type="ortho")  # Orthographic projection
     plt.title(title_prefix)
     if theoretical_flag:
         corners = [
@@ -462,10 +462,10 @@ def plot_heliostat_3d(
         xdata = [corner[0] for corner in corners]
         ydata = [corner[1] for corner in corners]
         zdata = [corner[2] for corner in corners]
-        ax.scatter3D(xdata[0], ydata[0], zdata[0], facecolor='tab:blue')
-        ax.scatter3D(xdata[1], ydata[1], zdata[1], facecolor='tab:orange')
-        ax.scatter3D(xdata[2], ydata[2], zdata[2], facecolor='tab:green')
-        ax.scatter3D(xdata[3], ydata[3], zdata[3], facecolor='c')
+        ax.scatter3D(xdata[0], ydata[0], zdata[0], facecolor="tab:blue")
+        ax.scatter3D(xdata[1], ydata[1], zdata[1], facecolor="tab:orange")
+        ax.scatter3D(xdata[2], ydata[2], zdata[2], facecolor="tab:green")
+        ax.scatter3D(xdata[3], ydata[3], zdata[3], facecolor="c")
         # draw center
         center = facet_center(
             heliostat_theoretical_dict[specifications.centered_facet][TOP_LEFT_CORNER_INDX],
@@ -473,7 +473,7 @@ def plot_heliostat_3d(
             heliostat_theoretical_dict[specifications.centered_facet][TOP_RIGHT_CORNER_INDX],
             heliostat_theoretical_dict[specifications.centered_facet][BOTTOM_LEFT_CORNER_INDX],
         )
-        ax.scatter3D(center[0], center[1], center[2], facecolor='tab:green')
+        ax.scatter3D(center[0], center[1], center[2], facecolor="tab:green")
         # draw heliostat
         for _, corners in heliostat_theoretical_dict.items():
             temp_corners = corners.copy()
@@ -487,7 +487,7 @@ def plot_heliostat_3d(
                 yline.append(temp_corners[indx + 1][1])
                 zline.append(temp_corners[indx][2])
                 zline.append(temp_corners[indx + 1][2])
-                ax.plot3D(xline, yline, zline, 'm')
+                ax.plot3D(xline, yline, zline, "m")
 
     # draw top corners
     corners = [
@@ -499,10 +499,10 @@ def plot_heliostat_3d(
     xdata = [corner[0] for corner in corners]
     ydata = [corner[1] for corner in corners]
     zdata = [corner[2] for corner in corners]
-    ax.scatter3D(xdata[0], ydata[0], zdata[0], facecolor='tab:blue')
-    ax.scatter3D(xdata[1], ydata[1], zdata[1], facecolor='tab:orange')
-    ax.scatter3D(xdata[2], ydata[2], zdata[2], facecolor='tab:green')
-    ax.scatter3D(xdata[3], ydata[3], zdata[3], facecolor='c')
+    ax.scatter3D(xdata[0], ydata[0], zdata[0], facecolor="tab:blue")
+    ax.scatter3D(xdata[1], ydata[1], zdata[1], facecolor="tab:orange")
+    ax.scatter3D(xdata[2], ydata[2], zdata[2], facecolor="tab:green")
+    ax.scatter3D(xdata[3], ydata[3], zdata[3], facecolor="c")
     # draw center
     center = facet_center(
         heliostat[specifications.centered_facet][TOP_LEFT_CORNER_INDX],
@@ -510,7 +510,7 @@ def plot_heliostat_3d(
         heliostat[specifications.centered_facet][TOP_RIGHT_CORNER_INDX],
         heliostat[specifications.centered_facet][BOTTOM_LEFT_CORNER_INDX],
     )
-    ax.scatter3D(center[0], center[1], center[2], facecolor='tab:green')
+    ax.scatter3D(center[0], center[1], center[2], facecolor="tab:green")
     # draw heliostat
     for _, corners in sorted(heliostat.items()):
         temp_corners = corners.copy()
@@ -524,12 +524,12 @@ def plot_heliostat_3d(
             yline.append(temp_corners[indx + 1][1])
             zline.append(temp_corners[indx][2])
             zline.append(temp_corners[indx + 1][2])
-            ax.plot3D(xline, yline, zline, 'tab:blue')
+            ax.plot3D(xline, yline, zline, "tab:blue")
 
     # draw cameras
     if frame_camera_pose_dict != None:
-        print('In plot_heliostat_3d(), figure_name = ', figure_name)
-        print('In plot_heliostat_3d(), number of camera frames = ', len(frame_camera_pose_dict.keys()))
+        print("In plot_heliostat_3d(), figure_name = ", figure_name)
+        print("In plot_heliostat_3d(), number of camera frames = ", len(frame_camera_pose_dict.keys()))
         idx = 0
         for rvec_tvec in dt.list_of_values_in_sorted_key_order(
             frame_camera_pose_dict
@@ -540,7 +540,7 @@ def plot_heliostat_3d(
             t_x = tvec[0][0]
             t_y = tvec[1][0]
             t_z = tvec[2][0]
-            print('In plot_heliostat_3d(), t_x, t_y, t_z = ', t_x, t_y, t_z)
+            print("In plot_heliostat_3d(), t_x, t_y, t_z = ", t_x, t_y, t_z)
             ax.scatter3D(
                 -t_x, t_y, t_z, s=0.5, label=str(idx)
             )  # 2021-11-14 4:00 AM.  Discovered that tvec_x coordinate is reversed compared to heliostat x axis.
@@ -557,13 +557,13 @@ def plot_heliostat_3d(
     # ax.set_zlim3d(bottom=min_z-0.05, top=max_z+0.05)
     else:
         ax3d.set_3d_axes_equal(ax)
-    ax.set_xlabel('X (m)')
-    ax.set_ylabel('Y (m)')
-    ax.set_zlabel('Z (m)')
+    ax.set_xlabel("X (m)")
+    ax.set_ylabel("Y (m)")
+    ax.set_zlabel("Z (m)")
     # plt.show()
     path_figure_base = os.path.join(saving_path, figure_name)
-    path_figure = path_figure_base + '.png'
-    print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+    path_figure = path_figure_base + ".png"
+    print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
     plt.savefig(path_figure, dpi=1200)
     if frame_camera_pose_dict != None:
         # ?? SCAFFOLDING RCB -- CALL plot_and_save_plane_views(path_figure_base, ax) HERE INSTEAD.
@@ -610,20 +610,20 @@ def plot_heliostat_3d(
 
         # XY
         ax.view_init(90, -90)  # x-y plane view
-        path_figure = path_figure_base + '_xy' + '.png'
-        print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+        path_figure = path_figure_base + "_xy" + ".png"
+        print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
         plt.savefig(path_figure, dpi=1200)
 
         # XZ
         ax.view_init(0, -90)  # x-z plane view
-        path_figure = path_figure_base + '_xz' + '.png'
-        print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+        path_figure = path_figure_base + "_xz" + ".png"
+        print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
         plt.savefig(path_figure, dpi=1200)
 
         # YZ
         ax.view_init(0, 0)  # y-z plane view
-        path_figure = path_figure_base + '_yz' + '.png'
-        print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+        path_figure = path_figure_base + "_yz" + ".png"
+        print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
         plt.savefig(path_figure, dpi=1200)
 
     plt.close()
@@ -636,23 +636,23 @@ def plot_heliostat_2d(
     theoretical_flag=False,
     axes_equal=True,
     plot_surface_normals=False,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     normal_wrt_average=False,
 ):
-    figure_name = hel_name + '_2d_' + option
+    figure_name = hel_name + "_2d_" + option
     if plot_surface_normals:
-        figure_name += '_displayed_normals'
+        figure_name += "_displayed_normals"
     if theoretical_flag:
-        figure_name += '_displayed_flat'
-    figure_name += '.png'
+        figure_name += "_displayed_flat"
+    figure_name += ".png"
 
     plt.figure()
     title = title_prefix
     if plot_surface_normals and normal_wrt_average:
-        title = title + ', Normals Relative to Average Normal'
+        title = title + ", Normals Relative to Average Normal"
     plt.title(title)
     if theoretical_flag:
         corners = [
@@ -663,10 +663,10 @@ def plot_heliostat_2d(
         ]
         xdata = [corner[0] for corner in corners]
         ydata = [corner[1] for corner in corners]
-        plt.scatter(xdata[0], ydata[0], facecolor='tab:blue')
-        plt.scatter(xdata[1], ydata[1], facecolor='tab:orange')
-        plt.scatter(xdata[2], ydata[2], facecolor='tab:green')
-        plt.scatter(xdata[3], ydata[3], facecolor='c')
+        plt.scatter(xdata[0], ydata[0], facecolor="tab:blue")
+        plt.scatter(xdata[1], ydata[1], facecolor="tab:orange")
+        plt.scatter(xdata[2], ydata[2], facecolor="tab:green")
+        plt.scatter(xdata[3], ydata[3], facecolor="c")
         # draw center
         center = facet_center(
             heliostat_theoretical_dict[specifications.centered_facet][TOP_LEFT_CORNER_INDX],
@@ -674,7 +674,7 @@ def plot_heliostat_2d(
             heliostat_theoretical_dict[specifications.centered_facet][TOP_RIGHT_CORNER_INDX],
             heliostat_theoretical_dict[specifications.centered_facet][BOTTOM_LEFT_CORNER_INDX],
         )
-        plt.scatter(center[0], center[1], facecolor='tab:green')
+        plt.scatter(center[0], center[1], facecolor="tab:green")
         for _, corners in heliostat_theoretical_dict.items():
             temp_corners = corners.copy()
             temp_corners.append(temp_corners[0])  # cyclic
@@ -685,7 +685,7 @@ def plot_heliostat_2d(
                 xline.append(temp_corners[indx + 1][0])
                 yline.append(temp_corners[indx][1])
                 yline.append(temp_corners[indx + 1][1])
-                plt.plot(xline, yline, 'm', alpha=0.6)
+                plt.plot(xline, yline, "m", alpha=0.6)
 
     """
     Plotting Heliostat's corners, Centers, and Sides
@@ -698,10 +698,10 @@ def plot_heliostat_2d(
     ]
     xdata = [corner[0] for corner in corners]
     ydata = [corner[1] for corner in corners]
-    plt.scatter(xdata[0], ydata[0], facecolor='tab:blue')
-    plt.scatter(xdata[1], ydata[1], facecolor='tab:orange')
-    plt.scatter(xdata[2], ydata[2], facecolor='tab:green')
-    plt.scatter(xdata[3], ydata[3], facecolor='c')
+    plt.scatter(xdata[0], ydata[0], facecolor="tab:blue")
+    plt.scatter(xdata[1], ydata[1], facecolor="tab:orange")
+    plt.scatter(xdata[2], ydata[2], facecolor="tab:green")
+    plt.scatter(xdata[3], ydata[3], facecolor="c")
     # draw center
     center = facet_center(
         heliostat[specifications.centered_facet][TOP_LEFT_CORNER_INDX],
@@ -709,7 +709,7 @@ def plot_heliostat_2d(
         heliostat[specifications.centered_facet][TOP_RIGHT_CORNER_INDX],
         heliostat[specifications.centered_facet][BOTTOM_LEFT_CORNER_INDX],
     )
-    plt.scatter(center[0], center[1], facecolor='tab:green')
+    plt.scatter(center[0], center[1], facecolor="tab:green")
     for _, corners in sorted(heliostat.items()):
         temp_corners = corners.copy()
         temp_corners.append(temp_corners[0])  # cyclic
@@ -720,7 +720,7 @@ def plot_heliostat_2d(
             xline.append(temp_corners[indx + 1][0])
             yline.append(temp_corners[indx][1])
             yline.append(temp_corners[indx + 1][1])
-            plt.plot(xline, yline, 'tab:blue')
+            plt.plot(xline, yline, "tab:blue")
 
     """
     Plotting Each Facet's surface normal
@@ -745,7 +745,7 @@ def plot_heliostat_2d(
                 diagonal_b = np.array(bottom_left) - np.array(top_right)
                 surface_normal = np.cross(diagonal_b, diagonal_a)
                 surface_normal = surface_normal / np.linalg.norm(surface_normal)
-                plt.scatter(center[0], center[1], facecolor='k', s=1)
+                plt.scatter(center[0], center[1], facecolor="k", s=1)
 
                 ux, uy, _ = surface_normal
                 ux_sum += ux
@@ -763,21 +763,21 @@ def plot_heliostat_2d(
             diagonal_b = np.array(bottom_left) - np.array(top_right)
             surface_normal = np.cross(diagonal_b, diagonal_a)
             surface_normal = surface_normal / np.linalg.norm(surface_normal)
-            plt.scatter(center[0], center[1], facecolor='k', s=1)
+            plt.scatter(center[0], center[1], facecolor="k", s=1)
 
             ux, uy, _ = surface_normal
             if normal_wrt_average:
                 ux -= ux_avg
                 uy -= uy_avg
             next_point = [center[0] + needle_scale * ux, center[1] + needle_scale * uy]
-            plt.plot([center[0], next_point[0]], [center[1], next_point[1]], color='c')
+            plt.plot([center[0], next_point[0]], [center[1], next_point[1]], color="c")
 
     if axes_equal:
-        plt.axis('equal')
+        plt.axis("equal")
 
-    plt.xlabel('X (m)')
-    plt.ylabel('Y (m)')
-    plt.savefig(saving_path + '/' + figure_name)
+    plt.xlabel("X (m)")
+    plt.ylabel("Y (m)")
+    plt.savefig(saving_path + "/" + figure_name)
     # plt.show()
     plt.close()
 
@@ -787,10 +787,10 @@ def plot_canting_angles(
     specifications,
     heliostat_theoretical_dict=None,
     directions_cosines=False,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     plot=True,
     normal_wrt_average=False,
 ):
@@ -851,53 +851,53 @@ def plot_canting_angles(
         canting_angles = offset_canting_angles
 
     if plot:
-        df = pd.DataFrame({'Nx': anglesx}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)])
+        df = pd.DataFrame({"Nx": anglesx}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)])
         ax = df.plot.bar(rot=0, color={"Nx": "tab:blue"}, figsize=(15, 10))
-        title = title_prefix + ': X-Component of Surface Normal'
+        title = title_prefix + ": X-Component of Surface Normal"
         if normal_wrt_average:
-            title += ', Relative to Average Normal'
+            title += ", Relative to Average Normal"
         plt.title(title)
-        plt.xlabel('Facet id')
-        plt.ylabel('X-component of units of Surface Normal')
+        plt.xlabel("Facet id")
+        plt.ylabel("X-component of units of Surface Normal")
         y_axis_max = 0.030  # ?? SCAFFOLDING RCB -- THIS MAKES SCALES SIMILAR ACROSS HELIOSTATS, BUT WILL BE TOO SMALL FOR SOME EXTREME ERRORS, AND ALSO DOESN'T ADJUST FOR DIFFERENT SOALR FIELDS.  RECTIFY THIS.
         plt.ylim(
             -y_axis_max, y_axis_max
         )  # ?? SCAFFOLDING RCB -- THIS MAKES SCALES SIMILAR ACROSS HELIOSTATS, BUT WILL BE TOO SMALL FOR SOME EXTREME ERRORS, AND ALSO DOESN'T ADJUST FOR DIFFERENT SOALR FIELDS.  RECTIFY THIS.
         #        plt.ylim(min(anglesx)-0.005, max(anglesx)+0.005)
-        plt.grid(axis='y')
-        figure_name = hel_name + '_canglesX_' + option + '.png'
-        plt.savefig(saving_path + '/' + figure_name)
+        plt.grid(axis="y")
+        figure_name = hel_name + "_canglesX_" + option + ".png"
+        plt.savefig(saving_path + "/" + figure_name)
         plt.close()
 
-        df = pd.DataFrame({'Ny': anglesy}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)])
+        df = pd.DataFrame({"Ny": anglesy}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)])
         ax = df.plot.bar(rot=0, color={"Ny": "tab:orange"}, figsize=(15, 10))
-        title = title_prefix + ': Y-Component of Surface Normal'
+        title = title_prefix + ": Y-Component of Surface Normal"
         if normal_wrt_average:
-            title += ', Relative to Average Normal'
+            title += ", Relative to Average Normal"
         plt.title(title)
-        plt.xlabel('Facet id')
-        plt.ylabel('Y-component of units of surface normal')
+        plt.xlabel("Facet id")
+        plt.ylabel("Y-component of units of surface normal")
         plt.ylim(
             -y_axis_max, y_axis_max
         )  # ?? SCAFFOLDING RCB -- THIS MAKES SCALES SIMILAR ACROSS HELIOSTATS, BUT WILL BE TOO SMALL FOR SOME EXTREME ERRORS, AND ALSO DOESN'T ADJUST FOR DIFFERENT SOALR FIELDS.  RECTIFY THIS.
         #        plt.ylim(min(anglesy)-0.001, max(anglesy)+0.001)
-        plt.grid(axis='y')
-        figure_name = hel_name + '_canglesY_' + option + '.png'
-        plt.savefig(saving_path + '/' + figure_name)
+        plt.grid(axis="y")
+        figure_name = hel_name + "_canglesY_" + option + ".png"
+        plt.savefig(saving_path + "/" + figure_name)
         plt.close()
 
-        df = pd.DataFrame({'Nz': anglesz}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)])
+        df = pd.DataFrame({"Nz": anglesz}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)])
         ax = df.plot.bar(rot=0, color={"Nz": "magenta"}, figsize=(15, 10))
-        title = title_prefix + ': Z-Component of Surface Normal'
+        title = title_prefix + ": Z-Component of Surface Normal"
         if normal_wrt_average:
-            title += ', Relative to Average Normal'
+            title += ", Relative to Average Normal"
         plt.title(title)
-        plt.xlabel('Facet id')
-        plt.ylabel('Z-component of units of Surface Normal')
+        plt.xlabel("Facet id")
+        plt.ylabel("Z-component of units of Surface Normal")
         plt.ylim(min(anglesz) - 0.000001, 1)
-        plt.grid(axis='y')
-        figure_name = hel_name + '_canglesZ_' + option + '.png'
-        plt.savefig(saving_path + '/' + figure_name)
+        plt.grid(axis="y")
+        figure_name = hel_name + "_canglesZ_" + option + ".png"
+        plt.savefig(saving_path + "/" + figure_name)
         plt.close()
 
         # plt.show()
@@ -911,10 +911,10 @@ def plot_corners_coordinates_differences(
     specifications,
     heliostat_theoretical_dict=None,
     xy=True,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
 ):
     top_left = []
     top_right = []
@@ -951,10 +951,10 @@ def plot_corners_coordinates_differences(
 
     df = pd.DataFrame(
         {
-            'Top Left Corner': top_left,
-            'Top Right Corner': top_right,
-            'Bottom Right Corner': bottom_right,
-            'Bottom Left Corner': bottom_left,
+            "Top Left Corner": top_left,
+            "Top Right Corner": top_right,
+            "Bottom Right Corner": bottom_right,
+            "Bottom Left Corner": bottom_left,
         },
         index=[i + 1 for i in range(0, specifications.facets_per_heliostat)],
     )
@@ -968,11 +968,11 @@ def plot_corners_coordinates_differences(
         },
     )
     if xy:
-        plt.title(title_prefix + ': XY-Difference')
+        plt.title(title_prefix + ": XY-Difference")
     else:
-        plt.title(title_prefix + ': Z-Difference')
-    plt.xlabel('Facet id')
-    plt.ylabel('Y (m)')
+        plt.title(title_prefix + ": Z-Difference")
+    plt.xlabel("Facet id")
+    plt.ylabel("Y (m)")
     plt.show()
     plt.close()
 
@@ -982,16 +982,16 @@ def plot_pose_estimation(
     specifications,
     heliostat_theoretical_dict=None,
     best_translation=True,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     plot=True,
 ):
-    figure_name = hel_name + '_poseXYZ_' + option
+    figure_name = hel_name + "_poseXYZ_" + option
     if best_translation:
-        figure_name += '_bestTranslation'
-    figure_name += '.png'
+        figure_name += "_bestTranslation"
+    figure_name += ".png"
     T = [0, 0, 0]
     if best_translation:
         T = find_best_translation(heliostat, heliostat_theoretical_dict=heliostat_theoretical_dict)
@@ -1021,17 +1021,17 @@ def plot_pose_estimation(
         pose_estimations[key] = [x - xth, y - yth, z - zth]
     if plot:
         df = pd.DataFrame(
-            {'X offset': xdiff, 'Y offset': ydiff, 'Z offset': zdiff},
+            {"X offset": xdiff, "Y offset": ydiff, "Z offset": zdiff},
             index=[i + 1 for i in range(0, specifications.facets_per_heliostat)],
         )
         ax = df.plot.bar(
             rot=0, color={"X offset": "tab:blue", "Y offset": "tab:orange", "Z offset": "cyan"}, figsize=(15, 10)
         )
-        plt.grid(axis='y')
-        plt.title(title_prefix + ': Centroid Difference')
-        plt.xlabel('Facet id')
-        plt.ylabel('Y (m)')
-        plt.savefig(saving_path + '/' + figure_name)
+        plt.grid(axis="y")
+        plt.title(title_prefix + ": Centroid Difference")
+        plt.xlabel("Facet id")
+        plt.ylabel("Y (m)")
+        plt.savefig(saving_path + "/" + figure_name)
         # plt.show()
         plt.close()
     return pose_estimations
@@ -1042,14 +1042,14 @@ def plot_pose_rotation_estimation(
     specifications,
     heliostat_theoretical_dict=None,
     best_translation=True,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     plot=True,
 ):
-    figure_name = hel_name + '_poseRotZ_' + option
-    figure_name += '.png'
+    figure_name = hel_name + "_poseRotZ_" + option
+    figure_name += ".png"
     rot_z_deg_list = []
     pose_rotation_estimations = {}
     for key, corners in sorted(heliostat.items()):
@@ -1074,14 +1074,14 @@ def plot_pose_rotation_estimation(
         pose_rotation_estimations[key] = [rot_z]
     if plot:
         df = pd.DataFrame(
-            {'Rotation About Z': rot_z_deg_list}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)]
+            {"Rotation About Z": rot_z_deg_list}, index=[i + 1 for i in range(0, specifications.facets_per_heliostat)]
         )
-        ax = df.plot.bar(rot=0, color={'Rotation About Z': 'tab:blue'}, figsize=(15, 10))
-        plt.grid(axis='y')
-        plt.title(title_prefix + ': Facet Z Rotation')
-        plt.xlabel('Facet id')
-        plt.ylabel('RotZ (degrees)')
-        plt.savefig(saving_path + '/' + figure_name)
+        ax = df.plot.bar(rot=0, color={"Rotation About Z": "tab:blue"}, figsize=(15, 10))
+        plt.grid(axis="y")
+        plt.title(title_prefix + ": Facet Z Rotation")
+        plt.xlabel("Facet id")
+        plt.ylabel("RotZ (degrees)")
+        plt.savefig(saving_path + "/" + figure_name)
         # plt.show()
         plt.close()
     return pose_rotation_estimations
@@ -1092,10 +1092,10 @@ def plot_square_sides_quality(
     specifications,
     heliostat_theoretical_dict=None,
     best_scaling=True,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     plot=True,
 ):
     scale = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -1196,10 +1196,10 @@ def plot_square_sides_quality(
 
         df = pd.DataFrame(
             {
-                'Top Side Error': top_error,
-                'Bottom Side Error': bottom_error,
-                'Right Side Error': right_error,
-                'Left Side Error': left_error,
+                "Top Side Error": top_error,
+                "Bottom Side Error": bottom_error,
+                "Right Side Error": right_error,
+                "Left Side Error": left_error,
             },
             index=[i + 1 for i in range(0, specifications.facets_per_heliostat)],
         )
@@ -1214,24 +1214,24 @@ def plot_square_sides_quality(
             figsize=(15, 10),
         )
         plt.title(title_prefix)
-        plt.xlabel('Facet id')
-        plt.ylabel('Meters')
+        plt.xlabel("Facet id")
+        plt.ylabel("Meters")
         bottom = min([min(top_error), min(right_error), min(bottom_error), min(left_error)])
         top = max([max(top_error), max(right_error), max(bottom_error), max(left_error)])
         x = [indx for indx in range(-1, specifications.facets_per_heliostat + 1)]
         y = [rmse for _ in range(-1, specifications.facets_per_heliostat + 1)]
-        plt.plot(x, y, linewidth=1.5, color='red', linestyle='dashed')
+        plt.plot(x, y, linewidth=1.5, color="red", linestyle="dashed")
         y = [-rmse for _ in range(-1, specifications.facets_per_heliostat + 1)]
-        plt.plot(x, y, linewidth=1.5, color='red', linestyle='dashed', label='RMSE')
+        plt.plot(x, y, linewidth=1.5, color="red", linestyle="dashed", label="RMSE")
         plt.ylim(bottom + (10e-2 * bottom), top + 10e-2 * top)
-        plt.grid(axis='y')
+        plt.grid(axis="y")
         plt.legend()
         # plt.show()
-        figure_name = hel_name + '_squareSidesErrors_' + option
+        figure_name = hel_name + "_squareSidesErrors_" + option
         if best_scaling:
-            figure_name += '_bestScaling'
-        figure_name += '.png'
-        plt.savefig(saving_path + '/' + figure_name)
+            figure_name += "_bestScaling"
+        figure_name += ".png"
+        plt.savefig(saving_path + "/" + figure_name)
         plt.close()
 
     return square_sides_errors
@@ -1242,10 +1242,10 @@ def plot_square_diagonals_quality(
     specifications,
     heliostat_theoretical_dict=None,
     best_scaling=True,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     plot=True,
 ):
     scale = np.array([[1, 0, 0], [0, 1, 0], [0, 0, 1]])
@@ -1323,7 +1323,7 @@ def plot_square_diagonals_quality(
         # plt.close()
 
         df = pd.DataFrame(
-            {'BottomLeft-TopRight Error': bltr_error_list, 'BottomRight-TopLeft Error': brtl_error_list},
+            {"BottomLeft-TopRight Error": bltr_error_list, "BottomRight-TopLeft Error": brtl_error_list},
             index=[i + 1 for i in range(0, specifications.facets_per_heliostat)],
         )
         ax = df.plot.bar(
@@ -1332,24 +1332,24 @@ def plot_square_diagonals_quality(
             figsize=(15, 10),
         )
         plt.title(title_prefix)
-        plt.xlabel('Facet id')
-        plt.ylabel('Meters')
+        plt.xlabel("Facet id")
+        plt.ylabel("Meters")
         bottom = min([min(bltr_error_list), min(brtl_error_list)])
         top = max([max(bltr_error_list), max(brtl_error_list)])
         x = [indx for indx in range(-1, specifications.facets_per_heliostat + 1)]
         y = [rmse for _ in range(-1, specifications.facets_per_heliostat + 1)]
-        plt.plot(x, y, linewidth=1.5, color='red', linestyle='dashed')
+        plt.plot(x, y, linewidth=1.5, color="red", linestyle="dashed")
         y = [-rmse for _ in range(-1, specifications.facets_per_heliostat + 1)]
-        plt.plot(x, y, linewidth=1.5, color='red', linestyle='dashed', label='RMSE')
+        plt.plot(x, y, linewidth=1.5, color="red", linestyle="dashed", label="RMSE")
         plt.ylim(bottom + (10e-2 * bottom), top + 10e-2 * top)
-        plt.grid(axis='y')
+        plt.grid(axis="y")
         plt.legend()
         # plt.show()
-        figure_name = hel_name + '_squareDiagonalsErrors_' + option
+        figure_name = hel_name + "_squareDiagonalsErrors_" + option
         if best_scaling:
-            figure_name += '_bestScaling'
-        figure_name += '.png'
-        plt.savefig(saving_path + '/' + figure_name)
+            figure_name += "_bestScaling"
+        figure_name += ".png"
+        plt.savefig(saving_path + "/" + figure_name)
         plt.close()
 
     return square_diagonals_errors
@@ -1359,13 +1359,13 @@ def plot_square_diagonal_offset_quality(
     heliostat,
     specifications,
     heliostat_theoretical_dict=None,
-    saving_path=' ',
-    hel_name=' ',
-    title_prefix=' ',
-    option='normalHel',
+    saving_path=" ",
+    hel_name=" ",
+    title_prefix=" ",
+    option="normalHel",
     plot=True,
 ):
-    figure_name = hel_name + '_diagonalOffset_' + option
+    figure_name = hel_name + "_diagonalOffset_" + option
     diagonals_distance = []
     diagonals_distance_dict = {}
     for key, corners in sorted(heliostat.items()):
@@ -1384,14 +1384,14 @@ def plot_square_diagonal_offset_quality(
 
     if plot:
         df = pd.DataFrame(
-            {'Diagonal Offset Distance': diagonals_distance},
+            {"Diagonal Offset Distance": diagonals_distance},
             index=[i + 1 for i in range(0, specifications.facets_per_heliostat)],
         )
         ax = df.plot.bar(rot=0, color={"Diagonal Offset Distance": "tab:blue"})
         plt.title(title_prefix)
-        plt.xlabel('Facet id')
-        plt.ylabel('Y (m)')
-        plt.savefig(saving_path + '/' + figure_name)
+        plt.xlabel("Facet id")
+        plt.ylabel("Y (m)")
+        plt.savefig(saving_path + "/" + figure_name)
         plt.close()
 
     return diagonals_distance_dict
@@ -1456,7 +1456,7 @@ def draw_annotated_frame_figure(
     # Construct annotations.
     annotation_list = []
     # Data: Observed corners in image space.
-    add_analysis_annotations(corner_xy_list, hel_name, False, True, False, 'c', 0.2, 0.6, 5, annotation_list)
+    add_analysis_annotations(corner_xy_list, hel_name, False, True, False, "c", 0.2, 0.6, 5, annotation_list)
     # Construct figure.
     plt.figure()
     # Fetch and draw image file.
@@ -1474,13 +1474,13 @@ def draw_annotated_frame_figure(
         frame_img,
         draw_image=False,  # Just show annotations.
         rgb=False,
-        title=(hel_name + ', ' + explain),
+        title=(hel_name + ", " + explain),
         annotation_list=annotation_list,
         crop_box=crop_box,
-        context_str='Heliostats3dInference.save_annotated_frame_figure()',
+        context_str="Heliostats3dInference.save_annotated_frame_figure()",
         save=True,
         output_dir=output_dir,
-        output_body=(hel_name + '_image_analysis_fig'),  # plot_image_figure() will add ".png"
+        output_body=(hel_name + "_image_analysis_fig"),  # plot_image_figure() will add ".png"
         dpi=1000,  # 250,
         include_figure_idx_in_filename=False,
     )
@@ -1492,16 +1492,16 @@ def draw_annotated_frame_image(
     # Construct annotations.
     annotation_list = []
     # Data: Observed corners in image space.
-    add_analysis_annotations(corner_xy_list, hel_name, True, False, False, 'r', 0.2, 0.6, 5, annotation_list)
-    add_analysis_annotations(corner_xy_list, hel_name, False, True, False, 'c', 0.2, 0.6, 5, annotation_list)
+    add_analysis_annotations(corner_xy_list, hel_name, True, False, False, "r", 0.2, 0.6, 5, annotation_list)
+    add_analysis_annotations(corner_xy_list, hel_name, False, True, False, "c", 0.2, 0.6, 5, annotation_list)
     if (note is not None) and len(note) > 0:
         note_xy = [150, 150]  # Upper left corner of the image.
         annotation_list.append(
             pa.PlotAnnotation(
-                'text',
+                "text",
                 [note_xy],
                 note,
-                rctxt.RenderControlText(fontsize=4, color='r', horizontalalignment='left', verticalalignment='top'),
+                rctxt.RenderControlText(fontsize=4, color="r", horizontalalignment="left", verticalalignment="top"),
             )
         )
     # Fetch image file.
@@ -1514,7 +1514,7 @@ def draw_annotated_frame_image(
         for annotation in annotation_list:
             annotation.image_draw(frame_img)  # Automatically crops to image boundary.
     # Save.
-    frame_img_body_ext = hel_name + '_image_analysis.png'
+    frame_img_body_ext = hel_name + "_image_analysis.png"
     frame_img_dir_body_ext = os.path.join(output_dir, frame_img_body_ext)
     # print('In draw_annotated_frame_image(), saving annotated image file: ', frame_img_dir_body_ext)
     cv.imwrite(frame_img_dir_body_ext, frame_img)
@@ -1536,13 +1536,13 @@ def add_analysis_annotations(
         facet_boundary_list = construct_facet_boundaries(corner_xy_list)
         for facet_boundary in facet_boundary_list:
             boundary_style = rcps.outline(color=color, linewidth=linewidth)
-            annotation_list.append(pa.PlotAnnotation('point_seq', facet_boundary, None, boundary_style))
+            annotation_list.append(pa.PlotAnnotation("point_seq", facet_boundary, None, boundary_style))
     if draw_markers:
-        point_style = rcps.marker(color=color, marker='.', markersize=markersize)
-        annotation_list.append(pa.PlotAnnotation('point_seq', corner_xy_list, None, point_style))
+        point_style = rcps.marker(color=color, marker=".", markersize=markersize)
+        annotation_list.append(pa.PlotAnnotation("point_seq", corner_xy_list, None, point_style))
     if draw_label:
         label_xy = g2d.label_point(corner_xy_list)
-        annotation_list.append(pa.PlotAnnotation('text', [label_xy], text, rctxt.bold(fontsize, color)))
+        annotation_list.append(pa.PlotAnnotation("text", [label_xy], text, rctxt.bold(fontsize, color)))
 
 
 def construct_facet_boundaries(corner_xy_list):
@@ -1578,13 +1578,13 @@ def analyze_and_render_heliostat_3d(
 
     # Generate plots.
     flat_heliostat = read_txt_file_to_heliostat(flat_hel_dir_body_ext, specifications)
-    msg = 'In analyze_and_render_3d_heliostat_model(), calling generate_plots() for heliostat ' + hel_name
+    msg = "In analyze_and_render_3d_heliostat_model(), calling generate_plots() for heliostat " + hel_name
     if explain is None:
         explain_2 = None
     else:
         explain_2 = explain.title()
-        msg += ', ' + explain
-    msg += '.'
+        msg += ", " + explain
+    msg += "."
     print(msg)
     generate_plots(
         hel_dir_body_ext,
@@ -1599,13 +1599,13 @@ def analyze_and_render_heliostat_3d(
         tracked_frame_camera_pose_dict=tracked_frame_camera_pose_dict,
         processed_frame_camera_pose_dict=processed_frame_camera_pose_dict,
     )
-    print('In analyze_and_render_3d_heliostat_model(), generate_plots() for heliostat ' + hel_name + ' finished.')
+    print("In analyze_and_render_3d_heliostat_model(), generate_plots() for heliostat " + hel_name + " finished.")
 
     # Generate csv files.
-    msg.replace('generate_plots()', 'generate_csv()')
+    msg.replace("generate_plots()", "generate_csv()")
     print(msg)
-    generate_csv(hel_dir_body_ext, output_dir, specifications, flat_heliostat, option='noRotate')
-    print('In analyze_and_render_3d_heliostat_model(), generate_csv() for heliostat ' + hel_name + ' finished.')
+    generate_csv(hel_dir_body_ext, output_dir, specifications, flat_heliostat, option="noRotate")
+    print("In analyze_and_render_3d_heliostat_model(), generate_csv() for heliostat " + hel_name + " finished.")
 
 
 def generate_plots(
@@ -1634,7 +1634,7 @@ def generate_plots(
 
     title_prefix = hel_name
     if explain is not None:
-        title_prefix += ', ' + explain
+        title_prefix += ", " + explain
     """
     Plotting Heliostat 2D
     """
@@ -1650,7 +1650,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotate',
+        option="noRotate",
     )
 
     """
@@ -1668,7 +1668,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotate',
+        option="noRotate",
     )
     plot_heliostat_2d(
         heliostat,
@@ -1679,7 +1679,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='wrtAvg',
+        option="wrtAvg",
         normal_wrt_average=True,
     )
     """
@@ -1696,7 +1696,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotate',
+        option="noRotate",
     )
     plot_heliostat_3d(
         heliostat=heliostat,
@@ -1706,7 +1706,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotate',
+        option="noRotate",
     )
     # if tracked_frame_camera_pose_dict != None:  # ?? SCAFFOLDING RCB -- TEMPORARY DISABLE
     #     plot_heliostat_3d(heliostat=heliostat, specifications=specifications, heliostat_theoretical_dict=heliostat_theoretical_dict, theoretical_flag=False, saving_path=heliostat_path, hel_name=hel_name, title_prefix=title_prefix + 'Camera locations tracking', option='noRotate', frame_camera_pose_dict=tracked_frame_camera_pose_dict, camera_suffix='track_cameras')  # ?? SCAFFOLDING RCB -- TEMPORARY DISABLE
@@ -1718,10 +1718,10 @@ def generate_plots(
             theoretical_flag=False,
             saving_path=heliostat_path,
             hel_name=hel_name,
-            title_prefix=title_prefix + 'Processed camera locations for',
-            option='noRotate',
+            title_prefix=title_prefix + "Processed camera locations for",
+            option="noRotate",
             frame_camera_pose_dict=processed_frame_camera_pose_dict,
-            camera_suffix='process_cameras',
+            camera_suffix="process_cameras",
         )
 
     """
@@ -1737,7 +1737,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotate',
+        option="noRotate",
     )
     plot_canting_angles(
         heliostat,
@@ -1746,7 +1746,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='wrtAvg',
+        option="wrtAvg",
         normal_wrt_average=True,
     )
 
@@ -1765,7 +1765,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotateNoTranslate',
+        option="noRotateNoTranslate",
     )
     """
     Pose Rotation Estimation
@@ -1782,7 +1782,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotateNoTranslate',
+        option="noRotateNoTranslate",
     )
 
     """
@@ -1800,7 +1800,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotateNoScale',
+        option="noRotateNoScale",
     )
 
     """
@@ -1818,7 +1818,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotateNoScale',
+        option="noRotateNoScale",
     )
 
     """
@@ -1834,7 +1834,7 @@ def generate_plots(
         saving_path=heliostat_path,
         hel_name=hel_name,
         title_prefix=title_prefix,
-        option='noRotate',
+        option="noRotate",
     )
 
 
@@ -1850,10 +1850,10 @@ def generate_plots(
 
 
 def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theoretical_dict, option):
-    def save_csv(dict, output_path=' ', name=' '):
-        header = ['Heliostat']
+    def save_csv(dict, output_path=" ", name=" "):
+        header = ["Heliostat"]
         for facet_id in range(0, specifications.facets_per_heliostat):
-            header.append('Facet ' + str(facet_id + 1))
+            header.append("Facet " + str(facet_id + 1))
 
         rows = []
         for hel_name, hel_facets in sorted(dict.items()):
@@ -1865,7 +1865,7 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
 
             rows.append(row)
         output_dir_body_ext = os.path.join(output_path, name)
-        with open(output_dir_body_ext, 'w', newline='') as f:
+        with open(output_dir_body_ext, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerow(header)
             writer.writerows(rows)
@@ -1904,8 +1904,8 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
         plot=False,
         option=option,
     )
-    save_csv(canting_angles, output_path=output_path, name=hel_name + '_canglesXYZ_' + option + '.csv')
-    wrt_avg_option = 'wrtAvg'
+    save_csv(canting_angles, output_path=output_path, name=hel_name + "_canglesXYZ_" + option + ".csv")
+    wrt_avg_option = "wrtAvg"
     canting_angles[hel_name] = plot_canting_angles(
         heliostat,
         specifications=specifications,
@@ -1915,7 +1915,7 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
         option=wrt_avg_option,
         normal_wrt_average=True,
     )
-    save_csv(canting_angles, output_path=output_path, name=hel_name + '_canglesXYZ_' + wrt_avg_option + '.csv')
+    save_csv(canting_angles, output_path=output_path, name=hel_name + "_canglesXYZ_" + wrt_avg_option + ".csv")
     """
     Pose Estimation
     """
@@ -1927,7 +1927,7 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
         plot=False,
         option=option,
     )
-    save_csv(pose_estimations, output_path=output_path, name=hel_name + '_poseXYZ_' + option + '.csv')
+    save_csv(pose_estimations, output_path=output_path, name=hel_name + "_poseXYZ_" + option + ".csv")
     """
     Pose Rotation Estimation
     """
@@ -1939,7 +1939,7 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
         plot=False,
         option=option,
     )
-    save_csv(pose_rotation_estimations, output_path=output_path, name=hel_name + '_poseRotZ_' + option + '.csv')
+    save_csv(pose_rotation_estimations, output_path=output_path, name=hel_name + "_poseRotZ_" + option + ".csv")
     """
     Square Sides Quality Error
     """
@@ -1951,7 +1951,7 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
         plot=False,
         option=option,
     )
-    save_csv(square_sides_errors, output_path=output_path, name=hel_name + '_serrorTRBL_' + option + '.csv')
+    save_csv(square_sides_errors, output_path=output_path, name=hel_name + "_serrorTRBL_" + option + ".csv")
     """
     Square Diagonals Quality Error
     """
@@ -1963,7 +1963,7 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
         plot=False,
         option=option,
     )
-    save_csv(square_diagonals_errors, output_path=output_path, name=hel_name + '_diagerrors_' + option + '.csv')
+    save_csv(square_diagonals_errors, output_path=output_path, name=hel_name + "_diagerrors_" + option + ".csv")
     """
     Square Diagonal Offsets Quality
     """
@@ -1975,7 +1975,7 @@ def generate_csv(hel_dir_body_ext, output_path, specifications, heliostat_theore
         plot=False,
         option=option,
     )
-    save_csv(square_diagonal_offsets, output_path=output_path, name=hel_name + '_diagoffsets_' + option + '.csv')
+    save_csv(square_diagonal_offsets, output_path=output_path, name=hel_name + "_diagoffsets_" + option + ".csv")
 
 
 # except:
@@ -1996,16 +1996,16 @@ def heliostat_name_given_heliostat_3d_dir_body_ext(
     heliostat_3d_dir_body_ext,
 ):  # ?? SCAFFOLDING RCB -- MAKE THIS GENERAL, CORRECT, ERROR-CHECKING.  (IT'S LATE, AND I'M OUT OF TIME.)
     heliostat_3d_dir, heliostat_3d_body, heliostat_3d_ext = ft.path_components(heliostat_3d_dir_body_ext)
-    if heliostat_3d_body.find('distorted') == -1:
+    if heliostat_3d_body.find("distorted") == -1:
         # Case 1:  No projected/distorted substrings.
-        tokens = heliostat_3d_body.split('_')
+        tokens = heliostat_3d_body.split("_")
         three_d_str = tokens[-1]
         corners_str = tokens[-2]
         name_str = tokens[-3]
         return name_str
     else:
         # Case 2:  Includes projected/distorted substrings.
-        tokens = heliostat_3d_body.split('_')
+        tokens = heliostat_3d_body.split("_")
         three_d_str = tokens[-1]
         corners_str = tokens[-2]
         distorted_str = tokens[-3]
@@ -2020,14 +2020,14 @@ def corners_3d_dir_body_ext(
     # Assemble filename body.
     c_3d_body = hel_name
     if (input_video_body is not None) and (len(input_video_body) > 0):
-        c_3d_body = input_video_body + '_' + c_3d_body
+        c_3d_body = input_video_body + "_" + c_3d_body
     if (projected_or_confirmed_str is not None) and (len(projected_or_confirmed_str) > 0):
-        c_3d_body += '_' + projected_or_confirmed_str
+        c_3d_body += "_" + projected_or_confirmed_str
     if (distorted_or_undistorted_str is not None) and (len(distorted_or_undistorted_str) > 0):
-        c_3d_body += '_' + distorted_or_undistorted_str
-    c_3d_body += '_' + 'corners_3d'
+        c_3d_body += "_" + distorted_or_undistorted_str
+    c_3d_body += "_" + "corners_3d"
     # Add extension and directory.
-    c_3d_body_ext = c_3d_body + '.csv'
+    c_3d_body_ext = c_3d_body + ".csv"
     c_3d_dir_body_ext = os.path.join(corners_3d_dir, c_3d_body_ext)
     # Return.
     return c_3d_dir_body_ext
@@ -2058,7 +2058,7 @@ def save_heliostat_3d(
     output_heliostat_3d_dir_body_ext = corners_3d_dir_body_ext(
         input_video_body, hel_name, projected_or_confirmed_str, distorted_or_undistorted_str, output_dir
     )
-    print('In Heliostats3dInference.save_heliostat_3d(), writing file: ', output_heliostat_3d_dir_body_ext)
+    print("In Heliostats3dInference.save_heliostat_3d(), writing file: ", output_heliostat_3d_dir_body_ext)
     with open(output_heliostat_3d_dir_body_ext, "w") as output_stream:
         wr = csv.writer(output_stream)
         wr.writerows(corner_xyz_list)
@@ -2108,20 +2108,20 @@ def plot_and_save_plane_views(path_figure_base, ax):
 
     # XY
     ax.view_init(90, -90)  # x-y plane view
-    path_figure = path_figure_base + '_xy' + '.png'
-    print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+    path_figure = path_figure_base + "_xy" + ".png"
+    print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
     plt.savefig(path_figure, dpi=1200)
 
     # XZ
     ax.view_init(0, -90)  # x-z plane view
-    path_figure = path_figure_base + '_xz' + '.png'
-    print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+    path_figure = path_figure_base + "_xz" + ".png"
+    print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
     plt.savefig(path_figure, dpi=1200)
 
     # YZ
     ax.view_init(0, 0)  # y-z plane view
-    path_figure = path_figure_base + '_yz' + '.png'
-    print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+    path_figure = path_figure_base + "_yz" + ".png"
+    print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
     plt.savefig(path_figure, dpi=1200)
 
 
@@ -2130,8 +2130,8 @@ def plot_heliostat_with_camera_poses(
     design_hel_dir_body_ext,  # ?? SCAFFOLDING RCB -- REORDER PARAMETERS, AND ALSO CALLER PARAMETER ORDER.
     specifications,
     dict_of_frame_dicts,
-    saving_path=' ',
-    title_prefix=' ',
+    saving_path=" ",
+    title_prefix=" ",
     explain=None,
     # frame_dict=None,
     # tracked_frame_camera_pose_dict=None,
@@ -2144,13 +2144,13 @@ def plot_heliostat_with_camera_poses(
     heliostat = read_txt_file_to_heliostat(design_hel_dir_body_ext, specifications)
 
     # Announce.
-    msg = 'In plot_heliostat_with_camera_poses(), drawing heliostat ' + hel_name
+    msg = "In plot_heliostat_with_camera_poses(), drawing heliostat " + hel_name
     if explain is None:
         explain_2 = None
     else:
         explain_2 = explain.title()
-        msg += ', ' + explain
-    msg += '.'
+        msg += ", " + explain
+    msg += "."
     print(msg)
 
     min_z = 10e2
@@ -2163,11 +2163,11 @@ def plot_heliostat_with_camera_poses(
             elif z > max_z:
                 max_z = z
 
-    figure_name = hel_name + '_camera_positions'
+    figure_name = hel_name + "_camera_positions"
 
     fig = plt.figure()
     #    ax = plt.axes(projection='3d')  # Perspective projection
-    ax = plt.axes(projection='3d', proj_type='ortho')  # Orthographic projection
+    ax = plt.axes(projection="3d", proj_type="ortho")  # Orthographic projection
     plt.title(title_prefix)
 
     # draw top corners
@@ -2180,10 +2180,10 @@ def plot_heliostat_with_camera_poses(
     xdata = [corner[0] for corner in corners]
     ydata = [corner[1] for corner in corners]
     zdata = [corner[2] for corner in corners]
-    ax.scatter3D(xdata[0], ydata[0], zdata[0], facecolor='tab:blue')
-    ax.scatter3D(xdata[1], ydata[1], zdata[1], facecolor='tab:orange')
-    ax.scatter3D(xdata[2], ydata[2], zdata[2], facecolor='tab:green')
-    ax.scatter3D(xdata[3], ydata[3], zdata[3], facecolor='c')
+    ax.scatter3D(xdata[0], ydata[0], zdata[0], facecolor="tab:blue")
+    ax.scatter3D(xdata[1], ydata[1], zdata[1], facecolor="tab:orange")
+    ax.scatter3D(xdata[2], ydata[2], zdata[2], facecolor="tab:green")
+    ax.scatter3D(xdata[3], ydata[3], zdata[3], facecolor="c")
     # draw center
     center = facet_center(
         heliostat[specifications.centered_facet][TOP_LEFT_CORNER_INDX],
@@ -2191,7 +2191,7 @@ def plot_heliostat_with_camera_poses(
         heliostat[specifications.centered_facet][TOP_RIGHT_CORNER_INDX],
         heliostat[specifications.centered_facet][BOTTOM_LEFT_CORNER_INDX],
     )
-    ax.scatter3D(center[0], center[1], center[2], facecolor='tab:green')
+    ax.scatter3D(center[0], center[1], center[2], facecolor="tab:green")
     # draw heliostat
     for _, corners in sorted(heliostat.items()):
         temp_corners = corners.copy()
@@ -2205,7 +2205,7 @@ def plot_heliostat_with_camera_poses(
             yline.append(temp_corners[indx + 1][1])
             zline.append(temp_corners[indx][2])
             zline.append(temp_corners[indx + 1][2])
-            ax.plot3D(xline, yline, zline, 'tab:blue')
+            ax.plot3D(xline, yline, zline, "tab:blue")
 
     # draw cameras
     if dict_of_frame_dicts != None:
@@ -2214,15 +2214,15 @@ def plot_heliostat_with_camera_poses(
     # plt.legend()
 
     ax3d.set_3d_axes_equal(ax)
-    ax.set_xlabel('X (m)')
-    ax.set_ylabel('Y (m)')
-    ax.set_zlabel('Z (m)')
+    ax.set_xlabel("X (m)")
+    ax.set_ylabel("Y (m)")
+    ax.set_zlabel("Z (m)")
     # plt.show()
 
     ft.create_directories_if_necessary(saving_path)
     path_figure_base = os.path.join(saving_path, figure_name)
-    path_figure = path_figure_base + '.png'
-    print('In plot_heliostat_3d(), saving figure:', path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
+    path_figure = path_figure_base + ".png"
+    print("In plot_heliostat_3d(), saving figure:", path_figure)  # ?? SCAFFOLDING RCB -- TEMPORARY ?
     plt.savefig(path_figure, dpi=1200)
     plot_and_save_plane_views(path_figure_base, ax)
 
@@ -2237,10 +2237,10 @@ def plot_heliostat_with_camera_poses_aux(ax, dict_of_frame_dicts, only_use_for_m
     for frame_id in dt.sorted_keys(dict_of_frame_dicts):
         frame_dict = dict_of_frame_dicts[frame_id]
         # Determine whether to skip this point.
-        if only_use_for_metrology and (frame_dict['use_for_metrology'] == False):
+        if only_use_for_metrology and (frame_dict["use_for_metrology"] == False):
             continue
         # Plot this point.
-        tvec = frame_dict['single_frame_camera_tvec']
+        tvec = frame_dict["single_frame_camera_tvec"]
         t_x = tvec[0][0]
         t_y = tvec[1][0]
         t_z = tvec[2][0]

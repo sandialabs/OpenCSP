@@ -51,11 +51,11 @@ class KeyTracks:
     ):  # Flags to control rendering on this run.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError('In KeyTracks.__init__(), null input_video_dir_body_ext encountered.')
+            raise ValueError("In KeyTracks.__init__(), null input_video_dir_body_ext encountered.")
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError('In KeyTracks.__init__(), null output_data_dir encountered.')
+            raise ValueError("In KeyTracks.__init__(), null output_data_dir encountered.")
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError('In KeyTracks.__init__(), null output_render_dir encountered.')
+            raise ValueError("In KeyTracks.__init__(), null output_render_dir encountered.")
 
         # Parse input video path components.
         input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
@@ -82,28 +82,28 @@ class KeyTracks:
         self.render_control = render_control
 
         # Found key tracks file names.
-        self.key_frame_projected_tracks_dir = os.path.join(self.output_data_dir, 'key_frame_projected_tracks')
-        self.key_frame_confirmed_tracks_dir = os.path.join(self.output_data_dir, 'key_frame_confirmed_tracks')
+        self.key_frame_projected_tracks_dir = os.path.join(self.output_data_dir, "key_frame_projected_tracks")
+        self.key_frame_confirmed_tracks_dir = os.path.join(self.output_data_dir, "key_frame_confirmed_tracks")
 
         # Summary statistics file name.
-        self.dict_body = self.input_video_body + '_key_frames_with_corners_statistics'
-        self.dict_body_ext = self.dict_body + '.csv'
+        self.dict_body = self.input_video_body + "_key_frames_with_corners_statistics"
+        self.dict_body_ext = self.dict_body + ".csv"
         self.dict_dir_body_ext = os.path.join(self.output_data_dir, self.dict_body_ext)
 
         # File listing key frames with mismatched heliostats.
-        self.mismatched_ids_body = self.input_video_body + '_mismatched_key_frame_ids'
-        self.mismatched_ids_body_ext = self.mismatched_ids_body + '.txt'
+        self.mismatched_ids_body = self.input_video_body + "_mismatched_key_frame_ids"
+        self.mismatched_ids_body_ext = self.mismatched_ids_body + ".txt"
         self.mismatched_ids_dir_body_ext = os.path.join(self.output_data_dir, self.mismatched_ids_body_ext)
 
         # Tracked frames per key frame file name.
-        self.tfpkf_body = self.input_video_body + '_tracked_frames_per_key_frame'
-        self.tfpkf_body_ext = self.tfpkf_body + '.csv'
+        self.tfpkf_body = self.input_video_body + "_tracked_frames_per_key_frame"
+        self.tfpkf_body_ext = self.tfpkf_body + ".csv"
         self.tfpkf_dir_body_ext = os.path.join(self.output_data_dir, self.tfpkf_body_ext)
 
         # Load key corners files.
         # Projected.
         print(
-            'In KeyTracks.__init__(), reading found key projected corners directory: ',
+            "In KeyTracks.__init__(), reading found key projected corners directory: ",
             self.input_key_projected_corners_dir,
         )
         key_projected_corners_body_ext_list = ft.files_in_directory(self.input_key_projected_corners_dir)
@@ -116,27 +116,27 @@ class KeyTracks:
                     self.input_key_projected_corners_dir, key_projected_corners_body_ext
                 )
                 print(
-                    'In KeyTracks.__init__(), reading found projected key corners file:      ', key_corners_dir_body_ext
+                    "In KeyTracks.__init__(), reading found projected key corners file:      ", key_corners_dir_body_ext
                 )
                 key_frame_projected_corners_fnxl = fnxl.FrameNameXyList()
                 key_frame_projected_corners_fnxl.load(key_corners_dir_body_ext)
                 # Store results.
                 key_frame_dict = {}
                 self.key_projected_corners_dict[key_frame_id] = key_frame_dict
-                self.key_projected_corners_dict[key_frame_id]['key_frame_id_str'] = key_frame_id_str
+                self.key_projected_corners_dict[key_frame_id]["key_frame_id_str"] = key_frame_id_str
                 self.key_projected_corners_dict[key_frame_id][
-                    'key_projected_corners_body_ext'
+                    "key_projected_corners_body_ext"
                 ] = key_projected_corners_body_ext
-                self.key_projected_corners_dict[key_frame_id]['key_corners_dir_body_ext'] = key_corners_dir_body_ext
+                self.key_projected_corners_dict[key_frame_id]["key_corners_dir_body_ext"] = key_corners_dir_body_ext
                 self.key_projected_corners_dict[key_frame_id][
-                    'key_frame_projected_corners_fnxl'
+                    "key_frame_projected_corners_fnxl"
                 ] = key_frame_projected_corners_fnxl
         # Confirm what was read.
-        print('In KeyTracks.__init__(), found projected key corners dictionary:')
+        print("In KeyTracks.__init__(), found projected key corners dictionary:")
         dt.print_dict_of_dicts(self.key_projected_corners_dict, max_value_2_length=200)
         # Confirmed.
         print(
-            'In KeyTracks.__init__(), reading found key confirmed corners directory: ',
+            "In KeyTracks.__init__(), reading found key confirmed corners directory: ",
             self.input_key_confirmed_corners_dir,
         )
         key_confirmed_corners_body_ext_list = ft.files_in_directory(self.input_key_confirmed_corners_dir)
@@ -149,23 +149,23 @@ class KeyTracks:
                     self.input_key_confirmed_corners_dir, key_confirmed_corners_body_ext
                 )
                 print(
-                    'In KeyTracks.__init__(), reading found confirmed key corners file:      ', key_corners_dir_body_ext
+                    "In KeyTracks.__init__(), reading found confirmed key corners file:      ", key_corners_dir_body_ext
                 )
                 key_frame_confirmed_corners_fnxl = fnxl.FrameNameXyList()
                 key_frame_confirmed_corners_fnxl.load(key_corners_dir_body_ext)
                 # Store results.
                 key_frame_dict = {}
                 self.key_confirmed_corners_dict[key_frame_id] = key_frame_dict
-                self.key_confirmed_corners_dict[key_frame_id]['key_frame_id_str'] = key_frame_id_str
+                self.key_confirmed_corners_dict[key_frame_id]["key_frame_id_str"] = key_frame_id_str
                 self.key_confirmed_corners_dict[key_frame_id][
-                    'key_confirmed_corners_body_ext'
+                    "key_confirmed_corners_body_ext"
                 ] = key_confirmed_corners_body_ext
-                self.key_confirmed_corners_dict[key_frame_id]['key_corners_dir_body_ext'] = key_corners_dir_body_ext
+                self.key_confirmed_corners_dict[key_frame_id]["key_corners_dir_body_ext"] = key_corners_dir_body_ext
                 self.key_confirmed_corners_dict[key_frame_id][
-                    'key_frame_confirmed_corners_fnxl'
+                    "key_frame_confirmed_corners_fnxl"
                 ] = key_frame_confirmed_corners_fnxl
         # Confirm what was read.
-        print('In KeyTracks.__init__(), found confirmed key corners dictionary:')
+        print("In KeyTracks.__init__(), found confirmed key corners dictionary:")
         dt.print_dict_of_dicts(self.key_confirmed_corners_dict, max_value_2_length=200)
 
         # Fetch a list of all frame ids in the video (not just key frames).
@@ -174,10 +174,10 @@ class KeyTracks:
         self.all_frame_body_ext_list = ft.files_in_directory(self.input_frame_dir, sort=True)
         # Confirm what was read.
         max_print_files = 12
-        print('In KeyTracks.__init__(), self.all_frame_body_ext_list:')
+        print("In KeyTracks.__init__(), self.all_frame_body_ext_list:")
         for frame_file in self.all_frame_body_ext_list[0 : min(max_print_files, len(self.all_frame_body_ext_list))]:
-            print('In KeyTracks.__init__()   ', frame_file)
-        print('...')
+            print("In KeyTracks.__init__()   ", frame_file)
+        print("...")
 
         # Find facet tracks in key frames, archiving the result.
         self.find_and_save_key_tracks()
@@ -200,7 +200,7 @@ class KeyTracks:
             or (not ft.directory_exists(self.output_data_dir))
             or ft.directory_is_empty(self.output_data_dir)
         ):
-            print('In KeyTracks.find_and_save_key_tracks(), constructing key frame tracks...')
+            print("In KeyTracks.find_and_save_key_tracks(), constructing key frame tracks...")
 
             # Determine which key frames to process.
             key_frame_ids_to_process = dt.sorted_keys(
@@ -209,38 +209,38 @@ class KeyTracks:
 
             # Process each key frame_id.
             if self.single_processor:
-                print('In KeyTracks.search_key_tracks(), starting key frame corner tracking (single processor)...')
+                print("In KeyTracks.search_key_tracks(), starting key frame corner tracking (single processor)...")
                 list_of_result_dicts = []
                 for key_frame_id in key_frame_ids_to_process:
                     list_of_result_dicts.append(self.search_key_track(key_frame_id))
             else:
-                print('In KeyTracks.search_key_tracks(), starting key frame corner tracking (multi-processor)...')
+                print("In KeyTracks.search_key_tracks(), starting key frame corner tracking (multi-processor)...")
                 logger = logt.multiprocessing_logger(self.log_dir_body_ext, level=logging.INFO)
-                logger.info('================================= Execution =================================')
+                logger.info("================================= Execution =================================")
                 with Pool(25) as pool:
                     list_of_result_dicts = pool.map(self.search_key_track, key_frame_ids_to_process)
 
             print(
-                'In KeyTracks.search_key_tracks(), key frame corner tracking done.  len(list_of_result_dicts) =',
+                "In KeyTracks.search_key_tracks(), key frame corner tracking done.  len(list_of_result_dicts) =",
                 len(list_of_result_dicts),
             )
 
             # Summarize search results.
-            print('In KeyTracks.find_and_save_key_tracks(), key_frame_projected_track_fnxls:')
+            print("In KeyTracks.find_and_save_key_tracks(), key_frame_projected_track_fnxls:")
             for result_dict in list_of_result_dicts:
-                key_frame_id = result_dict['key_frame_id']
-                key_frame_projected_track_fnxl = result_dict['key_frame_projected_track_fnxl']
+                key_frame_id = result_dict["key_frame_id"]
+                key_frame_projected_track_fnxl = result_dict["key_frame_projected_track_fnxl"]
                 print(
-                    '    ' + str(key_frame_id) + ':'
+                    "    " + str(key_frame_id) + ":"
                 )  # Using "str(key_frame_id)" is okay, because we don't want leading zeros.
                 key_frame_projected_track_fnxl.print(max_value_length=200, indent=8)
-            print('In KeyTracks.find_and_save_key_tracks(), key_frame_confirmed_track_fnxls:')
+            print("In KeyTracks.find_and_save_key_tracks(), key_frame_confirmed_track_fnxls:")
             for result_dict in list_of_result_dicts:
-                key_frame_id = result_dict['key_frame_id']
-                key_frame_confirmed_track_fnxl = result_dict['key_frame_confirmed_track_fnxl']
-                key_frame_confirmed_track_fnxl = result_dict['key_frame_confirmed_track_fnxl']
+                key_frame_id = result_dict["key_frame_id"]
+                key_frame_confirmed_track_fnxl = result_dict["key_frame_confirmed_track_fnxl"]
+                key_frame_confirmed_track_fnxl = result_dict["key_frame_confirmed_track_fnxl"]
                 print(
-                    '    ' + str(key_frame_id) + ':'
+                    "    " + str(key_frame_id) + ":"
                 )  # Using "str(key_frame_id)" is okay, because we don't want leading zeros.
                 key_frame_confirmed_track_fnxl.print(max_value_length=200, indent=8)
 
@@ -259,7 +259,7 @@ class KeyTracks:
 
     def search_key_track(self, key_frame_id):
         # Notify start.
-        print('In KeyTracks.search_key_track(), fetching key frames for key_frame_id=' + str(key_frame_id) + '...')
+        print("In KeyTracks.search_key_track(), fetching key frames for key_frame_id=" + str(key_frame_id) + "...")
 
         # Initialize logger.
         if not self.single_processor:
@@ -271,10 +271,10 @@ class KeyTracks:
         try:
             # Input key frame corners.
             key_frame_projected_corners_fnxl = self.key_projected_corners_dict[key_frame_id][
-                'key_frame_projected_corners_fnxl'
+                "key_frame_projected_corners_fnxl"
             ]
             key_frame_confirmed_corners_fnxl = self.key_confirmed_corners_dict[key_frame_id][
-                'key_frame_confirmed_corners_fnxl'
+                "key_frame_confirmed_corners_fnxl"
             ]
 
             # Solar field parameters.
@@ -282,8 +282,8 @@ class KeyTracks:
 
             # Execution control.
             iterations = 3  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
-            canny_levels = ['medium', 'light']  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
-            solvePnPtype = 'pnp'  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
+            canny_levels = ["medium", "light"]  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
+            solvePnPtype = "pnp"  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
             # # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
             # # Test runs were made with values of None and None for cam_matrix and dist_coeff.  However, study of the routine solvePNP() in utils.py
             # # and also routine confirm_corners() in KeyFrameTrackSearch.py indicate that the value of CameraMatrix and DistCoefs in utils.py are
@@ -298,14 +298,14 @@ class KeyTracks:
             # dist_coeff=utils.DistCoeffs  # Note: Untested code!
             cam_matrix = None  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
             dist_coeff = None  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
-            confirm_type = ''  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
+            confirm_type = ""  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
 
             # Execute search.
             logt.info(
                 local_logger,
-                'In KeyTracks.search_key_track_aux(), searching for corners in key_frame_id='
+                "In KeyTracks.search_key_track_aux(), searching for corners in key_frame_id="
                 + str(key_frame_id)
-                + '...',
+                + "...",
             )
             search_result = kfts.KeyFrameTrackSearch(  # Execution control.
                 iterations,  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
@@ -329,20 +329,20 @@ class KeyTracks:
 
             logt.info(
                 local_logger,
-                'In KeyTracks.search_key_track_aux(), corners done key_frame_id=' + str(key_frame_id) + '.',
+                "In KeyTracks.search_key_track_aux(), corners done key_frame_id=" + str(key_frame_id) + ".",
             )
         except:
             error_type, error_instance, traceback = sys.exc_info()
             logt.log_and_raise_value_error(
                 local_logger,
-                'In KeyTracks.search_key_track(), Key Frame 1 Processing Exception: ' + str(error_instance.args[0]),
+                "In KeyTracks.search_key_track(), Key Frame 1 Processing Exception: " + str(error_instance.args[0]),
             )
 
         # Assemble result dictionary.
         result_dict = {}
-        result_dict['key_frame_id'] = key_frame_id
-        result_dict['key_frame_projected_track_fnxl'] = search_result.key_frame_projected_track_fnxl
-        result_dict['key_frame_confirmed_track_fnxl'] = search_result.key_frame_confirmed_track_fnxl
+        result_dict["key_frame_id"] = key_frame_id
+        result_dict["key_frame_projected_track_fnxl"] = search_result.key_frame_projected_track_fnxl
+        result_dict["key_frame_confirmed_track_fnxl"] = search_result.key_frame_confirmed_track_fnxl
         return result_dict
 
     # WRITE RESULT
@@ -351,30 +351,30 @@ class KeyTracks:
         ft.create_directories_if_necessary(self.output_data_dir)
         # The FrameNameXyList track results for each key frame.
         for result_dict in list_of_result_dicts:
-            key_frame_id_str = upf.frame_id_str_given_frame_id(result_dict['key_frame_id'], self.input_frame_id_format)
+            key_frame_id_str = upf.frame_id_str_given_frame_id(result_dict["key_frame_id"], self.input_frame_id_format)
             # Projected.
-            key_frame_projected_track_fnxl = result_dict['key_frame_projected_track_fnxl']
+            key_frame_projected_track_fnxl = result_dict["key_frame_projected_track_fnxl"]
             key_frame_projected_track_body_ext = (
-                self.input_video_body + '_' + key_frame_id_str + '_projected_tracks_fnxl.csv'
+                self.input_video_body + "_" + key_frame_id_str + "_projected_tracks_fnxl.csv"
             )
             key_frame_projected_track_dir_body_ext = os.path.join(
                 self.key_frame_projected_tracks_dir, key_frame_projected_track_body_ext
             )
             print(
-                'In KeyTracks.save_key_tracks(), writing found projected key frame track: ',
+                "In KeyTracks.save_key_tracks(), writing found projected key frame track: ",
                 key_frame_projected_track_dir_body_ext,
             )
             key_frame_projected_track_fnxl.save(key_frame_projected_track_dir_body_ext)
             # Confirmed.
-            key_frame_confirmed_track_fnxl = result_dict['key_frame_confirmed_track_fnxl']
+            key_frame_confirmed_track_fnxl = result_dict["key_frame_confirmed_track_fnxl"]
             key_frame_confirmed_track_body_ext = (
-                self.input_video_body + '_' + key_frame_id_str + '_confirmed_tracks_fnxl.csv'
+                self.input_video_body + "_" + key_frame_id_str + "_confirmed_tracks_fnxl.csv"
             )
             key_frame_confirmed_track_dir_body_ext = os.path.join(
                 self.key_frame_confirmed_tracks_dir, key_frame_confirmed_track_body_ext
             )
             print(
-                'In KeyTracks.save_key_tracks(), writing found confirmed key frame track: ',
+                "In KeyTracks.save_key_tracks(), writing found confirmed key frame track: ",
                 key_frame_confirmed_track_dir_body_ext,
             )
             key_frame_confirmed_track_fnxl.save(key_frame_confirmed_track_dir_body_ext)
@@ -382,17 +382,17 @@ class KeyTracks:
     def save_data(self, list_of_result_dicts):
         # Statistics.
         summary_dict = {}
-        summary_dict['n_key_frame_tracks'] = len(list_of_result_dicts)
-        print('In KeyTracks.save_data(), writing key frame summary statistics...')
-        ft.write_dict_file('key frame tracks summary statistics', self.output_data_dir, self.dict_body, summary_dict)
+        summary_dict["n_key_frame_tracks"] = len(list_of_result_dicts)
+        print("In KeyTracks.save_data(), writing key frame summary statistics...")
+        ft.write_dict_file("key frame tracks summary statistics", self.output_data_dir, self.dict_body, summary_dict)
         # Tracked frames per key frame.
         tracked_frames_per_key_frame_dict = {}
         for result_dict in list_of_result_dicts:
-            key_frame_id = result_dict['key_frame_id']
-            key_frame_projected_track_fnxl = result_dict['key_frame_projected_track_fnxl']
+            key_frame_id = result_dict["key_frame_id"]
+            key_frame_projected_track_fnxl = result_dict["key_frame_projected_track_fnxl"]
             tracked_frames_per_key_frame_dict[key_frame_id] = key_frame_projected_track_fnxl.number_of_frames()
         print(
-            'In KeyTracks.save_data(), writing tracked_frames per key frame:',
+            "In KeyTracks.save_data(), writing tracked_frames per key frame:",
             os.path.join(self.output_data_dir, self.tfpkf_body_ext),
         )
         ft.write_dict_file(None, self.output_data_dir, self.tfpkf_body, tracked_frames_per_key_frame_dict)
@@ -402,7 +402,7 @@ class KeyTracks:
     def read_key_tracks(self):
         # Projected.
         print(
-            'In KeyTracks.read_key_tracks(), reading found key frame projected tracks directory: ',
+            "In KeyTracks.read_key_tracks(), reading found key frame projected tracks directory: ",
             self.key_frame_projected_tracks_dir,
         )
         key_frame_projected_track_body_ext_list = ft.files_in_directory(self.key_frame_projected_tracks_dir)
@@ -414,7 +414,7 @@ class KeyTracks:
             )
             self.list_of_key_frame_projected_track_dir_body_ext.append(key_frame_projected_track_dir_body_ext)
             print(
-                'In KeyTracks.read_key_tracks(), reading found key frame projected track:        ',
+                "In KeyTracks.read_key_tracks(), reading found key frame projected track:        ",
                 key_frame_projected_track_dir_body_ext,
             )
             key_frame_projected_track_fnxl = fnxl.FrameNameXyList()
@@ -422,7 +422,7 @@ class KeyTracks:
             self.list_of_key_frame_projected_track_fnxls.append(key_frame_projected_track_fnxl)
         # Confirmed.
         print(
-            'In KeyTracks.read_key_tracks(), reading found key frame confirmed tracks directory: ',
+            "In KeyTracks.read_key_tracks(), reading found key frame confirmed tracks directory: ",
             self.key_frame_confirmed_tracks_dir,
         )
         key_frame_confirmed_track_body_ext_list = ft.files_in_directory(self.key_frame_confirmed_tracks_dir)
@@ -434,7 +434,7 @@ class KeyTracks:
             )
             self.list_of_key_frame_confirmed_track_dir_body_ext.append(key_frame_confirmed_track_dir_body_ext)
             print(
-                'In KeyTracks.read_key_tracks(), reading found key frame confirmed track:        ',
+                "In KeyTracks.read_key_tracks(), reading found key frame confirmed track:        ",
                 key_frame_confirmed_track_dir_body_ext,
             )
             key_frame_confirmed_track_fnxl = fnxl.FrameNameXyList()
@@ -443,24 +443,24 @@ class KeyTracks:
 
     def read_data(self):
         # Statistics.
-        print('In KeyTracks.read_data(), reading frame statistics: ', self.dict_dir_body_ext)
+        print("In KeyTracks.read_data(), reading frame statistics: ", self.dict_dir_body_ext)
         self.frame_statistics_dict = ft.read_dict(self.dict_dir_body_ext)
         # Confirm what was read.
-        print('In KeyTracks.read_data(), frame statistics read:')
+        print("In KeyTracks.read_data(), frame statistics read:")
         dt.print_dict(self.frame_statistics_dict, indent=4)
         # Tracked frames per key frame.
-        print('In KeyTracks.read_data(), reading tracked frames per key frame: ', self.tfpkf_dir_body_ext)
+        print("In KeyTracks.read_data(), reading tracked frames per key frame: ", self.tfpkf_dir_body_ext)
         self.tfpkf_dict = ft.read_dict(self.tfpkf_dir_body_ext)
         # Confirm what was read.
-        print('In KeyTracks.read_data(), tracked frames per key frame read:')
+        print("In KeyTracks.read_data(), tracked frames per key frame read:")
         dt.print_dict(self.tfpkf_dict, max_keys=7, max_value_length=200, indent=4)
 
     # RENDER RESULT
 
     def render(self):
         if self.render_control.draw_key_tracks and self.generated_key_tracks:  # Don't render unless we generated.
-            print('In KeyTracks.render(), rendering key frame tracks...')
-            print('WARNING: In KeyTracks.render(), track rendering not implemented yet.')
+            print("In KeyTracks.render(), rendering key frame tracks...")
+            print("WARNING: In KeyTracks.render(), track rendering not implemented yet.")
 
 
 if __name__ == "__main__":
@@ -478,36 +478,36 @@ if __name__ == "__main__":
     # log_dir_body_ext                = experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/Small_150_KeyTracks/mavic_zoom/log/KeyTracks_log.txt'
     log_dir_body_ext = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/150_KeyTracks/mavic_zoom/log/KeyTracks_log.txt'
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/150_KeyTracks/mavic_zoom/log/KeyTracks_log.txt"
     )
     # Input/output sources.
     input_video_dir_body_ext = (
-        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + "2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4"
     )
     input_key_projected_corners_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/data/key_corners/'
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/data/key_corners/"
     )  # ?? SCAFFOLDING RCB -- BUG: USING PROJECTED CORNERS FOR BOTH PROJECTED AND CONFIRMED.
     input_key_confirmed_corners_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/data/key_corners/'
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/140_KeyCorners/mavic_zoom/data/key_corners/"
     )  # ?? SCAFFOLDING RCB -- BUG: USING PROJECTED CORNERS FOR BOTH PROJECTED AND CONFIRMED.
     input_frame_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/'
+        + "2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/"
     )
-    input_frame_id_format = '06d'  # Note different from format used in ffmpeg call, which is '.%06d'
+    input_frame_id_format = "06d"  # Note different from format used in ffmpeg call, which is '.%06d'
     # output_data_dir                 = experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/Small_150_KeyTracks/mavic_zoom/data/'
     # output_render_dir               = experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/Small_150_KeyTracks/mavic_zoom/render/'
     # output_construction_dir         = experiment_dir() + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/Small_150c_KeyTracks/mavic_zoom/'
     output_data_dir = (
-        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/150_KeyTracks/mavic_zoom/data/'
+        experiment_dir() + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/150_KeyTracks/mavic_zoom/data/"
     )
     output_render_dir = (
-        experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/150_KeyTracks/mavic_zoom/render/'
+        experiment_dir() + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/150_KeyTracks/mavic_zoom/render/"
     )
     output_construction_dir = (
-        experiment_dir() + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/150c_KeyTracks/mavic_zoom/'
+        experiment_dir() + "2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/150c_KeyTracks/mavic_zoom/"
     )
     # Render control.
     render_control = rckt.default()

@@ -8,7 +8,7 @@ from opencsp.app.sofast.lib.MeasurementSofastFringe import MeasurementSofastFrin
 import opencsp.app.sofast.lib.DistanceOpticScreen as osd
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 
-sys.path.append(os.path.join(opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(opencsp_code_dir(), ".."))
 import contrib.test_data_generation.downsample_data_general as ddg  # nopep8
 
 

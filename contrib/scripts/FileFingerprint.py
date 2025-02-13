@@ -8,7 +8,7 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
-sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(orp.opencsp_code_dir(), ".."))
 import contrib.scripts.AbstractFileFingerprint as aff  # nopep8
 
 
@@ -33,7 +33,7 @@ class FileFingerprint(ci.CsvInterface, aff.AbstractFileFingerprint):
         return delimeter.join([str(value) for value in values])
 
     @classmethod
-    def from_csv_line(cls, data: list[str]) -> tuple['FileFingerprint', list[str]]:
+    def from_csv_line(cls, data: list[str]) -> tuple["FileFingerprint", list[str]]:
         """Construct an instance of this class from the pre-split csv line 'data'. Also return any leftover portion of the csv line that wasn't used."""
         root, name_ext, size, hash_hex = data[0], data[1], data[2], data[3]
         size = int(size)
@@ -47,7 +47,7 @@ class FileFingerprint(ci.CsvInterface, aff.AbstractFileFingerprint):
             file_hash = hashlib.sha256(fin.read()).hexdigest()
         return cls(relative_path, file_name_ext, file_size, file_hash)
 
-    def __lt__(self, other: 'FileFingerprint'):
+    def __lt__(self, other: "FileFingerprint"):
         if not isinstance(other, FileFingerprint):
             lt.error_and_raise(TypeError, f"'other' is not of type FileFingerprint but instead of type {type(other)}")
         if self.relative_path == other.relative_path:

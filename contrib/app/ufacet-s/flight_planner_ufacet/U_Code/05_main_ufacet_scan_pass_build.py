@@ -170,19 +170,19 @@ if __name__ == "__main__":
 
     # Per-run input parameters.
     #    scan_type = 'Raster'
-    raster_scan_parameter_file = 'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
-    scan_type = 'UFACET'
-    ufacet_scan_parameter_file = 'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
+    raster_scan_parameter_file = "DUMMY FILL IN LATER"  # ?? SCAFFOLDING RCB -- TEMPORARY
+    scan_type = "UFACET"
+    ufacet_scan_parameter_file = "DUMMY FILL IN LATER"  # ?? SCAFFOLDING RCB -- TEMPORARY
     elevation_offset = 0.0  # m.
 
     # Define solar field.
     solar_field_spec = {}
-    solar_field_spec['name'] = 'Sandia NSTTF'
-    solar_field_spec['short_name'] = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat'] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_origin_lon_lat'] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_heliostat_file'] = './data/NSTTF_Heliostats.csv'
-    solar_field_spec['field_facet_centroids_file'] = './data/NSTTF_Facet_Centroids.csv'
+    solar_field_spec["name"] = "Sandia NSTTF"
+    solar_field_spec["short_name"] = "NSTTF"
+    solar_field_spec["field_origin_lon_lat"] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
+    solar_field_spec["field_origin_lon_lat"] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
+    solar_field_spec["field_heliostat_file"] = "./data/NSTTF_Heliostats.csv"
+    solar_field_spec["field_facet_centroids_file"] = "./data/NSTTF_Facet_Centroids.csv"
 
     # Define tracking parameters.
     # Aim point.

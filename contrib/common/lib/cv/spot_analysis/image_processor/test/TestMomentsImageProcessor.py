@@ -106,5 +106,5 @@ class TestMomentsImageProcessor(unittest.TestCase):
             image.save(image_path_name_ext)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

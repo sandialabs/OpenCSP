@@ -22,8 +22,8 @@ class TestRegionDetector(unittest.TestCase):
     def load_image(self, image_path_name_ext: str):
         # Load (and average) the reference images
         image_processors = {
-            'Avg': AverageByGroupImageProcessor(lambda o: 0, lambda l: None),
-            'Conv': ConvolutionImageProcessor(kernel="gaussian", diameter=3),
+            "Avg": AverageByGroupImageProcessor(lambda o: 0, lambda l: None),
+            "Conv": ConvolutionImageProcessor(kernel="gaussian", diameter=3),
         }
 
         sa = SpotAnalysis("averager", list(image_processors.values()))
@@ -77,5 +77,5 @@ class TestRegionDetector(unittest.TestCase):
         self.assertAlmostEqual(corners["bl"].y[0], 773, delta=5)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

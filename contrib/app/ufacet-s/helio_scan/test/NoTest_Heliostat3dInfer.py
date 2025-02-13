@@ -47,7 +47,7 @@ class Test_Heliostat3dInfer:
         self.heliostat_3d_file_suffix = heliostat_3d_file_suffix
         self.theoretical_heliostat_dir_body_ext = theoretical_heliostat_dir_body_ext
 
-        all_files = glob.glob(input_heliostat_2d_corners_dir + '*')
+        all_files = glob.glob(input_heliostat_2d_corners_dir + "*")
         self.files = []
         for file in all_files:
             if self.heliostat_3d_file_suffix in file:
@@ -65,44 +65,44 @@ class Test_Heliostat3dInfer:
         hel_name = self.heliostat_name_given_heliostat_2d_corner_trajectories_dir_body_ext(
             input_corner_2d_trajectories_file
         )
-        executable_output_body_ext = hel_name + '_reconstructed.txt'
+        executable_output_body_ext = hel_name + "_reconstructed.txt"
         executable_output_dir_body_ext = os.path.join(self.output_heliostat_3d_dir, executable_output_body_ext)
         print(
-            'In Test_Heliostat3dInfer.execute_infer_3d(), input_corner_2d_trajectories_file = '
+            "In Test_Heliostat3dInfer.execute_infer_3d(), input_corner_2d_trajectories_file = "
             + input_corner_2d_trajectories_file
         )
-        print('In Test_Heliostat3dInfer.execute_infer_3d(), hel_name = ' + hel_name)
+        print("In Test_Heliostat3dInfer.execute_infer_3d(), hel_name = " + hel_name)
         print(
-            'In Test_Heliostat3dInfer.execute_infer_3d(), executable_output_dir_body_ext = '
+            "In Test_Heliostat3dInfer.execute_infer_3d(), executable_output_dir_body_ext = "
             + executable_output_dir_body_ext
         )
-        print('\nIn Test_Heliostat3dInfer.execute_infer_3d(), self.heliostat_theoretical:')
+        print("\nIn Test_Heliostat3dInfer.execute_infer_3d(), self.heliostat_theoretical:")
         dt.print_dict(self.heliostat_theoretical)
         # hel_name   = file.split('/')[-1].split('_')[0]
 
         # Perform the 3-d inference.
         # print('In Test_Heliostat3dInfer.execute_infer_3d(), calling call_executable() for heliostat ' + hel_name + '...')
         # self.call_executable(file)
-        print('In In Test_Heliostat3dInfer.execute_infer_3d(), REPLACING CALL_EXECUTABLE()...')
+        print("In In Test_Heliostat3dInfer.execute_infer_3d(), REPLACING CALL_EXECUTABLE()...")
         assert False
 
-        print('In Test_Heliostat3dInfer.execute_infer_3d(), call_executable() for heliostat ' + hel_name + ' finished.')
+        print("In Test_Heliostat3dInfer.execute_infer_3d(), call_executable() for heliostat " + hel_name + " finished.")
 
         # We plan to recompile the C++ executable to have more fine-grain control over its output filename, but not today.
         # So rename the output file to match our naming standard.
-        print('In Test_Heliostat3dInfer.execute_infer_3d(), renaming output file for heliostat ' + hel_name + '...')
-        executable_output_body_ext = hel_name + '_reconstructed.txt'
+        print("In Test_Heliostat3dInfer.execute_infer_3d(), renaming output file for heliostat " + hel_name + "...")
+        executable_output_body_ext = hel_name + "_reconstructed.txt"
         executable_output_dir_body_ext = os.path.join(self.output_heliostat_3d_dir, executable_output_body_ext)
         heliostat_3d_dir_body_ext = os.path.join(
-            self.output_heliostat_3d_dir, hel_name + '_' + self.confirm_distort_str + '_corners_3d.txt'
+            self.output_heliostat_3d_dir, hel_name + "_" + self.confirm_distort_str + "_corners_3d.txt"
         )
         ft.rename_file(executable_output_dir_body_ext, heliostat_3d_dir_body_ext)
 
-        print('In Test_Heliostat3dInfer.execute_infer_3d(), calling generate_plots() for heliostat ' + hel_name + '...')
+        print("In Test_Heliostat3dInfer.execute_infer_3d(), calling generate_plots() for heliostat " + hel_name + "...")
         uh3a.generate_plots(
             heliostat_3d_dir_body_ext, output_evaluation_plot_dir, self.specifications, self.heliostat_theoretical
         )
-        print('In Test_Heliostat3dInfer.execute_infer_3d(), generate_plots() for heliostat ' + hel_name + ' finished.')
+        print("In Test_Heliostat3dInfer.execute_infer_3d(), generate_plots() for heliostat " + hel_name + " finished.")
 
         return heliostat_3d_dir_body_ext
 
@@ -130,11 +130,11 @@ class Test_Heliostat3dInfer:
         #                                  hel_name, self.output_heliostat_3d_dir])
         #         proc.wait()
 
-        print('In Test_Heliostat3dInfer.call_executable(), executable for heliostat ' + hel_name + ' finished.')
+        print("In Test_Heliostat3dInfer.call_executable(), executable for heliostat " + hel_name + " finished.")
 
     def perform_3d_inference(self, single_execution=True):
-        print('self.files =', self.files)
-        print('In Test_Heliostat3dInfer.perform_3d_inference(), starting reconstruction...')
+        print("self.files =", self.files)
+        print("In Test_Heliostat3dInfer.perform_3d_inference(), starting reconstruction...")
         if single_execution:
             heliostat_3d_dir_body_ext_list = []
             for file in self.files:
@@ -142,18 +142,18 @@ class Test_Heliostat3dInfer:
         else:
             with Pool(36) as pool:
                 heliostat_3d_dir_body_ext_list = pool.map(self.execute_infer_3d, self.files)
-        print('In Test_Heliostat3dInfer.perform_3d_inference() reconstruction finished.')
+        print("In Test_Heliostat3dInfer.perform_3d_inference() reconstruction finished.")
 
-        print('heliostat_3d_dir_body_ext_list = ', heliostat_3d_dir_body_ext_list)
+        print("heliostat_3d_dir_body_ext_list = ", heliostat_3d_dir_body_ext_list)
 
-        print('In Test_Heliostat3dInfer.perform_3d_inference(), starting csv file generation...')
+        print("In Test_Heliostat3dInfer.perform_3d_inference(), starting csv file generation...")
         output_evaluation_csv_dir_2 = (
-            self.output_evaluation_csv_dir + '/'
+            self.output_evaluation_csv_dir + "/"
         )  # ?? SCAFFOLDING RCB -- MAKE THIS PLATFORM INDEPENDENT.
         uh3a.generate_csv(
             heliostat_3d_dir_body_ext_list, output_evaluation_csv_dir_2, self.specifications, self.heliostat_theoretical
         )
-        print('In Test_Heliostat3dInfer.perform_3d_inference() csv files finished.')
+        print("In Test_Heliostat3dInfer.perform_3d_inference() csv files finished.")
 
     def heliostat_name_given_heliostat_2d_corner_trajectories_dir_body_ext(
         self, heliostat_2d_corner_trajectories_dir_body_ext
@@ -163,7 +163,7 @@ class Test_Heliostat3dInfer:
             heliostat_2d_corner_trajectories_body,
             heliostat_2d_corner_trajectories_ext,
         ) = ft.path_components(heliostat_2d_corner_trajectories_dir_body_ext)
-        tokens = heliostat_2d_corner_trajectories_body.split('_')
+        tokens = heliostat_2d_corner_trajectories_body.split("_")
         trajectories_str = tokens[-1]
         two_d_str = tokens[-2]
         corner_str = tokens[-3]
@@ -175,7 +175,7 @@ class Test_Heliostat3dInfer:
 
 if __name__ == "__main__":
     executable_path = (
-        home_dir() + 'Code/ufacet_code/Test_Heliostat3dInfer/bin/reconstruct_main.out'
+        home_dir() + "Code/ufacet_code/Test_Heliostat3dInfer/bin/reconstruct_main.out"
     )  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS.  PASS IN?
 
     # # 02_StandardExample
@@ -189,28 +189,28 @@ if __name__ == "__main__":
     # theoretical_heliostat_dir_body_ext = experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Corners.csv'  # ?? SCAFFOLDING RCB -- MOVE THIS INTO TEST DATA.
 
     # 01_Study_5W1
-    confirm_distort_str = 'confirmed_undistorted'
+    confirm_distort_str = "confirmed_undistorted"
     input_heliostat_2d_corners_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/input_merged_tracks/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/input_merged_tracks/"
     )
     output_heliostat_3d_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/output_reconstructed_heliostats/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/output_reconstructed_heliostats/"
     )
     output_evaluation_plot_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/output_evaluation_plots/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/output_evaluation_plots/"
     )
     output_evaluation_csv_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/output_evaluation_csv_files/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-10-02_Study_Heliostat3dInfer/01_Study_5W1_solo/output_evaluation_csv_files/"
     )
     cam_matrix = utils.CameraMatrix  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
-    heliostat_3d_file_suffix = '_' + confirm_distort_str + '_corner_2d_trajectories.txt'
+    heliostat_3d_file_suffix = "_" + confirm_distort_str + "_corner_2d_trajectories.txt"
     theoretical_heliostat_dir_body_ext = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Corners.csv'
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Corners.csv"
     )  # ?? SCAFFOLDING RCB -- MOVE THIS INTO TEST DATA.
 
     # # 02_Study_5W1_9E9_11W1_14E3
@@ -235,5 +235,5 @@ if __name__ == "__main__":
         theoretical_heliostat_dir_body_ext,
     )
 
-    print('\n\nAt toplevel, calling perform_3d_inference()...')
+    print("\n\nAt toplevel, calling perform_3d_inference()...")
     rec.perform_3d_inference(single_execution=True)

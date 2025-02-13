@@ -11,7 +11,7 @@ class Match:
     colend: int
     line: str
     line_part: str
-    matcher: 'SensitiveStringMatcher'
+    matcher: "SensitiveStringMatcher"
     msg: str = ""
 
 
@@ -140,6 +140,6 @@ class SensitiveStringMatcher:
     def set_match_msg(self, match: Match, pattern: re.Pattern | str, line_context: str):
         log_msg = (
             f"'{self.name}' string matched to pattern '{pattern}' on line {match.lineno} "
-            + f"[{match.colno}:{match.colend}]: \"{line_context.strip()}\" (\"{match.line.strip()}\")"
+            + f'[{match.colno}:{match.colend}]: "{line_context.strip()}" ("{match.line.strip()}")'
         )
         match.msg = log_msg

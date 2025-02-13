@@ -136,9 +136,9 @@ class NameFrameXyList:
         """
         if hel_name in self.dictionary:
             print(
-                'ERROR: In NameFrameXyList.add_list_of_frame_xy_lists(), attempt to add hel_name='
+                "ERROR: In NameFrameXyList.add_list_of_frame_xy_lists(), attempt to add hel_name="
                 + str(hel_name)
-                + ', which is already present.'
+                + ", which is already present."
             )
             assert False
         self.dictionary[hel_name] = input_list_of_frame_xy_lists
@@ -172,7 +172,7 @@ class NameFrameXyList:
                 else:
                     if error_if_common_frame:
                         print(
-                            'ERROR: In NameFrameXyList.merge_list_of_frame_xy_lists(), attempt to add xy_list for hel_name='
+                            "ERROR: In NameFrameXyList.merge_list_of_frame_xy_lists(), attempt to add xy_list for hel_name="
                             + str(hel_name)
                             + ' and frame="'
                             + str(input_frame_copy)
@@ -181,11 +181,11 @@ class NameFrameXyList:
                         assert False
                     if warn_if_common_frame:
                         if skip_if_common_frame:
-                            suffix = '  Skipping.'
+                            suffix = "  Skipping."
                         else:
-                            suffix = ''
+                            suffix = ""
                         print(
-                            'WARNING: In NameFrameXyList.merge_list_of_frame_xy_lists(), attempt to add xy_list for hel_name='
+                            "WARNING: In NameFrameXyList.merge_list_of_frame_xy_lists(), attempt to add xy_list for hel_name="
                             + str(hel_name)
                             + ' and frame="'
                             + str(input_frame_copy)
@@ -196,7 +196,7 @@ class NameFrameXyList:
                     if not skip_if_common_frame:
                         if warn_if_common_frame:
                             print(
-                                'WARNING: In NameFrameXyList.merge_list_of_frame_xy_lists(), adding to already-existing (hel_name='
+                                "WARNING: In NameFrameXyList.merge_list_of_frame_xy_lists(), adding to already-existing (hel_name="
                                 + str(hel_name)
                                 + ', frame="'
                                 + str(input_frame_copy)
@@ -236,7 +236,7 @@ class NameFrameXyList:
             else:
                 if error_if_common_frame:
                     print(
-                        'ERROR: In NameFrameXyList.merge_frame_xy_lists(), attempt to add xy_list for hel_name='
+                        "ERROR: In NameFrameXyList.merge_frame_xy_lists(), attempt to add xy_list for hel_name="
                         + str(hel_name)
                         + ' and frame="'
                         + str(input_frame_copy)
@@ -245,11 +245,11 @@ class NameFrameXyList:
                     assert False
                 if warn_if_common_frame:
                     if skip_if_common_frame:
-                        suffix = '  Skipping.'
+                        suffix = "  Skipping."
                     else:
-                        suffix = ''
+                        suffix = ""
                     print(
-                        'WARNING: In NameFrameXyList.merge_frame_xy_lists(), attempt to add xy_list for hel_name='
+                        "WARNING: In NameFrameXyList.merge_frame_xy_lists(), attempt to add xy_list for hel_name="
                         + str(hel_name)
                         + ' and frame="'
                         + str(input_frame_copy)
@@ -260,7 +260,7 @@ class NameFrameXyList:
                 if not skip_if_common_frame:
                     if warn_if_common_frame:
                         print(
-                            'WARNING: In NameFrameXyList.merge_frame_xy_lists(), adding to already-existing (hel_name='
+                            "WARNING: In NameFrameXyList.merge_frame_xy_lists(), adding to already-existing (hel_name="
                             + str(hel_name)
                             + ', frame="'
                             + str(input_frame_copy)
@@ -309,10 +309,10 @@ class NameFrameXyList:
         # print('In NameFrameXyList.load(), loading input file: ', input_dir_body_ext)
         # Check if the input file exists.
         if not ft.file_exists(input_dir_body_ext):
-            raise OSError('In NameFrameXyList.load(), file does not exist: ' + str(input_dir_body_ext))
+            raise OSError("In NameFrameXyList.load(), file does not exist: " + str(input_dir_body_ext))
         # Open and read the file.
-        with open(input_dir_body_ext, newline='') as input_stream:
-            reader = csv.reader(input_stream, delimiter=',')
+        with open(input_dir_body_ext, newline="") as input_stream:
+            reader = csv.reader(input_stream, delimiter=",")
             for input_row in reader:
                 self.add_row_to_dictionary(input_row)
 
@@ -369,7 +369,7 @@ class NameFrameXyList:
         # Write the heliostat dictionary in a structured format.
         # print('In NameFrameXyList.save(), saving file:', output_dir_body_ext)
         with open(output_dir_body_ext, "w") as output_stream:
-            writer = csv.writer(output_stream, delimiter=',')
+            writer = csv.writer(output_stream, delimiter=",")
             # Assemble the row.
             for hel_name in dt.sorted_keys(self.dictionary):
                 row_items = [hel_name]

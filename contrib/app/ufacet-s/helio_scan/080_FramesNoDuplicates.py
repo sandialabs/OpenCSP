@@ -33,15 +33,15 @@ class FramesNoDuplicates:
     ):  # Flags to control rendering on this run.
         # Check input.
         if (input_video_dir_body_ext == None) or (len(input_video_dir_body_ext) == 0):
-            raise ValueError('In FramesNoDuplicates.__init__(), null input_video_dir_body_ext encountered.')
+            raise ValueError("In FramesNoDuplicates.__init__(), null input_video_dir_body_ext encountered.")
         if (input_frame_dir == None) or (len(input_frame_dir) == 0):
-            raise ValueError('In FramesNoDuplicates.__init__(), null input_frame_dir encountered.')
+            raise ValueError("In FramesNoDuplicates.__init__(), null input_frame_dir encountered.")
         if (output_data_dir == None) or (len(output_data_dir) == 0):
-            raise ValueError('In FramesNoDuplicates.__init__(), null output_data_dir encountered.')
+            raise ValueError("In FramesNoDuplicates.__init__(), null output_data_dir encountered.")
         if (output_render_dir == None) or (len(output_render_dir) == 0):
-            raise ValueError('In FramesNoDuplicates.__init__(), null output_render_dir encountered.')
+            raise ValueError("In FramesNoDuplicates.__init__(), null output_render_dir encountered.")
         if (output_frame_dir == None) or (len(output_frame_dir) == 0):
-            raise ValueError('In FramesNoDuplicates.__init__(), null output_frame_dir encountered.')
+            raise ValueError("In FramesNoDuplicates.__init__(), null output_frame_dir encountered.")
 
         # Parse input video path components.
         input_video_dir, input_video_body, input_video_ext = ft.path_components(input_video_dir_body_ext)
@@ -60,18 +60,18 @@ class FramesNoDuplicates:
         self.render_control = render_control
 
         # Summary statistics file name.
-        self.dict_body = self.input_video_body + '_frames_non_duplicate_statistics'
-        self.dict_body_ext = self.dict_body + '.csv'
+        self.dict_body = self.input_video_body + "_frames_non_duplicate_statistics"
+        self.dict_body_ext = self.dict_body + ".csv"
         self.dict_dir_body_ext = os.path.join(self.output_data_dir, self.dict_body_ext)
 
         # File listing non-duplicate file names.
-        self.non_duplicate_body = self.input_video_body + '_non_duplicate_frame_files'
-        self.non_duplicate_body_ext = self.non_duplicate_body + '.txt'
+        self.non_duplicate_body = self.input_video_body + "_non_duplicate_frame_files"
+        self.non_duplicate_body_ext = self.non_duplicate_body + ".txt"
         self.non_duplicate_dir_body_ext = os.path.join(self.output_data_dir, self.non_duplicate_body_ext)
 
         # File listing duplicate file names.
-        self.duplicate_body = self.input_video_body + '_duplicate_frame_files'
-        self.duplicate_body_ext = self.duplicate_body + '.txt'
+        self.duplicate_body = self.input_video_body + "_duplicate_frame_files"
+        self.duplicate_body_ext = self.duplicate_body + ".txt"
         self.duplicate_dir_body_ext = os.path.join(self.output_data_dir, self.duplicate_body_ext)
 
         # Extract frames, if not already.
@@ -90,7 +90,7 @@ class FramesNoDuplicates:
 
         # Check if frames are already copied.
         if ft.directory_is_empty(self.output_frame_dir):
-            print('In FramesNoDuplicates.filter_frames_and_write_data(), filtering frames...')
+            print("In FramesNoDuplicates.filter_frames_and_write_data(), filtering frames...")
 
             # Identify duplicate frames.
             (non_duplicate_frame_files, duplicate_frame_files) = vm.identify_duplicate_frames(
@@ -100,9 +100,9 @@ class FramesNoDuplicates:
             # Copy non-duplicate frames to frame output directory.
             for frame_file in non_duplicate_frame_files:
                 print(
-                    'In FramesNoDuplicates.filter_frames_and_write_data(), copying frame: '
+                    "In FramesNoDuplicates.filter_frames_and_write_data(), copying frame: "
                     + frame_file
-                    + '  to  '
+                    + "  to  "
                     + output_frame_dir
                 )
                 ft.copy_file(os.path.join(input_frame_dir, frame_file), output_frame_dir)
@@ -111,20 +111,20 @@ class FramesNoDuplicates:
             # Create the output data directory if necessary.
             ft.create_directories_if_necessary(self.output_data_dir)
             summary_dict = {}
-            summary_dict['n_frames_non_duplicates'] = len(non_duplicate_frame_files)
-            summary_dict['n_frames_duplicates'] = len(duplicate_frame_files)
-            print('In FramesNoDuplicates.filter_frames_and_write_data(), writing frame summary statistics...')
+            summary_dict["n_frames_non_duplicates"] = len(non_duplicate_frame_files)
+            summary_dict["n_frames_duplicates"] = len(duplicate_frame_files)
+            print("In FramesNoDuplicates.filter_frames_and_write_data(), writing frame summary statistics...")
             ft.write_dict_file(
-                'frame summary statistics (duplicates removed)', self.output_data_dir, self.dict_body, summary_dict
+                "frame summary statistics (duplicates removed)", self.output_data_dir, self.dict_body, summary_dict
             )
             ft.write_text_file(
-                'non-duplicate frames', self.output_data_dir, self.non_duplicate_body, non_duplicate_frame_files
+                "non-duplicate frames", self.output_data_dir, self.non_duplicate_body, non_duplicate_frame_files
             )
-            ft.write_text_file('duplicate frames', self.output_data_dir, self.duplicate_body, duplicate_frame_files)
+            ft.write_text_file("duplicate frames", self.output_data_dir, self.duplicate_body, duplicate_frame_files)
 
     # LOAD RESULT
     def read_data(self):
-        print('In FramesNoDuplicates.read_data(), reading frame statistics: ', self.dict_dir_body_ext)
+        print("In FramesNoDuplicates.read_data(), reading frame statistics: ", self.dict_dir_body_ext)
         self.frame_statistics_dict = ft.read_dict(self.dict_dir_body_ext)
 
     # RENDER RESULT
@@ -133,12 +133,12 @@ class FramesNoDuplicates:
             self.draw_example_frames()
 
     def draw_example_frames(self):
-        print('In FramesNoDuplicates.draw_example_frames(), drawing example frames...')
+        print("In FramesNoDuplicates.draw_example_frames(), drawing example frames...")
         upf.draw_example_frames(
             self.output_frame_dir,
             self.output_render_dir,
             self.render_control,
-            delete_suffix='.JPG_fig.png',
+            delete_suffix=".JPG_fig.png",
             n_intervals=10,
             include_figure_idx_in_filename=False,
         )
@@ -146,23 +146,23 @@ class FramesNoDuplicates:
 
 if __name__ == "__main__":
     input_video_dir_body_ext = (
-        experiment_dir() + '2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4'
+        experiment_dir() + "2020-12-03_FastScan1/2_Data/20201203/1544_NS_U/mavic_zoom/DJI_427t_428_429.MP4"
     )
     input_frame_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/070c_ExtractedFrames/mavic_zoom/frames/'
+        + "2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/070c_ExtractedFrames/mavic_zoom/frames/"
     )
     output_data_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/080_FramesNoDuplicates/mavic_zoom/data/'
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/080_FramesNoDuplicates/mavic_zoom/data/"
     )
     output_render_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/080_FramesNoDuplicates/mavic_zoom/render/'
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/080_FramesNoDuplicates/mavic_zoom/render/"
     )
     output_frame_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/'
+        + "2020-12-03_FastScan1/3_Post/Construction/20201203/1544_NS_U/080c_FramesNoDuplicates/mavic_zoom/frames/"
     )
     tolerance_image_size = 0
     tolerance_image_pixel = 0

@@ -18,7 +18,7 @@ def abs_w(name_pqw):
 
 def heliostat_name_pqw_list_within_margin(solar_field, section_view_spec, ufacet_scan_parameters):
     # Fetch required control parameters.
-    margin_w = ufacet_scan_parameters['candidate_margin_w']
+    margin_w = ufacet_scan_parameters["candidate_margin_w"]
     # Find heliostats within margin.
     heliostat_name_pqw_list = []
     for heliostat in solar_field.heliostats:
@@ -69,7 +69,7 @@ def select_min_w_reject_nearby_p_aux(
 
 def select_min_w_reject_nearby_p(candidate_heliostat_name_pqw_list, ufacet_scan_parameters):
     # Fetch required control parameters.
-    discard_threshold_p = ufacet_scan_parameters['discard_threshold_p']
+    discard_threshold_p = ufacet_scan_parameters["discard_threshold_p"]
     # Prepare recursion variables.
     selected_heliostat_name_pqw_list = []
     rejected_heliostat_name_pqw_list = []
@@ -110,17 +110,17 @@ def construct_ufacet_section(solar_field, best_fit_segment_xy, ufacet_scan_param
     rejected_heliostat_name_list = [name_pqw[0] for name_pqw in rejected_heliostat_name_pqw_list]
     # Store results.
     section = {}
-    section['view_spec'] = section_view_spec
-    section['candidate_heliostat_name_list'] = candidate_heliostat_name_list
-    section['selected_heliostat_name_list'] = selected_heliostat_name_list
-    section['rejected_heliostat_name_list'] = rejected_heliostat_name_list
+    section["view_spec"] = section_view_spec
+    section["candidate_heliostat_name_list"] = candidate_heliostat_name_list
+    section["selected_heliostat_name_list"] = selected_heliostat_name_list
+    section["rejected_heliostat_name_list"] = rejected_heliostat_name_list
     # Return.
     return section
 
 
 def construct_ufacet_sections(solar_field, list_of_best_fit_segment_xys, ufacet_scan_parameters):
     # Notify progress.
-    print('Constructing UFACET scan sections...')
+    print("Constructing UFACET scan sections...")
 
     # Analyze each segment.
     section_list = []

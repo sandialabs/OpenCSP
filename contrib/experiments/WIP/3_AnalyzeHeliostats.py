@@ -160,7 +160,7 @@ def process_images(
         return (int(ret[0]), int(ret[1]))
 
     # build the list of image processors for the primary image
-    remove_leftover_noise = BackgroundColorSubtractionImageProcessor('constant', [2])
+    remove_leftover_noise = BackgroundColorSubtractionImageProcessor("constant", [2])
     image_processors = {
         "EchoEcho": EchoImageProcessor(),
         "AvgGroup": AverageByGroupImageProcessor(),
@@ -175,12 +175,12 @@ def process_images(
         "HotSpots": HotspotImageProcessor(15, record_visualization=True),
         "SpotSize": SpotWidthImageProcessor(spot_width_technique="fwhm"),
         "VFalseCl": ViewFalseColorImageProcessor(),
-        "VOverExp": ViewHighlightImageProcessor(base_image_selector='visualization', black_highlight_color=(70, 0, 70)),
-        "VAnnotat": ViewAnnotationsImageProcessor(base_image_selector='visualization'),
+        "VOverExp": ViewHighlightImageProcessor(base_image_selector="visualization", black_highlight_color=(70, 0, 70)),
+        "VAnnotat": ViewAnnotationsImageProcessor(base_image_selector="visualization"),
         "_VFalse2": ViewFalseColorImageProcessor(),
-        "_VOverE2": ViewHighlightImageProcessor(base_image_selector='visualization', black_highlight_color=(70, 0, 70)),
+        "_VOverE2": ViewHighlightImageProcessor(base_image_selector="visualization", black_highlight_color=(70, 0, 70)),
         "VCrosSec": ViewCrossSectionImageProcessor(
-            hotspot_pixel_locator, single_plot=False, y_range=(0, 255), base_image_selector='visualization'
+            hotspot_pixel_locator, single_plot=False, y_range=(0, 255), base_image_selector="visualization"
         ),
         "EnclEnrg": EnclosedEnergyImageProcessor("hotspot", percentages_of_interest=[0.85], plot_x_limit_pixels=600),
     }

@@ -220,9 +220,9 @@ class FrameNameXyList(csvi.CsvInterface):
         """
         if frame_id in self.dictionary:
             print(
-                'ERROR: In FrameNameXyList.add_list_of_name_xy_lists(), attempt to add frame_id='
+                "ERROR: In FrameNameXyList.add_list_of_name_xy_lists(), attempt to add frame_id="
                 + str(frame_id)
-                + ', which is already present.'
+                + ", which is already present."
             )
             assert False
         self.dictionary[frame_id] = input_list_of_name_xy_lists
@@ -258,7 +258,7 @@ class FrameNameXyList(csvi.CsvInterface):
                 else:
                     if error_if_common_name:
                         print(
-                            'ERROR: In FrameNameXyList.merge_list_of_name_xy_lists(), attempt to add xy_list for frame_id='
+                            "ERROR: In FrameNameXyList.merge_list_of_name_xy_lists(), attempt to add xy_list for frame_id="
                             + str(frame_id)
                             + ' and name="'
                             + str(input_name_copy)
@@ -267,11 +267,11 @@ class FrameNameXyList(csvi.CsvInterface):
                         assert False
                     if warn_if_common_name:
                         if skip_if_common_name:
-                            suffix = '  Skipping.'
+                            suffix = "  Skipping."
                         else:
-                            suffix = ''
+                            suffix = ""
                         print(
-                            'WARNING: In FrameNameXyList.merge_list_of_name_xy_lists(), attempt to add xy_list for frame_id='
+                            "WARNING: In FrameNameXyList.merge_list_of_name_xy_lists(), attempt to add xy_list for frame_id="
                             + str(frame_id)
                             + ' and name="'
                             + str(input_name_copy)
@@ -282,7 +282,7 @@ class FrameNameXyList(csvi.CsvInterface):
                     if not skip_if_common_name:
                         if warn_if_common_name:
                             print(
-                                'WARNING: In FrameNameXyList.merge_list_of_name_xy_lists(), adding to already-existing (frame_id='
+                                "WARNING: In FrameNameXyList.merge_list_of_name_xy_lists(), adding to already-existing (frame_id="
                                 + str(frame_id)
                                 + ', name="'
                                 + str(input_name_copy)
@@ -317,10 +317,10 @@ class FrameNameXyList(csvi.CsvInterface):
         # print('In FrameNameXyList.load(), loading input file: ', input_dir_body_ext)
         # Check if the input file exists.
         if not ft.file_exists(input_dir_body_ext):
-            raise OSError('In FrameNameXyList.load(), file does not exist: ' + str(input_dir_body_ext))
+            raise OSError("In FrameNameXyList.load(), file does not exist: " + str(input_dir_body_ext))
         # Open and read the file.
-        with open(input_dir_body_ext, newline='') as input_stream:
-            reader = csv.reader(input_stream, delimiter=',')
+        with open(input_dir_body_ext, newline="") as input_stream:
+            reader = csv.reader(input_stream, delimiter=",")
             for input_row in reader:
                 self.add_row_to_dictionary(input_row)
 
@@ -481,21 +481,21 @@ class FrameNameXyList(csvi.CsvInterface):
 
         # Call draw_frame(), using appropriate execution mode.
         if single_processor == True:
-            print('In In FrameNameXyList.draw_frames(), starting frame rendering (single processor)...')
+            print("In In FrameNameXyList.draw_frames(), starting frame rendering (single processor)...")
             for frame_id in self.dictionary.keys():
                 self.draw_frame(frame_id)
-            print('In In FrameNameXyList.draw_frames(), frame rendering done.')
+            print("In In FrameNameXyList.draw_frames(), frame rendering done.")
 
         elif single_processor == False:
-            print('In In FrameNameXyList.draw_frames(), starting frame rendering (multi-processor)...')
+            print("In In FrameNameXyList.draw_frames(), starting frame rendering (multi-processor)...")
             logger = logt.multiprocessing_logger(log_dir_body_ext, level=logging.INFO)
-            logger.info('================================= Execution =================================')
+            logger.info("================================= Execution =================================")
             with Pool(25) as pool:
                 pool.map(self.draw_frame, self.dictionary.keys())
-            print('In In FrameNameXyList.draw_frames(), frame rendering done.')
+            print("In In FrameNameXyList.draw_frames(), frame rendering done.")
 
         else:
-            print('ERROR: In FrameNameXyList.draw_frames(), unexpected value single_processor =', str(single_processor))
+            print("ERROR: In FrameNameXyList.draw_frames(), unexpected value single_processor =", str(single_processor))
             assert False
 
     def draw_frame(self, frame_id: int):
@@ -529,14 +529,14 @@ class FrameNameXyList(csvi.CsvInterface):
             if close_xy_list:
                 if len(active_xy_list_2) < 3:
                     print(
-                        'ERROR: In FrameNameXyList.draw_frame(), attempting to close an xy_list with too few vertices; len(xy_list) =',
+                        "ERROR: In FrameNameXyList.draw_frame(), attempting to close an xy_list with too few vertices; len(xy_list) =",
                         len(active_xy_list_2),
                     )
                     assert False
                 first_pt = active_xy_list_2[0]
                 active_xy_list_2.append(first_pt)
-            annotation_list.append(pa.PlotAnnotation('point_seq', active_xy_list_2, None, style_dict['point_seq']))
-            annotation_list.append(pa.PlotAnnotation('text', [label_xy], hel_name, style_dict['text']))
+            annotation_list.append(pa.PlotAnnotation("point_seq", active_xy_list_2, None, style_dict["point_seq"]))
+            annotation_list.append(pa.PlotAnnotation("text", [label_xy], hel_name, style_dict["text"]))
         # Prepare crop_box.
         # Crop box is [[x_min, y_min], [x_max, y_max]] or None.
         if crop:
@@ -550,7 +550,7 @@ class FrameNameXyList(csvi.CsvInterface):
         ip.plot_image_figure(
             frame_img,
             rgb=False,
-            title=(str(input_video_body) + ' Frame ' + str(frame_id) + ', ' + title_name),
+            title=(str(input_video_body) + " Frame " + str(frame_id) + ", " + title_name),
             annotation_list=annotation_list,
             crop_box=crop_box,
             context_str=context_str,

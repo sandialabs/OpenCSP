@@ -7,7 +7,7 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 
 # setting path
-sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(orp.opencsp_code_dir(), ".."))
 import contrib.scripts.sensitive_strings as ss  # nopep8
 
 
@@ -82,5 +82,5 @@ class test_sensitive_strings(unittest.TestCase):
         self.assertEqual(searcher.search_files(), 1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

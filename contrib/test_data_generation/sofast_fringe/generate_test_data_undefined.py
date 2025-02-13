@@ -20,7 +20,7 @@ def generate_dataset(
     """Generates and saves dataset"""
     # Check output file exists
     if not exists(dirname(file_dataset_out)):
-        raise FileNotFoundError(f'Output directory {file_dataset_out:s} does not exist.')
+        raise FileNotFoundError(f"Output directory {file_dataset_out:s} does not exist.")
 
     # Load components
     camera = Camera.load_from_hdf(file_camera)
@@ -39,7 +39,7 @@ def generate_dataset(
 
     # Define surface data
     surface_data = dict(
-        surface_type='parabolic', initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=False, downsample=10
+        surface_type="parabolic", initial_focal_lengths_xy=(100.0, 100.0), robust_least_squares=False, downsample=10
     )
 
     # Process optic data
@@ -50,7 +50,7 @@ def generate_dataset(
     display.save_to_hdf(file_dataset_out)
     camera.save_to_hdf(file_dataset_out)
     calibration.save_to_hdf(file_dataset_out)
-    print(f'All data saved to: {file_dataset_out:s}')
+    print(f"All data saved to: {file_dataset_out:s}")
 
     # Show slope map
     mask = sofast.data_image_processing_facet[0].mask_processed
@@ -58,19 +58,19 @@ def generate_dataset(
     slopes = np.sqrt(np.sum(slopes_xy**2, 0))
     image = np.zeros(mask.shape) * np.nan
     image[mask] = slopes
-    plt.imshow(image, cmap='jet')
-    plt.title('Slope Magnitude')
+    plt.imshow(image, cmap="jet")
+    plt.title("Slope Magnitude")
     plt.show()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Generate measurement set 1 data
-    base_dir = join(opencsp_code_dir(), 'test/data/measurements_sofast_fringe')
+    base_dir = join(opencsp_code_dir(), "test/data/measurements_sofast_fringe")
 
     generate_dataset(
-        file_measurement=join(base_dir, 'measurement_facet.h5'),
-        file_camera=join(base_dir, 'camera.h5'),
-        file_display=join(base_dir, 'display_distorted_2d.h5'),
-        file_calibration=join(base_dir, 'image_calibration.h5'),
-        file_dataset_out=join(base_dir, 'calculations_undefined_mirror/data.h5'),
+        file_measurement=join(base_dir, "measurement_facet.h5"),
+        file_camera=join(base_dir, "camera.h5"),
+        file_display=join(base_dir, "display_distorted_2d.h5"),
+        file_calibration=join(base_dir, "image_calibration.h5"),
+        file_dataset_out=join(base_dir, "calculations_undefined_mirror/data.h5"),
     )

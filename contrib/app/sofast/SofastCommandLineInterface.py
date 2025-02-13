@@ -31,7 +31,7 @@ from opencsp.common.lib.tool.time_date_tools import current_date_time_string_for
 class SofastCommandLineInterface:
     """Sofast Command Line Interface class."""
 
-    def __init__(self) -> 'SofastCommandLineInterface':
+    def __init__(self) -> "SofastCommandLineInterface":
         # Common sofast parameters
         self.image_acquisition: ImageAcquisition = None
         self.camera: Camera = None
@@ -66,11 +66,11 @@ class SofastCommandLineInterface:
         """Fixed pattern dot spacing, pixels"""
 
         # Save directories
-        self.dir_save_fringe: str = ''
+        self.dir_save_fringe: str = ""
         """Location to save Sofast Fringe measurement data"""
-        self.dir_save_fixed: str = ''
+        self.dir_save_fixed: str = ""
         """Location to save Sofast Fixed measurement data"""
-        self.dir_save_fringe_calibration: str = ''
+        self.dir_save_fringe_calibration: str = ""
         """Location to save Sofast Fringe calibration data"""
 
     def run(self) -> None:
@@ -163,22 +163,22 @@ class SofastCommandLineInterface:
 
     def func_run_fringe_measurement(self) -> None:
         """Runs sofast fringe measurement"""
-        lt.info(f'{timestamp():s} Starting Sofast Fringe measurement')
+        lt.info(f"{timestamp():s} Starting Sofast Fringe measurement")
         self.timestamp_fringe_measurement = timestamp()
 
         def _on_done():
-            lt.info(f'{timestamp():s} Completed Sofast Fringe measurement')
+            lt.info(f"{timestamp():s} Completed Sofast Fringe measurement")
             self.system_fringe.run_next_in_queue()
 
         self.system_fringe.run_measurement(_on_done)
 
     def func_run_fixed_measurement(self) -> None:
         """Runs Sofast Fixed measurement"""
-        lt.info(f'{timestamp():s} Starting Sofast Fixed measurement')
+        lt.info(f"{timestamp():s} Starting Sofast Fixed measurement")
         self.timestamp_fixed_measurement = timestamp()
 
         def _f1():
-            lt.info(f'{timestamp():s} Completed Sofast Fixed measurement')
+            lt.info(f"{timestamp():s} Completed Sofast Fixed measurement")
             self.system_fixed.run_next_in_queue()
 
         self.system_fixed.prepend_to_queue([self.system_fixed.run_measurement, _f1])
@@ -191,7 +191,7 @@ class SofastCommandLineInterface:
 
     def func_process_sofast_fringe_data(self):
         """Processes Sofast Fringe data"""
-        lt.info(f'{timestamp():s} Starting Sofast Fringe data processing')
+        lt.info(f"{timestamp():s} Starting Sofast Fringe data processing")
 
         # Get Measurement object
         measurement = self.system_fringe.get_measurements(
@@ -207,29 +207,29 @@ class SofastCommandLineInterface:
         # Process
         sofast.process_optic_singlefacet(self.facet_definition, self.surface_fringe)
 
-        lt.info(f'{timestamp():s} Completed Sofast Fringe data processing')
+        lt.info(f"{timestamp():s} Completed Sofast Fringe data processing")
 
         # Plot optic
         mirror = sofast.get_optic().mirror
 
-        lt.debug(f'{timestamp():s} Plotting Sofast Fringe data')
+        lt.debug(f"{timestamp():s} Plotting Sofast Fringe data")
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         axis_control_m = rca.meters()
-        fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
+        fig_record = fm.setup_figure(figure_control, axis_control_m, title="")
         mirror.plot_orthorectified_slope(self.res_plot, clim=self.colorbar_limit, axis=fig_record.axis)
-        fig_record.save(self.dir_save_fringe, f'{self.timestamp_fringe_measurement:s}_slope_magnitude_fringe', 'png')
+        fig_record.save(self.dir_save_fringe, f"{self.timestamp_fringe_measurement:s}_slope_magnitude_fringe", "png")
         fig_record.close()
 
         # Save processed sofast data
-        sofast.save_to_hdf(f'{self.dir_save_fringe:s}/{self.timestamp_fringe_measurement:s}_data_sofast_fringe.h5')
-        lt.debug(f'{timestamp():s} Sofast Fringe data saved to HDF5')
+        sofast.save_to_hdf(f"{self.dir_save_fringe:s}/{self.timestamp_fringe_measurement:s}_data_sofast_fringe.h5")
+        lt.debug(f"{timestamp():s} Sofast Fringe data saved to HDF5")
 
         # Continue
         self.system_fringe.run_next_in_queue()
 
     def func_process_sofast_fixed_data(self):
         """Process Sofast Fixed data"""
-        lt.info(f'{timestamp():s} Starting Sofast Fixed data processing')
+        lt.info(f"{timestamp():s} Starting Sofast Fixed data processing")
         # Get Measurement object
         measurement = self.system_fixed.get_measurement(
             self.measure_point_optic, self.dist_optic_screen, self.origin, name=self.name_optic
@@ -239,23 +239,23 @@ class SofastCommandLineInterface:
         # Process
         self.process_sofast_fixed.process_single_facet_optic(self.surface_fixed)
 
-        lt.info(f'{timestamp():s} Completed Sofast Fixed data processing')
+        lt.info(f"{timestamp():s} Completed Sofast Fixed data processing")
 
         # Plot optic
         mirror = self.process_sofast_fixed.get_mirror()
 
-        lt.debug(f'{timestamp():s} Plotting Sofast Fixed data')
+        lt.debug(f"{timestamp():s} Plotting Sofast Fixed data")
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         axis_control_m = rca.meters()
-        fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
+        fig_record = fm.setup_figure(figure_control, axis_control_m, title="")
         mirror.plot_orthorectified_slope(self.res_plot, clim=self.colorbar_limit, axis=fig_record.axis)
-        fig_record.save(self.dir_save_fixed, f'{self.timestamp_fixed_measurement:s}_slope_magnitude_fixed', 'png')
+        fig_record.save(self.dir_save_fixed, f"{self.timestamp_fixed_measurement:s}_slope_magnitude_fixed", "png")
 
         # Save processed sofast data
         self.process_sofast_fixed.save_to_hdf(
-            f'{self.dir_save_fixed:s}/{self.timestamp_fixed_measurement:s}_data_sofast_fixed.h5'
+            f"{self.dir_save_fixed:s}/{self.timestamp_fixed_measurement:s}_data_sofast_fixed.h5"
         )
-        lt.debug(f'{timestamp():s} Sofast Fixed data saved to HDF5')
+        lt.debug(f"{timestamp():s} Sofast Fixed data saved to HDF5")
 
         # Continue
         self.system_fixed.run_next_in_queue()
@@ -265,7 +265,7 @@ class SofastCommandLineInterface:
         measurement = self.system_fringe.get_measurements(
             self.measure_point_optic, self.dist_optic_screen, self.name_optic
         )[0]
-        file = f'{self.dir_save_fringe:s}/{self.timestamp_fringe_measurement:s}_measurement_fringe.h5'
+        file = f"{self.dir_save_fringe:s}/{self.timestamp_fringe_measurement:s}_measurement_fringe.h5"
         measurement.save_to_hdf(file)
         self.system_fringe.calibration.save_to_hdf(file)
         self.system_fringe.run_next_in_queue()
@@ -275,28 +275,28 @@ class SofastCommandLineInterface:
         measurement = self.system_fixed.get_measurement(
             self.measure_point_optic, self.dist_optic_screen, self.origin, name=self.name_optic
         )
-        measurement.save_to_hdf(f'{self.dir_save_fixed:s}/{self.timestamp_fixed_measurement:s}_measurement_fixed.h5')
+        measurement.save_to_hdf(f"{self.dir_save_fixed:s}/{self.timestamp_fixed_measurement:s}_measurement_fixed.h5")
         self.system_fixed.run_next_in_queue()
 
     def func_load_last_sofast_fringe_image_cal(self):
         """Loads last ImageCalibration object"""
         # Find file
-        files = glob.glob(join(self.dir_save_fringe_calibration, 'image_calibration_scaling*.h5'))
+        files = glob.glob(join(self.dir_save_fringe_calibration, "image_calibration_scaling*.h5"))
         files.sort()
 
         if len(files) == 0:
-            lt.error(f'No previous calibration files found in {self.dir_save_fringe_calibration}')
+            lt.error(f"No previous calibration files found in {self.dir_save_fringe_calibration}")
             return
 
         # Get latest file and set
         file = files[-1]
         image_calibration = ImageCalibrationScaling.load_from_hdf(file)
         self.system_fringe.set_calibration(image_calibration)
-        lt.info(f'{timestamp()} Loaded image calibration file: {file}')
+        lt.info(f"{timestamp()} Loaded image calibration file: {file}")
 
     def func_gray_levels_cal(self):
         """Runs gray level calibration sequence"""
-        file = join(self.dir_save_fringe_calibration, f'image_calibration_scaling_{timestamp():s}.h5')
+        file = join(self.dir_save_fringe_calibration, f"image_calibration_scaling_{timestamp():s}.h5")
         self.system_fringe.run_gray_levels_cal(
             ImageCalibrationScaling,
             file,
@@ -317,23 +317,23 @@ class SofastCommandLineInterface:
 
     def func_user_input(self):
         """Waits for user input"""
-        print('\n')
-        print('Value      Command')
-        print('------------------')
-        print('mrp        run Sofast Fringe measurement and process/save')
-        print('mrs        run Sofast Fringe measurement and save only')
-        print('mip        run Sofast Fixed measurement and process/save')
-        print('mis        run Sofast Fixed measurement and save only')
-        print('ce         calibrate camera exposure')
-        print('cr         calibrate camera-projector response')
-        print('lr         load most recent camera-projector response calibration file')
-        print('q          quit and close all')
-        print('im         show image from camera.')
-        print('lv         shows camera live view')
-        print('cross      show crosshairs')
-        retval = input('Input: ')
+        print("\n")
+        print("Value      Command")
+        print("------------------")
+        print("mrp        run Sofast Fringe measurement and process/save")
+        print("mrs        run Sofast Fringe measurement and save only")
+        print("mip        run Sofast Fixed measurement and process/save")
+        print("mis        run Sofast Fixed measurement and save only")
+        print("ce         calibrate camera exposure")
+        print("cr         calibrate camera-projector response")
+        print("lr         load most recent camera-projector response calibration file")
+        print("q          quit and close all")
+        print("im         show image from camera.")
+        print("lv         shows camera live view")
+        print("cross      show crosshairs")
+        retval = input("Input: ")
 
-        lt.debug(f'{timestamp():s} user input: {retval:s}')
+        lt.debug(f"{timestamp():s} user input: {retval:s}")
 
         try:
             self._run_given_input(retval)
@@ -343,21 +343,21 @@ class SofastCommandLineInterface:
 
     def _check_fringe_system_loaded(self) -> bool:
         if self.system_fringe is None:
-            lt.error(f'{timestamp()} No Sofast Fringe system loaded')
+            lt.error(f"{timestamp()} No Sofast Fringe system loaded")
             return False
         return True
 
     def _check_fixed_system_loaded(self) -> bool:
         if self.system_fixed is None:
-            lt.error(f'{timestamp()} No Sofast Fixed system loaded')
+            lt.error(f"{timestamp()} No Sofast Fixed system loaded")
             return False
         return True
 
     def _run_given_input(self, retval: str) -> None:
         """Runs the given command"""
         # Run fringe measurement and process/save
-        if retval == 'mrp':
-            lt.info(f'{timestamp()} Running Sofast Fringe measurement and processing/saving data')
+        if retval == "mrp":
+            lt.info(f"{timestamp()} Running Sofast Fringe measurement and processing/saving data")
             if self._check_fringe_system_loaded():
                 funcs = [
                     self.func_run_fringe_measurement,
@@ -371,8 +371,8 @@ class SofastCommandLineInterface:
             else:
                 self.func_user_input()
         # Run fringe measurement and save
-        elif retval == 'mrs':
-            lt.info(f'{timestamp()} Running Sofast Fringe measurement and saving data')
+        elif retval == "mrs":
+            lt.info(f"{timestamp()} Running Sofast Fringe measurement and saving data")
             if self._check_fringe_system_loaded():
                 funcs = [
                     self.func_run_fringe_measurement,
@@ -385,8 +385,8 @@ class SofastCommandLineInterface:
             else:
                 self.func_user_input()
         # Run fixed measurement and process/save
-        elif retval == 'mip':
-            lt.info(f'{timestamp()} Running Sofast Fixed measurement and processing/saving data')
+        elif retval == "mip":
+            lt.info(f"{timestamp()} Running Sofast Fixed measurement and processing/saving data")
             if self._check_fixed_system_loaded():
                 funcs = [
                     self.func_run_fixed_measurement,
@@ -399,8 +399,8 @@ class SofastCommandLineInterface:
             else:
                 self.func_user_input()
         # Run fixed measurement and save
-        elif retval == 'mis':
-            lt.info(f'{timestamp()} Running Sofast Fixed measurement and saving data')
+        elif retval == "mis":
+            lt.info(f"{timestamp()} Running Sofast Fixed measurement and saving data")
             if self._check_fixed_system_loaded():
                 funcs = [self.func_run_fixed_measurement, self.func_save_measurement_fixed, self.func_user_input]
                 self.system_fixed.set_queue(funcs)
@@ -408,13 +408,13 @@ class SofastCommandLineInterface:
             else:
                 self.func_user_input()
         # Calibrate exposure time
-        elif retval == 'ce':
-            lt.info(f'{timestamp()} Calibrating camera exposure')
+        elif retval == "ce":
+            lt.info(f"{timestamp()} Calibrating camera exposure")
             self.image_acquisition.calibrate_exposure()
             self.func_user_input()
         # Calibrate response
-        elif retval == 'cr':
-            lt.info(f'{timestamp()} Calibrating camera-projector response')
+        elif retval == "cr":
+            lt.info(f"{timestamp()} Calibrating camera-projector response")
             if self._check_fringe_system_loaded():
                 funcs = [self.func_gray_levels_cal]
                 self.system_fringe.set_queue(funcs)
@@ -422,63 +422,63 @@ class SofastCommandLineInterface:
             else:
                 self.func_user_input()
         # Load last fringe calibration file
-        elif retval == 'lr':
-            lt.info(f'{timestamp()} Loading response calibration')
+        elif retval == "lr":
+            lt.info(f"{timestamp()} Loading response calibration")
             if self._check_fringe_system_loaded():
                 self.func_load_last_sofast_fringe_image_cal()
             self.func_user_input()
         # Quit
-        elif retval == 'q':
-            lt.info(f'{timestamp():s} quitting')
+        elif retval == "q":
+            lt.info(f"{timestamp():s} quitting")
             if self.system_fringe is not None:
                 self.system_fringe.close_all()
             if self.system_fixed is not None:
                 self.system_fixed.close_all()
             return
         # Show single camera image
-        elif retval == 'im':
+        elif retval == "im":
             self.show_cam_image()
             self.func_user_input()
         # Show camera live view
-        elif retval == 'lv':
+        elif retval == "lv":
             self.show_live_view()
             self.func_user_input()
         # Project crosshairs
-        elif retval == 'cross':
+        elif retval == "cross":
             self.image_projection.show_crosshairs()
             self.func_user_input()
         else:
-            lt.error(f'{timestamp()} Command, {retval}, not recognized')
+            lt.error(f"{timestamp()} Command, {retval}, not recognized")
             self.func_user_input()
 
 
 # Start program
-if __name__ == '__main__':
+if __name__ == "__main__":
     # Define upper level save direcory
-    dir_save = abspath(join(dirname(__file__), '../../../../sofast_cli'))
+    dir_save = abspath(join(dirname(__file__), "../../../../sofast_cli"))
 
     # Define logger directory and set up logger
-    dir_log = join(dir_save, 'logs')
-    lt.logger(join(dir_log, f'log_{timestamp():s}.txt'), lt.log.INFO)
+    dir_log = join(dir_save, "logs")
+    lt.logger(join(dir_log, f"log_{timestamp():s}.txt"), lt.log.INFO)
 
     # Define directory containing Sofast calibration files
-    dir_cal = abspath(join(dirname(__file__), '../../../../sofast_calibration_files'))
+    dir_cal = abspath(join(dirname(__file__), "../../../../sofast_calibration_files"))
 
     # Define data files
-    file_facet_definition_json = join(dir_cal, 'facet_NSTTF.json')
-    file_spatial_orientation = join(dir_cal, 'spatial_orientation_optics_lab_landscape.h5')
-    file_display = join(dir_cal, 'display_shape_optics_lab_landscape_square_distorted_3d_100x100.h5')
-    file_camera = join(dir_cal, 'camera_sofast_optics_lab_landscape.h5')
-    file_image_projection = join(dir_cal, 'image_projection_optics_lab_landscape_square.h5')
-    file_dot_locs = join(dir_cal, 'dot_locations_optics_lab_landscape_square_width3_space6.h5')
+    file_facet_definition_json = join(dir_cal, "facet_NSTTF.json")
+    file_spatial_orientation = join(dir_cal, "spatial_orientation_optics_lab_landscape.h5")
+    file_display = join(dir_cal, "display_shape_optics_lab_landscape_square_distorted_3d_100x100.h5")
+    file_camera = join(dir_cal, "camera_sofast_optics_lab_landscape.h5")
+    file_image_projection = join(dir_cal, "image_projection_optics_lab_landscape_square.h5")
+    file_dot_locs = join(dir_cal, "dot_locations_optics_lab_landscape_square_width3_space6.h5")
 
     # Instantiate Sofast Command Line Interface
     sofast_cli = SofastCommandLineInterface()
 
     # Define sofast and calibration file save directories
-    sofast_cli.dir_save_fringe = join(dir_save, 'sofast_fringe')
-    sofast_cli.dir_save_fringe_calibration = join(sofast_cli.dir_save_fringe, 'calibration')
-    sofast_cli.dir_save_fixed = join(dir_save, 'sofast_fixed')
+    sofast_cli.dir_save_fringe = join(dir_save, "sofast_fringe")
+    sofast_cli.dir_save_fringe_calibration = join(sofast_cli.dir_save_fringe, "calibration")
+    sofast_cli.dir_save_fixed = join(dir_save, "sofast_fixed")
 
     # Load common data
     image_acquisition_in = ImageAcquisition(0)
@@ -493,7 +493,7 @@ if __name__ == '__main__':
     spatial_orientation_in = SpatialOrientation.load_from_hdf(file_spatial_orientation)
     measure_point_optic_in = Vxyz((0, 0, 0))  # meters
     dist_optic_screen_in = 10.158  # meters
-    name_optic_in = 'Test optic'
+    name_optic_in = "Test optic"
 
     sofast_cli.set_common_data(
         image_acquisition_in,

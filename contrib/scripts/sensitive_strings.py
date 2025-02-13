@@ -19,15 +19,15 @@ import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.time_date_tools as tdt
 
-sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(orp.opencsp_code_dir(), ".."))
 import contrib.scripts.FileCache as fc  # nopep8
 import contrib.scripts.FileFingerprint as ff  # nopep8
 import contrib.scripts.SensitiveStringMatcher as ssm  # nopep8
 
 
 class SensitiveStringsSearcher:
-    _text_file_extensions = ['.txt', '.csv', '.py', '.md', '.rst']
-    _text_file_path_name_exts = ['.coverageac']
+    _text_file_extensions = [".txt", ".csv", ".py", ".md", ".rst"]
+    _text_file_path_name_exts = [".coverageac"]
 
     def __init__(
         self,
@@ -269,17 +269,17 @@ class SensitiveStringsSearcher:
             lt.info("    " + relative_path_name_ext)
             lt.info("Is this unknown binary file safe to add, and doesn't contain any sensitive information (y/n)?")
             if self.verify_all_on_behalf_of_user:
-                val = 'y'
+                val = "y"
             else:
                 resp = input("").strip()
-                val = 'n' if len(resp) == 0 else resp[0]
+                val = "n" if len(resp) == 0 else resp[0]
             lt.info(f"    User responded '{val}'")
 
         else:
             lt.info("")
             lt.info("Is this image safe to add, and doesn't contain any sensitive information (y/n)?")
             if self.verify_all_on_behalf_of_user:
-                val = 'y'
+                val = "y"
             else:
                 cv2.imshow(cv_title, cv_img)
                 key = cv2.waitKey(0)
@@ -287,19 +287,19 @@ class SensitiveStringsSearcher:
                 time.sleep(0.1)  # small delay to prevent accidental double-bounces
 
                 # Check for 'y' or 'n'
-                if key == ord('y') or key == ord('Y'):
-                    val = 'y'
-                elif key == ord('n') or key == ord('N'):
-                    val = 'n'
+                if key == ord("y") or key == ord("Y"):
+                    val = "y"
+                elif key == ord("n") or key == ord("N"):
+                    val = "n"
                 else:
-                    val = '?'
+                    val = "?"
             if val.lower() in ["y", "n"]:
                 lt.info(f"    User responded '{val}'")
             else:
                 lt.error("Did not respond with either 'y' or 'n'. Assuming 'n'.")
-                val = 'n'
+                val = "n"
 
-        return val.lower() == 'y'
+        return val.lower() == "y"
 
     def search_binary_file(self, binary_file: ff.FileFingerprint) -> list[ssm.Match]:
         norm_path = self.norm_path(binary_file.relative_path, binary_file.name_ext)
@@ -336,7 +336,7 @@ class SensitiveStringsSearcher:
             _, name, ext = ft.path_components(file_norm_path)
             if self._is_img_ext(ext):
                 try:
-                    img = Image.open(file_norm_path).convert('RGB')
+                    img = Image.open(file_norm_path).convert("RGB")
                 except:
                     img = None
                 if img is not None:
@@ -423,13 +423,13 @@ class SensitiveStringsSearcher:
             # 16-bit version of git will fail.
             git = st.get_executable_path("git", "mobaxterm")
             git_committed = st.run(
-                f"\"{git}\" ls-tree --full-tree --name-only -r HEAD",
+                f'"{git}" ls-tree --full-tree --name-only -r HEAD',
                 cwd=self.root_search_dir,
                 stdout="collect",
                 stderr="print",
             )
             git_added = st.run(
-                f"\"{git}\" diff --name-only --cached --diff-filter=A",
+                f'"{git}" diff --name-only --cached --diff-filter=A',
                 cwd=self.root_search_dir,
                 stdout="collect",
                 stderr="print",
@@ -547,7 +547,7 @@ class SensitiveStringsSearcher:
                         RuntimeError,
                         "Programmer error in sensitive_strings.search_files(): "
                         + "No binary files should be in the cache, but at least 1 such file was found: "
-                        + f"\"{file_cf.relative_path}/{file_cf.name_ext}\"",
+                        + f'"{file_cf.relative_path}/{file_cf.name_ext}"',
                     )
 
         # Save the cleared files cache
@@ -593,33 +593,33 @@ class SensitiveStringsSearcher:
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description='Sensitive strings searcher')
+    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description="Sensitive strings searcher")
     parser.add_argument(
-        '--no-interactive',
-        action='store_true',
+        "--no-interactive",
+        action="store_true",
         dest="ninteractive",
         help="Don't interactively ask the user about unknown binary files. Simply fail instead.",
     )
     parser.add_argument(
-        '--accept-all',
-        action='store_true',
+        "--accept-all",
+        action="store_true",
         dest="acceptall",
         help="Don't interactively ask the user about unknown binary files. Simply accept all as verified on the user's behalf. "
         + "This can be useful when you're confident that the only changes have been that the binary files have moved but not changed.",
     )
     parser.add_argument(
-        '--accept-unfound',
-        action='store_true',
+        "--accept-unfound",
+        action="store_true",
         dest="acceptunfound",
         help="Don't fail because of unfound expected binary files. Instead remove the expected files from the list of allowed binaries. "
         + "This can be useful when you're confident that the only changes have been that the binary files have moved but not changed.",
     )
     parser.add_argument(
-        '--progress', action='store_true', dest="print_progress", help="Draw the progress while scanning."
+        "--progress", action="store_true", dest="print_progress", help="Draw the progress while scanning."
     )
     parser.add_argument(
-        '--verbose',
-        action='store_true',
+        "--verbose",
+        action="store_true",
         dest="verbose",
         help="Print more information while running. Overrides '--progress'.",
     )
@@ -630,11 +630,11 @@ if __name__ == "__main__":
     print_progress: bool = args.print_progress
     verbose: bool = args.verbose
 
-    ss_log_dir = ft.norm_path(opencsp_settings['sensitive_strings']['sensitive_strings_dir'])
+    ss_log_dir = ft.norm_path(opencsp_settings["sensitive_strings"]["sensitive_strings_dir"])
     log_path = ft.norm_path(os.path.join(ss_log_dir, "sensitive_strings_log.txt"))
-    sensitive_strings_csv = ft.norm_path(opencsp_settings['sensitive_strings']['sensitive_strings_file'])
-    allowed_binary_files_csv = ft.norm_path(opencsp_settings['sensitive_strings']['allowed_binaries_file'])
-    ss_cache_file = ft.norm_path(opencsp_settings['sensitive_strings']['cache_file'])
+    sensitive_strings_csv = ft.norm_path(opencsp_settings["sensitive_strings"]["sensitive_strings_file"])
+    allowed_binary_files_csv = ft.norm_path(opencsp_settings["sensitive_strings"]["allowed_binaries_file"])
+    ss_cache_file = ft.norm_path(opencsp_settings["sensitive_strings"]["cache_file"])
     date_time_str = tdt.current_date_time_string_forfile()
 
     log_already_exists = os.path.exists(log_path)

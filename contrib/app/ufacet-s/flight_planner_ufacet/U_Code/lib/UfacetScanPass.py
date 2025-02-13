@@ -39,12 +39,12 @@ class UfacetScanPass:
         # ?? SCAFFOLDING RCB -- ELIMINATE DUPLICATION, CONFUSION.
         # ?? SCAFFOLDING RCB -- RENAME, SO THAT "SECTION" IS NOT OVER-USED..
         self.section_context = self.ufacet_scan_parameters.copy()  # Copy because we will add to this.
-        self.section_context['solar_field'] = self.solar_field
-        self.section_context['view_spec'] = self.section[
-            'view_spec'
+        self.section_context["solar_field"] = self.solar_field
+        self.section_context["view_spec"] = self.section[
+            "view_spec"
         ]  # ?? SCAFFOLDING RCB -- ELIMINATE DUPLICATION, CONFUSION.
         # Heliostats along this pass.
-        self.heliostat_name_list = self.section['selected_heliostat_name_list']
+        self.heliostat_name_list = self.section["selected_heliostat_name_list"]
 
         # Identify heliostats to assess along this pass.
         self.assess_heliostat_name_list = self.heliostat_name_list  # ?? SCAFFOLDING RCB -- ELIMINATE THIS DISTINCTION
@@ -52,7 +52,7 @@ class UfacetScanPass:
         # Define the clipping box for rendering.
         p_min = 1e9
         p_max = -1e9
-        view_spec = self.section['view_spec']
+        view_spec = self.section["view_spec"]
         # Find the extremal (p_min, p_max) values.
         for heliostat_name in self.heliostat_name_list:
             heliostat = self.solar_field.lookup_heliostat(heliostat_name)
@@ -68,13 +68,13 @@ class UfacetScanPass:
         p_margin = 20  # m.
         pq_min = [p_min - p_margin, q_min]
         pq_max = [p_max + p_margin, q_max]
-        self.section_context['clip_pq_box'] = [pq_min, pq_max]
+        self.section_context["clip_pq_box"] = [pq_min, pq_max]
 
     def waypoints(self):
         # Fetch path parameters.
-        locale = self.ufacet_scan_parameters['locale']
-        view_spec = self.section['view_spec']
-        pass_segment = self.pass_constraints['selected_cacg_segment']  # "cacg" == "constant altitude, constant gaze"
+        locale = self.ufacet_scan_parameters["locale"]
+        view_spec = self.section["view_spec"]
+        pass_segment = self.pass_constraints["selected_cacg_segment"]  # "cacg" == "constant altitude, constant gaze"
         # Construct start and end (x,y,z) points.
         start_pq = pass_segment[0]  # Lead-in distance added later.
         end_pq = pass_segment[1]  # Run-past distance added later.
@@ -86,11 +86,11 @@ class UfacetScanPass:
         theta = math.atan2(dy, dx)
         # Fetch gaze angle.
         # Fork based on desired gaze control.
-        gaze_type = self.ufacet_scan_parameters['gaze_type']
-        if gaze_type == 'constant':
+        gaze_type = self.ufacet_scan_parameters["gaze_type"]
+        if gaze_type == "constant":
             # Constant gaze.
             selected_cacg_etaC = self.pass_constraints[
-                'selected_cacg_etaC'
+                "selected_cacg_etaC"
             ]  # "cacg" == "constant altitude, constant gaze"
             start_eta = selected_cacg_etaC[0]
             end_eta = selected_cacg_etaC[0]
@@ -108,15 +108,15 @@ class UfacetScanPass:
             # end_etaC = last_constraints['selected_cacg_etaC']  # ?? SCAFFOLDING RCB -- INCORRECT; DOESN'T SELECT PATH TYPE.
             # end_eta = end_etaC[0]
         # Apply manual input gaze angle offset.
-        start_eta += self.ufacet_scan_parameters['delta_eta']
-        end_eta += self.ufacet_scan_parameters['delta_eta']
+        start_eta += self.ufacet_scan_parameters["delta_eta"]
+        end_eta += self.ufacet_scan_parameters["delta_eta"]
 
         # Determine speed.
-        speed = self.ufacet_scan_parameters['speed']  # m/sec.
+        speed = self.ufacet_scan_parameters["speed"]  # m/sec.
         print(
-            'WARNING: In UfacetScanPass.waypoints(), speed calculation not implemented yet. Setting speed to '
+            "WARNING: In UfacetScanPass.waypoints(), speed calculation not implemented yet. Setting speed to "
             + str(speed)
-            + ' m/sec.'
+            + " m/sec."
         )  # ?? RCB SCAFFOLDING -- STUB
         # Construct way points.
         start_wpt = wp.WayPoint(locale, start_xyz, theta, start_eta, stop=False, speed=speed)
@@ -143,7 +143,7 @@ class UfacetScanPass:
 
 def construct_ufacet_passes(solar_field, section_list, ufacet_scan_parameters):
     # Notify progress.
-    print('Constructing UFACET scan passes...')
+    print("Constructing UFACET scan passes...")
 
     # Construct hte scan passes.
     scan_pass_list = []

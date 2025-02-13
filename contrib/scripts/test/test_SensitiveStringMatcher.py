@@ -9,7 +9,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.time_date_tools as tdt
 
 # setting path
-sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(orp.opencsp_code_dir(), ".."))
 import contrib.scripts.SensitiveStringMatcher as ssm  # nopep8
 
 
@@ -69,39 +69,39 @@ class test_SensitiveStringMatcher(unittest.TestCase):
         matches = matcher.check_lines(["foo", "bar", "baz"])
         self.assertEqual(2, len(matches))
         self.assertEqual(2, matches[0].lineno)
-        self.assertEqual('bar', matches[0].line_part)
+        self.assertEqual("bar", matches[0].line_part)
         self.assertEqual(3, matches[1].lineno)
-        self.assertEqual('baz', matches[1].line_part)
+        self.assertEqual("baz", matches[1].line_part)
 
     def test_partial_single_regex(self):
         matcher = ssm.SensitiveStringMatcher("Regex Matcher", "**next_is_regex", r"[a-z]o[a-z]")
         matches = matcher.check_lines(["foobarbaz"])
         self.assertEqual(1, len(matches))
         self.assertEqual(0, matches[0].colno)
-        self.assertEqual('foo', matches[0].line_part)
+        self.assertEqual("foo", matches[0].line_part)
 
         matcher = ssm.SensitiveStringMatcher("Regex Matcher", "**next_is_regex", r"[a-z]{2}r")
         matches = matcher.check_lines(["foobarbaz"])
         self.assertEqual(1, len(matches))
         self.assertEqual(3, matches[0].colno)
-        self.assertEqual('bar', matches[0].line_part)
+        self.assertEqual("bar", matches[0].line_part)
 
         matcher = ssm.SensitiveStringMatcher("Regex Matcher", "**next_is_regex", r"[a-z]{2}z")
         matches = matcher.check_lines(["foobarbaz"])
         self.assertEqual(1, len(matches))
         self.assertEqual(6, matches[0].colno)
-        self.assertEqual('baz', matches[0].line_part)
+        self.assertEqual("baz", matches[0].line_part)
 
     def test_partial_multiple_regex(self):
         matcher = ssm.SensitiveStringMatcher("Regex Matcher", "**all_regex", r"[a-z]o[a-z]", r"[a-z]{2}r", r"[a-z]{2}z")
         matches = matcher.check_lines(["foobarbaz"])
         self.assertEqual(3, len(matches))
         self.assertEqual(0, matches[0].colno)
-        self.assertEqual('foo', matches[0].line_part)
+        self.assertEqual("foo", matches[0].line_part)
         self.assertEqual(3, matches[1].colno)
-        self.assertEqual('bar', matches[1].line_part)
+        self.assertEqual("bar", matches[1].line_part)
         self.assertEqual(6, matches[2].colno)
-        self.assertEqual('baz', matches[2].line_part)
+        self.assertEqual("baz", matches[2].line_part)
 
     def test_mixed_plain_regex(self):
         matcher = ssm.SensitiveStringMatcher("Basic Matcher", "foo", "**next_is_regex", r"[a-z]{2}r", "baz")
@@ -109,22 +109,22 @@ class test_SensitiveStringMatcher(unittest.TestCase):
         matches = matcher.check_lines(["foobarbaz"])
         self.assertLessEqual(1, len(matches))
         self.assertEqual(0, matches[0].colno)
-        self.assertEqual('foo', matches[0].line_part)
+        self.assertEqual("foo", matches[0].line_part)
 
         matches = matcher.check_lines(["goobarbaz"])
         self.assertLessEqual(1, len(matches))
         self.assertEqual(3, matches[0].colno)
-        self.assertEqual('bar', matches[0].line_part)
+        self.assertEqual("bar", matches[0].line_part)
 
         matches = matcher.check_lines(["googgrbaz"])
         self.assertLessEqual(1, len(matches))
         self.assertEqual(3, matches[0].colno)
-        self.assertEqual('ggr', matches[0].line_part)
+        self.assertEqual("ggr", matches[0].line_part)
 
         matches = matcher.check_lines(["goobanbaz"])
         self.assertEqual(1, len(matches))
         self.assertEqual(6, matches[0].colno)
-        self.assertEqual('baz', matches[0].line_part)
+        self.assertEqual("baz", matches[0].line_part)
 
     def test_regex_dont_match(self):
         matcher = ssm.SensitiveStringMatcher("Basic Matcher", "foo", "**dont_match", "**next_is_regex", r"[a-z]o[a-z]")
@@ -140,5 +140,5 @@ class test_SensitiveStringMatcher(unittest.TestCase):
         self.assertEqual(0, len(matches))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

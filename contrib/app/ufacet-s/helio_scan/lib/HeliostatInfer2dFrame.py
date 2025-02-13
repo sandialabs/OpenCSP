@@ -51,12 +51,12 @@ class HeliostatInfer2dFrame:
         # Check input.
         if len(observed_corner_xy_list) != len(flat_corner_xyz_list):
             msg = (
-                'In HeliostatInfer2dFrame.__init__(), input len(observed_corner_xy_list)='
+                "In HeliostatInfer2dFrame.__init__(), input len(observed_corner_xy_list)="
                 + str(len(observed_corner_xy_list))
-                + ' is not equal to input len(flat_corner_xyz_list)='
+                + " is not equal to input len(flat_corner_xyz_list)="
                 + str(len(flat_corner_xyz_list))
             )
-            print('ERROR: ' + msg)
+            print("ERROR: " + msg)
             raise ValueError(msg)
 
         # Derived values.
@@ -66,9 +66,9 @@ class HeliostatInfer2dFrame:
         self.corner_dicts = []
         for idx in range(0, self.n_corners):
             corner_dict = {}
-            corner_dict['idx'] = idx
-            corner_dict['observed_xy'] = observed_corner_xy_list[idx]
-            corner_dict['flat_xyz'] = flat_corner_xyz_list[idx]
+            corner_dict["idx"] = idx
+            corner_dict["observed_xy"] = observed_corner_xy_list[idx]
+            corner_dict["flat_xyz"] = flat_corner_xyz_list[idx]
             self.corner_dicts.append(corner_dict)
 
         # Initialize homography dictionaries.
@@ -99,25 +99,25 @@ class HeliostatInfer2dFrame:
         # Find unique z values.
         unique_z_values = set()
         for corner_dict in self.corner_dicts:
-            unique_z_values.add(corner_dict['flat_xyz'][2])
+            unique_z_values.add(corner_dict["flat_xyz"][2])
         # Set up a list of homography data containers, one for each z value.
         homography_dicts = []
         for z in unique_z_values:
-            homography_dict = {'z': z}
+            homography_dict = {"z": z}
             homography_dicts.append(homography_dict)
         # Partition the corners, and find common corners.
         for homography_dict in homography_dicts:
-            z = homography_dict['z']
+            z = homography_dict["z"]
             coplanar_corner_dicts = []  # All points within homography plane.
             common_corner_dicts = []  # Points within homography plane, excluding missing points.
             for corner_dict in self.corner_dicts:
-                if corner_dict['flat_xyz'][2] == z:
-                    corner_dict['homography_z'] = z
+                if corner_dict["flat_xyz"][2] == z:
+                    corner_dict["homography_z"] = z
                     coplanar_corner_dicts.append(corner_dict)
-                    if (corner_dict['observed_xy'][0] != -1) or (corner_dict['observed_xy'][1] != -1):
+                    if (corner_dict["observed_xy"][0] != -1) or (corner_dict["observed_xy"][1] != -1):
                         common_corner_dicts.append(corner_dict)
-            homography_dict['coplanar_corner_dicts'] = coplanar_corner_dicts
-            homography_dict['common_corner_dicts'] = common_corner_dicts
+            homography_dict["coplanar_corner_dicts"] = coplanar_corner_dicts
+            homography_dict["common_corner_dicts"] = common_corner_dicts
         # Return.
         return homography_dicts
 
@@ -126,13 +126,13 @@ class HeliostatInfer2dFrame:
             self.contruct_homography(homography_dict)  # Adds to homography_dict as a side effect.
 
     def contruct_homography(self, homography_dict):
-        common_corner_dicts = homography_dict['common_corner_dicts']
-        common_observed_xy_list = [d['observed_xy'] for d in common_corner_dicts]
-        common_flat_xy_list = [d['flat_xyz'][0:2] for d in common_corner_dicts]  # Note drop z.
+        common_corner_dicts = homography_dict["common_corner_dicts"]
+        common_observed_xy_list = [d["observed_xy"] for d in common_corner_dicts]
+        common_flat_xy_list = [d["flat_xyz"][0:2] for d in common_corner_dicts]  # Note drop z.
         source_points = np.array(common_observed_xy_list)
         destination_points = np.array(common_flat_xy_list)
         H, retval = cv.findHomography(source_points, destination_points)
-        homography_dict['H'] = H
+        homography_dict["H"] = H
         # homography_dict['retval'] = retval  # Ignore until we need it, for example by using RANSAC homography method.
 
     def map_observed_points_onto_flat_model(self):
@@ -140,9 +140,9 @@ class HeliostatInfer2dFrame:
             self.map_observed_points_onto_flat_model_aux(homography_dict)
 
     def map_observed_points_onto_flat_model_aux(self, homography_dict):
-        H = homography_dict['H']
-        for corner_dict in homography_dict['common_corner_dicts']:
-            observed_xy = corner_dict['observed_xy']
+        H = homography_dict["H"]
+        for corner_dict in homography_dict["common_corner_dicts"]:
+            observed_xy = corner_dict["observed_xy"]
             observed_xy1 = np.array(observed_xy + [1])  # Homogeneous form.
             mapped_onto_flat_xy1 = H.dot(observed_xy1)
             # I observed that the product was not homogeneous.  Remembering that the homography may include multiplication
@@ -151,12 +151,12 @@ class HeliostatInfer2dFrame:
             normalized_onto_flat_xy1 = mapped_onto_flat_xy1 / mapped_onto_flat_xy1[2]
             # Construct a 3-d point for convenience in rendering up to this point in the computation.
             normalized_onto_flat_xy = normalized_onto_flat_xy1[0:2]
-            normalized_onto_flat_xyz = list(normalized_onto_flat_xy) + [corner_dict['homography_z']]
+            normalized_onto_flat_xyz = list(normalized_onto_flat_xy) + [corner_dict["homography_z"]]
             # Store mapped points.
-            corner_dict['observed_xy1'] = observed_xy1
-            corner_dict['mapped_onto_flat_xy1'] = mapped_onto_flat_xy1
-            corner_dict['normalized_onto_flat_xy1'] = normalized_onto_flat_xy1
-            corner_dict['normalized_onto_flat_xyz'] = normalized_onto_flat_xyz
+            corner_dict["observed_xy1"] = observed_xy1
+            corner_dict["mapped_onto_flat_xy1"] = mapped_onto_flat_xy1
+            corner_dict["normalized_onto_flat_xy1"] = normalized_onto_flat_xy1
+            corner_dict["normalized_onto_flat_xyz"] = normalized_onto_flat_xyz
 
 
 # print('In HeliostatInfer2dFrame.map_observed_points_onto_flat_model_aux()')  # ?? SCAFFOLDING RCB -- TEMPORARY

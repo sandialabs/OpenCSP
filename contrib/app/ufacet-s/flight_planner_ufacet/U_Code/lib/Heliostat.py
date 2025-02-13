@@ -91,7 +91,7 @@ class Heliostat:
 
     def facets_read_file(self, file):
         with open(file) as csvfile:
-            readCSV = csv.reader(csvfile, delimiter=',')
+            readCSV = csv.reader(csvfile, delimiter=",")
             id_row = 0
             id_facet = 0
             facets = []
@@ -117,13 +117,13 @@ class Heliostat:
 
     def aimpoint_xyz(self):
         if self._aimpoint_xyz == None:
-            print('ERROR: In Heliostat.aimpoint_xyz(), attempt to fetch unset _aimpoint_xyz.')
+            print("ERROR: In Heliostat.aimpoint_xyz(), attempt to fetch unset _aimpoint_xyz.")
             assert False
         return self._aimpoint_xyz
 
     def when_ymdhmsz(self):
         if self._when_ymdhmsz == None:
-            print('ERROR: In Heliostat.when_ymdhmsz(), attempt to fetch unset _when_ymdhmsz.')
+            print("ERROR: In Heliostat.when_ymdhmsz(), attempt to fetch unset _when_ymdhmsz.")
             assert False
         return self._when_ymdhmsz
 

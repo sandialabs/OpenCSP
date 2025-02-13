@@ -66,8 +66,8 @@ def get_matching_bcs_images(image_path_name_exts: list[str]) -> list[tuple[str, 
         path, name, ext = ft.path_components(image_path_name_ext)
 
         # Check if the image is a processed image
-        if name.endswith(' Processed') and ext.upper() == '.JPG':
-            base_name = name.split(' Processed')[0]
+        if name.endswith(" Processed") and ext.upper() == ".JPG":
+            base_name = name.split(" Processed")[0]
 
             # Get the images that are in the same directory or a sister directory
             base_dir, _, _ = ft.path_components(path)
@@ -106,10 +106,10 @@ def get_matching_bcs_images(image_path_name_exts: list[str]) -> list[tuple[str, 
 def prepare_for_tesseract(data_dir: str, processed_image_path_name_ext: str) -> tuple[np.ndarray, np.ndarray]:
     """Get the region of image for the given processed image, and just the red
     channel for the same region of interest."""
-    roi = {'left': 514, 'top': 98, 'right': 514 + 84, 'bottom': 98 + 41}
+    roi = {"left": 514, "top": 98, "right": 514 + 84, "bottom": 98 + 41}
 
     processed_image = np.array(Image.open(ft.join(data_dir, processed_image_path_name_ext)))
-    processed_image_roi = processed_image[roi['top'] : roi['bottom'], roi['left'] : roi['right']]
+    processed_image_roi = processed_image[roi["top"] : roi["bottom"], roi["left"] : roi["right"]]
     processed_image_red = processed_image_roi[:, :, 0]
 
     return processed_image_roi, processed_image_red
@@ -129,16 +129,16 @@ def load_gain_values(
         raw_tags = et.get_tags(raw_images, tags=["EXIF:ISO"])
         pixeldata_tags = et.get_tags(pixeldata_images, tags=["EXIF:ISO"])
 
-    has_processed_gain = ['EXIF:ISO' in tags for tags in processed_tags]
-    has_raw_gain = ['EXIF:ISO' in tags for tags in raw_tags]
-    has_pixeldata_gain = ['EXIF:ISO' in tags for tags in pixeldata_tags]
+    has_processed_gain = ["EXIF:ISO" in tags for tags in processed_tags]
+    has_raw_gain = ["EXIF:ISO" in tags for tags in raw_tags]
+    has_pixeldata_gain = ["EXIF:ISO" in tags for tags in pixeldata_tags]
 
     gain_exif_values: list[int | None] = []
     for i in range(len(has_processed_gain)):
         if has_processed_gain[i] and has_raw_gain[i] and has_pixeldata_gain[i]:
-            g1 = int(processed_tags[i]['EXIF:ISO'])
-            g2 = int(raw_tags[i]['EXIF:ISO'])
-            g3 = int(pixeldata_tags[i]['EXIF:ISO'])
+            g1 = int(processed_tags[i]["EXIF:ISO"])
+            g2 = int(raw_tags[i]["EXIF:ISO"])
+            g3 = int(pixeldata_tags[i]["EXIF:ISO"])
             if g1 == g2 and g1 == g3:
                 gain_exif_values.append(g1)
             else:
@@ -183,7 +183,7 @@ def tesseract_read_gain_values(
     processed_image_roi, processed_image_red = prepare_for_tesseract(data_dir, processed)
 
     # Try from the standard RGB image
-    gain_str = pytesseract.image_to_string(processed_image_roi, lang='eng')
+    gain_str = pytesseract.image_to_string(processed_image_roi, lang="eng")
     try:
         gain = int(gain_str)
     except Exception:
@@ -191,7 +191,7 @@ def tesseract_read_gain_values(
 
     # Try to read the gain value from just the red channel
     if gain is None:
-        gain_str = pytesseract.image_to_string(processed_image_red, lang='eng')
+        gain_str = pytesseract.image_to_string(processed_image_red, lang="eng")
         try:
             gain = int(gain_str)
         except Exception:
@@ -200,7 +200,7 @@ def tesseract_read_gain_values(
     # Increase contrast and try again
     if gain is None:
         processed_image_red = cv.convertScaleAbs(processed_image_red, alpha=2.0, beta=0)
-        gain_str = pytesseract.image_to_string(processed_image_red, lang='eng')
+        gain_str = pytesseract.image_to_string(processed_image_red, lang="eng")
         try:
             gain = int(gain_str)
         except Exception:

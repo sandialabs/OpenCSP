@@ -51,21 +51,21 @@ import opencsp.common.lib.render.view_spec as vs
 def construct_ufacet_scan_pass(solar_field, lead_in, run_past):
     # Control parameters.
     scan_parameters = {}
-    scan_parameters['locale'] = (
-        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters["locale"] = (
+        "Sandia NSTTF"  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
     )
-    scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
+    scan_parameters["camera"] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
-    scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
+    scan_parameters["camera"] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters['maximum_safe_altitude'] = (
+    scan_parameters["section_plane_tolerance"] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters["p_margin"] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters["altitude_margin"] = 2.5  # m.  Clearance of highest possible heliostat point.
+    scan_parameters["maximum_safe_altitude"] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
-    scan_parameters['gaze_tolerance'] = np.deg2rad(
+    scan_parameters["maximum_target_lookback"] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters["gaze_tolerance"] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
 
@@ -101,21 +101,21 @@ def construct_ufacet_scan_pass(solar_field, lead_in, run_past):
 def construct_ufacet_scan_passes(solar_field, lead_in, run_past):
     # Control parameters.
     scan_parameters = {}
-    scan_parameters['locale'] = (
-        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters["locale"] = (
+        "Sandia NSTTF"  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
     )
-    scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
+    scan_parameters["camera"] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
-    scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
+    scan_parameters["camera"] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters['maximum_safe_altitude'] = (
+    scan_parameters["section_plane_tolerance"] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters["p_margin"] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters["altitude_margin"] = 2.5  # m.  Clearance of highest possible heliostat point.
+    scan_parameters["maximum_safe_altitude"] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
-    scan_parameters['gaze_tolerance'] = np.deg2rad(
+    scan_parameters["maximum_target_lookback"] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters["gaze_tolerance"] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
 
@@ -151,21 +151,21 @@ def construct_ufacet_scan_passes(solar_field, lead_in, run_past):
 def construct_ufacet_scan(solar_field, lead_in, run_past):
     # Control parameters.
     scan_parameters = {}
-    scan_parameters['locale'] = (
-        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters["locale"] = (
+        "Sandia NSTTF"  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
     )
-    scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
+    scan_parameters["camera"] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
-    scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
+    scan_parameters["camera"] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters['maximum_safe_altitude'] = (
+    scan_parameters["section_plane_tolerance"] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters["p_margin"] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters["altitude_margin"] = 2.5  # m.  Clearance of highest possible heliostat point.
+    scan_parameters["maximum_safe_altitude"] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
-    scan_parameters['gaze_tolerance'] = np.deg2rad(
+    scan_parameters["maximum_target_lookback"] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters["gaze_tolerance"] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
 
@@ -298,7 +298,7 @@ def render_ufacet_scan(figure_control, scan):
 
 if __name__ == "__main__":
     # Figure control.
-    plt.close('all')
+    plt.close("all")
     fm.reset_figure_management()
     figure_control = rcfg.RenderControlFigure(tile_array=(2, 2), tile_square=False)
     #    figure_control = rcfg.RenderControlFigure(tile_array=(1,1), tile_square=False)
@@ -310,8 +310,8 @@ if __name__ == "__main__":
 
     # Load solar field data.
     field_origin_lon_lat = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    field_heliostat_file = './data/NSTTF_Heliostats.csv'
-    field_facet_centroids_file = './data/NSTTF_Facet_Centroids.csv'
+    field_heliostat_file = "./data/NSTTF_Heliostats.csv"
+    field_facet_centroids_file = "./data/NSTTF_Facet_Centroids.csv"
     solar_field = sf.SolarField(
         origin_lon_lat=field_origin_lon_lat,
         heliostat_file=field_heliostat_file,
@@ -463,14 +463,14 @@ if __name__ == "__main__":
     #     # view_yz = fosf.draw_flight_over_solar_field(figure_control, flight_over_solar_field, rcfosf_default, vs.view_spec_yz())
 
     # Summarize.
-    print('\n\nFigure Summary:')
+    print("\n\nFigure Summary:")
     fm.print_figure_summary()
 
     # Save figures.
     if save_figures:
-        print('\n\nSaving figures...')
+        print("\n\nSaving figures...")
         # Output directory.
-        output_path = os.path.join('..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M')))
+        output_path = os.path.join("..", ("output_" + datetime.now().strftime("%Y_%m_%d_%H%M")))
         if not (os.path.exists(output_path)):
             os.makedirs(output_path)
         fm.save_all_figures(output_path)

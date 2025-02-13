@@ -89,11 +89,11 @@ EDGE_COLOR = [255, 255, 255]  # ?? SCAFFOLDING RCB -- ORIGINAL VALUE
 # EDGE_COLOR = [255, 0, 0]  # ?? SCAFFOLDING RCB -- TEMPORARY
 
 ## CORNERS AND CENTER COLORs
-PLT_TOP_LEFT_COLOR = 'b'
-PLT_TOP_RIGHT_COLOR = 'm'
-PLT_BOTTOM_RIGHT_COLOR = 'g'
-PLT_BOTTOM_LEFT_COLOR = 'y'
-PLT_CENTER_COLOR = 'c'
+PLT_TOP_LEFT_COLOR = "b"
+PLT_TOP_RIGHT_COLOR = "m"
+PLT_BOTTOM_RIGHT_COLOR = "g"
+PLT_BOTTOM_LEFT_COLOR = "y"
+PLT_CENTER_COLOR = "c"
 
 ## MAGIC NUMBERS
 INTER_POINT_DISTANCE = 20  # for the corners  # ?? SCAFFOLDING RCB - MODIFIED ORIGINAL CODE
@@ -116,7 +116,7 @@ MINIMUM_CORNERS_REQUIRED_INSIDE_FRAME = (
 # of match.  It is expressed as a ratio because the number of corners per
 # heliostat varies with heliostat design.
 
-CLOCKWISE_DIR = ['top_left', 'top_right', 'bottom_right', 'bottom_left']
+CLOCKWISE_DIR = ["top_left", "top_right", "bottom_right", "bottom_left"]
 # Heliostat
 CENTERED_FACET = 13
 TOP_LEFT_FACET_INDX = 1
@@ -140,18 +140,18 @@ control_frame_processing = {
     "corners": True,
     "facets": True,
     "clustered_facets": True,
-    'projected_corners': True,
+    "projected_corners": True,
 }
 
 COEFF_KEYS = [
-    ['top_left', 'top_edge_coeff'],
-    ['top_left', 'left_edge_coeff'],
-    ['top_right', 'top_edge_coeff'],
-    ['top_right', 'right_edge_coeff'],
-    ['bottom_right', 'right_edge_coeff'],
-    ['bottom_right', 'bottom_edge_coeff'],
-    ['bottom_left', 'left_edge_coeff'],
-    ['bottom_left', 'bottom_edge_coeff'],
+    ["top_left", "top_edge_coeff"],
+    ["top_left", "left_edge_coeff"],
+    ["top_right", "top_edge_coeff"],
+    ["top_right", "right_edge_coeff"],
+    ["bottom_right", "right_edge_coeff"],
+    ["bottom_right", "bottom_edge_coeff"],
+    ["bottom_left", "left_edge_coeff"],
+    ["bottom_left", "bottom_edge_coeff"],
 ]
 
 
@@ -170,20 +170,20 @@ TOL_STEP = 0.1
 
 
 def save_image(img, imgname, path):
-    print('In save_image(), saving:', os.path.join(path, imgname))  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print("In save_image(), saving:", os.path.join(path, imgname))  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is None:  # ?? SCAFFOLDING RCB -- TEMPORARY
         print(
-            'WARNING: In save_image(), img==None encountered for output:', os.path.join(path, imgname)
+            "WARNING: In save_image(), img==None encountered for output:", os.path.join(path, imgname)
         )  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is not None:
         cv.imwrite(os.path.join(path, imgname), img)
 
 
 def save_fig(img=None, imgname=None, path=None, dpi=500, rgb=False):
-    print('In save_fig(),   saving:', os.path.join(path, imgname))  # ?? SCAFFOLDING RCB -- TEMPORARY
+    print("In save_fig(),   saving:", os.path.join(path, imgname))  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is None:  # ?? SCAFFOLDING RCB -- TEMPORARY
         print(
-            'WARNING: In save_fig(), img==None encountered for output:', os.path.join(path, imgname)
+            "WARNING: In save_fig(), img==None encountered for output:", os.path.join(path, imgname)
         )  # ?? SCAFFOLDING RCB -- TEMPORARY
     if img is not None:
         plt.figure()
@@ -207,24 +207,24 @@ def sky_with_hsv(img, rgb=False):
     return sky, sky_img
 
 
-def CannyImg(img=None, canny_type='normal', lower=None, upper=None):
+def CannyImg(img=None, canny_type="normal", lower=None, upper=None):
     if lower is not None and upper is not None:
         return cv.Canny(img, threshold1=lower, threshold2=upper)
     else:
-        if canny_type == 'tight':
+        if canny_type == "tight":
             lower, upper = 150, 200
-        elif canny_type == 'normal':
+        elif canny_type == "normal":
             median_val = np.median(img)
             lower = int(max(0, 0.7 * median_val))
             upper = int(min(255, 1.3 * median_val))
-        elif canny_type == 'medium':
+        elif canny_type == "medium":
             lower, upper = 50, 100
-        elif canny_type == 'light':
+        elif canny_type == "light":
             lower, upper = 25, 50
-        elif canny_type == 'lighter':
+        elif canny_type == "lighter":
             lower, upper = 10, 25
 
-        elif canny_type == 'auto':
+        elif canny_type == "auto":
             v = np.median(img)
             sigma = 0.33
             lower = int(max(0, (1.0 - sigma) * v))
@@ -234,22 +234,22 @@ def CannyImg(img=None, canny_type='normal', lower=None, upper=None):
 
 
 def extract_all_frames_from_video(vidoe_path=None, video_name=None, saving_path=None, fps=30):
-    cmd = 'ffmpeg'
-    cmd += ' -i ' + vidoe_path + video_name + ' -vf fps=' + str(fps) + ' ' + saving_path + 'img%d.png'
+    cmd = "ffmpeg"
+    cmd += " -i " + vidoe_path + video_name + " -vf fps=" + str(fps) + " " + saving_path + "img%d.png"
     subprocess.call(cmd.split())
 
 
 def extract_frames_from_video(
     video_path=None, video_name=None, saving_path=None, fps=30, starting_time=None, duration=None, backward=False
 ):
-    cmd = 'ffmpeg'
-    if starting_time is not None and starting_time != '':
-        time_instance_parts = starting_time.split(':')
+    cmd = "ffmpeg"
+    if starting_time is not None and starting_time != "":
+        time_instance_parts = starting_time.split(":")
         hrs = time_instance_parts[0]
         minutes = time_instance_parts[1]
         secs = time_instance_parts[2]
         if duration is not None:
-            duration_time = '00:00:0' + str(duration)
+            duration_time = "00:00:0" + str(duration)
             if backward:
                 minutes_prev = minutes
                 if int(secs) - duration + 1 < 0:
@@ -258,54 +258,54 @@ def extract_frames_from_video(
                 else:
                     secs_prev = int(secs) - duration + 1
                 if secs_prev < 10:
-                    previous_time = '00:' + str(minutes_prev) + ':0' + str(secs_prev)
+                    previous_time = "00:" + str(minutes_prev) + ":0" + str(secs_prev)
                 else:
-                    previous_time = '00:' + str(minutes_prev) + ':' + str(secs_prev)
-                cmd += ' -ss ' + previous_time + ' -t ' + str(duration_time)
+                    previous_time = "00:" + str(minutes_prev) + ":" + str(secs_prev)
+                cmd += " -ss " + previous_time + " -t " + str(duration_time)
 
                 starting_id = (int(minutes_prev) * 60 + int(secs_prev)) * fps
             else:
                 starting_id = (int(minutes) * 60 + int(secs)) * fps
-                cmd += ' -ss ' + starting_time + ' -t ' + str(duration_time)
+                cmd += " -ss " + starting_time + " -t " + str(duration_time)
 
             cmd += (
-                ' -i '
+                " -i "
                 + video_path
                 + video_name
-                + ' -vf fps='
+                + " -vf fps="
                 + str(fps)
-                + ' '
-                + '-start_number '
+                + " "
+                + "-start_number "
                 + str(starting_id)
-                + ' '
+                + " "
                 + saving_path
-                + '/img%d.png'
+                + "/img%d.png"
             )
         else:
             if int(secs) == 59:
                 minutes = int(minutes) + 1
-                secs = '00'
+                secs = "00"
             else:
                 secs = int(secs) + 1
             if len(str(secs)) == 1:
-                secs = '0' + str(secs)
+                secs = "0" + str(secs)
             if len(str(minutes)) == 1:
-                minutes = '0' + str(minutes)
+                minutes = "0" + str(minutes)
 
             time_instance_parts = [str(hrs), str(minutes), str(secs)]
             next_time_instance = ":".join(time_instance_parts)
 
             cmd += (
-                ' -i ' + video_path + video_name + '.mp4'
-                ' -ss '
+                " -i " + video_path + video_name + ".mp4"
+                " -ss "
                 + starting_time
-                + ' -to '
+                + " -to "
                 + next_time_instance
-                + ' -vf fps='
+                + " -vf fps="
                 + str(fps)
-                + ' '
+                + " "
                 + saving_path
-                + 'img%d.png'
+                + "img%d.png"
             )
 
     subprocess.call(cmd.split())
@@ -321,19 +321,19 @@ def extract_frames_nopipe(
     height=2160,
     width=3840,
 ):
-    saving_path += 'img%d.png'
+    saving_path += "img%d.png"
     command = [
-        'ffmpeg',
-        '-nostats',
-        '-loglevel',
-        '0',
-        '-ss',
+        "ffmpeg",
+        "-nostats",
+        "-loglevel",
+        "0",
+        "-ss",
         str(starting_frame_id / fps),
-        '-i',
-        video_path + video_name + '.mp4',
-        '-to',
+        "-i",
+        video_path + video_name + ".mp4",
+        "-to",
         str(ending_frame_id / fps),
-        '-vf',
+        "-vf",
         str(fps),
         str(saving_path),
         # '-c:v', 'ffv1',
@@ -364,7 +364,7 @@ def extract_frames_opencv(video=None, start=None, end=None, saving_path=None, ev
             while_safety = 0  # reset the safety count
             saved_count += 1
             if store:
-                imgname = saving_path + 'img' + str(saved_count) + '.png'
+                imgname = saving_path + "img" + str(saved_count) + ".png"
                 if not os.path.exists(imgname):
                     if plot:
                         image = cv.cvtColor(image, cv.COLOR_BGR2RGB)
@@ -383,29 +383,29 @@ def extract_specific_frames_pipe(
     video_path=None, video_name=None, starting_frame_id=None, ending_frame_id=None, fps=30, height=2160, width=3840
 ):
     command = [
-        'ffmpeg',
-        '-nostats',
-        '-loglevel',
-        '0',
-        '-ss',
+        "ffmpeg",
+        "-nostats",
+        "-loglevel",
+        "0",
+        "-ss",
         str(starting_frame_id / fps),
-        '-i',
-        video_path + video_name + '.mp4',
-        '-to',
+        "-i",
+        video_path + video_name + ".mp4",
+        "-to",
         str(ending_frame_id / fps),
-        '-c:v',
-        'ffv1',
+        "-c:v",
+        "ffv1",
         #'-vf', 'select=eq(n\,' + str(frame_id) + ')',
         #'-vsync', '0',
-        '-f',
-        'image2pipe',
-        '-pix_fmt',
-        'rgb24',
-        '-vcodec',
-        'rawvideo',
-        '-',
+        "-f",
+        "image2pipe",
+        "-pix_fmt",
+        "rgb24",
+        "-vcodec",
+        "rawvideo",
+        "-",
     ]
-    name = str(starting_frame_id) + '_' + str(ending_frame_id) + '.txt'
+    name = str(starting_frame_id) + "_" + str(ending_frame_id) + ".txt"
     name = home_dir() + name
     f1 = open(name, "wb")
     f2 = open(name, "rb")
@@ -417,7 +417,7 @@ def extract_specific_frames_pipe(
     while num_frames > 0:
         frame = f2.read(nbytes)
         if frame is not None:
-            image = np.frombuffer(frame, dtype='uint8')
+            image = np.frombuffer(frame, dtype="uint8")
         if image is not None and image.size:
             image = image.reshape((height, width, 3))
             image_list.append(image)
@@ -460,16 +460,16 @@ def set_proper_hom_coef_sign(point_on_line, btype, A, B, C) -> tuple[float, floa
     -------
         A, B, and C, possibly with signs flipped"""
     col_on_line, row_on_line = point_on_line[0], point_on_line[1]
-    if btype == 'left':
+    if btype == "left":
         col_to_check, row_to_check = col_on_line + 1, row_on_line
 
-    elif btype == 'top':
+    elif btype == "top":
         col_to_check, row_to_check = col_on_line, row_on_line + 1
 
-    elif btype == 'right':
+    elif btype == "right":
         col_to_check, row_to_check = col_on_line - 1, row_on_line
 
-    elif btype == 'bottom':
+    elif btype == "bottom":
         col_to_check, row_to_check = col_on_line, row_on_line - 1
 
     if A * col_to_check + B * row_to_check + C > 0:
@@ -479,7 +479,7 @@ def set_proper_hom_coef_sign(point_on_line, btype, A, B, C) -> tuple[float, floa
     return A, B, C
 
 
-def fit_line_component(component=None, type_fit='regression', plot_fit=False):
+def fit_line_component(component=None, type_fit="regression", plot_fit=False):
     """Does a line fit on the pixels in the given component.
 
     Adds the keys:
@@ -489,26 +489,26 @@ def fit_line_component(component=None, type_fit='regression', plot_fit=False):
     Notes:
         Chooses a scaling factor such that A^2 + B^2 = 1"""
 
-    def plot_line(pixels, points, hom_coef, color='r'):
+    def plot_line(pixels, points, hom_coef, color="r"):
         row, col = np.array([a[0] for a in pixels]), np.array([a[1] for a in pixels])
         A, B, C = hom_coef[0], hom_coef[1], hom_coef[2]
         col1, col2 = points[0], points[2]
         x_s = np.linspace(col1, col2, num=50, endpoint=True)
         y_s = (-A * x_s - C) / B
         plt.figure()
-        plt.scatter(col, row, label='Pixels', s=1)
-        plt.plot(x_s, y_s, color, label='Regression Line', linewidth=1)
-        plt.xlabel('Column')
-        plt.ylabel('Row')
+        plt.scatter(col, row, label="Pixels", s=1)
+        plt.plot(x_s, y_s, color, label="Regression Line", linewidth=1)
+        plt.xlabel("Column")
+        plt.ylabel("Row")
         plt.axis("equal")
         plt.legend()
         plt.show()
 
-    pixels = component['original_pixels']
-    btype = component['boundary_type']
-    if type_fit == 'regression':
+    pixels = component["original_pixels"]
+    btype = component["boundary_type"]
+    if type_fit == "regression":
         row, col = np.array([a[0] for a in pixels]), np.array([a[1] for a in pixels])
-        if btype == 'left' or btype == 'right':
+        if btype == "left" or btype == "right":
             # expected horizontal line in terms of row
             x, y = row, col
         else:
@@ -528,7 +528,7 @@ def fit_line_component(component=None, type_fit='regression', plot_fit=False):
         y1 = (-A * x1 - C) / B
         x2 = np.max(x)
         y2 = (-A * x2 - C) / B
-        if btype == 'left' or btype == 'right':
+        if btype == "left" or btype == "right":
             # transpose x, y
             A, B = B, A
             x1, y1 = y1, x1
@@ -537,12 +537,12 @@ def fit_line_component(component=None, type_fit='regression', plot_fit=False):
         start_point = [x1, y1]  # col, row, col, row
         A, B, C = set_proper_hom_coef_sign(start_point, btype, A, B, C)
         # storing to dict
-        component['original_line_hom_coef'] = [A, B, C]
-        component['original_line_residual'] = residual
-        component['original_line_points'] = [x1, y1, x2, y2]  # col, row, col, row
+        component["original_line_hom_coef"] = [A, B, C]
+        component["original_line_residual"] = residual
+        component["original_line_points"] = [x1, y1, x2, y2]  # col, row, col, row
         if plot_fit:
             plot_line(
-                pixels=pixels, points=component['original_line_points'], hom_coef=component['original_line_hom_coef']
+                pixels=pixels, points=component["original_line_points"], hom_coef=component["original_line_hom_coef"]
             )
 
     return component
@@ -676,21 +676,21 @@ def avg_pixel(point0, point1):
     return pixel
 
 
-def solvePNP(points3d, points2d, h, w, pnptype='pnp', cam_matrix=None, dist_coeff=None):
+def solvePNP(points3d, points2d, h, w, pnptype="pnp", cam_matrix=None, dist_coeff=None):
     # Check input.
     if len(points3d) != len(points2d):
         msg = (
-            'In solvePNP(), len(points3d)=' + str(len(points3d)) + ' does not equal len(points3d)=' + str(len(points3d))
+            "In solvePNP(), len(points3d)=" + str(len(points3d)) + " does not equal len(points3d)=" + str(len(points3d))
         )
-        print('ERROR: ' + msg)
+        print("ERROR: " + msg)
         raise ValueError(msg)
     if len(points3d) < 4:
-        msg = 'In solvePNP(), len(points3d)=' + str(len(points3d)) + ' is not at least 4.'
-        print('ERROR: ' + msg)
+        msg = "In solvePNP(), len(points3d)=" + str(len(points3d)) + " is not at least 4."
+        print("ERROR: " + msg)
         raise ValueError(msg)
     points3d_plane = points3d.copy()
     points3d_plane[:, 2] = 0
-    if pnptype == 'calib':
+    if pnptype == "calib":
         _, mtx, dist, _, _ = cv.calibrateCamera([points3d_plane], [points2d], (w, h), None, None)
         _, mtx, dist, rvecs, tvecs = cv.calibrateCamera(
             [points3d], [points2d], (w, h), mtx, dist, flags=cv.CALIB_USE_INTRINSIC_GUESS
@@ -702,9 +702,9 @@ def solvePNP(points3d, points2d, h, w, pnptype='pnp', cam_matrix=None, dist_coef
             mtx = CameraMatrix  # provided camera model
         if dist is None:
             dist = DistCoefs  # provided distortion coefficients
-        if pnptype == 'pnp':
+        if pnptype == "pnp":
             _, rvec, tvec = cv.solvePnP(points3d, points2d, mtx, dist)
-        elif pnptype == 'pnpransac':
+        elif pnptype == "pnpransac":
             _, rvec, tvec, _ = cv.solvePnPRansac(points3d, points2d, mtx, dist)
 
     # projection error
@@ -725,7 +725,7 @@ def uncouple_points(corners):
 
 
 def setup_loger(name, log_file, level=log.INFO):
-    formatter = log.Formatter('%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s')
+    formatter = log.Formatter("%(asctime)s,%(msecs)d %(name)s %(levelname)s %(message)s")
     handler = log.FileHandler(log_file)
     handler.setFormatter(formatter)
 
@@ -739,7 +739,7 @@ def setup_loger(name, log_file, level=log.INFO):
 def multiprocessing_loger(log_file, level=log.INFO):
     logger = mp.get_logger()
     logger.setLevel(level)
-    formatter = log.Formatter('[%(asctime)s| %(levelname)s| %(processName)s] %(message)s')
+    formatter = log.Formatter("[%(asctime)s| %(levelname)s| %(processName)s] %(message)s")
     handler = log.FileHandler(log_file)
     handler.setFormatter(formatter)
 
@@ -751,15 +751,15 @@ def multiprocessing_loger(log_file, level=log.INFO):
 
 
 def instance_to_frameid(instance, fps=30):
-    secs = int(instance.split(':')[-1])
-    mins = int(instance.split(':')[-2])
+    secs = int(instance.split(":")[-1])
+    mins = int(instance.split(":")[-2])
     total_secs = mins * 60 + secs
     starting_id = total_secs * fps - 1
     ending_id = starting_id + fps
     return starting_id, ending_id
 
 
-def frameid_to_string(id, frameXd='000000'):
+def frameid_to_string(id, frameXd="000000"):
     frameXd = list(frameXd)
     id = str(id)
     j = len(frameXd) - 1

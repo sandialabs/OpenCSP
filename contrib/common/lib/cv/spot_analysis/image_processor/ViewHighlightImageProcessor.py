@@ -90,7 +90,7 @@ class ViewHighlightImageProcessor(AbstractVisualizationImageProcessor):
         new_image = np.copy(old_image)
 
         # replace black
-        if isinstance(self.black_highlight_color, str) and self.black_highlight_color.lower() == 'none':
+        if isinstance(self.black_highlight_color, str) and self.black_highlight_color.lower() == "none":
             pass
         else:
             highlight_color = color.Color.from_generic(self.black_highlight_color)
@@ -102,7 +102,7 @@ class ViewHighlightImageProcessor(AbstractVisualizationImageProcessor):
             new_image[black_selector] = highlight_color.rgb_255()
 
         # replace white
-        if isinstance(self.white_highlight_color, str) and self.white_highlight_color.lower() == 'none':
+        if isinstance(self.white_highlight_color, str) and self.white_highlight_color.lower() == "none":
             pass
         else:
             highlight_color = color.Color.from_generic(self.white_highlight_color)

@@ -61,7 +61,7 @@ def direction_uxyz_given_azimuth_elevation(azimuth: float, elevation: float):  #
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.direction_uxyz_given_azimuth_elevation is deprecated. This function should be migrated to another library.',
+        "geometry_3d.direction_uxyz_given_azimuth_elevation is deprecated. This function should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -121,7 +121,7 @@ def distance_between_xyz_points(xyz_1, xyz_2):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.distance_between_xyz_points is deprecated. Use Vxyz subtraction/magnitude instead.',
+        "geometry_3d.distance_between_xyz_points is deprecated. Use Vxyz subtraction/magnitude instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -183,7 +183,7 @@ def vector_3d_cross_product(vxyz_1, vxyz_2):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.vector_3d_cross_product is deprecated. Use Vxyz.cross() instead.', DeprecationWarning, stacklevel=2
+        "geometry_3d.vector_3d_cross_product is deprecated. Use Vxyz.cross() instead.", DeprecationWarning, stacklevel=2
     )
     return list(
         np.cross(np.array(vxyz_1), np.array(vxyz_2))
@@ -229,7 +229,7 @@ def vector_3d_norm(vxyz):
         Indicates that this function is deprecated and should use Vxyz.magnitude() instead.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
-    warn('geometry_3d.vector_3d_norm is deprecated. Use Vxyz.magnitude() instead.', DeprecationWarning, stacklevel=2)
+    warn("geometry_3d.vector_3d_norm is deprecated. Use Vxyz.magnitude() instead.", DeprecationWarning, stacklevel=2)
     return np.sqrt(vxyz[0] ** 2 + vxyz[1] ** 2 + vxyz[2] ** 2)
 
 
@@ -273,7 +273,7 @@ def normalize_vector_3d(vxyz):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.normalize_vector_3d is deprecated. Use Vxyz.normalize() instead.', DeprecationWarning, stacklevel=2
+        "geometry_3d.normalize_vector_3d is deprecated. Use Vxyz.normalize() instead.", DeprecationWarning, stacklevel=2
     )
     norm = vector_3d_norm(vxyz)
     return [vxyz[0] / norm, vxyz[1] / norm, vxyz[2] / norm]
@@ -373,7 +373,7 @@ def best_fit_plane_B(xs, ys, zs):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.best_fit_plane_B is deprecated. Should be migrated to another library.',
+        "geometry_3d.best_fit_plane_B is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -455,7 +455,7 @@ def best_fit_plane(xyz_list):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.best_fit_plane is deprecated. Should be migrated to another library.',
+        "geometry_3d.best_fit_plane is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -512,7 +512,7 @@ def flip_homogeneous_plane(plane):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.flip_homogeneous_plane is deprecated. Should be migrated to another library.',
+        "geometry_3d.flip_homogeneous_plane is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -564,7 +564,7 @@ def homogeneous_plane_signed_distance_to_xyz(xyz, plane):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.homogeneous_plane_signed_distance_to_xyz is deprecated. Should be migrated to another library.',
+        "geometry_3d.homogeneous_plane_signed_distance_to_xyz is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -641,7 +641,7 @@ def construct_line_3d_given_two_points(
     # "ChatGPT 4o" assisted with generating this docstring.
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.construct_line_3d_given_two_points is deprecated.  Should be migrated to another library.',
+        "geometry_3d.construct_line_3d_given_two_points is deprecated.  Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -654,7 +654,7 @@ def construct_line_3d_given_two_points(
     z2 = xyz_2[2]
     # Check input.
     if (abs(x1 - x2) <= tolerance) and (abs(y1 - y2) <= tolerance) and (abs(z1 - z2) <= tolerance):
-        print('ERROR: In construct_line_3d_given_two_points(), degenerate point pair encountered.')
+        print("ERROR: In construct_line_3d_given_two_points(), degenerate point pair encountered.")
         assert False
     # Compute attributes.
     length = np.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2 + (z2 - z1) ** 2)
@@ -669,17 +669,17 @@ def construct_line_3d_given_two_points(
     eta = math.atan2(vz, length_xy)
     # Setup line_3d object.
     line_3d = {}
-    line_3d['xyz_1'] = xyz_1  # First example point.
-    line_3d['xyz_2'] = xyz_2  # Second example point.
-    line_3d['length'] = length  # Euclidean distance between example points.
-    line_3d['length_xy'] = length_xy  # Euclidean distance between example points, projected onto the xy plane.
-    line_3d['mid_xyz'] = mid_xyz  # Point midway between the two example points.
-    line_3d['vxyz'] = vxyz  # Vector pointing from first example point to second example point.
-    line_3d['uxyz'] = uxyz  # Unit vector pointing from first example point to second example point.
-    line_3d['theta'] = (
+    line_3d["xyz_1"] = xyz_1  # First example point.
+    line_3d["xyz_2"] = xyz_2  # Second example point.
+    line_3d["length"] = length  # Euclidean distance between example points.
+    line_3d["length_xy"] = length_xy  # Euclidean distance between example points, projected onto the xy plane.
+    line_3d["mid_xyz"] = mid_xyz  # Point midway between the two example points.
+    line_3d["vxyz"] = vxyz  # Vector pointing from first example point to second example point.
+    line_3d["uxyz"] = uxyz  # Unit vector pointing from first example point to second example point.
+    line_3d["theta"] = (
         theta  # Angle the line points, after projecting onto the xy plane, measured ccw about the z axis.
     )
-    line_3d['eta'] = eta  # Angle the line points above the xy plane (negative values indicate below the xy plane).
+    line_3d["eta"] = eta  # Angle the line points above the xy plane (negative values indicate below the xy plane).
     # Return.
     return line_3d
 
@@ -708,30 +708,8 @@ def closest_point_on_line_3d(xyz, line_3d):  # ?? SCAFFOLDING RCB -- THE 3-D LIN
         Indicates that this function is deprecated and should be migrated to another library.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
-    DEPRECATED: Finds the closest point on a 3D line to a given point.
-
-    This function calculates the point on the infinite line that is closest to the specified point in 3D space.
-
-    Parameters
-    ----------
-    xyz : list[float]
-        The coordinates of the point (x, y, z).
-    line_3d : dict
-        A dictionary representing the line, containing attributes such as 'mid_xyz' and 'uxyz'.
-
-    Returns
-    -------
-    list[float]
-        The coordinates of the closest point on the line to the given point.
-
-    Raises
-    ------
-    DeprecationWarning
-        Indicates that this function is deprecated and should be migrated to another library.
-    """
-    # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.closest_point_on_line_3d is deprecated. Should be migrated to another library.',
+        "geometry_3d.closest_point_on_line_3d is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -739,12 +717,12 @@ def closest_point_on_line_3d(xyz, line_3d):  # ?? SCAFFOLDING RCB -- THE 3-D LIN
     x = xyz[0]
     y = xyz[1]
     z = xyz[2]
-    mid_x = line_3d['mid_xyz'][0]
-    mid_y = line_3d['mid_xyz'][1]
-    mid_z = line_3d['mid_xyz'][2]
-    ux = line_3d['uxyz'][0]
-    uy = line_3d['uxyz'][1]
-    uz = line_3d['uxyz'][2]
+    mid_x = line_3d["mid_xyz"][0]
+    mid_y = line_3d["mid_xyz"][1]
+    mid_z = line_3d["mid_xyz"][2]
+    ux = line_3d["uxyz"][0]
+    uy = line_3d["uxyz"][1]
+    uz = line_3d["uxyz"][2]
     # Compute vector from mid point to given point.
     mid_to_xyz_x = x - mid_x
     mid_to_xyz_y = y - mid_y
@@ -805,7 +783,7 @@ def distance_to_line_3d(xyz, line_3d):  # ?? SCAFFOLDING RCB -- THE 3-D LINE SHO
     # "ChatGPT 4o" assisted with generating this docstring.
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_3d.distance_to_line_3d is deprecated. Should be migrated to another library.',
+        "geometry_3d.distance_to_line_3d is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )

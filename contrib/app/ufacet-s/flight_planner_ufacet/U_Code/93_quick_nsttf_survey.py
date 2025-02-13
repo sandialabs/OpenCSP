@@ -26,15 +26,15 @@ from opencsp.common.lib.csp.SolarField import SolarField
 
 
 if __name__ == "__main__":
-    plt.close('all')
+    plt.close("all")
     fm.reset_figure_management()
 
     # Per-run input parameters.
     elevation_offset = 0.0  # m.
 
     # Load solar field data.
-    file_field = './data/Solar_Field.csv'
-    file_centroids_offsets = './data/Facets_Centroids.csv'
+    file_field = "./data/Solar_Field.csv"
+    file_centroids_offsets = "./data/Facets_Centroids.csv"
     solar_field = SolarField(file_field=file_field, file_centroids_offsets=file_centroids_offsets)
 
     # Define tracking time.
@@ -55,45 +55,45 @@ if __name__ == "__main__":
 
     # Set heliostat configurations.
     configure_heliostat_name_list = [
-        '5E4',
-        '6E4',
-        '7E4',
-        '8E4',
-        '9E4',
-        '10E4',
-        '11E4',
-        '12E6',
-        '13E6',
-        '14E6',
-        '5E5',
-        '6E5',
-        '7E5',
-        '8E5',
-        '9E5',
-        '10E5',
-        '11E5',
-        '12E5',
-        '13E5',
-        '14E5',
-        '5E6',
-        '6E6',
-        '7E6',
-        '8E6',
-        '9E6',
-        '10E6',
-        '11E6',
-        '12E6',
-        '13E6',
-        '14E6',
-        '5E7',
-        '6E7',
-        '7E7',
-        '8E7',
-        '9E7',
-        '10E7',
-        '11E7',
-        '12E7',
-        '13E7',
+        "5E4",
+        "6E4",
+        "7E4",
+        "8E4",
+        "9E4",
+        "10E4",
+        "11E4",
+        "12E6",
+        "13E6",
+        "14E6",
+        "5E5",
+        "6E5",
+        "7E5",
+        "8E5",
+        "9E5",
+        "10E5",
+        "11E5",
+        "12E5",
+        "13E5",
+        "14E5",
+        "5E6",
+        "6E6",
+        "7E6",
+        "8E6",
+        "9E6",
+        "10E6",
+        "11E6",
+        "12E6",
+        "13E6",
+        "14E6",
+        "5E7",
+        "6E7",
+        "7E7",
+        "8E7",
+        "9E7",
+        "10E7",
+        "11E7",
+        "12E7",
+        "13E7",
     ]
     for heliostat_name in configure_heliostat_name_list:
         heliostat = solar_field.lookup_heliostat(heliostat_name)
@@ -101,21 +101,21 @@ if __name__ == "__main__":
 
     # Control parameters.
     scan_parameters = {}
-    scan_parameters['locale'] = (
-        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters["locale"] = (
+        "Sandia NSTTF"  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
     )
-    scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
+    scan_parameters["camera"] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
-    scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
+    scan_parameters["camera"] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters['maximum_safe_altitude'] = (
+    scan_parameters["section_plane_tolerance"] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters["p_margin"] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters["altitude_margin"] = 2.5  # m.  Clearance of highest possible heliostat point.
+    scan_parameters["maximum_safe_altitude"] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
-    scan_parameters['gaze_tolerance'] = np.deg2rad(
+    scan_parameters["maximum_target_lookback"] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters["gaze_tolerance"] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
 
@@ -144,11 +144,11 @@ if __name__ == "__main__":
     scan = Scan.Scan(scan_passes)
 
     # Construct the flight plan.
-    flight_plan = fp.FlightPlan('N-S Columns', [scan])
+    flight_plan = fp.FlightPlan("N-S Columns", [scan])
 
     # Write the flight plan file.
     # Output directory.
-    output_path = os.path.join('..', ('output_' + datetime.now().strftime('%Y_%m_%d_%H%M')))
+    output_path = os.path.join("..", ("output_" + datetime.now().strftime("%Y_%m_%d_%H%M")))
     if not (os.path.exists(output_path)):
         os.makedirs(output_path)
     flight_plan.save_to_lichi_csv(output_path, elevation_offset)

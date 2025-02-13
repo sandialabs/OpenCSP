@@ -8,7 +8,7 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 
 # setting path
-sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(orp.opencsp_code_dir(), ".."))
 import contrib.scripts.FileFingerprint as ff  # nopep8
 
 
@@ -78,5 +78,5 @@ class test_FileFingerprint(unittest.TestCase):
         self.assertNotEqual(ff1, ff2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -44,13 +44,13 @@ def view_spec_vplane(segment_xy) -> dict:  # A vertical plane containing the seg
 
     # Store results.
     spec = {}
-    spec['type'] = 'vplane'
-    spec['defining_segment_xy'] = segment_xy
-    spec['line_intersecting_xy_plane'] = line
-    spec['section_plane'] = plane
-    spec['origin_xyz'] = origin_xyz
-    spec['p_uxyz'] = p_uxyz
-    spec['q_uxyz'] = q_uxyz
-    spec['w_uxyz'] = w_uxyz
+    spec["type"] = "vplane"
+    spec["defining_segment_xy"] = segment_xy
+    spec["line_intersecting_xy_plane"] = line
+    spec["section_plane"] = plane
+    spec["origin_xyz"] = origin_xyz
+    spec["p_uxyz"] = p_uxyz
+    spec["q_uxyz"] = q_uxyz
+    spec["w_uxyz"] = w_uxyz
     # Return.
     return spec

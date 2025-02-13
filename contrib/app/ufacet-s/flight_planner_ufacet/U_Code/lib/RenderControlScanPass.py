@@ -15,11 +15,11 @@ class RenderControlScanPass:
     def __init__(
         self,
         draw_core_segment=True,
-        core_segment_style=rcps.outline(color='c', linewidth=4),
+        core_segment_style=rcps.outline(color="c", linewidth=4),
         draw_segment_of_interest=True,
-        segment_of_interest_style=rcps.outline(color='brown'),
+        segment_of_interest_style=rcps.outline(color="brown"),
         draw_idx=False,
-        idx_style=rctxt.default(color='k'),
+        idx_style=rctxt.default(color="k"),
     ):
         super(RenderControlScanPass, self).__init__()
 

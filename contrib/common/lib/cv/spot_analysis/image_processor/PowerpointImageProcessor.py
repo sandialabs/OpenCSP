@@ -22,7 +22,7 @@ import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
 
 
-ProcOrImg = TypeVar('ProcOrImage', AbstractSpotAnalysisImageProcessor, CacheableImage, str, np.ndarray, PIL.Image.Image)
+ProcOrImg = TypeVar("ProcOrImage", AbstractSpotAnalysisImageProcessor, CacheableImage, str, np.ndarray, PIL.Image.Image)
 
 
 class ProcessorSelector:
@@ -123,21 +123,21 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
             lt.error_and_raise(
                 FileNotFoundError,
                 "Error in PowerpointImageProcessor.__init__(): "
-                + f"destination directory \"{self.save_dir}\" does not exist!",
+                + f'destination directory "{self.save_dir}" does not exist!',
             )
         if ft.file_exists(self.dest_path_name_ext):
             if not overwrite:
                 lt.error_and_raise(
                     FileExistsError,
                     "Error in PowerpointImageProcessor.__init__(): "
-                    + f"destination file \"{self.dest_path_name_ext}\" already exists!",
+                    + f'destination file "{self.dest_path_name_ext}" already exists!',
                 )
         if processors_per_slide is not None:
             if not hasattr(processors_per_slide, "__iter__"):
                 lt.error_and_raise(
                     TypeError,
                     "Error in PowerpointImageProcessor.__init__(): "
-                    + f"\"processors_per_slide\" is a {type(processors_per_slide)}, but should be a list of lists",
+                    + f'"processors_per_slide" is a {type(processors_per_slide)}, but should be a list of lists',
                 )
             else:
                 for i, processor_set in enumerate(processors_per_slide):
@@ -147,7 +147,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
                         lt.error_and_raise(
                             TypeError,
                             "Error in PowerpointImageProcessor.__init__(): "
-                            + f"\"processors_per_slide[{i}]\" is a {type(processor_set)}, but should be a list!",
+                            + f'"processors_per_slide[{i}]" is a {type(processor_set)}, but should be a list!',
                         )
                     for j, processor_sel in enumerate(processor_set):
                         processor_sel_type = type(processor_sel)
@@ -161,7 +161,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
                                 lt.error_and_raise(
                                     TypeError,
                                     "Error in PowerpointImageProcessor.__init__(): "
-                                    + f"\"processors_per_slide[{i}][{j}]\" is a {processor_sel_type}, "
+                                    + f'"processors_per_slide[{i}][{j}]" is a {processor_sel_type}, '
                                     + f"but should be an {type(AbstractSpotAnalysisImageProcessor)}, "
                                     + f"{type(CacheableImage)}, or image-like!",
                                 )
