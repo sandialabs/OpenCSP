@@ -14,8 +14,6 @@ from opencsp.app.select_image_points import SelectImagePoints
 import opencsp.common.lib.cv.SpotAnalysis
 
 
-import opencsp.app.target.target_color.target_color as target_color
-
 import opencsp.common.lib.camera.CameraTransform as CameraTransform
 import opencsp.common.lib.camera.ImageAcquisition_DCAM_color
 import opencsp.common.lib.camera.ImageAcquisition_MSMF
@@ -110,7 +108,7 @@ class test_Docstrings(unittest.TestCase):
         opencsp.app.sofast.lib.spatial_processing,
     ]
 
-    target_class_list = [target_color, opencsp.app.target.target_color.lib.ImageColor]
+    target_class_list = [opencsp.app.target.target_color.lib.ImageColor]
 
     camera_calibration_class_list = [
         opencsp.app.camera_calibration.lib.calibration_camera,
@@ -167,7 +165,7 @@ class test_Docstrings(unittest.TestCase):
         opencsp.app.sofast.lib.spatial_processing,
     ]
 
-    target_class_list = [target_color, opencsp.app.target.target_color.lib.ImageColor]
+    target_class_list = [opencsp.app.target.target_color.lib.ImageColor]
 
     # TODO: example_camera_calibration_list
     # TODO: example_csp_list
