@@ -216,9 +216,7 @@ def calc_reflected_ray(normal_v: Vxyz, incoming_v: Vxyz) -> Vxyz:
 
     .. code-block:: text
 
-        \[
-        \text{reflected\_ray} = \text{incoming\_ray} - 2 \cdot (\text{normal} \cdot \text{incoming\_ray}) \cdot \text{normal}
-        \]
+        \text{reflected_ray} = \text{incoming_ray} - 2 \cdot (\text{normal} \cdot \text{incoming_ray}) \cdot \text{normal}
 
         norm_v and inc_v must broadcast together.
     """

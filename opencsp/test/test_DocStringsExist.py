@@ -418,12 +418,12 @@ class test_Docstrings(unittest.TestCase):
         cv_class_list
         + camera_class_list
         + csp_class_list
-        # + cv_class_list
-        # + deflectometry_class_list
-        # + file_class_list
-        # + geo_class_list
-        # + geometry_class_list
-        # + opencsp_path_class_list
+        + cv_class_list
+        + deflectometry_class_list
+        + file_class_list
+        + geo_class_list
+        + geometry_class_list
+        + opencsp_path_class_list
         # + photogrammetry_class_list
         # + process_class_list
         # + render_class_list
