@@ -24,7 +24,7 @@ class RenderControlFlightPlan:
         draw_scan=True,
         scan_pass_styles=rce.RenderControlEnsemble(rcsp.default()),
         draw_name=False,
-        name_style=rctxt.default(color='k'),
+        name_style=rctxt.default(color="k"),
     ):
         super(RenderControlFlightPlan, self).__init__()
 

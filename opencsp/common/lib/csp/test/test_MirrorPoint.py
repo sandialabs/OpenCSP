@@ -38,7 +38,7 @@ class TestMirrorPoint:
         """Tests z height output for flat mirror"""
         # Define mirror
         height = 0.1
-        mirror = self.get_test_mirror_flat(height, 'bilinear')
+        mirror = self.get_test_mirror_flat(height, "bilinear")
         # Define sample points
         xv = yv = np.arange(-0.45, 0.45, 0.1)
         X, Y = np.meshgrid(xv, yv)
@@ -53,7 +53,7 @@ class TestMirrorPoint:
         """Tests normal vector output for flat mirror"""
         # Define mirror
         height = 0.25
-        mirror = self.get_test_mirror_flat(height, 'bilinear')
+        mirror = self.get_test_mirror_flat(height, "bilinear")
         # Define sample points
         xv = yv = np.arange(-0.45, 0.45, 0.1)
         X, Y = np.meshgrid(xv, yv)
@@ -68,7 +68,7 @@ class TestMirrorPoint:
         np.testing.assert_array_almost_equal(norms_exp.data, norms_calc.data)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     Test = TestMirrorPoint()
     Test.test_mirror_z_array_flat_biinear()
     Test.test_mirror_z_flat_bilinear()

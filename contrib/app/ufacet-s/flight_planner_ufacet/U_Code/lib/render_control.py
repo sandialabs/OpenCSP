@@ -56,20 +56,20 @@ def initialize_render_control(
 ):  # Whether or not to draw grid lines.
     render_control = {}
     # Figure management.
-    render_control['figure_names'] = []
-    render_control['tile'] = tile
-    render_control['tile_array'] = tile_array
-    render_control['tile_square'] = tile_square
+    render_control["figure_names"] = []
+    render_control["tile"] = tile
+    render_control["tile_array"] = tile_array
+    render_control["tile_square"] = tile_square
 
     # Figure size and placement.
-    render_control['figsize'] = figsize
-    render_control['upper_left_xy'] = upper_left_xy
+    render_control["figsize"] = figsize
+    render_control["upper_left_xy"] = upper_left_xy
 
     # Axis control.
-    render_control['x_label'] = 'x (m)'
-    render_control['y_label'] = 'y (m)'
-    render_control['z_label'] = 'z (m)'
-    render_control['grid'] = grid
+    render_control["x_label"] = "x (m)"
+    render_control["y_label"] = "y (m)"
+    render_control["z_label"] = "z (m)"
+    render_control["grid"] = grid
 
     # Return.
     return render_control

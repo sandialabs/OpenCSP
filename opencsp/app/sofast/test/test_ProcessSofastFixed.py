@@ -30,12 +30,12 @@ class TestProcessSofastFixed(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         """Loads data and runs ProcessSofastFixed"""
-        cls.dir_sofast_fixed = join(opencsp_code_dir(), 'test/data/sofast_fixed')
-        cls.dir_sofast_common = join(opencsp_code_dir(), 'test/data/sofast_common')
-        cls.save_dir = join(opencsp_code_dir(), 'app/sofast/test/data/output/process_sofast_fixed')
+        cls.dir_sofast_fixed = join(opencsp_code_dir(), "test/data/sofast_fixed")
+        cls.dir_sofast_common = join(opencsp_code_dir(), "test/data/sofast_common")
+        cls.save_dir = join(opencsp_code_dir(), "app/sofast/test/data/output/process_sofast_fixed")
         ft.create_directories_if_necessary(cls.save_dir)
 
-        lt.logger(join(cls.save_dir, 'sofast_fixed_process_log.txt'), lt.log.ERROR)
+        lt.logger(join(cls.save_dir, "sofast_fixed_process_log.txt"), lt.log.ERROR)
 
         cls.sofast_single_facet: ProcessSofastFixed = None
         cls.sofast_facet_ensemble: ProcessSofastFixed = None
@@ -50,11 +50,11 @@ class TestProcessSofastFixed(unittest.TestCase):
         # Definitions
         file_camera = join(self.dir_sofast_common, "camera_sofast.h5")
         file_facet = join(self.dir_sofast_common, "Facet_split_NSTTF.json")
-        file_ensemble = join(self.dir_sofast_common, 'Ensemble_split_NSTTF_facet.json')
-        file_ori = join(self.dir_sofast_common, 'spatial_orientation.h5')
-        file_dot_locs = join(self.dir_sofast_fixed, 'data_measurement/fixed_pattern_dot_locations.h5')
-        file_meas = join(self.dir_sofast_fixed, 'data_measurement/measurement_facet_ensemble.h5')
-        file_exp = join(self.dir_sofast_fixed, 'data_expected/calculation_facet_ensemble.h5')
+        file_ensemble = join(self.dir_sofast_common, "Ensemble_split_NSTTF_facet.json")
+        file_ori = join(self.dir_sofast_common, "spatial_orientation.h5")
+        file_dot_locs = join(self.dir_sofast_fixed, "data_measurement/fixed_pattern_dot_locations.h5")
+        file_meas = join(self.dir_sofast_fixed, "data_measurement/measurement_facet_ensemble.h5")
+        file_exp = join(self.dir_sofast_fixed, "data_expected/calculation_facet_ensemble.h5")
 
         # Load data
         camera = Camera.load_from_hdf(file_camera)
@@ -72,15 +72,15 @@ class TestProcessSofastFixed(unittest.TestCase):
         self.exp_facet_pointing_trans = []
         for idx_facet in range(ensemble_data.num_facets):
             datasets = [
-                f'DataSofastCalculation/facet/facet_{idx_facet:03d}/SlopeSolverData/slopes_facet_xy',
-                f'DataSofastCalculation/facet/facet_{idx_facet:03d}/CalculationEnsemble/trans_facet_ensemble',
+                f"DataSofastCalculation/facet/facet_{idx_facet:03d}/SlopeSolverData/slopes_facet_xy",
+                f"DataSofastCalculation/facet/facet_{idx_facet:03d}/CalculationEnsemble/trans_facet_ensemble",
             ]
             data = h5.load_hdf5_datasets(datasets, file_exp)
-            self.exp_slopes_xy_facet_ensemble.append(data['slopes_facet_xy'])
-            self.exp_facet_pointing_trans.append(data['trans_facet_ensemble'])
+            self.exp_slopes_xy_facet_ensemble.append(data["slopes_facet_xy"])
+            self.exp_facet_pointing_trans.append(data["trans_facet_ensemble"])
 
         # Instantiate class
-        params = ParamsSofastFixed.load_from_hdf(file_exp, 'DataSofastInput/')
+        params = ParamsSofastFixed.load_from_hdf(file_exp, "DataSofastInput/")
         self.sofast_facet_ensemble = ProcessSofastFixed(orientation, camera, dot_locs)
         self.sofast_facet_ensemble.params = params
         self.sofast_facet_ensemble.load_measurement_data(measurement)
@@ -94,10 +94,10 @@ class TestProcessSofastFixed(unittest.TestCase):
         # Definitions
         file_camera = join(self.dir_sofast_common, "camera_sofast.h5")
         file_facet = join(self.dir_sofast_common, "Facet_NSTTF.json")
-        file_ori = join(self.dir_sofast_common, 'spatial_orientation.h5')
-        file_dot_locs = join(self.dir_sofast_fixed, 'data_measurement/fixed_pattern_dot_locations.h5')
-        file_meas = join(self.dir_sofast_fixed, 'data_measurement/measurement_facet.h5')
-        file_exp = join(self.dir_sofast_fixed, 'data_expected/calculation_facet.h5')
+        file_ori = join(self.dir_sofast_common, "spatial_orientation.h5")
+        file_dot_locs = join(self.dir_sofast_fixed, "data_measurement/fixed_pattern_dot_locations.h5")
+        file_meas = join(self.dir_sofast_fixed, "data_measurement/measurement_facet.h5")
+        file_exp = join(self.dir_sofast_fixed, "data_expected/calculation_facet.h5")
 
         # Load data
         surface = Surface2DParabolic(initial_focal_lengths_xy=(150.0, 150), robust_least_squares=False, downsample=1)
@@ -108,12 +108,12 @@ class TestProcessSofastFixed(unittest.TestCase):
         measurement = MeasurementSofastFixed.load_from_hdf(file_meas)
 
         # Load expected data
-        datasets = ['DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy']
+        datasets = ["DataSofastCalculation/facet/facet_000/SlopeSolverData/slopes_facet_xy"]
         data = h5.load_hdf5_datasets(datasets, file_exp)
-        self.exp_slopes_xy_single_facet = data['slopes_facet_xy']
+        self.exp_slopes_xy_single_facet = data["slopes_facet_xy"]
 
         # Instantiate class
-        params = ParamsSofastFixed.load_from_hdf(file_exp, 'DataSofastInput/')
+        params = ParamsSofastFixed.load_from_hdf(file_exp, "DataSofastInput/")
         self.sofast_single_facet = ProcessSofastFixed(orientation, camera, dot_locs)
         self.sofast_single_facet.params = params
         self.sofast_single_facet.load_measurement_data(measurement)
@@ -125,35 +125,35 @@ class TestProcessSofastFixed(unittest.TestCase):
 
     def test_save_facet_ensemble_as_hdf(self):
         """Tests saving to HDF file"""
-        self.sofast_facet_ensemble.save_to_hdf(join(self.save_dir, 'data_calculation_facet_ensemble.h5'))
+        self.sofast_facet_ensemble.save_to_hdf(join(self.save_dir, "data_calculation_facet_ensemble.h5"))
 
     def test_save_single_facet_as_hdf(self):
         """Tests saving to HDF file"""
-        self.sofast_single_facet.save_to_hdf(join(self.save_dir, 'data_calculation_single_facet.h5'))
+        self.sofast_single_facet.save_to_hdf(join(self.save_dir, "data_calculation_single_facet.h5"))
 
     def test_save_facet_ensemble_slope_figure(self):
         """Tests genreating and saving a figure of a facet ensemble"""
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         axis_control_m = rca.meters()
 
-        fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
-        ensemble = self.sofast_facet_ensemble.get_optic('bilinear')
+        fig_mng = fm.setup_figure(figure_control, axis_control_m, title="")
+        ensemble = self.sofast_facet_ensemble.get_optic("bilinear")
         res_meter = 0.002  # meter, 2mm resolution
         clim_mrad = 7  # +/- 7 mrad color bar limits
         ensemble.plot_orthorectified_slope(res=res_meter, clim=clim_mrad, axis=fig_mng.axis)
-        fig_mng.save(self.save_dir, 'slope_magnitude_facet_ensemble', 'png')
+        fig_mng.save(self.save_dir, "slope_magnitude_facet_ensemble", "png")
 
     def test_save_single_facet_slope_figure(self):
         """Tests generating and saving a figure of a single facet"""
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
         axis_control_m = rca.meters()
 
-        fig_mng = fm.setup_figure(figure_control, axis_control_m, title='')
-        facet = self.sofast_single_facet.get_optic('bilinear')
+        fig_mng = fm.setup_figure(figure_control, axis_control_m, title="")
+        facet = self.sofast_single_facet.get_optic("bilinear")
         res_meter = 0.002  # meter, 2mm resolution
         clim_mrad = 7  # +/- 7 mrad color bar limits
         facet.plot_orthorectified_slope(res=res_meter, clim=clim_mrad, axis=fig_mng.axis)
-        fig_mng.save(self.save_dir, 'slope_magnitude_single_facet', 'png')
+        fig_mng.save(self.save_dir, "slope_magnitude_single_facet", "png")
 
     def test_slopes_xy_facet_ensemble(self):
         """Tests slope data"""
@@ -188,8 +188,8 @@ class TestProcessSofastFixed(unittest.TestCase):
 
     def tearDown(self) -> None:
         # Make sure we release all matplotlib resources.
-        plt.close('all')
+        plt.close("all")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

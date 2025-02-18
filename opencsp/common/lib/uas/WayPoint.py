@@ -37,12 +37,12 @@ class WayPoint:
         self.set_longitude_latitude()
 
     def set_longitude_latitude(self):
-        if self.locale == 'NSTTF':
+        if self.locale == "NSTTF":
             lon, lat = lln.nsttf_lon_lat_given_xy(self.xyz[0], self.xyz[1])
             self.lon = lon
             self.lat = lat
         else:
-            print('In WayPoint. set_longitude_latitude(), unexpected locale encountered.')
+            print("In WayPoint. set_longitude_latitude(), unexpected locale encountered.")
             assert False
 
     def heading_deg(self):

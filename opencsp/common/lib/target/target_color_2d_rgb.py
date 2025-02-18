@@ -67,7 +67,7 @@ def construct_rgb_cube_inscribed_square_image(
     vecs_centerd = np.array([X.flatten(), Y.flatten(), np.zeros(X.size)]).T  # Nx3
 
     #  Rotate points to be normal to white (1, 1, 1)
-    rot = Rotation.from_euler(seq='zyz', angles=[90, 45, 45], degrees=True)
+    rot = Rotation.from_euler(seq="zyz", angles=[90, 45, 45], degrees=True)
     vecs = rot.apply(vecs_centerd)  # Nx3
 
     # Add offset along white (1, 1, 1) direction
@@ -111,7 +111,7 @@ if __name__ == "__main__":
     vecs_centerd = np.array([X.flatten(), Y.flatten(), np.zeros(X.size)]).T  # Nx3
 
     #  Rotate points to be normal to white (1, 1, 1)
-    rot = Rotation.from_euler(seq='zyz', angles=[90, 45, 45], degrees=True)
+    rot = Rotation.from_euler(seq="zyz", angles=[90, 45, 45], degrees=True)
     vecs = rot.apply(vecs_centerd)  # Nx3
 
     # Add offset along white (1, 1, 1) direction
@@ -139,7 +139,7 @@ if __name__ == "__main__":
     image_uint8 = np.uint8(image * 255)
 
     # Save target
-    imageio.imwrite('target_color_2d_rgb.png', image_uint8)
+    imageio.imwrite("target_color_2d_rgb.png", image_uint8)
 
     # Plot points in 3D color space
     # fig = plt.figure()

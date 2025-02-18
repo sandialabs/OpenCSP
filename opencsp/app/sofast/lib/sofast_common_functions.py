@@ -34,16 +34,16 @@ def check_system_fringe_loaded(sys_fringe: ssf.SystemSofastFringe | None, method
     if sys_fringe is not None:
         if ImageAcquisitionAbstract.instance() is None:
             # If we've done everything correctly then this should be unreachable code
-            raise RuntimeError(f'In {method_name}: SOFAST system instance exists without a connected camera!')
+            raise RuntimeError(f"In {method_name}: SOFAST system instance exists without a connected camera!")
         if ImageProjection.instance() is None:
             # If we've done everything correctly then this should be unreachable code
             raise RuntimeWarning(
-                'In ' + method_name + ': ' + 'SOFAST system instance exists without a loaded projector!'
+                "In " + method_name + ": " + "SOFAST system instance exists without a loaded projector!"
             )
         return True
     else:
         raise RuntimeError(
-            f'In {method_name}: Both ImageAcquisiton and ImageProjection must be loaded before using the SOFAST system.'
+            f"In {method_name}: Both ImageAcquisiton and ImageProjection must be loaded before using the SOFAST system."
         )
 
 
@@ -65,7 +65,7 @@ def check_calibration_loaded(sys_fringe: ssf.SystemSofastFringe, method_name: st
     check_system_fringe_loaded(sys_fringe, method_name)
 
     if sys_fringe.calibration is None:  # Not loaded
-        raise RuntimeError(f'In {method_name}: Camera-Projector calibration must be loaded/performed.')
+        raise RuntimeError(f"In {method_name}: Camera-Projector calibration must be loaded/performed.")
     else:  # Loaded
         return True
 
@@ -89,7 +89,7 @@ def check_camera_loaded(method_name: str, image_acquisition: ImageAcquisitionAbs
     """
     image_acquisition, _ = get_default_or_global_instances(image_acquisition_default=image_acquisition)
     if image_acquisition is None:  # Not loaded
-        raise RuntimeError('In ' + method_name + ': Camera must be loaded.')
+        raise RuntimeError("In " + method_name + ": Camera must be loaded.")
     else:  # Loaded
         return True
 
@@ -113,7 +113,7 @@ def check_projector_loaded(method_name: str, image_projection: ImageProjection =
     """
     _, image_projection = get_default_or_global_instances(image_projection_default=image_projection)
     if image_projection is None:  # Not loaded
-        raise RuntimeError('In ' + method_name + ': Projector must be loaded.')
+        raise RuntimeError("In " + method_name + ": Projector must be loaded.")
     else:  # Loaded
         return True
 
@@ -169,16 +169,16 @@ def run_exposure_cal(
     image_acquisition, image_projection = get_default_or_global_instances(image_acquisition, image_projection)
 
     # Check that a camera is available
-    check_camera_loaded('run_exposure_calibration', image_acquisition)
+    check_camera_loaded("run_exposure_calibration", image_acquisition)
 
     # Try to display a white image on the projector, if there is one
     if image_projection is None:
-        lt.info('Running calibration without displayed white image.')
+        lt.info("Running calibration without displayed white image.")
         image_acquisition.calibrate_exposure()
         if on_done is not None:
             on_done()
     else:
-        lt.info('Running calibration with displayed white image.')
+        lt.info("Running calibration with displayed white image.")
 
         def run_cal():
             image_acquisition.calibrate_exposure()
@@ -206,7 +206,7 @@ def get_exposure(image_acquisition: ImageAcquisitionAbstract = None) -> int | No
     RuntimeError:
         If there is no camera instance
     """
-    check_camera_loaded('get_exposure', image_acquisition=image_acquisition)
+    check_camera_loaded("get_exposure", image_acquisition=image_acquisition)
     image_acquisition, _ = get_default_or_global_instances(image_acquisition_default=image_acquisition)
     return image_acquisition.exposure_time
 
@@ -226,6 +226,6 @@ def set_exposure(new_exp: int, image_acquisition: ImageAcquisitionAbstract = Non
     RuntimeError:
         If there is no camera instance
     """
-    check_camera_loaded('set_exposure', image_acquisition=image_acquisition)
+    check_camera_loaded("set_exposure", image_acquisition=image_acquisition)
     image_acquisition, _ = get_default_or_global_instances(image_acquisition_default=image_acquisition)
     image_acquisition.exposure_time = int(new_exp)

@@ -72,7 +72,7 @@ class RayTrace:
         for lp in self.light_paths_ensemble:
             print(lp)
 
-    def __add__(self, trace: 'RayTrace'):
+    def __add__(self, trace: "RayTrace"):
         sum_trace = RayTrace()
 
         for light_source in self.scene.light_sources + trace.scene.light_sources:
@@ -158,7 +158,7 @@ class RayTrace:
         self.light_paths_ensemble.concatenate_in_place(LightPathEnsemble(new_paths))
 
     @classmethod
-    def from_hdf(cls, filename: str, trace_name: str = "RayTrace") -> 'RayTrace':
+    def from_hdf(cls, filename: str, trace_name: str = "RayTrace") -> "RayTrace":
         """
         Creates a RayTrace object from an HDF5 file.
 
@@ -181,7 +181,7 @@ class RayTrace:
         lpe = LightPathEnsemble([])
         for batch in batch_names:
             prefix = f"RayTrace_{trace_name}/Batches/{batch}/"
-            subgroups = [prefix + 'CurrentDirections', prefix + 'InitialDirections', prefix + 'Points']
+            subgroups = [prefix + "CurrentDirections", prefix + "InitialDirections", prefix + "Points"]
             curr_directions, init_directions, points = list(load_hdf5_datasets(subgroups, filename).values())
             curr_directions = Uxyz(curr_directions)
             init_directions = Uxyz(init_directions)
@@ -216,9 +216,7 @@ def calc_reflected_ray(normal_v: Vxyz, incoming_v: Vxyz) -> Vxyz:
 
     .. code-block:: text
 
-        \[
-        \text{reflected\_ray} = \text{incoming\_ray} - 2 \cdot (\text{normal} \cdot \text{incoming\_ray}) \cdot \text{normal}
-        \]
+        \text{reflected_ray} = \text{incoming_ray} - 2 \cdot (\text{normal} \cdot \text{incoming_ray}) \cdot \text{normal}
 
         norm_v and inc_v must broadcast together.
     """
@@ -639,7 +637,7 @@ def trace_scene_parallel(
     scene: scn.Scene,
     obj_resolution: Resolution,
     processor_count: int,
-    resolution_type: str = 'pixelX',
+    resolution_type: str = "pixelX",
     store_in_ram=True,
     max_ram_in_use_percent: float = 99.0,
     save_in_file=False,

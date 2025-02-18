@@ -11,7 +11,7 @@ import opencsp.common.lib.csp.SolarField as sf
 
 def construct_raster_scan(solar_field, raster_scan_parameter_file):
     # Notify progress.
-    print('Constructing raster scan...')
+    print("Constructing raster scan...")
 
     # Fetch scan parameters.
     raster_scan_parameters = psrp.construct_raster_scan_parameters(raster_scan_parameter_file)

@@ -129,5 +129,5 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         np.testing.assert_array_equal(operable.primary_image.nparray, self.b2_img.nparray.astype(np.float_))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -471,7 +471,7 @@ class RegionDetector:
         diameter = 7
 
         boundary_pixels = np.zeros_like(canny_edges)
-        boundary_pixels[boundary_locations.asindex('yx')] = 255
+        boundary_pixels[boundary_locations.asindex("yx")] = 255
 
         boundary_blob = boundary_pixels.copy().astype(np.float64)
         boundary_blob: np.ndarray = cv.filter2D(boundary_blob, -1, np.ones((diameter, diameter), np.float32))
@@ -525,7 +525,7 @@ class RegionDetector:
         height = boundary_edges.shape[0]
 
         # find initial edge groups, two per 'x' and 'y' search dir2.rections
-        scan_dirs = ('y', 'x')
+        scan_dirs = ("y", "x")
         scansteps_xy = (np.array([0, 1]), np.array([1, 0]))
         windows_wh = (np.array([width, self.edge_coarse_width]), np.array([self.edge_coarse_width, height]))
         initial_edge_groups: dict[str, tuple[r2.RectXY, r2.RectXY]] = {}
@@ -537,13 +537,13 @@ class RegionDetector:
         # find the edge groups again, excluding pixels from the opposite groups
         for scan_dir, scanstep_xy, window_wh in zip(scan_dirs, scansteps_xy, windows_wh):
             # get the subregion to scan within
-            if scan_dir == 'y':
-                groups = initial_edge_groups['x']
+            if scan_dir == "y":
+                groups = initial_edge_groups["x"]
                 left, right = sorted(groups, key=lambda g: g.left)
                 region = r2.RectXY(p2.Pxy((left.right, 0)), p2.Pxy((right.left, height)))
                 window_wh = np.array([region.right - region.left, self.edge_coarse_width])
-            elif scan_dir == 'x':
-                groups = initial_edge_groups['y']
+            elif scan_dir == "x":
+                groups = initial_edge_groups["y"]
                 top, bottom = sorted(groups, key=lambda g: g.top)
                 region = r2.RectXY(p2.Pxy((0, top.bottom)), p2.Pxy((width, bottom.top)))
                 window_wh = np.array([self.edge_coarse_width, region.bottom - region.top])
@@ -560,7 +560,7 @@ class RegionDetector:
         vis_image = np.expand_dims(boundary_edges, axis=2)
         vis_image = np.broadcast_to(vis_image, (vis_image.shape[0], vis_image.shape[1], 3))
         captions_groups = [
-            ("Initial edge groups", initial_edge_groups['x'] + initial_edge_groups['y']),
+            ("Initial edge groups", initial_edge_groups["x"] + initial_edge_groups["y"]),
             ("Refined edge groups", refined_edge_groups),
         ]
         captions_images: list[tuple[str, np.ndarray]] = []
@@ -642,10 +642,10 @@ class RegionDetector:
                 # left/right sides. Don't check within the overlapping
                 # region of the previously found window.
                 if i == 1:
-                    if scan_dir == 'y':
+                    if scan_dir == "y":
                         if (curr_pos.bottom > previous_window.top) and (curr_pos.top < previous_window.bottom):
                             continue
-                    elif scan_dir == 'x':
+                    elif scan_dir == "x":
                         if (curr_pos.right > previous_window.left) and (curr_pos.left < previous_window.right):
                             continue
                     else:
@@ -849,7 +849,7 @@ class RegionDetector:
 
         # Visualize the region
         matching_xy = all_xy[np.where(region.is_inside(all_xy))]
-        vis_image[matching_xy.asindex('yx')] = 255
+        vis_image[matching_xy.asindex("yx")] = 255
 
         return vis_image
 

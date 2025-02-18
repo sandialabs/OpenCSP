@@ -18,13 +18,13 @@ import opencsp.common.lib.target.target_image
 
 
 if __name__ == "__main__":
-    plt.close('all')
+    plt.close("all")
 
-    base_dir = opencsp_dir() + '\\common\\lib\\test\\output\\TestTargetColor\\actual_output'
+    base_dir = opencsp_dir() + "\\common\\lib\\test\\output\\TestTargetColor\\actual_output"
     output_dir = os.path.join(
-        'app', 'target', 'target_color', 'test', 'data', 'output', source_file_body
+        "app", "target", "target_color", "test", "data", "output", source_file_body
     )  # ?? SCAFFOLDING RCB -- ADD CODE TO CREATE DIRECTORY IF NECESSARY.
-    output_ext = '.png'
+    output_ext = ".png"
 
     print("Hello, world!")
 
@@ -47,8 +47,8 @@ if __name__ == "__main__":
     y_max = n_rows
 
     # Report statistics.
-    print('Min value = ', img.min())
-    print('Max value = ', img.max())
+    print("Min value = ", img.min())
+    print("Max value = ", img.max())
 
     # Max intensity.
     max_intensity = 1.0
@@ -63,12 +63,12 @@ if __name__ == "__main__":
 
     # Discrete linear color bar
     target_color_1d_gradient.linear_color_bar(
-        'discrete', color_bar, color_below_min, color_above_max, img, dpi, output_dir, output_ext
+        "discrete", color_bar, color_below_min, color_above_max, img, dpi, output_dir, output_ext
     )
 
     # Continuous linear color bar
     target_color_1d_gradient.linear_color_bar(
-        'continuous', color_bar, color_below_min, color_above_max, img, dpi, output_dir, output_ext
+        "continuous", color_bar, color_below_min, color_above_max, img, dpi, output_dir, output_ext
     )
 
     assert False
@@ -99,8 +99,8 @@ if __name__ == "__main__":
     # Image height and width determined by bullseye size.
     target_img_width_in = target_diameter_in  # Margin is controlled by the cx offset parameters.
     target_img_height_in = target_img_width_in  # For designing a square image
-    print('target_img_width_in  = ', target_img_width_in)
-    print('target_img_height_in = ', target_img_height_in)
+    print("target_img_width_in  = ", target_img_width_in)
+    print("target_img_height_in = ", target_img_height_in)
     # Convert to pixels, for later use.
     target_img_width_pix = target_img_width_in * dpi
     target_img_height_pix = target_img_height_in * dpi
@@ -156,7 +156,7 @@ if __name__ == "__main__":
 
     # Generate image #1.
     alignment_line_start_x, dummy = bullseye_color_bar(
-        'discrete',
+        "discrete",
         cx_offset_1_pix,
         y_offset_pix,
         target_design_focal_length_m,
@@ -175,7 +175,7 @@ if __name__ == "__main__":
 
     # Generate image #2.
     dummy, trim_line_start_x = bullseye_color_bar(
-        'discrete',
+        "discrete",
         cx_offset_2_pix,
         y_offset_pix,
         target_design_focal_length_m,
@@ -197,12 +197,12 @@ if __name__ == "__main__":
     total_width_x_in = total_width_x / dpi
 
     # Report.
-    print('dpi = ', dpi)
-    print('x_max = ', x_max)
-    print('alignment_line_start_x = ', alignment_line_start_x)
-    print('trim_line_start_x = ', trim_line_start_x)
-    print('total_width_x = ', total_width_x)
-    print('total_width_x_in = ', total_width_x_in)
+    print("dpi = ", dpi)
+    print("x_max = ", x_max)
+    print("alignment_line_start_x = ", alignment_line_start_x)
+    print("trim_line_start_x = ", trim_line_start_x)
+    print("total_width_x = ", total_width_x)
+    print("total_width_x_in = ", total_width_x_in)
 
     # Continuous bullseye color bar
 #    bullseye_color_bar('continuous')

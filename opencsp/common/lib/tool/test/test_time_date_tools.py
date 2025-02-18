@@ -12,5 +12,5 @@ class TestTimeDateTools(unittest.TestCase):
         self.assertEqual(when_ymdhmsz, when_ymdhmsz2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

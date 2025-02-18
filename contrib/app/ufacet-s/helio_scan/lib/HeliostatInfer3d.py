@@ -78,9 +78,9 @@ class HeliostatInfer3d:
     ):  # Flags to control rendering; e.g., whether to output intermediate construction steps.
         # Start progress log.
         self.search_log = []
-        msg_line = tdt.current_time_string() + ' ' + str(hel_name) + ' starting 3d inference...'
+        msg_line = tdt.current_time_string() + " " + str(hel_name) + " starting 3d inference..."
         self.search_log.append(msg_line)
-        print('\n' + msg_line)
+        print("\n" + msg_line)
 
         # Data.
         self.hel_name = hel_name
@@ -130,10 +130,10 @@ class HeliostatInfer3d:
 
         # Construct an ideal version of this heliostat.
         msg_line = (
-            tdt.current_time_string() + ' ' + str(hel_name) + ' constructing ideal heliostat...'
+            tdt.current_time_string() + " " + str(hel_name) + " constructing ideal heliostat..."
         )  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
         self.search_log.append(msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
-        print('\n' + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
+        print("\n" + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
         self.design_heliostat_spec = self.specifications.construct_design_heliostat_spec(self.hel_xyz)
         self.design_heliostat_xyz_list = self.specifications.heliostat_corner_xyz_list_given_heliostat_spec(
             self.design_heliostat_spec
@@ -148,10 +148,10 @@ class HeliostatInfer3d:
         # Determine which frames to process.
         # (We assemble this list to make adjustment easy during debugging.)
         msg_line = (
-            tdt.current_time_string() + ' ' + str(hel_name) + ' analyzing frames...'
+            tdt.current_time_string() + " " + str(hel_name) + " analyzing frames..."
         )  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
         self.search_log.append(msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
-        print('\n' + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
+        print("\n" + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
         self.dict_of_frame_dicts = {}
         for frame_id_xy_list in self.list_of_frame_id_observed_corner_xy_lists:
             frame_id = frame_id_xy_list[0]
@@ -174,16 +174,16 @@ class HeliostatInfer3d:
             camera_rvec, camera_tvec = self.compute_camera_pose(correspond_design_xyz_list, correspond_observed_xy_list)
             # Collect results for this frame.
             frame_dict = {}  # ?? SCAFFOLDING RCB -- SHOULD THIS BE A CLASS?
-            frame_dict['frame_id'] = frame_id
-            frame_dict['all_design_xyz_list'] = self.design_heliostat_xyz_list
-            frame_dict['all_observed_xy_list'] = observed_corner_xy_list
-            frame_dict['not_missing_mask'] = not_missing_mask
-            frame_dict['correspond_design_xyz_list'] = correspond_design_xyz_list
-            frame_dict['correspond_observed_xy_list'] = correspond_observed_xy_list
-            frame_dict['n_missing'] = n_missing
-            frame_dict['use_for_metrology'] = n_missing <= self.max_missing_corners_to_allow
-            frame_dict['single_frame_camera_rvec'] = camera_rvec
-            frame_dict['single_frame_camera_tvec'] = camera_tvec
+            frame_dict["frame_id"] = frame_id
+            frame_dict["all_design_xyz_list"] = self.design_heliostat_xyz_list
+            frame_dict["all_observed_xy_list"] = observed_corner_xy_list
+            frame_dict["not_missing_mask"] = not_missing_mask
+            frame_dict["correspond_design_xyz_list"] = correspond_design_xyz_list
+            frame_dict["correspond_observed_xy_list"] = correspond_observed_xy_list
+            frame_dict["n_missing"] = n_missing
+            frame_dict["use_for_metrology"] = n_missing <= self.max_missing_corners_to_allow
+            frame_dict["single_frame_camera_rvec"] = camera_rvec
+            frame_dict["single_frame_camera_tvec"] = camera_tvec
             # Add to results for all frames.
             self.dict_of_frame_dicts[frame_id] = frame_dict
 
@@ -195,13 +195,13 @@ class HeliostatInfer3d:
             specifications=self.specifications,
             dict_of_frame_dicts=self.dict_of_frame_dicts,
             saving_path=output_hel_dir,
-            title_prefix=' ',
+            title_prefix=" ",
             explain=None,
             tracked_style=rcps.RenderControlPointSeq(
-                linestyle='-', linewidth=0.3, color='m', marker='+', markersize=3  #'o',
+                linestyle="-", linewidth=0.3, color="m", marker="+", markersize=3  #'o',
             ),  # 0.4),
             processed_style=rcps.RenderControlPointSeq(
-                linestyle='-', linewidth=0.5, marker='o', markersize=0.7, markeredgewidth=0.2, color='b'
+                linestyle="-", linewidth=0.5, marker="o", markersize=0.7, markeredgewidth=0.2, color="b"
             ),
         )
 
@@ -209,17 +209,17 @@ class HeliostatInfer3d:
         design_error_n_pts = self.reprojection_error_all_frames_given_heliostat_spec(self.design_heliostat_spec)
         msg_line = (
             tdt.current_time_string()
-            + ' '
+            + " "
             + str(hel_name)
-            + ' overall error for '
+            + " overall error for "
             + str(hel_name)
-            + ' design_heliostat_spec = '
+            + " design_heliostat_spec = "
             + str(design_error_n_pts[0])
-            + ',  n_points ='
+            + ",  n_points ="
             + str(design_error_n_pts[1])
         )  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
         self.search_log.append(msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
-        print('\n' + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
+        print("\n" + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
 
         # # Draw frame images, for reference.
         # for frame_id in dt.sorted_keys(self.dict_of_frame_dicts):
@@ -234,12 +234,12 @@ class HeliostatInfer3d:
         # Find the 3-d heliostat which best fits the observed data.
         msg_line = (
             tdt.current_time_string()
-            + ' '
+            + " "
             + str(hel_name)
-            + ' adjusting design heliostat to minimize reprojection error...'
+            + " adjusting design heliostat to minimize reprojection error..."
         )  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
         self.search_log.append(msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
-        print('\n' + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
+        print("\n" + msg_line)  # ?? SCAFFOLDING RCB -- ENCAPSULATE THESE INTO A "LOG" MEMBER FUNCTION.
         self.search_heliostat_spec = copy.deepcopy(self.design_heliostat_spec)
         self.adjust_heliostat_spec_to_minimize_reprojection_error(
             self.search_heliostat_spec,  # Changed as a side effect.
@@ -262,10 +262,10 @@ class HeliostatInfer3d:
         )
 
     def select_distortion_model(self):
-        if self.distorted_or_undistorted_str == 'distorted':
+        if self.distorted_or_undistorted_str == "distorted":
             # The observed xy points are displaced by the effects of lens distortion.  So correct by the distortion model.
             return self.distortion_coefficients
-        elif self.distorted_or_undistorted_str == 'undistorted':
+        elif self.distorted_or_undistorted_str == "undistorted":
             # The observed xy points have alreay had distortion removed, so don't remove it again.
             return self.zero_distortion_coefficients
         else:
@@ -279,7 +279,7 @@ class HeliostatInfer3d:
         self, search_heliostat_spec, n_planar_iterations, n_canting_iterations, n_steps_one_direction, variable_steps
     ):
         # Save figures for initial state.
-        self.save_and_analyze_heliostat_spec('SearchIter' + str(0), search_heliostat_spec)
+        self.save_and_analyze_heliostat_spec("SearchIter" + str(0), search_heliostat_spec)
 
         # Iterative search, allowing planar adjustment of facet positions (x,y,z,rot_z).
         self.search_overall_error_history = []
@@ -293,14 +293,14 @@ class HeliostatInfer3d:
             self.search_overall_error_history.append([iteration, current_overall_error])
             msg_line = (
                 tdt.current_time_string()
-                + ' '
+                + " "
                 + str(self.hel_name)
-                + ' iteration {iteration:2d} overall error={overall_err:11.8f} n_points={n_points:d}'.format(
+                + " iteration {iteration:2d} overall error={overall_err:11.8f} n_points={n_points:d}".format(
                     iteration=iteration, overall_err=current_overall_error, n_points=current_n_points_sum
                 )
             )
             self.search_log.append(msg_line)
-            print('\n' + msg_line)
+            print("\n" + msg_line)
             previous_error = current_overall_error
             for facet_idx in range(0, n_facets):
                 if not facet_is_converged[facet_idx]:
@@ -320,9 +320,9 @@ class HeliostatInfer3d:
                     )
                     msg_line = (
                         tdt.current_time_string()
-                        + ' '
+                        + " "
                         + str(self.hel_name)
-                        + ' iteration {iteration:2d} facet {facet_idx:2d} min error={min_err:11.8f} after adjust {var_name:8s} by {del_var:11.8f} reduced={err_reduction:11.7f}'.format(
+                        + " iteration {iteration:2d} facet {facet_idx:2d} min error={min_err:11.8f} after adjust {var_name:8s} by {del_var:11.8f} reduced={err_reduction:11.7f}".format(
                             iteration=iteration,
                             facet_idx=facet_idx,
                             min_err=best_min_error,
@@ -337,15 +337,15 @@ class HeliostatInfer3d:
                 # Then all facets are converged.
                 msg_line = (
                     tdt.current_time_string()
-                    + ' '
+                    + " "
                     + str(self.hel_name)
-                    + ' iteration {iteration:2d}; all facets are converged (x,y,z,rot_z).'.format(iteration=iteration)
+                    + " iteration {iteration:2d}; all facets are converged (x,y,z,rot_z).".format(iteration=iteration)
                 )
                 self.search_log.append(msg_line)
-                print('\n' + msg_line)
+                print("\n" + msg_line)
                 break
         # Save figures for last planar iteration.
-        self.save_and_analyze_heliostat_spec('SearchIter' + str(iteration), search_heliostat_spec)
+        self.save_and_analyze_heliostat_spec("SearchIter" + str(iteration), search_heliostat_spec)
 
         # Iterative search, allowing adjustment of canting angles (rot_x,rot_y).
         facet_is_converged = [False] * n_facets
@@ -356,14 +356,14 @@ class HeliostatInfer3d:
             self.search_overall_error_history.append([iteration, current_overall_error])
             msg_line = (
                 tdt.current_time_string()
-                + ' '
+                + " "
                 + str(self.hel_name)
-                + ' iteration {iteration:2d} overall error={overall_err:11.8f} n_points={n_points:d}'.format(
+                + " iteration {iteration:2d} overall error={overall_err:11.8f} n_points={n_points:d}".format(
                     iteration=iteration, overall_err=current_overall_error, n_points=current_n_points_sum
                 )
             )
             self.search_log.append(msg_line)
-            print('\n' + msg_line)
+            print("\n" + msg_line)
             previous_error = current_overall_error
             for facet_idx in range(0, n_facets):
                 if not facet_is_converged[facet_idx]:
@@ -383,9 +383,9 @@ class HeliostatInfer3d:
                     )
                     msg_line = (
                         tdt.current_time_string()
-                        + ' '
+                        + " "
                         + str(self.hel_name)
-                        + ' iteration {iteration:2d} facet {facet_idx:2d} min error={min_err:11.8f} after adjust {var_name:8s} by {del_var:8.5f} reduced={err_reduction:11.7f}'.format(
+                        + " iteration {iteration:2d} facet {facet_idx:2d} min error={min_err:11.8f} after adjust {var_name:8s} by {del_var:8.5f} reduced={err_reduction:11.7f}".format(
                             iteration=iteration,
                             facet_idx=facet_idx,
                             min_err=best_min_error,
@@ -400,15 +400,15 @@ class HeliostatInfer3d:
                 # Then all facets are converged.
                 msg_line = (
                     tdt.current_time_string()
-                    + ' '
+                    + " "
                     + str(self.hel_name)
-                    + ' iteration {iteration:2d}; all facets are converged (rot_x,rot_y).'.format(iteration=iteration)
+                    + " iteration {iteration:2d}; all facets are converged (rot_x,rot_y).".format(iteration=iteration)
                 )
                 self.search_log.append(msg_line)
-                print('\n' + msg_line)
+                print("\n" + msg_line)
                 break
         # Save figures for last canting iteration.
-        self.save_and_analyze_heliostat_spec('SearchIter' + str(iteration), search_heliostat_spec)
+        self.save_and_analyze_heliostat_spec("SearchIter" + str(iteration), search_heliostat_spec)
 
     def find_best_variable_xyz_rot_z(
         self, search_heliostat_spec, facet_to_adjust_idx, n_steps_one_direction, variable_steps
@@ -416,7 +416,7 @@ class HeliostatInfer3d:
         rot_z_min_err, min_err_del_rot_z = self.find_best_value(
             copy.deepcopy(search_heliostat_spec),
             facet_to_adjust_idx=facet_to_adjust_idx,
-            var_name='rot_z',
+            var_name="rot_z",
             half_range=0.005,
             n_steps_one_direction=n_steps_one_direction,
             variable_steps=variable_steps,
@@ -424,7 +424,7 @@ class HeliostatInfer3d:
         c_x_min_err, min_err_del_c_x = self.find_best_value(
             copy.deepcopy(search_heliostat_spec),
             facet_to_adjust_idx=facet_to_adjust_idx,
-            var_name='center_x',
+            var_name="center_x",
             half_range=0.005,
             n_steps_one_direction=n_steps_one_direction,
             variable_steps=variable_steps,
@@ -432,7 +432,7 @@ class HeliostatInfer3d:
         c_y_min_err, min_err_del_c_y = self.find_best_value(
             copy.deepcopy(search_heliostat_spec),
             facet_to_adjust_idx=facet_to_adjust_idx,
-            var_name='center_y',
+            var_name="center_y",
             half_range=0.005,
             n_steps_one_direction=n_steps_one_direction,
             variable_steps=variable_steps,
@@ -440,13 +440,13 @@ class HeliostatInfer3d:
         # Find most productive error reduction variable.
         min_err = min(rot_z_min_err, c_x_min_err, c_y_min_err)
         if min_err == rot_z_min_err:
-            return 'rot_z', rot_z_min_err, min_err_del_rot_z
+            return "rot_z", rot_z_min_err, min_err_del_rot_z
         elif min_err == c_x_min_err:
-            return 'center_x', c_x_min_err, min_err_del_c_x
+            return "center_x", c_x_min_err, min_err_del_c_x
         elif min_err == c_y_min_err:
-            return 'center_y', c_y_min_err, min_err_del_c_y
+            return "center_y", c_y_min_err, min_err_del_c_y
         else:
-            print('ERROR: In Heliostats3dInference.find_best_variable(), unexpected situation encountered.')
+            print("ERROR: In Heliostats3dInference.find_best_variable(), unexpected situation encountered.")
             assert False
 
     def find_best_variable_rot_xy(
@@ -455,7 +455,7 @@ class HeliostatInfer3d:
         rot_x_min_err, min_err_del_rot_x = self.find_best_value(
             copy.deepcopy(search_heliostat_spec),
             facet_to_adjust_idx=facet_to_adjust_idx,
-            var_name='rot_x',
+            var_name="rot_x",
             half_range=0.0005,
             n_steps_one_direction=n_steps_one_direction,
             variable_steps=variable_steps,
@@ -463,7 +463,7 @@ class HeliostatInfer3d:
         rot_y_min_err, min_err_del_rot_y = self.find_best_value(
             copy.deepcopy(search_heliostat_spec),
             facet_to_adjust_idx=facet_to_adjust_idx,
-            var_name='rot_y',
+            var_name="rot_y",
             half_range=0.0005,
             n_steps_one_direction=n_steps_one_direction,
             variable_steps=variable_steps,
@@ -471,11 +471,11 @@ class HeliostatInfer3d:
         # Find most productive error reduction variable.
         min_err = min(rot_x_min_err, rot_y_min_err)
         if min_err == rot_x_min_err:
-            return 'rot_x', rot_x_min_err, min_err_del_rot_x
+            return "rot_x", rot_x_min_err, min_err_del_rot_x
         elif min_err == rot_y_min_err:
-            return 'rot_y', rot_y_min_err, min_err_del_rot_y
+            return "rot_y", rot_y_min_err, min_err_del_rot_y
         else:
-            print('ERROR: In Heliostats3dInference.find_best_variable(), unexpected situation encountered.')
+            print("ERROR: In Heliostats3dInference.find_best_variable(), unexpected situation encountered.")
             assert False
 
     def find_best_value(
@@ -536,7 +536,7 @@ class HeliostatInfer3d:
         reprojection_error_n_pts_per_frame_list = []
         for frame_id in dt.sorted_keys(self.dict_of_frame_dicts):
             frame_dict = self.dict_of_frame_dicts[frame_id]
-            if frame_dict['use_for_metrology']:
+            if frame_dict["use_for_metrology"]:
                 reprojection_error_n_pts = self.reprojection_error_single_facet_one_frame_given_corner_xyz_list(
                     heliostat_corner_xyz_list, facet_to_adjust_idx, frame_id, frame_dict
                 )
@@ -561,7 +561,7 @@ class HeliostatInfer3d:
         self, current_all_heliostat_xyz_list, facet_to_adjust_idx, frame_id, frame_dict
     ):
         # Fetch data.
-        all_observed_xy_list = frame_dict['all_observed_xy_list']
+        all_observed_xy_list = frame_dict["all_observed_xy_list"]
 
         # Facet-specific points.
         hel_ul = current_all_heliostat_xyz_list[facet_to_adjust_idx * 4]
@@ -601,8 +601,8 @@ class HeliostatInfer3d:
 
     def projected_points_given_facet_xyz_list(self, frame_dict, facet_xyz_list):
         # Fetch data.
-        camera_rvec = frame_dict['single_frame_camera_rvec']
-        camera_tvec = frame_dict['single_frame_camera_tvec']
+        camera_rvec = frame_dict["single_frame_camera_rvec"]
+        camera_tvec = frame_dict["single_frame_camera_tvec"]
         # Using the camera pose, transform the 3-d points into the camera image space.
         proj_pts, jacobian = cv.projectPoints(
             np.array(facet_xyz_list), camera_rvec, camera_tvec, self.camera_matrix, self.select_distortion_model()
@@ -634,7 +634,7 @@ class HeliostatInfer3d:
         reprojection_error_n_pts_by_facet_per_frame_list = []
         for frame_id in dt.sorted_keys(self.dict_of_frame_dicts):
             frame_dict = self.dict_of_frame_dicts[frame_id]
-            if frame_dict['use_for_metrology']:
+            if frame_dict["use_for_metrology"]:
                 reprojection_error_n_pts_by_facet = self.reprojection_error_one_frame_given_corner_xyz_list(
                     heliostat_corner_xyz_list, frame_id, frame_dict
                 )
@@ -659,7 +659,7 @@ class HeliostatInfer3d:
 
     def reprojection_error_one_frame_given_corner_xyz_list(self, current_all_heliostat_xyz_list, frame_id, frame_dict):
         # Fetch data.
-        all_observed_xy_list = frame_dict['all_observed_xy_list']
+        all_observed_xy_list = frame_dict["all_observed_xy_list"]
 
         # Project the 3-d heliostat corner points into the camera plane using the camera pose associated with the frame.
         proj_pts_reshaped = self.projected_points_given_corner_xyz_list(frame_dict, current_all_heliostat_xyz_list)
@@ -701,8 +701,8 @@ class HeliostatInfer3d:
 
     def projected_points_given_corner_xyz_list(self, frame_dict, correspond_heliostat_xyz_list):
         # Fetch data.
-        camera_rvec = frame_dict['single_frame_camera_rvec']
-        camera_tvec = frame_dict['single_frame_camera_tvec']
+        camera_rvec = frame_dict["single_frame_camera_rvec"]
+        camera_tvec = frame_dict["single_frame_camera_tvec"]
         # Using the camera pose, transform the 3-d points into the camera image space.
         proj_pts, jacobian = cv.projectPoints(
             np.array(correspond_heliostat_xyz_list),
@@ -774,7 +774,7 @@ class HeliostatInfer3d:
         # Construct (x,y,z) list.
         heliostat_corner_xyz_list = self.specifications.heliostat_corner_xyz_list_given_heliostat_spec(heliostat_spec)
         # Save.
-        print('In save_and_analyze_heliostat_spec(), heliostat_spec:')  # ?? SCAFFOLDING RCB -- WRITE TO DISK INSTEAD.
+        print("In save_and_analyze_heliostat_spec(), heliostat_spec:")  # ?? SCAFFOLDING RCB -- WRITE TO DISK INSTEAD.
         print(heliostat_spec)  # ?? SCAFFOLDING RCB -- WRITE TO DISK INSTEAD.
         output_hel_name = self.hel_name + hel_name_suffix
         output_hel_dir = os.path.join(self.output_construct_corners_3d_dir, output_hel_name)
@@ -803,8 +803,8 @@ class HeliostatInfer3d:
         # Construct corner (x,y,z)) list.
         design_xyz_list = self.specifications.heliostat_corner_xyz_list_given_heliostat_spec(design_spec)
         # Save.
-        design_hel_name = self.hel_name + 'design'
-        output_design_dir = os.path.join(self.output_data_dir, 'DesignHeliostats', design_hel_name)
+        design_hel_name = self.hel_name + "design"
+        output_design_dir = os.path.join(self.output_data_dir, "DesignHeliostats", design_hel_name)
         design_hel_xyz_dir_body_ext = uh3a.save_heliostat_3d(design_hel_name, design_xyz_list, output_design_dir)
         design_hel_spec_dir_body_ext = save_heliostat_spec(design_spec, design_hel_name, output_design_dir)
         # Analyze.
@@ -827,10 +827,10 @@ class HeliostatInfer3d:
         return (design_spec, design_xyz_list, design_hel_xyz_dir_body_ext, design_hel_spec_dir_body_ext)
 
     def save_frame_track_image(self, frame_id, observed_corner_xy_list):
-        frame_track_step_suffix = 'frameTrack'
+        frame_track_step_suffix = "frameTrack"
         step_hel_name = self.step_hel_name(frame_id, frame_track_step_suffix)
-        if self.distorted_or_undistorted_str == 'undistorted':
-            note = 'Depicted points are undistorted.  Expect misalignments with image content.'
+        if self.distorted_or_undistorted_str == "undistorted":
+            note = "Depicted points are undistorted.  Expect misalignments with image content."
         else:
             note = None
         output_frame_tracking_image_dir = os.path.join(self.output_construct_corners_3d_dir, step_hel_name)
@@ -957,13 +957,13 @@ class HeliostatInfer3d:
         # print('In print_facets_canting_angles_aux(), canting_angle_in_x_direction =', canting_angle_in_x_direction)
         # print('In print_facets_canting_angles_aux(), canting_angle_in_y_direction =', canting_angle_in_y_direction)
         print(
-            'In print_facets_canting_angles_aux(), idx = ',
+            "In print_facets_canting_angles_aux(), idx = ",
             idx,
-            '  cross_product:',
+            "  cross_product:",
             cross_product,
-            ' canting_angle_in_x_direction =',
+            " canting_angle_in_x_direction =",
             canting_angle_in_x_direction,
-            '  canting_angle_in_y_direction =',
+            "  canting_angle_in_y_direction =",
             canting_angle_in_y_direction,
         )
 
@@ -1003,19 +1003,19 @@ class HeliostatInfer3d:
         canting_angle_in_x_direction = math.atan2(n_x, n_z)
         canting_angle_in_y_direction = math.atan2(n_y, n_z)
         print(
-            'In print_facet_canting_angles(), facet ul, ur, lr, ll:',
+            "In print_facet_canting_angles(), facet ul, ur, lr, ll:",
             facet_ul_xyz,
             facet_ur_xyz,
             facet_lr_xyz,
             facet_ll_xyz,
         )
-        print('In print_facet_canting_angles(), ll_to_ur:', ll_to_ur[0], ll_to_ur[1], ll_to_ur[2])
-        print('In print_facet_canting_angles(), lr_to_ul:', lr_to_ul[0], lr_to_ul[1], lr_to_ul[2])
-        print('In print_facet_canting_angles(), cross_product:', cross_product)
-        print('In print_facet_canting_angles(), norm_of_cross=', norm_of_cross)
-        print('In print_facet_canting_angles(), diagonal_angle(deg)=', np.degrees(diagonal_angle))
-        print('In print_facet_canting_angles(), canting_angle_in_x_direction =', canting_angle_in_x_direction)
-        print('In print_facet_canting_angles(), canting_angle_in_y_direction =', canting_angle_in_y_direction)
+        print("In print_facet_canting_angles(), ll_to_ur:", ll_to_ur[0], ll_to_ur[1], ll_to_ur[2])
+        print("In print_facet_canting_angles(), lr_to_ul:", lr_to_ul[0], lr_to_ul[1], lr_to_ul[2])
+        print("In print_facet_canting_angles(), cross_product:", cross_product)
+        print("In print_facet_canting_angles(), norm_of_cross=", norm_of_cross)
+        print("In print_facet_canting_angles(), diagonal_angle(deg)=", np.degrees(diagonal_angle))
+        print("In print_facet_canting_angles(), canting_angle_in_x_direction =", canting_angle_in_x_direction)
+        print("In print_facet_canting_angles(), canting_angle_in_y_direction =", canting_angle_in_y_direction)
 
     # ACCESS
 
@@ -1074,7 +1074,7 @@ class HeliostatInfer3d:
     def step_hel_name(
         self, frame_id, step_suffix
     ):  # String to add to heliostat name to denote this step result.  Cannot include "_" or "-" characters.
-        return self.hel_name + 'f' + upf.frame_id_str_given_frame_id(frame_id, self.input_frame_id_format) + step_suffix
+        return self.hel_name + "f" + upf.frame_id_str_given_frame_id(frame_id, self.input_frame_id_format) + step_suffix
 
     # RENDER
 
@@ -1096,25 +1096,25 @@ def save_heliostat_spec(
     heliostat_spec, hel_name, output_dir
 ):  # ?? SCAFFOLDING RCB -- HELIOSTAT_SPEC SHOULD BE A CLASS, AND THIS SHOULD BE A CLASS MEMBER FUNCTION
     # Prepare output.
-    heading_line = 'facet_id,center_x,center_y,center_z,rot_x,rot_y,rot_z'
+    heading_line = "facet_id,center_x,center_y,center_z,rot_x,rot_y,rot_z"
     data_lines = []
     for facet_id in dt.sorted_keys(heliostat_spec):
         facet_spec = heliostat_spec[facet_id]
-        center_x = facet_spec['center_x']
-        center_y = facet_spec['center_y']
-        center_z = facet_spec['center_z']
-        rot_x = facet_spec['rot_x']
-        rot_y = facet_spec['rot_y']
-        rot_z = facet_spec['rot_z']
+        center_x = facet_spec["center_x"]
+        center_y = facet_spec["center_y"]
+        center_z = facet_spec["center_z"]
+        rot_x = facet_spec["rot_x"]
+        rot_y = facet_spec["rot_y"]
+        rot_z = facet_spec["rot_z"]
         data_lines.append(
-            '{0:d},{1:.6f},{2:.6f},{3:.6f},{4:.8f},{5:.8f},{6:.8f}'.format(
+            "{0:d},{1:.6f},{2:.6f},{3:.6f},{4:.8f},{5:.8f},{6:.8f}".format(
                 facet_id, center_x, center_y, center_z, rot_x, rot_y, rot_z
             )
         )
     # Write to disk.
-    output_file_body = hel_name + ' heliostat_spec'
+    output_file_body = hel_name + " heliostat_spec"
     explain = output_file_body  # I don't feel like something fancier.
-    print('In save_heliostat_spec(), saving heliostat_spec to file:', os.path.join(output_dir, output_file_body))
+    print("In save_heliostat_spec(), saving heliostat_spec to file:", os.path.join(output_dir, output_file_body))
     output_dir_body_ext = ft.write_csv_file(
         explain,  # Explanatory string to include in notification output.  None to skip.
         output_dir,  # Directory to write file.  See below if not exist.
@@ -1134,15 +1134,15 @@ def save_frame_dict_parameters(
     hel_name, dict_of_frame_dicts, output_dir
 ):  # ?? SCAFFOLDING RCB -- FRAME_CAMERA_POSE_DICT SHOULD BE A CLASS, AND THIS SHOULD BE A CLASS MEMBER FUNCTION
     # Prepare output.
-    heading_line = 'frame_id,rvec_x,rvec_y,rvec_z,tvec_x,tvec_y,tvec_z,n_missing,use_for_metrology'
+    heading_line = "frame_id,rvec_x,rvec_y,rvec_z,tvec_x,tvec_y,tvec_z,n_missing,use_for_metrology"
     data_lines = []
     for frame_id in dt.sorted_keys(dict_of_frame_dicts):
         # Fetch frame parameters.
         frame_dict = dict_of_frame_dicts[frame_id]
-        camera_rvec = frame_dict['single_frame_camera_rvec']
-        camera_tvec = frame_dict['single_frame_camera_tvec']
-        n_missing = frame_dict['n_missing']
-        use_for_metrology = frame_dict['use_for_metrology']
+        camera_rvec = frame_dict["single_frame_camera_rvec"]
+        camera_tvec = frame_dict["single_frame_camera_tvec"]
+        n_missing = frame_dict["n_missing"]
+        use_for_metrology = frame_dict["use_for_metrology"]
         # Fetch camera pose coordinates.
         r_x = camera_rvec[0][0]
         r_y = camera_rvec[1][0]
@@ -1151,14 +1151,14 @@ def save_frame_dict_parameters(
         t_y = camera_tvec[1][0]
         t_z = camera_tvec[2][0]
         data_lines.append(
-            '{0:d},{1:.8f},{2:.8f},{3:.8f},{4:.8f},{5:.8f},{6:.8f},{7:d},{8:d}'.format(
+            "{0:d},{1:.8f},{2:.8f},{3:.8f},{4:.8f},{5:.8f},{6:.8f},{7:d},{8:d}".format(
                 frame_id, r_x, r_y, r_z, t_x, t_y, t_z, n_missing, use_for_metrology
             )
         )
     # Write to disk.
-    output_file_body = hel_name + '_frame_dict_parameters'
+    output_file_body = hel_name + "_frame_dict_parameters"
     explain = output_file_body  # I don't feel like something fancier.
-    print('In save_frame_dict_parameters(), saving camera poses to file:', os.path.join(output_dir, output_file_body))
+    print("In save_frame_dict_parameters(), saving camera poses to file:", os.path.join(output_dir, output_file_body))
     output_dir_body_ext = ft.write_csv_file(
         explain,  # Explanatory string to include in notification output.  None to skip.
         output_dir,  # Directory to write file.  See below if not exist.
@@ -1173,7 +1173,7 @@ def save_frame_dict_parameters(
 
 def save_search_log(search_error_log, hel_name, output_dir):
     # Write to disk.
-    output_file_body = hel_name + '_search_log'
+    output_file_body = hel_name + "_search_log"
     explain = output_file_body  # I don't feel like something fancier.
     output_dir_body_ext = ft.write_text_file(
         explain,  # Explanatory string to include in notification output.  None to skip.
@@ -1188,14 +1188,14 @@ def save_search_log(search_error_log, hel_name, output_dir):
 
 def save_search_overall_error_history(search_overall_error_history, hel_name, output_dir):
     # Prepare output.
-    heading_line = 'iteration,overall_error'
+    heading_line = "iteration,overall_error"
     data_lines = []
     for fb in search_overall_error_history:
         iteration = fb[0]
         overall_error = fb[1]
-        data_lines.append('{0:d},{1:.10f}'.format(iteration, overall_error))
+        data_lines.append("{0:d},{1:.10f}".format(iteration, overall_error))
     # Write to disk.
-    output_file_body = hel_name + '_search_overall_error_history'
+    output_file_body = hel_name + "_search_overall_error_history"
     explain = output_file_body  # I don't feel like something fancier.
     output_dir_body_ext = ft.write_csv_file(
         explain,  # Explanatory string to include in notification output.  None to skip.
@@ -1211,7 +1211,7 @@ def save_search_overall_error_history(search_overall_error_history, hel_name, ou
 
 def save_search_facet_error_history(search_facet_error_history, hel_name, output_dir):
     # Prepare output.
-    heading_line = 'iteration,facet_idx,best_var_name,best_min_error,best_min_error_del_var'
+    heading_line = "iteration,facet_idx,best_var_name,best_min_error,best_min_error_del_var"
     data_lines = []
     for fb in search_facet_error_history:
         iteration = fb[0]
@@ -1220,12 +1220,12 @@ def save_search_facet_error_history(search_facet_error_history, hel_name, output
         best_min_error = fb[3]
         best_min_error_del_var = fb[4]
         data_lines.append(
-            '{0:d},{1:d},{2:s},{3:.10f},{4:.6f}'.format(
+            "{0:d},{1:d},{2:s},{3:.10f},{4:.6f}".format(
                 iteration, facet_idx, best_var_name, best_min_error, best_min_error_del_var
             )
         )
     # Write to disk.
-    output_file_body = hel_name + '_search_facet_error_history'
+    output_file_body = hel_name + "_search_facet_error_history"
     explain = output_file_body  # I don't feel like something fancier.
     output_dir_body_ext = ft.write_csv_file(
         explain,  # Explanatory string to include in notification output.  None to skip.
@@ -1242,10 +1242,10 @@ def save_search_facet_error_history(search_facet_error_history, hel_name, output
 def save_computation_complexity(calls_to_solve_pnp, calls_to_project_points, hel_name, output_dir):
     # Assemble data.
     data_lines = []
-    data_lines.append('calls_to_solve_pnp,' + str(calls_to_solve_pnp))
-    data_lines.append('calls_to_project_points,' + str(calls_to_project_points))
+    data_lines.append("calls_to_solve_pnp," + str(calls_to_solve_pnp))
+    data_lines.append("calls_to_project_points," + str(calls_to_project_points))
     # Write to disk.
-    output_file_body = hel_name + '_computation_complexity'
+    output_file_body = hel_name + "_computation_complexity"
     explain = output_file_body  # I don't feel like something fancier.
     output_dir_body_ext = ft.write_csv_file(
         explain,  # Explanatory string to include in notification output.  None to skip.
@@ -1264,16 +1264,16 @@ def save_projected_points_dict(projected_pts_dict, hel_name, output_dir):
     data_lines = []
     for frame_id in dt.sorted_keys(projected_pts_dict):
         projected_pts_list = projected_pts_dict[frame_id]
-        data_line = '{0:d},'.format(frame_id)
+        data_line = "{0:d},".format(frame_id)
         for xy in projected_pts_list:
-            data_line += '{0:.8f},'.format(xy[0])
-            data_line += '{0:.8f},'.format(xy[1])
+            data_line += "{0:.8f},".format(xy[0])
+            data_line += "{0:.8f},".format(xy[1])
         data_lines.append(data_line)
     # Write to disk.
-    output_file_body = hel_name + '_final_reprojected_points'
+    output_file_body = hel_name + "_final_reprojected_points"
     explain = output_file_body  # I don't feel like something fancier.
     print(
-        'In save_projected_points_dict(), saving final reprojected points to file:',
+        "In save_projected_points_dict(), saving final reprojected points to file:",
         os.path.join(output_dir, output_file_body),
     )
     output_dir_body_ext = ft.write_csv_file(

@@ -90,12 +90,12 @@ def percentile_filter(image: np.ndarray, percentile: int = 50, filter_shape: int
 
     # apply the filter
     if percentile == 0:
-        filtered_image = scipy.ndimage.minimum_filter(image, size=filter_shape, mode='nearest')
+        filtered_image = scipy.ndimage.minimum_filter(image, size=filter_shape, mode="nearest")
     elif percentile == 100:
-        filtered_image = scipy.ndimage.maximum_filter(image, size=filter_shape, mode='nearest')
+        filtered_image = scipy.ndimage.maximum_filter(image, size=filter_shape, mode="nearest")
     else:
         filtered_image = scipy.ndimage.percentile_filter(
-            image, percentile=percentile, size=filter_shape, mode='nearest'
+            image, percentile=percentile, size=filter_shape, mode="nearest"
         )
 
     return filtered_image

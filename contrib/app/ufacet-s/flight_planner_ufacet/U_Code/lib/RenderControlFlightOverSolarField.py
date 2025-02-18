@@ -15,7 +15,7 @@ class RenderControlFlightOverSolarField:
     def __init__(
         self,
         draw_solar_field=True,
-        solar_field_style=rcsf.heliostat_centroids(color='grey'),
+        solar_field_style=rcsf.heliostat_centroids(color="grey"),
         draw_flight_plan=True,
         flight_plan_style=rcfp.default(),
     ):

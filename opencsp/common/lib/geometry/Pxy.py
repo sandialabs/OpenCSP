@@ -23,7 +23,7 @@ class Pxy(Vxy):
         super().__init__(data, dtype)
 
     def __repr__(self):
-        return '2D Point:\n' + self._data.__repr__()
+        return "2D Point:\n" + self._data.__repr__()
 
     def distance(self, data_in: "Pxy") -> float:
         """

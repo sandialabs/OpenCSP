@@ -18,10 +18,10 @@ class TestSubprocess(unittest.TestCase):
         ret = super().setUpClass()
 
         cls.src_img_dir = os.path.join(
-            orp.opencsp_code_dir(), 'common', 'lib', 'cv', 'test', 'data', 'input', 'OpticalFlow'
+            orp.opencsp_code_dir(), "common", "lib", "cv", "test", "data", "input", "OpticalFlow"
         )
         cls.dst_dir = os.path.join(
-            orp.opencsp_code_dir(), 'common', 'lib', 'cv', 'test', 'data', 'output', 'OpticalFlow'
+            orp.opencsp_code_dir(), "common", "lib", "cv", "test", "data", "output", "OpticalFlow"
         )
         cls.src_img_file = os.path.join(cls.src_img_dir, "20210513F08f9800_w400.jpg")
         cls.tmp_img_dir = os.path.join(cls.dst_dir, "tmp")
@@ -348,5 +348,5 @@ class TestSubprocess(unittest.TestCase):
         self.assertTrue(np.array_equal(ang, ang2), "Angle matrices not equal after load+save")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

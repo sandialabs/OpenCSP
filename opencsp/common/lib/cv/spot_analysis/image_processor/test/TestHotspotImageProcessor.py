@@ -33,5 +33,5 @@ class TestHotspotImageProcessor(unittest.TestCase):
         self.assertEqual(expected, processor.internal_shapes)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

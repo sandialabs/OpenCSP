@@ -1,5 +1,4 @@
 Geometry Utilities
-===================
 
 This is a collection of geometry utilities for OpenCSP
 

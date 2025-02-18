@@ -103,7 +103,7 @@ class ImagesIterable(Iterable[CacheableImage]):
         else:
             lt.error_and_raise(
                 TypeError,
-                f"Error in ImagesStream(): argument \"stream\" should be an iterator, callable, or list, but is instead of type \"{type(stream)}\"",
+                f'Error in ImagesStream(): argument "stream" should be an iterator, callable, or list, but is instead of type "{type(stream)}"',
             )
         self._curr_iter_images: list[CacheableImage] = []
 

@@ -22,7 +22,7 @@ class DefinitionEnsemble:
         r_facet_ensemble: list[Rotation],
         ensemble_perimeter: np.ndarray,
         v_centroid_ensemble: Vxyz,
-    ) -> 'DefinitionEnsemble':
+    ) -> "DefinitionEnsemble":
         """Creates Facet Ensemble object from data
 
         Optic Data Definitions
@@ -48,7 +48,7 @@ class DefinitionEnsemble:
 
         if len(v_facet_locations) != len(r_facet_ensemble):
             raise ValueError(
-                f'Number of facet locations, {len(v_facet_locations):d}, does not match number of facet rotations, {len(r_facet_ensemble):d}.'
+                f"Number of facet locations, {len(v_facet_locations):d}, does not match number of facet rotations, {len(r_facet_ensemble):d}."
             )
 
         self.num_facets = len(r_facet_ensemble)
@@ -56,7 +56,7 @@ class DefinitionEnsemble:
     def __copy__(self):
         return self.copy()
 
-    def copy(self) -> 'DefinitionEnsemble':
+    def copy(self) -> "DefinitionEnsemble":
         """Returns copy of ensemble data"""
         return DefinitionEnsemble(
             self.v_facet_locations.copy(),
@@ -66,7 +66,7 @@ class DefinitionEnsemble:
         )
 
     @classmethod
-    def load_from_json(cls, file: str) -> 'DefinitionEnsemble':
+    def load_from_json(cls, file: str) -> "DefinitionEnsemble":
         """
         Loads facet ensemble definition data from JSON file.
 
@@ -77,19 +77,19 @@ class DefinitionEnsemble:
 
         """
         # Read JSON
-        with open(file, 'r', encoding='utf-8') as f:
+        with open(file, "r", encoding="utf-8") as f:
             data_json = json.load(f)
 
         ensemble_perimeter = np.array(
-            (data_json['ensemble_perimeter']['facet_indices'], data_json['ensemble_perimeter']['corner_indices'])
+            (data_json["ensemble_perimeter"]["facet_indices"], data_json["ensemble_perimeter"]["corner_indices"])
         ).T  # Nx2 ndarray
 
         # Put data in dictionary
         return cls(
-            v_facet_locations=_Vxyz_from_dict(data_json['v_facet_locations']),
-            r_facet_ensemble=_rot_list_from_dict(data_json['r_facet_ensemble']),
+            v_facet_locations=_Vxyz_from_dict(data_json["v_facet_locations"]),
+            r_facet_ensemble=_rot_list_from_dict(data_json["r_facet_ensemble"]),
             ensemble_perimeter=ensemble_perimeter,
-            v_centroid_ensemble=_Vxyz_from_dict(data_json['v_centroid_ensemble']),
+            v_centroid_ensemble=_Vxyz_from_dict(data_json["v_centroid_ensemble"]),
         )
 
     def save_to_json(self, file: str) -> None:
@@ -105,20 +105,20 @@ class DefinitionEnsemble:
         ensemble_perimeter = self.ensemble_perimeter
 
         data_dict = {
-            'v_facet_locations': _Vxyz_to_dict(self.v_facet_locations),  # Vxyz
-            'r_facet_ensemble': _rot_list_to_dict(self.r_facet_ensemble),  # list[Rotation]
-            'ensemble_perimeter': {
-                'facet_indices': ensemble_perimeter[:, 0].tolist(),  # list
-                'corner_indices': ensemble_perimeter[:, 1].tolist(),  # list
+            "v_facet_locations": _Vxyz_to_dict(self.v_facet_locations),  # Vxyz
+            "r_facet_ensemble": _rot_list_to_dict(self.r_facet_ensemble),  # list[Rotation]
+            "ensemble_perimeter": {
+                "facet_indices": ensemble_perimeter[:, 0].tolist(),  # list
+                "corner_indices": ensemble_perimeter[:, 1].tolist(),  # list
             },
-            'v_centroid_ensemble': _Vxyz_to_dict(self.v_centroid_ensemble),  # Vxyz
+            "v_centroid_ensemble": _Vxyz_to_dict(self.v_centroid_ensemble),  # Vxyz
         }
 
         # Save data in JSON
-        with open(file, 'w', encoding='utf-8') as f:
+        with open(file, "w", encoding="utf-8") as f:
             json.dump(data_dict, f, indent=3)
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """Saves data to given HDF5 file. Data is stored in PREFIX + DefinitionEnsemble/...
 
         Parameters
@@ -135,15 +135,15 @@ class DefinitionEnsemble:
             self.v_centroid_ensemble.data,
         ]
         datasets = [
-            prefix + 'DefinitionEnsemble/v_facet_locations',
-            prefix + 'DefinitionEnsemble/r_facet_ensemble',
-            prefix + 'DefinitionEnsemble/ensemble_perimeter',
-            prefix + 'DefinitionEnsemble/v_centroid_ensemble',
+            prefix + "DefinitionEnsemble/v_facet_locations",
+            prefix + "DefinitionEnsemble/r_facet_ensemble",
+            prefix + "DefinitionEnsemble/ensemble_perimeter",
+            prefix + "DefinitionEnsemble/v_centroid_ensemble",
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = '') -> 'DefinitionEnsemble':
+    def load_from_hdf(cls, file: str, prefix: str = "") -> "DefinitionEnsemble":
         """Loads DefinitionEnsemble object from given file.  Data is stored in PREFIX + DefinitionEnsemble/...
 
         Parameters
@@ -154,16 +154,16 @@ class DefinitionEnsemble:
             Prefix appended to folder path within HDF file (folders must be separated by "/")
         """
         datasets = [
-            prefix + 'DefinitionEnsemble/v_facet_locations',
-            prefix + 'DefinitionEnsemble/r_facet_ensemble',
-            prefix + 'DefinitionEnsemble/ensemble_perimeter',
-            prefix + 'DefinitionEnsemble/v_centroid_ensemble',
+            prefix + "DefinitionEnsemble/v_facet_locations",
+            prefix + "DefinitionEnsemble/r_facet_ensemble",
+            prefix + "DefinitionEnsemble/ensemble_perimeter",
+            prefix + "DefinitionEnsemble/v_centroid_ensemble",
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
-        v_facet_locations = Vxyz(data['v_facet_locations'])
-        r_facet_ensemble = [Rotation.from_rotvec(r) for r in data['r_facet_ensemble']]
-        ensemble_perimeter = data['ensemble_perimeter']
-        v_centroid_ensemble = Vxyz(data['v_centroid_ensemble'])
+        v_facet_locations = Vxyz(data["v_facet_locations"])
+        r_facet_ensemble = [Rotation.from_rotvec(r) for r in data["r_facet_ensemble"]]
+        ensemble_perimeter = data["ensemble_perimeter"]
+        v_centroid_ensemble = Vxyz(data["v_centroid_ensemble"])
         return cls(v_facet_locations, r_facet_ensemble, ensemble_perimeter, v_centroid_ensemble)
 
     def plot_facet_corners_xy_proj(self, facets: list[DefinitionFacet]) -> None:
@@ -172,16 +172,16 @@ class DefinitionEnsemble:
             facet: DefinitionFacet
             corners_cur_facet = facet.v_facet_corners
             corners_cur_ensemble: Vxyz = corners_cur_facet.rotate(R) + T
-            plt.scatter(corners_cur_ensemble.x, corners_cur_ensemble.y, label=f'Facet {idx_facet:d}')
+            plt.scatter(corners_cur_ensemble.x, corners_cur_ensemble.y, label=f"Facet {idx_facet:d}")
 
 
 def _Vxyz_to_dict(V: Vxyz) -> dict:
-    d = {'x': V.x.tolist(), 'y': V.y.tolist(), 'z': V.z.tolist()}
+    d = {"x": V.x.tolist(), "y": V.y.tolist(), "z": V.z.tolist()}
     return d
 
 
 def _Vxyz_from_dict(d: dict) -> Vxyz:
-    return Vxyz((d['x'], d['y'], d['z']))
+    return Vxyz((d["x"], d["y"], d["z"]))
 
 
 def _rot_list_to_dict(rot: list[Rotation]) -> dict:

@@ -31,7 +31,7 @@ def frame_id_str_given_frame_id(frame_id: int, input_frame_id_format: str):
     -------
         nnnnnn: str
             The frame id, formatted as a string"""
-    frame_id_format_str = '{0:' + input_frame_id_format + '}'
+    frame_id_format_str = "{0:" + input_frame_id_format + "}"
     return frame_id_format_str.format(frame_id)
 
 
@@ -83,7 +83,7 @@ def frame_file_body_ext_given_frame_id_str(input_video_body: str, frame_id_str: 
     -------
         body_ext: str
             Example "DJI_427t_428_429.000001.JPG" """
-    return input_video_body + '.' + frame_id_str + '.JPG'
+    return input_video_body + "." + frame_id_str + ".JPG"
 
 
 def frame_id_str_given_prefix_number_KeyWord_body_ext(prefix_number_keyword_body_ext, keyword):
@@ -93,7 +93,7 @@ def frame_id_str_given_prefix_number_KeyWord_body_ext(prefix_number_keyword_body
     # is a standard word such as "corners", "track", etc.
     #
     # Check extension.
-    components = prefix_number_keyword_body_ext.split('.')
+    components = prefix_number_keyword_body_ext.split(".")
     if len(components) < 2:
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_KeyWord_body_ext(), input prefix_number_keyword_body_ext="'
@@ -104,7 +104,7 @@ def frame_id_str_given_prefix_number_KeyWord_body_ext(prefix_number_keyword_body
         raise ValueError(msg)
     ext = components[-1]
     body = components[-2]
-    if ext != 'csv':
+    if ext != "csv":
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_KeyWord_body_ext(), input prefix_number_keyword_body_ext="'
             + str(prefix_number_keyword_body_ext)
@@ -113,7 +113,7 @@ def frame_id_str_given_prefix_number_KeyWord_body_ext(prefix_number_keyword_body
         print(msg)
         raise ValueError(msg)
     # Break the filename into components.
-    components = body.split('_')
+    components = body.split("_")
     if len(components) < 4:
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_KeyWord_body_ext(), input prefix_number_keyword_body_ext="'
@@ -125,7 +125,7 @@ def frame_id_str_given_prefix_number_KeyWord_body_ext(prefix_number_keyword_body
     fxnl_str = components[-1]
     keyword_str = components[-2]
     number_str = components[-3]
-    if fxnl_str != 'fnxl':
+    if fxnl_str != "fnxl":
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_KeyWord_body_ext(), input prefix_number_keyword_body_ext="'
             + str(prefix_number_keyword_body_ext)
@@ -167,7 +167,7 @@ def frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(
     # is a standard word such as "corners", "track", etc.
     #
     # Check extension.
-    components = prefix_number_adjective_keyword_body_ext.split('.')
+    components = prefix_number_adjective_keyword_body_ext.split(".")
     if len(components) < 2:
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(), input prefix_number_adjective_keyword_body_ext="'
@@ -178,7 +178,7 @@ def frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(
         raise ValueError(msg)
     ext = components[-1]
     body = components[-2]
-    if ext != 'csv':
+    if ext != "csv":
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(), input prefix_number_adjective_keyword_body_ext="'
             + str(prefix_number_adjective_keyword_body_ext)
@@ -187,7 +187,7 @@ def frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(
         print(msg)
         raise ValueError(msg)
     # Break the filename into components.
-    components = body.split('_')
+    components = body.split("_")
     if len(components) < 5:
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(), input prefix_number_adjective_keyword_body_ext="'
@@ -200,7 +200,7 @@ def frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(
     keyword_str = components[-2]
     adjective_str = components[-3]
     number_str = components[-4]
-    if fxnl_str != 'fnxl':
+    if fxnl_str != "fnxl":
         msg = (
             'ERROR: In frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(), input prefix_number_adjective_keyword_body_ext="'
             + str(prefix_number_adjective_keyword_body_ext)
@@ -248,7 +248,7 @@ def frame_id_str_given_key_corners_body_ext(key_corners_body_ext):
     #    VideoFileBody_nnnnnn_corners_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
     #
-    return frame_id_str_given_prefix_number_KeyWord_body_ext(key_corners_body_ext, 'corners')
+    return frame_id_str_given_prefix_number_KeyWord_body_ext(key_corners_body_ext, "corners")
 
 
 def frame_id_given_key_corners_body_ext(key_corners_body_ext):
@@ -263,7 +263,7 @@ def frame_id_str_given_key_projected_tracks_body_ext(key_track_body_ext):
     #    VideoFileBody_nnnnnn_track_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
     #
-    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(key_track_body_ext, 'projected', 'tracks')
+    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(key_track_body_ext, "projected", "tracks")
 
 
 def frame_id_given_key_projected_tracks_body_ext(key_track_body_ext):
@@ -278,7 +278,7 @@ def frame_id_str_given_key_confirmed_tracks_body_ext(key_track_body_ext):
     #    VideoFileBody_nnnnnn_track_fxnl.csv
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
     #
-    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(key_track_body_ext, 'confirmed', 'tracks')
+    return frame_id_str_given_prefix_number_Adjective_KeyWord_body_ext(key_track_body_ext, "confirmed", "tracks")
 
 
 def frame_id_given_key_confirmed_tracks_body_ext(key_track_body_ext):
@@ -294,7 +294,7 @@ def frame_id_str_given_frame_file_body_ext(frame_file_body_ext):
     # where the "nnnnnn" is a zero-padded numerical string such as "001258"
     #
     # Break the filename into components.
-    components = frame_file_body_ext.split('.')
+    components = frame_file_body_ext.split(".")
     if len(components) < 3:
         msg = (
             'ERROR: In frame_id_str_given_frame_file_body_ext(), input frame_file_body_ext="'
@@ -340,10 +340,10 @@ def draw_example_frame(
         rgb=False,
         title=input_frame_file,
         corners_color_pair_list=None,
-        context_str='draw_example_frame()',
+        context_str="draw_example_frame()",
         save=True,
         output_dir=output_render_dir,
-        output_body=input_frame_file + '_fig',
+        output_body=input_frame_file + "_fig",
         dpi=render_control.example_frame_dpi,
         include_figure_idx_in_filename=include_figure_idx_in_filename,
     )
@@ -353,7 +353,7 @@ def draw_example_frames(
     input_full_frame_dir,  # Directory containing the full list of full-size frames.
     output_render_dir,  # Directory to place the sample rame figures.
     render_control,  # Render control, indicating whether to clear previous output, etc.
-    delete_suffix='.png',  # File suffix characterizing previos files to delete.
+    delete_suffix=".png",  # File suffix characterizing previos files to delete.
     n_intervals=10,  # Number of intervals to divide the time line.  Must be at least 1.
     # Including first and last frame, (n+1) figures will be generated.
     include_figure_idx_in_filename=False,

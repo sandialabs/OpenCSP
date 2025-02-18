@@ -58,17 +58,17 @@ def apply_command_line_arguments(settings_from_ini: configparser.ConfigParser) -
 
     # parse the command line
     parser = argparse.ArgumentParser(
-        prog="OpenCSP/__init__.py", description='OpenCSP settings parser', add_help=False, exit_on_error=False
+        prog="OpenCSP/__init__.py", description="OpenCSP settings parser", add_help=False, exit_on_error=False
     )
     parser.add_argument(
-        '--dir-input',
+        "--dir-input",
         dest="dir_input",
         default="",
         type=str,
         help="Use the given directory value as the input directory instead of [opencsp_root_path]/[large_data_example_dir].",
     )
     parser.add_argument(
-        '--dir-output',
+        "--dir-output",
         dest="dir_output",
         default="",
         type=str,
@@ -125,4 +125,4 @@ for section in opencsp_settings.sections():
         print(f"opencsp_settings[{section}][{key}]={opencsp_settings[section][key]}")
 
 opencsp_settings = apply_command_line_arguments(opencsp_settings)
-__all__ = ['opencsp_settings']
+__all__ = ["opencsp_settings"]

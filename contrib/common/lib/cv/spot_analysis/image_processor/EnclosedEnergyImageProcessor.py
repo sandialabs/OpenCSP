@@ -87,7 +87,7 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
             percentages_of_interest_style = copy.deepcopy(enclosed_energy_style)
             ees_rgb = list(percentages_of_interest_style.measured.color)[:3]
             poi_rgb = [int((255 - v) / 2) + v for v in ees_rgb]
-            poi_color = color.Color.from_i255(*poi_rgb, 'percentages_of_interest', 'percentages_of_interest')
+            poi_color = color.Color.from_i255(*poi_rgb, "percentages_of_interest", "percentages_of_interest")
             percentages_of_interest_style.measured.set_color(poi_color)
 
         self.center_locator = PixelOfInterest(center_locator)
@@ -236,7 +236,7 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         # Create a new figure for the plot
         figure_control = rcfg.RenderControlFigure()
         label = self.enclosed_shape.capitalize() + "d Energy"
-        axis_control = rca.RenderControlAxis(x_label='Radius (pixels)', y_label=label)
+        axis_control = rca.RenderControlAxis(x_label="Radius (pixels)", y_label=label)
         view_spec_2d = vs.view_spec_xy()
         fig_record = fm.setup_figure_for_3d_data(
             figure_control,

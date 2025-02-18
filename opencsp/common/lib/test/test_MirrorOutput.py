@@ -48,8 +48,8 @@ class TestMirrorOutput(to.TestOutput):
     @classmethod
     def setUpClass(
         cls,
-        source_file_body: str = 'TestMirrorOutput',  # Set these here, because pytest calls
-        figure_prefix_root: str = 'tmo',  # setup_class() with no arguments.
+        source_file_body: str = "TestMirrorOutput",  # Set these here, because pytest calls
+        figure_prefix_root: str = "tmo",  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
@@ -74,14 +74,14 @@ class TestMirrorOutput(to.TestOutput):
         self.m1_len_y = 3.0  # m
         self.m1_rectangle_xy = (self.m1_len_x, self.m1_len_y)
         self.m1 = MirrorParametricRectangular(self.m1_fxn, self.m1_rectangle_xy)
-        self.m1_shape_description = 'rectangle ' + str(self.m1_len_x) + 'm x ' + str(self.m1_len_y) + 'm'
-        self.m1_title = 'Mirror (' + self.m1_shape_description + ', f=' + str(self.m1_focal_length) + 'm), Face Up'
+        self.m1_shape_description = "rectangle " + str(self.m1_len_x) + "m x " + str(self.m1_len_y) + "m"
+        self.m1_title = "Mirror (" + self.m1_shape_description + ", f=" + str(self.m1_focal_length) + "m), Face Up"
         self.m1_caption = (
-            'A single mirror of shape ('
+            "A single mirror of shape ("
             + self.m1_shape_description
-            + '), analytically defined with focal length f='
+            + "), analytically defined with focal length f="
             + str(self.m1_focal_length)
-            + 'm.'
+            + "m."
         )
         self.m1_comments = []
 
@@ -97,13 +97,13 @@ class TestMirrorOutput(to.TestOutput):
 
         # Facet, based on a parameteric mirror.
         self.f1 = Facet(self.m1)
-        self.f1_title = 'Facet, from ' + self.m1_title
+        self.f1_title = "Facet, from " + self.m1_title
         self.f1_caption = (
-            'A facet defined from a parameteric mirror of shape ('
+            "A facet defined from a parameteric mirror of shape ("
             + self.m1_shape_description
-            + '), with focal length f='
+            + "), with focal length f="
             + str(self.m1_focal_length)
-            + 'm.'
+            + "m."
         )
         self.f1_comments = []
 
@@ -131,26 +131,26 @@ class TestMirrorOutput(to.TestOutput):
         ]
         fe2x2.set_facet_cantings(fe_2x2_canting_rotations)
 
-        self.h2x2 = HeliostatAzEl(fe2x2, name='Simple 2x2 Heliostat')
-        self.h2x2_title = 'Heliostat with Parametrically Defined Facets'
+        self.h2x2 = HeliostatAzEl(fe2x2, name="Simple 2x2 Heliostat")
+        self.h2x2_title = "Heliostat with Parametrically Defined Facets"
         self.h2x2_caption = (
-            'Heliostat with four facets ('
+            "Heliostat with four facets ("
             + self.m1_shape_description
-            + '), with focal length f='
+            + "), with focal length f="
             + str(self.m1_focal_length)
-            + 'm.'
+            + "m."
         )
         self.h2x2_comments = []
 
         # Simple solar field, with two simple heliostats.
-        self.sf2x2_h1 = HeliostatAzEl(copy.deepcopy(fe2x2), 'Heliostat 1')
-        self.sf2x2_h2 = HeliostatAzEl(copy.deepcopy(fe2x2), 'Heliostat 2')
+        self.sf2x2_h1 = HeliostatAzEl(copy.deepcopy(fe2x2), "Heliostat 1")
+        self.sf2x2_h2 = HeliostatAzEl(copy.deepcopy(fe2x2), "Heliostat 2")
         self.sf2x2_heliostats = [self.sf2x2_h1, self.sf2x2_h2]
-        self.sf2x2 = SolarField(self.sf2x2_heliostats, [-106.509606, 34.962276], 'Test Field', 'test')
+        self.sf2x2 = SolarField(self.sf2x2_heliostats, [-106.509606, 34.962276], "Test Field", "test")
         heliostat_positions = Pxyz([[0, 0], [0, 10], [0, 0]])
         self.sf2x2.set_heliostat_positions(heliostat_positions)
-        self.sf2x2_title = 'Two Heliostats'
-        self.sf2x2_caption = 'Two 4-facet heliostats, tracking.'
+        self.sf2x2_title = "Two Heliostats"
+        self.sf2x2_caption = "Two 4-facet heliostats, tracking."
         self.sf2x2_comments = []
 
     def lambda_symmetric_paraboloid(self, focal_length: float) -> Callable[[float, float], float]:
@@ -179,16 +179,16 @@ class TestMirrorOutput(to.TestOutput):
 
         # Position/Rotation in space.
         tran = Vxyz([0, 0, 0])
-        rot = Rotation.from_euler('x', 45, True)
+        rot = Rotation.from_euler("x", 45, True)
         transform = TransformXYZ.from_R_V(rot, tran)
 
-        local_comments.append('Oriented face 45 deg up from level.')
+        local_comments.append("Oriented face 45 deg up from level.")
         self.scene.add_object(self.m_pentagon)
         self.scene.set_position_in_space(self.m_pentagon, transform)
 
         # Setup render control.
         mirror_control = rcm.RenderControlMirror()
-        local_comments.append('Render surface only.')
+        local_comments.append("Render surface only.")
 
         # Draw.
         fig_record = fm.setup_figure_for_3d_data(
@@ -198,8 +198,8 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(2),
-            title=self.m1_title + ', Face Horizon',
-            caption=st.add_to_last_sentence(self.m1_caption, ', facing the horizon'),
+            title=self.m1_title + ", Face Horizon",
+            caption=st.add_to_last_sentence(self.m1_caption, ", facing the horizon"),
             comments=local_comments,
             code_tag=self.code_tag,
         )
@@ -224,7 +224,7 @@ class TestMirrorOutput(to.TestOutput):
 
         self.scene.add_object(self.f1)
         self.scene.set_position_in_space(self.f1, transform)
-        local_comments.append('Oriented face horizon.')
+        local_comments.append("Oriented face horizon.")
 
         # Setup render control.
         mirror_control = rcm.RenderControlMirror(surface_normals=True, norm_len=1)
@@ -235,7 +235,7 @@ class TestMirrorOutput(to.TestOutput):
             draw_surface_normal=False,
             # draw_surface_normal_at_corners=True,
         )
-        local_comments.append('Render mirror surface with normals, facet outline with corner normals.')
+        local_comments.append("Render mirror surface with normals, facet outline with corner normals.")
 
         # Draw.
         fig_record = fm.setup_figure_for_3d_data(
@@ -274,7 +274,7 @@ class TestMirrorOutput(to.TestOutput):
         #               year, month, day, hour, minute, second, zone]
         when_ymdhmsz = (2021, 5, 13, 13, 0, 0, -6)
         self.sf2x2.set_full_field_tracking(aimpoint, when_ymdhmsz)
-        local_comments.append('Heliostats set to track to ' + str(aimpoint) + ' at ymdhmsz =' + str(when_ymdhmsz))
+        local_comments.append("Heliostats set to track to " + str(aimpoint) + " at ymdhmsz =" + str(when_ymdhmsz))
 
         # Setup render control.
         mirror_control = rcm.RenderControlMirror(surface_normals=False)
@@ -293,7 +293,7 @@ class TestMirrorOutput(to.TestOutput):
             draw_centroid=True, facet_ensemble_style=facet_ensemble_control, draw_facet_ensemble=True
         )
         solar_field_control = rcsf.RenderControlSolarField(heliostat_styles=heliostat_control)
-        local_comments.append('Render mirror surfaces, facet centroids, and heliostat outline and surface normal.')
+        local_comments.append("Render mirror surfaces, facet centroids, and heliostat outline and surface normal.")
         light_path_control = rclp.RenderControlLightPath(current_length=3)
 
         # Draw.
@@ -312,7 +312,7 @@ class TestMirrorOutput(to.TestOutput):
         self.sf2x2.draw(fig_record.view, solar_field_control)
 
         scene = Scene()
-        tz = pytz.timezone('US/Mountain')
+        tz = pytz.timezone("US/Mountain")
         time = datetime.datetime(2021, 5, 13, 13, 0, 0, 0, tz)
         sun = LightSourceSun.from_location_time([34.962276, -106.509606], time, 2)
         scene.add_light_source(sun)
@@ -349,29 +349,29 @@ class TestMirrorOutput(to.TestOutput):
         y_5W01 = 57.93  # meters  # TODO RCB: FETCH FROM DEFINITION FILE
         z_5W01 = 3.89  # meters  # TODO RCB: FETCH FROM DEFINITION FILE
         focal_length_5W01 = 55  # meters
-        name_5W01 = '5W01'
-        title_5W01 = 'NSTTF Heliostat ' + name_5W01
-        caption_5W01 = '5W01 modeled as a symmetric paraboloid with focal length f=' + str(focal_length_5W01) + 'm.'
+        name_5W01 = "5W01"
+        title_5W01 = "NSTTF Heliostat " + name_5W01
+        caption_5W01 = "5W01 modeled as a symmetric paraboloid with focal length f=" + str(focal_length_5W01) + "m."
         # 14W01.
         x_14W01 = -4.88  # meters  # TODO RCB: FETCH FROM DEFINITION FILE
         y_14W01 = 194.71  # meters  # TODO RCB: FETCH FROM DEFINITION FILE
         z_14W01 = 4.54  # meters  # TODO RCB: FETCH FROM DEFINITION FILE
         focal_length_14W01 = 186.8  # meters
-        name_14W01 = '14W01'
-        title_14W01 = 'NSTTF Heliostat ' + name_14W01
-        caption_14W01 = '14W01 modeled as a symmetric paraboloid with focal length f=' + str(focal_length_14W01) + 'm.'
+        name_14W01 = "14W01"
+        title_14W01 = "NSTTF Heliostat " + name_14W01
+        caption_14W01 = "14W01 modeled as a symmetric paraboloid with focal length f=" + str(focal_length_14W01) + "m."
         # Solar field.
-        short_name_sf = 'Mini NSTTF'
-        name_sf = 'Mini NSTTF with ' + name_5W01 + ' and ' + name_14W01
-        title_sf = 'Two NSTTF Heliostats: ' + name_5W01 + ' and ' + name_14W01
+        short_name_sf = "Mini NSTTF"
+        name_sf = "Mini NSTTF with " + name_5W01 + " and " + name_14W01
+        title_sf = "Two NSTTF Heliostats: " + name_5W01 + " and " + name_14W01
         caption_sf = (
-            'Two NSTTF heliostats.'
-            + '  '
+            "Two NSTTF heliostats."
+            + "  "
             + caption_5W01
-            + '  '
+            + "  "
             + caption_14W01
-            + '  '
-            + 'Facet surfaces and canting have the same focal length.'
+            + "  "
+            + "Facet surfaces and canting have the same focal length."
         )
         comments = []
 
@@ -432,7 +432,7 @@ class TestMirrorOutput(to.TestOutput):
         comments_exaggerated_z = (
             comments.copy()
         )  # We'll add a different comment for the plots with an exaggerated z axis.
-        comments.append('Render mirror surfaces and normals, facet outlines, and heliostat centroid.')
+        comments.append("Render mirror surfaces and normals, facet outlines, and heliostat centroid.")
 
         # Setup render control (long normals).
         mirror_control_long = rcm.RenderControlMirror(surface_normals=True, norm_len=12, norm_res=3)
@@ -466,7 +466,7 @@ class TestMirrorOutput(to.TestOutput):
         #                                                draw_facets=True)
         # solar_field_control = rcsf.RenderControlSolarField(heliostat_styles=heliostat_control)
 
-        comments_long.append('Render mirror surfaces and long normals, facet outlines, and heliostat centroid.')
+        comments_long.append("Render mirror surfaces and long normals, facet outlines, and heliostat centroid.")
 
         # Draw and output 5W01 figure (long normals, xy view).
         fig_record = fm.setup_figure_for_3d_data(
@@ -476,7 +476,7 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(17),
-            title=title_5W01 + ' (long normals)',
+            title=title_5W01 + " (long normals)",
             caption=caption_5W01,
             comments=comments,
             code_tag=self.code_tag,
@@ -492,7 +492,7 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(18),
-            title=title_14W01 + ' (long normals)',
+            title=title_14W01 + " (long normals)",
             caption=caption_14W01,
             comments=comments,
             code_tag=self.code_tag,
@@ -520,7 +520,7 @@ class TestMirrorOutput(to.TestOutput):
         )
         solar_field_control_very_long = rcsf.RenderControlSolarField(heliostat_styles=heliostat_control_very_long)
         comments_very_long.append(
-            'Render mirror surfaces and very long normals, facet outlines, and heliostat centroid.'
+            "Render mirror surfaces and very long normals, facet outlines, and heliostat centroid."
         )
 
         # Draw and output solar_field figure (very long normals, yz view).
@@ -531,7 +531,7 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(19),
-            title=title_sf + ' (very long normals)',
+            title=title_sf + " (very long normals)",
             caption=caption_sf,
             comments=comments,
             code_tag=self.code_tag,
@@ -570,7 +570,7 @@ class TestMirrorOutput(to.TestOutput):
             draw_facet_ensemble=True,
             post=False,
         )
-        comments_exaggerated_z.append('Render heliostat with exaggerated z axis.')
+        comments_exaggerated_z.append("Render heliostat with exaggerated z axis.")
 
         # # Draw and output 5W01 figure (exaggerated z).
         # fig_record = fm.setup_figure_for_3d_data(self.figure_control, self.axis_control_m, vs.view_spec_3d(),
@@ -599,7 +599,7 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(22),
-            title=title_14W01 + ' (exaggerated z)',
+            title=title_14W01 + " (exaggerated z)",
             caption=caption_14W01,
             comments=comments,
             code_tag=self.code_tag,
@@ -616,7 +616,7 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(23),
-            title=title_14W01 + ' (exaggerated z)',
+            title=title_14W01 + " (exaggerated z)",
             caption=caption_14W01,
             comments=comments,
             code_tag=self.code_tag,
@@ -641,16 +641,16 @@ class TestMirrorOutput(to.TestOutput):
         nsttf_facet_width = 1.2192  # TODO RCB: FETCH FROM DEFINITION FILE
         nsttf_facet_height = 1.2192  # TODO RCB: FETCH FROM DEFINITION FILE
         focal_length = 5  # meters.  A hyopthetical short-focal legnth heliostat, so curvature is more apparent.
-        name = 'Short Focal Length'
-        title = 'NSTTF Heliostat ' + name
+        name = "Short Focal Length"
+        title = "NSTTF Heliostat " + name
         caption = (
-            'Hypothetical short-focal length NSTTF heliostat modeled as a symmetric paraboloid with focal length f='
+            "Hypothetical short-focal length NSTTF heliostat modeled as a symmetric paraboloid with focal length f="
             + str(focal_length)
-            + 'm.'
+            + "m."
         )
         # Solar field.
-        short_name_sf = 'Mini NSTTF'
-        name_sf = 'Mini NSTTF with ' + name
+        short_name_sf = "Mini NSTTF"
+        name_sf = "Mini NSTTF with " + name
         comments = []
 
         # Construct heliostat objects and solar field object.
@@ -710,7 +710,7 @@ class TestMirrorOutput(to.TestOutput):
         h2.facet_ensemble.set_facet_positions(new_positions)
 
         h2.set_canting_from_equation(fn)
-        comments_lifted.append('Set canting angle and lifted.')
+        comments_lifted.append("Set canting angle and lifted.")
         fig_record = fm.setup_figure_for_3d_data(
             self.figure_control,
             self.axis_control_m,
@@ -718,8 +718,8 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(25),
-            title=title + ', Canted and Lifted',
-            caption=st.add_to_last_sentence(caption, ' with canting angle and lifted'),
+            title=title + ", Canted and Lifted",
+            caption=st.add_to_last_sentence(caption, " with canting angle and lifted"),
             comments=comments,
             code_tag=self.code_tag,
         )
@@ -739,7 +739,7 @@ class TestMirrorOutput(to.TestOutput):
 
         h1.set_canting_from_equation(fn)
         sf.set_full_field_tracking(aimpoint_xyz, when_ymdhmsz)
-        comments.append('Heliostats set to track to ' + str(aimpoint_xyz) + ' at ymdhmsz =' + str(when_ymdhmsz))
+        comments.append("Heliostats set to track to " + str(aimpoint_xyz) + " at ymdhmsz =" + str(when_ymdhmsz))
         fig_record = fm.setup_figure_for_3d_data(
             self.figure_control,
             self.axis_control_m,
@@ -747,8 +747,8 @@ class TestMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(27),
-            title=title + ', With Canting and Tracking',
-            caption=st.add_to_last_sentence(caption, ' with canting and tracking'),
+            title=title + ", With Canting and Tracking",
+            caption=st.add_to_last_sentence(caption, " with canting and tracking"),
             comments=comments,
             code_tag=self.code_tag,
         )
@@ -770,13 +770,13 @@ if __name__ == "__main__":
     test_object.setUpClass(interactive=interactive, verify=verify)
     test_object.setUp()  # Tests.
 
-    lt.info('Beginning tests...')
+    lt.info("Beginning tests...")
     test_object.test_mirror_halfpi_rotation()
     test_object.test_facet()
     test_object.test_solar_field()
     test_object.test_heliostat_05W01_and_14W01()
     test_object.test_heliostat_stages()
-    lt.info('All tests complete.')
+    lt.info("All tests complete.")
     # Cleanup.
     if interactive:
         input("Press Enter...")

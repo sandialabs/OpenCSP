@@ -11,7 +11,7 @@ import opencsp.common.lib.tool.hdf5_tools as hdf5_tools
 class DotLocationsFixedPattern:
     """Class that holds locations of dots for fixed pattern deflectometry."""
 
-    def __init__(self, x_dot_index: ndarray, y_dot_index: ndarray, xyz_dot_loc: ndarray) -> 'DotLocationsFixedPattern':
+    def __init__(self, x_dot_index: ndarray, y_dot_index: ndarray, xyz_dot_loc: ndarray) -> "DotLocationsFixedPattern":
         """Instantiates class with xy indices and xyz points.
 
         Parameters
@@ -24,9 +24,9 @@ class DotLocationsFixedPattern:
             Shape (N, M, 3) array holding xyz locations of dots in screen coordinates
         """
         if x_dot_index.size != xyz_dot_loc.shape[1]:
-            raise ValueError(f'X dimensions do not match: {x_dot_index.size} and {xyz_dot_loc.shape}')
+            raise ValueError(f"X dimensions do not match: {x_dot_index.size} and {xyz_dot_loc.shape}")
         if y_dot_index.size != xyz_dot_loc.shape[0]:
-            raise ValueError(f'Y dimensions do not match: {y_dot_index.size} and {xyz_dot_loc.shape}')
+            raise ValueError(f"Y dimensions do not match: {y_dot_index.size} and {xyz_dot_loc.shape}")
 
         # Store data
         self.x_dot_index = x_dot_index
@@ -50,7 +50,7 @@ class DotLocationsFixedPattern:
     @classmethod
     def from_projection_and_display(
         cls, fixed_pattern_projection: PatternSofastFixed, display: Display
-    ) -> 'DotLocationsFixedPattern':
+    ) -> "DotLocationsFixedPattern":
         """Instantiates a DotLocationsFixedPattern from a PatternSofastFixed object
         and a display object. This is used as a convenience if a Display calibration has
         already been done for a screen setup."""
@@ -103,14 +103,14 @@ class DotLocationsFixedPattern:
         """
         data = [self.x_dot_index, self.y_dot_index, self.xyz_dot_loc]
         datasets = [
-            'DotLocationsFixedPattern/x_dot_index',
-            'DotLocationsFixedPattern/y_dot_index',
-            'DotLocationsFixedPattern/xyz_dot_loc',
+            "DotLocationsFixedPattern/x_dot_index",
+            "DotLocationsFixedPattern/y_dot_index",
+            "DotLocationsFixedPattern/xyz_dot_loc",
         ]
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
 
     @classmethod
-    def load_from_hdf(cls, file: str) -> 'DotLocationsFixedPattern':
+    def load_from_hdf(cls, file: str) -> "DotLocationsFixedPattern":
         """
         Loads from HDF file
 
@@ -121,9 +121,9 @@ class DotLocationsFixedPattern:
 
         """
         datasets = [
-            'DotLocationsFixedPattern/x_dot_index',
-            'DotLocationsFixedPattern/y_dot_index',
-            'DotLocationsFixedPattern/xyz_dot_loc',
+            "DotLocationsFixedPattern/x_dot_index",
+            "DotLocationsFixedPattern/y_dot_index",
+            "DotLocationsFixedPattern/xyz_dot_loc",
         ]
         data = hdf5_tools.load_hdf5_datasets(datasets, file)
         return cls(**data)

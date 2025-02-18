@@ -21,22 +21,22 @@ class test_figure_management(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         path, name, _ = ft.path_components(__file__)
-        cls.in_dir = ft.join(path, 'data/input', name.split('test_')[-1])
-        cls.out_dir = ft.join(path, 'data/output', name.split('test_')[-1])
+        cls.in_dir = ft.join(path, "data/input", name.split("test_")[-1])
+        cls.out_dir = ft.join(path, "data/output", name.split("test_")[-1])
         ft.create_directories_if_necessary(cls.out_dir)
         if is_original_call:
             ft.delete_files_in_directory(cls.out_dir, "*")
         return super().setUpClass()
 
     def setUp(self) -> None:
-        self.test_name = self.id().split('.')[-1]
+        self.test_name = self.id().split(".")[-1]
 
     def setUp(self) -> None:
-        self.test_name = self.id().split('.')[-1]
+        self.test_name = self.id().split(".")[-1]
 
     def tearDown(self):
         # Make sure we release all matplotlib resources.
-        plt.close('all')
+        plt.close("all")
 
     def assert_exists(self, figs_txts, cnt):
         """Verifies that cnt images and text files exist."""
@@ -47,9 +47,9 @@ class test_figure_management(unittest.TestCase):
         self.assertEqual(len(figs), cnt, f"Incorrect number of image files!")
         self.assertEqual(len(txts), cnt, f"Incorrect number of text files!")
         for f in figs:
-            self.assertTrue(ft.file_exists(f), f"Image file \"{f}\" does not exist!")
+            self.assertTrue(ft.file_exists(f), f'Image file "{f}" does not exist!')
         for f in txts:
-            self.assertTrue(ft.file_exists(f), f"Text file \"{f}\" does not exist!")
+            self.assertTrue(ft.file_exists(f), f'Text file "{f}" does not exist!')
 
     def test_save_all_figures_line(self):
         """Test that saving a single figure (aka one image) succeeds."""
@@ -192,11 +192,11 @@ class test_figure_management(unittest.TestCase):
             self.assertEqual(img_large.height, 1800)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     import argparse
 
-    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description='Testing figure management')
-    parser.add_argument('--funcname', help="Calls the given function")
+    parser = argparse.ArgumentParser(prog=__file__.rstrip(".py"), description="Testing figure management")
+    parser.add_argument("--funcname", help="Calls the given function")
     args = parser.parse_args()
     func_name = args.funcname
 

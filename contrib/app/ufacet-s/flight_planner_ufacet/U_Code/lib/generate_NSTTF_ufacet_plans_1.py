@@ -42,17 +42,17 @@ def generate_NSTTF_ufacet_plans(
     #    render_control_scan_section_analysis = drc.setup_render_control_scan_section_analysis_flight_4view()
 
     # Figure control.
-    plt.close('all')
+    plt.close("all")
     fm.reset_figure_management()
     figure_control = rcfg.RenderControlFigure(tile_array=tile_array, tile_square=False)
 
     # Scan control parameters.
-    scan_type = 'UFACET'
+    scan_type = "UFACET"
     ufacet_scan_parameter_file = solar_field_short_name  # ?? SCAFFOLDING RCB -- TEMPORARY
     raster_scan_parameter_file = None
 
     # Define scan.
-    if solar_field_short_name == 'NSTTF':
+    if solar_field_short_name == "NSTTF":
         (
             solar_field_spec,
             ufacet_control_parameters,
@@ -62,20 +62,20 @@ def generate_NSTTF_ufacet_plans(
             up_azelhnames,
         ) = dsn.define_scan_NSTTF(solar_field_short_name, nsttf_configuration)
         # Favored launch point.
-        launch_name = 'A'  # Any string.  Examples are 'A', 'B', 'C', etc.
+        launch_name = "A"  # Any string.  Examples are 'A', 'B', 'C', etc.
     else:
         # print("ERROR: In generate_NSTTF_ufacet_plans(1), unexpected solar_field_short_name = '"  + solar_field_short_name + "' encountered.")
         assert False
 
     # Highlight unusual configurations.
-    if nsttf_configuration == 'Full Field':
+    if nsttf_configuration == "Full Field":
         pass
-    elif nsttf_configuration == 'Demo':
-        solar_field_spec['short_name'] += 'demo'
-        solar_field_spec['name'] += ' (Demo Configuration)'
-    elif nsttf_configuration == 'Half-and-Half':
-        solar_field_spec['short_name'] += 'hh'
-        solar_field_spec['name'] += ' (Half-and-Half)'
+    elif nsttf_configuration == "Demo":
+        solar_field_spec["short_name"] += "demo"
+        solar_field_spec["name"] += " (Demo Configuration)"
+    elif nsttf_configuration == "Half-and-Half":
+        solar_field_spec["short_name"] += "hh"
+        solar_field_spec["name"] += " (Half-and-Half)"
     else:
         print(
             'ERROR: In generate_NSTTF_ufacet_plans(), unexpected nsttf_configuration="'
@@ -181,7 +181,7 @@ def generate_NSTTF_ufacet_plans(
             when_ymdhmsz_2[when_hour_idx] = trial_spec[trial_spec_hour_idx]
             when_ymdhmsz_2[when_minute_idx] = trial_spec[trial_spec_minute_idx]
             aimpoint_xyz_2[2] = trial_spec[trial_spec_z_aim_idx]
-            ufacet_control_parameters['maximum_altitude'] = trial_spec[trial_spec_z_max_idx]
+            ufacet_control_parameters["maximum_altitude"] = trial_spec[trial_spec_z_max_idx]
             pars.scan_plan_trial(
                 tile_array,
                 solar_field_spec,
@@ -204,6 +204,6 @@ def generate_NSTTF_ufacet_plans(
 
 def generate_NSTTF_ufacet_plans_1(save_flight_plan, save_figures):
     elevation_offset = 0
-    generate_NSTTF_ufacet_plans('NSTTF', 'Full Field', elevation_offset, save_flight_plan, save_figures)
+    generate_NSTTF_ufacet_plans("NSTTF", "Full Field", elevation_offset, save_flight_plan, save_figures)
     # generate_NSTTF_ufacet_plans('NSTTF', 'Demo',          elevation_offset, save_flight_plan, save_figures)
-    generate_NSTTF_ufacet_plans('NSTTF', 'Half-and-Half', elevation_offset, save_flight_plan, save_figures)
+    generate_NSTTF_ufacet_plans("NSTTF", "Half-and-Half", elevation_offset, save_flight_plan, save_figures)

@@ -1,8 +1,8 @@
 """Unit test to test the MirrorPoint class"""
 
-import numpy as np
 import unittest
 
+import numpy as np
 
 from opencsp.common.lib.csp.LightPathEnsemble import LightPathEnsemble
 from opencsp.common.lib.csp.LightSourcePoint import LightSourcePoint
@@ -13,7 +13,6 @@ from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.geometry.Intersection import Intersection
 from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.csp.RayTrace as rt
@@ -206,9 +205,5 @@ class TestIntersection(unittest.TestCase):
         self.assertEqual(3, intersection_points.data.shape[1])
 
 
-if __name__ == '__main__':
-    Test = TestIntersection()
-    Test.test_rays_intersect_properly()
-    Test.test_parallel_reflection()
-    Test.test_converging_reflection()
+if __name__ == "__main__":
     unittest.main()

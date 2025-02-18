@@ -89,7 +89,7 @@ class MomentsAnnotation(AbstractAnnotations):
         single spot that is shaped like an enlongated circle.
         """
         phi = self.rotation_angle_2d
-        return scipy.spatial.transform.Rotation.from_euler('z', [phi])
+        return scipy.spatial.transform.Rotation.from_euler("z", [phi])
 
     @property
     def size(self) -> list[float]:

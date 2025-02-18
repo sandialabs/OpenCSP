@@ -21,16 +21,16 @@ from contrib.common.lib.cv.spot_analysis.image_processor.ViewHighlightImageProce
 
 # Make these classes available when importing cv.spot_analysis.image_processor.*
 __all__ = [
-    'BackgroundColorSubtractionImageProcessor',
-    'CustomSimpleImageProcessor',
-    'EnclosedEnergyImageProcessor',
-    'InpaintImageProcessor',
-    'MomentsImageProcessor',
-    'PowerpointImageProcessor',
-    'SaveToFileImageProcessor',
-    'SpotWidthImageProcessor',
-    'StabilizationImageProcessor',
-    'TargetBoardLocatorImageProcessor',
-    'ViewAnnotationsImageProcessor',
-    'ViewHighlightImageProcessor',
+    "BackgroundColorSubtractionImageProcessor",
+    "CustomSimpleImageProcessor",
+    "EnclosedEnergyImageProcessor",
+    "InpaintImageProcessor",
+    "MomentsImageProcessor",
+    "PowerpointImageProcessor",
+    "SaveToFileImageProcessor",
+    "SpotWidthImageProcessor",
+    "StabilizationImageProcessor",
+    "TargetBoardLocatorImageProcessor",
+    "ViewAnnotationsImageProcessor",
+    "ViewHighlightImageProcessor",
 ]

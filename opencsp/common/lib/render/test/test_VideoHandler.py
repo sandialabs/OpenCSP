@@ -12,8 +12,8 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 
 
 class test_VideoHandler(unittest.TestCase):
-    dir_in = os.path.join(orp.opencsp_code_dir(), 'common', 'lib', 'render', 'test', 'data', 'input', 'VideoHandler')
-    dir_out = os.path.join(orp.opencsp_code_dir(), 'common', 'lib', 'render', 'test', 'data', 'output', 'VideoHandler')
+    dir_in = os.path.join(orp.opencsp_code_dir(), "common", "lib", "render", "test", "data", "input", "VideoHandler")
+    dir_out = os.path.join(orp.opencsp_code_dir(), "common", "lib", "render", "test", "data", "output", "VideoHandler")
 
     @classmethod
     def setUpClass(cls) -> None:
@@ -71,7 +71,7 @@ class test_VideoHandler(unittest.TestCase):
         for frame_idx, color_idx in [(3, 0), (11, 1), (20, 2)]:
             img_name_ext = frame_name_format % frame_idx
             img_dir_name_ext = os.path.join(test_dir, img_name_ext)
-            self.assertTrue(os.path.exists(img_dir_name_ext), f"Could not find image file \"{img_dir_name_ext}\"")
+            self.assertTrue(os.path.exists(img_dir_name_ext), f'Could not find image file "{img_dir_name_ext}"')
 
             img = cv2.imread(img_dir_name_ext)
             row_avg = np.average(img, axis=0)
@@ -151,5 +151,5 @@ class test_VideoHandler(unittest.TestCase):
         self.assertLess(dst_size, src_size)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

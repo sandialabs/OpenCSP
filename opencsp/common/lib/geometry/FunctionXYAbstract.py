@@ -1,12 +1,8 @@
 import copy
 from abc import ABC, abstractmethod
-from typing import Iterable
-
-import numpy as np
 
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import RegionXY
 
 
 class FunctionXYAbstract(ABC):

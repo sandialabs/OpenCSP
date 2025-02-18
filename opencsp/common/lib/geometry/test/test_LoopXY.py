@@ -149,5 +149,5 @@ class TestLoopXY(unittest.TestCase):
         np.testing.assert_almost_equal(verts_xy_act, np.array([[0, 2], [0, 2]]))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -108,7 +108,7 @@ def default(primary: T | Callable[[], T] | None, *default: T | Callable[[], T] |
 
 
 def strict_types(func):
-    '''
+    """
     Decoratorates functions to make them strictly typed.
 
     Takes in keyword arguments with associated types.
@@ -156,7 +156,7 @@ def strict_types(func):
         At key word argument 'a': type of '1j' is complex, should be int
 
     ```
-    '''
+    """
 
     @functools.wraps(func)
     def wrapper(*posargs, **kwargs):

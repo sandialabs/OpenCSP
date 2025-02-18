@@ -14,7 +14,7 @@ class AbstractFileFingerprint(ABC):
     def relpath_name_ext(self):
         return os.path.join(self.relative_path, self.name_ext)
 
-    def eq_aff(self, other: 'AbstractFileFingerprint'):
+    def eq_aff(self, other: "AbstractFileFingerprint"):
         if not isinstance(other, AbstractFileFingerprint):
             return False
         return self.relative_path == other.relative_path and self.name_ext == other.name_ext

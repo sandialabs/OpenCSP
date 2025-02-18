@@ -20,7 +20,7 @@ class test_opencsp_root_path(unittest.TestCase):
         if not ft.file_exists(cls.tmp_settings_file):
             path, _, _ = ft.path_components(cls.tmp_settings_file)
             if ft.directory_exists(path):
-                open(cls.tmp_settings_file, 'w').write(cls.tmp_settings_contents)
+                open(cls.tmp_settings_file, "w").write(cls.tmp_settings_contents)
                 cls.did_create_settings_file = True
 
     @classmethod
@@ -75,7 +75,7 @@ class test_opencsp_root_path(unittest.TestCase):
         """Creates a temporary "settings.json" file if one doesn't already
         exist and populates it with test values."""
         if os.path.exists(self.tmp_settings_file):
-            file_contents = open(self.tmp_settings_file, 'r').read()
+            file_contents = open(self.tmp_settings_file, "r").read()
             if file_contents.strip() != self.tmp_settings_contents:
                 self.skipTest(
                     f"File '{self.tmp_settings_file}' already exists. Not replacing file with a testing file."
@@ -85,5 +85,5 @@ class test_opencsp_root_path(unittest.TestCase):
         self.assertEqual("s/t/u", orp.opencsp_scratch_dir())
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

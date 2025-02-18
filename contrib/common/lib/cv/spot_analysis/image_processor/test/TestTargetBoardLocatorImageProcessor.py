@@ -81,10 +81,10 @@ class TestTargetBoardLocatorImageProcessor(unittest.TestCase):
 
     def test_perspective_transform(self):
         corners = {
-            'tl': p2.Pxy([519.42333545, 256.22223199]),
-            'tr': p2.Pxy([1108.33624737, 271.21012117]),
-            'br': p2.Pxy([1091.97009466, 857.37629342]),
-            'bl': p2.Pxy([501.9556769, 840.95732619]),
+            "tl": p2.Pxy([519.42333545, 256.22223199]),
+            "tr": p2.Pxy([1108.33624737, 271.21012117]),
+            "br": p2.Pxy([1091.97009466, 857.37629342]),
+            "bl": p2.Pxy([501.9556769, 840.95732619]),
         }
         processor = TargetBoardLocatorImageProcessor.from_corners(
             corners, target_width_meters=2.44, target_height_meters=2.44
@@ -97,5 +97,5 @@ class TestTargetBoardLocatorImageProcessor(unittest.TestCase):
         npt.assert_allclose(result.nparray, np.array(expected), atol=2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

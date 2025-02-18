@@ -44,18 +44,18 @@ class TransformXYZ:
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         # Check 4x4 shape
         if matrix.shape != (4, 4):
-            raise ValueError('Input matrix must have shape 4x4.')
+            raise ValueError("Input matrix must have shape 4x4.")
 
         # Save matrix data
         self._matrix = matrix.astype(float)
 
     def __repr__(self):
-        return '3D Transform:\n' + self._matrix.__repr__()
+        return "3D Transform:\n" + self._matrix.__repr__()
 
     def __mul__(self, T):
         # Check input type
         if not isinstance(T, TransformXYZ):
-            raise TypeError(f'Type, {type(self)}, cannot be multipled by type, {type(T)}.')
+            raise TypeError(f"Type, {type(self)}, cannot be multipled by type, {type(T)}.")
 
         return TransformXYZ(self._matrix @ T._matrix)
 
@@ -103,7 +103,7 @@ class TransformXYZ:
         """
         # Check V is length 1
         if len(V) != 1:
-            raise ValueError('Input V must be a length 1 vector.')
+            raise ValueError("Input V must be a length 1 vector.")
         # Create matrix
         matrix = np.eye(4)
         # Add rotation and translation components
@@ -234,7 +234,7 @@ class TransformXYZ:
         V_out += self.V
         return V_out
 
-    def inv(self) -> 'TransformXYZ':
+    def inv(self) -> "TransformXYZ":
         """Returns inverse transformation
 
         Returns
@@ -245,6 +245,6 @@ class TransformXYZ:
         mat_inv = np.linalg.inv(self.matrix)
         return TransformXYZ(mat_inv)
 
-    def copy(self) -> 'TransformXYZ':
+    def copy(self) -> "TransformXYZ":
         """Returns a copy of the transform"""
         return TransformXYZ(self.matrix.copy())

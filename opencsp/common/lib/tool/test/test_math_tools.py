@@ -18,10 +18,10 @@ class TestMathTools(unittest.TestCase):
         self.assertEqual(overlap, [])
 
     def test_overlapping_range_default(self):
-        overlap = mt.overlapping_range([6, 7], [8, 9], default='hello')
-        self.assertEqual(overlap, 'hello')
-        overlap = mt.overlapping_range([], [], default='world')
-        self.assertEqual(overlap, 'world')
+        overlap = mt.overlapping_range([6, 7], [8, 9], default="hello")
+        self.assertEqual(overlap, "hello")
+        overlap = mt.overlapping_range([], [], default="world")
+        self.assertEqual(overlap, "world")
 
     def test_rolling_average_invalid(self):
         with self.assertRaises(ValueError):
@@ -70,5 +70,5 @@ class TestMathTools(unittest.TestCase):
         self.assertAlmostEqual(out7[6], (4 + 5 + 6 + 7) / 4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -18,7 +18,7 @@ def construct_ufacet_scan(
     solar_field, aimpoint_xyz, when_ymdhmsz, ufacet_scan_parameter_file, ufacet_control_parameters
 ):
     # Notify progress.
-    print('Constructing UFACET scan...')
+    print("Constructing UFACET scan...")
 
     # Fetch scan parameters.
     # Add-in control parameters, so there is only one container.
@@ -27,7 +27,7 @@ def construct_ufacet_scan(
     )
 
     # Fetch seed curve points.
-    curve_key_xy_list = ufacet_control_parameters['curve_key_xy_list']
+    curve_key_xy_list = ufacet_control_parameters["curve_key_xy_list"]
 
     # UFACET (x,y) analysis.
     list_of_ideal_xy_lists, list_of_best_fit_segment_xys = psuxya.ufacet_xy_analysis(
@@ -45,11 +45,11 @@ def construct_ufacet_scan(
 
     # Store results.
     ufacet_scan_construction = {}
-    ufacet_scan_construction['curve_key_xy_list'] = ufacet_control_parameters['curve_key_xy_list']
-    ufacet_scan_construction['list_of_ideal_xy_lists'] = list_of_ideal_xy_lists
-    ufacet_scan_construction['list_of_best_fit_segment_xys'] = list_of_best_fit_segment_xys
-    ufacet_scan_construction['section_list'] = section_list
-    ufacet_scan_construction['scan_pass_list'] = scan_pass_list
+    ufacet_scan_construction["curve_key_xy_list"] = ufacet_control_parameters["curve_key_xy_list"]
+    ufacet_scan_construction["list_of_ideal_xy_lists"] = list_of_ideal_xy_lists
+    ufacet_scan_construction["list_of_best_fit_segment_xys"] = list_of_best_fit_segment_xys
+    ufacet_scan_construction["section_list"] = section_list
+    ufacet_scan_construction["scan_pass_list"] = scan_pass_list
 
     # Return.
     # Return the scan parameters, because they include information for converting the scan into a flight.

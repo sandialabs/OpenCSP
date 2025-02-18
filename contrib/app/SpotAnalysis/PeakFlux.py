@@ -48,13 +48,13 @@ class PeakFlux:
         }
 
         self.image_processors: list[AbstractSpotAnalysisImageProcessor] = {
-            'Crop': CroppingImageProcessor(*self.crop_box),
-            'AvgG': AverageByGroupImageProcessor(group_assigner, group_trigger),
-            'Echo': EchoImageProcessor(),
-            'Coll': SupportingImagesCollectorImageProcessor(supporting_images_map),
-            'Null': NullImageSubtractionImageProcessor(),
-            'Noiz': ConvolutionImageProcessor(kernel="box", diameter=3),
-            'Targ': TargetBoardLocatorImageProcessor(
+            "Crop": CroppingImageProcessor(*self.crop_box),
+            "AvgG": AverageByGroupImageProcessor(group_assigner, group_trigger),
+            "Echo": EchoImageProcessor(),
+            "Coll": SupportingImagesCollectorImageProcessor(supporting_images_map),
+            "Null": NullImageSubtractionImageProcessor(),
+            "Noiz": ConvolutionImageProcessor(kernel="box", diameter=3),
+            "Targ": TargetBoardLocatorImageProcessor(
                 None,
                 None,
                 settings.target_board_size_wh[0],
@@ -64,30 +64,30 @@ class PeakFlux:
                 edge_coarse_width=30,
                 canny_test_gradients=settings.target_canny_test_gradients,
             ),
-            'Fill': InpaintImageProcessor(settings.infill_mask_file, settings.tmpdir),
-            'Save': SaveToFileImageProcessor(ft.join(settings.outdir, "filled_targets")),
-            'Ve3d': View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100)),
-            'HotL': HotspotImageProcessor(
+            "Fill": InpaintImageProcessor(settings.infill_mask_file, settings.tmpdir),
+            "Save": SaveToFileImageProcessor(ft.join(settings.outdir, "filled_targets")),
+            "Ve3d": View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100)),
+            "HotL": HotspotImageProcessor(
                 desired_shape=49, draw_debug_view=False, record_visualization=False, record_debug_view=6
             ),
-            'Vcx2': ViewCrossSectionImageProcessor(
-                self.get_peak_origin, 'Hotspot', single_plot=False, crop_to_threshold=20
+            "Vcx2": ViewCrossSectionImageProcessor(
+                self.get_peak_origin, "Hotspot", single_plot=False, crop_to_threshold=20
             ),
-            'Stat': PopulationStatisticsImageProcessor(min_pop_size=1, initial_min=0, initial_max=255),
-            'Fclr': ViewFalseColorImageProcessor(),
-            'Anno': ViewAnnotationsImageProcessor(),
+            "Stat": PopulationStatisticsImageProcessor(min_pop_size=1, initial_min=0, initial_max=255),
+            "Fclr": ViewFalseColorImageProcessor(),
+            "Anno": ViewAnnotationsImageProcessor(),
         }
         self.pptx_processor = PowerpointImageProcessor(
             save_dir=outdir,
             save_name="processing_pipeline",
             overwrite=True,
             processors_per_slide=[
-                [self.image_processors['Noiz'], self.image_processors['Targ']],
-                [self.image_processors['Fill']],
-                [self.image_processors['Ve3d']],
-                [self.image_processors['HotL']],
-                [self.image_processors['Vcx2']],
-                [self.image_processors['Fclr'], self.image_processors['Anno']],
+                [self.image_processors["Noiz"], self.image_processors["Targ"]],
+                [self.image_processors["Fill"]],
+                [self.image_processors["Ve3d"]],
+                [self.image_processors["HotL"]],
+                [self.image_processors["Vcx2"]],
+                [self.image_processors["Fclr"], self.image_processors["Anno"]],
             ],
         )
         image_processor_list = list(self.image_processors.values()) + [self.pptx_processor]
@@ -136,7 +136,7 @@ class PeakFlux:
         reference_image_dir_or_file : str
             The image file, or the directory containing image files.
         """
-        targ_processor: TargetBoardLocatorImageProcessor = self.image_processors['Targ']
+        targ_processor: TargetBoardLocatorImageProcessor = self.image_processors["Targ"]
         targ_processor.set_reference_images(reference_image_dir_or_file)
 
     def assign_inputs_from_settings(self):
@@ -176,7 +176,7 @@ class PeakFlux:
             if not ft.directory_exists(raw_images_path):
                 lt.error_and_raise(
                     FileNotFoundError,
-                    "Error in peak_flux: " + f"raw images directory \"{raw_images_path}\" does not exist",
+                    "Error in peak_flux: " + f'raw images directory "{raw_images_path}" does not exist',
                 )
             for file_name_ext in ft.files_in_directory(raw_images_path, files_only=True):
                 source_images_path_name_exts.append(ft.norm_path(os.path.join(raw_images_path, file_name_ext)))

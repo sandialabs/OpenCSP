@@ -106,5 +106,5 @@ class TestBackgroundColorSubtractionImageProcessor(unittest.TestCase):
         Image.fromarray(background).save(ft.join(self.out_dir, "test_build_background_image_plane.png"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     TestBackgroundColorSubtractionImageProcessor().test_build_background_image()

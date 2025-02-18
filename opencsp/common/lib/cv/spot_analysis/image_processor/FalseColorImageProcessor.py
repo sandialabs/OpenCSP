@@ -18,7 +18,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImageProcessor):
     images, for better contrast and legibility by humans.
     """
 
-    def __init__(self, map_type='human', opencv_map=cv2.COLORMAP_JET):
+    def __init__(self, map_type="human", opencv_map=cv2.COLORMAP_JET):
         """
         Parameters
         ----------
@@ -102,7 +102,7 @@ class FalseColorImageProcessor(AbstractSpotAnalysisImageProcessor):
             )
 
         # apply the false color mapping
-        if self.map_type == 'large' or self.map_type == 'human':
+        if self.map_type == "large" or self.map_type == "human":
             ret = [self.apply_mapping_jet_custom(operable)]
         else:
             ret = [self.apply_mapping_jet(operable, self.opencv_map)]

@@ -35,7 +35,7 @@ import opencsp.common.lib.tool.time_date_tools as tdt
 def calibrate_camera_exposure(image_acquisition: ImageAcquisition) -> None:
     """Automatically calibrates the camera exposure"""
     image_acquisition.calibrate_exposure()
-    lt.info(f'Camera gain: {image_acquisition.gain:.2f}')
+    lt.info(f"Camera gain: {image_acquisition.gain:.2f}")
 
 
 def process(
@@ -56,12 +56,12 @@ def process(
     # Print focal lengths from best fit paraboloid
     surf_coefs = system_sofast_fixed.data_slope_solver.surf_coefs_facet
     focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
-    lt.info(f'Parabolic fit focal xy lengths: ({focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}) m')
+    lt.info(f"Parabolic fit focal xy lengths: ({focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f}) m")
 
     time_str = tdt.current_date_time_string_forfile()
 
     # Save data as HDF5 file
-    file_save = join(dir_save, 'sofast_fixed_data_' + time_str + '.h5')
+    file_save = join(dir_save, "sofast_fixed_data_" + time_str + ".h5")
     system_sofast_fixed.save_to_hdf(file_save)
     fixed_pattern_dot_locs.save_to_hdf(file_save)
     orientation.save_to_hdf(file_save)
@@ -71,13 +71,13 @@ def process(
     surface.save_to_hdf(file_save)
 
     # Plot slope image
-    mirror = system_sofast_fixed.get_mirror(interpolation_type='bilinear')
+    mirror = system_sofast_fixed.get_mirror(interpolation_type="bilinear")
 
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
     axis_control_m = rca.meters()
-    fig_record = fm.setup_figure(figure_control, axis_control_m, title='')
+    fig_record = fm.setup_figure(figure_control, axis_control_m, title="")
     mirror.plot_orthorectified_slope(res=0.002, clim=7, axis=fig_record.axis)
-    fig_record.save(dir_save, 'slope_magnitude_' + time_str, 'png', close_after_save=False)
+    fig_record.save(dir_save, "slope_magnitude_" + time_str, "png", close_after_save=False)
     plt.show()
 
 
@@ -87,24 +87,24 @@ def run() -> None:
     v_measure_point_facet = Vxyz((0, 0, 0))
     dist_optic_screen = 10.263  # m
     pt_origin = Vxy((993, 644))  # pixels
-    name = 'NSTTF Facet'
+    name = "NSTTF Facet"
     width_pattern = 3  # pixels
     spacing_pattern = 6  # pixels
-    dir_cal_files = join(opencsp_code_dir(), '../../sofast_calibration_files')
-    dir_save = abspath('../../')
+    dir_cal_files = join(opencsp_code_dir(), "../../sofast_calibration_files")
+    dir_save = abspath("../../")
 
     # Start logging
-    lt.logger(join(dir_save, f'log_{tdt.current_date_time_string_forfile():s}.txt'))
+    lt.logger(join(dir_save, f"log_{tdt.current_date_time_string_forfile():s}.txt"))
 
     # Connect camera
     image_acquisition = ImageAcquisition()
 
     # Load data
-    file_camera = join(dir_cal_files, 'Camera_optics_lab_landscape.h5')
-    file_dot_location = join(dir_cal_files, f'fixed_pattern_dot_locations_w{width_pattern:d}_s{spacing_pattern:d}.h5')
-    file_spatial_orientation = join(dir_cal_files, 'spatial_orientation_optics_lab.h5')
-    file_facet_data = join(dir_cal_files, 'Facet_NSTTF.json')
-    file_image_projection = join(dir_cal_files, 'Image_Projection_optics_lab_landscape_square.h5')
+    file_camera = join(dir_cal_files, "Camera_optics_lab_landscape.h5")
+    file_dot_location = join(dir_cal_files, f"fixed_pattern_dot_locations_w{width_pattern:d}_s{spacing_pattern:d}.h5")
+    file_spatial_orientation = join(dir_cal_files, "spatial_orientation_optics_lab.h5")
+    file_facet_data = join(dir_cal_files, "Facet_NSTTF.json")
+    file_image_projection = join(dir_cal_files, "Image_Projection_optics_lab_landscape_square.h5")
 
     # Load ImageProjection and SystemSofastFixed objects
     image_projection = ImageProjection.load_from_hdf_and_display(file_image_projection)
@@ -113,7 +113,7 @@ def run() -> None:
     )
 
     # Display fixed pattern image
-    image = system_sofast_fixed.get_image('uint8', 255)
+    image = system_sofast_fixed.get_image("uint8", 255)
     image_projection.display_image_in_active_area(image)
 
     # Load other components
@@ -126,8 +126,8 @@ def run() -> None:
     surface = Surface2DParabolic(initial_focal_lengths_xy=(150.0, 150.0), robust_least_squares=False, downsample=1)
 
     def run_next():
-        resp = input('Measure (m), calibrate camera exposure (c), or stop (any other key): ')
-        if resp == 'm':
+        resp = input("Measure (m), calibrate camera exposure (c), or stop (any other key): ")
+        if resp == "m":
             # Capture image
             frame = image_acquisition.get_frame()
             # Process
@@ -136,7 +136,7 @@ def run() -> None:
             process(fixed_pattern_dot_locs, spatial_orientation, camera, facet, measurement, surface, dir_save)
             # Continue or exit
             image_projection.root.after(200, run_next)
-        elif resp == 'c':
+        elif resp == "c":
             calibrate_camera_exposure(image_acquisition)
             image_projection.root.after(200, run_next)
         else:
@@ -148,5 +148,5 @@ def run() -> None:
     image_projection.run()
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     run()

@@ -170,8 +170,8 @@ class Tower(RayTraceable):
         tower_style = tower_style.style(self.name)
 
         # Whole tower
-        if 'whole tower' in self.parts:
-            self.parts += ['top', 'northface', 'southface', 'bottom', 'northface']
+        if "whole tower" in self.parts:
+            self.parts += ["top", "northface", "southface", "bottom", "northface"]
 
         # Top of tower
         if "top" in self.parts:

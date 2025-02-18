@@ -14,7 +14,6 @@ from opencsp.app.select_image_points import SelectImagePoints
 import opencsp.common.lib.cv.SpotAnalysis
 
 
-import opencsp.common.lib.camera.CameraTransform as CameraTransform
 import opencsp.common.lib.camera.ImageAcquisition_DCAM_color
 import opencsp.common.lib.camera.ImageAcquisition_MSMF
 import opencsp.common.lib.camera.UCamera
@@ -24,9 +23,6 @@ import opencsp.common.lib.deflectometry.ParamsSlopeSolver
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverParaboloid
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverPlano
-import opencsp.common.lib.geometry.ReferenceFrame
-import opencsp.common.lib.geometry.TranslationXYZ
-import opencsp.common.lib.geometry.matrix_geometry_3d
 import opencsp.common.lib.opencsp_path.optical_analysis_data_path
 import opencsp.common.lib.process.ServerSynchronizer
 import opencsp.common.lib.process.parallel_video_tools
@@ -42,6 +38,7 @@ import opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d
 import opencsp.common.lib.render_control.RenderControlFramesNoDuplicates
 import opencsp.common.lib.render_control.RenderControlHeliostatTracks
 import opencsp.common.lib.render_control.RenderControlHeliostats3d
+import opencsp.common.lib.render_control.RenderControlIntersection
 import opencsp.common.lib.render_control.RenderControlKeyCorners
 import opencsp.common.lib.render_control.RenderControlKeyFramesGivenManual
 import opencsp.common.lib.render_control.RenderControlKeyTracks
@@ -49,6 +46,9 @@ import opencsp.common.lib.render_control.RenderControlPowerpointPresentation
 import opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
 import opencsp.common.lib.render_control.RenderControlVideoTracks
 import opencsp.common.lib.tool.dict_tools
+import opencsp.common.lib.uas.Scan
+import opencsp.common.lib.uas.ScanPass
+import opencsp.common.lib.uas.WayPoint
 
 
 class test_Docstrings(unittest.TestCase):
@@ -223,7 +223,6 @@ class test_Docstrings(unittest.TestCase):
     ]
     camera_class_list = [
         opencsp.common.lib.camera.Camera.Camera,
-        CameraTransform,
         opencsp.common.lib.camera.ImageAcquisitionAbstract.ImageAcquisitionAbstract,
         opencsp.common.lib.camera.ImageAcquisition_DCAM_color.ImageAcquisition,
         opencsp.common.lib.camera.ImageAcquisition_DCAM_mono.ImageAcquisition,
@@ -299,19 +298,13 @@ class test_Docstrings(unittest.TestCase):
         opencsp.common.lib.geometry.LoopXY,
         opencsp.common.lib.geometry.Pxy,
         opencsp.common.lib.geometry.Pxyz,
-        opencsp.common.lib.geometry.ReferenceFrame,
         opencsp.common.lib.geometry.RegionXY,
         opencsp.common.lib.geometry.TransformXYZ,
-        opencsp.common.lib.geometry.TranslationXYZ,
         opencsp.common.lib.geometry.Uxy,
         opencsp.common.lib.geometry.Uxyz,
         opencsp.common.lib.geometry.Vxy,
         opencsp.common.lib.geometry.Vxyz,
         opencsp.common.lib.geometry.angle,
-        opencsp.common.lib.geometry.geometry_2d,
-        opencsp.common.lib.geometry.geometry_3d,
-        opencsp.common.lib.geometry.matrix_geometry_3d,
-        opencsp.common.lib.geometry.transform_3d,
     ]
 
     opencsp_path_class_list = [
@@ -425,12 +418,12 @@ class test_Docstrings(unittest.TestCase):
         cv_class_list
         + camera_class_list
         + csp_class_list
-        # + cv_class_list
-        # + deflectometry_class_list
-        # + file_class_list
-        # + geo_class_list
-        # + geometry_class_list
-        # + opencsp_path_class_list
+        + cv_class_list
+        + deflectometry_class_list
+        + file_class_list
+        + geo_class_list
+        + geometry_class_list
+        + opencsp_path_class_list
         # + photogrammetry_class_list
         # + process_class_list
         # + render_class_list
@@ -489,5 +482,5 @@ class test_Docstrings(unittest.TestCase):
         print(f"n_docstrings: {n_docstrings}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

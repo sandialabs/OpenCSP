@@ -43,11 +43,11 @@ class ImageMarker:
         """
         # Perform checks
         if point_ids.size != pts_im_xy.shape[0]:
-            raise ValueError('Length of given point_ids and pts_im_xy must be equal.')
+            raise ValueError("Length of given point_ids and pts_im_xy must be equal.")
         if np.ndim(pts_im_xy) != 2 or pts_im_xy.shape[1] != 2:
-            raise ValueError('Points must be Nx2 array.')
+            raise ValueError("Points must be Nx2 array.")
         if not isinstance(point_ids.dtype.type, type(np.integer)):
-            raise TypeError('Input IDs dtype must be int')
+            raise TypeError("Input IDs dtype must be int")
 
         # Save data
         self.image = image
@@ -67,7 +67,7 @@ class ImageMarker:
         self.tvec = np.zeros(3) * np.nan
 
     def __repr__(self):
-        return f'Image {self.img_id:d}'
+        return f"Image {self.img_id:d}"
 
     def plot_image_with_points(self) -> None:
         """Plots captured image with image point and reprojected point locations"""
@@ -78,12 +78,12 @@ class ImageMarker:
         # Plot
         ax = plt.axes()
         ax.imshow(self.image)
-        ax.scatter(*pts_reproj.T, marker='o', facecolor='none', edgecolor='red', label='Reprojected')
-        ax.scatter(*self.pts_im_xy.T, marker='.', color='blue', label='Image points')
+        ax.scatter(*pts_reproj.T, marker="o", facecolor="none", edgecolor="red", label="Reprojected")
+        ax.scatter(*self.pts_im_xy.T, marker=".", color="blue", label="Image points")
         ax.legend()
 
     @classmethod
-    def load_aruco_origin(cls, file: str, img_id: int, camera: Camera, **kwargs) -> 'ImageMarker':
+    def load_aruco_origin(cls, file: str, img_id: int, camera: Camera, **kwargs) -> "ImageMarker":
         """Loads an image file, finds Aruco markers, saves the origin point.
 
         Parameters
@@ -114,7 +114,7 @@ class ImageMarker:
     def convert_to_four_corner(self, **kwargs) -> None:
         """Converts from using only origin point to all four marker corners"""
         if self.four_corner_model:
-            warn('Image is already a four corner model', UserWarning, stacklevel=2)
+            warn("Image is already a four corner model", UserWarning, stacklevel=2)
             return
         self.four_corner_model = True
 
@@ -153,7 +153,7 @@ class ImageMarker:
 
         # Check if too few points to calculate pose
         if self.located_markers_mask.sum() <= 5:
-            lt.debug(f'Camera pose {self.img_id:d} has too few points to solve')
+            lt.debug(f"Camera pose {self.img_id:d} has too few points to solve")
             return -1
 
         # Get object and image points
@@ -167,14 +167,14 @@ class ImageMarker:
 
         # Check if CV succeeded
         if not ret:
-            lt.debug('Camera pose {self.img_id:d} did not solve properly')
+            lt.debug("Camera pose {self.img_id:d} did not solve properly")
             return -1
-        lt.debug(f'Camera pose {self.img_id:d} solved')
+        lt.debug(f"Camera pose {self.img_id:d} solved")
 
         # Check if pose is valid
         valid = ph.valid_camera_pose(self.camera, rvec, tvec, pts_img, pts_obj)
         if not valid:
-            lt.debug(f'Camera pose {self.img_id:d} not valid')
+            lt.debug(f"Camera pose {self.img_id:d} not valid")
             return -1
 
         # Pose is valid
@@ -204,14 +204,14 @@ class ImageMarker:
         tvec : ndarray
             Shape (3,) translation vector
         """
-        lt.debug(f'Camera pose {self.img_id:d} set')
+        lt.debug(f"Camera pose {self.img_id:d} set")
         self.pose_known = True
         self.rvec = rvec
         self.tvec = tvec
 
     def unset_pose(self) -> None:
         """Removes the pose of the camera"""
-        lt.debug(f'Camera pose {self.img_id:d} unset')
+        lt.debug(f"Camera pose {self.img_id:d} unset")
         self.pose_known = False
         self.rvec = np.zeros(3) * np.nan
         self.tvec = np.zeros(3) * np.nan
@@ -249,13 +249,13 @@ class ImageMarker:
     def save_as_hdf(self, file: str) -> None:
         """Writes all information to given HDF file"""
         datasets = [
-            'point_ids',
-            'located_point_ids',
-            'unlocated_point_ids',
-            'pts_im_xy',
-            'pts_obj_xyz',
-            'located_marker_mask',
-            'image_index',
+            "point_ids",
+            "located_point_ids",
+            "unlocated_point_ids",
+            "pts_im_xy",
+            "pts_obj_xyz",
+            "located_marker_mask",
+            "image_index",
         ]
         data = [
             self.point_ids,

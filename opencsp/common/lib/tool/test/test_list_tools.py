@@ -8,31 +8,31 @@ import opencsp.common.lib.tool.list_tools as listt
 class test_list_tools(unittest.TestCase):
     def test_binary_search_size0(self):
         l = []
-        i, v = listt.binary_search(l, 'a')
+        i, v = listt.binary_search(l, "a")
         self.assertEqual(i, -1)
         self.assertEqual(v, None)
 
     def test_binary_search_size0_error(self):
         l = []
         with self.assertRaises(RuntimeError):
-            i, v = listt.binary_search(l, 'b', err_if_not_equal=True)
+            i, v = listt.binary_search(l, "b", err_if_not_equal=True)
 
     def test_binary_search_size1_match(self):
-        l = ['a']
-        i, v = listt.binary_search(l, 'a')
+        l = ["a"]
+        i, v = listt.binary_search(l, "a")
         self.assertEqual(i, 0)
-        self.assertEqual(v, 'a')
+        self.assertEqual(v, "a")
 
     def test_binary_search_size1_nomatch(self):
-        l = ['a']
-        i, v = listt.binary_search(l, 'b')
+        l = ["a"]
+        i, v = listt.binary_search(l, "b")
         self.assertEqual(i, 0)
-        self.assertEqual(v, 'a')
+        self.assertEqual(v, "a")
 
     def test_binary_search_size1_nomatch_error(self):
-        l = ['a']
+        l = ["a"]
         with self.assertRaises(RuntimeError):
-            i, v = listt.binary_search(l, 'b', err_if_not_equal=True)
+            i, v = listt.binary_search(l, "b", err_if_not_equal=True)
 
     def test_binary_search_size2_match(self):
         l = [10, 20]
@@ -53,28 +53,28 @@ class test_list_tools(unittest.TestCase):
         self.assertEqual(v, 20)
 
     def test_binary_search_size3_nomatch(self):
-        l = ['b', 'd', 'f']
-        i, v = listt.binary_search(l, 'a')
+        l = ["b", "d", "f"]
+        i, v = listt.binary_search(l, "a")
         self.assertEqual(i, 0)
-        self.assertEqual(v, 'b')
-        i, v = listt.binary_search(l, 'b')
+        self.assertEqual(v, "b")
+        i, v = listt.binary_search(l, "b")
         self.assertEqual(i, 0)
-        self.assertEqual(v, 'b')
-        i, v = listt.binary_search(l, 'c')
+        self.assertEqual(v, "b")
+        i, v = listt.binary_search(l, "c")
         self.assertEqual(i, 0)
-        self.assertEqual(v, 'b')
-        i, v = listt.binary_search(l, 'd')
+        self.assertEqual(v, "b")
+        i, v = listt.binary_search(l, "d")
         self.assertEqual(i, 1)
-        self.assertEqual(v, 'd')
-        i, v = listt.binary_search(l, 'e')
+        self.assertEqual(v, "d")
+        i, v = listt.binary_search(l, "e")
         self.assertEqual(i, 1)
-        self.assertEqual(v, 'd')
-        i, v = listt.binary_search(l, 'f')
+        self.assertEqual(v, "d")
+        i, v = listt.binary_search(l, "f")
         self.assertEqual(i, 2)
-        self.assertEqual(v, 'f')
-        i, v = listt.binary_search(l, 'g')
+        self.assertEqual(v, "f")
+        i, v = listt.binary_search(l, "g")
         self.assertEqual(i, 2)
-        self.assertEqual(v, 'f')
+        self.assertEqual(v, "f")
 
     def test_binary_search_many(self):
         l = sorted(np.random.random(10_000))
@@ -109,47 +109,47 @@ class test_list_tools(unittest.TestCase):
 
     def test_get_range_exact(self):
         lvals = [0, 1, 2, 3, 4]
-        tvals = ['a', 'b', 'c', 'd', 'e']
+        tvals = ["a", "b", "c", "d", "e"]
 
         middle_vals = listt.get_range(lvals, tvals, [1, 3])
         self.assertEqual(middle_vals[0], [1, 2, 3])
-        self.assertEqual(middle_vals[1], ['b', 'c', 'd'])
+        self.assertEqual(middle_vals[1], ["b", "c", "d"])
 
         front_vals = listt.get_range(lvals, tvals, [0, 2])
         self.assertEqual(front_vals[0], [0, 1, 2])
-        self.assertEqual(front_vals[1], ['a', 'b', 'c'])
+        self.assertEqual(front_vals[1], ["a", "b", "c"])
 
         back_vals = listt.get_range(lvals, tvals, [2, 4])
         self.assertEqual(back_vals[0], [2, 3, 4])
-        self.assertEqual(back_vals[1], ['c', 'd', 'e'])
+        self.assertEqual(back_vals[1], ["c", "d", "e"])
 
         all_vals = listt.get_range(lvals, tvals, [0, 4])
         self.assertEqual(all_vals[0], [0, 1, 2, 3, 4])
-        self.assertEqual(all_vals[1], ['a', 'b', 'c', 'd', 'e'])
+        self.assertEqual(all_vals[1], ["a", "b", "c", "d", "e"])
 
         overfull = listt.get_range(lvals, tvals, [-1, 5])
         self.assertEqual(overfull[0], [0, 1, 2, 3, 4])
-        self.assertEqual(overfull[1], ['a', 'b', 'c', 'd', 'e'])
+        self.assertEqual(overfull[1], ["a", "b", "c", "d", "e"])
 
     def test_get_range_approximate(self):
         lvals = [0, 1, 2, 3, 4]
-        tvals = ['a', 'b', 'c', 'd', 'e']
+        tvals = ["a", "b", "c", "d", "e"]
 
         closest_vals_front = listt.get_range(lvals, tvals, [-100, -1])
         self.assertEqual(closest_vals_front[0], [0])
-        self.assertEqual(closest_vals_front[1], ['a'])
+        self.assertEqual(closest_vals_front[1], ["a"])
 
         closest_vals_middle = listt.get_range(lvals, tvals, [1.2, 2.8])
         self.assertEqual(closest_vals_middle[0], [1, 2, 3])
-        self.assertEqual(closest_vals_middle[1], ['b', 'c', 'd'])
+        self.assertEqual(closest_vals_middle[1], ["b", "c", "d"])
 
         closest_vals_back = listt.get_range(lvals, tvals, [6, 100])
         self.assertEqual(closest_vals_back[0], [4])
-        self.assertEqual(closest_vals_back[1], ['e'])
+        self.assertEqual(closest_vals_back[1], ["e"])
 
         middle_vals_exclusive = listt.get_range(lvals, tvals, [1.2, 2.8], exclude_outside_range=True)
         self.assertEqual(middle_vals_exclusive[0], [2])
-        self.assertEqual(middle_vals_exclusive[1], ['c'])
+        self.assertEqual(middle_vals_exclusive[1], ["c"])
 
         empty_vals_front = listt.get_range(lvals, tvals, [-100, -1], exclude_outside_range=True)
         self.assertEqual(len(empty_vals_front[0]), 0)
@@ -192,5 +192,5 @@ class test_list_tools(unittest.TestCase):
         self.assertEqual(listt.rindex(lvals, 0), -1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

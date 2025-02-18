@@ -21,7 +21,7 @@ UP = Vxyz([0, 0, 1])
 class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientationAbstract):
     """Facet representation that contains a MirrorAbstract object."""
 
-    def __init__(self, mirror: MirrorAbstract, name: str = None) -> 'Facet':
+    def __init__(self, mirror: MirrorAbstract, name: str = None) -> "Facet":
         """Instantiates Facet class
 
         Parameters
@@ -58,7 +58,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         points_z = self.mirror.surface_displacement_at(points_xy)  # mirror frame
         # If the corners aren't in range of the mirror's interpolation function, set to 0
         if np.any(np.isnan(points_z)):
-            lt.warn('Could not find corner z values for facet; filling with zeros.')
+            lt.warn("Could not find corner z values for facet; filling with zeros.")
             points_z = np.nan_to_num(points_z, nan=0)
         points_xyz = Vxyz((points_xy.x, points_xy.y, points_z))  # mirror frame
 

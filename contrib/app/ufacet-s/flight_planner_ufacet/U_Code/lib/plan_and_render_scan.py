@@ -45,13 +45,13 @@ def plan_and_render_scan(
     render_control_scan_section_analysis,
 ):
     # Construct scan name and output directory.
-    scan_name = scan_type + ' Scan Over ' + solar_field.situation_str()
-    if scan_type == 'UFACET':
-        scan_short_name = solar_field.situation_abbrev() + '_' + scan_type[0]
-    elif scan_type == 'Raster':
-        scan_short_name = solar_field.short_name + '_' + scan_type[0]
-    elif scan_type == 'Vanity':
-        scan_short_name = solar_field.short_name + '_' + scan_type[0]
+    scan_name = scan_type + " Scan Over " + solar_field.situation_str()
+    if scan_type == "UFACET":
+        scan_short_name = solar_field.situation_abbrev() + "_" + scan_type[0]
+    elif scan_type == "Raster":
+        scan_short_name = solar_field.short_name + "_" + scan_type[0]
+    elif scan_type == "Vanity":
+        scan_short_name = solar_field.short_name + "_" + scan_type[0]
     else:
         print('ERROR: In plan_and_render_scan(), unexpected scan_type="' + str(scan_type) + '" encountered.')
         assert False
@@ -65,23 +65,23 @@ def plan_and_render_scan(
     output_path = os.path.join(render_control_top_level.figure_output_path, scan_short_name)
 
     # Construct the scan.
-    print('Constructing scan...')
-    if scan_type == 'UFACET':
+    print("Constructing scan...")
+    if scan_type == "UFACET":
         # Construct UFACET scan.
         scan, scan_parameters, ufacet_scan_construction = psu.construct_ufacet_scan(
             solar_field, aimpoint_xyz, when_ymdhmsz, ufacet_scan_parameter_file, ufacet_control_parameters
         )
-    elif scan_type == 'Raster':
+    elif scan_type == "Raster":
         # Construct raster survey scan.
         scan, scan_parameters = psr.construct_raster_scan(solar_field, raster_scan_parameter_file)
 
-    elif scan_type == 'Vanity':
+    elif scan_type == "Vanity":
         # Construct raster survey scan.
         scan, scan_parameters = psv.construct_vanity_scan(
             solar_field, vanity_scan_parameter_file, vanity_heliostat_name, vanity_heliostat_azimuth
         )
     else:
-        print('ERROR: In plan_and_render_scan, unexpected scan.type = ' + str(scan.type) + ' encountered.')
+        print("ERROR: In plan_and_render_scan, unexpected scan.type = " + str(scan.type) + " encountered.")
         assert False
 
     # Construct the flight plan.
@@ -92,19 +92,19 @@ def plan_and_render_scan(
 
     # Write the flight plan file.
     if render_control_top_level.save_flight_plan:
-        print('Writing flight plan file...')
+        print("Writing flight plan file...")
         if not (os.path.exists(output_path)):
             os.makedirs(output_path)
         flight_plan.save_to_litchi_csv(output_path, elevation_offset)
 
     # Draw UFACET construction steps.
-    if scan_type == 'UFACET':
+    if scan_type == "UFACET":
         if render_control_top_level.draw_ufacet_xy_analysis:
             # Draw UFACET (x,y) analysis.
-            print('Drawing UFACET (x,y) analysis...')
-            curve_key_xy_list = ufacet_scan_construction['curve_key_xy_list']
-            list_of_ideal_xy_lists = ufacet_scan_construction['list_of_ideal_xy_lists']
-            list_of_best_fit_segment_xys = ufacet_scan_construction['list_of_best_fit_segment_xys']
+            print("Drawing UFACET (x,y) analysis...")
+            curve_key_xy_list = ufacet_scan_construction["curve_key_xy_list"]
+            list_of_ideal_xy_lists = ufacet_scan_construction["list_of_ideal_xy_lists"]
+            list_of_best_fit_segment_xys = ufacet_scan_construction["list_of_best_fit_segment_xys"]
             psuxyar.draw_ufacet_xy_analysis(
                 figure_control,
                 solar_field,
@@ -119,8 +119,8 @@ def plan_and_render_scan(
 
         if render_control_top_level.draw_ufacet_section_construction:
             # Draw UFACET section construction.
-            print('Drawing UFACET section construction...')
-            section_list = ufacet_scan_construction['section_list']
+            print("Drawing UFACET section construction...")
+            section_list = ufacet_scan_construction["section_list"]
             #            psuscr.draw_construct_ufacet_sections(figure_control, solar_field, section_list, vs.view_spec_3d(), render_control_scan_section_setup)
             psuscr.draw_construct_ufacet_sections(
                 figure_control, solar_field, section_list, vs.view_spec_xy(), render_control_scan_section_setup
@@ -129,14 +129,14 @@ def plan_and_render_scan(
 
         if render_control_top_level.draw_ufacet_scan:
             # Draw the scan.
-            print('Drawing UFACET scan...')
+            print("Drawing UFACET scan...")
             psur.draw_ufacet_scan(figure_control, scan, render_control_scan_section_analysis)
 
     # Draw the flight plan.
     if render_control_top_level.draw_flight_plan:
-        print('Drawing flight plan over solar field...')
+        print("Drawing flight plan over solar field...")
         # Style setup.
-        xy_solar_field_style = rcsf.heliostat_vector_field_outlines(color='grey')
+        xy_solar_field_style = rcsf.heliostat_vector_field_outlines(color="grey")
         if render_control_top_level.xy_solar_field_style != None:
             xy_solar_field_style = render_control_top_level.xy_solar_field_style
         rcfosf_default = rcfosf.default()
@@ -157,13 +157,13 @@ def plan_and_render_scan(
 
     # Summarize.
     if render_control_top_level.summarize_figures:
-        print('\nSummarizing figures...')
+        print("\nSummarizing figures...")
         fm.print_figure_summary()
 
     # Save figures.
     if render_control_top_level.save_figures:
-        print('\nSaving figures...')
-        figure_output_path = os.path.join(output_path, 'plots')
+        print("\nSaving figures...")
+        figure_output_path = os.path.join(output_path, "plots")
         if not (os.path.exists(figure_output_path)):
             os.makedirs(figure_output_path)
         fm.save_all_figures(figure_output_path)
@@ -197,26 +197,26 @@ def scan_plan_trial(
     render_control_scan_section_analysis,
 ):
     # Notify progress.
-    print('\n\n\nStarting trial:')
-    print('    solar field:        ', solar_field_spec['name'])
-    print('    solar field abbrev: ', solar_field_spec['short_name'])
-    print('    aim_point:          ', aimpoint_xyz)
-    print('    when_ymdhmsz:       ', when_ymdhmsz)
-    print('    launch_name:        ', launch_name)
-    print('    synch_azelhnames:   ', synch_azelhnames)
-    print('    up_azelhnames:      ', up_azelhnames)
-    print('    elevation_offset:   ', elevation_offset)
-    print('    scan_type:          ', scan_type)
+    print("\n\n\nStarting trial:")
+    print("    solar field:        ", solar_field_spec["name"])
+    print("    solar field abbrev: ", solar_field_spec["short_name"])
+    print("    aim_point:          ", aimpoint_xyz)
+    print("    when_ymdhmsz:       ", when_ymdhmsz)
+    print("    launch_name:        ", launch_name)
+    print("    synch_azelhnames:   ", synch_azelhnames)
+    print("    up_azelhnames:      ", up_azelhnames)
+    print("    elevation_offset:   ", elevation_offset)
+    print("    scan_type:          ", scan_type)
     print()
 
     # Figure control.
-    plt.close('all')
+    plt.close("all")
     fm.reset_figure_management()
     figure_control = rcfg.RenderControlFigure(tile_array=tile_array, tile_square=False)
 
     # Initialize solar field.
     solar_field = sf.setup_solar_field(solar_field_spec, aimpoint_xyz, when_ymdhmsz, synch_azelhnames, up_azelhnames)
-    if scan_type == 'Vanity':
+    if scan_type == "Vanity":
         solar_field.set_full_field_stow()  # ?? SCAFFOLDING RCB -- MAKE GENERAL
 
     # Construct and draw scan.

@@ -176,10 +176,10 @@ if __name__ == "__main__":
     # Scan control parameters.
     # Raster.
     #    scan_type = 'Raster'
-    raster_scan_parameter_file = 'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
+    raster_scan_parameter_file = "DUMMY FILL IN LATER"  # ?? SCAFFOLDING RCB -- TEMPORARY
     # UFACET.
-    scan_type = 'UFACET'
-    ufacet_scan_parameter_file = 'DUMMY FILL IN LATER'  # ?? SCAFFOLDING RCB -- TEMPORARY
+    scan_type = "UFACET"
+    ufacet_scan_parameter_file = "DUMMY FILL IN LATER"  # ?? SCAFFOLDING RCB -- TEMPORARY
     # Define UFACET control flags.
     ufacet_control_parameters = {}
     # Seed points.
@@ -191,23 +191,23 @@ if __name__ == "__main__":
     #    ufacet_curve_keys_x = [112.2] # ?? SCAFFOLDING RCB -- TEMPORARY
     ufacet_curve_keys_y = [136.9] * len(ufacet_curve_keys_x)
     ufacet_curve_key_xy_list = [[key_x, key_y] for key_x, key_y in zip(ufacet_curve_keys_x, ufacet_curve_keys_y)]
-    ufacet_control_parameters['curve_key_xy_list'] = ufacet_curve_key_xy_list
+    ufacet_control_parameters["curve_key_xy_list"] = ufacet_curve_key_xy_list
     # Maximum altitude.
-    ufacet_control_parameters['maximum_altitude'] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
+    ufacet_control_parameters["maximum_altitude"] = 25.0  # m.  Maximum altitude, roughly AGL, including slope effects.
     # Gaze control.
-    ufacet_control_parameters['gaze_type'] = 'constant'  # 'constant' or 'linear'
-    ufacet_control_parameters['delta_eta'] = np.deg2rad(
+    ufacet_control_parameters["gaze_type"] = "constant"  # 'constant' or 'linear'
+    ufacet_control_parameters["delta_eta"] = np.deg2rad(
         0.0
     )  # deg.  Offset to add to gaze angle eta.  Set to zero for no offset.
 
     # Define solar field.
     solar_field_spec = {}
-    solar_field_spec['name'] = 'Sandia NSTTF'
-    solar_field_spec['short_name'] = 'NSTTF'
-    solar_field_spec['field_origin_lon_lat'] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_origin_lon_lat'] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
-    solar_field_spec['field_heliostat_file'] = './data/NSTTF_Heliostats.csv'
-    solar_field_spec['field_facet_centroids_file'] = './data/NSTTF_Facet_Centroids.csv'
+    solar_field_spec["name"] = "Sandia NSTTF"
+    solar_field_spec["short_name"] = "NSTTF"
+    solar_field_spec["field_origin_lon_lat"] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
+    solar_field_spec["field_origin_lon_lat"] = (nll.LON_NSTTF_ORIGIN, nll.LAT_NSTTF_ORIGIN)
+    solar_field_spec["field_heliostat_file"] = "./data/NSTTF_Heliostats.csv"
+    solar_field_spec["field_facet_centroids_file"] = "./data/NSTTF_Facet_Centroids.csv"
 
     # Define tracking parameters.
     # Aim point.
@@ -322,7 +322,7 @@ if __name__ == "__main__":
         when_ymdhmsz_2[when_hour_idx] = trial_spec[trial_spec_hour_idx]
         when_ymdhmsz_2[when_minute_idx] = trial_spec[trial_spec_minute_idx]
         aimpoint_xyz_2[2] = trial_spec[trial_spec_z_aim_idx]
-        ufacet_control_parameters['maximum_altitude'] = trial_spec[trial_spec_z_max_idx]
+        ufacet_control_parameters["maximum_altitude"] = trial_spec[trial_spec_z_max_idx]
         pars.scan_plan_trial(
             tile_array,
             solar_field_spec,

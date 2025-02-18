@@ -45,7 +45,7 @@ class FlightPlan:
         # ?? SCAFFOLDING RCB -- MAKE WHETHER TO DO THIS CONTROLLABLE.
         # Add preliminary waypoint, to ensure gimbal is established for first scan pass.
         if len(waypoint_list) == 0:
-            print('ERROR: In FlightPlan.set_waypoints_from_scans(), unexpected empty waypoint list encountered.')
+            print("ERROR: In FlightPlan.set_waypoints_from_scans(), unexpected empty waypoint list encountered.")
             assert False
         first_scan_waypt = waypoint_list[0]
         first_scan_x = first_scan_waypt.xyz[0]
@@ -71,7 +71,7 @@ class FlightPlan:
 
     def waypoints(self):
         if self._waypoint_list == None:
-            print('ERROR: In FlightPlan.waypoints(), attempt to fetch unset _waypoint_list.')
+            print("ERROR: In FlightPlan.waypoints(), attempt to fetch unset _waypoint_list.")
             assert False
         return self._waypoint_list
 
@@ -117,36 +117,36 @@ class FlightPlan:
 
     def save_to_litchi_csv(self, output_path, elevation_offset):  # Directory to write to.  # m.
         # Construct input template file path.
-        template_dir_path = os.path.join('..', 'U_Code_data', self.locale)
-        template_base_name = 'Litchi_Template'
+        template_dir_path = os.path.join("..", "U_Code_data", self.locale)
+        template_base_name = "Litchi_Template"
         locale_file_str = ft.convert_string_to_file_body(self.locale)
         launch_file_str = ft.convert_string_to_file_body(self.launch_name)
-        template_file_name = template_base_name + '_' + locale_file_str + '_' + launch_file_str + '.csv'
+        template_file_name = template_base_name + "_" + locale_file_str + "_" + launch_file_str + ".csv"
         template_path_file = os.path.join(template_dir_path, template_file_name)
         # Read input template.
         template_lines = []
-        input_stream = open(template_path_file, 'r')
+        input_stream = open(template_path_file, "r")
         for line in input_stream:
             template_lines.append(line)
         input_stream.close()
 
         # Check input.
         if len(template_lines) < 3:
-            print('ERROR: In FlightPlan.save_to_litchi_csv(), fewer than three lines in template.')
+            print("ERROR: In FlightPlan.save_to_litchi_csv(), fewer than three lines in template.")
             assert False
 
         # Find indices of key column headings.
         heading_line = template_lines[0]
-        heading_list = heading_line.split(',')
-        longitude_idx = heading_list.index('longitude')
-        latitude_idx = heading_list.index('latitude')
-        altitude_idx = heading_list.index('altitude(m)')
-        heading_idx = heading_list.index('heading(deg)')
-        gimbal_pitch_idx = heading_list.index('gimbalpitchangle')
+        heading_list = heading_line.split(",")
+        longitude_idx = heading_list.index("longitude")
+        latitude_idx = heading_list.index("latitude")
+        altitude_idx = heading_list.index("altitude(m)")
+        heading_idx = heading_list.index("heading(deg)")
+        gimbal_pitch_idx = heading_list.index("gimbalpitchangle")
 
         # Select data template line.
         data_template_line = template_lines[-1]
-        data_template_list = data_template_line.split(',')
+        data_template_list = data_template_line.split(",")
 
         # Write output file.
         output_file_body = ft.convert_string_to_file_body(self.short_name)
@@ -154,11 +154,11 @@ class FlightPlan:
         #        output_file = self.launch_name + '_' + output_file_body + '.csv'
         output_file_name = output_file_body
         if elevation_offset != 0:
-            output_file_name += '_dz={0:.1f}m'.format(elevation_offset)
-        output_file_name = output_file_name + '_' + self.launch_name + '.csv'
+            output_file_name += "_dz={0:.1f}m".format(elevation_offset)
+        output_file_name = output_file_name + "_" + self.launch_name + ".csv"
         output_path_file = os.path.join(output_path, output_file_name)
-        print('Saving flight plan file: ', output_path_file)
-        output_stream = open(output_path_file, 'w')
+        print("Saving flight plan file: ", output_path_file)
+        output_stream = open(output_path_file, "w")
         # Write heading lines.
         for line in template_lines[0:-1]:
             output_stream.write(line)
@@ -166,19 +166,19 @@ class FlightPlan:
         for waypoint in self.waypoints():
             # Prepare the data row.
             data_list = data_template_list.copy()
-            data_list[longitude_idx] = '{0:.8f}'.format(waypoint.lon)
-            data_list[latitude_idx] = '{0:.8f}'.format(waypoint.lat)
-            data_list[altitude_idx] = '{0:.3f}'.format(waypoint.xyz[2] + elevation_offset)
-            data_list[heading_idx] = '{0:.6f}'.format(waypoint.heading_deg())
-            data_list[gimbal_pitch_idx] = '{0:.6f}'.format(waypoint.gimbal_pitch_deg())
-            data_line = ','.join(data_list)
+            data_list[longitude_idx] = "{0:.8f}".format(waypoint.lon)
+            data_list[latitude_idx] = "{0:.8f}".format(waypoint.lat)
+            data_list[altitude_idx] = "{0:.3f}".format(waypoint.xyz[2] + elevation_offset)
+            data_list[heading_idx] = "{0:.6f}".format(waypoint.heading_deg())
+            data_list[gimbal_pitch_idx] = "{0:.6f}".format(waypoint.gimbal_pitch_deg())
+            data_line = ",".join(data_list)
             output_stream.write(data_line)
         # Add return-to-start waypoint.
         if len(template_lines) != 3:
             print(
-                'ERROR: In FlightPlan.save_to_litchi_csv(), unexpected len(template_lines) = '
+                "ERROR: In FlightPlan.save_to_litchi_csv(), unexpected len(template_lines) = "
                 + str(len(template_lines))
-                + ' encountered.'
+                + " encountered."
             )
             assert False
         output_stream.write(template_lines[-2])
@@ -213,11 +213,11 @@ def construct_flight_plan_from_scan(name, short_name, launch_name, scan):  # Sca
 
 def construct_flight_plan_from_scans(name, short_name, launch_name, scans):  # List of scan opbjects.
     # Notify progress.
-    print('Constructing flight plan...')
+    print("Constructing flight plan...")
 
     # Check input.
     if len(scans) == 0:
-        print('In construct_flight_plan_from_scans(), empty list of scans encountered.')
+        print("In construct_flight_plan_from_scans(), empty list of scans encountered.")
         assert False
 
     # Fetch locale.

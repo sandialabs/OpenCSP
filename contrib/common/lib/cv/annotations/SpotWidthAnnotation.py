@@ -45,7 +45,7 @@ class SpotWidthAnnotation(AbstractAnnotations):
     def get_bounding_box(self, index=0) -> reg.RegionXY:
         def width_for_rotation(width: float, rotation: float) -> float:
             vec = v2.Vxy([width, 0])
-            vec = vec.rotate(scipy.spatial.transform.Rotation.from_euler('z', rotation))
+            vec = vec.rotate(scipy.spatial.transform.Rotation.from_euler("z", rotation))
             return np.max(vec.x[0], vec.y[0])
 
         def single_width_bounding_box(center: p2.Pxy, width: float) -> reg.RegionXY:
@@ -82,7 +82,7 @@ class SpotWidthAnnotation(AbstractAnnotations):
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
         if self.spot_width_technique == "fwhm":
-            return scipy.spatial.transform.Rotation.from_euler('z', self.long_axis_rotation)
+            return scipy.spatial.transform.Rotation.from_euler("z", self.long_axis_rotation)
         return None
 
     @property
@@ -93,14 +93,14 @@ class SpotWidthAnnotation(AbstractAnnotations):
         label = self.get_label(include_label)
 
         # draw the full-width boundary
-        if self.style.full_width_style != 'None':
+        if self.style.full_width_style != "None":
             style_params = {
-                'facecolor': "None",
-                'edgecolor': self.style.full_width_style.color,
-                'linestyle': self.style.full_width_style.linestyle,
-                'linewidth': self.style.full_width_style.linewidth,
-                'alpha': self.style.full_width_style.markeralpha,
-                'label': label,
+                "facecolor": "None",
+                "edgecolor": self.style.full_width_style.color,
+                "linestyle": self.style.full_width_style.linestyle,
+                "linewidth": self.style.full_width_style.linewidth,
+                "alpha": self.style.full_width_style.markeralpha,
+                "label": label,
             }
             label = None
             if self.spot_width_technique == "fwhm":

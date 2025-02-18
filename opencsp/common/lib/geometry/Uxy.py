@@ -34,7 +34,7 @@ class Uxy(Vxy):
         self.normalize_in_place()
 
     def __repr__(self):
-        return '2D Unit Vector:\n' + self._data.__repr__()
+        return "2D Unit Vector:\n" + self._data.__repr__()
 
     def as_Vxy(self):
         """

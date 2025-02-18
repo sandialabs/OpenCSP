@@ -136,7 +136,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             Height of the target board in meters.
         """
         # validate the input
-        corner_names = ['tl', 'tr', 'br', 'bl']
+        corner_names = ["tl", "tr", "br", "bl"]
         for corner_name in corner_names:
             if corner_name not in corners:
                 lt.error_and_raise(
@@ -162,10 +162,10 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         )
         ret.corners = corners
         ret.edges = {
-            'top': l2.LineXY.from_two_points(corners['tl'], corners['tr']),
-            'bottom': l2.LineXY.from_two_points(corners['bl'], corners['br']),
-            'left': l2.LineXY.from_two_points(corners['tl'], corners['bl']),
-            'right': l2.LineXY.from_two_points(corners['tr'], corners['br']),
+            "top": l2.LineXY.from_two_points(corners["tl"], corners["tr"]),
+            "bottom": l2.LineXY.from_two_points(corners["bl"], corners["br"]),
+            "left": l2.LineXY.from_two_points(corners["tl"], corners["bl"]),
+            "right": l2.LineXY.from_two_points(corners["tr"], corners["br"]),
         }
         ret.region = reg2.RegionXY.from_vertices(p2.Pxy.from_list(corners.values()))
 
@@ -186,7 +186,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         meters_x = [0, self.target_width_meters, self.target_width_meters, 0]  # tl, tr, br, bl
         meters_y = [0, 0, self.target_height_meters, self.target_height_meters]
         meters_tltrbrbl = p2.Pxy((meters_x, meters_y))
-        pixels_tltrbrbl = [self.corners['tl'], self.corners['tr'], self.corners['br'], self.corners['bl']]
+        pixels_tltrbrbl = [self.corners["tl"], self.corners["tr"], self.corners["br"], self.corners["bl"]]
         self.transform = pt.PerspectiveTransform(pixels_tltrbrbl, meters_tltrbrbl)
 
     @property
@@ -262,7 +262,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             lt.error_and_raise(
                 FileNotFoundError,
                 "Error in TargetBoardLocatorImageProcessor._find_rectangle_in_reference_image(): "
-                + f"reference_image_dir_or_file \"{self.reference_image_dir_or_file}\" is neither a directory or a file.",
+                + f'reference_image_dir_or_file "{self.reference_image_dir_or_file}" is neither a directory or a file.',
             )
 
         # Verify that all the reference images exist
@@ -276,11 +276,11 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # Load (and average) the reference images
         image_processors = {
-            'Avg': AverageByGroupImageProcessor(lambda o: 0, lambda l: None),
-            'Conv': ConvolutionImageProcessor(kernel="gaussian", diameter=3),
+            "Avg": AverageByGroupImageProcessor(lambda o: 0, lambda l: None),
+            "Conv": ConvolutionImageProcessor(kernel="gaussian", diameter=3),
         }
         if self.cropped_x1x2y1y2:
-            image_processors['Crop'] = CroppingImageProcessor(*self.cropped_x1x2y1y2)
+            image_processors["Crop"] = CroppingImageProcessor(*self.cropped_x1x2y1y2)
 
         sa = SpotAnalysis("averager", list(image_processors.values()))
         sa.set_primary_images(image_files)

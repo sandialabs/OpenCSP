@@ -17,7 +17,7 @@ import opencsp.common.lib.tool.log_tools as lt
 class SystemSofastFixed:
     """Class that orchestrates the running of a SofastFixed system"""
 
-    def __init__(self, image_acquisition: ImageAcquisitionAbstract) -> 'SystemSofastFixed':
+    def __init__(self, image_acquisition: ImageAcquisitionAbstract) -> "SystemSofastFixed":
         """
         Instantiates SystemSofastFixed class.
 
@@ -35,7 +35,7 @@ class SystemSofastFixed:
         )
         # Validate input
         if image_projection is None or image_acquisition is None:
-            lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
+            lt.error_and_raise(RuntimeError, "Both ImageAcquisiton and ImageProjection must both be loaded.")
         self.image_acquisition = image_acquisition
 
         # Show crosshairs
@@ -52,11 +52,11 @@ class SystemSofastFixed:
         self.pattern_image: NDArray = None
         """The fixed pattern image being projected. NxMx3 numpy array"""
 
-        self.dtype = 'uint8'
+        self.dtype = "uint8"
         """The data type of the image being projected"""
         self.max_int = 255
         """The value that corresponds to pure white"""
-        self.dot_shape: Literal['circle', 'square'] = 'circle'
+        self.dot_shape: Literal["circle", "square"] = "circle"
         """The shape of the fixed pattern dots"""
         self.image_delay = image_projection.display_data.image_delay_ms  # ms
         """The delay after displaying the image to capturing an image, ms"""
@@ -73,8 +73,8 @@ class SystemSofastFixed:
         spacing_pattern : int
             Spacing between (not center-to-center) pattern markers, pixels
         """
-        lt.debug(f'SystemSofastFixed fixed pattern dot width set to {width_pattern:d} pixels')
-        lt.debug(f'SystemSofastFixed fixed pattern dot spacing set to {spacing_pattern:d} pixels')
+        lt.debug(f"SystemSofastFixed fixed pattern dot width set to {width_pattern:d} pixels")
+        lt.debug(f"SystemSofastFixed fixed pattern dot spacing set to {spacing_pattern:d} pixels")
         image_projection = ImageProjection.instance()
         size_x = image_projection.display_data.active_area_size_x
         size_y = image_projection.display_data.active_area_size_y
@@ -88,12 +88,12 @@ class SystemSofastFixed:
 
         Upon completion, runs self.run_next_in_queue()
         """
-        lt.debug('SystemSofastFixed pattern projected')
+        lt.debug("SystemSofastFixed pattern projected")
 
         # Check pattern has been defined
         if self.pattern_image is None:
             lt.error_and_raise(
-                ValueError, 'The SofastFixed pattern has not been set. Run self.set_pattern_parameters() first.'
+                ValueError, "The SofastFixed pattern has not been set. Run self.set_pattern_parameters() first."
             )
             return
 
@@ -107,7 +107,7 @@ class SystemSofastFixed:
 
         Upon completion, runs self.run_next_in_queue()
         """
-        lt.debug('SystemSofastFixed capturing camera image')
+        lt.debug("SystemSofastFixed capturing camera image")
         self.image_measurement = self.image_acquisition.get_frame()
 
         self.run_next_in_queue()
@@ -118,7 +118,7 @@ class SystemSofastFixed:
         dist_optic_screen: float,
         origin: Vxy,
         date: dt.datetime = None,
-        name: str = '',
+        name: str = "",
     ) -> MeasurementSofastFixed:
         """Returns the SofastFixedMeasurement object"""
         dist_optic_screen_measure = dos.DistanceOpticScreen(v_measure_point_facet, dist_optic_screen)
@@ -129,7 +129,7 @@ class SystemSofastFixed:
 
         Upon completion, runs self.run_next_in_queue()
         """
-        lt.debug(f'SystemSofastFixed pausing by {self.image_delay:.0f} ms')
+        lt.debug(f"SystemSofastFixed pausing by {self.image_delay:.0f} ms")
         image_projection = ImageProjection.instance()
         image_projection.root.after(self.image_delay, self.run_next_in_queue)
 
@@ -141,7 +141,7 @@ class SystemSofastFixed:
         If the fixed pattern image is already projected, use self.capture_image() instead.
         Upon completion, runs self.run_next_in_queue()
         """
-        lt.debug('SystemSofastFixed starting measurement sequence')
+        lt.debug("SystemSofastFixed starting measurement sequence")
 
         funcs = [self.project_pattern, self.pause, self.capture_image]
         self.prepend_to_queue(funcs)

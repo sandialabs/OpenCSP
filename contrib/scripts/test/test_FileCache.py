@@ -9,7 +9,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.time_date_tools as tdt
 
 # setting path
-sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(orp.opencsp_code_dir(), ".."))
 import contrib.scripts.FileCache as fc  # nopep8
 
 
@@ -48,5 +48,5 @@ class test_FileCache(unittest.TestCase):
         self.assertEqual(fc1, fc2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

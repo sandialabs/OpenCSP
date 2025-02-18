@@ -32,7 +32,7 @@ class TestSystemSofastFringe(unittest.TestCase):
 
         # Load ImageProjectionData
         self.file_image_projection_input = os.path.join(
-            opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5'
+            opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5"
         )
         self.image_projection_data = ImageProjectionData.load_from_hdf(self.file_image_projection_input)
 
@@ -50,7 +50,7 @@ class TestSystemSofastFringe(unittest.TestCase):
 
     def test_SystemSofastFringe(self):
         # Get test data location
-        file_im_proj = os.path.join(opencsp_code_dir(), 'test/data/sofast_common/image_projection_test.h5')
+        file_im_proj = os.path.join(opencsp_code_dir(), "test/data/sofast_common/image_projection_test.h5")
 
         # Create fringe object
         periods_x = [0.9, 3.9]
@@ -192,5 +192,5 @@ class TestSystemSofastFringe(unittest.TestCase):
         self.assertTrue(ia2.is_closed)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

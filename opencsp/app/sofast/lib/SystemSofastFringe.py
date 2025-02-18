@@ -22,7 +22,7 @@ class SystemSofastFringe:
 
     def __init__(
         self, image_acquisition: ImageAcquisitionAbstract | list[ImageAcquisitionAbstract] = None
-    ) -> 'SystemSofastFringe':
+    ) -> "SystemSofastFringe":
         """
         Instantiates SystemSofastFringe class.
 
@@ -50,7 +50,7 @@ class SystemSofastFringe:
 
         # Validate input
         if image_projection is None or image_acquisition is None:
-            lt.error_and_raise(RuntimeError, 'Both ImageAcquisiton and ImageProjection must both be loaded.')
+            lt.error_and_raise(RuntimeError, "Both ImageAcquisiton and ImageProjection must both be loaded.")
         if isinstance(image_acquisition, list):
             self._image_acquisitions = image_acquisition
         else:
@@ -136,7 +136,7 @@ class SystemSofastFringe:
             import opencsp.app.sofast.lib.sofast_common_functions as scf
 
             # Check for existance
-            scf.check_camera_loaded('SystemSofastFringe')
+            scf.check_camera_loaded("SystemSofastFringe")
             # Use global instance as a backup, in case all previously registered instances have been closed
             self._image_acquisitions = [ImageAcquisitionAbstract.instance()]
         return self._image_acquisitions
@@ -155,7 +155,7 @@ class SystemSofastFringe:
         else:
             lt.error_and_raise(
                 TypeError,
-                f'Error in SystemSofastFringe(): ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.',
+                f"Error in SystemSofastFringe(): ImageAcquisition must be instance or list of type {ImageAcquisitionAbstract}.",
             )
 
         # Set value
@@ -288,16 +288,16 @@ class SystemSofastFringe:
         if self.fringes is None:
             lt.error_and_raise(
                 ValueError,
-                'Error in SystemSofastFringe.create_fringe_images_from_image_calibration(): '
-                + 'fringes must be set using self.set_frignes() first.',
+                "Error in SystemSofastFringe.create_fringe_images_from_image_calibration(): "
+                + "fringes must be set using self.set_frignes() first.",
             )
 
         # Check calibration is loaded
         if self._calibration is None:
             lt.error_and_raise(
                 ValueError,
-                'Error in SystemSofastFringe.create_fringe_images_from_image_calibration'
-                + 'calibration must be set using self.set_calibration first.',
+                "Error in SystemSofastFringe.create_fringe_images_from_image_calibration"
+                + "calibration must be set using self.set_calibration first.",
             )
 
         image_projection = ImageProjection.instance()
@@ -343,7 +343,7 @@ class SystemSofastFringe:
 
         # Compare to threshold
         if saturation >= thresh:
-            lt.warn(f'Image is {saturation * 100:.2f}% saturated.')
+            lt.warn(f"Image is {saturation * 100:.2f}% saturated.")
 
     def run_gray_levels_cal(
         self,
@@ -402,7 +402,7 @@ class SystemSofastFringe:
             # Save calibration raw data
             if calibration_hdf5_path_name_ext != None:
                 data = [self._calibration.display_values, calibration_images]
-                datasets = ['CalibrationRawData/display_values', 'CalibrationRawData/images']
+                datasets = ["CalibrationRawData/display_values", "CalibrationRawData/images"]
                 h5.save_hdf5_datasets(data, datasets, calibration_hdf5_path_name_ext)
             # Run the "on done" callback
             if on_processed != None:
@@ -448,12 +448,12 @@ class SystemSofastFringe:
         # Check fringes/camera have been loaded
         if self.fringes is None:
             lt.error_and_raise(
-                ValueError, 'Error in SystemSofastFringe.capture_fringe_images(): Fringes have not been loaded.'
+                ValueError, "Error in SystemSofastFringe.capture_fringe_images(): Fringes have not been loaded."
             )
 
         if self._fringe_images_to_display is None:
             lt.error_and_raise(
-                ValueError, 'Error in SystemSofastFrigne.capture_fringe_images(): Fringe images have not been created'
+                ValueError, "Error in SystemSofastFrigne.capture_fringe_images(): Fringe images have not been created"
             )
 
         # Initialize fringe image list
@@ -483,7 +483,7 @@ class SystemSofastFringe:
         if self.fringes is None:
             lt.error_and_raise(
                 ValueError,
-                'Error in SystemSofastFringe.capture_mask_and_fringe_images(): Fringes have not been loaded.',
+                "Error in SystemSofastFringe.capture_mask_and_fringe_images(): Fringes have not been loaded.",
             )
 
         def run_after_capture():
@@ -587,7 +587,7 @@ class SystemSofastFringe:
         if self._calibration_images_captured is None:
             lt.error_and_raise(
                 ValueError,
-                'Error in SystemSofastFringe.get_calibration_images(): Calibration Images have not been collected yet.',
+                "Error in SystemSofastFringe.get_calibration_images(): Calibration Images have not been collected yet.",
             )
 
         images = []
@@ -618,11 +618,11 @@ class SystemSofastFringe:
         # Check data has been captured
         if self._fringe_images_captured is None:
             lt.error_and_raise(
-                ValueError, 'Error in SystemSofastFringe.get_measurements(): Fringe images have not been captured.'
+                ValueError, "Error in SystemSofastFringe.get_measurements(): Fringe images have not been captured."
             )
         if self._mask_images_captured is None:
             lt.error_and_raise(
-                ValueError, 'Error in SystemSofastFringe.get_measurements(): Mask images have not been captured.'
+                ValueError, "Error in SystemSofastFringe.get_measurements(): Mask images have not been captured."
             )
 
         measurements = []

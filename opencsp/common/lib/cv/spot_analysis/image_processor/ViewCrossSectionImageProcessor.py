@@ -32,7 +32,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
     def __init__(
         self,
         cross_section_location: tuple[int, int] | Callable[[SpotAnalysisOperable], tuple[int, int]],
-        label: str | rca.RenderControlAxis = 'Light Intensity',
+        label: str | rca.RenderControlAxis = "Light Intensity",
         single_plot: bool = True,
         interactive: bool | Callable[[SpotAnalysisOperable], bool] = False,
         crop_to_threshold: int | None = None,
@@ -66,8 +66,8 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         self.crop_to_threshold = crop_to_threshold
 
         # initialize certain visualization values
-        self.horizontal_style = rcps.RenderControlPointSeq(color='red', marker='None')
-        self.vertical_style = rcps.RenderControlPointSeq(color='blue', marker='None')
+        self.horizontal_style = rcps.RenderControlPointSeq(color="red", marker="None")
+        self.vertical_style = rcps.RenderControlPointSeq(color="blue", marker="None")
 
         # declare future values
         self.view_specs: list[dict]
@@ -101,14 +101,14 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         for plot_title in plot_titles:
             if self.single_plot:
-                rc_axis = rca.RenderControlAxis(x_label='index', y_label='value')
+                rc_axis = rca.RenderControlAxis(x_label="index", y_label="value")
                 name_suffix = ""
             else:
                 if "Horizontal" in plot_title:
-                    rc_axis = rca.RenderControlAxis(x_label='x', y_label='value')
+                    rc_axis = rca.RenderControlAxis(x_label="x", y_label="value")
                     name_suffix = " (Horizontal)"
                 else:
-                    rc_axis = rca.RenderControlAxis(x_label='y', y_label='value')
+                    rc_axis = rca.RenderControlAxis(x_label="y", y_label="value")
                     name_suffix = " (Vertical)"
 
             view_spec = vs.view_spec_xy()

@@ -53,14 +53,14 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
     def plot_orthorectified_slope_error(
         self,
-        reference: 'VisualizeOrthorectifiedSlopeAbstract',
+        reference: "VisualizeOrthorectifiedSlopeAbstract",
         res: float = 0.1,
-        type_: Literal['x', 'y', 'magnitude'] = 'magnitude',
+        type_: Literal["x", "y", "magnitude"] = "magnitude",
         clim: float | None = None,
         axis: plt.Axes | None = None,
         quiver_density: float | None = None,
         quiver_scale: float | None = 10,
-        quiver_color: str = 'white',
+        quiver_color: str = "white",
     ) -> None:
         """Plots slope difference with respect to a reference
         mirror on axes. Error defined as (self - reference).
@@ -86,10 +86,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
             Color of quiver arrows.
         """
         # Check inputs
-        if type_ not in ['x', 'y', 'magnitude']:
-            raise ValueError(f'Given type_ {type_} not supported.')
+        if type_ not in ["x", "y", "magnitude"]:
+            raise ValueError(f"Given type_ {type_} not supported.")
         if (quiver_density is not None) and (res > quiver_density):
-            raise ValueError('Quiver density cannot be less than image resolution.')
+            raise ValueError("Quiver density cannot be less than image resolution.")
 
         # Get axes
         if axis is None:
@@ -110,7 +110,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         slopes_diff = slopes_cur - slopes_ref  # radians
 
         # Calculate slope image
-        if type_ == 'x':
+        if type_ == "x":
             image = slopes_diff[0] * 1000  # mrad
             x_image = image
             y_image = np.zeros(x_image.shape)
@@ -118,9 +118,9 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = 'X Slope Error'
-            cmap = 'seismic'
-        elif type_ == 'y':
+            title = "X Slope Error"
+            cmap = "seismic"
+        elif type_ == "y":
             image = slopes_diff[1] * 1000  # mrad
             y_image = image
             x_image = np.zeros(y_image.shape)
@@ -128,9 +128,9 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = 'Y Slope Error'
-            cmap = 'seismic'
-        elif type_ == 'magnitude':
+            title = "Y Slope Error"
+            cmap = "seismic"
+        elif type_ == "magnitude":
             x_image = slopes_diff[0] * 1000  # mrad
             y_image = slopes_diff[1] * 1000  # mrad
             image = np.sqrt((x_image**2 + y_image**2) / 2)  # mrad
@@ -138,12 +138,12 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [0, clim]
             else:
                 clims = clim
-            title = 'Slope Error Magnitude'
-            cmap = 'jet'
+            title = "Slope Error Magnitude"
+            cmap = "jet"
 
         # Plot image on axis
         extent = (left - res / 2, right + res / 2, bottom - res / 2, top + res / 2)
-        plot_orthorectified_image(image, axis, cmap, extent, clims, 'mrad')
+        plot_orthorectified_image(image, axis, cmap, extent, clims, "mrad")
 
         # Add quiver arrows
         if quiver_density is not None:
@@ -155,12 +155,12 @@ class VisualizeOrthorectifiedSlopeAbstract:
     def plot_orthorectified_slope(
         self,
         res: float = 0.1,
-        type_: Literal['x', 'y', 'magnitude'] = 'magnitude',
+        type_: Literal["x", "y", "magnitude"] = "magnitude",
         clim: float | None = None,
         axis: plt.Axes | None = None,
         quiver_density: float | None = None,
         quiver_scale: float | None = 50,
-        quiver_color: str = 'white',
+        quiver_color: str = "white",
     ) -> None:
         """Plots orthorectified image of mirror slope
 
@@ -183,10 +183,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
             Color of quiver arrows.
         """
         # Check inputs
-        if type_ not in ['x', 'y', 'magnitude']:
-            raise ValueError(f'Given type_ {type_} not supported.')
+        if type_ not in ["x", "y", "magnitude"]:
+            raise ValueError(f"Given type_ {type_} not supported.")
         if (quiver_density is not None) and (res > quiver_density):
-            raise ValueError('Quiver density cannot be less than image resolution.')
+            raise ValueError("Quiver density cannot be less than image resolution.")
 
         # Get axes
         if axis is None:
@@ -196,7 +196,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         slopes, x_vec, y_vec = self.get_orthorectified_slope_array(res)
 
         # Calculate slope image
-        if type_ == 'x':
+        if type_ == "x":
             image = slopes[0] * 1000  # mrad
             x_image = image
             y_image = np.zeros(x_image.shape)
@@ -204,8 +204,8 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = 'X Slope'
-        elif type_ == 'y':
+            title = "X Slope"
+        elif type_ == "y":
             image = slopes[1] * 1000  # mrad
             y_image = image
             x_image = np.zeros(y_image.shape)
@@ -213,8 +213,8 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = 'Y Slope'
-        elif type_ == 'magnitude':
+            title = "Y Slope"
+        elif type_ == "magnitude":
             x_image = slopes[0] * 1000  # mrad
             y_image = slopes[1] * 1000  # mrad
             image = np.sqrt(x_image**2 + y_image**2)  # mrad
@@ -222,12 +222,12 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [0, clim]
             else:
                 clims = clim
-            title = 'Slope Magnitude'
+            title = "Slope Magnitude"
 
         # Plot image on axes
         left, right, bottom, top = self.axis_aligned_bounding_box
         extent = (left - res / 2, right + res / 2, bottom - res / 2, top + res / 2)
-        plot_orthorectified_image(image, axis, 'jet', extent, clims, 'mrad')
+        plot_orthorectified_image(image, axis, "jet", extent, clims, "mrad")
 
         # Add quiver arrows
         if quiver_density is not None:
@@ -239,10 +239,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
     def plot_orthorectified_curvature(
         self,
         res: float = 0.1,
-        type_: Literal['x', 'y', 'combined'] = 'combined',
+        type_: Literal["x", "y", "combined"] = "combined",
         clim: float | None = None,
         axis: plt.Axes | None = None,
-        processing: list[Literal['log', 'smooth']] = None,
+        processing: list[Literal["log", "smooth"]] = None,
         smooth_kernel_width: int = 1,
     ):
         """Plots orthorectified curvature (1st derivative of slope) image
@@ -268,8 +268,8 @@ class VisualizeOrthorectifiedSlopeAbstract:
             By default, 1.
         """
         # Check inputs
-        if type_ not in ['x', 'y', 'combined']:
-            raise ValueError(f'Given type_ {type_} not supported.')
+        if type_ not in ["x", "y", "combined"]:
+            raise ValueError(f"Given type_ {type_} not supported.")
         if processing is None:
             processing = []
 
@@ -299,40 +299,40 @@ class VisualizeOrthorectifiedSlopeAbstract:
             clims = clim
 
         # Calculate slope image
-        if type_ in ['x', 'combined']:
+        if type_ in ["x", "combined"]:
             image_x = np.diff(slopes[0] * 1000, axis=1)  # mrad / sample
             image_x /= x_del_vec[None, :]  # mrad / meter
             image = image_x
-            title = 'X Curvature'
+            title = "X Curvature"
             extent = (left, right, bottom - res / 2, top + res / 2)
 
-        if type_ in ['y', 'combined']:
+        if type_ in ["y", "combined"]:
             image_y = np.diff(slopes[1] * 1000, axis=0)  # mrad / sample
             image_y /= y_del_vec[:, None]  # mrad / meter
             image = image_y
-            title = 'Y Curvature'
+            title = "Y Curvature"
             extent = (left - res / 2, right + res / 2, bottom, top)
 
-        if type_ == 'combined':
+        if type_ == "combined":
             image = (image_x[1:, :] + image_y[:, 1:]) / 2  # mrad / meter
-            title = 'Combined Curvature'
+            title = "Combined Curvature"
             extent = (left, right, bottom, top)
 
         # Apply processing steps
         for proc in processing:
-            if proc == 'log':
+            if proc == "log":
                 # Take log of image
                 image = np.abs(image)
                 image[image == 0] = np.nan
                 image = np.log(image)
                 image[np.isinf(image)] = np.nan
-            elif proc == 'smooth':
+            elif proc == "smooth":
                 # Smooth images
                 ker = np.ones((smooth_kernel_width, smooth_kernel_width)) / smooth_kernel_width**2
-                image = convolve2d(image, ker, mode='same', boundary='symm')
+                image = convolve2d(image, ker, mode="same", boundary="symm")
 
         # Plot image on axes
-        plot_orthorectified_image(image, axis, 'seismic', extent, clims, 'mrad/meter')
+        plot_orthorectified_image(image, axis, "seismic", extent, clims, "mrad/meter")
 
         # Label axes
         axis.set_title(title)

@@ -31,7 +31,7 @@ class ImageAcquisitionAbstract(ABC):
     """
 
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    _instances: dict[int, 'ImageAcquisitionAbstract'] = {}
+    _instances: dict[int, "ImageAcquisitionAbstract"] = {}
     """ All instantiated camera instances. We use a dictionary to ensure that once an index is assigned,
     then all references to that same index will return the same camera (or None if the camera was closed). """
     _next_instance_idx: int = 0
@@ -39,7 +39,7 @@ class ImageAcquisitionAbstract(ABC):
 
     @staticmethod
     @functools.cache
-    def cam_options() -> dict[str, type['ImageAcquisitionAbstract']]:
+    def cam_options() -> dict[str, type["ImageAcquisitionAbstract"]]:
         """Defines camera objects to choose from (camera description, python type)"""
         # import here to avoid circular reference
         from opencsp.common.lib.camera.ImageAcquisition_DCAM_mono import ImageAcquisition as IA_DCAM_mono
@@ -47,9 +47,9 @@ class ImageAcquisitionAbstract(ABC):
         from opencsp.common.lib.camera.ImageAcquisition_MSMF import ImageAcquisition as IA_MSMF
 
         cam_options: dict[str, type[ImageAcquisitionAbstract]] = {
-            'DCAM Mono': IA_DCAM_mono,
-            'DCAM Color': IA_DCAM_color,
-            'MSMF Mono': IA_MSMF,
+            "DCAM Mono": IA_DCAM_mono,
+            "DCAM Color": IA_DCAM_color,
+            "MSMF Mono": IA_MSMF,
         }
         return cam_options
 
@@ -97,7 +97,7 @@ class ImageAcquisitionAbstract(ABC):
             return None
 
     @staticmethod
-    def instances(subclass: type['ImageAcquisitionAbstract'] = None) -> list['ImageAcquisitionAbstract']:
+    def instances(subclass: type["ImageAcquisitionAbstract"] = None) -> list["ImageAcquisitionAbstract"]:
         """Get all global camera (ImageAcquisition) instances, as available.
 
         If a camera has been closed, then this function will not include it, even if the instance exists.
@@ -121,7 +121,7 @@ class ImageAcquisitionAbstract(ABC):
         return ret
 
     @abstractmethod
-    def instance_matches(self, possible_matches: list['ImageAcquisitionAbstract']) -> bool:
+    def instance_matches(self, possible_matches: list["ImageAcquisitionAbstract"]) -> bool:
         """
         Returns true if there's another instance in the list of possible matches that is equal to this instance. False
         if no other instances match.
@@ -137,7 +137,7 @@ class ImageAcquisitionAbstract(ABC):
         Sets the camera's exposure so that only 1% of pixels are above the set
         saturation threshold. Uses a binary search algorithm.
         """
-        lt.info('Starting exposure calibration.')
+        lt.info("Starting exposure calibration.")
 
         def _get_exposure_idxs():
             """Returns indices of under/over exposed images"""
@@ -174,17 +174,17 @@ class ImageAcquisitionAbstract(ABC):
 
         # Checks that the minimum value is under-exposed
         self.exposure_time = exposure_values[0]
-        lt.debug(f'Trying minimum exposure: {exposure_values[0]}')
+        lt.debug(f"Trying minimum exposure: {exposure_values[0]}")
         im = self.get_frame()
         if _check_saturated(im):
-            lt.error_and_raise(ValueError, 'Minimum exposure value is too high; image still saturated.')
+            lt.error_and_raise(ValueError, "Minimum exposure value is too high; image still saturated.")
 
         # Checks that the maximum value is over-exposed
         self.exposure_time = exposure_values[-1]
-        lt.debug(f'Trying maximum exposure: {exposure_values[-1]}')
+        lt.debug(f"Trying maximum exposure: {exposure_values[-1]}")
         im = self.get_frame()
         if not _check_saturated(im):
-            lt.error_and_raise(ValueError, 'Maximum exposure value is too low; image not saturated.')
+            lt.error_and_raise(ValueError, "Maximum exposure value is too low; image not saturated.")
 
         # Check if exposure is set
         max_iters = int(np.ceil(np.log2(exposure_values.size)) + 1)
@@ -194,7 +194,7 @@ class ImageAcquisitionAbstract(ABC):
 
             # Set exposure
             self.exposure_time = exposure_values[idx]
-            lt.debug(f'Trying: {exposure_values[idx]}')
+            lt.debug(f"Trying: {exposure_values[idx]}")
 
             # Capture image
             im = self.get_frame()
@@ -213,12 +213,12 @@ class ImageAcquisitionAbstract(ABC):
 
         # Check exposure was set successfully
         if not _check_exposure_set():
-            lt.error_and_raise(ValueError, 'Error with setting exposure.')
+            lt.error_and_raise(ValueError, "Error with setting exposure.")
 
         # Set final exposure and log results
         exposure_value_set = exposure_values[_get_exposure_idxs()[0]]
         self.exposure_time = exposure_value_set
-        lt.info(f'Exposure set to: {exposure_value_set}')
+        lt.info(f"Exposure set to: {exposure_value_set}")
 
     @abstractmethod
     def get_frame(self):

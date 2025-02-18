@@ -77,9 +77,9 @@ def process_singlefacet_geometry(
         Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
-        lt.debug('process_optics_geometry debug on.')
+        lt.debug("process_optics_geometry debug on.")
     else:
-        lt.debug('process_optics_geometry debug off.')
+        lt.debug("process_optics_geometry debug off.")
 
     # Create data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
@@ -102,8 +102,8 @@ def process_singlefacet_geometry(
     if debug.debug_active:
         fig = plt.figure()
         debug.figures.append(fig)
-        plt.imshow(mask_raw, cmap='gray')
-        plt.title('Raw Mask')
+        plt.imshow(mask_raw, cmap="gray")
+        plt.title("Raw Mask")
 
     # Find edges of mask
     v_edges_image = ip.edges_from_mask(mask_raw)
@@ -118,8 +118,8 @@ def process_singlefacet_geometry(
         fig = plt.figure()
         debug.figures.append(fig)
         plt.imshow(mask_raw)
-        plt.scatter(*v_mask_centroid_image.data, marker='x')
-        plt.title('Mask Centroid')
+        plt.scatter(*v_mask_centroid_image.data, marker="x")
+        plt.title("Mask Centroid")
 
     # Find expected position of optic centroid
     v_cam_optic_centroid_cam_exp = sp.t_from_distance(
@@ -133,9 +133,9 @@ def process_singlefacet_geometry(
         debug.figures.append(fig)
         plt.imshow(mask_raw)
         plt.scatter(
-            *camera.project(v_cam_optic_centroid_cam_exp, Rotation.identity(), Vxyz((0, 0, 0))).data, marker='.'
+            *camera.project(v_cam_optic_centroid_cam_exp, Rotation.identity(), Vxyz((0, 0, 0))).data, marker="."
         )
-        plt.title('Expected Optic Centroid')
+        plt.title("Expected Optic Centroid")
 
     # Find expected orientation of optic
     r_cam_optic_exp = sp.r_from_position(v_cam_optic_centroid_cam_exp, ori.v_cam_screen_cam)
@@ -156,7 +156,7 @@ def process_singlefacet_geometry(
         debug.figures.append(fig)
         plt.imshow(mask_raw)
         _plot_labeled_points(v_optic_corners_image_exp)
-        plt.title('Expected Optic Corners')
+        plt.title("Expected Optic Corners")
 
     # Refine locations of optic corners with mask
     prs = [params.perimeter_refine_axial_search_dist, params.perimeter_refine_perpendicular_search_dist]
@@ -169,7 +169,7 @@ def process_singlefacet_geometry(
         debug.figures.append(fig)
         plt.imshow(mask_raw)
         _plot_labeled_points(loop_facet_image_refine.vertices)
-        plt.title('Refined Optic Corners')
+        plt.title("Refined Optic Corners")
 
     # Create fitted mask
     vx = np.arange(mask_raw.shape[1])
@@ -196,7 +196,7 @@ def process_singlefacet_geometry(
         plt.imshow(mask_raw)
         pts_reproj = camera.project(facet_data.v_facet_corners, r_cam_optic_refine_1.inv(), v_cam_optic_cam_refine_1)
         _plot_labeled_points(pts_reproj)
-        plt.title('Reprojected Points 1')
+        plt.title("Reprojected Points 1")
 
     # Calculate refined measure point vector in optic coordinates
     v_measure_point_optic_cam_refine_1 = v_measure_point_facet.rotate(r_optic_cam_refine_1)
@@ -214,7 +214,7 @@ def process_singlefacet_geometry(
         plt.imshow(mask_raw)
         pts_reproj = camera.project(facet_data.v_facet_corners, r_cam_optic_refine_1.inv(), v_cam_optic_cam_refine_2)
         _plot_labeled_points(pts_reproj)
-        plt.title('Reprojected Points 2')
+        plt.title("Reprojected Points 2")
 
     # Orient optic
     ori.orient_optic_cam(r_cam_optic_refine_1, v_cam_optic_cam_refine_2)
@@ -304,7 +304,7 @@ def process_undefined_geometry(
         Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
-        lt.debug('process_optics_geometry debug on, but is not yet supported for undefined mirrors.')
+        lt.debug("process_optics_geometry debug on, but is not yet supported for undefined mirrors.")
 
     # Define data classes
     data_geometry_general = cdc.CalculationDataGeometryGeneral()
@@ -418,7 +418,7 @@ def process_multifacet_geometry(
         Geometric/positional errors and reprojection errors associated with solving for facet location.
     """
     if debug.debug_active:
-        lt.debug('process_optics_geometry debug on.')
+        lt.debug("process_optics_geometry debug on.")
 
     # Get facet data
     v_facet_corners_facet: list = [
@@ -475,8 +475,8 @@ def process_multifacet_geometry(
     if debug.debug_active:
         fig = plt.figure()
         debug.figures.append(fig)
-        plt.imshow(mask_raw, cmap='gray')
-        plt.title('Raw Mask')
+        plt.imshow(mask_raw, cmap="gray")
+        plt.title("Raw Mask")
 
     # Find edges of mask
     v_edges_image = ip.edges_from_mask(mask_raw)
@@ -513,7 +513,7 @@ def process_multifacet_geometry(
         debug.figures.append(fig)
         plt.imshow(mask_raw)
         _plot_labeled_points(v_ensemble_corners_exp_image)
-        plt.title('Expected Perimeter Points')
+        plt.title("Expected Perimeter Points")
 
     # Refine perimeter points
     args = [
@@ -529,7 +529,7 @@ def process_multifacet_geometry(
         debug.figures.append(fig)
         plt.imshow(mask_raw)
         _plot_labeled_points(loop_ensemble_image_refine.vertices)
-        plt.title('Refined Perimeter Points')
+        plt.title("Refined Perimeter Points")
 
     # Refine ensemble position/orientation with perimeter points
     r_ensemble_cam_refine_1, v_cam_ensemble_cam_refine_1 = sp.calc_rt_from_img_pts(
@@ -568,7 +568,7 @@ def process_multifacet_geometry(
                 fig = plt.figure()
                 debug.figures.append(fig)
                 plt.imshow(mask_raw)
-                plt.title('Refined Facet Corners')
+                plt.title("Refined Facet Corners")
             loop.draw()
 
     # Concatenate all refined facet corners
@@ -693,4 +693,4 @@ def _plot_labeled_points(pts: Vxy) -> None:
     """Plots labeled points on axis for debugging"""
     plt.scatter(*pts.data)
     for idx, pt in enumerate(pts):
-        plt.text(*pt.data, idx, color='k')
+        plt.text(*pt.data, idx, color="k")

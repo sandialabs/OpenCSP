@@ -78,7 +78,7 @@ class PowerpointImage(pps.PowerpointShape):
 
             if not ft.file_exists(self._val, error_if_exists_as_dir=False):
                 lt.warn(
-                    f"Warning: PowerpointImage.__init__: reference type value \"{self._val}\" should be a path to an image file, but no such file exists!"
+                    f'Warning: PowerpointImage.__init__: reference type value "{self._val}" should be a path to an image file, but no such file exists!'
                 )
 
     def _test_saved_path(self):
@@ -278,7 +278,7 @@ class PowerpointImage(pps.PowerpointShape):
             lt.error_and_raise(
                 ValueError,
                 f"Error: in PowerpointImage.save: unrecognized type for image "
-                + f"(type \"{self._val.__class__.__name__}\")",
+                + f'(type "{self._val.__class__.__name__}")',
             )
 
         return path, ft.body_ext_given_file_dir_body_ext(path_name_ext)
@@ -327,14 +327,14 @@ class PowerpointImage(pps.PowerpointShape):
                 RuntimeError,
                 f"Error: in PowerpointImage.from_txt_file(), bad version {version} in {path_name_ext}, expected version v1",
             )
-        has_val = slines[2] == 'True'
+        has_val = slines[2] == "True"
         image_name_ext = slines[3]
         dims = cls._str_to_dims(None, slines[4])
         cell_dims = cls._str_to_dims(None, slines[5])
-        caption_is_above = slines[6] == 'True'
+        caption_is_above = slines[6] == "True"
         caption = slines[7]
-        caption_is_none = slines[8] == 'True'
-        stretch = slines[9] == 'True'
+        caption_is_none = slines[8] == "True"
+        stretch = slines[9] == "True"
 
         image_path_name_ext = None if not has_val else os.path.join(path, slines[3])
         caption = None if caption_is_none else caption
@@ -419,8 +419,8 @@ class PowerpointImage(pps.PowerpointShape):
             lt.error_and_raise(
                 RuntimeError,
                 f"Error: in PowerpointImage.save(): programmer error, "
-                + f"should have saved the temporary image to \"{self._tmp_save_path}\""
-                + f"but instead saved it to \"{saved_path}\"!",
+                + f'should have saved the temporary image to "{self._tmp_save_path}"'
+                + f'but instead saved it to "{saved_path}"!',
             )
         self._saved_name_ext = body_ext
         self._test_saved_path()

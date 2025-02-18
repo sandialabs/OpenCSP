@@ -143,7 +143,7 @@ class UfacetFlight:
         # check for a similar name
         else:
             exp = f"{video_dir}/{video_name}*{video_extension}"
-            lt.debug(f"In UfacetFlight.video_dir_name_ext(): searching for videos matching the expression \"{exp}\"")
+            lt.debug(f'In UfacetFlight.video_dir_name_ext(): searching for videos matching the expression "{exp}"')
             matches = list(glob.glob(exp))
             to_remove, to_append_to_end = [], []
             for m in matches:
@@ -196,7 +196,7 @@ class UfacetFlight:
 
         if not self._frames_dir_extracted.endswith("/CLIP"):
             lt.error_and_raise(
-                f"Error: in UfacetFlight.frames_dir_extracted, unexpected directory name \"{self._frames_dir_extracted}\" for flight \"{self._name}\". Extracted directory name should end in \"/CLIP\"!"
+                f'Error: in UfacetFlight.frames_dir_extracted, unexpected directory name "{self._frames_dir_extracted}" for flight "{self._name}". Extracted directory name should end in "/CLIP"!'
             )
         self._frames_dir_deduplicated = self._frames_dir_extracted[: -len("CLIP")]
         self._frames_dir_deduplicated += "CLIP_deduplicated"

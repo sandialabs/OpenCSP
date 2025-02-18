@@ -29,7 +29,7 @@ class TranslationXYZ:
             Indicates that TranslationXYZ is deprecated and should be replaced with Vxyz.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
-        warn('TranslationXYZ is deprecated. Replace with Vxyz.', DeprecationWarning, stacklevel=2)
+        warn("TranslationXYZ is deprecated. Replace with Vxyz.", DeprecationWarning, stacklevel=2)
         self.trans_mtrx = np.zeros((3, 1))
 
     def from_vector(v: Vxyz):

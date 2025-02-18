@@ -87,5 +87,5 @@ class TestEnclosedEnergyImageProcessor(unittest.TestCase):
     #     enclosed_energy_plot.save_image(ft.join(self.data_dir, self._testMethodName+".png"))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

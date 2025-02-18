@@ -24,7 +24,7 @@ class TestConvolutionImageProcessor(unittest.TestCase):
 
     def test_validate_initialization(self):
         with self.assertRaises(ValueError):
-            ConvolutionImageProcessor(kernel='not a valid kernel')
+            ConvolutionImageProcessor(kernel="not a valid kernel")
         with self.assertRaises(ValueError):
             ConvolutionImageProcessor(diameter=-3)
         with self.assertRaises(ValueError):
@@ -93,5 +93,5 @@ class TestConvolutionImageProcessor(unittest.TestCase):
             processor.process_image(operable)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -1,7 +1,6 @@
-from typing import Callable, Iterable
+from typing import Iterable
 
 import numpy as np
-import sympy
 
 from opencsp.common.lib.geometry.FunctionXYAbstract import FunctionXYAbstract
 from opencsp.common.lib.geometry.RegionXY import RegionXY
@@ -33,13 +32,6 @@ class FunctionXYDiscrete(FunctionXYAbstract):
         self.x_domain = set(x_domain)
         self.y_domain = set(y_domain)
         self.domain = list(values.keys())
-
-    # def __add__(self, f2:'FunctionXYDiscrete') -> "FunctionXYDiscrete":
-    #     sum = self.values + f2.values
-    #     return FunctionXYDiscrete(sum)
-
-    # def interpolate() -> FunctionXYAnalytic:
-    #     ...
 
     def value_at(self, x: float | Iterable[float], y: float | Iterable[float]) -> float | np.ndarray[float]:
         """
@@ -94,7 +86,7 @@ class FunctionXYDiscrete(FunctionXYAbstract):
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         return (x, y) in list(self.values.keys())
 
-    def draw(self, view: View3d, functionXY_style):
+    def draw(self, view: View3d):
         """
         Draws the function in a 3D view.
 
@@ -102,24 +94,18 @@ class FunctionXYDiscrete(FunctionXYAbstract):
         ----------
         view : View3d
             The 3D view in which to draw the function.
-        functionXY_style : RenderControlMirror
-            The style settings for rendering the function.
 
         Returns
         -------
         None
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
-        if view.view_spec['type'] == 'image':
-            # X, Y = np.meshgrid(self.x_domain, self.y_domain)
+        if view.view_spec["type"] == "image":
             arr = np.zeros((len(self.y_domain), len(self.x_domain)))
             for ix, x in enumerate(sorted(self.x_domain)):
                 for iy, y in enumerate(sorted(self.y_domain)):
                     arr[iy, ix] = self.value_at(x, y)
-            # A = self.as_callable()(X,Y)
-            extent = [min(self.x_domain), max(self.x_domain), min(self.y_domain), max(self.y_domain)]
-            # view.pcolormesh(list(self.x_domain), list(self.y_domain), arr, colorbar=True, cmap='jet', )
-            view.imshow(arr, colorbar=True, cmap='jet')
+            view.imshow(arr, colorbar=True, cmap="jet")
 
     @classmethod
     def from_array(cls, x_domain: np.ndarray, y_domain: np.ndarray, values: np.ndarray):

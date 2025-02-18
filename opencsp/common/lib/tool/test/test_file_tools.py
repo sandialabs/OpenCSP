@@ -111,7 +111,7 @@ class TestFileTools(unittest.TestCase):
         ft.copy_and_delete_file(test_dir + "/copy_and_delete_e.tmp", test_dir + "/copy_and_delete_e.tmp")
         self.assertTrue(ft.file_exists(test_dir + "/copy_and_delete_e.tmp"))
 
-    @unittest.skipIf('nt' not in os.name, "Testing slash normalization and path extension on windows only")
+    @unittest.skipIf("nt" not in os.name, "Testing slash normalization and path extension on windows only")
     def test_norm_path(self):
         actual = ft.norm_path("a/b/c/d")
         expected = "a\\b\\c\\d"
@@ -141,5 +141,5 @@ class TestFileTools(unittest.TestCase):
         self.assertEqual(actual, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

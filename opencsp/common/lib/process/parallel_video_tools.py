@@ -61,7 +61,7 @@ def parallel_frames_to_videos(
     lt.info(
         f"partition info: [nservers: {partitioner.nservers}, server_idx: {partitioner.server_idx}, ncpus: {partitioner.ncpus}, cpu_idx: {partitioner.cpu_idx}]"
     )
-    my_frames = partitioner.get_my_portion(frames_names, 'Frame to Videos')
+    my_frames = partitioner.get_my_portion(frames_names, "Frame to Videos")
     lt.info(f"Size of my_frames: {len(my_frames)}/{len(frames_names)}")
     if len(my_frames) == 0:
         return None

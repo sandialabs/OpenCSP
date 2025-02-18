@@ -12,7 +12,7 @@ def add_quivers(
     quiver_density: float,
     axis: plt.Axes | None = None,
     scale: float | None = None,
-    color: str = 'white',
+    color: str = "white",
 ) -> None:
     """
     Adds quiver arrows to data plot.
@@ -49,7 +49,7 @@ def add_quivers(
     v_dirs = -im_y[y1::Ny, x1::Nx]
 
     # Add quiver arrows to axes
-    axis.quiver(x_locs, y_locs, u_dirs, v_dirs, color=color, scale=scale, scale_units='x')
+    axis.quiver(x_locs, y_locs, u_dirs, v_dirs, color=color, scale=scale, scale_units="x")
 
 
 def plot_orthorectified_image(
@@ -77,7 +77,7 @@ def plot_orthorectified_image(
     cmap_title : str
         Title of colorbar
     """
-    plt_im = axis.imshow(image, cmap, origin='lower', extent=extent)
+    plt_im = axis.imshow(image, cmap, origin="lower", extent=extent)
     plt_im.set_clim(clims)
     plt_cmap = plt.colorbar(plt_im, ax=axis)
     plt_cmap.ax.set_ylabel(cmap_title, rotation=270, labelpad=15)

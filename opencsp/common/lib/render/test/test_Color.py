@@ -10,22 +10,22 @@ class test_Color(unittest.TestCase):
     @classmethod
     def setUpClass(cls) -> None:
         path, name, _ = ft.path_components(__file__)
-        cls.out_dir = ft.join(path, 'data/output', name.split('test_')[-1])
+        cls.out_dir = ft.join(path, "data/output", name.split("test_")[-1])
         ft.create_directories_if_necessary(cls.out_dir)
-        ft.delete_files_in_directory(cls.out_dir, '*')
+        ft.delete_files_in_directory(cls.out_dir, "*")
         return super().setUpClass()
 
     def setUp(self) -> None:
-        self.test_name = self.id().split('.')[-1]
+        self.test_name = self.id().split(".")[-1]
 
     def test_init_Color(self):
         """Simple class initialization."""
-        instance = cl.Color(0, 0, 0, 'black', 'k')
+        instance = cl.Color(0, 0, 0, "black", "k")
         self.assertIsNotNone(instance)
 
     def test_init_range(self):
         """Verify that the RGB channels are enforced to a range 0-1."""
-        color = cl.Color(-1, 1, 2, 'black', 'k')
+        color = cl.Color(-1, 1, 2, "black", "k")
         self.assertAlmostEqual(color.rgb()[0], 0)
         self.assertAlmostEqual(color.rgb()[1], 1)
         self.assertAlmostEqual(color.rgb()[2], 1)
@@ -116,7 +116,7 @@ class test_Color(unittest.TestCase):
         The matplotlib tab10 colors are encoded in color.py. This test is here
         to catch any change in the matplotlib colors, if there ever is any.
         """
-        mpl_colors = matplotlib.color_sequences['tab10']
+        mpl_colors = matplotlib.color_sequences["tab10"]
 
         for i, color in cl.plot_colorsi.items():
             r1, g1, b1 = color.rgb()
@@ -126,5 +126,5 @@ class test_Color(unittest.TestCase):
             self.assertAlmostEqual(b1, b2)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

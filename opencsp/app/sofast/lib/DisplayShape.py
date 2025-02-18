@@ -9,7 +9,7 @@ import opencsp.common.lib.tool.hdf5_tools as h5
 class DisplayShape(h5.HDF5_IO_Abstract):
     """Representation of a screen/projector for deflectometry."""
 
-    def __init__(self, grid_data: dict, name: str = '') -> 'DisplayShape':
+    def __init__(self, grid_data: dict, name: str = "") -> "DisplayShape":
         """
         Instantiates deflectometry display representation.
 
@@ -66,39 +66,39 @@ class DisplayShape(h5.HDF5_IO_Abstract):
         self._init_interp_func()
 
     def __repr__(self):
-        return 'DisplayShape: { ' + self.name + ' }'
+        return "DisplayShape: { " + self.name + " }"
 
     def _init_interp_func(self):
         # Rectangular (undistorted) screen model
-        if self.grid_data['screen_model'] == 'rectangular2D':
+        if self.grid_data["screen_model"] == "rectangular2D":
             self.interp_func = self._interp_func_rectangular2D
 
         # Distorted screen model
-        elif self.grid_data['screen_model'] == 'distorted2D':
+        elif self.grid_data["screen_model"] == "distorted2D":
             # Create X/Y interpolation function
-            points = self.grid_data['xy_screen_fraction']  # Vxy, fractional screens
-            values = self.grid_data['xy_screen_coords']  # Vxy, screen coordinates
+            points = self.grid_data["xy_screen_fraction"]  # Vxy, fractional screens
+            values = self.grid_data["xy_screen_coords"]  # Vxy, screen coordinates
 
             # Check input types
             if not isinstance(values, Vxy):
-                raise ValueError('Values must be type Vxy for 2D distorted model.')
+                raise ValueError("Values must be type Vxy for 2D distorted model.")
             if len(points) != len(values):
-                raise ValueError('Input points and values must be same length.')
+                raise ValueError("Input points and values must be same length.")
 
             func_xy = LinearNDInterpolator(points.data.T, values.data.T)
 
             self.interp_func = lambda Vuv: self._interp_func_2D(Vuv, func_xy)
 
-        elif self.grid_data['screen_model'] == 'distorted3D':
+        elif self.grid_data["screen_model"] == "distorted3D":
             # Create X/Y/Z interpolation function
-            points = self.grid_data['xy_screen_fraction']  # Vxy, fractional screens
-            values = self.grid_data['xyz_screen_coords']  # Vxyz, screen coordinates
+            points = self.grid_data["xy_screen_fraction"]  # Vxy, fractional screens
+            values = self.grid_data["xyz_screen_coords"]  # Vxyz, screen coordinates
 
             # Check input types
             if not isinstance(values, Vxyz):
-                raise ValueError('Values must be type Vxyz for 3D distorted model.')
+                raise ValueError("Values must be type Vxyz for 3D distorted model.")
             if len(points) != len(values):
-                raise ValueError('Input points and values must be same length.')
+                raise ValueError("Input points and values must be same length.")
 
             func_xyz = LinearNDInterpolator(points.data.T, values.data.T)
 
@@ -121,8 +121,8 @@ class DisplayShape(h5.HDF5_IO_Abstract):
         Vxyz
             XYZ points in display coordinates.
         """
-        xm = (uv_display_pts.x - 0.5) * self.grid_data['screen_x']  # meters
-        ym = (uv_display_pts.y - 0.5) * self.grid_data['screen_y']  # meters
+        xm = (uv_display_pts.x - 0.5) * self.grid_data["screen_x"]  # meters
+        ym = (uv_display_pts.y - 0.5) * self.grid_data["screen_y"]  # meters
         zm = np.zeros(xm.shape)  # meters
         return Vxyz((xm, ym, zm))  # meters, display coordinates
 
@@ -166,7 +166,7 @@ class DisplayShape(h5.HDF5_IO_Abstract):
         return Vxyz(xyz)  # meters, display coordinates
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = '') -> 'DisplayShape':
+    def load_from_hdf(cls, file: str, prefix: str = "") -> "DisplayShape":
         """Loads data from given file. Assumes data is stored as: PREFIX + DisplayShape/Field_1
 
         Parameters
@@ -177,37 +177,37 @@ class DisplayShape(h5.HDF5_IO_Abstract):
             Prefix to append to folder path within HDF file (folders must be separated by "/")
         """
         # Load grid data
-        datasets = [prefix + 'DisplayShape/screen_model', prefix + 'DisplayShape/name']
+        datasets = [prefix + "DisplayShape/screen_model", prefix + "DisplayShape/name"]
         data = h5.load_hdf5_datasets(datasets, file)
 
         # Rectangular
-        if data['screen_model'] == 'rectangular2D':
-            datasets = [prefix + 'DisplayShape/screen_x', prefix + 'DisplayShape/screen_y']
+        if data["screen_model"] == "rectangular2D":
+            datasets = [prefix + "DisplayShape/screen_x", prefix + "DisplayShape/screen_y"]
             grid_data = h5.load_hdf5_datasets(datasets, file)
 
         # Distorted 2D
-        elif data['screen_model'] == 'distorted2D':
-            datasets = [prefix + 'DisplayShape/xy_screen_fraction', prefix + 'DisplayShape/xy_screen_coords']
+        elif data["screen_model"] == "distorted2D":
+            datasets = [prefix + "DisplayShape/xy_screen_fraction", prefix + "DisplayShape/xy_screen_coords"]
             grid_data = h5.load_hdf5_datasets(datasets, file)
-            grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
-            grid_data['xy_screen_coords'] = Vxy(grid_data['xy_screen_coords'])
+            grid_data["xy_screen_fraction"] = Vxy(grid_data["xy_screen_fraction"])
+            grid_data["xy_screen_coords"] = Vxy(grid_data["xy_screen_coords"])
 
         # Distorted 3D
-        elif data['screen_model'] == 'distorted3D':
-            datasets = [prefix + 'DisplayShape/xy_screen_fraction', prefix + 'DisplayShape/xyz_screen_coords']
+        elif data["screen_model"] == "distorted3D":
+            datasets = [prefix + "DisplayShape/xy_screen_fraction", prefix + "DisplayShape/xyz_screen_coords"]
             grid_data = h5.load_hdf5_datasets(datasets, file)
-            grid_data['xy_screen_fraction'] = Vxy(grid_data['xy_screen_fraction'])
-            grid_data['xyz_screen_coords'] = Vxyz(grid_data['xyz_screen_coords'])
+            grid_data["xy_screen_fraction"] = Vxy(grid_data["xy_screen_fraction"])
+            grid_data["xyz_screen_coords"] = Vxyz(grid_data["xyz_screen_coords"])
 
         else:
             raise ValueError(f'Model, {data["screen_model"]}, not supported.')
 
-        grid_data.update({'screen_model': data['screen_model']})
+        grid_data.update({"screen_model": data["screen_model"]})
         # Return display object
-        kwargs = {'name': data['name'], 'grid_data': grid_data}
+        kwargs = {"name": data["name"], "grid_data": grid_data}
         return cls(**kwargs)
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """Saves data to given file. Data is stored as: PREFIX + DisplayShape/Field_1
 
         Parameters
@@ -221,14 +221,14 @@ class DisplayShape(h5.HDF5_IO_Abstract):
         datasets = []
         data = []
         for dataset in self.grid_data.keys():
-            datasets.append(prefix + 'DisplayShape/' + dataset)
+            datasets.append(prefix + "DisplayShape/" + dataset)
             if isinstance(self.grid_data[dataset], (Vxy, Vxyz)):
                 data.append(self.grid_data[dataset].data)
             else:
                 data.append(self.grid_data[dataset])
 
         # Add name
-        datasets.append(prefix + 'DisplayShape/name')
+        datasets.append(prefix + "DisplayShape/name")
         data.append(self.name)
 
         # Save data

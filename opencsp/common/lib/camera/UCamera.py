@@ -190,7 +190,7 @@ def mavic_zoom():
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     return Camera(
-        name='Mavic Zoom',
+        name="Mavic Zoom",
         sensor_x_mm=6.17,  # mm.
         sensor_y_mm=4.54,  # mm.  sqrt(7.66^2 - 6.17^2)
         pixels_x=4000,  # For still images.
@@ -210,7 +210,7 @@ def sony_alpha_20mm_landscape():
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     return Camera(
-        name='Sony Alpha, 20mm',
+        name="Sony Alpha, 20mm",
         sensor_x_mm=35.9,  # mm.
         sensor_y_mm=24.0,  # mm.
         pixels_x=8760,  # For still images.
@@ -230,7 +230,7 @@ def sony_alpha_20mm_portrait():
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     return Camera(
-        name='Sony Alpha, 20mm',
+        name="Sony Alpha, 20mm",
         sensor_x_mm=24.0,  # mm.
         sensor_y_mm=35.9,  # mm.
         pixels_x=4864,  # For still images.
@@ -250,7 +250,7 @@ def ultra_wide_angle():
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     return Camera(
-        name='Ultra Wide Angle',
+        name="Ultra Wide Angle",
         sensor_x_mm=24.0,  # mm.
         sensor_y_mm=35.9,  # mm.
         pixels_x=4864,  # For still images.
@@ -275,7 +275,7 @@ class RealCamera(csvi.CsvInterface):
         self,
         # These values are taken from the utils.py file as it existed in the original repository on July 2, 2021.
         # I believe they correspond to the Mavic Zoom.
-        name='Mavic Zoom',  # String describing camera and lens.
+        name="Mavic Zoom",  # String describing camera and lens.
         # Image size.
         n_x=3840,  # Pixels.
         n_y=2160,  # Pixels.
@@ -500,7 +500,7 @@ def ideal_camera_wide_angle():
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     return RealCamera(
-        name='Ideal Camera, Wide Angle',
+        name="Ideal Camera, Wide Angle",
         # Image size.
         n_x=4,  # Pixels.
         n_y=3,  # Pixels.
@@ -537,7 +537,7 @@ def ideal_camera_normal():
     # Thus a "normal" focal length for our 4x3 ideal sensor is 5 * 1.156 = 5.78, or approximately 6.0.
     #
     return RealCamera(
-        name='Ideal Camera, Normal',
+        name="Ideal Camera, Normal",
         # Image size.
         n_x=4,  # Pixels.
         n_y=3,  # Pixels.
@@ -567,7 +567,7 @@ def ideal_camera_telephoto():
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     return RealCamera(
-        name='Ideal Camera, Telephoto',
+        name="Ideal Camera, Telephoto",
         # Image size.
         n_x=4,  # Pixels.
         n_y=3,  # Pixels.
@@ -598,7 +598,7 @@ def real_mavic_zoom():
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Values from calibration.
     return RealCamera(
-        name='Real Mavic Zoom',
+        name="Real Mavic Zoom",
         # Image size.
         n_x=3840,  # Pixels.
         n_y=2160,  # Pixels.
@@ -635,7 +635,7 @@ def real_sony_alpha_20mm_still():
     # Matlab distortion coefficients:
     #     [-0.0568132871107041, 0.0395572945993200, 0, 0]
     return RealCamera(
-        name='Real Sony Alpha, 20mm (still)',
+        name="Real Sony Alpha, 20mm (still)",
         # Image size.
         n_x=8640,  # Pixels.
         n_y=5760,  # Pixels.
@@ -686,7 +686,7 @@ def real_sony_alpha_20mm_video():
     # "ChatGPT 4o-mini" assisted with generating this docstring.
     # Values extrapolated to smaller image size from measurements in real_sony_alpha_20mm_still()
     return RealCamera(
-        name='Real Sony Alpha, 20mm (still)',
+        name="Real Sony Alpha, 20mm (still)",
         # Image size.
         n_x=7680,  # 8640,           # Pixels.
         n_y=4320,  # 5760,           # Pixels.

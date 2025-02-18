@@ -41,7 +41,7 @@ def homogeneous_line(xy1, xy2):
         geometry_2d.homogeneous_line is deprecated. Use LineXY instead.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
-    warn('geometry_2d.homogeneous_line is deprecated. Use LineXY instead.', DeprecationWarning, stacklevel=2)
+    warn("geometry_2d.homogeneous_line is deprecated. Use LineXY instead.", DeprecationWarning, stacklevel=2)
     # Returns homogeneous line coeffcients, in normalized form.
     x1 = xy1[0]
     y1 = xy1[1]
@@ -52,10 +52,10 @@ def homogeneous_line(xy1, xy2):
     C = (x2 * y1) - (x1 * y2)
     n = np.sqrt((A * A) + (B * B))
     if n == 0:
-        print('\nERROR: In homogeneous_line, degenerate case encountered.', DeprecationWarning, stacklevel=2)
-        print('   xy1 =', xy1)
-        print('   xy2 =', xy2)
-        print('\n')
+        print("\nERROR: In homogeneous_line, degenerate case encountered.", DeprecationWarning, stacklevel=2)
+        print("   xy1 =", xy1)
+        print("   xy2 =", xy2)
+        print("\n")
         assert False
     A = A / n
     B = B / n
@@ -84,7 +84,7 @@ def flip_homogeneous_line(line):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.', DeprecationWarning, stacklevel=2
+        "geometry_2d.flip_homogeneous_line is deprecated. Use LineXY.flip() instead.", DeprecationWarning, stacklevel=2
     )
     # Reverse the sense of the homogeneous line.
     return [-x for x in line]
@@ -113,7 +113,7 @@ def homogeneous_line_signed_distance_to_xy(xy, line):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.homogeneous_line_signed_distance_to_xy is deprecated. Use LineXY.dist_from_line_signed() instead.',
+        "geometry_2d.homogeneous_line_signed_distance_to_xy is deprecated. Use LineXY.dist_from_line_signed() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -149,7 +149,7 @@ def homogeneous_line_y_given_x(x, line):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.homogeneous_line_y_given_x is deprecated. Use LineXY.y_from_x() instead.',
+        "geometry_2d.homogeneous_line_y_given_x is deprecated. Use LineXY.y_from_x() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -186,7 +186,7 @@ def homogeneous_line_x_given_y(y, line):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.homogeneous_line_x_given_y is deprecated. Use LineXY.x_from_y() instead.',
+        "geometry_2d.homogeneous_line_x_given_y is deprecated. Use LineXY.x_from_y() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -224,7 +224,7 @@ def intersect_lines(line1, line2):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.intersect_lines is deprecated. Use LineXY.intersect_with() instead.',
+        "geometry_2d.intersect_lines is deprecated. Use LineXY.intersect_with() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -273,7 +273,7 @@ def shift_x(ray, dx):
         geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
-    warn('geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.', DeprecationWarning, stacklevel=2)
+    warn("geometry_2d.shift_x is deprecated. Use Vxy.__add__() instead.", DeprecationWarning, stacklevel=2)
     x0 = ray[0][0]
     y0 = ray[0][1]
     x1 = ray[1][0]
@@ -304,7 +304,7 @@ def intersect_rays(ray1, ray2):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.intersect_rays is deprecated. Use LineXY.intersect_with() instead.',
+        "geometry_2d.intersect_rays is deprecated. Use LineXY.intersect_with() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -336,7 +336,7 @@ def draw_clip_xy_box(view, clip_xy_box):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.draw_clip_xy_box is deprecated. Should be migrated to another library.',
+        "geometry_2d.draw_clip_xy_box is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -347,7 +347,7 @@ def draw_clip_xy_box(view, clip_xy_box):
     p_max = xy_max[0]
     y_max = xy_max[1]
     xy_list = [[p_min, y_min], [p_max, y_min], [p_max, y_max], [p_min, y_max]]
-    view.draw_pq_list(xy_list, close=True, style=rcps.outline(color='r'), label='Clip Box')
+    view.draw_pq_list(xy_list, close=True, style=rcps.outline(color="r"), label="Clip Box")
 
 
 def clip_line_to_xy_box(line, clip_xy_box):
@@ -373,7 +373,7 @@ def clip_line_to_xy_box(line, clip_xy_box):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.clip_line_to_xy_box is deprecated. Should be migrated to another library.',
+        "geometry_2d.clip_line_to_xy_box is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -407,10 +407,10 @@ def clip_line_to_xy_box(line, clip_xy_box):
     # Check result.
     if len(clip_points) != 2:
         print(
-            'WARNING: In clip_line_to_xy_box(), unexpected result with ', len(clip_points), ' clip points encountered.'
+            "WARNING: In clip_line_to_xy_box(), unexpected result with ", len(clip_points), " clip points encountered."
         )
-        print('          line        = ', line)
-        print('          clip_xy_box = ', clip_xy_box)
+        print("          line        = ", line)
+        print("          clip_xy_box = ", clip_xy_box)
     # Return.
     return clip_points
 
@@ -443,7 +443,7 @@ def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.extend_ray is deprecated. Should be migrated to another library.', DeprecationWarning, stacklevel=2
+        "geometry_2d.extend_ray is deprecated. Should be migrated to another library.", DeprecationWarning, stacklevel=2
     )
     xy0 = ray[0]
     xy1 = ray[1]
@@ -452,9 +452,9 @@ def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
 
     clip_points = clip_line_to_xy_box(line, clip_xy_box)
     if len(clip_points) == 0:
-        print('ERROR: In extend_ray(), ray is outside clip box.')
-        print('          ray = ', ray)
-        print('          clip_xy_box = ', clip_xy_box)
+        print("ERROR: In extend_ray(), ray is outside clip box.")
+        print("          ray = ", ray)
+        print("          clip_xy_box = ", clip_xy_box)
     clip_xy0 = clip_points[0]
     clip_xy1 = clip_points[1]
 
@@ -467,15 +467,15 @@ def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
     if (c0dot <= 0) and (c1dot <= 0):
         # The whole ray is outside the clip box, and it points away from the box.
         if fail_if_null_result:
-            print('ERROR: In extend_ray(), Unexpected situation encountered.')
-            print('          ray = ', ray)
-            print('          clip_xy_box = ', clip_xy_box)
+            print("ERROR: In extend_ray(), Unexpected situation encountered.")
+            print("          ray = ", ray)
+            print("          clip_xy_box = ", clip_xy_box)
             assert False
         else:
-            print('WARNING: In extend_ray(), Unexpected situation encountered.')
-            print('            ray = ', ray)
-            print('            clip_xy_box = ', clip_xy_box)
-            print('         Proceeding....')
+            print("WARNING: In extend_ray(), Unexpected situation encountered.")
+            print("            ray = ", ray)
+            print("            clip_xy_box = ", clip_xy_box)
+            print("         Proceeding....")
             return None
     elif c0dot <= 0:
         return [xy0, clip_xy1]
@@ -486,15 +486,15 @@ def extend_ray(ray, clip_xy_box, fail_if_null_result=True):
         if c0dot == c1dot:
             # Degenerate case.
             if fail_if_null_result:
-                print('ERROR: In extend_ray(), degenerate case encountered.')
-                print('          ray = ', ray)
-                print('          clip_xy_box = ', clip_xy_box)
+                print("ERROR: In extend_ray(), degenerate case encountered.")
+                print("          ray = ", ray)
+                print("          clip_xy_box = ", clip_xy_box)
                 assert False
             else:
-                print('WARNING: In extend_ray(), degenerate case encountered.')
-                print('            ray = ', ray)
-                print('            clip_xy_box = ', clip_xy_box)
-                print('         Proceeding....')
+                print("WARNING: In extend_ray(), degenerate case encountered.")
+                print("            ray = ", ray)
+                print("            clip_xy_box = ", clip_xy_box)
+                print("         Proceeding....")
                 return None
         elif c0dot > c1dot:
             return [clip_xy1, clip_xy0]
@@ -540,7 +540,7 @@ def best_fit_line_segment_A(xy_seq):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.best_fit_line_segment_A is deprecated. Use LineXY.fit_from_points() instead.',
+        "geometry_2d.best_fit_line_segment_A is deprecated. Use LineXY.fit_from_points() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -560,10 +560,10 @@ def best_fit_line_segment_A(xy_seq):
     degree = 1
     # Select x vs. y sense for better numerical conditioning.
     if (dx == 0) and (dy == 0):
-        print('ERROR: In best_fit_line(), ill-conditioned input:')
-        print('             xy_seq:', xy_seq)
-        print('       Ill-conditioned because dx = dy = 0')
-        print(' ')
+        print("ERROR: In best_fit_line(), ill-conditioned input:")
+        print("             xy_seq:", xy_seq)
+        print("       Ill-conditioned because dx = dy = 0")
+        print(" ")
         assert False
     if dx > dy:
         pfit, stats = np.polynomial.Polynomial.fit(
@@ -627,7 +627,7 @@ def best_fit_line_segment(xy_list):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.best_fit_line_segment is deprecated. Use LineXY.fit_from_points() instead.',
+        "geometry_2d.best_fit_line_segment is deprecated. Use LineXY.fit_from_points() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -665,7 +665,7 @@ def rotate_about_origin(xy, theta):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.rotate_about_origin is deprecated. Use Vxy.rotate() or TransformXY instead.',
+        "geometry_2d.rotate_about_origin is deprecated. Use Vxy.rotate() or TransformXY instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -705,7 +705,7 @@ def rotate_about_center(xy, theta, center_xy):
         Indicates that this function is deprecated and should be replaced with TransformXY.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
-    warn('geometry_2d.rotate_about_center is deprecated. Use TransformXY instead.', DeprecationWarning, stacklevel=2)
+    warn("geometry_2d.rotate_about_center is deprecated. Use TransformXY instead.", DeprecationWarning, stacklevel=2)
     x = xy[0]
     y = xy[1]
     cx = center_xy[0]
@@ -748,7 +748,7 @@ def rotate_xyz_about_center_xy(xyz, theta, center_xy):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.rotate_xyz_about_center_xy is deprecated. Use TransformXYZ, TransformXY, Vxyz.rotate() oro Vxy.rotate() instead.',
+        "geometry_2d.rotate_xyz_about_center_xy is deprecated. Use TransformXYZ, TransformXY, Vxyz.rotate() oro Vxy.rotate() instead.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -796,7 +796,7 @@ def label_point(xy_list):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'geometry_2d.label_point is deprecated. Should be migrated to another library.',
+        "geometry_2d.label_point is deprecated. Should be migrated to another library.",
         DeprecationWarning,
         stacklevel=2,
     )

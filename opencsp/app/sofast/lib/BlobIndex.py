@@ -40,7 +40,7 @@ class DebugBlobIndex:
         self.debug_active: bool = False
         self.figures: list = []
         self.bg_image: np.ndarray = None
-        self.name: str = ''
+        self.name: str = ""
 
 
 class BlobIndex(AbstractPlotHandler):
@@ -63,7 +63,7 @@ class BlobIndex(AbstractPlotHandler):
         To filter bad points (experimental, not implemented yet)
     """
 
-    def __init__(self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int) -> 'BlobIndex':
+    def __init__(self, points: Vxy, x_min: int, x_max: int, y_min: int, y_max: int) -> "BlobIndex":
         """Instantiates BlobIndex class
 
         Parameters
@@ -198,7 +198,7 @@ class BlobIndex(AbstractPlotHandler):
         self._points_mat[idx_y + self._offset_y, idx_x + self._offset_x] = self._points[idx_pt].data.squeeze()
         self._point_indices_mat[idx_y + self._offset_y, idx_x + self._offset_x] = idx_pt
 
-        lt.debug(f'Blob number {idx_pt:d} was assigned ({idx_x:d}, {idx_y:d})')
+        lt.debug(f"Blob number {idx_pt:d} was assigned ({idx_x:d}, {idx_y:d})")
 
     def _unassign(self, idx_pt: int) -> None:
         # Unassigns a point index
@@ -218,17 +218,17 @@ class BlobIndex(AbstractPlotHandler):
         self._idx_y[idx_pt] = np.nan
         self._is_assigned[idx_pt] = False
 
-        lt.debug(f'Blob number {idx_pt:d} was unassigned')
+        lt.debug(f"Blob number {idx_pt:d} was unassigned")
 
     def _assign_center(self, pt_origin: Vxy, idx_x: int, idx_y: int) -> None:
         # Assigns given origin point to given xy index
         idx, dist = self._nearest_unassigned_idx_from_xy_point(pt_origin)
         if dist > self.search_thresh:
-            lt.warn(f'Assigning point {idx:d} to index ({idx_x:d}, {idx_y:d}) resulted in {dist:.2f} pixels error.')
+            lt.warn(f"Assigning point {idx:d} to index ({idx_x:d}, {idx_y:d}) resulted in {dist:.2f} pixels error.")
         self._assign(idx, idx_x, idx_y)
 
     def _find_nearest_in_direction(
-        self, idx_pt: int, direction: Literal['right', 'left', 'up', 'down']
+        self, idx_pt: int, direction: Literal["right", "left", "up", "down"]
     ) -> tuple[int, int, int]:
         """Finds the directly nearest point index to given point
         in left, right, up, down direction. Can return already found points
@@ -256,19 +256,19 @@ class BlobIndex(AbstractPlotHandler):
         idx_x = self._idx_x[idx_pt]
         idx_y = self._idx_y[idx_pt]
 
-        if direction == 'right':
+        if direction == "right":
             mask = np.logical_and(unassigned_deltas.x > 0, unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)))
             idx_x_out = idx_x + 1
             idx_y_out = idx_y
-        elif direction == 'left':
+        elif direction == "left":
             mask = np.logical_and(unassigned_deltas.x < 0, -unassigned_deltas.x > (2 * np.abs(unassigned_deltas.y)))
             idx_x_out = idx_x - 1
             idx_y_out = idx_y
-        elif direction == 'up':
+        elif direction == "up":
             mask = np.logical_and(unassigned_deltas.y > 0, unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
             idx_x_out = idx_x
             idx_y_out = idx_y + 1
-        elif direction == 'down':
+        elif direction == "down":
             mask = np.logical_and(unassigned_deltas.y < 0, -unassigned_deltas.y > (2 * np.abs(unassigned_deltas.x)))
             idx_x_out = idx_x
             idx_y_out = idx_y - 1
@@ -291,33 +291,33 @@ class BlobIndex(AbstractPlotHandler):
         # g  h  i
         ret, idx_e = self._point_index_from_xy_index(idx_x, idx_y)
         if not ret:
-            lt.warn(f'Could not find 3x3 center block. Could not find point index xy=({idx_x:d}, {idx_y:d}).')
+            lt.warn(f"Could not find 3x3 center block. Could not find point index xy=({idx_x:d}, {idx_y:d}).")
         # Right
-        idx_f, x, y = self._find_nearest_in_direction(idx_e, 'right')
+        idx_f, x, y = self._find_nearest_in_direction(idx_e, "right")
         self._assign(idx_f, x, y)
         # Left
-        idx_d, x, y = self._find_nearest_in_direction(idx_e, 'left')
+        idx_d, x, y = self._find_nearest_in_direction(idx_e, "left")
         self._assign(idx_d, x, y)
         # Up
-        idx_b, x, y = self._find_nearest_in_direction(idx_e, 'up')
+        idx_b, x, y = self._find_nearest_in_direction(idx_e, "up")
         self._assign(idx_b, x, y)
         # Down
-        idx_h, x, y = self._find_nearest_in_direction(idx_e, 'down')
+        idx_h, x, y = self._find_nearest_in_direction(idx_e, "down")
         self._assign(idx_h, x, y)
         # Up/right
-        idx_c, x, y = self._find_nearest_in_direction(idx_f, 'up')
+        idx_c, x, y = self._find_nearest_in_direction(idx_f, "up")
         self._assign(idx_c, x, y)
         # Up/left
-        idx_a, x, y = self._find_nearest_in_direction(idx_d, 'up')
+        idx_a, x, y = self._find_nearest_in_direction(idx_d, "up")
         self._assign(idx_a, x, y)
         # Down/right
-        idx_i, x, y = self._find_nearest_in_direction(idx_f, 'down')
+        idx_i, x, y = self._find_nearest_in_direction(idx_f, "down")
         self._assign(idx_i, x, y)
         # Down/left
-        idx_g, x, y = self._find_nearest_in_direction(idx_d, 'down')
+        idx_g, x, y = self._find_nearest_in_direction(idx_d, "down")
         self._assign(idx_g, x, y)
 
-    def _extend_data(self, direction: Literal['x', 'y'], step: Step) -> None:
+    def _extend_data(self, direction: Literal["x", "y"], step: Step) -> None:
         # Extends found blob rows/collumns in given direction
         # Steps in the given axis, a or b
         #
@@ -328,12 +328,12 @@ class BlobIndex(AbstractPlotHandler):
         # step : Step
         #     Direction to search
         if not isinstance(step, Step):
-            raise ValueError(f'Step must be a Step class, not type {type(step)}')
+            raise ValueError(f"Step must be a Step class, not type {type(step)}")
 
-        if direction == 'x':
+        if direction == "x":
             idxs_a = self._idx_y
             idxs_b = self._idx_x
-        elif direction == 'y':
+        elif direction == "y":
             idxs_a = self._idx_x
             idxs_b = self._idx_y
         else:
@@ -358,9 +358,9 @@ class BlobIndex(AbstractPlotHandler):
                                 pt_prev = pts[is_b == idx_b_prev]
                                 if (len(pt_cur) > 1) or (len(pt_prev) > 1):
                                     raise ValueError(
-                                        f'Point index {idx_a:.0f}, {i_b:.0f} '
-                                        'was assigned more than once. '
-                                        'Try tightening dot search settings.'
+                                        f"Point index {idx_a:.0f}, {i_b:.0f} "
+                                        "was assigned more than once. "
+                                        "Try tightening dot search settings."
                                     )
                             else:  # Next iterations, use new points
                                 pt_prev = pt_cur
@@ -374,7 +374,7 @@ class BlobIndex(AbstractPlotHandler):
                                 break
                             # Assign point
                             if dist < self.search_thresh:
-                                if direction == 'x':
+                                if direction == "x":
                                     idx_x = int(i_b + step.value + (idx_b_next * step.value))
                                     idx_y = int(idx_a)
                                 else:
@@ -442,7 +442,7 @@ class BlobIndex(AbstractPlotHandler):
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_all_points()
-            plt.title('1: All found dots in image' + self.debug.name)
+            plt.title("1: All found dots in image" + self.debug.name)
             self.debug.figures.append(fig)
 
         # Assign center point
@@ -455,7 +455,7 @@ class BlobIndex(AbstractPlotHandler):
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_assigned_points_labels(labels=True)
-            plt.title('2: Locations of known, center dot' + self.debug.name)
+            plt.title("2: Locations of known, center dot" + self.debug.name)
             self.debug.figures.append(fig)
 
         # Find 3x3 core point block
@@ -468,25 +468,25 @@ class BlobIndex(AbstractPlotHandler):
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_assigned_points_labels(labels=True)
-            plt.title('3: Locations of 3x3 center block' + self.debug.name)
+            plt.title("3: Locations of 3x3 center block" + self.debug.name)
             self.debug.figures.append(fig)
 
         # Extend rows
         prev_num_unassigned = self._num_unassigned()
         for idx in range(self.max_num_iters):
-            self._extend_data('x', Step(-1))
-            self._extend_data('x', Step(1))
+            self._extend_data("x", Step(-1))
+            self._extend_data("x", Step(1))
             if self.apply_filter:
                 self._filter_bad_points()
-            self._extend_data('y', Step(-1))
-            self._extend_data('y', Step(1))
+            self._extend_data("y", Step(-1))
+            self._extend_data("y", Step(1))
             if self.apply_filter:
                 self._filter_bad_points()
 
             # Check if no progress has been made
             cur_num_unassigned = self._num_unassigned()
             if prev_num_unassigned == cur_num_unassigned:
-                lt.debug(f'All possible points found in {idx + 1:d} iterations.')
+                lt.debug(f"All possible points found in {idx + 1:d} iterations.")
                 break
             prev_num_unassigned = cur_num_unassigned
 
@@ -497,7 +497,7 @@ class BlobIndex(AbstractPlotHandler):
             if self.debug.bg_image is not None:
                 plt.imshow(self.debug.bg_image)
             self.plot_points_connections()
-            plt.title('4: Row assignments' + self.debug.name)
+            plt.title("4: Row assignments" + self.debug.name)
             self.debug.figures.append(fig)
 
     def plot_assigned_points_labels(self, labels: bool = False) -> None:
@@ -508,16 +508,16 @@ class BlobIndex(AbstractPlotHandler):
         labels : bool, optional
             To include xy blob index labels, by default False
         """
-        plt.scatter(*self._points[self._is_assigned].data, color='blue')
+        plt.scatter(*self._points[self._is_assigned].data, color="blue")
         if labels:
             for x, y, pt in zip(
                 self._idx_x[self._is_assigned], self._idx_y[self._is_assigned], self._points[self._is_assigned]
             ):
-                plt.text(*pt.data, f'({x:.0f}, {y:.0f})')
+                plt.text(*pt.data, f"({x:.0f}, {y:.0f})")
 
     def plot_all_points(self) -> None:
         """Plots all points"""
-        plt.scatter(*self._points.data, color='red')
+        plt.scatter(*self._points.data, color="red")
 
     def plot_points_connections(self, labels: bool = False) -> None:
         """Plots points and connections for rows/collumns
@@ -535,7 +535,7 @@ class BlobIndex(AbstractPlotHandler):
             xs = pts.x
             ys = pts.y
             idxs = np.argsort(xs)
-            plt.plot(xs[idxs], ys[idxs], marker='.', alpha=0.5)
+            plt.plot(xs[idxs], ys[idxs], marker=".", alpha=0.5)
 
             # Add point indices
             if labels:

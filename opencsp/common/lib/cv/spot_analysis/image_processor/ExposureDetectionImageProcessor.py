@@ -70,9 +70,9 @@ class ExposureDetectionImageProcessor(AbstractSpotAnalysisImageProcessor):
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         image = operable.primary_image.nparray
         notes = (
-            'ExposureDetectionImageProcessor',
+            "ExposureDetectionImageProcessor",
             [
-                f'settings: {self.under_exposure_limit=}, {self.under_exposure_threshold=}, {self.over_exposure_limit=}, {self.max_pixel_value=}'
+                f"settings: {self.under_exposure_limit=}, {self.under_exposure_threshold=}, {self.over_exposure_limit=}, {self.max_pixel_value=}"
             ],
         )
 
@@ -131,7 +131,7 @@ if __name__ == "__main__":
     ft.create_directories_if_necessary(outdir)
     ft.delete_files_in_directory(outdir, "*")
     images_filenames = ft.files_in_directory_by_extension(indir, ["jpg"])["jpg"]
-    images_path_name_ext = [indir + '/' + filename for filename in images_filenames]
+    images_path_name_ext = [indir + "/" + filename for filename in images_filenames]
 
     import opencsp.common.lib.cv.SpotAnalysis as sa
     from opencsp.common.lib.cv.spot_analysis.image_processor import CroppingImageProcessor
@@ -141,7 +141,7 @@ if __name__ == "__main__":
         ExposureDetectionImageProcessor(under_exposure_threshold=120),
     ]
 
-    spot_analysis = sa.SpotAnalysis('ExposureDetectionImageProcessor test', image_processors, outdir)
+    spot_analysis = sa.SpotAnalysis("ExposureDetectionImageProcessor test", image_processors, outdir)
     spot_analysis.set_primary_images(images_path_name_ext)
 
     for operable in spot_analysis:

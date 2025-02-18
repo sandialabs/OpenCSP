@@ -110,5 +110,5 @@ class TestPopulationStatisticsImageProcessor(unittest.TestCase):
         nptest.assert_array_almost_equal(stats[2].avgf_rolling_window, expected)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

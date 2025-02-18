@@ -23,7 +23,7 @@ def bundle_adjust(
     pts_img: np.ndarray,
     intrinsic_mat: np.ndarray,
     dist_coefs: np.ndarray,
-    opt_type: Literal['camera', 'points', 'both'],
+    opt_type: Literal["camera", "points", "both"],
     verbose: int,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     """
@@ -66,7 +66,7 @@ def bundle_adjust(
 
     """
     # Check inputs
-    if opt_type not in ['camera', 'points', 'both']:
+    if opt_type not in ["camera", "points", "both"]:
         raise ValueError(f'Given opt_type must be one of ("camera", "points", "both"), not "{opt_type:s}"')
 
     # Calculate number of cameras and points
@@ -86,12 +86,12 @@ def bundle_adjust(
         x0,
         jac_sparsity=jac_sparsity,
         verbose=verbose,
-        x_scale='jac',
+        x_scale="jac",
         ftol=1e-4,
-        method='trf',
+        method="trf",
         args=(n_cameras, n_points, camera_indices, point_indices, pts_img, intrinsic_mat, dist_coefs),
     )
-    lt.debug('Bundle adjustment finished: ' + res.message)
+    lt.debug("Bundle adjustment finished: " + res.message)
 
     # Return data
     data = res.x[: n_cameras * 6].reshape((n_cameras, 6))
@@ -108,7 +108,7 @@ def rotate(points: np.ndarray, rot_vecs: np.ndarray):
 
     """
     theta = np.linalg.norm(rot_vecs, axis=1)[:, np.newaxis]
-    with np.errstate(invalid='ignore'):
+    with np.errstate(invalid="ignore"):
         v = rot_vecs / theta
         v = np.nan_to_num(v)
     dot = np.sum(points * v, axis=1)[:, np.newaxis]
@@ -170,12 +170,12 @@ def bundle_adjustment_sparsity(
     i = np.arange(camera_indices.size)
 
     # Fill in diagonals of Jacobian sparsity matrix
-    if opt_type in ['camera', 'both']:
+    if opt_type in ["camera", "both"]:
         for s in range(6):
             jac_sparsity[2 * i, camera_indices * 6 + s] = 1  # rotation
             jac_sparsity[2 * i + 1, camera_indices * 6 + s] = 1  # translation
 
-    if opt_type in ['points', 'both']:
+    if opt_type in ["points", "both"]:
         for s in range(3):
             jac_sparsity[2 * i, n_cameras * 6 + point_indices * 3 + s] = 1
             jac_sparsity[2 * i + 1, n_cameras * 6 + point_indices * 3 + s] = 1

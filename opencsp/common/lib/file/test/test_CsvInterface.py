@@ -116,5 +116,5 @@ class test_CsvInterface(unittest.TestCase):
             TstCsvInterface("2", 2, 2.0).to_csv(self.id(), self.out_dir, self.out_file, overwrite=False)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

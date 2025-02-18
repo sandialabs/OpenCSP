@@ -14,7 +14,7 @@ import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 
 def __sandia_nsttf_test_definition_dir():
     return os.path.join(
-        orp.opencsp_code_dir(), 'common', 'lib', 'test', 'data', 'input', 'sandia_nsttf_test_definition'
+        orp.opencsp_code_dir(), "common", "lib", "test", "data", "input", "sandia_nsttf_test_definition"
     )
 
 
@@ -31,7 +31,7 @@ def sandia_nsttf_test_heliostats_origin_file():
         The path to the heliostats origin file.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
-    return os.path.join(__sandia_nsttf_test_definition_dir(), 'NSTTF_Heliostats_origin_at_torque_tube.csv')
+    return os.path.join(__sandia_nsttf_test_definition_dir(), "NSTTF_Heliostats_origin_at_torque_tube.csv")
 
 
 def sandia_nsttf_test_facet_centroidsfile():
@@ -47,4 +47,4 @@ def sandia_nsttf_test_facet_centroidsfile():
         The path to the facet centroids file.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
-    return os.path.join(__sandia_nsttf_test_definition_dir(), 'NSTTF_Facet_Centroids.csv')
+    return os.path.join(__sandia_nsttf_test_definition_dir(), "NSTTF_Facet_Centroids.csv")

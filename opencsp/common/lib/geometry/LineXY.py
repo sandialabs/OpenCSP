@@ -64,7 +64,7 @@ class LineXY:
         self._original_two_points: tuple[Vxy, Vxy] | None = None
 
     def __repr__(self):
-        return '2D Line: ' + self.A.__repr__() + ', ' + self.B.__repr__() + ', ' + self.C.__repr__()
+        return "2D Line: " + self.A.__repr__() + ", " + self.B.__repr__() + ", " + self.C.__repr__()
 
     @property
     def n_vec(self) -> Vxy:
@@ -182,7 +182,7 @@ class LineXY:
         n = len(Pxy)
         thresh = int(0.99 * n)
         if n <= 15:
-            raise ValueError(f'To fit line from points, must have > 15 points, but {n:d} were given.')
+            raise ValueError(f"To fit line from points, must have > 15 points, but {n:d} were given.")
 
         # Fit from random combinations of points, keeping the best
         best_active = 0
@@ -261,7 +261,7 @@ class LineXY:
 
         """
         if len(Pxy1) != 1 or len(Pxy2) != 1:
-            raise ValueError('Input vectors must be length 1.')
+            raise ValueError("Input vectors must be length 1.")
 
         # Find line coefficients
         delta = Pxy2 - Pxy1
@@ -406,7 +406,7 @@ class LineXY:
         """
         return Pxy.dot(self.n_vec) + self.C
 
-    def intersect_with(self, Lxy: 'LineXY') -> Vxy | None:
+    def intersect_with(self, Lxy: "LineXY") -> Vxy | None:
         """
         Calculates intersection point of two 2D lines.
 

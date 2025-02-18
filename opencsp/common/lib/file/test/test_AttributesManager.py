@@ -14,7 +14,7 @@ class SimpleAttributeParser(aap.AbstractAttributeParser):
         self.strval = "hello world"
         self.listval = ["foo", "bar", "baz"]
 
-    def set_defaults(self, other: 'SimpleAttributeParser'):
+    def set_defaults(self, other: "SimpleAttributeParser"):
         self.strval = tt.default(self.strval, other.strval)
         self.listval = tt.default(self.listval, other.listval)
 
@@ -122,5 +122,5 @@ class test_AttributesManager(unittest.TestCase):
         self.assertEqual("This should be jsonifiable", in_parser.strval)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

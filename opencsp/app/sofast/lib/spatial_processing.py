@@ -113,7 +113,7 @@ def refine_v_distance(
 
     # Perform optimization
     scale_0 = 1.0
-    out = minimize(error_func, scale_0, method='Powell')
+    out = minimize(error_func, scale_0, method="Powell")
 
     # Return refined tvec
     return v_cam_optic_cam * out.x
@@ -143,7 +143,7 @@ def calc_rt_from_img_pts(pts_image: Vxy, pts_object: Vxyz, camera: Camera) -> tu
     ret, rvec, tvec = cv.solvePnP(pts_object.data.T, pts_image.data.T, camera.intrinsic_mat, camera.distortion_coef)
 
     if not ret:
-        lt.error_and_raise(ValueError, 'Could not find position of optic relative to camera.')
+        lt.error_and_raise(ValueError, "Could not find position of optic relative to camera.")
 
     return Rotation.from_rotvec(rvec.squeeze()), Vxyz(tvec.squeeze())
 
@@ -182,7 +182,7 @@ def calc_r_from_img_pts(
         return reproj_error
 
     # Perform optimization
-    out = minimize(error_func, r_object_cam_0.as_rotvec(), method='Powell')
+    out = minimize(error_func, r_object_cam_0.as_rotvec(), method="Powell")
 
     return Rotation.from_rotvec(out.x)
 

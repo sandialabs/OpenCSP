@@ -24,7 +24,7 @@ def is_cluster():
     Returns:
         bool: True if running on a HPC cluster node
     """
-    return opencsp_settings['system'].getboolean('is_cluster')
+    return opencsp_settings["system"].getboolean("is_cluster")
 
 
 __is_production_run = is_cluster() or not __debug__
@@ -63,5 +63,5 @@ def mem_status():
 
         return total / 10e8, used / 10e8, (avail) / 10e8
     else:
-        total_memory, used_memory, free_memory = map(int, os.popen('free -t -m').readlines()[-1].split()[1:])
+        total_memory, used_memory, free_memory = map(int, os.popen("free -t -m").readlines()[-1].split()[1:])
         return total_memory / 1000, used_memory / 1000, free_memory / 1000

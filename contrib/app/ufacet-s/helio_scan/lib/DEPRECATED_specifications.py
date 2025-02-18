@@ -77,7 +77,7 @@ class Specifications:
         self, heliostat_locations_file
     ):  # ?? SCAFFOLDING RCB -- ADAPTED FROM ROUTINE "heliostats_read_file" IN SolarField.py; INTEGRATE WITH THAT
         with open(heliostat_locations_file) as input_stream:
-            readCSV = csv.reader(input_stream, delimiter=',')
+            readCSV = csv.reader(input_stream, delimiter=",")
             id_row = 0
             id_heliostat = 0
             heliostat_dict = {}
@@ -210,9 +210,9 @@ class Specifications:
             centered_flat_lr_xyz = [half_w, -half_h, 0]
             centered_flat_ll_xyz = [-half_w, -half_h, 0]
             # Rotate the facet.
-            R_x = t3d.axisrotation([1, 0, 0], facet_spec['rot_x'])
-            R_y = t3d.axisrotation([0, 1, 0], facet_spec['rot_y'])
-            R_z = t3d.axisrotation([0, 0, 1], facet_spec['rot_z'])
+            R_x = t3d.axisrotation([1, 0, 0], facet_spec["rot_x"])
+            R_y = t3d.axisrotation([0, 1, 0], facet_spec["rot_y"])
+            R_z = t3d.axisrotation([0, 0, 1], facet_spec["rot_z"])
             R = R_y.dot(
                 R_x.dot(R_z)
             )  # First Rz, then Rx, then Ry  # ?? SCAFFOLDING RCB -- USE FASTER AND MORE PRECISE ROTx, ROTy, ROTz FUNCTIONS.  See https://learnopencv.com/rotation-matrix-to-euler-angles/
@@ -221,9 +221,9 @@ class Specifications:
             centered_rotated_lr_xyz = R.dot(centered_flat_lr_xyz)
             centered_rotated_ll_xyz = R.dot(centered_flat_ll_xyz)
             # Translate the facet.
-            cx = facet_spec['center_x']
-            cy = facet_spec['center_y']
-            cz = facet_spec['center_z']
+            cx = facet_spec["center_x"]
+            cy = facet_spec["center_y"]
+            cz = facet_spec["center_z"]
             center = np.array([cx, cy, cz])
             final_ul_xyz = centered_rotated_ul_xyz + center
             final_ur_xyz = centered_rotated_ur_xyz + center
@@ -244,12 +244,12 @@ class Specifications:
         idx = 0
         for facet_centroid_xyz in self.facets_centroids:
             facet_spec = {}
-            facet_spec['center_x'] = facet_centroid_xyz[0]
-            facet_spec['center_y'] = facet_centroid_xyz[1]
-            facet_spec['center_z'] = facet_centroid_xyz[2]
-            facet_spec['rot_x'] = 0.0
-            facet_spec['rot_y'] = 0.0
-            facet_spec['rot_z'] = 0.0
+            facet_spec["center_x"] = facet_centroid_xyz[0]
+            facet_spec["center_y"] = facet_centroid_xyz[1]
+            facet_spec["center_z"] = facet_centroid_xyz[2]
+            facet_spec["rot_x"] = 0.0
+            facet_spec["rot_y"] = 0.0
+            facet_spec["rot_z"] = 0.0
             heliostat_spec[idx] = facet_spec
             idx += 1
         # Return.
@@ -288,12 +288,12 @@ class Specifications:
             rot_x, rot_y, rot_z = t3d.rotation_matrix_to_euler_angles(R_z_to_normal)
             # Assemble facet spec.
             facet_spec = {}
-            facet_spec['center_x'] = cx
-            facet_spec['center_y'] = cy
-            facet_spec['center_z'] = cz
-            facet_spec['rot_x'] = rot_x
-            facet_spec['rot_y'] = rot_y
-            facet_spec['rot_z'] = rot_z
+            facet_spec["center_x"] = cx
+            facet_spec["center_y"] = cy
+            facet_spec["center_z"] = cz
+            facet_spec["rot_x"] = rot_x
+            facet_spec["rot_y"] = rot_y
+            facet_spec["rot_z"] = rot_z
             # Add to heliostat_spec.
             heliostat_spec[idx] = facet_spec
             idx += 1
@@ -372,8 +372,8 @@ def vertically_move_facets_to_flat_z_heights(flat_corner_xyz_list, smooth_xyz_li
 
 def nsttf_specifications():
     return Specifications(
-        name='nsttf',
-        heliostat_design_name='Nsttf',
+        name="nsttf",
+        heliostat_design_name="Nsttf",
         corners_per_facet=4,
         corners_per_heliostat=100,
         facets_per_row=5,
@@ -388,14 +388,14 @@ def nsttf_specifications():
         bottom_left_facet_indx=21,
         #        facets_centroids_file    = '<home_dir>/temporary_ufacet_input/csv_files/nsttf_centroids.csv',
         facets_centroids_file=experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Centroids.csv',  # ?? SCAFFOLDING RCB -- RENAME TO "facet_centroids_file"  ALSO, THIS SHOULD BE PASSED IN.
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Centroids.csv",  # ?? SCAFFOLDING RCB -- RENAME TO "facet_centroids_file"  ALSO, THIS SHOULD BE PASSED IN.
         heliostat_locations_file=experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/020_FieldModel/data/NSTTF_Heliostats_origin_at_torque_tube.csv',  # ?? SCAFFOLDING RCB -- THIS SHOULD BE PASSED IN.
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/020_FieldModel/data/NSTTF_Heliostats_origin_at_torque_tube.csv",  # ?? SCAFFOLDING RCB -- THIS SHOULD BE PASSED IN.
         # Aim point assumed when computing an ideal focal length for a heliostat.
         design_aim_point_x=0.00,  # m. BCS radiometer.
         design_aim_point_y=8.00,  # m.
         design_aim_point_z=30.00,  # m.
         # Key heliostats.
-        nearest_heliostat='5W1',
-        farthest_heliostat='13E14',
+        nearest_heliostat="5W1",
+        farthest_heliostat="13E14",
     )

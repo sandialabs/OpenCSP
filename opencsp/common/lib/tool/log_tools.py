@@ -80,8 +80,8 @@ def logger(log_dir_body_ext: str = None, level: int = log.INFO, delete_existing_
 
     # Standard initial lines.
     if not delete_existing_log:
-        info('')  # Blank line to separate from previous log, if any.
-    info('Start run ' + tdt.current_date_time_string())
+        info("")  # Blank line to separate from previous log, if any.
+    info("Start run " + tdt.current_date_time_string())
 
     return global_singleprocessing_logger
 
@@ -120,7 +120,7 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO) -> log.Logger:
     global_multiprocessing_logger.setLevel(level)
 
     # Get the host and process name
-    process_name = '%(processName)s'
+    process_name = "%(processName)s"
     hn_match = re.match(".*?([0-9]+).*", socket.gethostname())
     if hn_match:
         process_name = hn_match.groups()[0] + ":" + process_name
@@ -140,7 +140,7 @@ def multiprocessing_logger(log_dir_body_ext=None, level=log.INFO) -> log.Logger:
     #     global_multiprocessing_logger.addHandler(handler)
 
     # Standard initial lines.
-    info('Start run ' + tdt.current_date_time_string())
+    info("Start run " + tdt.current_date_time_string())
 
     # Return.
     return global_multiprocessing_logger

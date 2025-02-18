@@ -58,5 +58,5 @@ class TestSubprocess(unittest.TestCase):
         self.assertEqual(results, outputs, "Output order from pool.starmap() should be the same as input order")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

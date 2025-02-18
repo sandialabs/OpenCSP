@@ -26,17 +26,17 @@ class TestCameraCalibration:
             If true, saves data in output location instead of running unit tests, by default False
         """
         # Get test data location
-        base_dir = os.path.join(os.path.dirname(__file__), 'data')
+        base_dir = os.path.join(os.path.dirname(__file__), "data")
 
         # Pattern to search for captured images
-        image_pattern = os.path.join(base_dir, 'images/*.png')
-        test_data_file = os.path.join(base_dir, 'data_test.h5')
+        image_pattern = os.path.join(base_dir, "images/*.png")
+        test_data_file = os.path.join(base_dir, "data_test.h5")
 
         # Define number of checkerboard corners
         npts = (18, 23)
 
         # Define camera name
-        cam_name = 'Test Camera'
+        cam_name = "Test Camera"
 
         # Find all files
         files = glob(image_pattern)
@@ -76,15 +76,15 @@ class TestCameraCalibration:
 
         # Save or load test data
         datasets = [
-            'p_image_points',
-            'p_object_points',
-            'intrinsic_matrix',
-            'distortion_coeffs',
-            'image_shape_xy',
-            'r_cam_object',
-            'v_cam_object_cam',
-            'calibration_error',
-            'reprojection_errors',
+            "p_image_points",
+            "p_object_points",
+            "intrinsic_matrix",
+            "distortion_coeffs",
+            "image_shape_xy",
+            "r_cam_object",
+            "v_cam_object_cam",
+            "calibration_error",
+            "reprojection_errors",
         ]
 
         # Save calculated image and object points
@@ -113,24 +113,24 @@ class TestCameraCalibration:
             ]
 
             save_hdf5_datasets(data, datasets, test_data_file)
-            print('Test data was created and saved to:', test_data_file)
+            print("Test data was created and saved to:", test_data_file)
 
         else:
-            print('Performing tests...')
+            print("Performing tests...")
 
             # Load saved data
             data = load_hdf5_datasets(datasets, test_data_file)
 
             # Save expected data in class
-            cls.p_image_points_exp = data['p_image_points']
-            cls.Pxyz_object_points_exp = data['p_object_points']
-            cls.intrinsic_matrix_exp = data['intrinsic_matrix']
-            cls.distortion_coeffs_exp = data['distortion_coeffs']
-            cls.image_shape_xy_exp = data['image_shape_xy']
-            cls.R_cam_object_exp = data['r_cam_object']
-            cls.V_cam_object_cam_exp = data['v_cam_object_cam']
-            cls.calibration_error_exp = data['calibration_error']
-            cls.reprojection_errors_exp = data['reprojection_errors']
+            cls.p_image_points_exp = data["p_image_points"]
+            cls.Pxyz_object_points_exp = data["p_object_points"]
+            cls.intrinsic_matrix_exp = data["intrinsic_matrix"]
+            cls.distortion_coeffs_exp = data["distortion_coeffs"]
+            cls.image_shape_xy_exp = data["image_shape_xy"]
+            cls.R_cam_object_exp = data["r_cam_object"]
+            cls.V_cam_object_cam_exp = data["v_cam_object_cam"]
+            cls.calibration_error_exp = data["calibration_error"]
+            cls.reprojection_errors_exp = data["reprojection_errors"]
 
     def test_image_points(self):
         np.testing.assert_allclose(self.p_image_points, self.p_image_points_exp)

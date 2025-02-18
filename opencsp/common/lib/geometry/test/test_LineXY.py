@@ -272,5 +272,5 @@ class TestLineXY(unittest.TestCase):
         self.assertAlmostEqual(line.angle, np.pi * 7 / 4)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

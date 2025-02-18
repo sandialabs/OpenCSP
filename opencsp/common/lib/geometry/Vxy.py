@@ -67,11 +67,11 @@ class Vxy:
         if type(data_tmp) is np.ndarray:
             data_tmp = data_tmp.squeeze()
             if np.ndim(data_tmp) not in [1, 2]:
-                raise ValueError('Input data must have 1 or 2 dimensions if ndarray.')
+                raise ValueError("Input data must have 1 or 2 dimensions if ndarray.")
             elif np.ndim(data_tmp) == 2 and data_tmp.shape[0] != 2:
-                raise ValueError('First dimension of 2-dimensional data must be length 2 if ndarray.')
+                raise ValueError("First dimension of 2-dimensional data must be length 2 if ndarray.")
         elif len(data_tmp) != 2:
-            raise ValueError('Input data must have length 2.')
+            raise ValueError("Input data must have length 2.")
 
         # Save and format data
         self._data = np.array(data_tmp, dtype=dtype).reshape((2, -1))
@@ -117,7 +117,7 @@ class Vxy:
 
         """
         if not isinstance(v_in, Vxy):
-            raise TypeError('Input operand must be {}, not {}'.format(Vxy, type(v_in)))
+            raise TypeError("Input operand must be {}, not {}".format(Vxy, type(v_in)))
 
     def __add__(self, v_in):
         """
@@ -144,17 +144,17 @@ class Vxy:
         elif type(data_in) is np.ndarray:
             return self._from_data(self._data * data_in)
         else:
-            raise TypeError('Vxy cannot be multipled by type, {}.'.format(type(data_in)))
+            raise TypeError("Vxy cannot be multipled by type, {}.".format(type(data_in)))
 
     def __getitem__(self, key):
         # Check that only one dimension is being indexed
         if np.size(key) > 1 and any(isinstance(x, slice) for x in key):
-            raise ValueError('Can only index over one dimension.')
+            raise ValueError("Can only index over one dimension.")
 
         return self._from_data(self._data[:, key], dtype=self.dtype)
 
     def __repr__(self):
-        return '2D Vector:\n' + self._data.__repr__()
+        return "2D Vector:\n" + self._data.__repr__()
 
     def __len__(self):
         return self._data.shape[1]
@@ -175,7 +175,7 @@ class Vxy:
         mag = self.magnitude()
 
         if np.any(mag == 0):
-            raise ValueError('Vector contains zero vector, cannot normalize.')
+            raise ValueError("Vector contains zero vector, cannot normalize.")
 
         return mag
 
@@ -267,9 +267,9 @@ class Vxy:
         """
         # Check inputs
         if type(R) is not np.ndarray:
-            raise TypeError('Rotation must be type ndarray, not {}'.format(type(R)))
+            raise TypeError("Rotation must be type ndarray, not {}".format(type(R)))
         if R.shape != (2, 2):
-            raise ValueError('Rotation matrix must be shape (2, 2), not {}'.format(R.shape))
+            raise ValueError("Rotation matrix must be shape (2, 2), not {}".format(R.shape))
 
         self._data = R @ self._data
 
@@ -348,7 +348,7 @@ class Vxy:
 
         return ax
 
-    def concatenate(self, V: 'Vxy') -> 'Vxy':
+    def concatenate(self, V: "Vxy") -> "Vxy":
         """Concatenates Vxy to end of current vector.
 
         Parameters
@@ -366,7 +366,7 @@ class Vxy:
         return Vxy(np.array([x, y]))
 
     @classmethod
-    def merge(cls, v_list: list['Vxy']) -> 'Vxy':
+    def merge(cls, v_list: list["Vxy"]) -> "Vxy":
         """Merges list of multiple Vxy objects into one Vxy.
 
         Parameters
@@ -400,7 +400,7 @@ class Vxy:
             )
         return self.x[0], self.y[0]
 
-    def asindex(self, axis_order='xy') -> tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]:
+    def asindex(self, axis_order="xy") -> tuple[npt.NDArray[np.int64], npt.NDArray[np.int64]]:
         """
         Returns the x and y values as integer arrays. This allows for indexing
         of a numpy array as follows::
@@ -420,7 +420,7 @@ class Vxy:
             print(arr_val[desired_indexes.asindex()])
             # [0, 4, 6]
         """
-        indexes = {'x': self.x.astype(np.int64), 'y': self.y.astype(np.int64)}
+        indexes = {"x": self.x.astype(np.int64), "y": self.y.astype(np.int64)}
 
         ret = []
         for axis in axis_order:

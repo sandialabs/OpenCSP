@@ -24,8 +24,8 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
         fringe_periods_y: np.ndarray,
         dist_optic_screen_measure: osd.DistanceOpticScreen,
         date: dt.datetime,
-        name: str = '',
-    ) -> 'MeasurementSofastFringe':
+        name: str = "",
+    ) -> "MeasurementSofastFringe":
         """
         A measurement contains 2 (MxN) mask images, n (MxN) images of
         horizontal/vertical fringes.
@@ -50,7 +50,7 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
 
         # Check mask image size
         if mask_images.shape[2] != 2 or np.ndim(mask_images) != 3:
-            raise ValueError(f'Two mask images needed, but {mask_images.shape[2]} given.')
+            raise ValueError(f"Two mask images needed, but {mask_images.shape[2]} given.")
 
         # Save input measurement data
         self.mask_images = mask_images
@@ -67,7 +67,7 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
         self.num_fringe_ims = self.fringe_images.shape[2]
         # Check number of input fringes
         if (self.num_y_ims + self.num_x_ims) != self.num_fringe_ims or np.ndim(fringe_images) != 3:
-            raise ValueError(f'Incorrect number of fringe images given. Fringe images shape = {fringe_images.shape}.')
+            raise ValueError(f"Incorrect number of fringe images given. Fringe images shape = {fringe_images.shape}.")
 
         # Instantiate calibration objected fringes
         self._fringe_images_calibrated = None
@@ -86,7 +86,7 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
     def fringe_images_calibrated(self) -> np.ndarray:
         """Returns calibrated fringes"""
         if self._fringe_images_calibrated is None:
-            raise ValueError('Fringe images have not been calibrated.')
+            raise ValueError("Fringe images have not been calibrated.")
 
         return self._fringe_images_calibrated
 
@@ -114,12 +114,12 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
 
         """
         if not isinstance(calibration, ImageCalibrationAbstract):
-            raise ValueError('Input calibration must be instance of ImageCalibrationAbstract.')
+            raise ValueError("Input calibration must be instance of ImageCalibrationAbstract.")
 
         self._fringe_images_calibrated = calibration.apply_to_images(self, **kwargs)
 
     @classmethod
-    def load_from_hdf(cls, file: str, prefix: str = '') -> 'MeasurementSofastFringe':
+    def load_from_hdf(cls, file: str, prefix: str = "") -> "MeasurementSofastFringe":
         """
         Loads data from given file. Assumes data is stored as: PREFIX + MeasurementSofastFringe/Field_1
 
@@ -133,17 +133,17 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
         """
         # Load grid data
         datasets = [
-            prefix + 'MeasurementSofastFringe/mask_images',
-            prefix + 'MeasurementSofastFringe/fringe_images',
-            prefix + 'MeasurementSofastFringe/fringe_periods_x',
-            prefix + 'MeasurementSofastFringe/fringe_periods_y',
+            prefix + "MeasurementSofastFringe/mask_images",
+            prefix + "MeasurementSofastFringe/fringe_images",
+            prefix + "MeasurementSofastFringe/fringe_periods_x",
+            prefix + "MeasurementSofastFringe/fringe_periods_y",
         ]
         kwargs = hdf5_tools.load_hdf5_datasets(datasets, file)
-        kwargs.update(super()._load_from_hdf(file, prefix + 'MeasurementSofastFringe/'))
+        kwargs.update(super()._load_from_hdf(file, prefix + "MeasurementSofastFringe/"))
 
         return cls(**kwargs)
 
-    def save_to_hdf(self, file: str, prefix: str = '') -> None:
+    def save_to_hdf(self, file: str, prefix: str = "") -> None:
         """
         Saves data to given file. Data is stored as: PREFIX + MeasurementSofastFringe/Field_1
 
@@ -156,13 +156,13 @@ class MeasurementSofastFringe(ams.AbstractMeasurementSofast):
             Default is empty string ''.
         """
         datasets = [
-            prefix + 'MeasurementSofastFringe/mask_images',
-            prefix + 'MeasurementSofastFringe/fringe_images',
-            prefix + 'MeasurementSofastFringe/fringe_periods_x',
-            prefix + 'MeasurementSofastFringe/fringe_periods_y',
+            prefix + "MeasurementSofastFringe/mask_images",
+            prefix + "MeasurementSofastFringe/fringe_images",
+            prefix + "MeasurementSofastFringe/fringe_periods_x",
+            prefix + "MeasurementSofastFringe/fringe_periods_y",
         ]
         data = [self.mask_images, self.fringe_images, self.fringe_periods_x, self.fringe_periods_y]
 
         # Save data
         hdf5_tools.save_hdf5_datasets(data, datasets, file)
-        super()._save_to_hdf(file, prefix + 'MeasurementSofastFringe/')
+        super()._save_to_hdf(file, prefix + "MeasurementSofastFringe/")

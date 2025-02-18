@@ -161,8 +161,8 @@ class RenderControlScanSectionAnalysis:
         if self.draw_single_heliostat_constraints_gaze_example_C:
             return self.draw_single_heliostat_constraints_gaze_example_C
         else:
-            C_min = section_context['path_family_C_min']
-            C_max = section_context['path_family_C_max']
+            C_min = section_context["path_family_C_min"]
+            C_max = section_context["path_family_C_max"]
             return C_min + (0.25 * (C_max - C_min))
 
 

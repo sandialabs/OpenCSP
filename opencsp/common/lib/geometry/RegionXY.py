@@ -38,7 +38,7 @@ class RegionXY:
             Loop to append to the region.
 
         """
-        raise NotImplementedError('Cannot add more than one loop to a region currently.')
+        raise NotImplementedError("Cannot add more than one loop to a region currently.")
 
     def as_mask(self, vx: np.ndarray, vy: np.ndarray):
         """
@@ -113,7 +113,7 @@ class RegionXY:
         """Returns a Vxy of count points per edge per loop defining the region"""
         return Vxy.merge([loop.edge_sample(count) for loop in self.loops])
 
-    def points_sample(self, resolution: 'Resolution') -> Pxy:
+    def points_sample(self, resolution: "Resolution") -> Pxy:
         """Returns a Pxy object of points sampled from inside the region.
 
         Parameters
@@ -162,7 +162,7 @@ class RegionXY:
         if len(self.loops) == 1:
             return self.loops[0].axis_aligned_bounding_box()
         else:
-            raise NotImplementedError('RegionXY.axis_aligned_bounding_box is only implemented for single loop regions.')
+            raise NotImplementedError("RegionXY.axis_aligned_bounding_box is only implemented for single loop regions.")
 
     # alias for easy use axis_aligned_bounding_box()
     aabbox = axis_aligned_bounding_box
@@ -229,14 +229,14 @@ class Resolution:
         self.composite_transformation = TransformXYZ.identity()
 
     @classmethod
-    def separation(cls, separation: float) -> 'Resolution':
+    def separation(cls, separation: float) -> "Resolution":
         """Separates the points along x and y by the separation."""
         res = Resolution(None)
         res.unresolved = ("separation", separation)
         return res
 
     @classmethod
-    def pixelX(cls, points_along_x: int) -> 'Resolution':
+    def pixelX(cls, points_along_x: int) -> "Resolution":
         """Will have `points_along_x` points along x and
         equispaced points along y."""
         res = Resolution(None)
@@ -244,7 +244,7 @@ class Resolution:
         return res
 
     @classmethod
-    def random(cls, number_of_points: int, seed: int = None) -> 'Resolution':
+    def random(cls, number_of_points: int, seed: int = None) -> "Resolution":
         """There will be `number_of_points` uniformly randomly in the region.
         Can choose to add a seed."""
         res = Resolution(None)
@@ -252,7 +252,7 @@ class Resolution:
         return res
 
     @classmethod
-    def center(cls) -> 'Resolution':
+    def center(cls) -> "Resolution":
         """Gives the center point of a bounding box.
         This resolution cannot be 'resolved' since there is not a set of points that can
         represent what it is trying to do."""
@@ -272,7 +272,7 @@ class Resolution:
     def is_unresolved(self) -> bool:
         return self.unresolved is not None
 
-    def change_frame_and_copy(self, frame_transform: TransformXYZ) -> 'Resolution':
+    def change_frame_and_copy(self, frame_transform: TransformXYZ) -> "Resolution":
         res = copy.deepcopy(self)
         frame_translation = frame_transform.V.projXY()
         if res.is_unresolved():
@@ -350,7 +350,7 @@ class Resolution:
 
         pass  # end of resolve
 
-    def resolve_and_copy(self, bounding_box: tuple[float, float, float, float] | RegionXY) -> 'Resolution':
+    def resolve_and_copy(self, bounding_box: tuple[float, float, float, float] | RegionXY) -> "Resolution":
         """
         If the Resolution object is "unresolved" this is the function that resolves it to a
         set of points in xy space (Pxy). If there is no unresolved tag, this function

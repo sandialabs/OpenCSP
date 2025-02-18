@@ -96,7 +96,7 @@ def segment_approximating_ideal_gaze_curve(curve_xy_list):
 
 def ufacet_xy_analysis(solar_field, aimpoint_xyz, when_ymdhmsz, curve_key_xy_list):
     # Notify progress.
-    print('UFACET scan (x,y) analysis...')
+    print("UFACET scan (x,y) analysis...")
 
     # Fetch solar_field origin.
     field_origin_lon_lat = solar_field.origin_lon_lat

@@ -9,7 +9,7 @@ import opencsp.common.lib.tool.time_date_tools as tdt
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
-sys.path.append(os.path.join(orp.opencsp_code_dir(), '..'))
+sys.path.append(os.path.join(orp.opencsp_code_dir(), ".."))
 import contrib.scripts.AbstractFileFingerprint as aff  # nopep8
 
 
@@ -32,7 +32,7 @@ class FileCache(ci.CsvInterface, aff.AbstractFileFingerprint):
         return delimeter.join([str(value) for value in values])
 
     @classmethod
-    def from_csv_line(cls, data: list[str]) -> tuple['FileCache', list[str]]:
+    def from_csv_line(cls, data: list[str]) -> tuple["FileCache", list[str]]:
         """Construct an instance of this class from the pre-split csv line 'data'. Also return any leftover portion of the csv line that wasn't used."""
         root, name_ext, last_modified = data[0], data[1], data[2]
         return cls(root, name_ext, last_modified), data[3:]
@@ -41,7 +41,7 @@ class FileCache(ci.CsvInterface, aff.AbstractFileFingerprint):
     def for_file(cls, root_path: str, relative_path: str, file_name_ext: str):
         norm_path = ft.norm_path(os.path.join(root_path, relative_path, file_name_ext))
         modified_time = datetime.datetime.fromtimestamp(os.stat(norm_path).st_mtime)
-        last_modified = modified_time.strftime('%Y-%m-%d %H:%M:%S')
+        last_modified = modified_time.strftime("%Y-%m-%d %H:%M:%S")
         return cls(relative_path, file_name_ext, last_modified)
 
     def __hash__(self):

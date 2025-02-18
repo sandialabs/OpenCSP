@@ -67,5 +67,5 @@ class TestFileTools(unittest.TestCase):
         np.testing.assert_almost_equal(angle.normalize(input_vals), expected_vals, 7)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

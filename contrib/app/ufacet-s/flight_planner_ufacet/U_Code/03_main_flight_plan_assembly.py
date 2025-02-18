@@ -35,21 +35,21 @@ import opencsp.common.lib.render.view_spec as vs
 def construct_ufacet_scan(solar_field, lead_in, run_past):
     # Control parameters.
     scan_parameters = {}
-    scan_parameters['locale'] = (
-        'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+    scan_parameters["locale"] = (
+        "Sandia NSTTF"  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
     )
-    scan_parameters['camera'] = cam.sony_alpha_20mm_landscape()  # Camera model.
+    scan_parameters["camera"] = cam.sony_alpha_20mm_landscape()  # Camera model.
     # scan_parameters['camera'] = cam.sony_alpha_20mm_portrait()  # Camera model.
-    scan_parameters['camera'] = cam.ultra_wide_angle()  # Camera model.
+    scan_parameters["camera"] = cam.ultra_wide_angle()  # Camera model.
     # scan_parameters['camera'] = cam.mavic_zoom()  # Camera model.
-    scan_parameters['section_plane_tolerance'] = 3  # m.  Lateral distance to include heliostats in section.
-    scan_parameters['p_margin'] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
-    scan_parameters['altitude_margin'] = 2.5  # m.  Clearance of highest possible heliostat point.
-    scan_parameters['maximum_safe_altitude'] = (
+    scan_parameters["section_plane_tolerance"] = 3  # m.  Lateral distance to include heliostats in section.
+    scan_parameters["p_margin"] = 0  # 2 # m.  Lateral distance to add to constraints to allow UAS postiion error.
+    scan_parameters["altitude_margin"] = 2.5  # m.  Clearance of highest possible heliostat point.
+    scan_parameters["maximum_safe_altitude"] = (
         90.0  # meters.  # ?? SCAFFOLDING -- BASE THIS ON TECHNICAL FACTORS:  SOLAR FLUX, ETC
     )
-    scan_parameters['maximum_target_lookback'] = 3  # Number of heliostats to look back for reflection targets.
-    scan_parameters['gaze_tolerance'] = np.deg2rad(
+    scan_parameters["maximum_target_lookback"] = 3  # Number of heliostats to look back for reflection targets.
+    scan_parameters["gaze_tolerance"] = np.deg2rad(
         1
     )  # Uncertainty in gaze angle.  True angle is +/- tolerance from nominal.
 
@@ -205,7 +205,7 @@ def construct_raster_survey_scan(
 
 if __name__ == "__main__":
     # Figure control.
-    plt.close('all')
+    plt.close("all")
     fm.reset_figure_management()
     figure_control = rcfg.RenderControlFigure(tile_array=(2, 2), tile_square=False)
     #    figure_control = rcfg.RenderControlFigure(tile_array=(1,1), tile_square=False)
@@ -216,8 +216,8 @@ if __name__ == "__main__":
     elevation_offset = 0.0  # m.
 
     # Load solar field data.
-    file_field = './data/Solar_Field.csv'
-    file_centroids_offsets = './data/Facets_Centroids.csv'
+    file_field = "./data/Solar_Field.csv"
+    file_centroids_offsets = "./data/Facets_Centroids.csv"
     solar_field = SolarField(file_field=file_field, file_centroids_offsets=file_centroids_offsets)
 
     # Define tracking time.
@@ -238,54 +238,54 @@ if __name__ == "__main__":
 
     # Set heliostat configurations.
     configure_heliostat_name_list = [
-        '5E4',
-        '6E4',
-        '7E4',
-        '8E4',
-        '9E4',
-        '10E4',
-        '11E4',
-        '12E6',
-        '13E6',
-        '14E6',
-        '5E5',
-        '6E5',
-        '7E5',
-        '8E5',
-        '9E5',
-        '10E5',
-        '11E5',
-        '12E5',
-        '13E5',
-        '14E5',
-        '5E6',
-        '6E6',
-        '7E6',
-        '8E6',
-        '9E6',
-        '10E6',
-        '11E6',
-        '12E6',
-        '13E6',
-        '14E6',
-        '5E7',
-        '6E7',
-        '7E7',
-        '8E7',
-        '9E7',
-        '10E7',
-        '11E7',
-        '12E7',
-        '13E7',
-        '5E8',
-        '6E8',
-        '7E8',
-        '8E8',
-        '9E8',
-        '10E8',
-        '11E8',
-        '12E8',
-        '13E8',
+        "5E4",
+        "6E4",
+        "7E4",
+        "8E4",
+        "9E4",
+        "10E4",
+        "11E4",
+        "12E6",
+        "13E6",
+        "14E6",
+        "5E5",
+        "6E5",
+        "7E5",
+        "8E5",
+        "9E5",
+        "10E5",
+        "11E5",
+        "12E5",
+        "13E5",
+        "14E5",
+        "5E6",
+        "6E6",
+        "7E6",
+        "8E6",
+        "9E6",
+        "10E6",
+        "11E6",
+        "12E6",
+        "13E6",
+        "14E6",
+        "5E7",
+        "6E7",
+        "7E7",
+        "8E7",
+        "9E7",
+        "10E7",
+        "11E7",
+        "12E7",
+        "13E7",
+        "5E8",
+        "6E8",
+        "7E8",
+        "8E8",
+        "9E8",
+        "10E8",
+        "11E8",
+        "12E8",
+        "13E8",
     ]
     for heliostat_name in configure_heliostat_name_list:
         heliostat = solar_field.lookup_heliostat(heliostat_name)
@@ -299,31 +299,31 @@ if __name__ == "__main__":
     fly_forward_backward = False  # True
 
     # Construct the scan.
-    scan_type = 'UFACET'
+    scan_type = "UFACET"
     # scan_type = 'survey'
-    if scan_type == 'UFACET':
+    if scan_type == "UFACET":
         # Construct UFACET scan.
         scan = construct_ufacet_scan(solar_field, lead_in, run_past)
         render_ufacet_scan(figure_control, scan)
-    elif scan_type == 'survey':
+    elif scan_type == "survey":
         # Construct raster survey scan.
         # Construct the segment scanning specification.
-        locale = 'Sandia NSTTF'  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
+        locale = "Sandia NSTTF"  # Information needed to convert (x,y,z into global (longitude, latitude) coordinates.
         eta = np.deg2rad(-35.0)  # Degrees, converted to radians here.
         relative_z = 20  # m.
         speed = 10  # m/sec.
         scan_segment_spec = {}
-        scan_segment_spec['locale'] = locale
-        scan_segment_spec['eta'] = eta
-        scan_segment_spec['relative_z'] = relative_z
-        scan_segment_spec['speed'] = speed
+        scan_segment_spec["locale"] = locale
+        scan_segment_spec["eta"] = eta
+        scan_segment_spec["relative_z"] = relative_z
+        scan_segment_spec["speed"] = speed
         # Construct the scan.
         scan = construct_raster_survey_scan(
             solar_field, scan_segment_spec, n_horizontal, n_vertical, lead_in, run_past, fly_forward_backward
         )
 
     # Construct the flight plan.
-    flight_plan = fp.construct_flight_plan_from_scan('N-S Columns', scan)
+    flight_plan = fp.construct_flight_plan_from_scan("N-S Columns", scan)
 
     #    # Write the flight plan file.
     #    # Output directory.

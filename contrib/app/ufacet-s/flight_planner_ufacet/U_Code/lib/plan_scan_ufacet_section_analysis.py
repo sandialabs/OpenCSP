@@ -19,8 +19,8 @@ import opencsp.common.lib.render.view_spec as vs
 
 def construct_minimum_safe_altitude_line(section_context, heliostat_name_list):
     # Fetch required parameters.
-    solar_field = section_context['solar_field']
-    view_spec = section_context['view_spec']
+    solar_field = section_context["solar_field"]
+    view_spec = section_context["view_spec"]
 
     # Construct line connecting first and last heliostat origins.
     first_heliostat = solar_field.lookup_heliostat(heliostat_name_list[0])
@@ -58,7 +58,7 @@ def construct_minimum_safe_altitude_line(section_context, heliostat_name_list):
     # to get maximum height a heliostat can attain.
     mirror_half_height = first_heliostat.top_left_corner_offset[1]  # m.
     # Altitude safety margin.
-    altitude_margin = section_context['altitude_margin']  # meters.
+    altitude_margin = section_context["altitude_margin"]  # meters.
     # Minimum allowable commanded height above heliostat origin.
     mnsa_height_above_origin = mirror_half_height + altitude_margin
     # Construct minimum safe altitude constraint.
@@ -66,16 +66,16 @@ def construct_minimum_safe_altitude_line(section_context, heliostat_name_list):
     mnsa_ray_head = [last_p, (corrected_last_q + mnsa_height_above_origin)]
     mnsa_ray = [mnsa_ray_tail, mnsa_ray_head]
     # Construct maximum safe altitude constraint.
-    maximum_safe_altitude = section_context['maximum_safe_altitude']  # meters.
+    maximum_safe_altitude = section_context["maximum_safe_altitude"]  # meters.
     mxsa_ray_tail = [first_p, maximum_safe_altitude]
     mxsa_ray_head = [last_p, maximum_safe_altitude]
     mxsa_ray = [mxsa_ray_tail, mxsa_ray_head]
 
     # Save key results.
-    section_context['above_all_origin_line'] = above_all_origin_line
-    section_context['mnsa_height_above_origin'] = mnsa_height_above_origin
-    section_context['mnsa_ray'] = mnsa_ray
-    section_context['mxsa_ray'] = mxsa_ray
+    section_context["above_all_origin_line"] = above_all_origin_line
+    section_context["mnsa_height_above_origin"] = mnsa_height_above_origin
+    section_context["mnsa_ray"] = mnsa_ray
+    section_context["mxsa_ray"] = mxsa_ray
 
     # Return.
     return section_context
@@ -83,9 +83,9 @@ def construct_minimum_safe_altitude_line(section_context, heliostat_name_list):
 
 def construct_flight_path_family(section_context):
     # Fetch required parameters.
-    above_all_origin_line = section_context['above_all_origin_line']
-    mnsa_height_above_origin = section_context['mnsa_height_above_origin']
-    maximum_safe_altitude = section_context['maximum_safe_altitude']
+    above_all_origin_line = section_context["above_all_origin_line"]
+    mnsa_height_above_origin = section_context["mnsa_height_above_origin"]
+    maximum_safe_altitude = section_context["maximum_safe_altitude"]
 
     # Family of flight paths, indexed by "altitude" -- actually distance from origin measured perpendicular to path slope.
     #
@@ -107,13 +107,13 @@ def construct_flight_path_family(section_context):
     C_step = 1.0  # m   C_step is arbitrary, and controls altitude resolution of analysis.
 
     # Save path family.
-    section_context['path_family_A'] = A
-    section_context['path_family_B'] = B
-    section_context['path_family_C_mnsa'] = C_mnsa
-    section_context['path_family_C_mxsa'] = C_mxsa
-    section_context['path_family_C_min'] = C_min
-    section_context['path_family_C_max'] = C_max
-    section_context['path_family_C_step'] = C_step
+    section_context["path_family_A"] = A
+    section_context["path_family_B"] = B
+    section_context["path_family_C_mnsa"] = C_mnsa
+    section_context["path_family_C_mxsa"] = C_mxsa
+    section_context["path_family_C_min"] = C_min
+    section_context["path_family_C_max"] = C_max
+    section_context["path_family_C_step"] = C_step
 
     # Return.
     return section_context
@@ -121,8 +121,8 @@ def construct_flight_path_family(section_context):
 
 def fetch_key_points(section_context, h_a_name, h_t_name_list, h_b_name):
     # Fetch required parameters.
-    solar_field = section_context['solar_field']
-    view_spec = section_context['view_spec']
+    solar_field = section_context["solar_field"]
+    view_spec = section_context["view_spec"]
 
     # Assessed heliostat.
     h_a = solar_field.lookup_heliostat(h_a_name)
@@ -185,11 +185,11 @@ def ray_eta(ray):
 
 def single_heliostat_gaze_angle_analysis(section_context, ab_pq, at_pq, s_locus, e_locus, constraints):
     # Fetch family of flight paths.
-    A = section_context['path_family_A']
-    B = section_context['path_family_B']
-    C_min = section_context['path_family_C_min']
-    C_max = section_context['path_family_C_max']
-    C_step = section_context['path_family_C_step']
+    A = section_context["path_family_A"]
+    B = section_context["path_family_B"]
+    C_min = section_context["path_family_C_min"]
+    C_max = section_context["path_family_C_max"]
+    C_step = section_context["path_family_C_step"]
 
     # Initialize loop variables.
     path_s_pq_list = []
@@ -220,16 +220,16 @@ def single_heliostat_gaze_angle_analysis(section_context, ab_pq, at_pq, s_locus,
         C += C_step
 
     # Save constraints.
-    constraints['path_s_pq_list'] = path_s_pq_list  # Path sacn region start point, as a function of C.
-    constraints['path_e_pq_list'] = path_e_pq_list  # Path sacn region start point, as a function of C.
-    constraints['ray_min_eta_list'] = (
+    constraints["path_s_pq_list"] = path_s_pq_list  # Path sacn region start point, as a function of C.
+    constraints["path_e_pq_list"] = path_e_pq_list  # Path sacn region start point, as a function of C.
+    constraints["ray_min_eta_list"] = (
         ray_min_eta_list  # Ray pointing from path start point to assessed heliostat top edge, function of C.
     )
-    constraints['ray_max_eta_list'] = (
+    constraints["ray_max_eta_list"] = (
         ray_max_eta_list  # Ray pointing from path end point to assessed heliostat bottom edge, function of C.
     )
-    constraints['min_etaC_list'] = min_etaC_list  # Lower bound on required gaze angle interval, as a function of C.
-    constraints['max_etaC_list'] = max_etaC_list  # Upper bound on required gaze angle interval, as a function of C.
+    constraints["min_etaC_list"] = min_etaC_list  # Lower bound on required gaze angle interval, as a function of C.
+    constraints["max_etaC_list"] = max_etaC_list  # Upper bound on required gaze angle interval, as a function of C.
 
     # Return.
     return constraints
@@ -237,17 +237,17 @@ def single_heliostat_gaze_angle_analysis(section_context, ab_pq, at_pq, s_locus,
 
 def single_heliostat_gaze_angle_selection(section_context, constraints):
     # Fetch the camera vertical field of view.
-    camera = section_context['camera']
+    camera = section_context["camera"]
     # For now, ignore zoom lens focal length selection and just assume widest angle setting.
     camera_vertical_fov = camera.fov_vertical_max
 
     # Fetch the gaze angle lower and uppper required limits, as a function of C.
-    min_etaC_list = constraints['min_etaC_list']
-    max_etaC_list = constraints['max_etaC_list']
+    min_etaC_list = constraints["min_etaC_list"]
+    max_etaC_list = constraints["max_etaC_list"]
     # Check input.
     if len(min_etaC_list) != len(max_etaC_list):
         print(
-            'ERROR: In, single_heliostat_gaze_angle_selection(), mismatched min_etaC and max_etaC lengths encountered.'
+            "ERROR: In, single_heliostat_gaze_angle_selection(), mismatched min_etaC and max_etaC lengths encountered."
         )
         assert False
 
@@ -265,7 +265,7 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
             envelope_max_etaC_list.append(shifted_min_etaC)  #
 
     # Shrink by gaze tolerance.
-    gaze_tolerance = section_context['gaze_tolerance']
+    gaze_tolerance = section_context["gaze_tolerance"]
     shrunk_min_etaC_list = []
     shrunk_max_etaC_list = []
     for envelope_min_etaC, envelope_max_etaC in zip(envelope_min_etaC_list, envelope_max_etaC_list):
@@ -279,8 +279,8 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
             shrunk_max_etaC_list.append([shrunk_max_eta, C])
 
     # Clip to eta limits.
-    eta_min = section_context['eta_min']
-    eta_max = section_context['eta_max']
+    eta_min = section_context["eta_min"]
+    eta_max = section_context["eta_max"]
     clipped_min_etaC_list = []
     clipped_max_etaC_list = []
     for envelope_min_etaC, envelope_max_etaC in zip(shrunk_min_etaC_list, shrunk_max_etaC_list):
@@ -294,8 +294,8 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
             clipped_max_etaC_list.append([clipped_max_eta, C])
 
     # Fork based on desired gaze control.
-    gaze_type = section_context['gaze_type']
-    if gaze_type == 'constant':
+    gaze_type = section_context["gaze_type"]
+    if gaze_type == "constant":
         # Select gaze angle.
         if len(clipped_min_etaC_list) > 0:
             lowest_min_etaC = clipped_min_etaC_list[0]
@@ -303,13 +303,13 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
             selected_cacg_eta = (lowest_min_etaC[0] + lowest_max_etaC[0]) / 2.0
             # Select altitude.
             C_clipped = lowest_min_etaC[1]
-            C_critical = constraints['C_critical']
+            C_critical = constraints["C_critical"]
             selected_cacg_C = max(C_clipped, C_critical)
         else:
-            print('WARNING: In single_heliostat_gaze_angle_selection(), infeasible case encountered.')
-            print('               len(envelope_min_etaC_list) = ', len(envelope_min_etaC_list))
-            print('               len(shrunk_min_etaC_list)   = ', len(shrunk_min_etaC_list))
-            print('               len(clipped_min_etaC_list)  = ', len(clipped_min_etaC_list))
+            print("WARNING: In single_heliostat_gaze_angle_selection(), infeasible case encountered.")
+            print("               len(envelope_min_etaC_list) = ", len(envelope_min_etaC_list))
+            print("               len(shrunk_min_etaC_list)   = ", len(shrunk_min_etaC_list))
+            print("               len(clipped_min_etaC_list)  = ", len(clipped_min_etaC_list))
             # Set values that will force the following code to clip the altitude and gaze angle.
             selected_cacg_eta = np.deg2rad(-200.0)  # Extreme value.
             selected_cacg_C = 100000.0  # m.   Signal value.
@@ -322,18 +322,18 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
         #    2. The mirror's first appearance will generally be reflecting sky only, facilitating automatic recognition.
         #    3. We will see the full heliostat reflecting sky, supporting per-facet inspection tasks across all mirrors.
         #
-        max_C = section_context['maximum_altitude']
+        max_C = section_context["maximum_altitude"]
         if selected_cacg_C > max_C:
-            print('NOTE: In single_heliostat_gaze_angle_selection(), clipping to max altitude.')
+            print("NOTE: In single_heliostat_gaze_angle_selection(), clipping to max altitude.")
             # Pick altitude, then lookup eta that ensures mirror will be seen intially facing all sky.
             if len(shifted_max_etaC_list) < 2:
                 print(
-                    'ERROR: In single_heliostat_gaze_angle_selection(), unexpected short shifted_max_etaC_list encountered.'
+                    "ERROR: In single_heliostat_gaze_angle_selection(), unexpected short shifted_max_etaC_list encountered."
                 )
                 assert False
             selected_cacg_C = max_C  # m.
             if shifted_max_etaC_list[0][1] > selected_cacg_C:
-                print('ERROR: In single_heliostat_gaze_angle_selection(), shifted_max_etaC_list starts above C.')
+                print("ERROR: In single_heliostat_gaze_angle_selection(), shifted_max_etaC_list starts above C.")
                 assert False
             # Search for point on eta = f(C) curve.
             selected_cacg_eta = math.inf
@@ -342,7 +342,7 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
                 C = max_etaC[1]
                 if not (C > prev_C):
                     print(
-                        'ERROR: In single_heliostat_gaze_angle_selection(), shifted_max_etaC_list is not in order of ascending C.'
+                        "ERROR: In single_heliostat_gaze_angle_selection(), shifted_max_etaC_list is not in order of ascending C."
                     )
                     assert False
                 if C >= selected_cacg_C:
@@ -350,13 +350,13 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
                     break
                 prev_C = C
             if selected_cacg_eta == math.inf:
-                print('ERROR: In single_heliostat_gaze_angle_selection(), unexpected selected_cacg_eta == math.inf.')
+                print("ERROR: In single_heliostat_gaze_angle_selection(), unexpected selected_cacg_eta == math.inf.")
                 assert False
             if prev_C > selected_cacg_C:
-                print('ERROR: In single_heliostat_gaze_angle_selection(), unexpected prev_C > selected_cacg_C.')
+                print("ERROR: In single_heliostat_gaze_angle_selection(), unexpected prev_C > selected_cacg_C.")
                 assert False
             if C < selected_cacg_C:
-                print('ERROR: In single_heliostat_gaze_angle_selection(), unexpected C < selected_cacg_C.')
+                print("ERROR: In single_heliostat_gaze_angle_selection(), unexpected C < selected_cacg_C.")
                 assert False
             # Shrink.
             # Recall max and min swapped.
@@ -376,15 +376,15 @@ def single_heliostat_gaze_angle_selection(section_context, constraints):
     selected_cacg_etaC = [selected_cacg_eta, selected_cacg_C]
 
     # Save result.
-    constraints['shifted_min_etaC_list'] = shifted_min_etaC_list
-    constraints['shifted_max_etaC_list'] = shifted_max_etaC_list
-    constraints['envelope_min_etaC_list'] = envelope_min_etaC_list
-    constraints['envelope_max_etaC_list'] = envelope_max_etaC_list
-    constraints['shrunk_min_etaC_list'] = shrunk_min_etaC_list
-    constraints['shrunk_max_etaC_list'] = shrunk_max_etaC_list
-    constraints['clipped_min_etaC_list'] = clipped_min_etaC_list
-    constraints['clipped_max_etaC_list'] = clipped_max_etaC_list
-    constraints['selected_cacg_etaC'] = selected_cacg_etaC  # "cacg" == "constant altitude, constant gaze"
+    constraints["shifted_min_etaC_list"] = shifted_min_etaC_list
+    constraints["shifted_max_etaC_list"] = shifted_max_etaC_list
+    constraints["envelope_min_etaC_list"] = envelope_min_etaC_list
+    constraints["envelope_max_etaC_list"] = envelope_max_etaC_list
+    constraints["shrunk_min_etaC_list"] = shrunk_min_etaC_list
+    constraints["shrunk_max_etaC_list"] = shrunk_max_etaC_list
+    constraints["clipped_min_etaC_list"] = clipped_min_etaC_list
+    constraints["clipped_max_etaC_list"] = clipped_max_etaC_list
+    constraints["selected_cacg_etaC"] = selected_cacg_etaC  # "cacg" == "constant altitude, constant gaze"
 
     # Return.
     return constraints
@@ -397,11 +397,11 @@ def single_heliostat_section_analysis(
     assess_heliostat_name,
 ):
     # Control parameters.
-    p_margin = section_context['p_margin']
-    maximum_target_lookback = section_context['maximum_target_lookback']
+    p_margin = section_context["p_margin"]
+    maximum_target_lookback = section_context["maximum_target_lookback"]
 
     # Fetch context parameters.
-    mnsa_ray = section_context['mnsa_ray']
+    mnsa_ray = section_context["mnsa_ray"]
 
     # Fetch key heliostats.
     # Assessed.
@@ -425,7 +425,7 @@ def single_heliostat_section_analysis(
     if len(t_pq_list) == 0:
         if bb_pq == None:
             print(
-                'ERROR: In single_heliostat_section_analysis(), No-target, no background case not supported.  Use vanity mode.'
+                "ERROR: In single_heliostat_section_analysis(), No-target, no background case not supported.  Use vanity mode."
             )
             assert False
         dp = at_pq[0] - bb_pq[0]
@@ -489,7 +489,7 @@ def single_heliostat_section_analysis(
             sca_pq = msa_pq
     else:
         print(
-            'ERROR: In single_heliostat_section_analysis(), No-target, no background case not supported.  Use vanity mode.'
+            "ERROR: In single_heliostat_section_analysis(), No-target, no background case not supported.  Use vanity mode."
         )
         assert False
 
@@ -508,7 +508,7 @@ def single_heliostat_section_analysis(
         # Construct the start locus.
         s_locus = [sca_pq, dom2_pq]
     else:
-        print('ERROR: In single_heliostat_section_analysis(), No-target start locus case not supported.\n')
+        print("ERROR: In single_heliostat_section_analysis(), No-target start locus case not supported.\n")
         assert False
 
     # PASS END ANALYSIS
@@ -536,7 +536,7 @@ def single_heliostat_section_analysis(
         # Its starting point is the assessed heliostat top edge, which is obviously below the minimum safe altitude.
         eca_pq = g2d.intersect_rays(mnsa_ray, te_lb)
     else:
-        print('ERROR: In single_heliostat_section_analysis(), No-target end critical altitude case not supported (1).')
+        print("ERROR: In single_heliostat_section_analysis(), No-target end critical altitude case not supported (1).")
         assert False
 
     # Construct the end locus.
@@ -555,12 +555,12 @@ def single_heliostat_section_analysis(
         # Construct the end locus.
         e_locus = [eca_pq, dom2_pq]
     else:
-        print('ERROR: In single_heliostat_section_analysis(), No-target, end critical altitude case not supported (2).')
+        print("ERROR: In single_heliostat_section_analysis(), No-target, end critical altitude case not supported (2).")
         assert False
 
     # Critical altitude.
-    A = section_context['path_family_A']
-    B = section_context['path_family_B']
+    A = section_context["path_family_A"]
+    B = section_context["path_family_B"]
     C_start = -g2d.homogeneous_line_signed_distance_to_xy(sca_pq, [A, B, 0])
     C_end = -g2d.homogeneous_line_signed_distance_to_xy(eca_pq, [A, B, 0])
     C_critical = max(C_start, C_end)
@@ -568,33 +568,33 @@ def single_heliostat_section_analysis(
     # Save the constraints.
     # Save before gaze angle analysis, because some gaze angle analysis routines might want to fetch contsraints.
     constraints = {}
-    constraints['h_a_idx'] = h_a_idx  # Assessed heliostat index in assess_heliostat_name_list.
-    constraints['h_a_name'] = h_a_name  # Assessed heliostat name.
-    constraints['h_t_name_list'] = h_t_name_list  # Reflected target heliostat name list.
-    constraints['h_b_name'] = h_b_name  # Background heliostat name.
-    constraints['at_pq'] = at_pq  # Top corner of assessed heliostat.
-    constraints['ab_pq'] = ab_pq  # Bottom corner of assessed heliostat.
-    constraints['t_pq_list'] = t_pq_list  # List of reflection target points.  Might include a fictitious point.
-    constraints['bb_pq'] = bb_pq  # Bottom corner of background heliostat.
-    constraints['nu'] = nu  # Angle from p axis to assessed heliostat surface normal, measured ccw.
-    constraints['abv_lb'] = abv_lb  # Assessed bottom visibility, p lower bound.
-    constraints['abvm_lb'] = abvm_lb  # Assessed bottom visibility margin, p lower bound.
-    constraints['atv_lb'] = atv_lb  # Assessed top visibility, p lower bound.
-    constraints['atvm_lb'] = atvm_lb  # Assessed top visibility margin, p lower bound.
-    constraints['ts_ub_list'] = ts_ub_list  # Target reflection start list, p upper bound.
-    constraints['ts_ub'] = ts_ub  # Target reflection start, p upper bound.
-    constraints['tsm_ub'] = tsm_ub  # Target reflection margin, p upper bound.
-    constraints['sca_pq'] = sca_pq  # Path start critical altitude point.
-    constraints['s_locus'] = s_locus  # Valid pass start points.
-    constraints['te_lb_list'] = te_lb_list  # Target reflection end list, p lower bound.
-    constraints['te_lb'] = te_lb  # Target reflection end, p lower bound.
-    constraints['tem_lb'] = tem_lb  # Target reflection end margin, p lower bound.
-    constraints['pln_ub'] = pln_ub  # Mirror plane, p upper bound.
-    constraints['eca_pq'] = eca_pq  # Path end critical altitude point.
-    constraints['e_locus'] = e_locus  # Valid pass end points.
-    constraints['C_start'] = C_start  # Altitude of start critical point.
-    constraints['C_end'] = C_end  # Altitude of end critical point.
-    constraints['C_critical'] = C_critical  # Critical altitude, considering both start and end.
+    constraints["h_a_idx"] = h_a_idx  # Assessed heliostat index in assess_heliostat_name_list.
+    constraints["h_a_name"] = h_a_name  # Assessed heliostat name.
+    constraints["h_t_name_list"] = h_t_name_list  # Reflected target heliostat name list.
+    constraints["h_b_name"] = h_b_name  # Background heliostat name.
+    constraints["at_pq"] = at_pq  # Top corner of assessed heliostat.
+    constraints["ab_pq"] = ab_pq  # Bottom corner of assessed heliostat.
+    constraints["t_pq_list"] = t_pq_list  # List of reflection target points.  Might include a fictitious point.
+    constraints["bb_pq"] = bb_pq  # Bottom corner of background heliostat.
+    constraints["nu"] = nu  # Angle from p axis to assessed heliostat surface normal, measured ccw.
+    constraints["abv_lb"] = abv_lb  # Assessed bottom visibility, p lower bound.
+    constraints["abvm_lb"] = abvm_lb  # Assessed bottom visibility margin, p lower bound.
+    constraints["atv_lb"] = atv_lb  # Assessed top visibility, p lower bound.
+    constraints["atvm_lb"] = atvm_lb  # Assessed top visibility margin, p lower bound.
+    constraints["ts_ub_list"] = ts_ub_list  # Target reflection start list, p upper bound.
+    constraints["ts_ub"] = ts_ub  # Target reflection start, p upper bound.
+    constraints["tsm_ub"] = tsm_ub  # Target reflection margin, p upper bound.
+    constraints["sca_pq"] = sca_pq  # Path start critical altitude point.
+    constraints["s_locus"] = s_locus  # Valid pass start points.
+    constraints["te_lb_list"] = te_lb_list  # Target reflection end list, p lower bound.
+    constraints["te_lb"] = te_lb  # Target reflection end, p lower bound.
+    constraints["tem_lb"] = tem_lb  # Target reflection end margin, p lower bound.
+    constraints["pln_ub"] = pln_ub  # Mirror plane, p upper bound.
+    constraints["eca_pq"] = eca_pq  # Path end critical altitude point.
+    constraints["e_locus"] = e_locus  # Valid pass end points.
+    constraints["C_start"] = C_start  # Altitude of start critical point.
+    constraints["C_end"] = C_end  # Altitude of end critical point.
+    constraints["C_critical"] = C_critical  # Critical altitude, considering both start and end.
 
     # GAZE ANGLE ANALYSIS
     constraints = single_heliostat_gaze_angle_analysis(section_context, ab_pq, at_pq, s_locus, e_locus, constraints)
@@ -608,20 +608,20 @@ def multi_heliostat_gaze_angle_analysis(pass_constraints):
     # Find the worst-case required limits.
     pass_min_etaC_list = []
     pass_max_etaC_list = []
-    per_heliostat_constraints = pass_constraints['per_heliostat_constraints']
+    per_heliostat_constraints = pass_constraints["per_heliostat_constraints"]
     for h_a_name in per_heliostat_constraints.keys():
         h_a_constraints = per_heliostat_constraints[h_a_name]
-        h_a_min_etaC_list = h_a_constraints['min_etaC_list']
-        h_a_max_etaC_list = h_a_constraints['max_etaC_list']
+        h_a_min_etaC_list = h_a_constraints["min_etaC_list"]
+        h_a_max_etaC_list = h_a_constraints["max_etaC_list"]
         if len(pass_min_etaC_list) == 0:
             pass_min_etaC_list = h_a_min_etaC_list.copy()
             pass_max_etaC_list = h_a_max_etaC_list.copy()
         else:
             if len(pass_min_etaC_list) != len(h_a_min_etaC_list):
-                print('ERROR: In, multi_heliostat_gaze_angle_analysis(), mismatched min_etaC lengths encountered.')
+                print("ERROR: In, multi_heliostat_gaze_angle_analysis(), mismatched min_etaC lengths encountered.")
                 assert False
             if len(pass_max_etaC_list) != len(h_a_max_etaC_list):
-                print('ERROR: In, multi_heliostat_gaze_angle_analysis(), mismatched max_etaC lengths encountered.')
+                print("ERROR: In, multi_heliostat_gaze_angle_analysis(), mismatched max_etaC lengths encountered.")
                 assert False
             for pass_min_etaC, h_a_min_etaC, idx in zip(
                 pass_min_etaC_list, h_a_min_etaC_list, range(0, len(pass_min_etaC_list))
@@ -634,25 +634,25 @@ def multi_heliostat_gaze_angle_analysis(pass_constraints):
                 if h_a_max_etaC[0] > pass_max_etaC[0]:
                     pass_max_etaC_list[idx] = h_a_max_etaC.copy()
     # Save result.
-    pass_constraints['pass_min_etaC_list'] = pass_min_etaC_list
-    pass_constraints['pass_max_etaC_list'] = pass_max_etaC_list
+    pass_constraints["pass_min_etaC_list"] = pass_min_etaC_list
+    pass_constraints["pass_max_etaC_list"] = pass_max_etaC_list
     # Return.
     return pass_constraints
 
 
 def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
     # Fetch the camera vertical field of view.
-    camera = section_context['camera']
+    camera = section_context["camera"]
     # For now, ignore zoom lens focal length selection and just assume widest angle setting.
     camera_vertical_fov = camera.fov_vertical_max
 
     # Fetch the gaze angle lower and uppper required limits, as a function of C.
-    pass_min_etaC_list = pass_constraints['pass_min_etaC_list']
-    pass_max_etaC_list = pass_constraints['pass_max_etaC_list']
+    pass_min_etaC_list = pass_constraints["pass_min_etaC_list"]
+    pass_max_etaC_list = pass_constraints["pass_max_etaC_list"]
     # Check input.
     if len(pass_min_etaC_list) != len(pass_max_etaC_list):
         print(
-            'ERROR: In, multi_heliostat_gaze_angle_selection(), mismatched min_etaC and max_etaC lengths encountered.'
+            "ERROR: In, multi_heliostat_gaze_angle_selection(), mismatched min_etaC and max_etaC lengths encountered."
         )
         assert False
 
@@ -670,7 +670,7 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
             envelope_max_etaC_list.append(shifted_min_etaC)  #
 
     # Shrink by gaze tolerance.
-    gaze_tolerance = section_context['gaze_tolerance']
+    gaze_tolerance = section_context["gaze_tolerance"]
     shrunk_min_etaC_list = []
     shrunk_max_etaC_list = []
     for envelope_min_etaC, envelope_max_etaC in zip(envelope_min_etaC_list, envelope_max_etaC_list):
@@ -684,8 +684,8 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
             shrunk_max_etaC_list.append([shrunk_max_eta, C])
 
     # Clip to eta limits.
-    eta_min = section_context['eta_min']
-    eta_max = section_context['eta_max']
+    eta_min = section_context["eta_min"]
+    eta_max = section_context["eta_max"]
     clipped_min_etaC_list = []
     clipped_max_etaC_list = []
     for envelope_min_etaC, envelope_max_etaC in zip(shrunk_min_etaC_list, shrunk_max_etaC_list):
@@ -699,8 +699,8 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
             clipped_max_etaC_list.append([clipped_max_eta, C])
 
     # Fork based on desired gaze control.
-    gaze_type = section_context['gaze_type']
-    if gaze_type == 'constant':
+    gaze_type = section_context["gaze_type"]
+    if gaze_type == "constant":
         # Select gaze angle.
         if len(clipped_min_etaC_list) > 0:
             lowest_min_etaC = clipped_min_etaC_list[0]
@@ -709,18 +709,18 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
             # Select altitude.
             C_clipped = lowest_min_etaC[1]
             max_C_critical = -math.inf
-            per_heliostat_constraints = pass_constraints['per_heliostat_constraints']
+            per_heliostat_constraints = pass_constraints["per_heliostat_constraints"]
             for h_a_name in per_heliostat_constraints.keys():
                 h_a_constraints = per_heliostat_constraints[h_a_name]
-                h_a_C_critical = h_a_constraints['C_critical']
+                h_a_C_critical = h_a_constraints["C_critical"]
                 if h_a_C_critical > max_C_critical:
                     max_C_critical = h_a_C_critical
             selected_cacg_C = max(C_clipped, max_C_critical)
         else:
-            print('WARNING: In multi_heliostat_gaze_angle_selection(), infeasible case encountered.')
-            print('               len(envelope_min_etaC_list) = ', len(envelope_min_etaC_list))
-            print('               len(shrunk_min_etaC_list)   = ', len(shrunk_min_etaC_list))
-            print('               len(clipped_min_etaC_list)  = ', len(clipped_min_etaC_list))
+            print("WARNING: In multi_heliostat_gaze_angle_selection(), infeasible case encountered.")
+            print("               len(envelope_min_etaC_list) = ", len(envelope_min_etaC_list))
+            print("               len(shrunk_min_etaC_list)   = ", len(shrunk_min_etaC_list))
+            print("               len(clipped_min_etaC_list)  = ", len(clipped_min_etaC_list))
             # Set values that will force the following code to clip the altitude and gaze angle.
             selected_cacg_eta = np.deg2rad(-90.0)  # Extreme value.
             selected_cacg_C = 90.0  # m.   Signal value.
@@ -733,18 +733,18 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
         #    2. The mirror's first appearance will generally be reflecting sky only, facilitating automatic recognition.
         #    3. We will see the full heliostat reflecting sky, supporting per-facet inspection tasks across all mirrors.
         #
-        max_C = section_context['maximum_altitude']
+        max_C = section_context["maximum_altitude"]
         if selected_cacg_C > max_C:
-            print('NOTE: In multi_heliostat_gaze_angle_selection(), clipping to max altitude.')
+            print("NOTE: In multi_heliostat_gaze_angle_selection(), clipping to max altitude.")
             # Pick altitude, then lookup eta that ensures mirror will be seen intially facing all sky.
             if len(shifted_max_etaC_list) < 2:
                 print(
-                    'ERROR: In multi_heliostat_gaze_angle_selection(), unexpected short shifted_max_etaC_list encountered.'
+                    "ERROR: In multi_heliostat_gaze_angle_selection(), unexpected short shifted_max_etaC_list encountered."
                 )
                 assert False
             selected_cacg_C = max_C  # m.
             if shifted_max_etaC_list[0][1] > selected_cacg_C:
-                print('ERROR: In multi_heliostat_gaze_angle_selection(), shifted_max_etaC_list starts above C.')
+                print("ERROR: In multi_heliostat_gaze_angle_selection(), shifted_max_etaC_list starts above C.")
                 assert False
             # Search for point on eta = f(C) curve.
             selected_cacg_eta = math.inf
@@ -756,13 +756,13 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
                     break
                 prev_C = C
             if selected_cacg_eta == math.inf:
-                print('ERROR: In multi_heliostat_gaze_angle_selection(), unexpected selected_cacg_eta == math.inf.')
+                print("ERROR: In multi_heliostat_gaze_angle_selection(), unexpected selected_cacg_eta == math.inf.")
                 assert False
             if prev_C > selected_cacg_C:
-                print('ERROR: In multi_heliostat_gaze_angle_selection(), unexpected prev_C > selected_cacg_C.')
+                print("ERROR: In multi_heliostat_gaze_angle_selection(), unexpected prev_C > selected_cacg_C.")
                 assert False
             if C < selected_cacg_C:
-                print('ERROR: In multi_heliostat_gaze_angle_selection(), unexpected C < selected_cacg_C.')
+                print("ERROR: In multi_heliostat_gaze_angle_selection(), unexpected C < selected_cacg_C.")
                 assert False
             # Shrink.
             # Recall max and min swapped.
@@ -782,15 +782,15 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
     selected_cacg_etaC = [selected_cacg_eta, selected_cacg_C]
 
     # Save result.
-    pass_constraints['shifted_min_etaC_list'] = shifted_min_etaC_list
-    pass_constraints['shifted_max_etaC_list'] = shifted_max_etaC_list
-    pass_constraints['envelope_min_etaC_list'] = envelope_min_etaC_list
-    pass_constraints['envelope_max_etaC_list'] = envelope_max_etaC_list
-    pass_constraints['clipped_min_etaC_list'] = clipped_min_etaC_list
-    pass_constraints['clipped_max_etaC_list'] = clipped_max_etaC_list
-    pass_constraints['shrunk_min_etaC_list'] = shrunk_min_etaC_list
-    pass_constraints['shrunk_max_etaC_list'] = shrunk_max_etaC_list
-    pass_constraints['selected_cacg_etaC'] = selected_cacg_etaC  # "cacg" == "constant altitude, constant gaze"
+    pass_constraints["shifted_min_etaC_list"] = shifted_min_etaC_list
+    pass_constraints["shifted_max_etaC_list"] = shifted_max_etaC_list
+    pass_constraints["envelope_min_etaC_list"] = envelope_min_etaC_list
+    pass_constraints["envelope_max_etaC_list"] = envelope_max_etaC_list
+    pass_constraints["clipped_min_etaC_list"] = clipped_min_etaC_list
+    pass_constraints["clipped_max_etaC_list"] = clipped_max_etaC_list
+    pass_constraints["shrunk_min_etaC_list"] = shrunk_min_etaC_list
+    pass_constraints["shrunk_max_etaC_list"] = shrunk_max_etaC_list
+    pass_constraints["selected_cacg_etaC"] = selected_cacg_etaC  # "cacg" == "constant altitude, constant gaze"
 
     # Return.
     return pass_constraints
@@ -798,11 +798,11 @@ def multi_heliostat_gaze_angle_selection(section_context, pass_constraints):
 
 def multi_heliostat_construct_flight_path(section_context, assess_heliostat_name_list, pass_constraints):
     # Fetch the selected gaze angle and altitude.
-    selected_cacg_etaC = pass_constraints['selected_cacg_etaC']  # "cacg" == "constant altitude, constant gaze"
+    selected_cacg_etaC = pass_constraints["selected_cacg_etaC"]  # "cacg" == "constant altitude, constant gaze"
 
     # Fetch family of flight paths.
-    A = section_context['path_family_A']
-    B = section_context['path_family_B']
+    A = section_context["path_family_A"]
+    B = section_context["path_family_B"]
 
     # Construct selected flight path line.
     selected_cacg_A = A
@@ -812,18 +812,18 @@ def multi_heliostat_construct_flight_path(section_context, assess_heliostat_name
 
     # Construct start scan point.
     first_heliostat_name = assess_heliostat_name_list[0]
-    per_heliostat_constraints = pass_constraints['per_heliostat_constraints']
+    per_heliostat_constraints = pass_constraints["per_heliostat_constraints"]
     first_constraints = per_heliostat_constraints[first_heliostat_name]
-    first_s_locus = first_constraints['s_locus']
+    first_s_locus = first_constraints["s_locus"]
     selected_cacg_start_pq = g2d.intersect_lines(
         selected_cacg_line, g2d.homogeneous_line(first_s_locus[0], first_s_locus[1])
     )
 
     # Construct end scan point.
     last_heliostat_name = assess_heliostat_name_list[-1]
-    per_heliostat_constraints = pass_constraints['per_heliostat_constraints']
+    per_heliostat_constraints = pass_constraints["per_heliostat_constraints"]
     last_constraints = per_heliostat_constraints[last_heliostat_name]
-    last_e_locus = last_constraints['e_locus']
+    last_e_locus = last_constraints["e_locus"]
     selected_cacg_end_pq = g2d.intersect_lines(
         selected_cacg_line, g2d.homogeneous_line(last_e_locus[0], last_e_locus[1])
     )
@@ -832,8 +832,8 @@ def multi_heliostat_construct_flight_path(section_context, assess_heliostat_name
     selected_cacg_segment = [selected_cacg_start_pq, selected_cacg_end_pq]
 
     # Save result.
-    pass_constraints['selected_cacg_line'] = selected_cacg_line
-    pass_constraints['selected_cacg_segment'] = selected_cacg_segment
+    pass_constraints["selected_cacg_line"] = selected_cacg_line
+    pass_constraints["selected_cacg_segment"] = selected_cacg_segment
 
     # Return.
     return pass_constraints
@@ -841,12 +841,12 @@ def multi_heliostat_construct_flight_path(section_context, assess_heliostat_name
 
 def multi_heliostat_vertical_fov_analysis(pass_constraints):
     # Fetch the gaze angle lower and uppper required limits, as a function of C.
-    pass_min_etaC_list = pass_constraints['pass_min_etaC_list']
-    pass_max_etaC_list = pass_constraints['pass_max_etaC_list']
+    pass_min_etaC_list = pass_constraints["pass_min_etaC_list"]
+    pass_max_etaC_list = pass_constraints["pass_max_etaC_list"]
     # Check input.
     if len(pass_min_etaC_list) != len(pass_max_etaC_list):
         print(
-            'ERROR: In, multi_heliostat_vertical_fov_analysis(), mismatched min_etaC and max_etaC lengths encountered.'
+            "ERROR: In, multi_heliostat_vertical_fov_analysis(), mismatched min_etaC and max_etaC lengths encountered."
         )
         assert False
     # Assemble required field of view list.
@@ -855,7 +855,7 @@ def multi_heliostat_vertical_fov_analysis(pass_constraints):
         vertical_fov = pass_max_etaC[0] - pass_min_etaC[0]
         vertical_fovC_list.append([vertical_fov, pass_min_etaC[1]])
     # Save result.
-    pass_constraints['vertical_fovC_list'] = vertical_fovC_list
+    pass_constraints["vertical_fovC_list"] = vertical_fovC_list
     # Return.
     return pass_constraints
 
@@ -863,20 +863,20 @@ def multi_heliostat_vertical_fov_analysis(pass_constraints):
 def assemble_single_heliostat_etaC_dict(pass_constraints):
     # Collect selected (eta,C) results for each heliostat.
     selected_cacg_etaC_dict = {}
-    per_heliostat_constraints = pass_constraints['per_heliostat_constraints']
+    per_heliostat_constraints = pass_constraints["per_heliostat_constraints"]
     for h_a_name in per_heliostat_constraints.keys():
         h_a_constraints = per_heliostat_constraints[h_a_name]
-        selected_cacg_etaC = h_a_constraints['selected_cacg_etaC']  # "cacg" == "constant altitude, constant gaze"
+        selected_cacg_etaC = h_a_constraints["selected_cacg_etaC"]  # "cacg" == "constant altitude, constant gaze"
         selected_cacg_etaC_dict[h_a_name] = selected_cacg_etaC
     # Save result.
-    pass_constraints['selected_cacg_etaC_dict'] = selected_cacg_etaC_dict
+    pass_constraints["selected_cacg_etaC_dict"] = selected_cacg_etaC_dict
     # Return.
     return pass_constraints
 
 
 def section_analysis(section_context, heliostat_name_list, assess_heliostat_name_list):
     # Notify progress.
-    print('Constructing UFACET section ' + heliostat_name_list[0] + '-' + heliostat_name_list[-1] + ' analysis...')
+    print("Constructing UFACET section " + heliostat_name_list[0] + "-" + heliostat_name_list[-1] + " analysis...")
 
     # Construct minimum safe altitude line for this section.
     section_context = construct_minimum_safe_altitude_line(section_context, heliostat_name_list)
@@ -892,7 +892,7 @@ def section_analysis(section_context, heliostat_name_list, assess_heliostat_name
 
     # Full pass analysis.
     pass_constraints = {}
-    pass_constraints['per_heliostat_constraints'] = per_heliostat_constraints
+    pass_constraints["per_heliostat_constraints"] = per_heliostat_constraints
     pass_constraints = multi_heliostat_gaze_angle_analysis(pass_constraints)
     pass_constraints = multi_heliostat_gaze_angle_selection(section_context, pass_constraints)
     pass_constraints = multi_heliostat_vertical_fov_analysis(pass_constraints)

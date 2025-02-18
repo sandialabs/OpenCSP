@@ -37,7 +37,7 @@ class RenderControlHeliostat:
         draw_facet_ensemble=True,
         facet_ensemble_style=rcfe.RenderControlFacetEnsemble(rcf.outline()),
         draw_name=False,  # unimplmeneted
-        name_style=rctxt.default(color='k'),  # unimplmeneted
+        name_style=rctxt.default(color="k"),  # unimplmeneted
         post=0,  # by default there is no post
     ):
 
@@ -78,37 +78,37 @@ def blank():
     return RenderControlHeliostat(draw_centroid=False, draw_facet_ensemble=False)
 
 
-def name(color='k', fontsize='medium'):
+def name(color="k", fontsize="medium"):
     # Name only.
     return RenderControlHeliostat(
         draw_centroid=True,  # Draw a tiny point to ensure that things will draw.
-        centroid_style=rcps.marker(color=color, marker='.', markersize=0.1),
+        centroid_style=rcps.marker(color=color, marker=".", markersize=0.1),
         draw_facet_ensemble=False,
         draw_name=True,
         name_style=rctxt.RenderControlText(color=color, fontsize=fontsize),
     )
 
 
-def centroid(color='k'):
+def centroid(color="k"):
     # Centroid only.
     return RenderControlHeliostat(
         draw_centroid=True, centroid_style=rcps.marker(color=color), draw_facet_ensemble=False
     )
 
 
-def centroid_name(color='k'):
+def centroid_name(color="k"):
     # Centroid and name.
     return RenderControlHeliostat(
         draw_centroid=True,
         centroid_style=rcps.marker(color=color),
         draw_facet_ensemble=False,
         draw_name=True,
-        name_style=rctxt.RenderControlText(color=color, horizontalalignment='left'),
+        name_style=rctxt.RenderControlText(color=color, horizontalalignment="left"),
     )
 
 
 def centroid_name_outline(
-    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
+    color="k", horizontalalignment="center", verticalalignment="center"  # center, right, left
 ):  # center, top, bottom, baseline, center_baseline
     # Name and overall outline.
     return RenderControlHeliostat(
@@ -123,7 +123,7 @@ def centroid_name_outline(
     )
 
 
-def outline(color='k'):
+def outline(color="k"):
     # Overall outline only.
     return RenderControlHeliostat(
         draw_centroid=False, draw_facet_ensemble=True, facet_ensemble_style=rcfe.only_outline(color=color)
@@ -131,7 +131,7 @@ def outline(color='k'):
 
 
 def name_outline(
-    color='k', horizontalalignment='center', verticalalignment='center'  # center, right, left
+    color="k", horizontalalignment="center", verticalalignment="center"  # center, right, left
 ):  # center, top, bottom, baseline, center_baseline
     # Name and overall outline.
     return RenderControlHeliostat(
@@ -148,7 +148,7 @@ def name_outline(
     )
 
 
-def facet_outlines_names(color='k'):
+def facet_outlines_names(color="k"):
     # Facet outlines and facet name labels.
     return RenderControlHeliostat(
         draw_centroid=False,
@@ -158,7 +158,7 @@ def facet_outlines_names(color='k'):
     )
 
 
-def normal(color='k', normal_vector_length=DEFAULT_SURFACE_NORMAL_LENGTH):
+def normal(color="k", normal_vector_length=DEFAULT_SURFACE_NORMAL_LENGTH):
     # Overall surface normal only.
     return RenderControlHeliostat(
         draw_centroid=True,
@@ -171,7 +171,7 @@ def normal(color='k', normal_vector_length=DEFAULT_SURFACE_NORMAL_LENGTH):
     )
 
 
-def normal_outline(color='k', normal_vector_length=DEFAULT_SURFACE_NORMAL_LENGTH, **kwargs):
+def normal_outline(color="k", normal_vector_length=DEFAULT_SURFACE_NORMAL_LENGTH, **kwargs):
     # Overall surface normal and overall outline.
     fe_style = rcfe.facet_ensemble_outline(color=color, normal_vector_length=normal_vector_length)
     return RenderControlHeliostat(
@@ -179,7 +179,7 @@ def normal_outline(color='k', normal_vector_length=DEFAULT_SURFACE_NORMAL_LENGTH
     )
 
 
-def normal_facet_outlines_names(color='k'):
+def normal_facet_outlines_names(color="k"):
     # Facet outlines and facet name labels.
     fe_style = rcfe.RenderControlFacetEnsemble(
         draw_normal_vector=True,
@@ -193,7 +193,7 @@ def normal_facet_outlines_names(color='k'):
     )
 
 
-def mirror_surfaces(color='k', **kwargs):
+def mirror_surfaces(color="k", **kwargs):
     fe_style = rcfe.RenderControlFacetEnsemble(rcf.normal_mirror_surface(color=color))
     return RenderControlHeliostat(
         draw_centroid=False, draw_facet_ensemble=True, facet_ensemble_style=fe_style, **kwargs
@@ -214,16 +214,16 @@ def mirror_surfaces(color='k', **kwargs):
 #                                   draw_name=False)
 
 
-def normal_facet_outlines(color='k'):
+def normal_facet_outlines(color="k"):
     return RenderControlHeliostat(facet_ensemble_style=rcfe.normal_facet_outlines(color=color))
 
 
-def facet_outlines(color='k', **kwargs):
+def facet_outlines(color="k", **kwargs):
     # Facet outline only.
     return RenderControlHeliostat(facet_ensemble_style=rcfe.facet_outlines(color=color))
 
 
-def facet_outlines_normals(color='k'):
+def facet_outlines_normals(color="k"):
     fe_style = rcfe.RenderControlFacetEnsemble(default_style=rcf.normal_outline(color=color))
     return RenderControlHeliostat(draw_facet_ensemble=True, facet_ensemble_style=fe_style)
 

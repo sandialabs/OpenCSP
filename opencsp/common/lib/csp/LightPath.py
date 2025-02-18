@@ -70,7 +70,7 @@ class LightPath:
 
     def many_rays_from_many_vectors(
         many_points_lists: list[Pxyz], many_init_directions: Vxyz, many_current_directions: Vxyz = []
-    ) -> list['LightPath']:
+    ) -> list["LightPath"]:
         """
         Creates a list of LightPaths from vectors
         If the many_points_lists is None then the function will infer that they are

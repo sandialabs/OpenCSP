@@ -66,7 +66,7 @@ class Reconstruct:
         self.heliostat_3d_file_suffix = heliostat_3d_file_suffix
         self.theoretical_heliostat_dir_body_ext = theoretical_heliostat_dir_body_ext
 
-        all_files = glob.glob(input_heliostat_2d_corners_dir + '*')
+        all_files = glob.glob(input_heliostat_2d_corners_dir + "*")
         self.files = []
         for file in all_files:
             if self.heliostat_3d_file_suffix in file:
@@ -85,25 +85,25 @@ class Reconstruct:
         # hel_name   = file.split('/')[-1].split('_')[0]
 
         # Perform the reconstruction.
-        print('In execute_reconstruction(), calling call_executable() for heliostat ' + hel_name + '...')
+        print("In execute_reconstruction(), calling call_executable() for heliostat " + hel_name + "...")
         self.call_executable(file)
-        print('In execute_reconstruction(), call_executable() for heliostat ' + hel_name + ' finished.')
+        print("In execute_reconstruction(), call_executable() for heliostat " + hel_name + " finished.")
 
         # We plan to recompile the C++ executable to have more fine-grain control over its output filename, but not today.
         # So rename the output file to match our naming standard.
-        print('In execute_reconstruction(), renaming output file for heliostat ' + hel_name + '...')
-        executable_output_body_ext = hel_name + '_reconstructed.txt'
+        print("In execute_reconstruction(), renaming output file for heliostat " + hel_name + "...")
+        executable_output_body_ext = hel_name + "_reconstructed.txt"
         executable_output_dir_body_ext = os.path.join(self.output_heliostat_3d_dir, executable_output_body_ext)
         heliostat_3d_dir_body_ext = os.path.join(
-            self.output_heliostat_3d_dir, hel_name + '_' + self.confirm_distort_str + '_corners_3d.txt'
+            self.output_heliostat_3d_dir, hel_name + "_" + self.confirm_distort_str + "_corners_3d.txt"
         )
         ft.rename_file(executable_output_dir_body_ext, heliostat_3d_dir_body_ext)
 
-        print('In execute_reconstruction(), calling generate_plots() for heliostat ' + hel_name + '...')
+        print("In execute_reconstruction(), calling generate_plots() for heliostat " + hel_name + "...")
         uh3a.generate_plots(
             heliostat_3d_dir_body_ext, output_evaluation_plot_dir, self.specifications, self.heliostat_theoretical
         )
-        print('In execute_reconstruction(), generate_plots() for heliostat ' + hel_name + ' finished.')
+        print("In execute_reconstruction(), generate_plots() for heliostat " + hel_name + " finished.")
 
         return heliostat_3d_dir_body_ext
 
@@ -115,27 +115,27 @@ class Reconstruct:
         cx = self.cam_matrix[0][2]
         cy = self.cam_matrix[1][2]
 
-        print('In call_executable(), self.executable_path =', self.executable_path)
-        print('In call_executable(), file =', file)
-        print('In call_executable(), str(fx)   =', str(fx))
-        print('In call_executable(), str(fy)   =', str(fy))
-        print('In call_executable(), str(cx)   =', str(cx))
-        print('In call_executable(), str(cy)   =', str(cy))
-        print('In call_executable(), heliostat =', hel_name)
-        print('In call_executable(), self.output_heliostat_3d_dir =', self.output_heliostat_3d_dir)
+        print("In call_executable(), self.executable_path =", self.executable_path)
+        print("In call_executable(), file =", file)
+        print("In call_executable(), str(fx)   =", str(fx))
+        print("In call_executable(), str(fy)   =", str(fy))
+        print("In call_executable(), str(cx)   =", str(cx))
+        print("In call_executable(), str(cy)   =", str(cy))
+        print("In call_executable(), heliostat =", hel_name)
+        print("In call_executable(), self.output_heliostat_3d_dir =", self.output_heliostat_3d_dir)
 
-        print('In call_executable(), calling executable for heliostat ' + hel_name + '...')
+        print("In call_executable(), calling executable for heliostat " + hel_name + "...")
 
         proc = subprocess.Popen(
             [self.executable_path, file, str(fx), str(fy), str(cx), str(cy), hel_name, self.output_heliostat_3d_dir]
         )
         proc.wait()
 
-        print('In call_executable(), executable for heliostat ' + hel_name + ' finished.')
+        print("In call_executable(), executable for heliostat " + hel_name + " finished.")
 
     def perform_reconstruction(self, single_execution=True):
-        print('self.files =', self.files)
-        print('In perform_reconstruction(), starting reconstruction...')
+        print("self.files =", self.files)
+        print("In perform_reconstruction(), starting reconstruction...")
         if single_execution:
             heliostat_3d_dir_body_ext_list = []
             for file in self.files:
@@ -143,18 +143,18 @@ class Reconstruct:
         else:
             with Pool(36) as pool:
                 heliostat_3d_dir_body_ext_list = pool.map(self.execute_reconstruction, self.files)
-        print('In perform_reconstruction() reconstruction finished.')
+        print("In perform_reconstruction() reconstruction finished.")
 
-        print('heliostat_3d_dir_body_ext_list = ', heliostat_3d_dir_body_ext_list)
+        print("heliostat_3d_dir_body_ext_list = ", heliostat_3d_dir_body_ext_list)
 
-        print('In perform_reconstruction(), starting csv file generation...')
+        print("In perform_reconstruction(), starting csv file generation...")
         output_evaluation_csv_dir_2 = (
-            self.output_evaluation_csv_dir + '/'
+            self.output_evaluation_csv_dir + "/"
         )  # ?? SCAFFOLDING RCB -- MAKE THIS PLATFORM INDEPENDENT.
         uh3a.generate_csv(
             heliostat_3d_dir_body_ext_list, output_evaluation_csv_dir_2, self.specifications, self.heliostat_theoretical
         )
-        print('In perform_reconstruction() csv files finished.')
+        print("In perform_reconstruction() csv files finished.")
 
     def heliostat_name_given_heliostat_2d_corner_trajectories_dir_body_ext(
         self, heliostat_2d_corner_trajectories_dir_body_ext
@@ -164,7 +164,7 @@ class Reconstruct:
             heliostat_2d_corner_trajectories_body,
             heliostat_2d_corner_trajectories_ext,
         ) = ft.path_components(heliostat_2d_corner_trajectories_dir_body_ext)
-        tokens = heliostat_2d_corner_trajectories_body.split('_')
+        tokens = heliostat_2d_corner_trajectories_body.split("_")
         trajectories_str = tokens[-1]
         two_d_str = tokens[-2]
         corner_str = tokens[-3]
@@ -176,7 +176,7 @@ class Reconstruct:
 
 if __name__ == "__main__":
     executable_path = (
-        home_dir() + 'Code/ufacet_code/Reconstruct/bin/reconstruct_main.out'
+        home_dir() + "Code/ufacet_code/Reconstruct/bin/reconstruct_main.out"
     )  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS.  PASS IN?
 
     # # 02_StandardExample
@@ -200,28 +200,28 @@ if __name__ == "__main__":
     # theoretical_heliostat_dir_body_ext = experiment_dir() + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Corners.csv'  # ?? SCAFFOLDING RCB -- MOVE THIS INTO TEST DATA.
 
     # 02_Study_5W1_9E9_11W1_14E3
-    confirm_distort_str = 'confirmed_undistorted'
+    confirm_distort_str = "confirmed_undistorted"
     input_heliostat_2d_corners_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/input_merged_tracks/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/input_merged_tracks/"
     )
     output_heliostat_3d_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/output_reconstructed_heliostats/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/output_reconstructed_heliostats/"
     )
     output_evaluation_plot_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/output_evaluation_plots/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/output_evaluation_plots/"
     )
     output_evaluation_csv_dir = (
         experiment_dir()
-        + '2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/output_evaluation_csv_files/'
+        + "2020-12-03_FastScan1/9_Analysis/2021-09-21_ReconstructionStudy/02_Study_5W1_9E9_11W1_14E3_solo/output_evaluation_csv_files/"
     )
     cam_matrix = utils.CameraMatrix  # ?? SCAFFOLDING RCB -- RE-EVALUATE THIS
-    heliostat_3d_file_suffix = '_' + confirm_distort_str + '_corner_2d_trajectories.txt'
+    heliostat_3d_file_suffix = "_" + confirm_distort_str + "_corner_2d_trajectories.txt"
     theoretical_heliostat_dir_body_ext = (
         experiment_dir()
-        + '2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Corners.csv'
+        + "2020-12-03_FastScan1/3_Post/Answers/20201203/1544_NS_U/010_HeliostatModel/data/NSTTF_Facet_Corners.csv"
     )  # ?? SCAFFOLDING RCB -- MOVE THIS INTO TEST DATA.
 
     rec = Reconstruct(
@@ -236,5 +236,5 @@ if __name__ == "__main__":
         theoretical_heliostat_dir_body_ext,
     )
 
-    print('\n\nAt toplevel, calling perform_reconstruction()...')
+    print("\n\nAt toplevel, calling perform_reconstruction()...")
     rec.perform_reconstruction(single_execution=False)  # True)

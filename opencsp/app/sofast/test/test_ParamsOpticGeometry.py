@@ -8,9 +8,9 @@ import opencsp.common.lib.tool.file_tools as ft
 class TestParamsOpticGeometry(unittest.TestCase):
     def test_save_load_hdf(self):
         # Define save dir
-        dir_save = join(dirname(__file__), 'data/output/ParamsOpticGeometry')
+        dir_save = join(dirname(__file__), "data/output/ParamsOpticGeometry")
         ft.create_directories_if_necessary(dir_save)
-        file_save = join(dir_save, 'params_optic_geometry.h5')
+        file_save = join(dir_save, "params_optic_geometry.h5")
 
         # Instantiate with defaults
         params = ParamsOpticGeometry()
@@ -22,5 +22,5 @@ class TestParamsOpticGeometry(unittest.TestCase):
         ParamsOpticGeometry.load_from_hdf(file_save)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

@@ -35,7 +35,7 @@ def axisrotation(unit_vector, angle):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BE
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'transform_3d.axisrotation is deprecated. Replace with scipy.spatial.transform.Rotation',
+        "transform_3d.axisrotation is deprecated. Replace with scipy.spatial.transform.Rotation",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -54,7 +54,7 @@ def axisrotation(unit_vector, angle):  # ?? SCAFFOLDING RCB -- ADD UNDERSCORE BE
     # The input vector must be a unit vector.
     norm = np.sqrt(ux**2 + uy**2 + uz**2)
     if abs(norm - 1.0) > 1e-9:  # tolerance
-        print('ERROR: In axisrotation(), input unit_vector =', unit_vector, ' is not of unit length.  Length =', norm)
+        print("ERROR: In axisrotation(), input unit_vector =", unit_vector, " is not of unit length.  Length =", norm)
 
     c = np.cos(lhr_angle)
     s = np.sin(lhr_angle)
@@ -98,7 +98,7 @@ def rotation_matrix_to_euler_angles(R):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'transform_3d.rotation_matrix_to_euler_angles is deprecated. Replace with scipy.spatial.transform.Rotation.',
+        "transform_3d.rotation_matrix_to_euler_angles is deprecated. Replace with scipy.spatial.transform.Rotation.",
         DeprecationWarning,
         stacklevel=2,
     )
@@ -145,7 +145,7 @@ def is_rotation_matrix(R):
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     warn(
-        'transform_3d.is_rotation_matrix is deprecated. Replace with scipy.spatial.transform.Rotation.',
+        "transform_3d.is_rotation_matrix is deprecated. Replace with scipy.spatial.transform.Rotation.",
         DeprecationWarning,
         stacklevel=2,
     )

@@ -26,7 +26,7 @@ pil_image_formats_writable = pil_image_formats_rw + ["palm", "pdf", "xv"]
 # fmt: on
 
 
-def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
+def numpy_to_image(arr: np.ndarray, rescale_or_clip="rescale", rescale_max=-1):
     """Convert the numpy representation of an image to a Pillow Image.
 
     Coverts the given arr to an Image. The array is converted to an integer
@@ -69,7 +69,7 @@ def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
 
     # rescale down to 8-bit if bitdepth is too large
     if np.iinfo(int_type).max > 255:
-        if rescale_or_clip == 'rescale':
+        if rescale_or_clip == "rescale":
             if rescale_max < 0:
                 rescale_max = np.max(arr)
             scale = 255 / rescale_max

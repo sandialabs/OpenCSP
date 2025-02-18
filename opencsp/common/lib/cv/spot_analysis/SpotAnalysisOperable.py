@@ -46,7 +46,7 @@ class SpotAnalysisOperable:
     primary image. These images will be used as part of the computation.
     """
     previous_operables: (
-        tuple[list['SpotAnalysisOperable'], "AbstractSpotAnalysisImagesProcessor"] | tuple[None, None]
+        tuple[list["SpotAnalysisOperable"], "AbstractSpotAnalysisImagesProcessor"] | tuple[None, None]
     ) = (None, None)
     """
     The operable(s) that were used to generate this operable, and the image
@@ -170,8 +170,8 @@ class SpotAnalysisOperable:
         return ret
 
     def replace_use_default_values(
-        self, supporting_images: dict[ImageType, CacheableImage] = None, data: 'SpotAnalysisOperable' = None
-    ) -> 'SpotAnalysisOperable':
+        self, supporting_images: dict[ImageType, CacheableImage] = None, data: "SpotAnalysisOperable" = None
+    ) -> "SpotAnalysisOperable":
         """Sets the supporting_images and other data for an operable where they
         are None for this instance. Returns a new operable with the populated
         values."""

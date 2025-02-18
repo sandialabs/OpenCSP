@@ -75,8 +75,8 @@ class ConvolutionImageProcessor(AbstractSpotAnalysisImageProcessor):
         image = image.astype(np.float64)
 
         # evaluate the filter
-        mode = 'same'  # shape is max(image, kernel)
-        boundary = 'symm'  # edges are reflected, ie image[-1] = image[0], image[-2] = image[1], etc...
+        mode = "same"  # shape is max(image, kernel)
+        boundary = "symm"  # edges are reflected, ie image[-1] = image[0], image[-2] = image[1], etc...
         kernel = np.ones((self.diameter, self.diameter)) / (self.diameter**2)
         ret = scipy.signal.convolve2d(image, kernel, mode, boundary)
 

@@ -71,7 +71,7 @@ class Color:
         return cls(rgb[0], rgb[1], rgb[2], name, value)
 
     @classmethod
-    def from_str(cls, sval='b') -> "Color":
+    def from_str(cls, sval="b") -> "Color":
         longhand = sval
         if sval in _plot_color_shorthands:
             longhand = _plot_color_shorthands[sval]
@@ -90,7 +90,7 @@ class Color:
             return cls.from_str(val)
         else:
             rgb = val
-            return cls(rgb[0], rgb[1], rgb[2], 'tuple', 'tuple')
+            return cls(rgb[0], rgb[1], rgb[2], "tuple", "tuple")
 
     def rgb(self) -> tuple[float, float, float]:
         """
@@ -166,47 +166,47 @@ class Color:
 
 
 def black():
-    return Color(0.0, 0.0, 0.0, 'black', 'k')
+    return Color(0.0, 0.0, 0.0, "black", "k")
 
 
 def dark_grey():
-    return Color(0.25, 0.25, 0.25, 'dark grey', 'dg')
+    return Color(0.25, 0.25, 0.25, "dark grey", "dg")
 
 
 def grey():
-    return Color(0.5, 0.5, 0.5, 'grey', 'gy')
+    return Color(0.5, 0.5, 0.5, "grey", "gy")
 
 
 def light_grey():
-    return Color(0.75, 0.75, 0.75, 'light grey', 'lg')
+    return Color(0.75, 0.75, 0.75, "light grey", "lg")
 
 
 def white():
-    return Color(1.0, 1.0, 1.0, 'white', 'w')
+    return Color(1.0, 1.0, 1.0, "white", "w")
 
 
 def red():
-    return Color(1.0, 0.0, 0.0, 'red', 'r')
+    return Color(1.0, 0.0, 0.0, "red", "r")
 
 
 def green():
-    return Color(0.0, 1.0, 0.0, 'green', 'g')
+    return Color(0.0, 1.0, 0.0, "green", "g")
 
 
 def blue():
-    return Color(0.0, 0.0, 1.0, 'blue', 'b')
+    return Color(0.0, 0.0, 1.0, "blue", "b")
 
 
 def cyan():
-    return Color(0.0, 1.0, 1.0, 'cyan', 'c')
+    return Color(0.0, 1.0, 1.0, "cyan", "c")
 
 
 def magenta():
-    return Color(1.0, 0.0, 1.0, 'magenta', 'm')
+    return Color(1.0, 0.0, 1.0, "magenta", "m")
 
 
 def yellow():
-    return Color(1.0, 1.0, 0.0, 'yellow', 'y')
+    return Color(1.0, 1.0, 0.0, "yellow", "y")
 
 
 def color_map(*colors_sequence: "Color"):
@@ -219,16 +219,16 @@ class _PlotColors(Iterable[Color]):
 
     def __init__(self):
         self._color_hexes = [
-            '#1f77b4',
-            '#ff7f0e',
-            '#2ca02c',
-            '#d62728',
-            '#9467bd',
-            '#8c564b',
-            '#e377c2',
-            '#7f7f7f',
-            '#bcbd22',
-            '#17becf',
+            "#1f77b4",
+            "#ff7f0e",
+            "#2ca02c",
+            "#d62728",
+            "#9467bd",
+            "#8c564b",
+            "#e377c2",
+            "#7f7f7f",
+            "#bcbd22",
+            "#17becf",
         ]
         self.blue = Color.from_hex(self._color_hexes[0], "blue", "b")
         self.orange = Color.from_hex(self._color_hexes[1], "orange", "o")
@@ -270,13 +270,13 @@ Color order: blue, orange, green, red, purple, brown, pink, gray, yellow, cyan "
 
 
 _plot_color_shorthands = {
-    'b': 'blue',
-    'g': 'green',
-    'r': 'red',
-    'c': 'cyan',
-    'm': 'magenta',
-    'y': 'yellow',
-    'k': 'black',
-    'w': 'white',
+    "b": "blue",
+    "g": "green",
+    "r": "red",
+    "c": "cyan",
+    "m": "magenta",
+    "y": "yellow",
+    "k": "black",
+    "w": "white",
 }
 """ From https://matplotlib.org/stable/users/explain/colors/colors.html """

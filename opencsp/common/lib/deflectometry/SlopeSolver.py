@@ -28,7 +28,7 @@ class SlopeSolver:
         dist_optic_screen: float,
         surface: Surface2DAbstract,
         debug: SlopeSolverDataDebug = SlopeSolverDataDebug(),
-    ) -> 'SlopeSolver':
+    ) -> "SlopeSolver":
         """
         Initializes the slope solving object.
 
@@ -105,7 +105,7 @@ class SlopeSolver:
                 num_nans = np.isnan(self.surface.v_surf_int_pts_optic.data)
                 if np.any(num_nans):
                     warnings.warn(
-                        f'{num_nans.sum():d} / {num_nans.size:d} values are NANs in surface intersection points in iteration: ({idx1:d}, {idx2:d}).',
+                        f"{num_nans.sum():d} / {num_nans.size:d} values are NANs in surface intersection points in iteration: ({idx1:d}, {idx2:d}).",
                         stacklevel=2,
                     )
 
@@ -116,7 +116,7 @@ class SlopeSolver:
                 num_nans = np.isnan(self.surface.slopes)
                 if np.any(num_nans):
                     warnings.warn(
-                        f'{num_nans.sum():d} / {num_nans.size:d} values are NANs in slope data in iteration: ({idx1:d}, {idx2:d}).',
+                        f"{num_nans.sum():d} / {num_nans.size:d} values are NANs in slope data in iteration: ({idx1:d}, {idx2:d}).",
                         stacklevel=2,
                     )
 
@@ -180,7 +180,7 @@ class SlopeSolver:
         """
         # Check alignment has been completed
         if self._data.trans_alignment is None:
-            raise ValueError('Initial alignment needs to be completed before final slope fitting (self.fit_surface).')
+            raise ValueError("Initial alignment needs to be completed before final slope fitting (self.fit_surface).")
 
         # Apply alignment transforms about alignment point
         trans_shift_1 = TransformXYZ.from_V(-self.surface.v_align_point_optic)
@@ -204,26 +204,26 @@ class SlopeSolver:
         if self.debug.slope_solver_single_plot and isinstance(self.debug.slope_solver_figures, list):
             # Create first figure if needed
             fig = plt.figure()
-            axes = fig.add_subplot(projection='3d')
+            axes = fig.add_subplot(projection="3d")
             self.debug.slope_solver_figures = fig
             # Plot facet corners
             facet_outline = self.debug.optic_data.v_facet_corners.data
-            axes.scatter(*facet_outline, color='k')
+            axes.scatter(*facet_outline, color="k")
             # Format
-            axes.set_title('Slope Solver')
+            axes.set_title("Slope Solver")
         elif self.debug.slope_solver_single_plot:
             # Get axes for single plot
             axes = self.debug.slope_solver_figures.gca()
         else:
             # Create a new figure
             fig = plt.figure()
-            axes = fig.add_subplot(projection='3d')
+            axes = fig.add_subplot(projection="3d")
             self.debug.slope_solver_figures.append(fig)
             # Plot facet corners
             facet_outline = self.debug.optic_data.v_facet_corners.data
-            axes.scatter(*facet_outline, color='k')
+            axes.scatter(*facet_outline, color="k")
             # Format
-            axes.set_title(f'Slope Solver ({idx1:d}, {idx2:d})')
+            axes.set_title(f"Slope Solver ({idx1:d}, {idx2:d})")
 
         # Plot intersection points
         self.surface.plot_intersection_points(

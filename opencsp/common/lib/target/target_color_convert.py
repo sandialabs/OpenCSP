@@ -230,9 +230,9 @@ def color_given_value(val, val_min, val_max, color_below_min, color_bar, color_a
     val_step = (val_max - val_min) / n_steps
     step = (val - val_min) / val_step  # Since (val_min <= val <= val_max), we know (0 <= step <= 1).
     idx = int(step)
-    if discrete_or_continuous == 'discrete':
+    if discrete_or_continuous == "discrete":
         return color_bar[idx]
-    elif discrete_or_continuous == 'continuous':
+    elif discrete_or_continuous == "continuous":
         if idx < 0:
             return color_below_min
         elif idx > (n_colors - 1):
@@ -251,7 +251,7 @@ def color_given_value(val, val_min, val_max, color_below_min, color_bar, color_a
             return [(color_0[0] + (frac * d_red)), (color_0[1] + (frac * d_green)), (color_0[2] + (frac * d_blue))]
     else:
         print(
-            'ERROR: In color_given_value(), encountered unexpected discrete_or_continuous value:',
+            "ERROR: In color_given_value(), encountered unexpected discrete_or_continuous value:",
             discrete_or_continuous,
         )
         assert False
@@ -268,13 +268,13 @@ def angle_between_color_vectors(rgb_1, rgb_2):
 
 def color_bar_segment_spanned_angle(idx, color_bar):
     if idx < 0:
-        print('ERROR: In angle_between_color_vectors(), idx = ', str(idx), ' is less than zero.')
+        print("ERROR: In angle_between_color_vectors(), idx = ", str(idx), " is less than zero.")
         assert False  # ?? SCAFFOLDING RCB -- REPLACE WITH RAISING AN EXCEPTION?  (THROUGHOUT)
     if idx >= (len(color_bar) - 1):  # Below we fetch color_bar(idx+1), so compare against (len(color-bar)-1).
         print(
-            'ERROR: In angle_between_color_vectors(), idx = ',
+            "ERROR: In angle_between_color_vectors(), idx = ",
             str(idx),
-            ' is greater than or equal to color bar length:',
+            " is greater than or equal to color bar length:",
             len(color_bar),
         )
         assert False  # ?? SCAFFOLDING RCB -- REPLACE WITH RAISING AN EXCEPTION?  (THROUGHOUT)

@@ -58,7 +58,7 @@ def downsample_images(images: np.ndarray, n: int) -> np.ndarray:
         n_images = images.shape[2]
 
     for idx_im in range(n_images):
-        images_ds_list.append(convolve2d(images[..., idx_im], ker, mode='valid')[::n, ::n, None].astype('uint8'))
+        images_ds_list.append(convolve2d(images[..., idx_im], ker, mode="valid")[::n, ::n, None].astype("uint8"))
 
     images_out = np.concatenate(images_ds_list, 2)
 

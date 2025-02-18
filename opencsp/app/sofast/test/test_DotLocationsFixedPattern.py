@@ -55,7 +55,7 @@ class TestDotLocationsFixedPattern(unittest.TestCase):
 
     def test_from_Display(self):
         # Load display
-        file_disp = os.path.join(opencsp_code_dir(), 'test/data/sofast_common/display_distorted_3d.h5')
+        file_disp = os.path.join(opencsp_code_dir(), "test/data/sofast_common/display_distorted_3d.h5")
         display = Display.load_from_hdf(file_disp)
         fp_proj = PatternSofastFixed(30, 30, 5, 5)
 
@@ -81,5 +81,5 @@ class TestDotLocationsFixedPattern(unittest.TestCase):
         np.testing.assert_allclose(fp.xyz_dot_loc, xyz_exp, atol=1e-6, rtol=0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

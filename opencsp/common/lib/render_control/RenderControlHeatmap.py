@@ -59,9 +59,9 @@ class RenderControlHeatmap:
 
     def __init__(
         self,
-        linestyle_unimplemented='None',
+        linestyle_unimplemented="None",
         linewidth_unimplemented=1,
-        cmap: str | matplotlib.colors.Colormap = 'Viridis',
+        cmap: str | matplotlib.colors.Colormap = "Viridis",
     ):
         self.linestyle_unimplemented = linestyle_unimplemented
         self.linewidth_unimplemented = linewidth_unimplemented

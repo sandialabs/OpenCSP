@@ -41,7 +41,7 @@ class Uxyz(Vxyz):
         self.normalize_in_place()
 
     def __repr__(self):
-        return '3D Unit Vector:\n' + self._data.__repr__()
+        return "3D Unit Vector:\n" + self._data.__repr__()
 
     def cross(self, V) -> Vxyz:
         """

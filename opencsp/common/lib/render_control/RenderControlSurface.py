@@ -11,7 +11,7 @@ class RenderControlSurface:
         color: str | cl.Color | None = "silver",
         color_map: str | matplotlib.colors.Colormap | None = None,
         alpha: float = 0.25,
-        edgecolor='black',
+        edgecolor="black",
         linewidth=0.05,
         contour: None | bool | str = True,
         contour_color_map: str | None = None,
@@ -59,7 +59,7 @@ class RenderControlSurface:
         self.contour = False
         self.contour_color_map = contour_color_map
         self.contour_alpha = 0.7
-        self.contours = {'x': False, 'y': False, 'z': False}
+        self.contours = {"x": False, "y": False, "z": False}
 
         self._standardize_color_values()
 
@@ -67,11 +67,11 @@ class RenderControlSurface:
         if contour is None or contour == False:
             self.contour = False
         elif contour == True:
-            self.contours['x'] = True
+            self.contours["x"] = True
         elif isinstance(contour, str):
             self.contour = True
             for axis in contour:
-                axis = axis.replace('p', 'x').replace('q', 'y').replace('r', 'z')
+                axis = axis.replace("p", "x").replace("q", "y").replace("r", "z")
                 if axis not in self.contours:
                     lt.error_and_raise(
                         ValueError,

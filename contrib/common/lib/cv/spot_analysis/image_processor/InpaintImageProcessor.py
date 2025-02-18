@@ -347,7 +347,7 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
             """ Pixels that are a part of this iteration, and only this iteration. """
 
             # get one iteration of convolution
-            new_valid_pixels = scipy.ndimage.gaussian_filter(valid_pixels.copy(), sigma=1, radius=1, mode='constant')
+            new_valid_pixels = scipy.ndimage.gaussian_filter(valid_pixels.copy(), sigma=1, radius=1, mode="constant")
 
             # limit to the pixels from just this iteration
             new_valid_pixels_test = np.logical_and(new_valid_pixels > 0, valid_pixels == 0)
@@ -408,7 +408,7 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
             self.extended_corner_masks[corner] = np.load(ft.join(self.cache_dir, ecmf))
 
         # verify we got all the required files
-        required_corners = ['tl', 'tr', 'br', 'bl']
+        required_corners = ["tl", "tr", "br", "bl"]
         for corner in required_corners:
             if corner not in self.corner_mask_scales:
                 self.corner_mask_scales.clear()
@@ -477,7 +477,7 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # extend the mask to allow for interpolation between the two sides of
         # the marching edges
-        for corner, xdir, ydir in [('tl', -1, -1), ('tr', 1, -1), ('br', 1, 1), ('bl', -1, 1)]:
+        for corner, xdir, ydir in [("tl", -1, -1), ("tr", 1, -1), ("br", 1, 1), ("bl", -1, 1)]:
 
             # create the extended corner mask
             self.extended_corner_masks[corner] = np.clip(sized_mask.copy(), 0, 1)
@@ -504,10 +504,10 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
         # debugging
         if False:
             self.setup_debug_images((2, 2))
-            self.draw_debug_image(self.extended_corner_masks['tl'], block=False)
-            self.draw_debug_image(self.extended_corner_masks['tr'], block=False)
-            self.draw_debug_image(self.extended_corner_masks['br'], block=False)
-            self.draw_debug_image(self.extended_corner_masks['bl'], block=True)
+            self.draw_debug_image(self.extended_corner_masks["tl"], block=False)
+            self.draw_debug_image(self.extended_corner_masks["tr"], block=False)
+            self.draw_debug_image(self.extended_corner_masks["br"], block=False)
+            self.draw_debug_image(self.extended_corner_masks["bl"], block=True)
 
         # cache to disk
         if self.cache_dir is not None:
@@ -554,7 +554,7 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
             self.corner_mask_scales[corner] = np.load(ft.join(self.cache_dir, ecmf))
 
         # verify we got all the required files
-        required_corners = ['tl', 'tr', 'br', 'bl']
+        required_corners = ["tl", "tr", "br", "bl"]
         for corner in required_corners:
             if corner not in self.corner_mask_scales:
                 self.corner_mask_scales.clear()
@@ -621,11 +621,11 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
         extended_corner_masks = self.get_extended_corner_masks(sized_mask)
 
         # create the corner mask scale from the extended corner masks
-        corners = ['tl', 'tr', 'br', 'bl']
+        corners = ["tl", "tr", "br", "bl"]
         for corner in corners:
             self.corner_mask_scales[corner] = extended_corner_masks[corner].astype(np.float32)
 
-        for corner, xdir, ydir in [('tl', 1, 1), ('tr', -1, 1), ('br', -1, -1), ('bl', 1, -1)]:
+        for corner, xdir, ydir in [("tl", 1, 1), ("tr", -1, 1), ("br", -1, -1), ("bl", 1, -1)]:
 
             # start with this corner's extended mask
             scale_edge = np.zeros((height, width, 2), np.uint8)
@@ -679,7 +679,7 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
                 )
 
         # rescale each corner mask scale so that in total they add up to 1
-        total_mask = np.zeros_like(self.corner_mask_scales['tl'])
+        total_mask = np.zeros_like(self.corner_mask_scales["tl"])
         mask_pixels = np.where(sized_mask > 0)
         for corner in corners:
             total_mask[mask_pixels] += self.corner_mask_scales[corner][mask_pixels]
@@ -689,10 +689,10 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
         # debugging
         if False:
             self.setup_debug_images((3, 2))
-            self.draw_debug_image(self.corner_mask_scales['tl'], title="self.corner_mask_scales['tl']", block=False)
-            self.draw_debug_image(self.corner_mask_scales['tr'], title="self.corner_mask_scales['tr']", block=False)
-            self.draw_debug_image(self.corner_mask_scales['br'], title="self.corner_mask_scales['br']", block=False)
-            self.draw_debug_image(self.corner_mask_scales['bl'], title="self.corner_mask_scales['bl']", block=False)
+            self.draw_debug_image(self.corner_mask_scales["tl"], title="self.corner_mask_scales['tl']", block=False)
+            self.draw_debug_image(self.corner_mask_scales["tr"], title="self.corner_mask_scales['tr']", block=False)
+            self.draw_debug_image(self.corner_mask_scales["br"], title="self.corner_mask_scales['br']", block=False)
+            self.draw_debug_image(self.corner_mask_scales["bl"], title="self.corner_mask_scales['bl']", block=False)
             self.draw_debug_image(
                 sum(self.corner_mask_scales.values()), title="sum(self.corner_mask_scales)", block=True
             )

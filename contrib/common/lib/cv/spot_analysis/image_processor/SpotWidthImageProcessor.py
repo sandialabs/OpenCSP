@@ -219,7 +219,7 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
             centroid, spot_width = self.average_radius_x2(image)
             annotations.append(SpotWidthAnnotation(self.spot_width_technique, centroid, spot_width, style=self.style))
             notes.append(
-                (self.name, json.dumps({'spot_width': spot_width, 'spot_width_technique': self.spot_width_technique}))
+                (self.name, json.dumps({"spot_width": spot_width, "spot_width_technique": self.spot_width_technique}))
             )
         elif self.spot_width_technique == "fwhm":
             centroid, spot_width, long_axis_rotation, long_axis_center, orthogonal_axis_width, algorithm_image = (
@@ -241,11 +241,11 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
                     self.name,
                     json.dumps(
                         {
-                            'long_axis_center': long_axis_center.astuple(),
-                            'long_axis_rotation': long_axis_rotation,
-                            'orthogonal_axis_width': orthogonal_axis_width,
-                            'spot_width': spot_width,
-                            'spot_width_technique': self.spot_width_technique,
+                            "long_axis_center": long_axis_center.astuple(),
+                            "long_axis_rotation": long_axis_rotation,
+                            "orthogonal_axis_width": orthogonal_axis_width,
+                            "spot_width": spot_width,
+                            "spot_width_technique": self.spot_width_technique,
                         }
                     ),
                 )

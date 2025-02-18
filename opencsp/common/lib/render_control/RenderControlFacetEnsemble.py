@@ -83,7 +83,7 @@ class RenderControlFacetEnsemble:
 # GENERATORS
 
 
-def normal_facet_outlines(color='k', **kwargs):
+def normal_facet_outlines(color="k", **kwargs):
     return RenderControlFacetEnsemble(
         draw_normal_vector=True,
         default_style=rcf.outline(color=color),
@@ -94,7 +94,7 @@ def normal_facet_outlines(color='k', **kwargs):
     )
 
 
-def facet_outlines(color='k', **kwargs):
+def facet_outlines(color="k", **kwargs):
     return RenderControlFacetEnsemble(
         draw_normal_vector=False,
         default_style=rcf.outline(color=color),
@@ -105,7 +105,7 @@ def facet_outlines(color='k', **kwargs):
     )
 
 
-def facet_outlines_thin(color='k', linewidth=0.25, **kwargs):
+def facet_outlines_thin(color="k", linewidth=0.25, **kwargs):
     return RenderControlFacetEnsemble(
         draw_normal_vector=False,
         default_style=rcf.outline_thin(color=color, linewidth=linewidth),
@@ -116,7 +116,7 @@ def facet_outlines_thin(color='k', linewidth=0.25, **kwargs):
     )
 
 
-def facet_ensemble_outline(color='k', normal_vector_length=4.0, **kwargs):
+def facet_ensemble_outline(color="k", normal_vector_length=4.0, **kwargs):
     return RenderControlFacetEnsemble(
         draw_normal_vector=True,
         normal_vector_length=normal_vector_length,
@@ -131,11 +131,11 @@ def facet_ensemble_outline(color='k', normal_vector_length=4.0, **kwargs):
     )
 
 
-def only_outline(color='k'):
+def only_outline(color="k"):
     return RenderControlFacetEnsemble(draw_outline=True, outline_style=rcps.outline(color=color), draw_facets=False)
 
 
-def normal_only(color='k', normal_vector_length=4.0, **kwargs):
+def normal_only(color="k", normal_vector_length=4.0, **kwargs):
     return RenderControlFacetEnsemble(
         draw_normal_vector=True,
         default_style=rcf.outline(color=color),

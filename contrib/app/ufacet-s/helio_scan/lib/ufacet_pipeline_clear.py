@@ -31,5 +31,5 @@ def prepare_render_directory(output_render_dir, delete_suffix, render_control):
     # For case 3, we want to leave previous results in place, and selectively generate the new material using the
     # render control flags.
     if (not ft.directory_is_empty(output_render_dir)) and (render_control.clear_previous == True):
-        print('In prepare_render_directory(), deleting previous render files from:', output_render_dir)
-        ft.delete_files_in_directory(output_render_dir, ('*' + delete_suffix))
+        print("In prepare_render_directory(), deleting previous render files from:", output_render_dir)
+        ft.delete_files_in_directory(output_render_dir, ("*" + delete_suffix))

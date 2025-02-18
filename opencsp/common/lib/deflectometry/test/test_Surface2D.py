@@ -21,7 +21,7 @@ class Test2DSurface(unittest.TestCase):
         # Generate test data
         cls.data_test = [generate_2DParabolic(), generate_2DPlano()]
         # Save location
-        cls.dir_save = join(opencsp_code_dir(), 'common/lib/deflectometry/test/data/output/Surface2D')
+        cls.dir_save = join(opencsp_code_dir(), "common/lib/deflectometry/test/data/output/Surface2D")
         ft.create_directories_if_necessary(cls.dir_save)
 
     def test_intersect(self):
@@ -100,10 +100,10 @@ class Test2DSurface(unittest.TestCase):
 
     def test_io(self):
         """Test saving to HDF5"""
-        prefix = 'test_folder/'
+        prefix = "test_folder/"
         for idx, surf in enumerate(self.data_test):
             surf_cur: Surface2DAbstract = surf[0]
-            file = join(self.dir_save, f'test_surface_{idx:d}.h5')
+            file = join(self.dir_save, f"test_surface_{idx:d}.h5")
             # Test saving
             surf_cur.save_to_hdf(file, prefix)
             # Test loading
@@ -213,5 +213,5 @@ def generate_2DPlano() -> tuple[Surface2DPlano, Vxyz, np.ndarray, np.ndarray, np
     return (surface, v_surf_int_pts_exp, slopes_exp, slope_coefs_exp, surf_coefs_exp, u_design_exp, u_fit_exp)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

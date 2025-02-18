@@ -115,7 +115,7 @@ def bullseye_color_bar(
                     img[row, col, 0] = color_frame[0] / 255.0
                     img[row, col, 1] = color_frame[1] / 255.0
                     img[row, col, 2] = color_frame[2] / 255.0
-        print('alignment_line_start_x = ', alignment_line_start_x)
+        print("alignment_line_start_x = ", alignment_line_start_x)
     else:
         alignment_line_start_x = -999
     # Trim line.
@@ -137,14 +137,14 @@ def bullseye_color_bar(
                     img[row, col, 0] = color_frame[0] / 255.0
                     img[row, col, 1] = color_frame[1] / 255.0
                     img[row, col, 2] = color_frame[2] / 255.0
-        print('trim_line_start_x = ', trim_line_start_x)
+        print("trim_line_start_x = ", trim_line_start_x)
     else:
         trim_line_start_x = -999
     # Save.
-    output_file_body = 'matplotlib_' + discrete_or_continuous + '_bullseye_color_bar' + '_cx' + str(cx_offset_pix)
+    output_file_body = "matplotlib_" + discrete_or_continuous + "_bullseye_color_bar" + "_cx" + str(cx_offset_pix)
     output_file_dir_body_ext = os.path.join(output_dir, output_file_body + output_ext)
-    print('Saving file:', output_file_dir_body_ext)
+    print("Saving file:", output_file_dir_body_ext)
     plt.imsave(output_file_dir_body_ext, img, dpi=dpi)
-    print('Done.')
+    print("Done.")
     # Return
     return alignment_line_start_x, trim_line_start_x

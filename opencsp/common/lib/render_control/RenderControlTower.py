@@ -42,15 +42,15 @@ class RenderControlTower:
 
         # default values
         if name_style is None:
-            namestyle = rctxt.default(color='k')
+            namestyle = rctxt.default(color="k")
         if point_styles is None:
             point_styles = rcps.marker()
         if wire_frame is None:
             wire_frame = rcps.outline()
         if target is None:
-            target = rcps.marker(marker='x', color='r', markersize=6)
+            target = rcps.marker(marker="x", color="r", markersize=6)
         if bcs is None:
-            bcs = rcps.marker(marker='+', color='b', markersize=6)
+            bcs = rcps.marker(marker="+", color="b", markersize=6)
 
         super(RenderControlTower, self).__init__()
 
@@ -78,9 +78,9 @@ def normal_tower():
 
 def no_target():
     # tower outline with no target.
-    return RenderControlTower(wire_frame=rcps.outline(color='g'), target=False)
+    return RenderControlTower(wire_frame=rcps.outline(color="g"), target=False)
 
 
 def no_bcs():
     # tower outline with not bcs.
-    return RenderControlTower(wire_frame=rcps.outline(color='g'), bcs=False)
+    return RenderControlTower(wire_frame=rcps.outline(color="g"), bcs=False)

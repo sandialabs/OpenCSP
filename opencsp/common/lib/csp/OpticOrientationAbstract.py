@@ -45,7 +45,7 @@ class OpticOrientationAbstract(ABC):
     """
 
     def __init__(self) -> None:
-        self._parent: 'OpticOrientationAbstract' = None
+        self._parent: "OpticOrientationAbstract" = None
         self._self_to_parent_transform: TransformXYZ = None
 
         self._set_optic_children()
@@ -67,15 +67,15 @@ class OpticOrientationAbstract(ABC):
 
     @property
     @abstractmethod
-    def children(self) -> list['OpticOrientationAbstract']:
+    def children(self) -> list["OpticOrientationAbstract"]:
         """Returns the children of this instance of OpticOrientationAbstract decendent."""
         raise NotImplementedError("abstract property children must be overwritten.")
 
     @abstractmethod
-    def _add_child_helper(self, new_child: 'OpticOrientationAbstract'):
+    def _add_child_helper(self, new_child: "OpticOrientationAbstract"):
         "Add child OpticOrientationAbstract object to self."
 
-    def add_child(self, new_child: 'OpticOrientationAbstract', new_child_to_self_transform=TransformXYZ.identity()):
+    def add_child(self, new_child: "OpticOrientationAbstract", new_child_to_self_transform=TransformXYZ.identity()):
         """Adds a child to the current optic"""
         if new_child.parent is not None:
             raise ValueError(
@@ -100,7 +100,7 @@ class OpticOrientationAbstract(ABC):
     #     child_to_remove._parent = None
 
     @property
-    def parent(self) -> 'OpticOrientationAbstract':
+    def parent(self) -> "OpticOrientationAbstract":
         """The parent of the current Optic"""
         return self._parent
 
@@ -135,7 +135,7 @@ class OpticOrientationAbstract(ABC):
             searcher = searcher._parent
         return transform
 
-    def get_transform_relative_to(self: 'OpticOrientationAbstract', target: 'OpticOrientationAbstract') -> TransformXYZ:
+    def get_transform_relative_to(self: "OpticOrientationAbstract", target: "OpticOrientationAbstract") -> TransformXYZ:
         """
         Gets the transformation from '`self`' frame to the '`target`' frame if `target`
         is an optic ancestor or decendent of `self`.
@@ -175,13 +175,13 @@ class OpticOrientationAbstract(ABC):
 
         raise ValueError("The given 'target' is not an in the current parent-child tree.")
 
-    def get_most_basic_optics(self) -> list['OpticOrientationAbstract']:
+    def get_most_basic_optics(self) -> list["OpticOrientationAbstract"]:
         """Return the list of the smallest optic that makes up composite optics."""
         warn("Funciton is not verified")
         if self.children is None:
             return [self]
 
-        basic_optics: list['OpticOrientationAbstract'] = []
+        basic_optics: list["OpticOrientationAbstract"] = []
         for child in self.children:
             basic_optics += child.get_most_basic_optics()
         return basic_optics

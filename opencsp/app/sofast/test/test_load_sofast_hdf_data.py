@@ -9,8 +9,8 @@ class TestImageProcessing(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         # Get test data location
-        cls.file_fringe = join(opencsp_code_dir(), 'test/data/sofast_fringe/data_expected_facet/data.h5')
-        cls.file_fixed = join(opencsp_code_dir(), 'test/data/sofast_fixed/data_expected/calculation_facet.h5')
+        cls.file_fringe = join(opencsp_code_dir(), "test/data/sofast_fringe/data_expected_facet/data.h5")
+        cls.file_fixed = join(opencsp_code_dir(), "test/data/sofast_fixed/data_expected/calculation_facet.h5")
 
     def test_load_fringe(self):
         lsd.load_mirror(self.file_fringe)
@@ -25,5 +25,5 @@ class TestImageProcessing(unittest.TestCase):
         lsd.load_mirror_ideal(self.file_fixed, 100.0)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     unittest.main()

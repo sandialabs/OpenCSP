@@ -176,7 +176,7 @@ class ServerSynchronizer:
             if ft.file_exists(file_path_name_ext):
                 try:
                     lines = ft.read_text_file(file_path_name_ext)
-                    err_type, err_msg = lines[0], '\n'.join(lines[1:])
+                    err_type, err_msg = lines[0], "\n".join(lines[1:])
                 except:
                     err_type, err_msg = "unknown error", "N/A"
                 ret.append(tuple([other_server_index, err_type, err_msg]))
@@ -193,7 +193,7 @@ class ServerSynchronizer:
         errored_servers = list(filter(lambda es: es[0] != self.server_index, errored_servers))
         if len(errored_servers) > 0:
             errored_server, err_type, err_msg = errored_servers[0]
-            return f"Error: in ServerSynchronizer.{method_name}(), server {errored_server} encountered a {err_type} with the message \"{err_msg}\""
+            return f'Error: in ServerSynchronizer.{method_name}(), server {errored_server} encountered a {err_type} with the message "{err_msg}"'
         return None
 
     def wait(self):

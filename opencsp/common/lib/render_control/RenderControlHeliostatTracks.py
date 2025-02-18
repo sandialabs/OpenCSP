@@ -13,15 +13,15 @@ class RenderControlHeliostatTracks:
         self,
         clear_previous=True,  # Remove any existing files in the designated output directory.
         draw_heliostat_tracks=True,  # Whether to draw the video track figures.
-        heliostat_tracks_points_marker='o',  # Marker for video tracks.
+        heliostat_tracks_points_marker="o",  # Marker for video tracks.
         heliostat_tracks_points_markersize=1.5,  # Marker size for video tracks.
-        heliostat_tracks_points_color='m',  # Color for video track points.
-        heliostat_tracks_label_horizontalalignment='center',  # Horizontal alignment for heliostat label.
-        heliostat_tracks_label_verticalalignment='center',  # Vertical alignment for heliostat label.
+        heliostat_tracks_points_color="m",  # Color for video track points.
+        heliostat_tracks_label_horizontalalignment="center",  # Horizontal alignment for heliostat label.
+        heliostat_tracks_label_verticalalignment="center",  # Vertical alignment for heliostat label.
         heliostat_tracks_label_fontsize=6,  # Font size for heliostat label.
-        heliostat_tracks_label_fontstyle='normal',  # Font style for heliostat label.
-        heliostat_tracks_label_fontweight='bold',  # Font weight for heliostat label.
-        heliostat_tracks_label_color='m',  # Color for heliostat label.
+        heliostat_tracks_label_fontstyle="normal",  # Font style for heliostat label.
+        heliostat_tracks_label_fontweight="bold",  # Font weight for heliostat label.
+        heliostat_tracks_label_color="m",  # Color for heliostat label.
         heliostat_tracks_dpi=200,  # Dpi for saving figure to disk.
         heliostat_tracks_crop=True,  # Whether to crop annotations outside image frame.
     ):
@@ -45,7 +45,7 @@ class RenderControlHeliostatTracks:
 # COMMON CASES
 
 
-def default(color='m'):
+def default(color="m"):
     return RenderControlHeliostatTracks(heliostat_tracks_points_color=color, heliostat_tracks_label_color=color)
 
 
