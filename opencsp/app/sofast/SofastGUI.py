@@ -214,7 +214,7 @@ class SofastGUI:
         r += 1
 
         self.btn_close_projection = tkinter.Button(
-            label_frame_projector, text="Close Display Window", command=self.close_projection_window
+            label_frame_projector, text="Close Image Projection", command=self.close_projection_window
         )
         self.btn_close_projection.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
         tkt.TkToolTip(self.btn_close_projection, "Close only projection window.")
