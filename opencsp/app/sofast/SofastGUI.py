@@ -266,14 +266,6 @@ class SofastGUI:
 
         # =============== First Column - System run controls ===============
         r = 0
-        # Run sofast capture
-        self.btn_run_measurement = tkinter.Button(
-            label_frame_run, text="Run Data Capture", command=self.run_measurement
-        )
-        self.btn_run_measurement.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
-        tkt.TkToolTip(self.btn_run_measurement, "Runs SOFAST data capture. Mask then fringes are captured.")
-        r += 1
-
         # Perform projector-camera brightness calibration
         self.btn_gray_levels_cal = tkinter.Button(
             label_frame_run, text="Run Response Calibration", command=self.run_gray_levels_cal
@@ -304,6 +296,14 @@ class SofastGUI:
         tkt.TkToolTip(
             self.btn_view_gray_levels_cal, "Views current Projector-Camera Brightness Calibration sequence data file."
         )
+        r += 1
+
+        # Run sofast capture
+        self.btn_run_measurement = tkinter.Button(
+            label_frame_run, text="Run Data Capture", command=self.run_measurement
+        )
+        self.btn_run_measurement.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
+        tkt.TkToolTip(self.btn_run_measurement, "Runs SOFAST data capture. Mask then fringes are captured.")
         r += 1
 
         # =============== First Column - Close button ===============
