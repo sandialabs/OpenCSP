@@ -57,22 +57,22 @@ def example_process_facet():
     # ================================
 
     # Instantiate SofastFixed class and load measurement data
-    fixed_pattern = ProcessSofastFixed(orientation, camera, fixed_pattern_dot_locs, facet_data)
+    fixed_pattern = ProcessSofastFixed(orientation, camera, fixed_pattern_dot_locs)
     fixed_pattern.load_measurement_data(measurement)
 
     # Process
     surface = Surface2DParabolic(initial_focal_lengths_xy=(150.0, 150), robust_least_squares=False, downsample=1)
-    fixed_pattern.process_single_facet_optic(surface)
+    fixed_pattern.process_single_facet_optic(facet_data, surface, measurement.origin, (0, 0))
 
     # 3. Log best-fit parabolic focal lengnths
     # ========================================
-    surf_coefs = fixed_pattern.data_slope_solver.surf_coefs_facet
+    surf_coefs = fixed_pattern.slope_solvers[0].surface.surf_coefs
     focal_lengths_xy = [1 / 4 / surf_coefs[2], 1 / 4 / surf_coefs[5]]
     lt.info(f'Parabolic fit xy focal lengths: {focal_lengths_xy[0]:.3f}, {focal_lengths_xy[1]:.3f} m')
 
     # 4. Plot slope magnitude
     # =======================
-    mirror = fixed_pattern.get_mirror('bilinear')
+    mirror = fixed_pattern.get_optic('bilinear')
 
     figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
     axis_control_m = rca.meters()
