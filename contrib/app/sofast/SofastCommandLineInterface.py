@@ -157,9 +157,7 @@ class SofastCommandLineInterface:
         self.origin = origin
         self.surface_fixed = surface_fixed
 
-        self.process_sofast_fixed = ProcessSofastFixed(
-            self.spatial_orientation, self.camera, fixed_pattern_dot_locs, self.facet_definition
-        )
+        self.process_sofast_fixed = ProcessSofastFixed(self.spatial_orientation, self.camera, fixed_pattern_dot_locs)
 
     def func_run_fringe_measurement(self) -> None:
         """Runs sofast fringe measurement"""
@@ -237,12 +235,15 @@ class SofastCommandLineInterface:
         self.process_sofast_fixed.load_measurement_data(measurement)
 
         # Process
-        self.process_sofast_fixed.process_single_facet_optic(self.surface_fixed)
+        xy_known = (0, 0)
+        self.process_sofast_fixed.process_single_facet_optic(
+            self.facet_definition, self.surface_fixed, self.origin, xy_known=xy_known
+        )
 
         lt.info(f"{timestamp():s} Completed Sofast Fixed data processing")
 
         # Plot optic
-        mirror = self.process_sofast_fixed.get_mirror()
+        mirror = self.process_sofast_fixed.get_optic()
 
         lt.debug(f"{timestamp():s} Plotting Sofast Fixed data")
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
@@ -517,7 +518,7 @@ if __name__ == "__main__":
 
     # Load Sofast Fixed data
     fixed_pattern_dot_locs_in = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
-    origin_in = Vxy((1100, 560))  # pixels
+    origin_in = Vxy((1100, 560))  # pixels, location of (0, 0) dot in camera image
     surface_fixed_in = Surface2DParabolic((100.0, 100.0), False, 1)
 
     sofast_cli.set_sofast_fixed_data(fixed_pattern_dot_locs_in, origin_in, surface_fixed_in)
