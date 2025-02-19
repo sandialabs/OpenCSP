@@ -318,20 +318,6 @@ class SofastCommandLineInterface:
 
     def func_user_input(self):
         """Waits for user input"""
-        print("\n")
-        print("Value      Command")
-        print("------------------")
-        print("mrp        run Sofast Fringe measurement and process/save")
-        print("mrs        run Sofast Fringe measurement and save only")
-        print("mip        run Sofast Fixed measurement and process/save")
-        print("mis        run Sofast Fixed measurement and save only")
-        print("ce         calibrate camera exposure")
-        print("cr         calibrate camera-projector response")
-        print("lr         load most recent camera-projector response calibration file")
-        print("q          quit and close all")
-        print("im         show image from camera.")
-        print("lv         shows camera live view")
-        print("cross      show crosshairs")
         retval = input("Input: ")
 
         lt.debug(f"{timestamp():s} user input: {retval:s}")
@@ -357,7 +343,23 @@ class SofastCommandLineInterface:
     def _run_given_input(self, retval: str) -> None:
         """Runs the given command"""
         # Run fringe measurement and process/save
-        if retval == "mrp":
+        if retval == "help":
+            print("\n")
+            print("Value      Command")
+            print("------------------")
+            print("mrp        run Sofast Fringe measurement and process/save")
+            print("mrs        run Sofast Fringe measurement and save only")
+            print("mip        run Sofast Fixed measurement and process/save")
+            print("mis        run Sofast Fixed measurement and save only")
+            print("ce         calibrate camera exposure")
+            print("cr         calibrate camera-projector response")
+            print("lr         load most recent camera-projector response calibration file")
+            print("q          quit and close all")
+            print("im         show image from camera.")
+            print("lv         shows camera live view")
+            print("cross      show crosshairs")
+            self.func_user_input()
+        elif retval == "mrp":
             lt.info(f"{timestamp()} Running Sofast Fringe measurement and processing/saving data")
             if self._check_fringe_system_loaded():
                 funcs = [
