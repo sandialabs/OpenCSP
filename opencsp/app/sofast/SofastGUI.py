@@ -187,11 +187,11 @@ class SofastGUI:
 
         # =============== First Column - Projection controls ===============
         r = 0
-        self.btn_show_cal_image = tkinter.Button(
+        self.btn_show_cal_image_fiducial = tkinter.Button(
             label_frame_projector, text="Show Cal Fiducial Image", command=self.show_calibration_fiducial_image
         )
-        self.btn_show_cal_image.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
-        tkt.TkToolTip(self.btn_show_cal_image, "Shows calibration fiducial image on projection window.")
+        self.btn_show_cal_image_fiducial.grid(row=r, column=0, pady=2, padx=2, sticky="nesw")
+        tkt.TkToolTip(self.btn_show_cal_image_fiducial, "Shows calibration fiducial image on projection window.")
         r += 1
 
         self.btn_show_cal_image = tkinter.Button(
@@ -462,6 +462,7 @@ class SofastGUI:
         self.btn_view_gray_levels_cal.config(state=state_system)
 
         # Turn projector buttons on/off
+        self.btn_show_cal_image_fiducial.config(state=state_projection)
         self.btn_show_cal_image.config(state=state_projection)
         self.btn_show_axes.config(state=state_projection)
         self.btn_show_crosshairs.config(state=state_projection)
