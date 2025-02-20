@@ -550,9 +550,8 @@ if __name__ == "__main__":
 
     # Set Sofast Fixed parameters
     # ===========================
-
-    # NOTE: to get the value of "origin_in," the user must first start the CLI, brign up the
-    # camera live view, then manually find the location of the (0, 0) fixed pattern dot
+    # NOTE: to get the value of "origin_in," the user must first start the CLI, bring up the
+    # camera live view, then manually find the location of the (0, 0) fixed pattern dot.
     fixed_pattern_dot_locs_in = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
     origin_in = Vxy((1100, 560))  # pixels, location of (0, 0) dot in camera image
     surface_fixed_in = Surface2DParabolic((100.0, 100.0), False, 1)
