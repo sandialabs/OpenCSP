@@ -633,7 +633,7 @@ class SofastGUI:
             return
 
         # Check if calibration file is loaded
-        if not self._check_calibration_loaded("run_measurment"):
+        if not self._check_calibration_loaded("run_measurement"):
             return
 
         # Get fringe object
