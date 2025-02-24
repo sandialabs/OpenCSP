@@ -7,6 +7,26 @@ your working directory and modifying it there. To run SOFAST, perform the follow
 
 NOTE: To update any of the parameters in the bottom of the file, the CLI must be
 restarted for changes to take effect.
+
+TODO:
+Refactor so that common code is separate from end-of-file input/execution block, move this to common.
+
+Make this a "kitchen sink" file, which includes all aspects:
+1. Data collection:
+   - Fringe measurement
+   - Fixed measurement with projector
+   - Fixed measurement with printed target in ambient lght
+2. Data analysis -- finding the best-fit instance of the class of shapes.
+
+3. Fitting to a desired reference optical shape.  (Make this an enhancement issue added to SOFAST.  Then, another file?)
+
+4. Plotting/ray tracing
+
+(Suggest puttting calibration in another file.)
+
+This file contains 1 and 2.
+
+In output logs, include user input.
 """
 
 import glob
