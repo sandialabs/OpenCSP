@@ -1,3 +1,34 @@
+"""A script that runs SOFAST in a command-line manner. We recommend copying this file into
+your working directory and modifying it there. To run SOFAST, perform the following steps:
+
+1. Navigate to the bottom of this file and fill in all user-input data specific to your SOFAST run.
+2. Type "help" to display help message
+3. Run SOFAST. Collect only measurement data, or (optionally) process data.
+
+NOTE: To update any of the parameters in the bottom of the file, the CLI must be
+restarted for changes to take effect.
+
+TODO:
+Refactor so that common code is separate from end-of-file input/execution block, move this to common.
+
+Make this a "kitchen sink" file, which includes all aspects:
+1. Data collection:
+   - Fringe measurement
+   - Fixed measurement with projector
+   - Fixed measurement with printed target in ambient lght
+2. Data analysis -- finding the best-fit instance of the class of shapes.
+
+3. Fitting to a desired reference optical shape.  (Make this an enhancement issue added to SOFAST.  Then, another file?)
+
+4. Plotting/ray tracing
+
+(Suggest puttting calibration in another file.)
+
+This file contains 1 and 2.
+
+In output logs, include user input.
+"""
+
 import glob
 from os.path import join, dirname, abspath
 
@@ -157,9 +188,7 @@ class SofastCommandLineInterface:
         self.origin = origin
         self.surface_fixed = surface_fixed
 
-        self.process_sofast_fixed = ProcessSofastFixed(
-            self.spatial_orientation, self.camera, fixed_pattern_dot_locs, self.facet_definition
-        )
+        self.process_sofast_fixed = ProcessSofastFixed(self.spatial_orientation, self.camera, fixed_pattern_dot_locs)
 
     def func_run_fringe_measurement(self) -> None:
         """Runs sofast fringe measurement"""
@@ -237,12 +266,15 @@ class SofastCommandLineInterface:
         self.process_sofast_fixed.load_measurement_data(measurement)
 
         # Process
-        self.process_sofast_fixed.process_single_facet_optic(self.surface_fixed)
+        xy_known = (0, 0)
+        self.process_sofast_fixed.process_single_facet_optic(
+            self.facet_definition, self.surface_fixed, self.origin, xy_known=xy_known
+        )
 
         lt.info(f"{timestamp():s} Completed Sofast Fixed data processing")
 
         # Plot optic
-        mirror = self.process_sofast_fixed.get_mirror()
+        mirror = self.process_sofast_fixed.get_optic()
 
         lt.debug(f"{timestamp():s} Plotting Sofast Fixed data")
         figure_control = rcfg.RenderControlFigure(tile_array=(1, 1), tile_square=True)
@@ -317,20 +349,6 @@ class SofastCommandLineInterface:
 
     def func_user_input(self):
         """Waits for user input"""
-        print("\n")
-        print("Value      Command")
-        print("------------------")
-        print("mrp        run Sofast Fringe measurement and process/save")
-        print("mrs        run Sofast Fringe measurement and save only")
-        print("mip        run Sofast Fixed measurement and process/save")
-        print("mis        run Sofast Fixed measurement and save only")
-        print("ce         calibrate camera exposure")
-        print("cr         calibrate camera-projector response")
-        print("lr         load most recent camera-projector response calibration file")
-        print("q          quit and close all")
-        print("im         show image from camera.")
-        print("lv         shows camera live view")
-        print("cross      show crosshairs")
         retval = input("Input: ")
 
         lt.debug(f"{timestamp():s} user input: {retval:s}")
@@ -356,7 +374,23 @@ class SofastCommandLineInterface:
     def _run_given_input(self, retval: str) -> None:
         """Runs the given command"""
         # Run fringe measurement and process/save
-        if retval == "mrp":
+        if retval == "help":
+            print("\n")
+            print("Value      Command")
+            print("------------------")
+            print("mrp        run Sofast Fringe measurement and process/save")
+            print("mrs        run Sofast Fringe measurement and save only")
+            print("mip        run Sofast Fixed measurement and process/save")
+            print("mis        run Sofast Fixed measurement and save only")
+            print("ce         calibrate camera exposure")
+            print("cr         calibrate camera-projector response")
+            print("lr         load most recent camera-projector response calibration file")
+            print("q          quit and close all")
+            print("im         show image from camera.")
+            print("lv         shows camera live view")
+            print("cross      show crosshairs")
+            self.func_user_input()
+        elif retval == "mrp":
             lt.info(f"{timestamp()} Running Sofast Fringe measurement and processing/saving data")
             if self._check_fringe_system_loaded():
                 funcs = [
@@ -454,12 +488,18 @@ class SofastCommandLineInterface:
 
 # Start program
 if __name__ == "__main__":
+    # Define main directory in which to save captured/processed data
+    # ==============================================================
+
     # Define upper level save direcory
     dir_save = abspath(join(dirname(__file__), "../../../../sofast_cli"))
 
     # Define logger directory and set up logger
     dir_log = join(dir_save, "logs")
     lt.logger(join(dir_log, f"log_{timestamp():s}.txt"), lt.log.INFO)
+
+    # Define the file locations of all SOFAST calibration data
+    # ========================================================
 
     # Define directory containing Sofast calibration files
     dir_cal = abspath(join(dirname(__file__), "../../../../sofast_calibration_files"))
@@ -473,27 +513,39 @@ if __name__ == "__main__":
     file_dot_locs = join(dir_cal, "dot_locations_optics_lab_landscape_square_width3_space6.h5")
 
     # Instantiate Sofast Command Line Interface
+    # =========================================
     sofast_cli = SofastCommandLineInterface()
 
-    # Define sofast and calibration file save directories
+    # Define specific sofast save directories
+    # =======================================
     sofast_cli.dir_save_fringe = join(dir_save, "sofast_fringe")
     sofast_cli.dir_save_fringe_calibration = join(sofast_cli.dir_save_fringe, "calibration")
     sofast_cli.dir_save_fixed = join(dir_save, "sofast_fixed")
 
-    # Load common data
-    image_acquisition_in = ImageAcquisition(0)
-    image_acquisition_in.frame_size = (1626, 1236)
-    image_acquisition_in.gain = 230
+    # Define camera (ImageAcquisition) parameters
+    # ===========================================
+    image_acquisition_in = ImageAcquisition(instance=0)  # First camera instance found
+    image_acquisition_in.frame_size = (1626, 1236)  # Set frame size
+    image_acquisition_in.gain = 230  # Set gain (higher=faster/more noise, lower=slower/less noise)
 
+    # Define projector/display (ImageProjection) parameters
+    # =====================================================
     image_projection_in = ImageProjection.load_from_hdf(file_image_projection)
-    image_projection_in.display_data.image_delay_ms = 200
+    image_projection_in.display_data.image_delay_ms = 200  # define projector-camera delay
 
-    camera_in = Camera.load_from_hdf(file_camera)
-    facet_definition_in = DefinitionFacet.load_from_json(file_facet_definition_json)
-    spatial_orientation_in = SpatialOrientation.load_from_hdf(file_spatial_orientation)
-    measure_point_optic_in = Vxyz((0, 0, 0))  # meters
-    dist_optic_screen_in = 10.158  # meters
-    name_optic_in = "Test optic"
+    # Define measurement-specific inputs
+    # ==================================
+
+    # NOTE: to update any of these fields, change them here and restart the SOFAST CLI
+    measure_point_optic_in = Vxyz((0, 0, 0))  # Measure point on optic, meters
+    dist_optic_screen_in = 10.158  # Measured optic-screen distance, meters
+    name_optic_in = "Test optic"  # Optic name
+
+    # Load all other calibration files
+    # ================================
+    camera_in = Camera.load_from_hdf(file_camera)  # SOFAST camera definition
+    facet_definition_in = DefinitionFacet.load_from_json(file_facet_definition_json)  # Facet definition
+    spatial_orientation_in = SpatialOrientation.load_from_hdf(file_spatial_orientation)  # Spatial orientation
 
     sofast_cli.set_common_data(
         image_acquisition_in,
@@ -506,21 +558,26 @@ if __name__ == "__main__":
         name_optic_in,
     )
 
-    sofast_cli.colorbar_limit = 2
+    sofast_cli.colorbar_limit = 2  # Update plotting colorbar limit, mrad
 
-    # Load Sofast Fringe data
+    # Set Sofast Fringe parameters
+    # ============================
     display_shape_in = DisplayShape.load_from_hdf(file_display)
     fringes_in = Fringes.from_num_periods(4, 4)
     surface_fringe_in = Surface2DParabolic((100.0, 100.0), False, 10)
 
     sofast_cli.set_sofast_fringe_data(display_shape_in, fringes_in, surface_fringe_in)
 
-    # Load Sofast Fixed data
+    # Set Sofast Fixed parameters
+    # ===========================
+    # NOTE: to get the value of "origin_in," the user must first start the CLI, bring up the
+    # camera live view, then manually find the location of the (0, 0) fixed pattern dot.
     fixed_pattern_dot_locs_in = DotLocationsFixedPattern.load_from_hdf(file_dot_locs)
-    origin_in = Vxy((1100, 560))  # pixels
+    origin_in = Vxy((1100, 560))  # pixels, location of (0, 0) dot in camera image
     surface_fixed_in = Surface2DParabolic((100.0, 100.0), False, 1)
 
     sofast_cli.set_sofast_fixed_data(fixed_pattern_dot_locs_in, origin_in, surface_fixed_in)
 
     # Run
+    # ===
     sofast_cli.run()

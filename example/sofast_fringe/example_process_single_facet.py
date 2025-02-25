@@ -58,7 +58,7 @@ def example_process_single_facet():
     2. Save projected sinusoidal fringe images to PNG format
     3. Save captured sinusoidal fringe images and mask images to PNG format
     4. Processes data with SOFAST and save processed data to HDF5
-    5. Generate plot suite and save images files
+    5. Generate plot suite and save image files
     """
     # General setup
     # =============
