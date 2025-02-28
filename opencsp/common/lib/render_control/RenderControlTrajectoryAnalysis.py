@@ -1,13 +1,12 @@
-"""
-
-
-"""
-
-
 class RenderControlTrajectoryAnalysis:
     """
     Render control for the UFACET pipeline step TrajectoryAnalysis.
+
+    This class manages the rendering settings for the TrajectoryAnalysis step in the UFACET pipeline,
+        allowing customization of various visual elements related to the 3D trajectories of heliostats.
     """
+
+    # "ChatGPT 4o" assisted with generating this docstring.
 
     def __init__(
         self,
@@ -25,6 +24,42 @@ class RenderControlTrajectoryAnalysis:
         heliostats_3d_dpi=200,  # Dpi for saving figure to disk.
         heliostats_3d_crop=True,  # Whether to crop annotations outside image frame.
     ):
+        """
+        Render control for the UFACET pipeline step TrajectoryAnalysis.
+
+        This class manages the rendering settings for the TrajectoryAnalysis step in the UFACET pipeline,
+        allowing customization of various visual elements related to the 3D trajectories of heliostats.
+
+        Parameters
+        ----------
+        clear_previous : bool, optional
+            Whether to remove any existing files in the designated output directory. By default, True.
+        draw_heliostats_3d : bool, optional
+            Whether to draw the 3D video track figures for heliostats. By default, True.
+        heliostats_3d_points_marker : str, optional
+            Marker style for the 3D video track points. By default, 'o'.
+        heliostats_3d_points_markersize : float, optional
+            Size of the marker for 3D video track points. By default, 1.5.
+        heliostats_3d_points_color : str, optional
+            Color for the 3D video track points. By default, 'm' (magenta).
+        heliostats_3d_label_horizontalalignment : str, optional
+            Horizontal alignment for the heliostat label. By default, 'center'.
+        heliostats_3d_label_verticalalignment : str, optional
+            Vertical alignment for the heliostat label. By default, 'center'.
+        heliostats_3d_label_fontsize : int, optional
+            Font size for the heliostat label. By default, 6.
+        heliostats_3d_label_fontstyle : str, optional
+            Font style for the heliostat label. By default, 'normal'.
+        heliostats_3d_label_fontweight : str, optional
+            Font weight for the heliostat label. By default, 'bold'.
+        heliostats_3d_label_color : str, optional
+            Color for the heliostat label. By default, 'm' (magenta).
+        heliostats_3d_dpi : int, optional
+            DPI (dots per inch) for saving figures to disk. By default, 200.
+        heliostats_3d_crop : bool, optional
+            Whether to crop annotations outside the image frame. By default, True.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         super(RenderControlTrajectoryAnalysis, self).__init__()
 
         self.clear_previous = clear_previous
@@ -45,9 +80,38 @@ class RenderControlTrajectoryAnalysis:
 # COMMON CASES
 
 
-def default(color="m"):
+def default(color='m'):
+    """
+    Create a default render control for trajectory analysis.
+
+    This function returns a `RenderControlTrajectoryAnalysis` instance with default settings,
+    using the specified color for the points and labels.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the 3D video track points and heliostat labels. By default, 'm' (magenta).
+
+    Returns
+    -------
+    RenderControlTrajectoryAnalysis
+        An instance of `RenderControlTrajectoryAnalysis` configured with default parameters.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlTrajectoryAnalysis(heliostats_3d_points_color=color, heliostats_3d_label_color=color)
 
 
 def fast():
+    """
+    Create a fast render control for trajectory analysis.
+
+    This function returns a `RenderControlTrajectoryAnalysis` instance configured to skip
+    drawing the 3D heliostat tracks, which can speed up the rendering process.
+
+    Returns
+    -------
+    RenderControlTrajectoryAnalysis
+        An instance of `RenderControlTrajectoryAnalysis` configured for fast rendering.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlTrajectoryAnalysis(draw_heliostats_3d=False)

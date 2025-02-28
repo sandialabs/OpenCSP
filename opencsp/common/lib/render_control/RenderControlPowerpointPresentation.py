@@ -9,6 +9,8 @@ import opencsp.common.lib.tool.time_date_tools as tdt
 
 
 class RenderControlPowerpointPresentation:
+    """Create a new presentation instance to which to add slides."""
+
     def __init__(self, new_slides: list[pps.PowerpointSlide] = None, existing_presentation_path_name_ext: str = None):
         """Create a new presentation instance to which to add slides.
 

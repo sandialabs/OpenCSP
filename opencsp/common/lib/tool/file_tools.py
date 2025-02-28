@@ -932,6 +932,37 @@ def merge_files(in_files: list[str], out_file: str, overwrite=False, remove_in_f
 
 
 def convert_shortcuts_to_symlinks(dirname: str):
+    """
+    Convert Windows shortcut files (.lnk) in a specified directory to symbolic links.
+
+    This function scans the given directory for shortcut files and replaces them with
+    symbolic links pointing to the original target files or directories. It handles
+    nested shortcuts by recursively resolving the target paths.
+
+    Parameters
+    ----------
+    dirname : str
+        The path to the directory containing the shortcut files to be converted.
+
+    Raises
+    ------
+    FileExistsError
+        If a symbolic link with the same name already exists as a file or directory.
+    Exception
+        If there is an error reading a shortcut or creating a symbolic link.
+
+    Notes
+    -----
+    This function is designed to work on Windows systems only. It uses the
+    `win32com.client` module to interact with Windows shortcuts. If the function
+    is executed on a non-Windows system, it will log a debug message and exit without
+    performing any actions.
+
+    Examples
+    --------
+    >>> convert_shortcuts_to_symlinks("C:\\path\\to\\shortcuts")
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     if os.name == "nt":
         # update dirname to use windows "\" seperators
         dirname = os.path.normpath(dirname)

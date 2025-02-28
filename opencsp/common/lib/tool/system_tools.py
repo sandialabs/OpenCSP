@@ -40,6 +40,7 @@ def is_production_run():
 
 
 def set_is_production_run(is_production_run: bool):
+    "Setter for __is_production_run global"
     __is_production_run = is_production_run
 
 
