@@ -23,3 +23,4 @@ This section describes the OpenCSP classes and interfaces.
    common/lib/render_control/index.rst
    common/lib/target/index.rst
    common/lib/tool/index.rst
+   common/lib/uav/index.rst
