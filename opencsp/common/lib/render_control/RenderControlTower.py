@@ -115,5 +115,17 @@ def no_target():
 
 
 def no_bcs():
+    """
+    Create a render control for a tower outline without boundary control points (BCS).
+
+    This function returns a `RenderControlTower` instance configured to draw the tower outline
+    without any boundary control points.
+
+    Returns
+    -------
+    RenderControlTower
+        An instance of `RenderControlTower` configured to display the tower outline without boundary control points.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # tower outline with not bcs.
     return RenderControlTower(wire_frame=rcps.outline(color="g"), bcs=False)

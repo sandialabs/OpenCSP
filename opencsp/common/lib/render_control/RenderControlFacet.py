@@ -136,6 +136,25 @@ def outline(color='k'):
 
 
 def outline_thin(color="k", linewidth=0.5):
+    """
+    Create a render control that displays a thin outline of the facet.
+
+    This function returns a `RenderControlFacet` instance configured to draw a thin outline
+    of the facet without the centroid or surface normal.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color of the outline. By default, 'k' (black).
+    linewidth : float, optional
+        Width of the outline line. By default, 0.5.
+
+    Returns
+    -------
+    RenderControlFacet
+        An instance of `RenderControlFacet` configured to display a thin outline.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     return RenderControlFacet(
         draw_centroid=False,
         draw_outline=True,

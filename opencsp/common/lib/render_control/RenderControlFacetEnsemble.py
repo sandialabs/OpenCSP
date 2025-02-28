@@ -213,6 +213,27 @@ def facet_outlines(color='k', **kwargs):
 
 
 def facet_outlines_thin(color="k", linewidth=0.25, **kwargs):
+    """
+    Create a render control ensemble with thin facet outlines.
+
+    This function returns a `RenderControlFacetEnsemble` instance configured to draw thin
+    outlines of the facets without normal vectors or centroids.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the outlines. By default, 'k' (black).
+    linewidth : float, optional
+        Width of the outline line. By default, 0.25.
+    **kwargs : keyword arguments
+        Additional keyword arguments to pass to the `RenderControlFacetEnsemble`.
+
+    Returns
+    -------
+    RenderControlFacetEnsemble
+        An instance of `RenderControlFacetEnsemble` configured for thin facet outlines.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     return RenderControlFacetEnsemble(
         draw_normal_vector=False,
         default_style=rcf.outline_thin(color=color, linewidth=linewidth),
