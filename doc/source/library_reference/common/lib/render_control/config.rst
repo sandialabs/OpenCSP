@@ -1,3 +1,6 @@
+Axis
+====
+
 .. currentmodule:: opencsp.common.lib.render_control.RenderControlAxis
 
 .. automodule:: opencsp.common.lib.render_control.RenderControlAxis
@@ -6,6 +9,9 @@
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
+
+Bcs
+===
 
 .. currentmodule:: opencsp.common.lib.render_control.RenderControlBcs
 
@@ -16,6 +22,21 @@
    :show-inheritance:
    :member-order: groupwise
 
+Point Sequence
+==============
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlPointSeq
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlPointSeq
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Deflectometry
+=============
+
 .. currentmodule:: opencsp.common.lib.render_control.RenderControlDeflectometryInstrument
 
 .. automodule:: opencsp.common.lib.render_control.RenderControlDeflectometryInstrument
@@ -25,23 +46,8 @@
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlEnsemble
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlEnsemble
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
+Facet
+=====
 
 .. currentmodule:: opencsp.common.lib.render_control.RenderControlFacet
 
@@ -61,45 +67,24 @@
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlFigure
+Ensemble
+========
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlFigure
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlEnsemble
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlEnsemble
    :members:
    :special-members: __init__
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlFigureRecord
+Heliostats
+==========
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlFigureRecord
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlFramesNoDuplicates
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlFramesNoDuplicates
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlFunctionXY
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlFunctionXY
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlHeatmap
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlHeatmap
+.. automodule:: opencsp.common.lib.render_control.RenderControlEvaluateHeliostats3d
    :members:
    :special-members: __init__
    :undoc-members:
@@ -133,18 +118,120 @@
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlIntersection
+LightPath
+=========
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlIntersection
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlLightPath
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlLightPath
    :members:
    :special-members: __init__
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlKeyCorners
+Trajectory Analysis
+===================
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlKeyCorners
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Mirror
+======
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlMirror
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlMirror
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Ray Trace
+=========
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlRayTrace
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlRayTrace
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Solar Field
+===========
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlSolarField
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlSolarField
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Surface
+=======
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlSurface
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlSurface
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Tower
+=====
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlTower
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlTower
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Figure
+======
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlFigure
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlFigure
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+FigureRecord
+============
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlFigureRecord
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlFigureRecord
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Frames
+======
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlFramesNoDuplicates
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlFramesNoDuplicates
    :members:
    :special-members: __init__
    :undoc-members:
@@ -160,41 +247,44 @@
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlKeyTracks
+FunctionXY
+==========
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlKeyTracks
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlFunctionXY
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlFunctionXY
    :members:
    :special-members: __init__
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlLightPath
+Heatmap
+=======
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlLightPath
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlHeatmap
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlHeatmap
    :members:
    :special-members: __init__
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlMirror
+Intersection
+============
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlMirror
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlIntersection
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlIntersection
    :members:
    :special-members: __init__
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlPointSeq
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlPointSeq
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
+Powerpoint
+==========
 
 .. currentmodule:: opencsp.common.lib.render_control.RenderControlPowerpointPresentation
 
@@ -214,32 +304,8 @@
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlRayTrace
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlRayTrace
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlSolarField
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlSolarField
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlSurface
-
-.. automodule:: opencsp.common.lib.render_control.RenderControlSurface
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
+Text
+====
 
 .. currentmodule:: opencsp.common.lib.render_control.RenderControlText
 
@@ -250,18 +316,27 @@
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlTower
+Video
+=====
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlTower
+Key Corners
+===========
+
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlKeyCorners
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlKeyCorners
    :members:
    :special-members: __init__
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
 
-.. currentmodule:: opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
+Key Tracks
+==========
 
-.. automodule:: opencsp.common.lib.render_control.RenderControlTrajectoryAnalysis
+.. currentmodule:: opencsp.common.lib.render_control.RenderControlKeyTracks
+
+.. automodule:: opencsp.common.lib.render_control.RenderControlKeyTracks
    :members:
    :special-members: __init__
    :undoc-members:
