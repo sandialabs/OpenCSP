@@ -79,9 +79,8 @@ def view_spec_im() -> dict:
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
-    spec['type'] = 'image'
+    spec["type"] = "image"
     return spec
-
 
 
 def view_spec_camera(camera, camera_xform) -> dict:
