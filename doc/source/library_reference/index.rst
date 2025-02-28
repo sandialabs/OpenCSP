@@ -21,3 +21,4 @@ This section describes the OpenCSP classes and interfaces.
    common/lib/photogrammetry/index.rst
    common/lib/render/index.rst
    common/lib/render_control/index.rst
+   common/lib/target/index.rst
