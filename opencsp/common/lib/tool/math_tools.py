@@ -187,10 +187,10 @@ def ncr(n, r):
     Calculate the binomial coefficient, also known as "n choose r".
 
     The binomial coefficient is defined as:
-    \[
-    C(n, r) = \frac{n!}{r!(n-r)!}
-    \]
-    where \( n \) is the total number of items, and \( r \) is the number of items to choose.
+
+    C(n, r) = n! / (r! * (n - r)!)
+
+    where 'n' is the total number of items, and 'r' is the number of items to choose.
 
     Parameters
     ----------
@@ -362,8 +362,10 @@ def lambda_symmetric_paraboloid(focal_length: numbers.Number) -> Callable[[float
     Create a lambda function representing a symmetric paraboloid.
 
     The symmetric paraboloid is defined by the equation:
-    \( z = \frac{1}{4f} (x^2 + y^2) \)
-    where \( f \) is the focal length of the paraboloid.
+
+    z = (1 / (4 * f)) * (x^2 + y^2)
+
+    where 'f' is the focal length of the paraboloid.
 
     Parameters
     ----------
