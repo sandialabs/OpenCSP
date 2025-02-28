@@ -1,10 +1,3 @@
-"""
-Color management.
-
-
-
-"""
-
 import math
 
 import opencsp.common.lib.geometry.Vxyz as Vxyz
@@ -13,8 +6,15 @@ import opencsp.common.lib.geometry.Uxyz as Uxyz
 
 def matlab_color_bar():
     """
-    This color bar was manually measured based on slope magnitude plots produced by the original MATLAB SOFAST version.
+    Generate a color bar based on manually measured slope magnitude plots from the original MATLAB SOFAST version.
+
+    Returns
+    -------
+    list of tuple
+        A list of RGB tuples representing the color bar, where each tuple contains three integers
+        corresponding to the red, green, and blue color channels (0-255).
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     color_bar = [
         (0, 0, 143),
         (0, 0, 159),
@@ -102,8 +102,16 @@ def matlab_color_bar():
 # ?? SCAFFOLDING RCB -- USE THIS TO CLARIFY AND THEN FIXPROBLEMS WITH COLOR INTEROPLATION.
 def corner_tour_closed_color_bar():
     """
-    This color bar traverses the corners of the [R,G,B] space, excluding black and white, returning to the start point.
+    Generate a color bar that traverses the corners of the RGB space, excluding black and white,
+    and returns to the starting point.
+
+    Returns
+    -------
+    list of tuple
+        A list of RGB tuples representing the color bar, where each tuple contains three floats
+        corresponding to the red, green, and blue color channels (0-255).
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     #                  Red    Green     Blue
     color_bar = [
         (0.00, 0.00, 255.00),
@@ -135,9 +143,16 @@ def corner_tour_closed_color_bar():
 
 def O_color_bar():
     """
-    This color bar moves smoothly through the following color sequence:
-        Blue --> Cyan --> Green --> Yellow --> Red --> Magenta --> Blue
+    Generate a color bar that moves smoothly through a sequence of colors:
+    Blue --> Cyan --> Green --> Yellow --> Red --> Magenta --> Blue.
+
+    Returns
+    -------
+    list of tuple
+        A list of RGB tuples representing the color bar, where each tuple contains three floats
+        corresponding to the red, green, and blue color channels (0-255).
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     #                  Red    Green     Blue
     color_bar = [
         (0.00, 0.00, 255.00),
@@ -171,10 +186,15 @@ def O_color_bar():
 
 def nikon_D3300_monitor_equal_step_color_bar():
     """
-    This was measured at SNL on August 24, 2023.
+    Generate a color bar measured using an LCD monitor as a color reference on August 24, 2023.
 
-    An LCD monitor was used as a color reference.
+    Returns
+    -------
+    list of tuple
+        A list of RGB tuples representing the color bar, where each tuple contains three floats
+        corresponding to the red, green, and blue color channels (0-255).
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
     #                  Red    Green     Blue
     color_bar = [
         (0.00, 14.00, 254.00),
@@ -216,6 +236,32 @@ def nikon_D3300_monitor_equal_step_color_bar():
 
 # Color lookup
 def color_given_value(val, val_min, val_max, color_below_min, color_bar, color_above_max, discrete_or_continuous):
+    """
+    Lookup the color corresponding to a given value based on a specified color bar.
+
+    Parameters
+    ----------
+    val : float
+        The value for which to find the corresponding color.
+    val_min : float
+        The minimum value of the range.
+    val_max : float
+        The maximum value of the range.
+    color_below_min : tuple
+        The color to return if the value is below the minimum (RGB tuple).
+    color_bar : list of tuple
+        The color bar to use for mapping values to colors (list of RGB tuples).
+    color_above_max : tuple
+        The color to return if the value is above the maximum (RGB tuple).
+    discrete_or_continuous : str
+        Specifies whether to return a 'discrete' or 'continuous' color.
+
+    Returns
+    -------
+    tuple
+        The RGB color corresponding to the input value.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Out-of-bounds cases.
     if val < val_min:
         return color_below_min
@@ -258,6 +304,22 @@ def color_given_value(val, val_min, val_max, color_below_min, color_bar, color_a
 
 
 def angle_between_color_vectors(rgb_1, rgb_2):
+    """
+    Calculate the angle between two RGB color vectors.
+
+    Parameters
+    ----------
+    rgb_1 : tuple
+        The first RGB color vector (RGB tuple).
+    rgb_2 : tuple
+        The second RGB color vector (RGB tuple).
+
+    Returns
+    -------
+    float
+        The angle in radians between the two RGB color vectors.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     rgb_1_uvec = Uxyz.Uxyz(rgb_1)
     rgb_2_uvec = Uxyz.Uxyz(rgb_2)
     cross_1_2_vec = rgb_1_uvec.cross(rgb_2_uvec)
@@ -267,6 +329,22 @@ def angle_between_color_vectors(rgb_1, rgb_2):
 
 
 def color_bar_segment_spanned_angle(idx, color_bar):
+    """
+    Calculate the angle spanned by a segment of the color bar between two adjacent colors.
+
+    Parameters
+    ----------
+    idx : int
+        The index of the color segment in the color bar.
+    color_bar : list of tuple
+        The color bar to use for calculating the angle (list of RGB tuples).
+
+    Returns
+    -------
+    float
+        The angle in radians spanned by the color segment.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     if idx < 0:
         print("ERROR: In angle_between_color_vectors(), idx = ", str(idx), " is less than zero.")
         assert False  # ?? SCAFFOLDING RCB -- REPLACE WITH RAISING AN EXCEPTION?  (THROUGHOUT)
@@ -285,6 +363,20 @@ def color_bar_segment_spanned_angle(idx, color_bar):
 
 
 def construct_color_bar_spanned_angle_list(color_bar):
+    """
+    Construct a list of angles spanned by each segment of the color bar.
+
+    Parameters
+    ----------
+    color_bar : list of tuple
+        The color bar to use for calculating the angles (list of RGB tuples).
+
+    Returns
+    -------
+    list of float
+        A list of angles in radians spanned by each segment of the color bar.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     angle_list = []
     for idx in range(len(color_bar) - 1):  # One less than n_colors, because we look at pairs of (idx, idx+1).
         angle_1_2 = color_bar_segment_spanned_angle(idx, color_bar)
@@ -294,6 +386,21 @@ def construct_color_bar_spanned_angle_list(color_bar):
 
 
 def survey_color_bar(color_bar):
+    """
+    Survey the color bar to calculate the total angle spanned and the indices of the first and last non-zero angles.
+
+    Parameters
+    ----------
+    color_bar : list of tuple
+        The color bar to survey (list of RGB tuples).
+
+    Returns
+    -------
+    tuple
+        A tuple containing the total angle sum (float), the index of the first non-zero angle (int),
+        and the index of the last non-zero angle (int).
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     angle_sum = 0.0
     first_non_zero_angle_idx = -1
     last_non_zero_angle_idx = -1
@@ -309,6 +416,24 @@ def survey_color_bar(color_bar):
 
 
 def construct_rgb_cumulative_angle_pair_list(color_bar, first_color_idx, last_color_idx):
+    """
+    Construct a list of RGB colors with their corresponding cumulative angles.
+
+    Parameters
+    ----------
+    color_bar : list of tuple
+        The color bar to use for constructing the list (list of RGB tuples).
+    first_color_idx : int
+        The index of the first color to include in the list.
+    last_color_idx : int
+        The index of the last color to include in the list.
+
+    Returns
+    -------
+    list of tuple
+        A list of tuples where each tuple contains an RGB color and its corresponding cumulative angle.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     cumulative_angle = 0.0
     rgb_cumulative_angle_list = []
     # TODO RCB:  This logic is confusing and opaque.  Can it be simplified?
@@ -331,6 +456,22 @@ def construct_rgb_cumulative_angle_pair_list(color_bar, first_color_idx, last_co
 
 
 def lookup_color_and_angle_before(rgb_angle_list, desired_angle):
+    """
+    Lookup the RGB color and angle before a specified desired angle.
+
+    Parameters
+    ----------
+    rgb_angle_list : list of tuple
+        A list of tuples where each tuple contains an RGB color and its corresponding angle.
+    desired_angle : float
+        The desired angle for which to find the preceding color and angle.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the RGB color and the angle before the desired angle.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     previous_rgb_angle = rgb_angle_list[0]
     previous_rgb = previous_rgb_angle[0]
     previous_angle = previous_rgb_angle[1]
@@ -350,6 +491,22 @@ def lookup_color_and_angle_before(rgb_angle_list, desired_angle):
 
 
 def lookup_color_and_angle_after(rgb_angle_list, desired_angle):
+    """
+    Lookup the RGB color and angle after a specified desired angle.
+
+    Parameters
+    ----------
+    rgb_angle_list : list of tuple
+        A list of tuples where each tuple contains an RGB color and its corresponding angle.
+    desired_angle : float
+        The desired angle for which to find the following color and angle.
+
+    Returns
+    -------
+    tuple
+        A tuple containing the RGB color and the angle after the desired angle.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     for idx in range(len(rgb_angle_list)):
         this_rgb_angle = rgb_angle_list[idx]
         this_rgb = this_rgb_angle[0]
@@ -362,9 +519,29 @@ def lookup_color_and_angle_after(rgb_angle_list, desired_angle):
 
 def interpolate_color(desired_angle, rgb_before, angle_before, rgb_after, angle_after):
     """
-    This isn't exactly right.  A correct routine would construct a ray at the desired angle in the [R,G,B] space, and
-    project that ray onto the line between rgb_before and rgb_after. But we'll live with this approximation for now.
+    Interpolate the RGB color at a specified desired angle between two RGB colors.
+
+    Parameters
+    ----------
+    desired_angle : float
+        The angle at which to interpolate the color.
+    rgb_before : tuple
+        The RGB color before the desired angle (RGB tuple).
+    angle_before : float
+        The angle corresponding to the rgb_before color.
+    rgb_after : tuple
+        The RGB color after the desired angle (RGB tuple).
+    angle_after : float
+        The angle corresponding to the rgb_after color.
+
+    Returns
+    -------
+    tuple
+        The interpolated RGB color as a tuple of integers (rounded).
     """
+    # "ChatGPT 4o" assisted with generating this docstring.
+    # TODO: This isn't exactly right.  A correct routine would construct a ray at the desired angle in the [R,G,B] space, and
+    # project that ray onto the line between rgb_before and rgb_after. But we'll live with this approximation for now.
     # Boundary case.
     if angle_before == angle_after:
         interpolated_r = rgb_before[0]
@@ -392,6 +569,22 @@ def interpolate_color(desired_angle, rgb_before, angle_before, rgb_after, angle_
 
 
 def interpolate_color_given_angle(rgb_angle_list, desired_angle):
+    """
+    Interpolate the RGB color corresponding to a specified desired angle using a list of RGB colors and angles.
+
+    Parameters
+    ----------
+    rgb_angle_list : list of tuple
+        A list of tuples where each tuple contains an RGB color and its corresponding angle.
+    desired_angle : float
+        The desired angle for which to interpolate the color.
+
+    Returns
+    -------
+    tuple
+        The interpolated RGB color as a tuple of integers.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     rgb_before, angle_before = lookup_color_and_angle_before(rgb_angle_list, desired_angle)
     rgb_after, angle_after = lookup_color_and_angle_after(rgb_angle_list, desired_angle)
     interpolated_rgb = interpolate_color(desired_angle, rgb_before, angle_before, rgb_after, angle_after)
@@ -400,6 +593,20 @@ def interpolate_color_given_angle(rgb_angle_list, desired_angle):
 
 
 def normalize_color_bar_to_equal_angles(color_bar):
+    """
+    Normalize a color bar to have equal angles between colors.
+
+    Parameters
+    ----------
+    color_bar : list of tuple
+        The color bar to normalize, represented as a list of RGB tuples.
+
+    Returns
+    -------
+    list of tuple
+        A new color bar with equal angles between colors, represented as a list of RGB tuples.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Determine the number of color bar bins.
     n_colors = len(color_bar)
 

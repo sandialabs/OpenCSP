@@ -5,6 +5,10 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class RenderControlSurface:
+    """
+    Render control information for how to style surface plots (see View3d
+    function plot_surface and plot_trisurface)."""
+
     def __init__(
         self,
         draw_title=True,

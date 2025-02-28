@@ -17,60 +17,167 @@ tdt_ignore_legacy = False
 
 
 def print_current_date_time() -> None:
+    """
+    Print the current date and time to the log.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     lt.info("Current Date and Time =" + current_date_time_string())
 
 
 def print_current_date() -> None:
+    """
+    Print the current date to the log.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     lt.info("Current Date =" + current_date_string())
 
 
 def print_current_time() -> None:
+    """
+    Print the current time to the log.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     lt.info("Current Time =" + current_time_string())
 
 
 def current_date_time_string() -> str:
-    """%Y-%m-%d %H:%M:%S"""
-    return current_date_string() + " " + current_time_string()
+    """
+    Get the current date and time as a formatted string.
+
+    The format of the string is "%Y-%m-%d %H:%M:%S".
+
+    Returns
+    -------
+    str
+        The current date and time as a string.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
+    return current_date_string() + ' ' + current_time_string()
 
 
 def current_date_string() -> str:
-    """%Y-%m-%d"""
+    """
+    Get the current date as a formatted string.
+
+    The format of the string is "%Y-%m-%d".
+
+    Returns
+    -------
+    str
+        The current date as a string.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     now = datetime.now()
     current_date_str = now.strftime("%Y-%m-%d")
     return current_date_str
 
 
 def current_time_string() -> str:
-    """%H:%M:%S"""
+    """
+    Get the current time as a formatted string.
+
+    The format of the string is "%H:%M:%S".
+
+    Returns
+    -------
+    str
+        The current time as a string.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     now = datetime.now()
     current_time_str = now.strftime("%H:%M:%S")
     return current_time_str
 
 
 def current_date_string_forfile() -> str:
-    """%Y%m%d"""
+    """
+    Get the current date as a formatted string suitable for filenames.
+
+    The format of the string is "%Y%m%d".
+
+    Returns
+    -------
+    str
+        The current date as a string suitable for use in filenames.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     now = datetime.now()
     current_date_str = now.strftime("%Y%m%d")
     return current_date_str
 
 
 def current_time_string_forfile() -> str:
-    """%H%M%S"""
+    """
+    Get the current time as a formatted string suitable for filenames.
+
+    The format of the string is "%H%M%S".
+
+    Returns
+    -------
+    str
+        The current time as a string suitable for use in filenames.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     now = datetime.now()
     current_time_str = now.strftime("%H%M%S")
     return current_time_str
 
 
 def current_date_time_string_forfile() -> str:
-    """%Y%m%d_%H%M%S"""
-    return current_date_string_forfile() + "_" + current_time_string_forfile()
+    """
+    Get the current date and time as a formatted string suitable for filenames.
+
+    The format of the string is "%Y%m%d_%H%M%S".
+
+    Returns
+    -------
+    str
+        The current date and time as a string suitable for use in filenames.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
+    return current_date_string_forfile() + '_' + current_time_string_forfile()
 
 
 def current_time() -> float:
+    """
+    Get the current time in seconds since the epoch.
+
+    Returns
+    -------
+    float
+        The current time in seconds since the epoch (Unix time).
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return time.time()
 
 
 def elapsed_time_since_start_sec(start_time: float) -> float:
+    """
+    Calculate the elapsed time in seconds since a given start time.
+
+    Parameters
+    ----------
+    start_time : float
+        The start time in seconds since the epoch.
+
+    Returns
+    -------
+    float
+        The elapsed time in seconds since the start time.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return time.time() - start_time
 
 
@@ -135,6 +242,48 @@ def tz(name_or_offset: str | float | timedelta):
 def add_seconds_to_ymdhmsz(
     ymdhmsz: list[int, int, int, int, int, float, int], time_sec: float, ignore_legacy=None
 ) -> list[int, int, int, int, int, float, int]:
+    """
+    Add a specified number of seconds to a date and time represented as a list.
+
+    The input list is expected to be in the format:
+    [year, month, day, hour, minute, second, zone].
+
+    Parameters
+    ----------
+    ymdhmsz : list[int, int, int, int, int, float, int]
+        A list representing the date and time, where:
+        - year (int): The year.
+        - month (int): The month (1-12).
+        - day (int): The day of the month (1-31).
+        - hour (int): The hour (0-23).
+        - minute (int): The minute (0-59).
+        - second (float): The second (0-59.999...).
+        - zone (int): The time zone offset.
+    time_sec : float
+        The number of seconds to add to the date and time.
+    ignore_legacy : bool, optional
+        If set to False, a warning message will be printed indicating that this function is a legacy function.
+
+    Returns
+    -------
+    list[int, int, int, int, int, float, int]
+        A new list representing the updated date and time after adding the specified seconds.
+
+    Raises
+    ------
+    AssertionError
+        If rolling over a day boundary is not implemented.
+
+    Notes
+    -----
+    This function currently does not handle rolling over a day boundary or month boundary.
+
+    Examples
+    --------
+    >>> add_seconds_to_ymdhmsz([2023, 3, 15, 12, 30, 45.0, 0], 30)
+    [2023, 3, 15, 12, 31, 15.0, 0]
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     ignore_legacy = tdt_ignore_legacy if (ignore_legacy == None) else ignore_legacy
     if ignore_legacy == False:
         print(
@@ -173,6 +322,48 @@ def add_seconds_to_ymdhmsz(
 def subtract_seconds_from_ymdhmsz(
     ymdhmsz: list[int, int, int, int, int, float, int], time_sec: float, ignore_legacy=None
 ) -> list[int, int, int, int, int, float, int]:
+    """
+    Subtract a specified number of seconds from a date and time represented as a list.
+
+    The input list is expected to be in the format:
+    [year, month, day, hour, minute, second, zone].
+
+    Parameters
+    ----------
+    ymdhmsz : list[int, int, int, int, int, float, int]
+        A list representing the date and time, where:
+        - year (int): The year.
+        - month (int): The month (1-12).
+        - day (int): The day of the month (1-31).
+        - hour (int): The hour (0-23).
+        - minute (int): The minute (0-59).
+        - second (float): The second (0-59.999...).
+        - zone (int): The time zone offset.
+    time_sec : float
+        The number of seconds to subtract from the date and time.
+    ignore_legacy : bool, optional
+        If set to False, a warning message will be printed indicating that this function is a legacy function.
+
+    Returns
+    -------
+    list[int, int, int, int, int, float, int]
+        A new list representing the updated date and time after subtracting the specified seconds.
+
+    Raises
+    ------
+    AssertionError
+        If rolling over a month boundary is not implemented.
+
+    Notes
+    -----
+    This function currently does not handle rolling over a month boundary.
+
+    Examples
+    --------
+    >>> subtract_seconds_from_ymdhmsz([2023, 3, 15, 12, 30, 45.0, 0], 30)
+    [2023, 3, 15, 12, 30, 15.0, 0]
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     ignore_legacy = tdt_ignore_legacy if (ignore_legacy == None) else ignore_legacy
     if ignore_legacy == False:
         print(

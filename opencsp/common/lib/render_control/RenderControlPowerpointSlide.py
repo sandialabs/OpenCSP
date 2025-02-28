@@ -2,6 +2,8 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class RenderControlPowerpointSlide:
+    """Controls for how to render a power slide."""
+
     def __init__(
         self,
         title_size=30,

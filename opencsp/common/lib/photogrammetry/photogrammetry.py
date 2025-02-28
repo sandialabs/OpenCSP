@@ -91,7 +91,7 @@ def valid_camera_pose(
 
     Parameters
     ----------
-    camera : Camera
+    camera : opencsp.common.lib.camera.Camera.Camera
         Camera object.
     rvecs : ndarray
         Shape (3,) rvec array.
@@ -219,13 +219,13 @@ def align_points(pts_obj: Vxyz, vals: Vxyz, scale: bool = False) -> tuple[Transf
     pts_obj : Vxyz
         Object points, meters.
     vals : Vxyz
-        [(x1, y1, z1), (x2, y2, z2), ...] The expected coordinate values
+        ``[(x1, y1, z1), (x2, y2, z2), ...]`` The expected coordinate values
         of each coordinate index that correspond to points in pts_obj.
         If a coordinate is to be ignored, set it to np.nan.
-        Example:
-            [(np.nan, 0, np.nan), (np.nan, 0, np.nan), (0, 0, np.nan)]
+
+        For example: ``[(np.nan, 0, np.nan), (np.nan, 0, np.nan), (0, 0, np.nan)]``
     scale : bool
-        To apply a scaling factor to points, by default False
+        To apply a scaling factor to points (default False)
 
     Returns
     -------
@@ -233,7 +233,6 @@ def align_points(pts_obj: Vxyz, vals: Vxyz, scale: bool = False) -> tuple[Transf
         Point cloud Transform object
         Point cloud scale factor
         Point alignment error, meters
-
     """
 
     def calc_point_errors(vec: ndarray):
@@ -383,7 +382,7 @@ def triangulate(
 
     Parameters
     ----------
-    cameras : list[Camera]
+    cameras : list[opencsp.common.lib.camera.Camera.Camera]
         N Camera objects used to capture images
     rots : list[Rotation]
         N world to camera Rotations

@@ -1,17 +1,28 @@
-"""
-
-
-"""
-
 import opencsp.common.lib.uas.ScanPass as sp
 
 
 class Scan:
     """
     A flight scan, comprised of a sequence of scan passes.
+
+    Attributes
+    ----------
+    passes : list of ScanPass
+        The list of scan passes associated with this flight scan.
     """
 
+    # "ChatGPT 4o" assisted with generating this docstring.
+
     def __init__(self, scan_passes):  # List of ScanPass objects.
+        """
+        A flight scan, comprised of a sequence of scan passes.
+
+        Parameters
+        ----------
+        scan_passes : list of ScanPass
+            A list of ScanPass objects representing the individual scan passes that make up the flight scan.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         super(Scan, self).__init__()
 
         # Check input.
@@ -25,6 +36,15 @@ class Scan:
     # ACCESS
 
     def waypoints(self):
+        """
+        Retrieve a list of waypoints from all scan passes.
+
+        Returns
+        -------
+        list
+            A list of waypoints collected from each scan pass.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         waypoint_list = []
         for scan_pass in self.passes:
             pass_waypoint_list = scan_pass.waypoints()
@@ -32,11 +52,34 @@ class Scan:
         return waypoint_list
 
     def locale(self):
+        """
+        Get the locale of the first scan pass.
+
+        Returns
+        -------
+        str
+            The locale of the first scan pass in the sequence.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         return self.passes[0].locale()
 
     # MODIFICATION
 
     def set_scan_pass_numbers(self, next_scan_index):
+        """
+        Set the index for each scan pass and return the next available index.
+
+        Parameters
+        ----------
+        next_scan_index : int
+            The starting index to assign to the scan passes.
+
+        Returns
+        -------
+        int
+            The next available index after assigning numbers to the scan passes.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         for scan_pass in self.passes:
             scan_pass.idx = next_scan_index
             next_scan_index += 1
@@ -45,6 +88,21 @@ class Scan:
     # RENDERING
 
     def draw(self, view, scan_pass_styles):
+        """
+        Render the scan passes on the specified view using the provided styles.
+
+        Parameters
+        ----------
+        view : object
+            The view object where the scan passes will be rendered.
+        scan_pass_styles : dict
+            A dictionary containing styles for rendering the scan passes.
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         for scan_pass in self.passes:
             scan_pass.draw(view, scan_pass_styles)
 
@@ -55,6 +113,34 @@ class Scan:
 
 
 def construct_scan_given_segments_of_interest(list_of_xyz_segments, scan_parameters):
+    """
+    Construct a Scan object given a list of XYZ segments of interest.
+
+    This function creates scan passes based on the provided segments and scan parameters,
+    arranging them in a back-and-forth boustrophedon pattern.
+
+    Parameters
+    ----------
+    list_of_xyz_segments : list of list of float
+        A list of segments, where each segment is defined by a list of XYZ coordinates.
+    scan_parameters : dict
+        A dictionary containing parameters for the scan configuration.
+
+    Returns
+    -------
+    Scan
+        A Scan object constructed from the provided segments and parameters.
+
+    Notes
+    -----
+    The function assumes that the input segment list is parallel, meaning each segment points
+    from p0 to p1 in the same direction. It reverses every other segment to create a boustrophedon pattern.
+
+    Examples
+    --------
+    >>> scan = construct_scan_given_segments_of_interest([[0, 0, 0], [1, 1, 1]], {'fly_forward_backward': True})
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Notify progress.
     print("Constructing scan given segments of interest...")
 
@@ -90,6 +176,34 @@ def construct_scan_given_segments_of_interest(list_of_xyz_segments, scan_paramet
 
 
 def construct_scan_given_UFACET_scan_passes(ufacet_scan_pass_list, scan_parameters):
+    """
+    Construct a Scan object given a list of UFACET scan passes.
+
+    This function creates scan passes based on the provided UFACET scan passes and scan parameters,
+    arranging them in a back-and-forth boustrophedon pattern.
+
+    Parameters
+    ----------
+    ufacet_scan_pass_list : list of ScanPass
+        A list of UFACET scan passes to be used for constructing the Scan object.
+    scan_parameters : dict
+        A dictionary containing parameters for the scan configuration.
+
+    Returns
+    -------
+    Scan
+        A Scan object constructed from the provided UFACET scan passes and parameters.
+
+    Notes
+    -----
+    The function assumes that UFACET scans are specified by line segments that are parallel,
+    and it reverses every other pass to create a boustrophedon pattern.
+
+    Examples
+    --------
+    >>> scan = construct_scan_given_UFACET_scan_passes(ufacet_passes, {'fly_forward_backward': True})
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Notify progress.
     print("Constructing scan given UFACET scan passes...")
 

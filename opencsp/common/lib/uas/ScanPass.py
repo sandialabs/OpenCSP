@@ -11,10 +11,27 @@ import opencsp.common.lib.uas.WayPoint as wp
 
 class ScanPass:
     """
-    Model scan pass within a flight.
+    Model a scan pass within a flight.
+
+    This class represents a single scan pass, which consists of waypoints and associated parameters
+    for a flight operation.
+
+    Attributes
+    ----------
+    idx : int
+        The index of the scan pass.
     """
 
+    # "ChatGPT 4o" assisted with generating this docstring.
+
     def __init__(self):
+        """
+        Model a scan pass within a flight.
+
+        This class represents a single scan pass, which consists of waypoints and associated parameters
+        for a flight operation.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         super(ScanPass, self).__init__()
 
         # Constructed members.
@@ -32,6 +49,20 @@ class ScanPass:
     # ACCESS
 
     def core_waypoints(self):
+        """
+        Retrieve the core waypoints for the scan pass.
+
+        Returns
+        -------
+        list
+            A list of core waypoints for the scan pass.
+
+        Raises
+        ------
+        AssertionError
+            If the core waypoint list is not set.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # Core waypoints do not include the lead-in and run-past extra travel distance.
         if self._core_waypoint_list == None:
             print("ERROR: In ScanPass.core_waypoints(), attempt to fetch unset _core_waypoint_list.")
@@ -39,36 +70,120 @@ class ScanPass:
         return self._core_waypoint_list
 
     def waypoints(self):
+        """
+        Retrieve all waypoints for the scan pass.
+
+        Returns
+        -------
+        list
+            A list of all waypoints for the scan pass.
+
+        Raises
+        ------
+        AssertionError
+            If the waypoint list is not set.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if self._waypoint_list == None:
             print("ERROR: In ScanPass.waypoints(), attempt to fetch unset _waypoint_list.")
             assert False
         return self._waypoint_list
 
     def segment_dict(self):
+        """
+        Retrieve the segment dictionary for the scan pass.
+
+        Returns
+        -------
+        dict
+            The segment dictionary for the scan pass.
+
+        Raises
+        ------
+        AssertionError
+            If the segment dictionary is not set.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if self._segment_dict == None:
             print("In ScanPass.segment_dict(), attempt to fetch unset _segment_dict.")
             assert False
         return self._segment_dict
 
     def ufacet_scan_pass(self):
+        """
+        Retrieve the associated UFACET scan pass.
+
+        Returns
+        -------
+        UfacetScanPass
+            The associated UFACET scan pass.
+
+        Raises
+        ------
+        AssertionError
+            If the UFACET scan pass is not set.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if self._ufacet_scan_pass == None:
             print("In ScanPass.ufacet_scan_pass(), attempt to fetch unset _ufacet_scan_pass.")
             assert False
         return self._ufacet_scan_pass
 
     def lead_in(self):
+        """
+        Retrieve the lead-in distance for the scan pass.
+
+        Returns
+        -------
+        float
+            The lead-in distance for the scan pass.
+
+        Raises
+        ------
+        AssertionError
+            If the lead-in distance is not set.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if self._lead_in == None:
             print("In ScanPass.lead_in(), attempt to fetch unset _lead_in.")
             assert False
         return self._lead_in
 
     def run_past(self):
+        """
+        Retrieve the run-past distance for the scan pass.
+
+        Returns
+        -------
+        float
+            The run-past distance for the scan pass.
+
+        Raises
+        ------
+        AssertionError
+            If the run-past distance is not set.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if self._run_past == None:
             print("In ScanPass.run_past(), attempt to fetch unset _run_past.")
             assert False
         return self._run_past
 
     def locale(self):
+        """
+        Retrieve the locale for the scan pass.
+
+        Returns
+        -------
+        str
+            The locale for the scan pass.
+
+        Raises
+        ------
+        AssertionError
+            If the locale is not set.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # Defined bor both raster and UFACET scans, but the input source differs.
         # Cache here to provide uniform access.
         if self._locale == None:
@@ -79,6 +194,28 @@ class ScanPass:
     # MODIFICATION
 
     def set_core_waypoints_given_segment_of_interest(self, segment_xyz, fly_backward, raster_scan_parameters):
+        """
+        Set the core waypoints based on a segment of interest.
+
+        Parameters
+        ----------
+        segment_xyz : list of list of float
+            A list of XYZ coordinates defining the segment of interest.
+        fly_backward : bool
+            A flag indicating whether to fly backward along the segment.
+        raster_scan_parameters : dict
+            A dictionary containing parameters for the raster scan.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        AssertionError
+            If the gaze angle is positive.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # This routine does not consider ground clearance.
         # It assumes that the specified eta and relative_z will yield a collisiion-free result.
         #
@@ -143,6 +280,19 @@ class ScanPass:
         self._core_waypoint_list = [start_wpt, end_wpt]
 
     def set_core_waypoints_from_UFACET_scan_pass(self, ufacet_scan_pass):
+        """
+        Set the core waypoints from a UFACET scan pass.
+
+        Parameters
+        ----------
+        ufacet_scan_pass : UfacetScanPass
+            The UFACET scan pass from which to set the core waypoints.
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # Save locale.
         self._locale = ufacet_scan_pass.ufacet_scan_parameters["locale"]
         # Set UFACET-specific data member.
@@ -151,6 +301,24 @@ class ScanPass:
         self._core_waypoint_list = ufacet_scan_pass.waypoints()
 
     def set_waypoints_with_margin(self, scan_parameters):
+        """
+        Set waypoints with lead-in and run-past margins.
+
+        Parameters
+        ----------
+        scan_parameters : dict
+            A dictionary containing parameters for the scan, including lead-in and run-past distances.
+
+        Returns
+        -------
+        None
+
+        Raises
+        ------
+        AssertionError
+            If the core waypoint list is not set or has fewer than two elements.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # Check input.
         if self._core_waypoint_list == None:
             print("In ScanPass.set_waypoints_with_margin(), attempt to fetch unset _core_waypoint_list.")
@@ -255,6 +423,21 @@ class ScanPass:
     # RENDERING
 
     def draw(self, view, scan_pass_styles):
+        """
+        Render the scan pass on the specified view using the provided styles.
+
+        Parameters
+        ----------
+        view : object
+            The view object where the scan pass will be rendered.
+        scan_pass_styles : object
+            An object containing styles for rendering the scan pass.
+
+        Returns
+        -------
+        None
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         # Fetch draw style control.
         scan_pass_style = scan_pass_styles.style(self.idx)
 
@@ -281,6 +464,28 @@ class ScanPass:
 
 
 def construct_scan_pass_given_segment_of_interest(segment_xyz, fly_backward, scan_parameters):
+    """
+    Construct a ScanPass object given a segment of interest.
+
+    Parameters
+    ----------
+    segment_xyz : list of list of float
+        A list of XYZ coordinates defining the segment of interest.
+    fly_backward : bool
+        A flag indicating whether to fly backward along the segment.
+    scan_parameters : dict
+        A dictionary containing parameters for the scan configuration.
+
+    Returns
+    -------
+    ScanPass
+        A ScanPass object constructed from the provided segment and parameters.
+
+    Examples
+    --------
+    >>> scan_pass = construct_scan_pass_given_segment_of_interest([[0, 0, 0], [1, 1, 1]], False, {'locale': 'en'})
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     scan_pass = ScanPass()
     scan_pass.set_core_waypoints_given_segment_of_interest(segment_xyz, fly_backward, scan_parameters)
     scan_pass.set_waypoints_with_margin(scan_parameters)
@@ -290,6 +495,28 @@ def construct_scan_pass_given_segment_of_interest(segment_xyz, fly_backward, sca
 def construct_scan_pass_given_UFACET_scan_pass(
     ufacet_scan_pass, fly_backward, scan_parameters  # UfacetScanPass object.
 ):
+    """
+    Construct a ScanPass object given a UFACET scan pass.
+
+    Parameters
+    ----------
+    ufacet_scan_pass : UfacetScanPass
+        The UFACET scan pass from which to construct the ScanPass.
+    fly_backward : bool
+        A flag indicating whether to fly backward for this scan pass.
+    scan_parameters : dict
+        A dictionary containing parameters for the scan configuration.
+
+    Returns
+    -------
+    ScanPass
+        A ScanPass object constructed from the provided UFACET scan pass and parameters.
+
+    Examples
+    --------
+    >>> scan_pass = construct_scan_pass_given_UFACET_scan_pass(ufacet_pass, True, {'locale': 'en'})
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Notify progress.
     print(
         "Constructing UFACET scan pass "

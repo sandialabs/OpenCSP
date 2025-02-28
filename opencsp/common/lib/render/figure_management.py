@@ -31,11 +31,38 @@ show_figures = True
 
 
 def reset_figure_tiles():
+    """
+    Resets the index of figure tiles to zero.
+
+    This function sets the global variable `figure_tile_idx` to 0, effectively
+    resetting the state of figure tiles for subsequent operations.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     global figure_tile_idx
     figure_tile_idx = 0
 
 
 def do_show_figures(flag: bool = True):
+    """
+    Sets the global flag for displaying figures.
+
+    This function updates the global variable `show_figures` to control whether
+    figures should be displayed or not.
+
+    Parameters
+    ----------
+    flag : bool, optional
+        A boolean flag indicating whether to show figures. Defaults to True.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     global show_figures
     show_figures = flag
 
@@ -48,6 +75,18 @@ figure_tile_idx = 0  # Used for tile control.
 
 
 def reset_figure_management():
+    """
+    Resets the figure management system to its initial state.
+
+    This function resets the figure tile index, sets the figure number to zero,
+    and clears the list of recorded figure records. It effectively reinitializes
+    the figure management system, allowing for a fresh start in managing figures.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     reset_figure_tiles()
     global figure_num
     figure_num = 0
@@ -521,6 +560,18 @@ def _display_bar(
 
 
 def print_figure_summary() -> None:
+    """
+    Prints a summary of recorded figures.
+
+    This function iterates through a global list of figure records (`fig_record_list`)
+    and prints comments associated with each figure. It provides a way to review the
+    details of the figures that have been recorded during the session.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     global fig_record_list
     for fig_record in fig_record_list:
         print()
@@ -561,4 +612,22 @@ def save_all_figures(output_path: str, format: str = None):
 
 
 def formatted_fig_display(block: bool = False) -> None:
+    """
+    Displays the current figure in a formatted manner.
+
+    This function utilizes Matplotlib's `plt.show()` to display the current figure.
+    The `block` parameter controls whether the display is blocking or non-blocking.
+
+    Parameters
+    ----------
+    block : bool, optional
+        If True, the function will block execution until the figure window is closed.
+        If False, the function will return immediately, allowing further code execution.
+        Defaults to False.
+
+    Returns
+    -------
+    None
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     plt.show(block=block)

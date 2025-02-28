@@ -38,7 +38,7 @@ class ImageMarker:
             Nx2 array of point locations in image.
         img_id : int
             ID of image.
-        camera : Camera
+        camera : opencsp.common.lib.camera.Camera.Camera
             Camera object of camera that captured image.
         """
         # Perform checks
@@ -92,7 +92,7 @@ class ImageMarker:
             File path to image
         img_id : int
             Image index to save to image.
-        camera : Camera
+        camera : opencsp.common.lib.camera.Camera.Camera
             Calibrated camera object
 
         Returns

@@ -1,3 +1,6 @@
+MultiprocessNonDaemonic
+=======================
+
 .. currentmodule:: opencsp.common.lib.process.MultiprocessNonDaemonic
 
 .. automodule:: opencsp.common.lib.process.MultiprocessNonDaemonic
@@ -6,6 +9,9 @@
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
+
+ParallelPartitioner
+===================
 
 .. currentmodule:: opencsp.common.lib.process.ParallelPartitioner
 
@@ -16,6 +22,9 @@
    :show-inheritance:
    :member-order: groupwise
 
+ServerSynchronizer
+==================
+
 .. currentmodule:: opencsp.common.lib.process.ServerSynchronizer
 
 .. automodule:: opencsp.common.lib.process.ServerSynchronizer
@@ -24,6 +33,18 @@
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
+
+.. currentmodule:: opencsp.common.lib.process.lib.ServerSynchronizerError
+
+.. automodule:: opencsp.common.lib.process.lib.ServerSynchronizerError
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+File tools
+==========
 
 .. currentmodule:: opencsp.common.lib.process.parallel_file_tools
 
@@ -34,6 +55,18 @@
    :show-inheritance:
    :member-order: groupwise
 
+.. currentmodule:: opencsp.common.lib.process.lib.ProcessOutputLine
+
+.. automodule:: opencsp.common.lib.process.lib.ProcessOutputLine
+   :members:
+   :special-members: __init__
+   :undoc-members:
+   :show-inheritance:
+   :member-order: groupwise
+
+Video tools
+===========
+
 .. currentmodule:: opencsp.common.lib.process.parallel_video_tools
 
 .. automodule:: opencsp.common.lib.process.parallel_video_tools
@@ -42,6 +75,9 @@
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
+
+Subprocess tools
+================
 
 .. currentmodule:: opencsp.common.lib.process.subprocess_tools
 
@@ -60,22 +96,3 @@
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.process.lib.ProcessOutputLine
-
-.. automodule:: opencsp.common.lib.process.lib.ProcessOutputLine
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-
-.. currentmodule:: opencsp.common.lib.process.lib.ServerSynchronizerError
-
-.. automodule:: opencsp.common.lib.process.lib.ServerSynchronizerError
-   :members:
-   :special-members: __init__
-   :undoc-members:
-   :show-inheritance:
-   :member-order: groupwise
-

@@ -109,35 +109,34 @@ def default(primary: T | Callable[[], T] | None, *default: T | Callable[[], T] |
 
 def strict_types(func):
     """
-    Decoratorates functions to make them strictly typed.
+    Decorator to enforce strict typing on function arguments.
 
-    Takes in keyword arguments with associated types.
-    If the argument applied to the function does not pass an
-    isinstance test against the defined type, the function will raise a TypeError.
-    # TODO tristan: does not apply strictness to return value
+    This decorator takes keyword arguments with associated types. If an argument
+    passed to the function does not pass an isinstance test against the defined
+    type, the function will raise a TypeError.
 
     Important
     ---------
-    In general it is important to understand that this decorator is not robust, but
-    if it fails it should be very clear. In that case do not bother troubleshooting,
-    I recommend simply removing the decorator, as it is likely a bug in the decorator.
+    This decorator is not robust. If it fails, it should be very clear. In such
+    cases, it is recommended to remove the decorator, as it is likely a bug in
+    the decorator.
 
     Notes
     -----
-    * Using this decorator will block some information about the decorated function
-    from some python functions that return function information.
-    * A type represented with a string of itself (i.e. `'Vxyz'`) will
-    not recognize subclasses properly, and in some instaces could break entirely.
-    * Beware of using types that contain a secondary type within (e.x. `list[int]`),
-    the inner types will be ignored and in some cases could fail entirely.
-    * The function does not do any checks on the `return` value. (Might add in the future)
+    * Using this decorator may block some information about the decorated
+      function from certain Python functions that return function information.
+    * A type represented as a string (e.g., `'Vxyz'`) will not recognize
+      subclasses properly and may break entirely in some instances.
+    * Beware of using types that contain a secondary type (e.g., `list[int]`);
+      the inner types will be ignored and may fail entirely.
+    * The function does not currently check the return value (this may be added
+      in the future).
 
-    Example
-    -------
-    ```python
-    @strict_types
-    def add(a: int, b: int):
-        return a + b
+    Examples
+    --------
+    >>> @strict_types
+    ... def add(a: int, b: int):
+    ...     return a + b
 
     >>> add(1, 2)
     3
@@ -148,15 +147,14 @@ def strict_types(func):
 
     >>> add(1, b=2.0)
     TypeError: incorrect types in 'add'.
-        At key word argument 'b': type of '2.0' is float, should be int
+        At keyword argument 'b': type of '2.0' is float, should be int
 
     >>> add(b=2.0, a=1j)
     TypeError: incorrect types in 'add'.
-        At key word argument 'b': type of '2.0' is float, should be int
-        At key word argument 'a': type of '1j' is complex, should be int
-
-    ```
+        At keyword argument 'b': type of '2.0' is float, should be int
+        At keyword argument 'a': type of '1j' is complex, should be int
     """
+    # ChatGPT 4o-mini assisted with generating this doc string
 
     @functools.wraps(func)
     def wrapper(*posargs, **kwargs):

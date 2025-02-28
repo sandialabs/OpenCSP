@@ -16,6 +16,27 @@ _V = TypeVar("_V")
 
 
 def remove_duplicates(list):
+    """
+    Remove duplicate elements from a list while preserving the original order.
+
+    Parameters
+    ----------
+    list : list
+        The input list from which duplicates will be removed.
+
+    Returns
+    -------
+    list
+        A new list containing the unique elements from the input list, in the order they first appeared.
+
+    Examples
+    --------
+    >>> remove_duplicates([1, 2, 2, 3, 4, 4, 5])
+    [1, 2, 3, 4, 5]
+    >>> remove_duplicates(['a', 'b', 'a', 'c'])
+    ['a', 'b', 'c']
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     result = []
     for x in list:
         if x not in result:
@@ -24,6 +45,27 @@ def remove_duplicates(list):
 
 
 def contains_duplicates(list):
+    """
+    Check if a list contains any duplicate elements.
+
+    Parameters
+    ----------
+    list : list
+        The input list to check for duplicates.
+
+    Returns
+    -------
+    bool
+        True if the list contains duplicates, False otherwise.
+
+    Examples
+    --------
+    >>> contains_duplicates([1, 2, 3, 4])
+    False
+    >>> contains_duplicates([1, 2, 2, 3])
+    True
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return len(list) != len(remove_duplicates(list))
 
 
