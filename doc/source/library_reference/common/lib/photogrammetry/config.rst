@@ -1,3 +1,6 @@
+ImageMarker
+===========
+
 .. currentmodule:: opencsp.common.lib.photogrammetry.ImageMarker
 
 .. automodule:: opencsp.common.lib.photogrammetry.ImageMarker
@@ -7,6 +10,9 @@
    :show-inheritance:
    :member-order: groupwise
 
+Bundle Adjustment
+=================
+
 .. currentmodule:: opencsp.common.lib.photogrammetry.bundle_adjustment
 
 .. automodule:: opencsp.common.lib.photogrammetry.bundle_adjustment
@@ -15,6 +21,9 @@
    :undoc-members:
    :show-inheritance:
    :member-order: groupwise
+
+Photogrammetry
+==============
 
 .. currentmodule:: opencsp.common.lib.photogrammetry.photogrammetry
 
