@@ -18,7 +18,12 @@ import opencsp.common.lib.tool.log_tools as lt
 class RenderControlFigureRecord:
     """
     Tracks figures that have been generated.
+
+    This class manages the registration and saving of Matplotlib figures, including their metadata,
+    comments, and other relevant information.
     """
+
+    # ChatGPT 4o-mini assisted with generating this code
 
     def __init__(
         self,
@@ -29,12 +34,27 @@ class RenderControlFigureRecord:
         figure: Figure,  # Matplotlib figure object.
         axis_control=None,
     ):  # Axis control instance used in figure_management.setup_figure
-        """Register for a render figure.
+        """
+        Register for a render figure.
 
-        You probably don't want to instantiate this class directly.
-        Most likely what you want is one of:
-         - figure_management.setup_figure()
-         - figure_management.setup_figure_for_3d_data()"""
+        This constructor initializes a RenderControlFigureRecord instance with the provided parameters.
+
+        Parameters
+        ----------
+        name : str
+            Figure handle and title of figure window.
+        title : str
+            Title of the plot.
+        caption : str
+            Caption for the plot.
+        figure_num : int
+            Number of this figure in the generated sequence. A unique key.
+        figure : Figure
+            Matplotlib figure object.
+        axis_control : RenderControlAxis, optional
+            Axis control instance used in figure_management.setup_figure. Default is None.
+        """
+        # ChatGPT 4o-mini assisted with generating this code
 
         # in-situ imports to avoid import cycles
         import opencsp.common.lib.render_control.RenderControlAxis as rca
@@ -62,6 +82,15 @@ class RenderControlFigureRecord:
 
     @property
     def title(self) -> str:
+        """
+        Get the title of the figure.
+
+        Returns
+        -------
+        str
+            The title of the figure.
+        """
+        # ChatGPT 4o-mini assisted with generating this code
         return self._title
 
     @title.setter
@@ -76,9 +105,11 @@ class RenderControlFigureRecord:
 
     def clear(self):
         """
-        Clears the old plot data without deleting the window, listeners, or orientation. Useful for updating a plot
-        interactively.
+        Clears the old plot data without deleting the window, listeners, or orientation.
+
+        This method is useful for updating a plot interactively.
         """
+        # ChatGPT 4o-mini assisted with generating this code
         # self.fig_record.figure.clear(keep_observers=True) <-- not doing this, clears everything except window
 
         # Register data to be re-assigned
@@ -104,20 +135,65 @@ class RenderControlFigureRecord:
             self.axis.set_zlabel(zlabel)
 
     def add_metadata_line(self, metadata_line: str) -> None:
+        """
+        Add a metadata line to the figure record.
+
+        Parameters
+        ----------
+        metadata_line : str
+            The metadata line to add.
+        """
+        # ChatGPT 4o-mini assisted with generating this code
         self.metadata.append(metadata_line)
 
     def add_comment_line(self, comment_line: str) -> None:
+        """
+        Add a comment line to the figure record.
+
+        Parameters
+        ----------
+        comment_line : str
+            The comment line to add.
+        """
+        # ChatGPT 4o-mini assisted with generating this code
         self.comments.append(comment_line)
 
     def print_comments(self):
+        """Prints all comments associated with this figure record."""
+        # ChatGPT 4o-mini assisted with generating this code
         for comment_line in self.comments:
             lt.info(comment_line)
 
     def to_array(self):
+        """
+        Convert the figure to a NumPy array.
+
+        Returns
+        -------
+        np.ndarray
+            A NumPy array representation of the figure.
+        """
+        # ChatGPT 4o-mini assisted with generating this code
         return self.figure_to_array(self.figure)
 
     @staticmethod
     def figure_to_array(figure: Figure):
+        """
+        Convert a Matplotlib figure to a NumPy array.
+
+        This method forces Matplotlib to render to its internal buffer and converts the buffer to a NumPy array.
+
+        Parameters
+        ----------
+        figure : Figure
+            The Matplotlib figure to convert.
+
+        Returns
+        -------
+        np.ndarray
+            A NumPy array representation of the figure.
+        """
+        # ChatGPT 4o-mini assisted with generating this code
         # Force matplotlib to render to it's internal buffer
         figure.canvas.draw()
 
@@ -125,19 +201,30 @@ class RenderControlFigureRecord:
         return np.asarray(figure.canvas.buffer_rgba())
 
     def save(self, output_dir: str, output_file_body: str = None, format: str = None, dpi=600, close_after_save=True):
-        """Saves this figure record to an image file.
-
-        Args:
-            - output_dir (str): The directory to save to.
-            - output_file_body (str): Name of the file to save to. None for self.name. Defaults to None.
-            - format (str): The file format to save with. None for "svg". Defaults to None.
-            - dpi (int): Dots per inch used to format the figure. Defaults to 600.
-            - close_after_save (bool): False: keep the matplotlib plot open after saving. True: close the plot after saving. Defaults to True.
-
-        Returns:
-            - str: output_figure_dir_body_ext, the image file
-            - str: output_figure_text_dir_body_ext, the description of the image file (metadata, title, caption, comments, etc)
         """
+        Saves this figure record to an image file.
+
+        Parameters
+        ----------
+        output_dir : str
+            The directory to save to.
+        output_file_body : str, optional
+            Name of the file to save to. None for self.name. Defaults to None.
+        format : str, optional
+            The file format to save with. None for "svg". Defaults to None.
+        dpi : int, optional
+            Dots per inch used to format the figure. Defaults to 600.
+        close_after_save : bool, optional
+            If True, closes the plot after saving. Defaults to True.
+
+        Returns
+        -------
+        tuple
+            A tuple containing:
+            - str: The path to the saved image file.
+            - str: The path to the saved text file containing metadata and comments.
+        """
+        # ChatGPT 4o-mini assisted with generating this doc string
         try:
             if format is None:
                 format = "svg"  # Default format was previously 'png'.

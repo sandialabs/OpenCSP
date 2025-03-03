@@ -1,8 +1,3 @@
-"""
-
-
-"""
-
 from typing import Iterable
 from warnings import warn
 
@@ -40,7 +35,45 @@ class RenderControlFacetEnsemble:
         corner_normal_style=rcps.outline(),  # unimplmeneted
         corner_normal_base_style=rcps.marker(),  # unimplmeneted
     ):
+        """
+        Render control for collections of named facets.
 
+        Provides a default render control, with exceptions for objects with specific names.
+        Multiple classes of exceptions can be defined, each with its own specialized render style.
+        Render styles may be of arbitrary type: RenderControlFacet, RenderControlHeliostat, etc.
+
+        Parameters
+        ----------
+        default_style : RenderControlFacet, optional
+            The default rendering style for facets. By default, an instance of `RenderControlFacet`.
+        draw_facets : bool, optional
+            Whether to draw the facets. By default, True.
+        special_styles : dict[str, RenderControlFacet], optional
+            A dictionary mapping facet names to their specialized rendering styles. By default, None.
+        draw_centroid : bool, optional
+            Whether to draw the centroid of the facets. By default, False.
+        draw_normal_vector : bool, optional
+            Whether to draw the normal vector for the facets. By default, False.
+        normal_vector_length : float, optional
+            Length of the normal vector. By default, 4.0.
+        normal_vector_style : object, optional
+            Style for the normal vector. By default, `rcps.outline()`.
+        normal_vector_base_style : object, optional
+            Style for the base of the normal vector. By default, `rcps.marker()`.
+        draw_outline : bool, optional
+            Whether to draw the outline of the facets. By default, False.
+        outline_style : object, optional
+            Style for the outline. By default, `rcps.outline()`.
+        draw_surface_normal_at_corners : bool, optional
+            Whether to draw surface normals at corners. By default, False (unimplemented).
+        corner_normal_length : float, optional
+            Length of the corner normal. By default, 2.0 (unimplemented).
+        corner_normal_style : object, optional
+            Style for the corner normal. By default, `rcps.outline()` (unimplemented).
+        corner_normal_base_style : object, optional
+            Style for the base of the corner normal. By default, `rcps.marker()` (unimplemented).
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.draw_facets = draw_facets
         self.default_style = default_style
         self.draw_normal_vector = draw_normal_vector
@@ -64,6 +97,23 @@ class RenderControlFacetEnsemble:
         self.draw_centroid = draw_centroid
 
     def get_facet_style(self, facet_name: str):
+        """
+        Retrieve the rendering style for a specific facet.
+
+        This method checks if a special style exists for the given facet name and returns it.
+        If no special style is found, the default style is returned.
+
+        Parameters
+        ----------
+        facet_name : str
+            The name of the facet for which to retrieve the rendering style.
+
+        Returns
+        -------
+        RenderControlFacet
+            The rendering style associated with the specified facet name.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         style = self.default_style
         if facet_name in self.special_styles:
             style = self.special_styles[facet_name]
@@ -71,6 +121,25 @@ class RenderControlFacetEnsemble:
 
     # @strict_types
     def add_special_style(self, facet_name: str | list, facet_style: rcf.RenderControlFacet):
+        """
+        Add a special rendering style for a specific facet or a list of facets.
+
+        This method allows the user to associate a custom rendering style with a facet name or
+        multiple facet names. If a facet name is None, a warning is issued.
+
+        Parameters
+        ----------
+        facet_name : str or list
+            The name of the facet or a list of facet names to which the special style will be applied.
+        facet_style : RenderControlFacet
+            The rendering style to associate with the specified facet name(s).
+
+        Raises
+        ------
+        UserWarning
+            If `facet_name` is None, a warning is issued indicating that special styles should not be applied.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         if type(facet_name) is list and isinstance(facet_name[0], str):
             for name in facet_name:
                 self.add_special_style(name, facet_style)
@@ -83,7 +152,26 @@ class RenderControlFacetEnsemble:
 # GENERATORS
 
 
-def normal_facet_outlines(color="k", **kwargs):
+def normal_facet_outlines(color='k', **kwargs):
+    """
+    Create a render control ensemble with normal facet outlines.
+
+    This function returns a `RenderControlFacetEnsemble` instance configured to draw normal
+    facet outlines with specified styles.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the outlines and normal vectors. By default, 'k' (black).
+    **kwargs : keyword arguments
+        Additional keyword arguments to pass to the `RenderControlFacetEnsemble`.
+
+    Returns
+    -------
+    RenderControlFacetEnsemble
+        An instance of `RenderControlFacetEnsemble` configured for normal facet outlines.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlFacetEnsemble(
         draw_normal_vector=True,
         default_style=rcf.outline(color=color),
@@ -94,7 +182,26 @@ def normal_facet_outlines(color="k", **kwargs):
     )
 
 
-def facet_outlines(color="k", **kwargs):
+def facet_outlines(color='k', **kwargs):
+    """
+    Create a render control ensemble with facet outlines.
+
+    This function returns a `RenderControlFacetEnsemble` instance configured to draw facet
+    outlines without normal vectors or centroids.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the outlines. By default, 'k' (black).
+    **kwargs : keyword arguments
+        Additional keyword arguments to pass to the `RenderControlFacetEnsemble`.
+
+    Returns
+    -------
+    RenderControlFacetEnsemble
+        An instance of `RenderControlFacetEnsemble` configured for facet outlines.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlFacetEnsemble(
         draw_normal_vector=False,
         default_style=rcf.outline(color=color),
@@ -106,6 +213,27 @@ def facet_outlines(color="k", **kwargs):
 
 
 def facet_outlines_thin(color="k", linewidth=0.25, **kwargs):
+    """
+    Create a render control ensemble with thin facet outlines.
+
+    This function returns a `RenderControlFacetEnsemble` instance configured to draw thin
+    outlines of the facets without normal vectors or centroids.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the outlines. By default, 'k' (black).
+    linewidth : float, optional
+        Width of the outline line. By default, 0.25.
+    **kwargs : keyword arguments
+        Additional keyword arguments to pass to the `RenderControlFacetEnsemble`.
+
+    Returns
+    -------
+    RenderControlFacetEnsemble
+        An instance of `RenderControlFacetEnsemble` configured for thin facet outlines.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     return RenderControlFacetEnsemble(
         draw_normal_vector=False,
         default_style=rcf.outline_thin(color=color, linewidth=linewidth),
@@ -116,7 +244,28 @@ def facet_outlines_thin(color="k", linewidth=0.25, **kwargs):
     )
 
 
-def facet_ensemble_outline(color="k", normal_vector_length=4.0, **kwargs):
+def facet_ensemble_outline(color='k', normal_vector_length=4.0, **kwargs):
+    """
+    Create a render control ensemble with outlines and normal vectors for facets.
+
+    This function returns a `RenderControlFacetEnsemble` instance configured to draw outlines
+    and normal vectors for facets.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the outlines and normal vectors. By default, 'k' (black).
+    normal_vector_length : float, optional
+        Length of the normal vectors. By default, 4.0.
+    **kwargs : keyword arguments
+        Additional keyword arguments to pass to the `RenderControlFacetEnsemble`.
+
+    Returns
+    -------
+    RenderControlFacetEnsemble
+        An instance of `RenderControlFacetEnsemble` configured for outlines and normal vectors.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlFacetEnsemble(
         draw_normal_vector=True,
         normal_vector_length=normal_vector_length,
@@ -131,11 +280,49 @@ def facet_ensemble_outline(color="k", normal_vector_length=4.0, **kwargs):
     )
 
 
-def only_outline(color="k"):
+def only_outline(color='k'):
+    """
+    Create a render control ensemble that displays only the outline of facets.
+
+    This function returns a `RenderControlFacetEnsemble` instance configured to draw only
+    the outlines of the facets without any other visual elements.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the outlines. By default, 'k' (black).
+
+    Returns
+    -------
+    RenderControlFacetEnsemble
+        An instance of `RenderControlFacetEnsemble` configured to display only the outlines.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlFacetEnsemble(draw_outline=True, outline_style=rcps.outline(color=color), draw_facets=False)
 
 
-def normal_only(color="k", normal_vector_length=4.0, **kwargs):
+def normal_only(color='k', normal_vector_length=4.0, **kwargs):
+    """
+    Create a render control ensemble that displays only the normal vectors of facets.
+
+    This function returns a `RenderControlFacetEnsemble` instance configured to draw only
+    the normal vectors without any outlines or centroids.
+
+    Parameters
+    ----------
+    color : str, optional
+        Color for the normal vectors. By default, 'k' (black).
+    normal_vector_length : float, optional
+        Length of the normal vectors. By default, 4.0.
+    **kwargs : keyword arguments
+        Additional keyword arguments to pass to the `RenderControlFacetEnsemble`.
+
+    Returns
+    -------
+    RenderControlFacetEnsemble
+        An instance of `RenderControlFacetEnsemble` configured to display only the normal vectors.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlFacetEnsemble(
         draw_normal_vector=True,
         default_style=rcf.outline(color=color),

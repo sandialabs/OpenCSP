@@ -4,7 +4,40 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 class TkToolTip(object):
-    def __init__(self, widget, text="widget info"):
+    """
+    A tooltip class for Tkinter widgets.
+
+    This class provides a tooltip that appears when the mouse hovers over a specified widget.
+    The tooltip displays a text message and automatically hides when the mouse leaves the widget.
+
+    Attributes
+    ----------
+    waittime : int
+        The time in milliseconds to wait before showing the tooltip.
+    wraplength : int
+        The maximum width of the tooltip in pixels.
+    id_ : int or None
+        The identifier for the scheduled tooltip display.
+    tw : tk.Toplevel or None
+        The tooltip window instance.
+    """
+
+    # "ChatGPT 4o" assisted with generating this docstring.
+    def __init__(self, widget, text='widget info'):
+        """
+        A tooltip class for Tkinter widgets.
+
+        This class provides a tooltip that appears when the mouse hovers over a specified widget.
+        The tooltip displays a text message and automatically hides when the mouse leaves the widget.
+
+        Parameters
+        ----------
+        widget : tk.Widget
+            The Tkinter widget to which the tooltip is attached.
+        text : str, optional
+            The text to display in the tooltip. Default is 'widget info'.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.waittime = 500  # miliseconds
         self.wraplength = 180  # pixels
         self.widget = widget
@@ -16,23 +49,33 @@ class TkToolTip(object):
         self.tw = None
 
     def enter(self, event=None):
+        """Schedule the tooltip to be displayed."""
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.schedule()
 
     def leave(self, event=None):
+        """Unschedule the tooltip and hide it."""
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.unschedule()
         self.hidetip()
 
     def schedule(self):
+        """Schedule the tooltip to be shown after the wait time."""
+        # "ChatGPT 4o" assisted with generating this docstring.
         self.unschedule()
         self.id_ = self.widget.after(self.waittime, self.showtip)
 
     def unschedule(self):
+        """Cancel the scheduled tooltip display."""
+        # "ChatGPT 4o" assisted with generating this docstring.
         id_ = self.id_
         self.id_ = None
         if id_:
             self.widget.after_cancel(id_)
 
     def showtip(self, event=None):
+        """Create and display the tooltip window."""
+        # "ChatGPT 4o" assisted with generating this docstring.
         x, y, cx, cy = self.widget.bbox("insert")
         x += self.widget.winfo_rootx() + self.widget.winfo_width()
         y += self.widget.winfo_rooty() + self.widget.winfo_height()
@@ -53,6 +96,8 @@ class TkToolTip(object):
         label.pack(ipadx=1)
 
     def hidetip(self):
+        """Hide the tooltip window."""
+        # "ChatGPT 4o" assisted with generating this docstring.
         tw = self.tw
         self.tw = None
         if tw:
@@ -60,17 +105,41 @@ class TkToolTip(object):
 
 
 def window(*vargs, TopLevel=False, **kwargs):
-    """Initializes and returns a new tkinter.Tk (or tkinter.TopLevel) instance.
-
-    If creating the window fails, tries again (up to two more times).
-
-    Sometimes initializing a tk window fails. But if you try to
-    initialize the window again, it seems to always succeed.
-    When it fails, it is often with an error about not being able to find a
-    file. Something like::
-
-        _tkinter.TclError: Can't find a usable init.tcl in the following directories
     """
+    Initialize and return a new Tkinter window or Toplevel instance.
+
+    This function attempts to create a Tkinter window. If the creation fails, it retries up to two more times.
+    This is useful in cases where initializing a Tkinter window may fail due to environmental issues.
+
+    Parameters
+    ----------
+    *vargs : tuple
+        Positional arguments to pass to the Tkinter window constructor.
+    TopLevel : bool, optional
+        If True, create a Toplevel window instead of a Tk window. Default is False.
+    **kwargs : dict
+        Keyword arguments to pass to the Tkinter window constructor.
+
+    Returns
+    -------
+    tk.Tk or tk.Toplevel
+        A new Tkinter window or Toplevel instance.
+
+    Raises
+    ------
+    Exception
+        If the window creation fails after three attempts.
+
+    Notes
+    -----
+    If the window creation fails, a warning is logged, and the function will wait for a second before retrying.
+
+    Examples
+    --------
+    >>> main_window = window()
+    >>> top_window = window(TopLevel=True)
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     window_class = tk.Tk
     if TopLevel:
         window_class = tk.Toplevel

@@ -1,8 +1,5 @@
 """
 Image plotting, with annotations.
-
-
-
 """
 
 import cv2 as cv
@@ -26,6 +23,50 @@ def plot_image_figure(
     dpi=200,  # Resolution to write.
     include_figure_idx_in_filename=True,
 ):  # Whether to auto-index the filenames.
+    """
+    Plots an image with optional annotations and saves it to disk.
+
+    This function creates a figure to display an image, optionally drawing annotations
+    and saving the figure to a specified directory. The image can be displayed in either
+    RGB or BGR format.
+
+    Parameters
+    ----------
+    image : np.ndarray
+        The image to be plotted, represented as a NumPy array.
+    draw_image : bool, optional
+        If True, the image will be displayed in the figure. Defaults to True.
+    rgb : bool, optional
+        If True, the image is assumed to be in RGB format. If False, it is assumed to be in BGR format. Defaults to True.
+    title : str | None, optional
+        The title to display at the top of the figure. Defaults to None.
+    annotation_list : list, optional
+        A list of annotations to draw on the plot. Each annotation should have a `plot` method. Defaults to None.
+    crop_box : list[list[int]] | None, optional
+        A list defining the crop box as [[x_min, y_min], [x_max, y_max]]. If None, no cropping is applied. Defaults to None.
+    context_str : str | None, optional
+        An explanatory string to include in the status output line. Defaults to None.
+    save : bool, optional
+        If True, the figure will be saved to disk. Defaults to True.
+    output_dir : str | None, optional
+        The directory where the figure will be saved. Defaults to None.
+    output_body : str, optional
+        The base filename for the saved figure. Defaults to 'image'.
+    dpi : int, optional
+        The resolution (dots per inch) for the saved figure. Defaults to 200.
+    include_figure_idx_in_filename : bool, optional
+        If True, the figure index will be included in the filename. Defaults to True.
+
+    Returns
+    -------
+    None
+
+    Raises
+    ------
+    ValueError
+        If the output directory is not specified when saving the figure.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Create the figure.
     plt.figure()
     plt.title(title)

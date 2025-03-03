@@ -1,9 +1,3 @@
-"""
-
-
-"""
-
-
 class RenderControlKeyCorners:
     """
     Render control for the UFACET pipeline step KeyCorners.
@@ -25,6 +19,42 @@ class RenderControlKeyCorners:
         key_corners_dpi=200,  # Dpi for saving figure to disk.
         key_corners_crop=False,  # Whether to crop annotations outside image frame.
     ):
+        """
+        Render control for the UFACET pipeline step KeyCorners.
+
+        This class manages the rendering settings for the KeyCorners step in the UFACET pipeline,
+        allowing customization of various visual elements related to key corners.
+
+        Parameters
+        ----------
+        clear_previous : bool, optional
+            Whether to remove any existing files in the designated output directory. By default, True.
+        draw_key_corners : bool, optional
+            Whether to draw the key corner figures. By default, True.
+        key_corners_points_marker : str, optional
+            Marker style for the key corner points. By default, 'o'.
+        key_corners_points_markersize : float, optional
+            Size of the marker for key corner points. By default, 1.5.
+        key_corners_points_color : str, optional
+            Color for the key corner points. By default, 'm' (magenta).
+        key_corners_label_horizontalalignment : str, optional
+            Horizontal alignment for the key corner label. By default, 'center'.
+        key_corners_label_verticalalignment : str, optional
+            Vertical alignment for the key corner label. By default, 'center'.
+        key_corners_label_fontsize : int, optional
+            Font size for the key corner label. By default, 6.
+        key_corners_label_fontstyle : str, optional
+            Font style for the key corner label. By default, 'normal'.
+        key_corners_label_fontweight : str, optional
+            Font weight for the key corner label. By default, 'bold'.
+        key_corners_label_color : str, optional
+            Color for the key corner label. By default, 'm' (magenta).
+        key_corners_dpi : int, optional
+            DPI (dots per inch) for saving figures to disk. By default, 200.
+        key_corners_crop : bool, optional
+            Whether to crop annotations outside the image frame. By default, False.
+        """
+        # "ChatGPT 4o" assisted with generating this docstring.
         super(RenderControlKeyCorners, self).__init__()
 
         self.clear_previous = clear_previous
@@ -99,8 +129,31 @@ class RenderControlKeyCorners:
 
 
 def default():
+    """
+    Create a default render control for key corners.
+
+    This function returns a `RenderControlKeyCorners` instance with default settings.
+
+    Returns
+    -------
+    RenderControlKeyCorners
+        An instance of `RenderControlKeyCorners` configured with default parameters.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlKeyCorners()
 
 
 def fast():
+    """
+    Create a fast render control for key corners.
+
+    This function returns a `RenderControlKeyCorners` instance configured to skip
+    drawing the key corner figures, which can speed up the rendering process.
+
+    Returns
+    -------
+    RenderControlKeyCorners
+        An instance of `RenderControlKeyCorners` configured for fast rendering.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     return RenderControlKeyCorners(draw_key_corners=False)

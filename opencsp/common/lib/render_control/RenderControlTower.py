@@ -6,7 +6,12 @@ from opencsp.common.lib.render_control.RenderControlPointSeq import RenderContro
 class RenderControlTower:
     """
     Render control for towers.
+
+    This class manages the rendering settings for towers, allowing customization of various visual
+    elements related to the tower's representation.
     """
+
+    # "ChatGPT 4o" assisted with generating this docstring.
 
     def __init__(
         self,
@@ -20,25 +25,29 @@ class RenderControlTower:
         bcs: RenderControlPointSeq = None,
     ) -> None:
         """
-        Controls for rendering a tower.
+        Render control for towers.
+
+        This class manages the rendering settings for towers, allowing customization of various visual
+        elements related to the tower's representation.
 
         Parameters
         ----------
         centroid : bool, optional
-            If True, centroid will be drawn on graph as origin of tower. Default is False.
+            If True, the centroid will be drawn on the graph as the origin of the tower. Default is False.
         draw_name : bool, optional
-            If True then the name will be drawn on graph. Default is False.
-        name_style : None | str
-            If draw_name = True, then styles name using RenderControlText. By default from RenderControlText, color 'black'.
-        draw_outline : bool
-            Draws outline of Tower using wire_frame style. Default is True.
-        point_styles : RenderControlPointSeq
-            Draws target as a point on the Tower.
-        wire_frame : RenderControlPointSeq
-            Outline style of Tower, that draws walls edges. Default is RenderControlSeq outline, color 'black', linewidth '1'.
-        target : RenderControlPointSeq
-            If target, draws a point on Tower. Default color is 'red', with shape 'x', markersize '6'.
+            If True, the name of the tower will be drawn on the graph. Default is False.
+        name_style : None | str, optional
+            If `draw_name` is True, styles the name using `RenderControlText`. By default, it uses the default style from `RenderControlText`, with color 'black'.
+        draw_outline : bool, optional
+            If True, draws the outline of the tower using the wire frame style. Default is True.
+        point_styles : RenderControlPointSeq, optional
+            Styles for drawing the target as a point on the tower. Default is None.
+        wire_frame : RenderControlPointSeq, optional
+            Outline style of the tower that draws the walls and edges. Default is `RenderControlPointSeq` outline with color 'black' and linewidth '1'.
+        target : RenderControlPointSeq, optional
+            If provided, draws a point on the tower. Default is a red 'x' marker with a size of 6.
         """
+        # "ChatGPT 4o" assisted with generating this docstring.
 
         # default values
         if name_style is None:
@@ -72,15 +81,51 @@ class RenderControlTower:
 
 
 def normal_tower():
+    """
+    Create a render control for a normal tower.
+
+    This function returns a `RenderControlTower` instance configured to display the overall outline
+    of the tower.
+
+    Returns
+    -------
+    RenderControlTower
+        An instance of `RenderControlTower` configured for a normal tower outline.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Overall tower outline only.
     return RenderControlTower()
 
 
 def no_target():
+    """
+    Create a render control for a tower outline without a target.
+
+    This function returns a `RenderControlTower` instance configured to draw the tower outline
+    without any target point.
+
+    Returns
+    -------
+    RenderControlTower
+        An instance of `RenderControlTower` configured to display the tower outline without a target.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # tower outline with no target.
     return RenderControlTower(wire_frame=rcps.outline(color="g"), target=False)
 
 
 def no_bcs():
+    """
+    Create a render control for a tower outline without boundary control points (BCS).
+
+    This function returns a `RenderControlTower` instance configured to draw the tower outline
+    without any boundary control points.
+
+    Returns
+    -------
+    RenderControlTower
+        An instance of `RenderControlTower` configured to display the tower outline without boundary control points.
+    """
+    # "ChatGPT 4o-mini" assisted with generating this docstring.
     # tower outline with not bcs.
     return RenderControlTower(wire_frame=rcps.outline(color="g"), bcs=False)

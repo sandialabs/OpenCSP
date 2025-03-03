@@ -183,6 +183,42 @@ def none_if_nan(x):
 
 
 def ncr(n, r):
+    """
+    Calculate the binomial coefficient, also known as "n choose r".
+
+    The binomial coefficient is defined as:
+
+    C(n, r) = n! / (r! * (n - r)!)
+
+    where 'n' is the total number of items, and 'r' is the number of items to choose.
+
+    Parameters
+    ----------
+    n : int
+        The total number of items. Must be a non-negative integer.
+    r : int
+        The number of items to choose. Must be a non-negative integer less than or equal to \( n \).
+
+    Returns
+    -------
+    float
+        The binomial coefficient \( C(n, r) \).
+
+    Raises
+    ------
+    ValueError
+        If \( n \) or \( r \) are negative, or if \( r \) is greater than \( n \).
+
+    Examples
+    --------
+    >>> ncr(5, 2)
+    10.0
+    >>> ncr(10, 3)
+    120.0
+    >>> ncr(0, 0)
+    1.0
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     r = min(r, n - r)
     numer = reduce(op.mul, range(n, n - r, -1), 1)
     denom = reduce(op.mul, range(1, r + 1), 1)
@@ -322,6 +358,39 @@ def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int
 
 # @strict_types
 def lambda_symmetric_paraboloid(focal_length: numbers.Number) -> Callable[[float, float], float]:
+    """
+    Create a lambda function representing a symmetric paraboloid.
+
+    The symmetric paraboloid is defined by the equation:
+
+    z = (1 / (4 * f)) * (x^2 + y^2)
+
+    where 'f' is the focal length of the paraboloid.
+
+    Parameters
+    ----------
+    focal_length : numbers.Number
+        The focal length of the paraboloid. Must be a positive number.
+
+    Returns
+    -------
+    Callable[[float, float], float]
+        A lambda function that takes two float arguments (x, y) and returns the corresponding z value
+        of the symmetric paraboloid.
+
+    Raises
+    ------
+    ValueError
+        If the focal_length is not positive.
+
+    Examples
+    --------
+    >>> paraboloid = lambda_symmetric_paraboloid(2.0)
+    >>> z_value = paraboloid(1.0, 1.0)
+    >>> print(z_value)
+    0.125
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     a = 1.0 / (4 * focal_length)
     return lambda x, y: a * (x**2 + y**2)
     # return FunctionXYContinuous(f"{a} * (x**2 + y**2)")

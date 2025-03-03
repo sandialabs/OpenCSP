@@ -11,6 +11,8 @@ import opencsp.common.lib.tool.file_tools as ft
 
 
 class PowerpointImage(pps.PowerpointShape):
+    """Our own representation of a pptx powerpoint image, for more control over layouts."""
+
     _tmp_save_path = os.path.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
 
     def __init__(

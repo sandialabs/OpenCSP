@@ -1,14 +1,10 @@
 """
-
 Specifying a view of a three-dimensional space.
 
 Options include general 3-d (allowing interactive rotation), xy, xz, yz, general section plane.
 
 In all of the 2-d cases, there is an embedded (p,q) parameter space, which corresponds to 
 different projections of the 3-d coordinates.
-
-
-
 """
 
 import numpy as np
@@ -18,36 +14,91 @@ import numpy as np
 
 
 def view_spec_3d() -> dict:
+    """Returns a specification dictionary for a 3D view.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to '3d'.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
     spec["type"] = "3d"
     return spec
 
 
 def view_spec_xy() -> dict:
+    """Returns a specification dictionary for an XY view.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xy'.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
     spec["type"] = "xy"
     return spec
 
 
 def view_spec_xz() -> dict:
+    """Returns a specification dictionary for an XZ view.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xz'.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
     spec["type"] = "xz"
     return spec
 
 
 def view_spec_yz() -> dict:
+    """Returns a specification dictionary for a YZ view.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'yz'.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
     spec["type"] = "yz"
     return spec
 
 
 def view_spec_im() -> dict:
+    """Returns a specification dictionary for an image view.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'image'.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
     spec["type"] = "image"
     return spec
 
 
 def view_spec_camera(camera, camera_xform) -> dict:
+    """Returns a specification dictionary for a camera view.
+
+    Parameters
+    ----------
+    camera : object
+        The camera object representing the camera's properties.
+    camera_xform : object
+        The transformation object for the camera.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'camera' and the camera properties.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
     spec["type"] = "camera"
     spec["camera"] = camera
@@ -59,6 +110,21 @@ def view_spec_camera(camera, camera_xform) -> dict:
 
 
 def xyz2pqw(xyz, view_spec):
+    """Converts 3D coordinates to (p, q, w) coordinates based on the view specification.
+
+    Parameters
+    ----------
+    xyz : np.ndarray
+        The 3D coordinates to convert.
+    view_spec : dict
+        The view specification that determines the conversion method.
+
+    Returns
+    -------
+    list[float] | None
+        The converted (p, q, w) coordinates, or None if the point is behind the camera in a camera view.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Enforces the right-hand rule in all conversions.
     # That is, [p,q,w] is a right-handed coordinate system.
     if view_spec["type"] == "3d":
@@ -101,6 +167,21 @@ def xyz2pqw(xyz, view_spec):
 
 
 def xyz2pq(xyz, view_spec):
+    """Converts 3D coordinates to (p, q) coordinates based on the view specification.
+
+    Parameters
+    ----------
+    xyz : np.ndarray
+        The 3D coordinates to convert.
+    view_spec : dict
+        The view specification that determines the conversion method.
+
+    Returns
+    -------
+    list[float] | None
+        The converted (p, q) coordinates, or None if the point is behind the camera in a camera view.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     pqw = xyz2pqw(xyz, view_spec)
     if pqw == None:
         return None
@@ -109,6 +190,26 @@ def xyz2pq(xyz, view_spec):
 
 
 def pqw2xyz(pqw, view_spec):
+    """Converts (p, q, w) coordinates back to 3D coordinates based on the view specification.
+
+    Parameters
+    ----------
+    pqw : list[float]
+        The (p, q, w) coordinates to convert.
+    view_spec : dict
+        The view specification that determines the conversion method.
+
+    Returns
+    -------
+    list[float]
+        The converted 3D coordinates.
+
+    Raises
+    ------
+    ValueError
+        If the view specification type is unrecognized.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     # Assumes the right-hand rule for all conversions.
     # That is, [p,q,w] is viewed as a right-handed coordinate system.
     if view_spec["type"] == "3d":
@@ -138,6 +239,21 @@ def pqw2xyz(pqw, view_spec):
 
 
 def pq2xyz(pq, view_spec):
+    """Converts (p, q) coordinates to 3D coordinates based on the view specification.
+
+    Parameters
+    ----------
+    pq : list[float]
+        The (p, q) coordinates to convert.
+    view_spec : dict
+        The view specification that determines the conversion method.
+
+    Returns
+    -------
+    list[float]
+        The converted 3D coordinates.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     pqw = pq.copy()
     pqw.append(0)
     return pqw2xyz(pqw, view_spec)

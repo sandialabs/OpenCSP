@@ -424,13 +424,13 @@ class test_Docstrings(unittest.TestCase):
         + geo_class_list
         + geometry_class_list
         + opencsp_path_class_list
-        # + photogrammetry_class_list
-        # + process_class_list
-        # + render_class_list
-        # + render_control_class_list
-        # + common_target_class_list
-        # + tool_class_list
-        # + uas_class_list
+        + photogrammetry_class_list
+        + process_class_list
+        + render_class_list
+        + render_control_class_list
+        + common_target_class_list
+        + tool_class_list
+        + uas_class_list
     )
 
     class_list = app_class_list + common_class_list

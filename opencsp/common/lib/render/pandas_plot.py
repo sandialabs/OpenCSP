@@ -1,9 +1,5 @@
 """
-
 Plotting Pandas Objects
-
-
-
 """
 
 import matplotlib.pyplot as plt
@@ -24,6 +20,48 @@ def dataframe_plot(
     y_axis_grid=False,  # Draw horizontal grid lines.
     legend=True,
 ):  # Whether to draw the plot legend.
+    """
+    Plots data from a Pandas DataFrame.
+
+    This function creates a plot using data from the specified DataFrame, allowing for multiple
+    curves to be plotted based on the provided column specifications. It sets up the figure,
+    plots the data, and displays the plot.
+
+    Parameters
+    ----------
+    figure_control : object
+        Control object for managing the figure.
+    df : pd.DataFrame
+        The DataFrame containing the data to plot.
+    title : str
+        The title of the plot.
+    x_column : str
+        The name of the column to use for the horizontal axis.
+    y_column_label_styles : list[list]
+        A list of specifications for the data curves to plot. Each specification should be a list
+        containing the column heading, legend label (or None), and point sequence render control.
+    x_axis_label : str | None
+        The label for the x-axis. If None, no label is shown.
+    y_axis_label : str | None
+        The label for the y-axis. If None, no label is shown.
+    x_axis_grid : bool, optional
+        If True, vertical grid lines are drawn on the x-axis. Defaults to False.
+    y_axis_grid : bool, optional
+        If True, horizontal grid lines are drawn on the y-axis. Defaults to False.
+    legend : bool, optional
+        If True, the plot legend is displayed. Defaults to True.
+
+    Returns
+    -------
+    object
+        A figure record object containing information about the created figure.
+
+    Raises
+    ------
+    ValueError
+        If the specified x_column or any y_column in y_column_label_styles does not exist in the DataFrame.
+    """
+    # "ChatGPT 4o" assisted with generating this docstring.
     figure_record = fm.setup_figure(figure_control, title=title)
     for y_column_label_style in y_column_label_styles:
         y_column = y_column_label_style[0]
