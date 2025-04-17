@@ -376,7 +376,7 @@ def thin(marker=',', linewidth=0.3, color='y') -> RenderControlPointSeq:
     Returns
     -------
     RenderControlPointSeq
-        An instance of RenderControlPointSeq configured with the specified 
+        An instance of RenderControlPointSeq configured with the specified
         marker, linewidth, and color.
     """
     # ChatGPT 4o-mini assisted with writing this doc string
@@ -399,7 +399,7 @@ def thick(marker=',', linewidth=1.5, color='y') -> RenderControlPointSeq:
     Returns
     -------
     RenderControlPointSeq
-        An instance of RenderControlPointSeq configured with the specified 
+        An instance of RenderControlPointSeq configured with the specified
         marker, linewidth, and color.
     """
     # ChatGPT 4o-mini assisted with writing this doc string
