@@ -73,7 +73,7 @@ class TestTowerOutput(to.TestOutput):
         comments = []
 
         # Configuration setup
-        tower = Tower(name="Sandia NSTTF", origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        tower = Tower(name="Sandia NSTTF", origin=np.array([0, 0, 0]), parts=["whole tower", "TowerTop"])
 
         # Setup render control.
         # Style setup
@@ -114,7 +114,7 @@ class TestTowerOutput(to.TestOutput):
         comments = []
 
         # Configuration setup
-        tower_receiver = Tower(name="Sandia NSTTF", origin=np.array([0, 0, 0]), parts=["whole tower", "target"])
+        tower_receiver = Tower(name="Sandia NSTTF", origin=np.array([0, 0, 0]), parts=["whole tower", "TowerTop"])
         tower_control = Tower(
             name="Sandia NSTTF Control Tower",
             origin=np.array([0, 0, 0]),

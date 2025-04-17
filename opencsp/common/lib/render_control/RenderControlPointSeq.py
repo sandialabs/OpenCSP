@@ -59,7 +59,7 @@ class RenderControlPointSeq:
     '|'   vline marker
     '_'   hline marker
     'None' no marker
-    '$\u266B$' two quarter notes
+    '$\u266b$' two quarter notes
     'arrow' draws an arrow at the end of every line
 
     For more markers, see:
@@ -68,19 +68,19 @@ class RenderControlPointSeq:
 
     # ChatGPT 4o-mini assisted with generating this doc string
     def __init__(
-        self,
-        linestyle="-",
-        linewidth: float = 1,
-        color: str | cl.Color = "b",
-        marker="x",
-        markersize: float = 6,
-        markeredgecolor: str | cl.Color = None,
-        markeredgewidth=None,
-        markerfacecolor: str | cl.Color = None,
+        self,  # See above for details:
+        linestyle='-',  # '-', '--', '-.', ':', '' or 'None'
+        linewidth: float = 1,  # float
+        color: str | cl.Color = 'b',  # line color
+        marker='x',  # .,ov^<>12348sp*hH+xXDd|_ or None
+        markersize: float = 6,  # float
+        markeredgecolor: str | cl.Color = None,  # Defaults to color above if not set.
+        markeredgewidth=None,  # Defaults to linewidth if not set.
+        markerfacecolor: str | cl.Color = None,  # Defaults to color above if not set.
         markeralpha: float | None = None,
-        vector_color: str | cl.Color = "b",
-        vector_linewidth: float = 1,
-        vector_scale: float = 1.0,
+        vector_color: str | cl.Color = 'b',  # Used if points are in a vector field.
+        vector_linewidth: float = 1,  # Used if points are in a vector field.
+        vector_scale: float = 1.0,  # Facter to grow/srhink vector length, for points in a vector field.
     ):
         """
         Initialize the rendering control for point sequences.
@@ -225,7 +225,7 @@ class RenderControlPointSeq:
 # COMMON CASES
 
 
-def default(marker=".", color="b", linewidth=1, markersize=8):
+def default(marker='.', color='b', linewidth=1, markersize=8):
     """
     Create a default render control for point sequences.
 
@@ -248,9 +248,10 @@ def default(marker=".", color="b", linewidth=1, markersize=8):
         An instance of `RenderControlPointSeq` configured with default parameters.
     """
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
+    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
-def outline(color="k", linewidth=1):
+def outline(color='k', linewidth=1):
     """
     Create a render control for outlines of physical objects.
 
@@ -269,9 +270,10 @@ def outline(color="k", linewidth=1):
         An instance of `RenderControlPointSeq` configured to display outlines only.
     """
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker='None')
+    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker='None')
 
 
-def data_curve(color="b", linewidth=1, marker=".", markersize=3) -> RenderControlPointSeq:
+def data_curve(color='b', linewidth=1, marker='.', markersize=3) -> RenderControlPointSeq:
     """
     Create a render control for a data curve with identified data points.
 
@@ -295,9 +297,10 @@ def data_curve(color="b", linewidth=1, marker=".", markersize=3) -> RenderContro
         An instance of `RenderControlPointSeq` configured for a data curve.
     """
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
+    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
-def marker(marker="o", color="b", markersize=3) -> RenderControlPointSeq:
+def marker(marker='o', color='b', markersize=3) -> RenderControlPointSeq:
     """
     Create a render control for displaying markers.
 
@@ -318,9 +321,10 @@ def marker(marker="o", color="b", markersize=3) -> RenderControlPointSeq:
         An instance of `RenderControlPointSeq` configured to display markers.
     """
     return RenderControlPointSeq(linestyle='None', color=color, marker=marker, markersize=markersize)
+    return RenderControlPointSeq(linestyle='None', color=color, marker=marker, markersize=markersize)
 
 
-def vector_field(marker=".", color="b", markersize=3, vector_linewidth=1, vector_scale=1.0) -> RenderControlPointSeq:
+def vector_field(marker='.', color='b', markersize=3, vector_linewidth=1, vector_scale=1.0) -> RenderControlPointSeq:
     """
     Create a render control for a field of vector needles.
 
@@ -346,7 +350,7 @@ def vector_field(marker=".", color="b", markersize=3, vector_linewidth=1, vector
     """
     # ChatGPT 4o-mini assisted with generating this doc string
     return RenderControlPointSeq(
-        linestyle="None",
+        linestyle='None',
         color=color,
         marker=marker,
         markersize=markersize,
@@ -358,22 +362,45 @@ def vector_field(marker=".", color="b", markersize=3, vector_linewidth=1, vector
 
 def thin(marker=',', linewidth=0.3, color='y') -> RenderControlPointSeq:
     """
-    Create a render control for a thin line style.
-
-    This function returns a `RenderControlPointSeq` instance configured for a thin line style.
+    Create a thin render control point sequence.
 
     Parameters
     ----------
     marker : str, optional
-        Marker style for the points. By default, ',' (pixel marker).
+        The marker style for the control points. Default is ','.
     linewidth : float, optional
-        Line width for the points. By default, 0.3.
+        The width of the lines used to render the control points. Default is 0.3.
     color : str, optional
-        Color for the points. By default, 'y' (yellow).
+        The color of the control points. Default is 'y'.
 
     Returns
     -------
     RenderControlPointSeq
-        An instance of `RenderControlPointSeq` configured for a thin line style.
+        An instance of RenderControlPointSeq configured with the specified 
+        marker, linewidth, and color.
     """
+    # ChatGPT 4o-mini assisted with writing this doc string
+    return RenderControlPointSeq(color=color, marker=marker, linewidth=linewidth)
+
+
+def thick(marker=',', linewidth=1.5, color='y') -> RenderControlPointSeq:
+    """
+    Create a thick render control point sequence.
+
+    Parameters
+    ----------
+    marker : str, optional
+        The marker style for the control points. Default is ','.
+    linewidth : float, optional
+        The width of the lines used to render the control points. Default is 1.5.
+    color : str, optional
+        The color of the control points. Default is 'y'.
+
+    Returns
+    -------
+    RenderControlPointSeq
+        An instance of RenderControlPointSeq configured with the specified 
+        marker, linewidth, and color.
+    """
+    # ChatGPT 4o-mini assisted with writing this doc string
     return RenderControlPointSeq(color=color, marker=marker, linewidth=linewidth)

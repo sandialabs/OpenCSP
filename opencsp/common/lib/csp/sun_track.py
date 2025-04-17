@@ -128,6 +128,38 @@ def tracking_surface_normal_xyz(
     h_sn = sun + ha
     h_sn.normalize_in_place()
 
+    return h_sn
+
+
+def tracking_surface_normal_xyz_given_sun(
+    heliostat_origin: Pxyz,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint: Pxyz,  # (x,y,z) in m.     Reflection aim point.
+    sun_vector: Vxyz,
+):  # (year, month, day, hour, minute, second, timezone) tuple.
+    #  Example: (2022, 7, 4, 11, 20, 0, -6)
+    #              => July 4, 2022 at 11:20 am MDT (-6 hours)
+    """
+    Computes heliostat surface normal which tracks the sun to the aimpoint.
+    """
+    print(f"helio: {heliostat_origin}, aim: {aimpoint}, sun: {sun_vector}")
+    # Sun position.
+    # sun = Vxyz(sp.sun_position(location_lon_lat, when_ymdhmsz))
+    sun = sun_vector.normalize()
+    # sun_xyz = sun_vector.normalize().data.T.flatten()
+
+    # make sure we only keep the first Vxyz
+    sun = sun[0]
+    heliostat_origin = heliostat_origin[0]
+    aimpoint = aimpoint[0]
+
+    # Reflected ray to aimpoint.
+    ha = aimpoint - heliostat_origin
+    ha.normalize_in_place()
+
+    # Surface normal
+    h_sn = ha - sun
+    h_sn.normalize_in_place()
+
     # n_x = h_sn[0]
     # n_y = h_sn[1]
     # n_z = h_sn[2]
@@ -152,8 +184,8 @@ def tracking_surface_normal_xyz(
 
 # @strict_types
 def tracking_surface_normal_xyz_given_sun_vector(
-    heliostat_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Heliostat origin.
-    aimpoint_xyz: list | np.ndarray | tuple,  # (x,y,z) in m.     Reflection aim point.
+    heliostat_xyz: Pxyz,  # (x,y,z) in m.     Heliostat origin.
+    aimpoint_xyz: Pxyz,  # (x,y,z) in m.     Reflection aim point.
     sun_vector: Vxyz,
 ):  # Current direction of the sun
     #  Example: (2022, 7, 4, 11, 20, 0, -6)
@@ -167,19 +199,21 @@ def tracking_surface_normal_xyz_given_sun_vector(
 
     # Construct points as arrays.
     sun = np.array(sun_xyz)
-    h = np.array(heliostat_xyz)
-    aim = np.array(aimpoint_xyz)
+    h = np.array([heliostat_xyz.x[0], heliostat_xyz.y[0], heliostat_xyz.z[0]])
+    aim = np.array([aimpoint_xyz.x[0], aimpoint_xyz.y[0], aimpoint_xyz.z[0]])
 
     # Reflected ray to aimpoint.
     ha = aim - h
     ha = ha / np.linalg.norm(ha)
 
     # Surface normal
-    h_sn = sun + ha
+    h_sn = ha - sun
     h_sn = h_sn / np.linalg.norm(h_sn)
     n_x = h_sn[0]
     n_y = h_sn[1]
     n_z = h_sn[2]
+
+    print(f'In tracking_surface_normal_xyz(), xyz: , {[n_x, n_y, n_z]}, sun_vector: {sun}, ha: {ha}')
 
     # Return.
     return [n_x, n_y, n_z]

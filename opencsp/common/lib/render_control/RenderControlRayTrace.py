@@ -1,4 +1,5 @@
 import opencsp.common.lib.render_control.RenderControlLightPath as rclp
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 
 class RenderControlRayTrace:
@@ -21,7 +22,7 @@ class RenderControlRayTrace:
 # Common Configurations
 
 
-def init_current_lengths(init_len=1, current_len=1):
+def init_current_lengths(init_len=1, current_len=1, line_render: float = rcps.thin()):
     """
     Initializes a RenderControlRayTrace object with specified initial and current lengths for light paths.
 
@@ -41,4 +42,6 @@ def init_current_lengths(init_len=1, current_len=1):
         A RenderControlRayTrace object initialized with the specified lengths.
     """
     # "ChatGPT 4o-mini" assisted with generating this docstring.
-    return RenderControlRayTrace(rclp.RenderControlLightPath(init_length=init_len, current_length=current_len))
+    return RenderControlRayTrace(
+        rclp.RenderControlLightPath(init_length=init_len, current_length=current_len, line_render_control=line_render)
+    )
