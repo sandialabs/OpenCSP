@@ -55,13 +55,16 @@ class PowerpointShape:
         # -----
         # If a single value is provided, it returns a single integer. If an iterable is provided, it returns a list of integers.
         # "ChatGPT 4o" assisted with generating this doc
-        try:
+        if isinstance(vals, Iterable) and not isinstance(vals, None):
             ret = []
             for val in vals:
                 ret.append(pptx.util.Inches(val))
             return ret
-        except:
+        elif isinstance(vals, int) or isinstance(vals, float):
             return pptx.util.Inches(val)
+        else:
+            vals_type = type(vals).__name__
+            raise TypeError(f"\"vals\" of type \"{vals_type}\" is not supported.")
 
     def cell_dims_pptx(self):
         """Returns the PowerPoint-style inches that bound this shape (left, top, width, height).
