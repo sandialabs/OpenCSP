@@ -16,6 +16,6 @@ This section describes the OpenCSP examples.
    solarfield/index.rst
    targetcolor/index.rst
 
-Note: To fetch sample data for all examples, click here_.
+Note: To fetch sample data for all code examples, click here_.
 
 .. _here: https://sandia-csp.app.box.com/s/iftmhdkhgjnmfgefsfmkid011dtv8n3g/folder/253231533209
