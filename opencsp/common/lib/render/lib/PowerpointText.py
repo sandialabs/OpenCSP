@@ -30,7 +30,7 @@ class PowerpointText(pps.PowerpointShape):
     def __init__(
         self,
         val: str = None,
-        dims: tuple[float, float, float, float] = (1.0, 1.0, 1.0, 1.0), #None,
+        dims: tuple[float, float, float, float] = (1.0, 1.0, 1.0, 1.0),
         cell_dims: tuple[float, float, float, float] = None,
         is_title=False,
         parent_slide=None,
