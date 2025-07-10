@@ -6,9 +6,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 from opencsp.common.lib.render.lib.PowerpointText import PowerpointText
 
-
 class test_PowerpointText(unittest.TestCase):
-    # def setUpClass(cls)
     def test_has_val_with_content(self):
         ppt_text_instance = PowerpointText(val="example text written for pytest")
         assert ppt_text_instance.has_val() == True
