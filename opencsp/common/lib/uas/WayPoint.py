@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import numpy as np
 

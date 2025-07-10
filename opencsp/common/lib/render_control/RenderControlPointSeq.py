@@ -60,6 +60,7 @@ class RenderControlPointSeq:
     '_'   hline marker
     'None' no marker
     '$\u266b$' two quarter notes
+    '$\u266b$' two quarter notes
     'arrow' draws an arrow at the end of every line
 
     For more markers, see:
@@ -362,45 +363,22 @@ def vector_field(marker='.', color='b', markersize=3, vector_linewidth=1, vector
 
 def thin(marker=',', linewidth=0.3, color='y') -> RenderControlPointSeq:
     """
-    Create a thin render control point sequence.
+    Create a render control for a thin line style.
+
+    This function returns a `RenderControlPointSeq` instance configured for a thin line style.
 
     Parameters
     ----------
     marker : str, optional
-        The marker style for the control points. Default is ','.
+        Marker style for the points. By default, ',' (pixel marker).
     linewidth : float, optional
-        The width of the lines used to render the control points. Default is 0.3.
+        Line width for the points. By default, 0.3.
     color : str, optional
-        The color of the control points. Default is 'y'.
+        Color for the points. By default, 'y' (yellow).
 
     Returns
     -------
     RenderControlPointSeq
-        An instance of RenderControlPointSeq configured with the specified
-        marker, linewidth, and color.
+        An instance of `RenderControlPointSeq` configured for a thin line style.
     """
-    # ChatGPT 4o-mini assisted with writing this doc string
-    return RenderControlPointSeq(color=color, marker=marker, linewidth=linewidth)
-
-
-def thick(marker=',', linewidth=1.5, color='y') -> RenderControlPointSeq:
-    """
-    Create a thick render control point sequence.
-
-    Parameters
-    ----------
-    marker : str, optional
-        The marker style for the control points. Default is ','.
-    linewidth : float, optional
-        The width of the lines used to render the control points. Default is 1.5.
-    color : str, optional
-        The color of the control points. Default is 'y'.
-
-    Returns
-    -------
-    RenderControlPointSeq
-        An instance of RenderControlPointSeq configured with the specified
-        marker, linewidth, and color.
-    """
-    # ChatGPT 4o-mini assisted with writing this doc string
     return RenderControlPointSeq(color=color, marker=marker, linewidth=linewidth)

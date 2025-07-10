@@ -128,7 +128,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         return slope_data  # facet child
 
     def get_2D_dimensions(self) -> tuple[float, float]:
-        """Returns width and heightin facet's child coordinate
+        """Returns width and height in facet's child coordinate
         reference frame.
 
         Returns

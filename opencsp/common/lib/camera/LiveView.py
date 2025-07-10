@@ -10,6 +10,9 @@ import opencsp.common.lib.render.lib.AbstractPlotHandler as aph
 
 
 class LiveView(aph.AbstractPlotHandler):
+    """Class used to view a live-stream from a connected camera using tkinter and ImageAcquisition
+    interfaces."""
+
     def __init__(
         self, image_acquisition: ImageAcquisitionAbstract = None, update_ms: int = 20, highlight_saturation: bool = True
     ):

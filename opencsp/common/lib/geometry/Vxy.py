@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.typing as npt
 
+import opencsp.common.lib.geometry.angle as geo_angle
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -110,6 +111,27 @@ class Vxy:
             ys += val.y.tolist()
         return cls((xs, ys))
 
+    @classmethod
+    def from_numpy_coords(cls, yx_coords: tuple[np.ndarray, np.ndarray]):
+        """Builds a Vxy instance from numpy coordinates, such as those returned by np.where(arr == 0)."""
+        if len(yx_coords) != 2:
+            lt.error_and_raise(
+                ValueError,
+                "Error in Vxy.from_numpy_yx_coords(): "
+                + f"expected yx_coords to be of length 2, but "
+                + "{len(yx_coords)=}.",
+            )
+        if not isinstance(yx_coords[0], np.ndarray) or not isinstance(yx_coords[1], np.ndarray):
+            lt.error_and_raise(
+                TypeError,
+                "Error in Vxy.from_numpy_yx_coords(): "
+                + f"expected yx_coords to contain numpy arrays, but "
+                + f"{type(yx_coords[0])=} and {type(yx_coords[1])=}.",
+            )
+
+        xy_coords = [yx_coords[1], yx_coords[0]]
+        return cls._from_data(xy_coords)
+
     def _check_is_Vxy(self, v_in):
         """
         Checks if input data is instance of Vxy for methods that require this
@@ -145,6 +167,19 @@ class Vxy:
             return self._from_data(self._data * data_in)
         else:
             raise TypeError("Vxy cannot be multipled by type, {}.".format(type(data_in)))
+
+    def __truediv__(self, data_in):
+        """
+        Element wise division. Operand 1 type must be int, float, or Vxy.
+        """
+        if type(data_in) in [int, float, np.float32, np.float64]:
+            return self._from_data(self._data / data_in)
+        elif isinstance(data_in, Vxy):
+            return self._from_data(self._data / data_in.data)
+        elif type(data_in) is np.ndarray:
+            return self._from_data(self._data / data_in)
+        else:
+            raise TypeError('Vxy cannot be divided by type, {}.'.format(type(data_in)))
 
     def __getitem__(self, key):
         # Check that only one dimension is being indexed
@@ -211,6 +246,23 @@ class Vxy:
 
         """
         return np.sqrt(np.sum(self._data**2, 0))
+
+    def angle(self) -> npt.NDArray[np.float_]:
+        """
+        Returns the orientation relative to the origin for each vector, in
+        radians in the standard coordinate system (0 on the x-axis to the right,
+        positive counter-clockwise).
+
+        Returns
+        -------
+        np.ndarray
+            Length n ndarray of vector angles in the range 0-2pi.
+        """
+        xy_as_complex = np.array([complex(xv, yv) for xv, yv in zip(self.x, self.y)])
+        angles = np.angle(xy_as_complex)
+        normalized = geo_angle.normalize(angles)
+
+        return normalized
 
     def rotate(self, R: np.ndarray):
         """

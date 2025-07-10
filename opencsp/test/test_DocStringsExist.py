@@ -9,6 +9,7 @@ import example.sofast_calibration.example_calibration_screen_shape
 # Examples
 import example.sofast_fringe.example_make_rectangular_screen_definition
 import example.sofast_fringe.sofast_temperature_analysis
+import example.sofast_fringe.sofast_command_line_tool
 
 
 # TODO: why aren't these imported from import opencsp as opencsp above
@@ -169,6 +170,7 @@ class test_Docstrings(unittest.TestCase):
         opencsp.app.sofast.lib.process_optics_geometry,
         opencsp.app.sofast.lib.sofast_common_functions,
         opencsp.app.sofast.lib.spatial_processing,
+        opencsp.app.sofast.lib.SofastInterface,
     ]
 
     target_class_list = [opencsp.app.target.target_color.lib.ImageColor]
@@ -184,7 +186,10 @@ class test_Docstrings(unittest.TestCase):
     # TODO: example_sofast_calibration_list
     # TODO: example_sofast_fringe_list
     # TODO: example_targetcolor_list
+
     example_list = [
+        example.sofast_fringe.sofast_temperature_analysis,
+        example.sofast_fringe.sofast_command_line_tool,
         example.sofast_fringe.example_process_in_debug_mode,
         example.sofast_fringe.sofast_temperature_analysis,
         example.sofast_fringe.example_make_rectangular_screen_definition,

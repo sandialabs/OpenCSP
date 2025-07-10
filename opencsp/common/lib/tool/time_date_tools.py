@@ -7,7 +7,7 @@ Convenience functions for manipulating time and dates.
 """
 
 import dateutil.tz as dtz
-from datetime import datetime, timezone, timedelta
+from datetime import date, time, datetime, timezone, timedelta
 import pytz
 import time
 
@@ -53,52 +53,31 @@ def print_current_time() -> None:
 
 
 def current_date_time_string() -> str:
-    """
-    Get the current date and time as a formatted string.
-
-    The format of the string is "%Y-%m-%d %H:%M:%S".
-
-    Returns
-    -------
-    str
-        The current date and time as a string.
-    """
-    # "ChatGPT 4o" assisted with generating this docstring.
-    return current_date_string() + ' ' + current_time_string()
-
-
-def current_date_string() -> str:
-    """
-    Get the current date as a formatted string.
-
-    The format of the string is "%Y-%m-%d".
-
-    Returns
-    -------
-    str
-        The current date as a string.
-    """
-    # "ChatGPT 4o" assisted with generating this docstring.
+    """%Y-%m-%d %H:%M:%S"""
     now = datetime.now()
-    current_date_str = now.strftime("%Y-%m-%d")
+    return current_date_string(now.date()) + ' ' + current_time_string(now.time())
+
+
+def current_date_string(now: date = None) -> str:
+    """%Y-%m-%d"""
+    if now is None:
+        now = datetime.now().date()
+    current_date_str = now.strftime('%Y-%m-%d')
     return current_date_str
 
 
-def current_time_string() -> str:
-    """
-    Get the current time as a formatted string.
-
-    The format of the string is "%H:%M:%S".
-
-    Returns
-    -------
-    str
-        The current time as a string.
-    """
-    # "ChatGPT 4o" assisted with generating this docstring.
-    now = datetime.now()
-    current_time_str = now.strftime("%H:%M:%S")
+def current_time_string(now: time = None) -> str:
+    """%H:%M:%S"""
+    if now is None:
+        now = datetime.now().time()
+    current_time_str = now.strftime('%H:%M:%S')
     return current_time_str
+
+
+def date_string_forfile(d: date) -> str:
+    """%Y%m%d"""
+    date_str = d.strftime('%Y%m%d')
+    return date_str
 
 
 def current_date_string_forfile() -> str:
@@ -114,8 +93,14 @@ def current_date_string_forfile() -> str:
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     now = datetime.now()
-    current_date_str = now.strftime("%Y%m%d")
+    current_date_str = date_string_forfile(now.date())
     return current_date_str
+
+
+def time_string_forfile(t: time) -> str:
+    """%H%M%S"""
+    time_str = t.strftime('%H%M%S')
+    return time_str
 
 
 def current_time_string_forfile() -> str:
@@ -131,23 +116,19 @@ def current_time_string_forfile() -> str:
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     now = datetime.now()
-    current_time_str = now.strftime("%H%M%S")
+    current_time_str = time_string_forfile(now.time())
     return current_time_str
 
 
+def date_time_string_forfile(dt: datetime) -> str:
+    """%Y%m%d_%H%M%S"""
+    return date_string_forfile(dt.date()) + '_' + time_string_forfile(dt.time())
+
+
 def current_date_time_string_forfile() -> str:
-    """
-    Get the current date and time as a formatted string suitable for filenames.
-
-    The format of the string is "%Y%m%d_%H%M%S".
-
-    Returns
-    -------
-    str
-        The current date and time as a string suitable for use in filenames.
-    """
-    # "ChatGPT 4o" assisted with generating this docstring.
-    return current_date_string_forfile() + '_' + current_time_string_forfile()
+    """%Y%m%d_%H%M%S"""
+    now = datetime.now()
+    return date_time_string_forfile(now)
 
 
 def current_time() -> float:

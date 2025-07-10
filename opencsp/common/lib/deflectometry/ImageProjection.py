@@ -1,5 +1,4 @@
-"""Class handling the projection of images on a monitor/projector
-"""
+"""Class handling the projection of images on a monitor/projector"""
 
 from dataclasses import dataclass
 import tkinter

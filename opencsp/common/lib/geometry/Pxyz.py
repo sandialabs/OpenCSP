@@ -70,3 +70,19 @@ class Pxyz(Vxyz):
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         return Pxyz([[], [], []])
+
+    def draw_point(
+        self,
+        figure: rcfr.RenderControlFigureRecord | v3d.View3d,
+        style: rcps.RenderControlPointSeq = None,
+        labels: list[str] = None,
+    ):
+        """Calls figure.draw_xyz(p) for all points in this instance, and with
+        the default arguments in place for any None's."""
+        if style is None:
+            style = rcps.default(markersize=2)
+        if labels is None:
+            labels = [None] * len(self)
+        view = figure if isinstance(figure, v3d.View3d) else figure.view
+        for x, y, z, label in zip(self.x, self.y, self.z, labels):
+            view.draw_xyz((x, y, z), style, label)

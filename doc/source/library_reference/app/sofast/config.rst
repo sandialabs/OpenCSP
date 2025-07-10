@@ -78,6 +78,16 @@ opencsp.app.sofast.lib.ParamsSofastFixed
    :undoc-members:
    :show-inheritance:
 
+opencsp.app.sofast.lib.SofastInterface
+======================================
+
+.. currentmodule:: opencsp.app.sofast.lib.SofastInterface
+
+.. automodule:: opencsp.app.sofast.lib.SofastInterface
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 opencsp.app.sofast.lib.SystemSofastFringe
 =========================================
 
