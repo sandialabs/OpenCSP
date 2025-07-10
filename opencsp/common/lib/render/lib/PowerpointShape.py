@@ -55,7 +55,7 @@ class PowerpointShape:
         # -----
         # If a single value is provided, it returns a single integer. If an iterable is provided, it returns a list of integers.
         # "ChatGPT 4o" assisted with generating this doc
-        if isinstance(vals, Iterable) and not isinstance(vals, None):
+        if isinstance(vals, Iterable) and vals is not None:
             ret = []
             for val in vals:
                 ret.append(pptx.util.Inches(val))

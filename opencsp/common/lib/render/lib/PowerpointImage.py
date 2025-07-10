@@ -138,7 +138,15 @@ class PowerpointImage(pps.PowerpointShape):
         return self.dims is not None
 
     def dims_pptx(self):
-        """Returns the powerpoint-style inches to place this image at (left, top, width, height)."""
+        """Returns the PowerPoint-style dimensions (left, top, width, height) for this image.
+
+        Returns
+        -------
+        tuple[float, float, float, float]
+            The dimensions of the image in inches.
+        """
+        # ChatGPT 4o-mini assisted with generating this doc string
+        assert self.has_dims()
         return self._pptx_inches(self.dims)
 
     @staticmethod
