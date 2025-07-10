@@ -63,5 +63,4 @@ class test_PowerpointText(unittest.TestCase):
         ppt_text_instance = PowerpointText(dims=(1.0, 1.0, 1.0, 1.0)) 
         ppt_text_instance.compute_and_assign_height(font_pnt) 
  
-        assert ppt_text_instance.dims == value_should_be 
-
+        assert ppt_text_instance.dims == value_should_be
