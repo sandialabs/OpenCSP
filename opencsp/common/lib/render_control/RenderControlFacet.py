@@ -24,8 +24,8 @@ class RenderControlFacet:
         centroid_style=rcps.marker(),
         draw_outline=True,
         outline_style=rcps.outline(),
-        draw_fill=False,
-        fill_color=None,
+        # draw_fill=False, # Removed, use mirror style for rendering the surface
+        # fill_color=None, # Removed, use mirror style for rendering the surface
         draw_surface_normal=False,
         surface_normal_length=4,
         surface_normal_style=rcps.outline(),
@@ -79,8 +79,6 @@ class RenderControlFacet:
         self.centroid_style = centroid_style
         self.draw_outline = draw_outline
         self.outline_style = outline_style
-        self._draw_fill = draw_fill
-        self._fill_color = fill_color
         self.draw_surface_normal = draw_surface_normal
         self.surface_normal_length = surface_normal_length
         self.surface_normal_style = surface_normal_style
@@ -94,46 +92,13 @@ class RenderControlFacet:
         self.draw_mirror_curvature = draw_mirror_curvature
         self.mirror_styles = mirror_styles
 
-        self._update_fill_color()
-
-    @property
-    def draw_fill(self):
-        return self._draw_fill
-
-    @draw_fill.setter
-    def draw_fill(self, val: bool):
-        self._draw_fill = val
-        self._update_fill_color()
-
-    @property
-    def fill_color(self):
-        if self._fill_color is not None:
-            return self._fill_color
-        else:
-            return self.outline_style.color
-
-    @fill_color.setter
-    def fill_color(self, val):
-        self._fill_color = val
-        self._update_fill_color()
-
-    def _update_fill_color(self):
-        if self._draw_fill:
-            if self.outline_style.color is None or np.any(self.outline_style.color != self.fill_color):
-                self.outline_style = copy.copy(self.outline_style)
-                self.outline_style.color = self.fill_color
-        else:
-            if self.outline_style.color is not None:
-                self.outline_style = copy.copy(self.outline_style)
-                self.outline_style.color = None
-
-    def style(self, imput_name: str):
+    def style(self, input_name: str):
         """
         Gets the style for the given name. Always returns self for the current implement.
 
         Parameters
         ----------
-        imput_name : str
+        input_name : str
             The name to get the style for. Ignored in the current implementation.
 
         Returns

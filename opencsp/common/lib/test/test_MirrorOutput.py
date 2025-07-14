@@ -5,6 +5,7 @@ Test generation and rendering of mirror surfaces, their surface normals, etc.
 import copy
 import datetime
 from typing import Callable
+import unittest
 
 import numpy as np
 import pytz
@@ -764,20 +765,24 @@ if __name__ == "__main__":
     # Set verify to False when you want to generate all figures and then copy
     # them into the expected_output directory.
     # (Does not affect pytest, which uses default value.)
-    verify = False
-    # Setup.
-    test_object = TestMirrorOutput()
-    test_object.setUpClass(interactive=interactive, verify=verify)
-    test_object.setUp()  # Tests.
+    verify = True
 
-    lt.info("Beginning tests...")
-    test_object.test_mirror_halfpi_rotation()
-    test_object.test_facet()
-    test_object.test_solar_field()
-    test_object.test_heliostat_05W01_and_14W01()
-    test_object.test_heliostat_stages()
-    lt.info("All tests complete.")
-    # Cleanup.
-    if interactive:
-        input("Press Enter...")
-    test_object.tearDown()
+    if interactive or not verify:
+        # Setup.
+        test_object = TestMirrorOutput()
+        test_object.setUpClass(interactive=interactive, verify=verify)
+        test_object.setUp()  # Tests.
+
+        lt.info("Beginning tests...")
+        test_object.test_mirror_halfpi_rotation()
+        test_object.test_facet()
+        test_object.test_solar_field()
+        test_object.test_heliostat_05W01_and_14W01()
+        test_object.test_heliostat_stages()
+        lt.info("All tests complete.")
+        # Cleanup.
+        if interactive:
+            input("Press Enter...")
+        test_object.tearDown()
+    else:
+        unittest.main()

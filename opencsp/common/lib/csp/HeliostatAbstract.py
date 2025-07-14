@@ -259,18 +259,13 @@ class HeliostatAbstract(RayTraceable, OpticOrientationAbstract, ABC):
             reference frame in space. If None, defaults to position points
             in the heliostat's global coordinate reference frame.
         """
-
+        # Set defaults
         if heliostat_style is None:
-            heliostat_style = RenderControlHeliostat()
-
+            heliostat_style = rch.default()
         if transform is None:
             transform = self.self_to_global_tranformation
 
         origin = transform.apply(Pxyz.origin())
-
-        # TODO TJL:do we want a default style?
-        if heliostat_style is None:
-            heliostat_style = rch.default()
 
         # Centroid.
         if heliostat_style.draw_centroid:
