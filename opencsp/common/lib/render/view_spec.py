@@ -128,18 +128,51 @@ def view_spec_pqw() -> dict:
 
 
 def view_spec_xyz() -> dict:
+    """
+    Returns a specification dictionary for an XYZ view.
+
+    This function generates a dictionary that specifies the view type as
+    'xyz', which can be used for rendering or visualization purposes.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xyz'.
+    """
     spec = {}
     spec['type'] = 'xyz'
     return spec
 
 
 def view_spec_pq() -> dict:
+    """
+    Returns a specification dictionary for an PQ view.
+
+    This function generates a dictionary that specifies the view type as
+    'xy', which can be used for rendering or visualization purposes.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xy'.
+    """
     spec = {}
     spec['type'] = 'xy'
     return spec
 
 
 def view_spec_pqw() -> dict:
+    """
+    Returns a specification dictionary for an PQW view.
+
+    This function generates a dictionary that specifies the view type as
+    'xyz', which can be used for rendering or visualization purposes.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xyz'.
+    """
     spec = {}
     spec['type'] = 'xyz'
     return spec
