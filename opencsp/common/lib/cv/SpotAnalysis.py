@@ -98,7 +98,7 @@ class SpotAnalysis(Iterator[SpotAnalysisOperable]):
         38. Filters (gaussian, box, etc) (:py:class:`.ConvoluationImageProcessor`)
         39. Peak value pixel identification (:py:class:`.HotspotImageProcessor`)
         40. Logorithmic scaling (:py:class:`.LogScaleImageProcessor`)
-        41. False color visualization (:py:class:`.FalseColorImageProcessor`)
+        41. False color visualization (:py:class:`.ViewFalseColorImageProcessor`)
         42. Over/under exposure visualization (NOT IMPLEMENTED YET)
         43. Image fill/inpainting (:py:class:`.InpaintImageProcessor`)
 
@@ -130,7 +130,7 @@ class SpotAnalysis(Iterator[SpotAnalysisOperable]):
             'Noiz': ConvolutionImageProcessor(kernel="box", diameter=3),
             'Ve3d': View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100)),
             'Stat': PopulationStatisticsImageProcessor(min_pop_size=1, initial_min=0, initial_max=255),
-            'Fclr': FalseColorImageProcessor(),
+            'Fclr': ViewFalseColorImageProcessor(),
         }
         pptx_processor = PowerpointImageProcessor(
             save_dir=outdir,

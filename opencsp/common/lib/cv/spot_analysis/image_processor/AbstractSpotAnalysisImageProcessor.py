@@ -213,7 +213,7 @@ class AbstractSpotAnalysisImageProcessor:
             processors = [
                 EchoImageProcessor(),
                 LogScaleImageProcessor(),
-                FalseColorImageProcessor()
+                ViewFalseColorImageProcessor()
             ]
             spot_analysis = SpotAnalysis("Log Scale Images", processors)
             spot_analysis.set_primary_images(images)

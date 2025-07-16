@@ -15,8 +15,8 @@ import opencsp.common.lib.tool.image_tools as it
 class TestFalseColorImageProcessor(unittest.TestCase):
     def setUp(self) -> None:
         path, _, _ = ft.path_components(__file__)
-        self.data_dir = os.path.join(path, "data", "input", "FalseColorImageProcessor")
-        self.out_dir = os.path.join(path, "data", "output", "FalseColorImageProcessor")
+        self.data_dir = os.path.join(path, "data", "input", "ViewFalseColorImageProcessor")
+        self.out_dir = os.path.join(path, "data", "output", "ViewFalseColorImageProcessor")
         ft.create_directories_if_necessary(self.data_dir)
         ft.create_directories_if_necessary(self.out_dir)
 

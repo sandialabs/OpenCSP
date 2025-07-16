@@ -26,7 +26,7 @@ import opencsp.common.lib.camera.ImageAcquisition_MSMF
 import opencsp.common.lib.camera.UCamera
 import opencsp.common.lib.cv.SpotAnalysis
 import opencsp.common.lib.cv.spot_analysis.image_processor.AnnotationImageProcessor
-import opencsp.common.lib.cv.spot_analysis.image_processor.FalseColorImageProcessor
+import opencsp.common.lib.cv.spot_analysis.image_processor.ViewFalseColorImageProcessor
 import opencsp.common.lib.deflectometry.ImageProjectionSetupGUI
 import opencsp.common.lib.deflectometry.ParamsSlopeSolver
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract
@@ -231,7 +231,7 @@ class test_Docstrings(unittest.TestCase):
         opencsp.common.lib.cv.spot_analysis.image_processor.CroppingImageProcessor,
         opencsp.common.lib.cv.spot_analysis.image_processor.EchoImageProcessor,
         opencsp.common.lib.cv.spot_analysis.image_processor.ExposureDetectionImageProcessor,
-        opencsp.common.lib.cv.spot_analysis.image_processor.FalseColorImageProcessor,
+        opencsp.common.lib.cv.spot_analysis.image_processor.ViewFalseColorImageProcessor,
         opencsp.common.lib.cv.spot_analysis.image_processor.HotspotImageProcessor,
         opencsp.common.lib.cv.spot_analysis.image_processor.LogScaleImageProcessor,
         opencsp.common.lib.cv.spot_analysis.image_processor.NullImageSubtractionImageProcessor,

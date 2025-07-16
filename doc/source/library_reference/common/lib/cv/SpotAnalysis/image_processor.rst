@@ -21,7 +21,7 @@ processing/machine vision situation.
    CroppingImageProcessor
    EchoImageProcessor
    ExposureDetectionImageProcessor
-   FalseColorImageProcessor
+   ViewFalseColorImageProcessor
    HotspotImageProcessor
    LogScaleImageProcessor
    NullImageSubtractionImageProcessor
