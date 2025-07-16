@@ -118,7 +118,13 @@ class TestOutput(unittest.TestCase):
         """
         # Show the figure, save it to disk, and verify that it matches expectations.
         stest.show_save_and_check_figure(
-            fig_record, self.actual_output_dir, self.expected_output_dir, self.verify, show_figs=True, dpi=dpi
+            fig_record,
+            self.actual_output_dir,
+            self.expected_output_dir,
+            self.verify,
+            show_figs=True,
+            dpi=dpi,
+            code_tag=self.code_tag,
         )
         # Clear.
         if not self.interactive:
@@ -130,7 +136,14 @@ class TestOutput(unittest.TestCase):
         """
         # Save the image to disk, and verify that it matches expectations.
         stest.save_and_check_image(
-            image, dpm, self.actual_output_dir, self.expected_output_dir, output_file_body, output_ext, self.verify
+            image,
+            dpm,
+            self.actual_output_dir,
+            self.expected_output_dir,
+            output_file_body,
+            output_ext,
+            self.verify,
+            code_tag=self.code_tag,
         )
         # Clear.
         if not self.interactive:

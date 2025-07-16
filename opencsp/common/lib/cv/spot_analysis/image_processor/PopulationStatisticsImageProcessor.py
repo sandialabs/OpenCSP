@@ -47,7 +47,7 @@ class PopulationStatisticsImageProcessor(AbstractSpotAnalysisImageProcessor):
             Initial value used to estimage the population maximum. If None, then the maximum of the first image seen is
             used. By default None
         """
-        super().__init__(self.__class__.__name__)
+        super().__init__()
 
         if min_pop_size > 0:
             if target_rolling_window_size > min_pop_size:

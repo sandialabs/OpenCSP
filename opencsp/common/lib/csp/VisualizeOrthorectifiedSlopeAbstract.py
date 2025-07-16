@@ -19,6 +19,22 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
     @abstractmethod
     def orthorectified_slope_array(self, x_vec: np.ndarray, y_vec: np.ndarray) -> np.ndarray:
+        """Returns slope array at the given interpolation vectors.
+
+        See also :py:meth:`get_orthorectified_slope_array`
+
+        Parameters
+        ----------
+        x_vec : ndarray
+            X interpolation vector of length n.
+        y_vec : ndarray
+            Y interpolation vector of length m.
+
+        Returns
+        -------
+        slope_array : ndarray
+            Shape (2, n, m) array of x/y slopes
+        """
         pass
 
     @property
@@ -26,7 +42,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
     def axis_aligned_bounding_box(self) -> tuple[float, float, float, float]:
         pass
 
-    def get_orthorectified_slope_array(self, res) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
+    def get_orthorectified_slope_array(self, res: float = 0.1) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
         """Returns slope array given resolution
 
         Parameters

@@ -22,8 +22,26 @@ class ImageType(Enum):
     """ For multi-image comparison, such as for re-alignment to a previous position, motion characterization, or measuring wind effect. """
     BACKGROUND_MASK = 5
     """ A boolean image that indicates which pixels should be included in a computation (True to include, False to exclude). """
+    VISUALIZATION = 6
+    """ Images used to view the results or state of image processing. """
+    ALGORITHM = 7
+    """ Explainer images that visualize how an image processing step was completed. """
 
     def __lt__(self, other):
         if isinstance(other, self.__class__):
             return self.value < other.value
         raise NotImplementedError
+
+    @staticmethod
+    @functools.cache
+    def ALL() -> tuple["ImageType"]:
+        cls = ImageType
+        return (
+            cls.PRIMARY,
+            cls.REFERENCE,
+            cls.NULL,
+            cls.COMPARISON,
+            cls.BACKGROUND_MASK,
+            cls.VISUALIZATION,
+            cls.ALGORITHM,
+        )

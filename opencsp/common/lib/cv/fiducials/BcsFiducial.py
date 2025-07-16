@@ -1,5 +1,6 @@
 import matplotlib.axes
 import matplotlib.patches
+import numpy as np
 import scipy.spatial
 
 from opencsp.common.lib.cv.fiducials.AbstractFiducials import AbstractFiducials
@@ -8,6 +9,7 @@ import opencsp.common.lib.geometry.RegionXY as reg
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.geometry.Vxyz as v3
 import opencsp.common.lib.render_control.RenderControlBcs as rcb
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 
 
 class BcsFiducial(AbstractFiducials):
@@ -114,18 +116,10 @@ class BcsFiducial(AbstractFiducials):
         # "ChatGPT 4o" assisted with generating this docstring.
         return [self.size * self.pixels_to_meters]
 
-    def _render(self, axes: matplotlib.axes.Axes):
-        # Render the BCS fiducial on the given plot's axes.
-        #
-        # Parameters
-        # ----------
-        # axes : matplotlib.axes.Axes
-        #    The plot's axes on which to render the BCS fiducial.
-        #
-        # Notes
-        # -----
+    def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray, include_label=False):
         # This method adds a circle and a marker to the axes based on the style defined for the fiducial.
-        # "ChatGPT 4o" assisted with generating this doc.
+        label = self.get_label(include_label)
+
         if self.style.linestyle is not None:
             circ = matplotlib.patches.Circle(
                 self.origin.data.tolist(),
@@ -134,16 +128,11 @@ class BcsFiducial(AbstractFiducials):
                 linestyle=self.style.linestyle,
                 linewidth=self.style.linewidth,
                 fill=False,
+                label=label,
             )
-            axes.add_patch(circ)
+            fig.view.axis.add_patch(circ)
+            label = None
 
         if self.style.marker is not None:
-            axes.scatter(
-                self.origin.x,
-                self.origin.y,
-                linewidth=self.style.linewidth,
-                marker=self.style.marker,
-                s=self.style.markersize,
-                c=self.style.markerfacecolor,
-                edgecolor=self.style.markeredgecolor,
-            )
+            fig.view.draw_pq(([self.origin.x], [self.origin.y]), style=self.style, label=label)
+            label = None

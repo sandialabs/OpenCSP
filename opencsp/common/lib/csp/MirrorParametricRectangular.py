@@ -41,5 +41,19 @@ class MirrorParametricRectangular(MirrorParametric):
 
     @classmethod
     def from_focal_length(cls, focal_length: float, size: tuple[float, float]):
+        """Defines a mirror with the given focal length.
+
+        Parameters
+        ----------
+        focal_length : float
+            The distance at which this mirror is focused, in meters.
+        size : tuple[float, float]
+            The length of the sides of the mirror, in meters.
+
+        Returns
+        -------
+        MirrorParametricRectangular
+            The new mirror instance.
+        """
         func = FunctionXYContinuous(f"(x**2 + y**2)/(4*{focal_length})")
         return MirrorParametricRectangular(func, size)

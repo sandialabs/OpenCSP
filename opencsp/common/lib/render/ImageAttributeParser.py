@@ -3,6 +3,7 @@ import os
 
 import opencsp.common.lib.file.AbstractAttributeParser as aap
 import opencsp.common.lib.file.AttributesManager as am
+import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.typing_tools as tt
@@ -60,17 +61,16 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
 
         # retrieve any available attributes from the associated attributes file
         self._previous_attr: am.AttributesManager = None
-        try:
+        with et.ignored(Exception):
             if self.current_image_source is not None:
                 opath, oname, oext = ft.path_components(self.current_image_source)
             else:
                 opath, oname, oext = ft.path_components(self.original_image_source)
 
             attributes_file = os.path.join(opath, f"{oname}.txt")
-            self._previous_attr = am.AttributesManager()
-            self._previous_attr.load(attributes_file)
-        except Exception as e:
-            pass
+            with et.ignored(Exception):
+                self._previous_attr = am.AttributesManager()
+                self._previous_attr.load(attributes_file)
         if self._previous_attr != None:
             prev_image_attr: ImageAttributeParser = self._previous_attr.get_parser(self.__class__)
 
@@ -86,6 +86,7 @@ class ImageAttributeParser(aap.AbstractAttributeParser):
                         )
 
             self.set_defaults(prev_image_attr)
+        pass
 
     def attributes_key(self) -> str:
         return "image attributes"

@@ -262,6 +262,24 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
         return [xy_min, xy_max]
 
     def heliostat_field_regular_grid_xy(self, n_x: int, n_y: int):
+        """
+        Generates a regular grid of points in the XY plane based on the bounding box of the heliostats.
+        The grid is created by evenly spacing points within the bounding box defined by the heliostat origins.
+
+        The grid is evenly spaced across the entire field.
+
+        Parameters
+        ----------
+        n_x : int
+            The number of points along the X-axis.
+        n_y : int
+            The number of points along the Y-axis.
+
+        Returns
+        -------
+        list[list[float]]
+            A list of [x, y] coordinates representing the points in the regular grid.
+        """
         bbox_xy = self.heliostat_bounding_box_xy()
         xy_min = bbox_xy[0]
         x_min = xy_min[0]
@@ -278,6 +296,20 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
     # MODIFICATION
 
     def set_full_field_tracking(self, aimpoint_xyz: Pxyz, when_ymdhmsz: tuple):
+        """
+        Configures all heliostats in the solar field to track a specified aim point.
+
+        Parameters
+        ----------
+        aimpoint_xyz : Pxyz
+            The 3D coordinates of the aim point that the heliostats will track, in field-relative coordinates.
+        when_ymdhmsz : tuple
+            A tuple representing the time (year, month, day, hour, minute, second) when the tracking is set.
+
+        Notes
+        -----
+        This method updates the internal state of the solar field and each heliostat.
+        """
         # Save tracking command.
         self._aimpoint_xyz = aimpoint_xyz
         self._when_ymdhmsz = when_ymdhmsz
@@ -286,10 +318,20 @@ class SolarField(RayTraceable, OpticOrientationAbstract):
             heliostat.set_tracking_configuration(aimpoint_xyz, self.origin_lon_lat, when_ymdhmsz)
 
     def set_full_field_stow(self):
+        """
+        Configures all heliostats in the solar field to a stowed position.
+
+        See also :py:meth:`HeliostatConfiguration.NSTTF_stow`
+        """
         for heliostat in self.heliostats:
             heliostat.set_orientation(hc.NSTTF_stow())
 
     def set_full_field_face_up(self):
+        """
+        Configures all heliostats in the solar field to a stowed position.
+
+        See also :py:meth:`HeliostatConfiguration.face_up`
+        """
         for heliostat in self.heliostats:
             heliostat.set_orientation(hc.face_up())
 

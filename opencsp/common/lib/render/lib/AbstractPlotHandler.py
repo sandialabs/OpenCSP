@@ -26,6 +26,11 @@ class AbstractPlotHandler(ABC):
         self._free_plots()
 
     def close(self):
+        """
+        Closes all registered plots.
+
+        This method frees up system resources associated with the plots.
+        """
         self._free_plots()
 
     def _on_plot_closed(self, event: matplotlib.backend_bases.CloseEvent):

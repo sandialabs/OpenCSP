@@ -562,6 +562,7 @@ class Vxyz:
 
     @classmethod
     def origin(cls):
+        """Returns an instance of this class with coordinate (0, 0, 0)."""
         return cls([0, 0, 0])
 
     def draw_line(

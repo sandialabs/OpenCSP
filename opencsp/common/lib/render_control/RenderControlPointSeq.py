@@ -40,10 +40,10 @@ class RenderControlPointSeq:
     '^'   triangle_up marker
     '<'   triangle_left marker
     '>'   triangle_right marker
-    '1'   tri_down marker
-    '2'   tri_up marker
-    '3'   tri_left marker
-    '4'   tri_right marker
+    '1'   tri_down marker (three lines from the center to points on 30, 150, and 270 degrees)
+    '2'   tri_up marker (three lines from the center to points on 90, 210, and 330 degrees)
+    '3'   tri_left marker (three lines from the center to points on 60, 180, and 300 degrees)
+    '4'   tri_right marker (three lines from the center to points on 0, 120, and 240 degrees)
     '8'   octagon marker
     's'   square marker
     'p'   pentagon marker
@@ -89,7 +89,8 @@ class RenderControlPointSeq:
         Parameters
         ----------
         linestyle : str, optional
-            Determines how lines are drawn. One of '-', '--', '-.', ':', '' or 'None'. Default is '-'.
+            Determines how lines are drawn. One of '-', '--', '-.', ':', '' or 'None'.
+            Default is '-' (solid line).
         linewidth : float, optional
             Width of lines in pixels. Default is 1.
         color : str | Color, optional
@@ -105,7 +106,7 @@ class RenderControlPointSeq:
         markerfacecolor : str | Color | None, optional
             The color of the marker faces. Default is the same as `color`.
         markeralpha : float | None, optional
-            The alpha value (transparency) for the markers, where 0 is fully transparent and 1 is fully opaque. Default is None.
+            The alpha value (transparency) for the markers, where 0 is fully transparent and 1 is fully opaque. None for matplotlib default style. Default is None.
         vector_color : str | Color | None, optional
             The color for vectors. Only applies to points in a vector field. Default is 'b'.
         vector_linewidth : float, optional
@@ -154,6 +155,11 @@ class RenderControlPointSeq:
         if self._color is not None:
             return self._color.rgba()
 
+    @color.setter
+    def color(self, val: str | cl.Color | tuple[float] | None):
+        self._color = val
+        self._standardize_color_values()
+
     @property
     def markeredgecolor(self) -> tuple[float, float, float, float] | None:
         """
@@ -168,6 +174,13 @@ class RenderControlPointSeq:
         if self._markeredgecolor is not None:
             if self.markeralpha is not None:
                 return self._markeredgecolor.rgba(self.markeralpha)
+            else:
+                return self._markeredgecolor.rgb()
+
+    @markeredgecolor.setter
+    def markeredgecolor(self, val: str | cl.Color | tuple[float] | None):
+        self._markeredgecolor = val
+        self._standardize_color_values()
 
     @property
     def markerfacecolor(self) -> tuple[float, float, float, float] | None:
@@ -183,6 +196,13 @@ class RenderControlPointSeq:
         if self._markerfacecolor is not None:
             if self.markeralpha is not None:
                 return self._markerfacecolor.rgba(self.markeralpha)
+            else:
+                return self._markerfacecolor.rgb()
+
+    @markerfacecolor.setter
+    def markerfacecolor(self, val: str | cl.Color | tuple[float] | None):
+        self._markerfacecolor = val
+        self._standardize_color_values()
 
     @property
     def vector_color(self) -> tuple[float, float, float, float] | None:
@@ -198,19 +218,28 @@ class RenderControlPointSeq:
         if self._vector_color is not None:
             return self._vector_color.rgba()
 
-    def set_color(self, color):
+    @vector_color.setter
+    def vector_color(self, val: str | cl.Color | tuple[float] | None):
+        self._vector_color = val
+        self._standardize_color_values()
+
+    # MODIFICATION
+
+    def set_color(self, color: str | cl.Color | tuple[float] | None):
         """
-        Set the primary color and update marker edge and face colors.
+        Update the color values for this instance. Updates all color values to
+        the given color. Use the "color = [value]" setters to change just a
+        single color.
 
         Parameters
         ----------
-        color : str | Color
-            The new color to set for the primary color and marker colors.
+        color : str | cl.Color | tuple[float]
+            The fill color to use for a filled shape.
         """
-        # ChatGPT 4o-mini assisted with generating this doc string
         self._color = color
         self._markeredgecolor = color
         self._markerfacecolor = color
+        self._vector_color = color
 
         self._standardize_color_values()
 
@@ -249,7 +278,6 @@ def default(marker='.', color='b', linewidth=1, markersize=8):
         An instance of `RenderControlPointSeq` configured with default parameters.
     """
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
-    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
 def outline(color='k', linewidth=1):
@@ -270,7 +298,6 @@ def outline(color='k', linewidth=1):
     RenderControlPointSeq
         An instance of `RenderControlPointSeq` configured to display outlines only.
     """
-    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker='None')
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker='None')
 
 
@@ -298,7 +325,6 @@ def data_curve(color='b', linewidth=1, marker='.', markersize=3) -> RenderContro
         An instance of `RenderControlPointSeq` configured for a data curve.
     """
     return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
-    return RenderControlPointSeq(linestyle='-', linewidth=linewidth, color=color, marker=marker, markersize=markersize)
 
 
 def marker(marker='o', color='b', markersize=3) -> RenderControlPointSeq:
@@ -321,7 +347,6 @@ def marker(marker='o', color='b', markersize=3) -> RenderControlPointSeq:
     RenderControlPointSeq
         An instance of `RenderControlPointSeq` configured to display markers.
     """
-    return RenderControlPointSeq(linestyle='None', color=color, marker=marker, markersize=markersize)
     return RenderControlPointSeq(linestyle='None', color=color, marker=marker, markersize=markersize)
 
 

@@ -97,6 +97,23 @@ class VideoHandler:
 
     @classmethod
     def VideoInspector(cls, src_video_dir_name_ext: str):
+        """
+        Create a VideoHandler for inspecting a video.
+
+        Video inspectors can be useful for retrieving properties of a video,
+        such as with the methods :py:meth:`get_width_height`,
+        :py:meth:`get_duration`, or :py:meth:`get_num_frames`.
+
+        Parameters
+        ----------
+        src_video_dir_name_ext : str
+            Path to the video file to inspect.
+
+        Returns
+        -------
+        VideoHandler
+            A VideoHandler instance for inspecting the video.
+        """
         return cls(src_video_dir_name_ext=src_video_dir_name_ext)
 
     @classmethod
@@ -107,6 +124,25 @@ class VideoHandler:
         video_control: rcv.RenderControlVideo,
         frame_control: rcvf.RenderControlVideoFrames,
     ):
+        """
+        Create a VideoHandler for creating a video from frames.
+
+        Parameters
+        ----------
+        src_frames_dir : str
+            Directory containing the frames to use for creating the video.
+        dst_video_dir_name_ext : str
+            Path to the output video file.
+        video_control : rcv.RenderControlVideo
+            Video control settings.
+        frame_control : rcvf.RenderControlVideoFrames
+            Frame control settings.
+
+        Returns
+        -------
+        VideoHandler
+            A VideoHandler instance for creating the video.
+        """
         return cls(
             dst_video_dir_name_ext=dst_video_dir_name_ext,
             src_frames_dir=src_frames_dir,
@@ -116,6 +152,23 @@ class VideoHandler:
 
     @classmethod
     def VideoMerger(cls, src_videos_path, src_videos_ext, dst_video_dir_name_ext):
+        """
+        Create a VideoHandler for merging (concatenating) videos.
+
+        Parameters
+        ----------
+        src_videos_path : str
+            Path to the directory containing the videos to merge.
+        src_videos_ext : str
+            File extension of the videos to merge.
+        dst_video_dir_name_ext : str
+            Path to the output video file.
+
+        Returns
+        -------
+        VideoHandler
+            A VideoHandler instance for merging the videos.
+        """
         return cls(
             src_video_dir_name_ext=os.path.join(src_videos_path, f"NA.{src_videos_ext}"),
             dst_video_dir_name_ext=dst_video_dir_name_ext,
@@ -125,6 +178,24 @@ class VideoHandler:
     def VideoTransformer(
         cls, src_video_dir_name_ext: str, dst_video_dir_name_ext: str, video_control: rcv.RenderControlVideo
     ):
+        """
+        Create a VideoHandler for transforming a video, such as changing the
+        resolution or the encoding method.
+
+        Parameters
+        ----------
+        src_video_dir_name_ext : str
+            Path to the input video file.
+        dst_video_dir_name_ext : str
+            Path to the output video file.
+        video_control : rcv.RenderControlVideo
+            Video control settings.
+
+        Returns
+        -------
+        VideoHandler
+            A VideoHandler instance for transforming the video.
+        """
         return cls(
             src_video_dir_name_ext=src_video_dir_name_ext,
             dst_video_dir_name_ext=dst_video_dir_name_ext,
@@ -139,6 +210,25 @@ class VideoHandler:
         dst_example_frames_dir: str,
         frame_control: rcvf.RenderControlVideoFrames,
     ):
+        """
+        Create a VideoHandler for extracting frames from a video.
+
+        Parameters
+        ----------
+        src_video_dir_name_ext : str
+            Path to the input video file.
+        dst_frames_dir : str
+            Directory to store the extracted frames in.
+        dst_example_frames_dir : str
+            Directory to store example frames in.
+        frame_control : rcvf.RenderControlVideoFrames
+            Frame control settings.
+
+        Returns
+        -------
+        VideoHandler
+            A VideoHandler instance for extracting frames from the video.
+        """
         return cls(
             src_video_dir_name_ext=src_video_dir_name_ext,
             dst_frames_dir=dst_frames_dir,

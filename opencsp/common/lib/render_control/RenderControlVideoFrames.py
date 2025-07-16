@@ -214,7 +214,9 @@ class RenderControlVideoFrames:
         source_video_dir_body_ext : str, optional
             If provided, the input video name will be used as the first part of the extracted frame names.
         is_example_frames : bool, optional
-            If True, get the arguments for the example frames. Default is False.
+            If True, get the arguments for the example frames. Example frames
+            are the same as standard frames, except that only a smaller
+            fraction of total video frames are extraced. Default is False.
 
         Returns
         -------

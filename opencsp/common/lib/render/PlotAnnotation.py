@@ -271,7 +271,23 @@ class PlotAnnotation:
             print('ERROR: In PlotAnnotation.image_draw(), unexpected type="' + str(type) + '" encountered.')
             assert False
 
-    def crop_pt_list_to_box(self, input_point_list, crop_box):
+    def crop_pt_list_to_box(self, input_point_list: list[tuple[float, float]], crop_box: list[tuple, tuple]) -> list:
+        """
+        Crop a list of points to a specified box.
+
+        Parameters
+        ----------
+        input_point_list : list
+            List of points, where each point is a [x, y] pair.
+        crop_box : list, optional
+            Box defined by the corners [xy_min, xy_max]. If None, no cropping is performed.
+
+        Returns
+        -------
+        list
+            A new list of the points that are within the crop box, or the input list
+            if crop_box is None.
+        """
         if crop_box is None:
             return input_point_list
         else:
@@ -289,7 +305,22 @@ class PlotAnnotation:
                     cropped_pt_list.append(pt)
             return cropped_pt_list
 
-    def point_is_in_crop_box(self, point, crop_box):
+    def point_is_in_crop_box(self, point: list, crop_box: list) -> bool:
+        """
+        Check if a point is within a specified box.
+
+        Parameters
+        ----------
+        point : list
+            Point defined by a [x, y] pair.
+        crop_box : list, optional
+            Box defined by the corners [xy_min, xy_max]. If None, then return True.
+
+        Returns
+        -------
+        bool
+            True if the point is within the crop box, False otherwise.
+        """
         if crop_box is None:
             return True
         else:
@@ -423,8 +454,45 @@ class PlotAnnotation:
         return thickness
 
     def opencv_origin(
-        self, text, int_pt, font, font_scale, font_thickness, plot_horizontalalignment, plot_verticalalignment
+        self,
+        text,
+        int_pt,
+        font=0,
+        font_scale=1.0,
+        font_thickness=1,
+        plot_horizontalalignment: str = None,
+        plot_verticalalignment: str = None,
     ):
+        """
+        Compute the origin point for OpenCV text drawing.
+
+        Parameters
+        ----------
+        text : str
+            The text to be drawn.
+        int_pt : list[int, int]
+            The input point (x, y) where the text will be drawn.
+        font : int, optional
+            The OpenCV font type. Default 0.
+        font_scale : float, optional
+            The font scale. Default 1.0.
+        font_thickness : int, optional
+            The font thickness. Default 1.
+        plot_horizontalalignment : str, optional
+            The horizontal alignment of the text. Can be 'left', 'center', or 'right'. Default "center".
+        plot_verticalalignment : str, optional
+            The vertical alignment of the text. Can be 'bottom', 'center', or 'top'. Default "center".
+
+        Returns
+        -------
+        list[int, int]
+            The origin point (x, y) for OpenCV text drawing.
+
+        Notes
+        -----
+        This method uses OpenCV's getTextSize function to determine the size of the text,
+        and then computes the origin point based on the input point and the text alignment.
+        """
         # Determine size of text.
         text_box, baseline = cv.getTextSize(text, font, font_scale, font_thickness)
         width = text_box[0]
@@ -435,7 +503,7 @@ class PlotAnnotation:
         # Compute origin x.
         if plot_horizontalalignment == "left":
             origin_x = input_x
-        elif plot_horizontalalignment == "center":
+        elif plot_horizontalalignment == "center" or plot_horizontalalignment is None:
             origin_x = input_x - int(width / 2)
         elif plot_horizontalalignment == "right":
             origin_x = input_x - width
@@ -449,7 +517,7 @@ class PlotAnnotation:
         # Compute origin y.
         if plot_verticalalignment == "bottom":
             origin_y = input_y
-        elif plot_verticalalignment == "center":
+        elif plot_verticalalignment == "center" or plot_verticalalignment is None:
             origin_y = input_y + int(height / 2)  # Recall that in images, y is flipped.
         elif plot_verticalalignment == "top":
             origin_y = input_y + height  # Recall that in images, y is flipped.
