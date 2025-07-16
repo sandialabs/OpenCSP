@@ -30,7 +30,7 @@ class ConvolutionImageProcessor(AbstractSpotAnalysisImageProcessor):
         diameter : int, optional
             The size of the kernel to be applied, by default 3
         """
-        super().__init__()
+        super().__init__(self.__class__.__name__)
 
         # validate inputs
         if kernel not in self._kernels:
@@ -113,7 +113,6 @@ class ConvolutionImageProcessor(AbstractSpotAnalysisImageProcessor):
         filtered_image = self.kernel(input_image)
 
         # create the returned operable
-        cacheable = CacheableImage(filtered_image)
+        cacheable = CacheableImage(filtered_image, source_path=operable.primary_image.source_path)
         new_operable = dataclasses.replace(operable, primary_image=cacheable)
-
         return [new_operable]

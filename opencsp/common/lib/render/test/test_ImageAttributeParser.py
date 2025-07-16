@@ -49,7 +49,6 @@ class test_ImageAttributeParser(unittest.TestCase):
         parser = iap.ImageAttributeParser(notes="")
         self.assertEqual(True, parser.has_contents())
 
-    @pytest.mark.skip("See https://github.com/sandialabs/OpenCSP/issues/3")
     def test_with_attrfile(self):
         """Load all values from the associated attributes file. Use the new current_image_source value."""
         parser = iap.ImageAttributeParser(current_image_source=self.img_file)

@@ -11,9 +11,7 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysi
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImageProcessor,
 )
-from contrib.common.lib.cv.spot_analysis.image_processor.ViewAnnotationsImageProcessor import (
-    ViewAnnotationsImageProcessor,
-)
+from opencsp.common.lib.cv.spot_analysis.image_processor.AnnotationImageProcessor import AnnotationImageProcessor
 from opencsp.common.lib.cv.spot_analysis.image_processor.ConvolutionImageProcessor import ConvolutionImageProcessor
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
@@ -30,7 +28,7 @@ class BcsLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
     It is recommended this this processor be used after ConvolutionImageProcessor(kernel='gaussian').
     """
 
-    def __init__(self, min_radius_px=30, max_radius_px=150, record_visualization=False):
+    def __init__(self, min_radius_px=30, max_radius_px=150):
         """
         Parameters
         ----------
@@ -39,11 +37,10 @@ class BcsLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         max_radius_px : int, optional
             Maximum radius of the BSC circle, in pixels. By default 300
         """
-        super().__init__()
+        super().__init__(self.__class__.__name__)
 
         self.min_radius_px = min_radius_px
         self.max_radius_px = max_radius_px
-        self.record_visualization = record_visualization
 
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         image = operable.primary_image.nparray.squeeze()
@@ -78,19 +75,9 @@ class BcsLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # assign to the operable
         new_found_fiducials = copy.copy(operable.found_fiducials)
-        if circle is not None:
+        if circle != None:
             new_found_fiducials.append(circle)
         ret = dataclasses.replace(operable, found_fiducials=new_found_fiducials)
-
-        # add the visualization of this step to the visualization images
-        if self.record_visualization:
-            if circle is not None:
-                visualized = circle.render_to_image(operable.primary_image.nparray)
-                cacheable_visualized = CacheableImage(visualized)
-                visualization_images = copy.copy(ret.visualization_images)
-                visualization_images[self] = [cacheable_visualized]
-                ret = dataclasses.replace(ret, visualization_images=visualization_images)
-
         return [ret]
 
 
@@ -110,11 +97,11 @@ if __name__ == "__main__":
 
     processor0 = ConvolutionImageProcessor(kernel="gaussian", diameter=3)
     processor1 = BcsLocatorImageProcessor()
-    processor2 = ViewAnnotationsImageProcessor()
+    processor2 = AnnotationImageProcessor()
 
-    result0 = processor0.process_operable(operable)[0]
-    result1 = processor1.process_operable(result0)[0]
-    result2 = processor2.process_operable(result1)[0]
+    result0 = processor0.process_image(operable)[0]
+    result1 = processor1.process_image(result0)[0]
+    result2 = processor2.process_image(result1)[0]
     img = result2.primary_image.nparray
 
     plt.figure()
