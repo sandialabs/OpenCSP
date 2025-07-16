@@ -3,7 +3,7 @@ Specifying a view of a three-dimensional space.
 
 Options include general 3-d (allowing interactive rotation), xy, xz, yz, general section plane.
 
-In all of the 2-d cases, there is an embedded (p,q) parameter space, which corresponds to 
+In all of the 2-d cases, there is an embedded (p,q) parameter space, which corresponds to
 different projections of the 3-d coordinates.
 """
 

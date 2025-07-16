@@ -1,9 +1,16 @@
+import copy
+import numbers
+
 import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.geometry.EdgeXY import EdgeXY
 from opencsp.common.lib.geometry.LineXY import LineXY
 from opencsp.common.lib.geometry.Vxy import Vxy
+import opencsp.common.lib.render.View3d as v3d
+import opencsp.common.lib.render.view_spec as vs
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
+import opencsp.common.lib.tool.log_tools as lt
 
 
 class LoopXY:
@@ -232,7 +239,8 @@ class LoopXY:
         Returns
         -------
         np.ndarray
-            2d mask with shape (yv.size, xv.size).
+            Boolean 2d mask with shape (yv.size, xv.size). True for inside this
+            loop, False for outside this loop.
 
         """
         # Create XY coordinates
@@ -257,7 +265,8 @@ class LoopXY:
         Returns
         -------
         mask : np.ndarray
-            1D boolean array of same length as input points.
+            1D boolean array of same length as input points. True where the
+            points are inside, False where the points are outside.
 
         """
         mask = np.ones(len(points), dtype=bool)
@@ -302,7 +311,7 @@ class LoopXY:
 
         return mask
 
-    def draw(self, ax: plt.Axes = None, linecolor: str = "black") -> None:
+    def draw(self, ax: plt.Axes = None, style: rcps.RenderControlPointSeq = None) -> None:
         """
         Draws lines as arrows and marks starting point.
 
@@ -310,40 +319,20 @@ class LoopXY:
         ----------
         ax : Axes, optional
             The axes to draw on. If not given, uses current axes.
-        linecolor : str, optional
-            Color to draw arrows. The default is 'black'.
+        style : str, optional
+            The style used to draw this region. Default rcps.default().
 
         """
         if ax is None:
             ax = plt.gca()
+        if style is None:
+            style = rcps.default(marker='arrow')
 
-        # Determine arrow size
-        dx = self.vertices.x.max() - self.vertices.x.min()
-        dy = self.vertices.y.max() - self.vertices.y.min()
-        length = max([dx, dy]) / 30
         # Draw arrows
-        for idx1 in range(len(self.vertices)):
-            # Get starting point
-            x1 = self.vertices.x[idx1]
-            y1 = self.vertices.y[idx1]
-            # Get dx, dy
-            idx2 = np.mod(idx1 + 1, len(self.vertices))
-            x2 = self.vertices.x[idx2]
-            y2 = self.vertices.y[idx2]
-            dx = x2 - x1
-            dy = y2 - y1
-            # Plot arrow
-            ax.arrow(
-                x1,
-                y1,
-                dx,
-                dy,
-                facecolor=linecolor,
-                edgecolor=linecolor,
-                length_includes_head=True,
-                head_length=length,
-                head_width=length / 2,
-            )
+        first_vert_np = np.array([self.vertices.x[:1], self.vertices.y[:1]])
+        closed_loop_verts = Vxy(np.concatenate((self.vertices.data, first_vert_np), axis=1))
+        view = v3d.View3d(ax.figure, ax, vs.view_spec_xy())
+        view.draw_pq((closed_loop_verts.x, closed_loop_verts.y), style)
 
         # Plot starting point as green dot
         ax.scatter(*self.vertices.data[:, 0:1], color="green")
@@ -453,3 +442,139 @@ class LoopXY:
         intersect_points = Vxy((keep_xs, keep_ys))
 
         return intersect_points
+
+    def intersect_edge(self, edge: EdgeXY, thresh=1e-6) -> Vxy:
+        """Returns intersection points with edge.
+
+        Parameters
+        ----------
+        edge : EdgeXY
+            Edge to intersect with loop.
+        thresh : float, optional
+            Boundary around the extents of the edge to be considered as part of
+            the edge when testing points against the edge limits. Default is 1e-6.
+
+        Returns
+        -------
+        Vxy
+            Intersection points with the edge. May be empty.
+
+        Raises
+        ------
+        ValueError
+            If the type of edge is not compatible with the current version of
+            the algorithm.
+        """
+        # check for algorithm compatibility
+        if edge._curve_data['type'] != 'line':
+            lt.error_and_raise(
+                ValueError,
+                "Error in LoopXY.intersect_edge(): "
+                + f"The current version of this algorithm only supports edges with type 'line', but {edge['type']=}.",
+            )
+
+        # get the line intersections
+        edge_as_line = LineXY.from_two_points(edge.vertices[0], edge.vertices[1])
+        line_intersections = self.intersect_line(edge_as_line)
+
+        # limit to the region containing the edge extents
+        bottom = np.min(edge.vertices.y) - thresh
+        top = np.max(edge.vertices.y) + thresh
+        left = np.min(edge.vertices.x) - thresh
+        right = np.max(edge.vertices.x) + thresh
+        keep_x = np.logical_and(line_intersections.x >= left, line_intersections.x <= right)
+        keep_y = np.logical_and(line_intersections.y >= bottom, line_intersections.y <= top)
+        keep = np.logical_and(keep_x, keep_y)
+
+        return Vxy([line_intersections.x[keep], line_intersections.y[keep]])
+
+    def intersect_loop(self, other: 'LoopXY', thresh=1e-6) -> 'LoopXY':
+        """Returns the overlapping area between this loop and the other loop.
+
+        Parameters
+        ----------
+        other: LoopXY
+            Other loop to find the overlapping area with.
+
+        Returns
+        -------
+        intersection: LoopXY
+            A new loop composed of the overlapping area.
+        thresh: float, optional
+            The acceptable tolerance for overlapping regions.
+
+        Raises
+        ------
+        ValueError
+            If the edges for the other loop aren't supported by the code as
+            currently implemented.
+        """
+
+        def _remove_duplicates_from_sorted_list(points: list[Vxy], thresh=1e-6) -> list[Vxy]:
+            points = copy.copy(points)
+
+            to_remove: list[Vxy] = []
+            for n in range(len(points)):
+                m = (n + 1) % len(points)
+                pt_n, pt_m = points[n], points[m]
+                if (np.abs(pt_n.x[0] - pt_m.x[0]) < thresh) and (np.abs(pt_n.y[0] - pt_m.y[0]) < thresh):
+                    to_remove.append(pt_m)
+
+            for pt in to_remove:
+                points.remove(pt)
+
+            return points
+
+        # get the vertices that overlap in both loops
+        a, b = self, other
+        a_contains_b = self.is_inside_or_on_border(b.vertices, thresh)
+        b_contains_a = b.is_inside_or_on_border(a.vertices, thresh)
+        a_vertices = Vxy([a.vertices.x[b_contains_a], a.vertices.y[b_contains_a]])
+        b_vertices = Vxy([b.vertices.x[a_contains_b], b.vertices.y[a_contains_b]])
+        ab_vertices = Vxy(np.concatenate((a_vertices.data, b_vertices.data), axis=1))
+
+        # include the intersection vertices for the loop edges
+        for edge in other._edges:
+            edge_intersections = self.intersect_edge(edge)
+            if len(edge_intersections) > 0:
+                ab_vertices = Vxy(np.concatenate((ab_vertices.data, edge_intersections.data), axis=1))
+
+        # sort by x/y and remove duplicate vertices
+        ab_verts_list = [Vxy([ab_vertices[i].x, ab_vertices[i].y]) for i in range(len(ab_vertices))]
+        ab_verts_list = sorted(ab_verts_list, key=lambda pt: pt.y[0])
+        ab_verts_list = sorted(ab_verts_list, key=lambda pt: pt.x[0])
+        ab_verts_list = _remove_duplicates_from_sorted_list(ab_verts_list, thresh)
+
+        # sort by angle
+        origin = ab_verts_list.pop(0)
+        ab_verts_list = [origin] + sorted(ab_verts_list, key=lambda pt: (pt - origin).angle()[0])
+
+        # return a new loop
+        ab_verts = Vxy.from_list(ab_verts_list)
+        return LoopXY.from_vertices(ab_verts)
+
+    def __add__(self, other: Vxy | numbers.Number) -> "LoopXY":
+        if isinstance(other, Vxy) or isinstance(other, numbers.Number):
+            pass
+        else:
+            lt.error_and_raise(
+                TypeError,
+                "Error in LoopXY.__add__(): "
+                + f"secondary value in addition must be of type Vxy or Number, "
+                + f"but is {type(other)}",
+            )
+        if isinstance(other, Vxy) and len(other) != 1:
+            lt.error_and_raise(
+                ValueError,
+                "Error in LoopXY.__add__(): " + f"other value Vxy must have length 1, " + f"but {len(other)=}",
+            )
+
+        if isinstance(other, Vxy):
+            verticies = self.vertices + other
+        else:
+            verticies = self.vertices + Vxy([other, other])
+
+        return LoopXY.from_vertices(verticies)
+
+    def __sub__(self, other: Vxy) -> "LoopXY":
+        return self + (-other)

@@ -1,5 +1,4 @@
-"""Unit test suite to test DisplayShape class
-"""
+"""Unit test suite to test DisplayShape class"""
 
 import unittest
 from os.path import dirname, join

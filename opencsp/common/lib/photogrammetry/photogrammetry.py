@@ -1,5 +1,4 @@
-"""Library of photogrammetry-related functions and algorithms
-"""
+"""Library of photogrammetry-related functions and algorithms"""
 
 import cv2 as cv
 import cv2.aruco as aruco

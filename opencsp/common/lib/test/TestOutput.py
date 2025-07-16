@@ -1,7 +1,7 @@
 """
 Base class supporting testing routines that generate output, including plots, csv files, etc.
 
-Derived classes will call test routines that write output to an "actual_output" directory, and these 
+Derived classes will call test routines that write output to an "actual_output" directory, and these
 files will be compared against known-good files in a sibling "expected_output" directory.
 
 Supports both interactive execution and automatic execution via pytest.

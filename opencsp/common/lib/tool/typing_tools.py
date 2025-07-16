@@ -1,7 +1,9 @@
 import functools
 import inspect
 import types
-from typing import Callable, TypeVar
+from typing import Callable, Generic, TypeVar
+
+from pandas import Series as pandas_Series
 
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -235,3 +237,8 @@ def ensure_not_string(t: type | str, class_container: type) -> type:
             "that is not the class containing the function"
         )
     return t
+
+
+# add type hint support for pandas Series
+class Series(pandas_Series, Generic[T]):
+    pass

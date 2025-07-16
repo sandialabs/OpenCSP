@@ -51,6 +51,7 @@ class TestImageTools(unittest.TestCase):
         self.assertEqual(((1, 1), 1), it.dims_and_nchannels(np.array([[0]])))
         self.assertEqual(((2, 2), 1), it.dims_and_nchannels(np.array([[0, 0], [0, 0]])))
         self.assertEqual(((1, 1), 3), it.dims_and_nchannels(np.array([[[0, 0, 0]]])))
+        self.assertEqual(((480, 640), 3), it.dims_and_nchannels(np.array(Image.new("RGB", (640, 480)))))
 
         # not enough/too many dimensions
         self.assertRaises(ValueError, it.dims_and_nchannels, np.array([0]))

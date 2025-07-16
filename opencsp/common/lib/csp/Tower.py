@@ -58,10 +58,10 @@ class Tower(RayTraceable):
         south: float = -9.1186,
         north: float = 6.25,
         height_g3p3: float = 53.89,
-        east_g3p3: float = -33.42,
-        west_g3p3: float = -46.58,
-        south_g3p3: float = -23.004,
-        north_g3p3: float = -9.83,
+        east_g3p3: float = -33.47,
+        west_g3p3: float = -46.63,
+        south_g3p3: float = -23.054,
+        north_g3p3: float = -9.90,
         x_aim: float = 0,
         y_aim: float = 6.25,
         z_aim: float = 63.5508,
@@ -143,7 +143,9 @@ class Tower(RayTraceable):
         theta = np.radians(tilt_angle)
 
         # Define the rotation matrix for a tilt around the Z-axis
-        rotation_matrix = np.array([[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]])
+        self.rotation_matrix = np.array(
+            [[np.cos(theta), -np.sin(theta), 0], [np.sin(theta), np.cos(theta), 0], [0, 0, 1]]
+        )
 
         # Tower faces, top, and bottom
         self.top = [
@@ -241,10 +243,12 @@ class Tower(RayTraceable):
         ]
 
         # Apply rotation to G3P3 tower coordinates
-        self.top_g3p3 = self.rotate_coordinates(self.top_g3p3, rotation_matrix)
-        self.northface_g3p3 = self.rotate_coordinates(self.northface_g3p3, rotation_matrix)
-        self.southface_g3p3 = self.rotate_coordinates(self.southface_g3p3, rotation_matrix)
-        self.bottom_g3p3 = self.rotate_coordinates(self.bottom_g3p3, rotation_matrix)
+        self.top_g3p3 = self.rotate_coordinates(self.top_g3p3, self.rotation_matrix)
+        self.northface_g3p3 = self.rotate_coordinates(self.northface_g3p3, self.rotation_matrix)
+        self.southface_g3p3 = self.rotate_coordinates(self.southface_g3p3, self.rotation_matrix)
+        self.bottom_g3p3 = self.rotate_coordinates(self.bottom_g3p3, self.rotation_matrix)
+
+        self.normal_south_face = self.calculate_south_face_normal()
 
         self.point = [self.x_aim, self.y_aim, self.z_aim]
         """
@@ -274,8 +278,6 @@ class Tower(RayTraceable):
             rotated_coord = rotation_matrix @ coord  # Matrix multiplication
             rotated_coordinates.append(rotated_coord.tolist())  # Convert back to list
         return rotated_coordinates
-
-    # RENDERING
 
     def draw(self, view: View3d, tower_style: RenderControlTower) -> None:
         # Assumes that heliostat configuration has already been set.
@@ -347,3 +349,24 @@ class Tower(RayTraceable):
             view.draw_xyz(self.g3p3_point, style=tower_style.g3p3)
 
         return
+
+    def calculate_south_face_normal(self):
+        """Calculate the normal vector of the south face."""
+        # Extract points of the south face
+        p1 = np.array(self.southface_g3p3[0])
+        p2 = np.array(self.southface_g3p3[2])
+        p3 = np.array(self.southface_g3p3[3])
+
+        # Create two edge vectors
+        edge1 = p2 - p3  # Vector from p1 to p2
+        edge2 = p1 - p3  # Vector from p1 to p3
+
+        # Calculate the normal vector using the cross product
+        normal_vector = np.cross(edge1, edge2)
+
+        # Normalize the normal vector
+        normal_vector = normal_vector / np.linalg.norm(normal_vector)
+
+        # Apply the rotation to the normal vector
+        # rotated_normal = self.rotation_matrix @ normal_vector
+        return normal_vector

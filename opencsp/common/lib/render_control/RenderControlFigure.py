@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import matplotlib.pyplot
 import numpy as np

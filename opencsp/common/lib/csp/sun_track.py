@@ -141,7 +141,6 @@ def tracking_surface_normal_xyz_given_sun(
     """
     Computes heliostat surface normal which tracks the sun to the aimpoint.
     """
-    print(f"helio: {heliostat_origin}, aim: {aimpoint}, sun: {sun_vector}")
     # Sun position.
     # sun = Vxyz(sp.sun_position(location_lon_lat, when_ymdhmsz))
     sun = sun_vector.normalize()

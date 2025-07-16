@@ -1,5 +1,4 @@
-"""Three dimensional vector representation
-"""
+"""Three dimensional vector representation"""
 
 from typing import Callable, Union
 
