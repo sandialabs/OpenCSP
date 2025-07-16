@@ -17,6 +17,7 @@ concurrency:
 jobs:
   ubi8-nightly:
     name: ubi8-nightly
+    if: github.event.repository.fork == false
     runs-on: [ubuntu-latest]
     permissions:
       packages: read

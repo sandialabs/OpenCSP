@@ -19,6 +19,7 @@ concurrency:
 jobs:
   windows2022-ci:
     name: windows2022-ci
+    if: github.event.repository.fork == false
     runs-on: [windows-2022]
     steps:
       - name: Checkout
