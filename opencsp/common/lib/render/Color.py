@@ -289,57 +289,79 @@ class Color:
 
 
 def black():
-    """Returns a black color instance."""
+    """
+    returns rgb black color
+    """
     return Color(0.0, 0.0, 0.0, 'black', 'k')
 
 
 def dark_grey():
-    """Returns a dark grey color instance."""
+    """
+    returns rgb dark grey color
+    """
     return Color(0.25, 0.25, 0.25, 'dark grey', 'dg')
 
 
 def grey():
-    """Returns a grey color instance."""
+    """
+    returns rgb grey color
+    """
     return Color(0.5, 0.5, 0.5, 'grey', 'gy')
 
 
 def light_grey():
-    """Returns a light grey color instance."""
+    """
+    returns rgb light grey color
+    """
     return Color(0.75, 0.75, 0.75, 'light grey', 'lg')
 
 
 def white():
-    """Returns a white color instance."""
+    """
+    returns rgb white color
+    """
     return Color(1.0, 1.0, 1.0, 'white', 'w')
 
 
 def red():
-    """Returns a red color instance."""
+    """
+    returns rgb red color
+    """
     return Color(1.0, 0.0, 0.0, 'red', 'r')
 
 
 def green():
-    """Returns a green color instance."""
+    """
+    returns rgb green color
+    """
     return Color(0.0, 1.0, 0.0, 'green', 'g')
 
 
 def blue():
-    """Returns a blue color instance."""
+    """
+    returns rgb blue color
+    """
     return Color(0.0, 0.0, 1.0, 'blue', 'b')
 
 
 def cyan():
-    """Returns a cyan color instance."""
+    """
+    returns rgb cyan color
+    """
     return Color(0.0, 1.0, 1.0, 'cyan', 'c')
 
 
 def magenta():
-    """Returns a magenta color instance."""
+    """
+    returns rgb magneta color
+    """
     return Color(1.0, 0.0, 1.0, 'magenta', 'm')
 
 
 def yellow():
-    """Returns a yellow color instance."""
+    """
+    returns rgb yellow color
+    """
     return Color(1.0, 1.0, 0.0, 'yellow', 'y')
 
 
