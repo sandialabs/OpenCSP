@@ -29,6 +29,7 @@ pil_image_formats_writable = pil_image_formats_rw + ["palm", "pdf", "xv"]
 pil_image_formats_supporting_exif = ["jpg", "jpeg", "png", "tiff", "webp"]
 # fmt: on
 
+
 T = TypeVar('T')
 
 
@@ -301,23 +302,6 @@ def getsizeof_approx(img: Image) -> int:
     return object_size + image_data_size
 
 
-def _import_exiftool():
-    # TODO should exiftool be added to requirements.txt?
-    # This also requires the installation of Phil Harvey's ExifTool.
-    # https://pypi.org/project/PyExifTool/
-    # https://exiftool.org/
-    try:
-        import exiftool
-    except ImportError:
-        lt.error_and_raise(
-            ImportError,
-            "Error in image_tools._import_exiftool(): "
-            + "exiftool is not currently installed as a standard part of OpenCSP."
-            + " To use exif information with OpenCSP, please follow the installation instructions at "
-            + "https://pypi.org/project/PyExifTool/#getting-pyexiftool.",
-        )
-
-
 def get_exif_value(
     data_dir: str, image_path_name_exts: str | list[str], exif_val: str = "EXIF:ISO", parser: Callable[[str], T] = int
 ) -> T | list[T]:
@@ -401,6 +385,7 @@ def set_exif_value(data_dir: str, image_path_name_ext: str, exif_val: str, exif_
     functionality is intended to be implemented in the future.
     """
     # "ChatGPT 4o" assisted with generating this docstring.
+    # TODO is calling set_tags twice intended and necessary?
     with exiftool.ExifToolHelper() as et:
         et.set_tags(
             ft.join(data_dir, image_path_name_ext),

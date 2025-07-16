@@ -781,14 +781,25 @@ def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check
                 + str(os.path.dirname(output_dir_body_ext)),
             )
     # Rename the file.
-    shutil.move(input_dir_body_ext, output_dir_body_ext)
-    # Verify the rename
-    if not is_file_check_only:
-        if not os.path.exists(output_dir_body_ext):
-            lt.error_and_raise(
-                FileNotFoundError,
-                f"Error: In rename_file(), failed to find output file after rename: '{input_dir_body_ext}' --> '{output_dir_body_ext}'",
-            )
+    osError = None
+
+    for attempt in range(retries):
+        try:
+            os.rename(input_dir_body_ext, output_dir_body_ext)
+            # Verify the rename
+            if not is_file_check_only:
+                if not os.path.exists(output_dir_body_ext):
+                    lt.error_and_raise(
+                        FileNotFoundError,
+                        f"Error: In rename_file(), failed to find output file after rename: '{input_dir_body_ext}' --> '{output_dir_body_ext}'",
+                    )
+            return
+        except OSError as e:
+            print(f"Attempt {attempt + 1}: {e}")
+            time.sleep(delay)
+            osError = e
+
+    raise osError
 
 
 def rename_directory(input_dir: str, output_dir: str):

@@ -5,9 +5,10 @@ import numpy as np
 from opencsp.common.lib.geometry.FunctionXYAbstract import FunctionXYAbstract
 from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.render_control.RenderControlFunctionXY as rcfxy
+import opencsp.common.lib.render.lib.Drawable as dw
 
 
-class FunctionXYGrid(FunctionXYAbstract):
+class FunctionXYGrid(FunctionXYAbstract, dw.Drawable):
     """Discrete Fuction defined by a grid.
     This object uses x:column and y:row.
     When accessing, this looks like column major.
@@ -81,6 +82,22 @@ class FunctionXYGrid(FunctionXYAbstract):
         raise NotImplementedError("__setstate__ has not been implemented for FunctionXYGrid")
 
     def to_index_values(self, x: float, y: float) -> tuple[int, int]:
+        """
+        Convert x and y coordinates to grid indices.
+
+        Parameters
+        ----------
+        x : float
+            The x-coordinate to convert.
+        y : float
+            The y-coordinate to convert.
+
+        Returns
+        -------
+        tuple[int, int] | bool
+            A tuple of the x and y indices if the coordinates are on a grid point,
+            or False if the coordinates don't match the grid step size and translation.
+        """
         x_index = (x - self.x0) / self.x_step
         y_index = (y - self.y0) / self.y_step
         if int(x_index) != x_index or int(y_index) != y_index:

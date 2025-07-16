@@ -30,7 +30,20 @@ class Pxy(Vxy):
         return "2D Point:\n" + self._data.__repr__()
 
     def distance(self, data_in: "Pxy") -> npt.NDArray[np.float_]:
-        """Calculates the euclidian distance between this point and the data_in point."""
+        """
+        Calculates the Euclidean distance between this point and another Pxy point.
+
+        Parameters
+        ----------
+        data_in : Pxy
+            The point to which the distance is to be calculated.
+
+        Returns
+        -------
+        float
+            The Euclidean distance between the two points.
+        """
+        # "ChatGPT 4o-mini" assisted with generating this docstring.
         self._check_is_Vxy(data_in)
 
         # broadcast input point to the same number of points as self

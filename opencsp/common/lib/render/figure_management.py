@@ -424,6 +424,9 @@ def setup_figure(
     # Hide the axes, as appropriate
     hide_axes(fig_record, figure_control)
 
+    # Hide the axes, as appropriate
+    hide_axes(fig_record, figure_control)
+
     return fig_record
 
 
@@ -516,6 +519,9 @@ def setup_figure_for_3d_data(
     fig_record.axis = ax
     fig_record.view = view
     fig_record.add_metadata_line("View spec: " + str(view_spec["type"]))
+
+    # Hide the axes, as appropriate
+    hide_axes(fig_record, figure_control)
 
     # Hide the axes, as appropriate
     hide_axes(fig_record, figure_control)

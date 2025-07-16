@@ -76,6 +76,20 @@ class RenderControlSolarField:
     #     self.special_styles[heliostat_name] = heliostat_style
 
     def get_special_style(self, heliostat_name: str):
+        """
+        Gets the special style for the given heliostat name.
+
+        Parameters
+        ----------
+        heliostat_name : str
+            The name of the heliostat.
+
+        Returns
+        -------
+        style : RenderControlHeliostat
+            The special style associated with the heliostat name, or the default style if no
+            special style is defined.
+        """
         style = self.heliostat_styles
         if heliostat_name in self.special_styles:
             style = self.special_styles[heliostat_name]
@@ -83,6 +97,19 @@ class RenderControlSolarField:
 
     # @strict_types
     def add_special_names(self, heliostat_names: str | list, heliostat_style: rch.RenderControlHeliostat):
+        """
+        Adds special names to the solar field render control, for rendering individual
+        heliostats with their own styles.
+
+        The same style is registered independently for each of the named heliostats.
+
+        Parameters
+        ----------
+        heliostat_names : str | list
+            The names to add to the solar field render control.
+        heliostat_style : RenderControlHeliostat
+            The style associated with the names.
+        """
         if type(heliostat_names) is list and isinstance(heliostat_names[0], str):
             for name in heliostat_names:
                 self.add_special_names(name, heliostat_style)

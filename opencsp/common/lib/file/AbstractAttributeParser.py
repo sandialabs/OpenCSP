@@ -200,6 +200,10 @@ class AbstractAttributeParser(ABC):
 
     @classmethod
     def RegisterClass(cls):
+        """
+        Registers this AbstractAttributeParser subclass with the AttributesManager,
+        allowing it to be used for parsing and saving attributes files.
+        """
         import opencsp.common.lib.file.AttributesManager as am
 
         am.AttributesManager._register_parser_class(cls)

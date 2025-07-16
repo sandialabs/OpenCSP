@@ -8,9 +8,10 @@ from opencsp.common.lib.geometry.FunctionXYAbstract import FunctionXYAbstract
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.render.View3d import View3d
+import opencsp.common.lib.render.lib.Drawable as dw
 
 
-class FunctionXYContinuous(FunctionXYAbstract):
+class FunctionXYContinuous(FunctionXYAbstract, dw.Drawable):
     """Wrapper for function that can be pickled. \n
     Extends the FunctionXYAbstract class.
 
@@ -64,7 +65,7 @@ class FunctionXYContinuous(FunctionXYAbstract):
     def in_domain(self, x: float, y: float) -> bool:
         raise NotImplementedError
 
-    def draw(self, view: View3d, functionXY_style):
+    def draw(self, view: View3d):
         if view.view_spec["type"] == "image":
             # X, Y = np.meshgrid(self.x_domain, self.y_domain)
             arr = np.zeros((len(self.y_domain), len(self.x_domain)))

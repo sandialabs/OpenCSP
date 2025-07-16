@@ -2,6 +2,7 @@ from hashlib import new
 
 import numpy as np
 
+import opencsp.common.lib.render.lib.Drawable as dw
 import opencsp.common.lib.render_control.RenderControlLightPath as rclp
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 from opencsp.common.lib.geometry.Pxyz import Pxyz
@@ -11,7 +12,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 
 
-class LightPath:
+class LightPath(dw.Drawable):
     """
     The LightPath will represent the path of a photon in a light beam.
     There are two ways to think about the photon for this class.
@@ -138,6 +139,23 @@ class LightPath:
             )
 
     def add_step(self, point: Pxyz, new_direction: Uxyz, new_intensity: float = None):
+        """
+        Add a step (aka a reflection) to this light path.
+
+        Parameters
+        ----------
+        point : Pxyz
+            Where the reflection takes place.
+        new_direction : Uxyz
+            The direction that the bounced light is traveling in.
+        new_intensity : float, optional
+            Reserved
+
+        Raises
+        ------
+        ValueError
+            If the given point or direction is not singular.
+        """
         if not (issubclass(type(point), Vxyz) and issubclass(new_direction, Vxyz)):
             raise TypeError(
                 f"LightPath.add_step expects two parameters of the Vxyz class family\n \
@@ -155,21 +173,5 @@ class LightPath:
             )
         self.points_list = self.points_list.concatenate(point)
         self.current_direction = new_direction
-
-        if not (issubclass(type(point), Vxyz) and issubclass(new_direction, Vxyz)):
-            raise TypeError(
-                f"LightPath.add_step expects two parameters of the Vxyz class family\n \
-                            Parameter 1 is of type {type(point)} and parameter 2 is of type {type(new_direction)}."
-            )
-        if len(point) != 1:
-            raise ValueError(
-                f"parameter is not a single point. LightPath.add_step can only add one step at a time. \
-                             \nThe Pxyz given in parameter 1 was of length {len(point)}."
-            )
-        if len(new_direction) != 1:
-            raise ValueError(
-                f"parameter is not a single new direction. LightPath.add_step can only add one step at a time. \
-                             \nThe Vxyz given in paremeter 2 was of length {len(new_direction)}."
-            )
         self.points_list = self.points_list.concatenate(point)
         self.current_direction = new_direction

@@ -34,20 +34,58 @@ class TargetAbstract(ABC):
     # ACCESS
 
     def rows_cols(self):
+        """
+        Returns the number of rows and columns in the image.
+
+        Returns
+        -------
+        n_rows : int
+            The number of rows in the image.
+        n_cols : int
+            The number of columns in the image.
+        """
         n_rows = self.image.shape[0]
         n_cols = self.image.shape[1]
         return n_rows, n_cols
 
     def rows_cols_bands(self):
+        """
+        Returns the number of rows, columns, and (color?) bands in the image.
+
+        Returns
+        -------
+        n_rows : int
+            The number of rows in the image.
+        n_cols : int
+            The number of columns in the image.
+        n_bands : int
+            The number of (color?) bands in the image.
+        """
         n_rows = self.image.shape[0]
         n_cols = self.image.shape[1]
         n_bands = self.image.shape[2]
         return n_rows, n_cols, n_bands
 
     def image_size_str_meter(self) -> str:
+        """
+        Returns a string describing the image size in meters.
+
+        Returns
+        -------
+        size_str : str
+            A string in the format 'w{width:.3f}m_h{height:.3f}m_{dpm:.1f}dpm'.
+        """
         return "w{w:.3f}m_h{h:.3f}m_{dpm:.1f}dpm".format(w=self.image_width, h=self.image_height, dpm=round(self.dpm))
 
     def image_size_str_inch(self) -> str:
+        """
+        Returns a string describing the image size in inches.
+
+        Returns
+        -------
+        size_str : str
+            A string in the format 'w{width:.3f}in_h{height:.3f}in_{dpi:d}dpi'.
+        """
         return "w{w:.3f}in_h{h:.3f}in_{dpi:d}dpi".format(
             w=uc.meter_to_inch(self.image_width),
             h=uc.meter_to_inch(self.image_height),
@@ -55,14 +93,41 @@ class TargetAbstract(ABC):
         )
 
     def description_meter(self) -> str:
+        """
+        Returns a string describing the target in meters.
+
+        Returns
+        -------
+        description : str
+            A string in the format '{pattern_description}__w{width}m_h{height}m_{dpm}dpm'.
+        """
         return self.pattern_description + "__" + self.image_size_str_meter()
 
     def description_inch(self) -> str:
+        """
+        Returns a string describing the target in inches.
+
+        Returns
+        -------
+        description : str
+            A string in the format '{pattern_description}__w{width}in_h{height}in_{dpi}dpi'.
+        """
         return self.pattern_description + "__" + self.image_size_str_inch()
 
     # MODIFICATION
 
     def set_pattern_description(self, description: str) -> None:
+        """
+        Sets the pattern description.
+
+        For the abstract class base implementation the value "blank" is always used.
+
+        Parameters
+        ----------
+        description : str
+            The new pattern description.
+        """
+        # TODO BGB use the description value
         self.pattern_description = "blank"
 
     # ?? SCAFFOLDING RCB -- ASK TRISTAN ABOUT THIS

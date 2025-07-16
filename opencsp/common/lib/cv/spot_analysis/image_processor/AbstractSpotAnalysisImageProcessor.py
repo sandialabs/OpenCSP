@@ -242,11 +242,11 @@ class AbstractSpotAnalysisImageProcessor:
         for result in spot_analysis:
             # return the same type
             if isinstance(images[0], CacheableImage):
-                ret.append(result)
+                ret.append(result.primary_image)
             elif isinstance(images[0], np.ndarray):
-                ret.append(result.nparray)
+                ret.append(result.primary_image.nparray)
             elif isinstance(images[0], Image.Image):
-                ret.append(result.to_image())
+                ret.append(result.primary_image.to_image())
             else:
                 lt.error_and_raise(
                     TypeError,

@@ -290,8 +290,8 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
 
         This static method generates a render control figure based on the dimensions
         and number of channels of the primary image associated with the provided
-        `SpotAnalysisOperable`. The figure is configured with specific settings
-        such as tile layout and whitespace padding.
+        `SpotAnalysisOperable`. This default figure does not use tiling and does not
+        include the typical matplotlib whitespace padding.
 
         Parameters
         ----------
@@ -308,12 +308,9 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         Notes
         -----
         - The figure size is determined based on the pixel dimensions of the
-           primary image.
-        - The method assumes that the `primary_image` attribute of the operable
-          contains a valid NumPy array representation of the image.
-
+          primary image.
         """
-        # ChatGPT 4o-mini assisted with generating this docstring
+        # ChatGPT 4o-mini assisted with generating this docstring, reviewed by a human
         (height_px, width_px), nchannel = it.dims_and_nchannels(operable.primary_image.nparray)
         figsize = rcf.RenderControlFigure.pixel_resolution_inches(width_px, height_px)
         figure_control = rcf.RenderControlFigure(tile=False, figsize=figsize, grid=False, draw_whitespace_padding=False)
@@ -333,7 +330,6 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         operable : SpotAnalysisOperable
             The operable instance to be visualized. It may contain visualization
             images that will be updated during the execution.
-
         is_last : bool
             A flag indicating whether this is the last operable to be processed.
             This may affect how the visualization is handled.
@@ -347,13 +343,13 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         Notes
         -----
         - If a visualization coordinator is present, the operable is visualized
-        through it. If not, the visualization is performed immediately.
+          through it. If not, the visualization is performed immediately.
         - The method initializes figure records if they have not been set up
-        previously.
+          previously.
         - The visualization images are copied and updated to ensure that the
-        original operable remains unchanged.
+          original operable remains unchanged.
         """
-        # ChatGPT 4o-mini assisted with generating this docstring
+        # ChatGPT 4o-mini assisted with generating this docstring, reviewed by a human
         ret: SpotAnalysisOperable = None
 
         if self.has_visualization_coordinator:

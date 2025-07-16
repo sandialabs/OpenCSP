@@ -51,10 +51,15 @@ class Color:
 
     @classmethod
     def from_i255(cls, red: int, green: int, blue: int, name: str, short_name: str):
+        """Create a Color instance from integer RGB values in the range 0-255."""
         return cls(red / 255, green / 255, blue / 255, name, short_name)
 
     @classmethod
     def from_hex(cls, hexval: str, name: str, short_name: str) -> "Color":
+        """
+        Create a Color instance from a hexadecimal color code, with RGB color
+        values in the range 00-FF. For example "0xCCFF00" for greenish yellow.
+        """
         if hexval.startswith("0x"):
             hexval = "#" + hexval[2:]
         elif hexval.startswith("x"):
@@ -69,11 +74,21 @@ class Color:
 
     @classmethod
     def from_hsv(cls, hue: float, saturation: float, value: float, name: str, short_name: str):
+        """Create a Color instance from HSV color values in the range 0-1."""
         rgb = matplotlib.colors.hsv_to_rgb((hue, saturation, value))
-        return cls(rgb[0], rgb[1], rgb[2], name, value)
+        return cls(rgb[0], rgb[1], rgb[2], name, short_name)
 
     @classmethod
     def from_str(cls, sval='b') -> "Color":
+        """
+        Create a Color instance from a color string.
+
+        Parameters
+        ----------
+        sval : str, optional
+            The color string. Should be either a previously registered
+            shorthand string or matplotlib.colors.to_rgb value. Default 'b'.
+        """
         longhand = sval
         if sval in _plot_color_shorthands:
             longhand = _plot_color_shorthands[sval]
@@ -142,6 +157,25 @@ class Color:
 
     @classmethod
     def convert(cls, val: Union["Color", str, tuple, None]) -> "Color":
+        """
+        Convert a color value to a Color object.
+
+        Parameters
+        ----------
+        val : Color, str, tuple, or None
+            The color value to convert.
+
+        Returns
+        -------
+        Color or None
+            The converted Color object, or None if the input is None.
+
+        Notes
+        -----
+        If the input is already a Color object, it is returned unchanged.
+        If the input is a string, it is parsed using the :py:func:`from_str` method.
+        If the input is a tuple, it is assumed to be an RGB value.
+        """
         if val is None:
             return None
         elif isinstance(val, Color):
@@ -159,6 +193,19 @@ class Color:
         return (self.red, self.green, self.blue)
 
     def rgba(self, alpha=1.0) -> tuple[float, float, float, float]:
+        """
+        Returns color in [R,G,B,A] format, with range [0,1] for each.
+
+        Parameters
+        ----------
+        alpha : float, optional
+            The alpha (transparency) value, by default 1.0
+
+        Returns
+        -------
+        tuple[float, float, float, float]
+            The color in [R,G,B,A] format
+        """
         return (self.red, self.green, self.blue, alpha)
 
     def rgb_255(self) -> tuple[int, int, int]:
@@ -168,9 +215,25 @@ class Color:
         return (int(self.red * 255), int(self.green * 255), int(self.blue * 255))
 
     def to_hex(self) -> str:
+        """
+        Returns the color as a hexadecimal string.
+
+        Returns
+        -------
+        str
+            The color as a hexadecimal string
+        """
         return matplotlib.colors.to_hex(self.rgb()).upper()
 
     def to_hsv(self) -> tuple[float, float, float]:
+        """
+        Returns the color in HSV (Hue, Saturation, Value) format.
+
+        Returns
+        -------
+        tuple[float, float, float]
+            The color in HSV format
+        """
         ret = matplotlib.colors.rgb_to_hsv(self.rgb())
         return float(ret[0]), float(ret[1]), float(ret[2])
 
@@ -302,9 +365,20 @@ def yellow():
     return Color(1.0, 1.0, 0.0, 'yellow', 'y')
 
 
-def color_map(*colors_sequence: "Color"):
+def color_map(*colors_sequence: Color) -> matplotlib.colors.Colormap:
     """
-        returns first color sequence
+    Builds a colormap that will return a color between the given color sequence,
+    given a value between 0 and 1.
+
+    Parameters
+    ----------
+    *colors_sequence : Color
+        The color sequence to build the colormap from
+
+    Returns
+    -------
+    matplotlib.colors.Colormap
+        The built colormap
     """
     colors_sequence = list(colors_sequence)
     return colors_sequence[0].build_colormap(*colors_sequence[1:])
@@ -341,6 +415,7 @@ class _PlotColors(Iterable[Color]):
         self._colors = [self[cn] for cn in self._color_names]
 
     def __getitem__(self, key: int | str) -> Color:
+        """Returns a color instance from the plot colors."""
         if isinstance(key, int):
             key %= len(self._colors)
             return self._colors[key]
@@ -350,6 +425,7 @@ class _PlotColors(Iterable[Color]):
             raise KeyError
 
     def __iter__(self) -> Iterator[Color]:
+        """Returns an iterator over the plot colors."""
         return iter(self._colors)
 
 

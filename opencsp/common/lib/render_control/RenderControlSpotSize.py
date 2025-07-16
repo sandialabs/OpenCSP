@@ -3,8 +3,8 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 class RenderControlSpotSize:
     """
-    Controls how an enclosed energy plot will be drawn, as from
-    :py:class:`StandardPlotOutput` or :py:class:`SpotWidthImageProcessor`.
+    Controls how a spot size plot will be drawn, as from
+    :py:class:`SpotWidthAnnotation` or :py:class:`SpotWidthImageProcessor`.
     """
 
     def __init__(

@@ -58,6 +58,18 @@ class TestHotspotImageProcessor(unittest.TestCase):
         expected_image = CacheableImage.from_single_source(expected_image_path)
         npt.assert_allclose(actual_image.nparray, expected_image.nparray, atol=2)
 
+        # get the results
+        actual_position: HotspotAnnotation = result.annotations[0]
+        actual_image = result.visualization_images[processor][0]
+        actual_image_path = ft.join(self.out_dir, self._testMethodName + "_hotspot_location_visualization.png")
+        actual_image.to_image().save(actual_image_path)
+
+        # verify the results
+        self.assertEqual(actual_position.origin.astuple(), (812.0, 1258.0))
+        expected_image_path = ft.join(self.data_dir, "hotspot_location_visualization.png")
+        expected_image = CacheableImage.from_single_source(expected_image_path)
+        npt.assert_allclose(actual_image.nparray, expected_image.nparray, atol=2)
+
 
 if __name__ == "__main__":
     unittest.main()

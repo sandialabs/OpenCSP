@@ -371,39 +371,39 @@ class StandardPlotOutput:
 
         # Draw reference if available
         if self._has_reference_ray_trace:
-            fig_rec.axis.plot(
-                self._ray_trace_output_reference.ensquared_energy_widths,
-                self._ray_trace_output_reference.ensquared_energy_values,
-                label="Reference",
-                color="k",
-                linestyle="--",
-            )
-            """ widths_and_vals = list(
+            # fig_rec.axis.plot(
+            #     self._ray_trace_output_reference.ensquared_energy_widths,
+            #     self._ray_trace_output_reference.ensquared_energy_values,
+            #     label="Reference",
+            #     color="k",
+            #     linestyle="--",
+            # )
+            widths_and_vals = list(
                 zip(
                     self._ray_trace_output_reference.ensquared_energy_widths,
                     self._ray_trace_output_reference.ensquared_energy_values,
                 )
             )
-            fig_rec.view.draw_pq_list(widths_and_vals, style=rcee.default().theoretical, label='Reference') """
+            fig_rec.view.draw_pq_list(widths_and_vals, style=rcee.default().theoretical, label='Reference')
         else:
             lt.info('Reference ray trace data not available, skipping reference enclosed energy curve.')
 
         # Draw measured if available
         if self._has_measured_ray_trace:
-            fig_rec.axis.plot(
-                self._ray_trace_output_measured.ensquared_energy_widths,
-                self._ray_trace_output_measured.ensquared_energy_values,
-                label="Measured",
-                color="k",
-                linestyle="-",
-            )
-            """ widths_and_vals = list(
+            # fig_rec.axis.plot(
+            #     self._ray_trace_output_measured.ensquared_energy_widths,
+            #     self._ray_trace_output_measured.ensquared_energy_values,
+            #     label="Measured",
+            #     color="k",
+            #     linestyle="-",
+            # )
+            widths_and_vals = list(
                 zip(
                     self._ray_trace_output_measured.ensquared_energy_widths,
                     self._ray_trace_output_measured.ensquared_energy_values,
                 )
             )
-            fig_rec.view.draw_pq_list(widths_and_vals, style=rcee.default().measured, label='Measured') """
+            fig_rec.view.draw_pq_list(widths_and_vals, style=rcee.default().measured, label='Measured')
         else:
             lt.info('Measured ray trace data not available, skipping measured enclosed energy curve.')
 

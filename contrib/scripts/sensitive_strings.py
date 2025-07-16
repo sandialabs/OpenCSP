@@ -1,6 +1,7 @@
 import argparse
 import copy
 import os
+import shutil
 import sys
 import time
 
@@ -235,11 +236,12 @@ class SensitiveStringsSearcher:
                         matches.append(ssm.Match(0, 0, 0, "", "", None, "HDF5 file denied by user"))
                 else:  # if self.interactive
                     for file_relpath_name_ext in hdf5_matches:
-                        match = hdf5_matches[file_relpath_name_ext]
-                        path, name, _ = ft.path_components(file_relpath_name_ext)
-                        dataset_name = path.replace("\\", "/") + "/" + name
-                        match.msg = dataset_name + "::" + match.msg
-                        matches.append(match)
+                        per_file_matches = hdf5_matches[file_relpath_name_ext]
+                        for match in per_file_matches:
+                            path, name, _ = ft.path_components(file_relpath_name_ext)
+                            dataset_name = path.replace("\\", "/") + "/" + name
+                            match.msg = dataset_name + "::" + match.msg
+                            matches.append(match)
             else:  # if len(hdf5_matches) > 0:
                 lt.error_and_raise(
                     RuntimeError,
@@ -258,6 +260,8 @@ class SensitiveStringsSearcher:
 
         # Remove the temporary files created for the searcher.
         # Files created by the searcher should be removed in its __del__() method.
+        assert "tmp_" in h5_dir  # sanity check: we don't want to remove any files we didn't create
+        shutil.rmtree(h5_dir)
         ft.delete_file(tmp_allowed_binary_csv)
 
         return matches

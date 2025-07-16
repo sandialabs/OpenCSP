@@ -96,6 +96,23 @@ class RenderControlFigure:
 
     @staticmethod
     def num_tiles_4x3aspect(num_figures: int):
+        """
+        Calculates the number of rows and colums to evenly spread the given number
+        of tiles in a 4x3 aspect ratio. It is assumed that the tiles are square.
+
+        It is guaranteed that rows * cols >= num_figures. There might be more
+        spaces in the grid than figures to fill it.
+
+        Parameters
+        ----------
+        num_figures : int
+            The number of figures/tiles to be presented in rows x columns grid.
+
+        Returns
+        -------
+        rows_cols : tuple[int, int]
+            The number of rows and columns in a 4x3 aspect ratio.
+        """
         if num_figures <= 1:
             n_rows = 1
             n_cols = 1

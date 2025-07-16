@@ -43,28 +43,31 @@ class PowerpointImage(pps.PowerpointShape):
         """
         Parameters
         ----------
-        image: str | np.ndarray | rcfr.RenderControlFigureRecord
+        image: str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord
             The image to add. If an array, image, or figure record, then it will
             be saved to a temporary file with save(). Defaults to None.
         dims: tuple[float,float,float,float]
-            The (left, top, width, height) of the image, or None to fill in one of
-            the cells from the template slides. Defaults to None.
-        dims: tuple[float,float,float,float]
-            The (left, top, width, height) of the bounds for this shape, or None
-            to fill in one of the cells from the template slides. Defaults to None.
+            The (left, top, width, height) of the image on the powerpoint slide,
+            or None to fill in one of the cells from the template slides. Units
+            are inches. Defaults to None.
+        cell_dims: tuple[float,float,float,float]
+            The (left, top, width, height) of the bounds for this shape on the
+            powerpoint slide, or None to fill in one of the cells from the
+            template slides. Units are inches. Defaults to None.
         caption_is_above: bool
             True to put the image caption (if any) above the image, False to put
             the caption below the image. Defaults to False.
         caption: str
             The image caption. Defaults to None.
         stretch: bool
-            True to stretch the image to fit the entire cell, False to fit
-            within cell. Most useful with template slides. Default false.
+            True to stretch the image dims to fit the entire cell, False to fit
+            the image dims within cell. Most useful with template slides.
+            Default false.
         parent_slide: PowerpointSlide
             The slide containing this image. Used for fitting within the slide
             format. If None then the default format will be used. Default None.
         """
-        # ChatGPT 4o-mini assisted with generating this doc string
+        # ChatGPT 4o-mini assisted with generating this doc string, reviewed by a human
         super().__init__(cell_dims)
         self._val: str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord | None = None
         """ The image data for this instance, or the "path/name.ext" to the
@@ -93,38 +96,32 @@ class PowerpointImage(pps.PowerpointShape):
 
         self.set_val(val)
 
-    def has_val(self):
-        """Check if the image value is set.
-
-        Returns
-        -------
-        bool
-            True if an image has been assigned to this instance, or False if
-            this instance was created without an assigned image and has not had an
-            image assigned yet.
+    def has_val(self) -> bool:
         """
-        # ChatGPT 4o-mini assisted with generating this doc string
+        Returns true if an image has been assigned to this instance, or False if
+        this instance was created without an assigned image and has not had an
+        image assigned yet.
+        """
         return self._val is not None
 
     def get_val(self) -> None | str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord:
-        """Get the image assigned to this instance.
-
-        What you probably actually want is :py:meth:`get_saved_path`.
+        """
+        Get the image assigned to this instance. What you probably actually want
+        is :py:meth:`get_saved_path`. Returns None if :py:meth:`has_val` is False.
 
         Returns
         -------
         None | str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord
             The image value assigned to this instance. Returns None if no image is assigned
-            (:py:meth:`has_val` is False), returns None.
+            (:py:meth:`has_val` is False).
         """
         # ChatGPT 4o-mini assisted with generating this doc string
         return self._val
 
     def set_val(self, image: str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord):
-        """Set the image value for this instance.
-
-        If this instance already has an image assigned then the old
-        value is overwritten without any checking.
+        """
+        Assigns an image to this instance. If this instance already has an image
+        assigned then the old value is overwritten without any checking.
 
         Parameters
         ----------
@@ -148,6 +145,10 @@ class PowerpointImage(pps.PowerpointShape):
                     f"Warning in PowerpointImage.set_val: "
                     + f"reference type value \"{self._val}\" should be a path to an image file, but no such file exists!"
                 )
+
+        else:
+            # TODO overwrite the saved value if one exists
+            pass
 
     def _test_saved_path(self):
         """
@@ -332,7 +333,7 @@ class PowerpointImage(pps.PowerpointShape):
             self.save()
 
         # get the width and height
-        image_width, image_height = self.get_size()
+        image_width, image_height = self.shape
 
         # check if the size is reasonable (within reduced_image_size_scale% of the target size)
         reasonable = reduced_image_size_scale
@@ -351,7 +352,7 @@ class PowerpointImage(pps.PowerpointShape):
         pil_image.save(self.get_saved_path())
 
     def get_saved_path(self) -> str:
-        """Get the path to the saved file version of the image content.
+        """Get the pathname.ext to the original or temporary file version of the image content.
 
         Calls save() as necessary to ensure the image is saved.
 
@@ -392,16 +393,19 @@ class PowerpointImage(pps.PowerpointShape):
     def _move_file(self, from_dir_name_ext: str, to_dir_name_ext: str):
         """Move a file from one location to another.
 
-        Args:
-            from_dir_name_ext (str): The source file path.
-            to_dir_name_ext (str): The destination file path.
+        Parameters
+        ----------
+        from_dir_name_ext: str
+            The source file path/name.ext.
+        to_dir_name_ext: str
+            The destination file path/name.ext.
 
         Raises
         ------
         OSError
             If the file cannot be moved.
         """
-        # ChatGPT 4o-mini assisted with generating this doc string
+        # ChatGPT 4o-mini assisted with generating this doc string, reviewed by a human
         try:
             ft.rename_file(from_dir_name_ext, to_dir_name_ext)
         except OSError:
@@ -410,13 +414,17 @@ class PowerpointImage(pps.PowerpointShape):
     def _save(self, path_name_ext: str):
         """Save the image value to the specified path.
 
-        Args:
-            path_name_ext (str): The full path where the image should be saved.
+        Parameters
+        ----------
+        path_name_ext: str
+            The full path where the image should be saved.
 
         Returns
         -------
-        tuple[str, str]
-            A tuple containing the directory of the saved file and the body+extension of the saved file.
+        path: str
+            The directory of the saved file.
+        body_ext: str
+            The body+ext of the saved file.
         """
         # ChatGPT 4o-mini assisted with generating this doc string
         path, _, ext = ft.path_components(path_name_ext)
@@ -427,8 +435,21 @@ class PowerpointImage(pps.PowerpointShape):
             pil_val.save(path_name_ext)
 
         elif isinstance(self._val, rcfr.RenderControlFigureRecord):
-            path, name, ext = ft.path_components(path_name_ext)
-            self._val.save(path, name + ext)
+            # Figure records add extra stuffs to the image names. Save them to
+            # a temporary file and then move to our desired location.
+            rec_val: rcfr.RenderControlFigureRecord = self._val
+            format = ext.lstrip(".")
+            _, tmp_path_name_ext = ft.get_temporary_file(suffix=ext, text=False)
+            tmp_path, tmp_name, tmp_ext = ft.path_components(tmp_path_name_ext)
+            tmp_path_name_ext_rcfr, _ = rec_val.save(tmp_path, tmp_name, format)
+            try:
+                self._move_file(tmp_path_name_ext_rcfr, path_name_ext)
+            except PermissionError:
+                if ft.file_exists(path_name_ext):
+                    raise
+                # probably just need to wait for matplotlib to release its stranglehold...
+                time.sleep(1)
+                self._move_file(tmp_path_name_ext_rcfr, path_name_ext)
 
         elif isinstance(self._val, np.ndarray):
             pil_val = it.numpy_to_image(self._val)
@@ -539,8 +560,8 @@ class PowerpointImage(pps.PowerpointShape):
         Returns
         -------
         dir_name_ext_pattern: str
-            A name.ext pattern with 2 '%d' fill values, or 1 '%d' if slide_idx
-            is not None, or 0 '%d' if for_glob is True.
+            A path + a name.ext pattern with 2 '%d' fill values, or 1 '%d'
+            if slide_idx is not None, or 0 '%d' if for_glob is True.
         """
         if slide_idx == None:
             ret = "%d_%d.png"
@@ -554,10 +575,12 @@ class PowerpointImage(pps.PowerpointShape):
         """Set the path where the image and its associated serialized text will be saved.
 
         If the image has already been saved, it will move the existing image
-        and text files to the new save path.
+        and associated text files to the new save path.
 
-        Args:
-            save_path (str): The new directory path where the image should be saved.
+        Parameters
+        ----------
+        save_path (str):
+            The new directory path where the image should be saved.
         """
         # ChatGPT 4o-mini assisted with generating this doc string
         if self.is_saved_to_file():
@@ -568,7 +591,10 @@ class PowerpointImage(pps.PowerpointShape):
 
         self._tmp_save_path = save_path
 
-    def save(self):
+        if self.is_saved_to_file():
+            self._test_saved_path()
+
+    def save(self) -> None | str:
         """
         Saves the metadata for this instance to a text file in the temporary
         directory, and saves the assigned image (as necessary) to an image file
@@ -646,9 +672,9 @@ class PowerpointImage(pps.PowerpointShape):
         return self.get_text_file_path()
 
     def clear_tmp_save(self):
-        """Remove the temporarily saved file for this image.
-
-        This method deletes the saved image file and its associated metadata file.
+        """
+        Reloads the image for this instance from the temporary save file, then
+        deletes the temporary save file and its associated metadata file.
         """
         # ChatGPT 4o-mini assisted with generating this doc string
         if not self.is_saved_to_file():
@@ -659,6 +685,8 @@ class PowerpointImage(pps.PowerpointShape):
         # replace this instance's value with the saved-to-disk version
         self.set_val(np.array(Image.open(path_name_ext)))
         self._saved_name_ext = None
+
+        # TODO verify that the path is the expected temporary path
 
         # delete the saved files
         ft.delete_file(path_name_ext, error_on_not_exists=False)

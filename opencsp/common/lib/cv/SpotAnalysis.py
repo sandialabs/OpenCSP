@@ -211,6 +211,10 @@ class SpotAnalysis(Iterator[SpotAnalysisOperable]):
         self.set_image_processors(image_processors)
 
     def set_image_processors(self, image_processors: list[AbstractSpotAnalysisImageProcessor]):
+        """
+        Update the image processors for this instance.
+        This is typically done by passing in the image processors to the class constructor.
+        """
         self.image_processors = image_processors
 
         # register the visualization processors
