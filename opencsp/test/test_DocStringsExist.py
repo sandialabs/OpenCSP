@@ -25,6 +25,8 @@ import opencsp.common.lib.camera.ImageAcquisition_DCAM_color
 import opencsp.common.lib.camera.ImageAcquisition_MSMF
 import opencsp.common.lib.camera.UCamera
 import opencsp.common.lib.cv.SpotAnalysis
+import opencsp.common.lib.cv.spot_analysis.image_processor.AnnotationImageProcessor
+import opencsp.common.lib.cv.spot_analysis.image_processor.FalseColorImageProcessor
 import opencsp.common.lib.deflectometry.ImageProjectionSetupGUI
 import opencsp.common.lib.deflectometry.ParamsSlopeSolver
 import opencsp.common.lib.deflectometry.ParamsSlopeSolverAbstract

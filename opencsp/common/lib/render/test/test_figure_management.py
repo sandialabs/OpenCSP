@@ -5,10 +5,10 @@ import matplotlib.pyplot as plt
 from PIL import Image
 
 import opencsp.common.lib.render.figure_management as fm
+import opencsp.common.lib.render.test.lib.RenderControlFigureRecordInfSave as rcfr_is
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-import opencsp.common.lib.render.test.lib.RenderControlFigureRecordInfSave as rcfr_is
 import opencsp.common.lib.tool.file_tools as ft
 
 is_original_call = "--funcname" in sys.argv

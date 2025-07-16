@@ -56,7 +56,11 @@ def view_spec_xz() -> dict:
 
 
 def view_spec_yz() -> dict:
-    """Returns a specification dictionary for a YZ view.
+    """
+    Returns a specification dictionary for a YZ view.
+
+    This function generates a dictionary that specifies the view type as
+    'yz', which can be used for rendering or visualization purposes.
 
     Returns
     -------
@@ -66,6 +70,60 @@ def view_spec_yz() -> dict:
     # "ChatGPT 4o" assisted with generating this docstring.
     spec = {}
     spec["type"] = "yz"
+    return spec
+
+
+def view_spec_xyz() -> dict:
+    """
+    Returns a specification dictionary for an XYZ view.
+
+    This function generates a dictionary that specifies the view type as
+    'xyz', which can be used for rendering or visualization purposes.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xyz'.
+    """
+    # ChatGPT 4o-mini assisted with generating this docstring
+    spec = {}
+    spec['type'] = 'xyz'
+    return spec
+
+
+def view_spec_pq() -> dict:
+    """
+    Returns a specification dictionary for an XY view.
+
+    This function generates a dictionary that specifies the view type as
+    'xy', which can be used for rendering or visualization purposes.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xy'.
+    """
+    # ChatGPT 4o-mini assisted with generating this docstring
+    spec = {}
+    spec['type'] = 'xy'
+    return spec
+
+
+def view_spec_pqw() -> dict:
+    """
+    Returns a specification dictionary for an XYZ view.
+
+    This function generates a dictionary that specifies the view type as
+    'xyz', which can be used for rendering or visualization purposes.
+
+    Returns
+    -------
+    dict
+        A dictionary containing the view type set to 'xyz'.
+    """
+    # ChatGPT 4o-mini assisted with generating this docstring
+    spec = {}
+    spec['type'] = 'xyz'
     return spec
 
 

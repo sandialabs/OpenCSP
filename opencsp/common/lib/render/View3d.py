@@ -4,19 +4,9 @@ import numbers
 import time
 from typing import Callable, Iterable
 
+from matplotlib.axes import Axes
 import matplotlib.backend_bases as backb
 import matplotlib.colors
-import matplotlib.image as mpimg
-import matplotlib.pyplot as plt
-from matplotlib.axes import Axes
-from matplotlib.figure import Figure
-from mpl_toolkits.mplot3d.axes3d import Axes3D
-import numpy as np
-from PIL import Image
-import scipy.ndimage
-
-from matplotlib.axes import Axes
-import matplotlib.backend_bases as backb
 from matplotlib.figure import Figure
 import matplotlib.image as mpimg
 import matplotlib.pyplot as plt
@@ -24,6 +14,7 @@ from mpl_toolkits.mplot3d.axes3d import Axes3D
 import numpy as np
 from PIL import Image
 import scipy.ndimage
+from typing import TYPE_CHECKING
 
 import opencsp.common.lib.render.axis_3d as ax3d
 import opencsp.common.lib.render.view_spec as vs
@@ -33,6 +24,15 @@ import opencsp.common.lib.render_control.RenderControlText as rctxt
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.render.lib.AbstractPlotHandler as aph
 from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
+
+from typing import Any as local_RenderControlFigureRecord
+
+if TYPE_CHECKING:
+    # Use the TYPE_CHECKING magic value to avoid cyclic imports at runtime.
+    # This import is only here for type annotations.
+    from opencsp.common.lib.render_control.RenderControlFigureRecord import (
+        RenderControlFigureRecord as local_RenderControlFigureRecord,
+    )
 
 
 class View3d(aph.AbstractPlotHandler):
@@ -53,20 +53,10 @@ class View3d(aph.AbstractPlotHandler):
         figure: Figure,
         axis: Axes,
         view_spec: dict,  # 3d, xy, xz, yz
-        equal=None,  # Whether to ensure axes have equal size tick spacing.
-        parent=None,
+        equal: bool = None,  # Whether to ensure axes have equal size tick spacing.
+        parent: local_RenderControlFigureRecord = None,
     ):
-        # in-situ imports to avoid import cycles
-        import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
-
-        parent: rcfr.RenderControlFigureRecord = parent
-
         super(View3d, self).__init__()
-
-        # defaults if not set
-        if parent != None:
-            equal = equal if equal != None else parent.equal
-        equal = equal if equal != None else True
 
         # interactive graphing values
         self._callbacks: dict[str, int] = {}
@@ -114,19 +104,26 @@ class View3d(aph.AbstractPlotHandler):
         """
         Shows a plot, ensuring that equal axis is set if applicable.
         """
-        # in-situ imports to avoid import cycles
-        import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
-
         # defaults if not set
         # equal is simple
         # grid can be inherited from the parent's axis_control, or defaults to true
-        equal = equal if equal != None else self.equal
-        if self.parent != None:
-            parent_grid = True
-            if self.parent.axis_control != None:
-                parent_grid = self.parent.axis_control.grid
-            grid = grid if grid != None else parent_grid
-        grid = grid if grid != None else True
+        if equal is None:
+            equal = self.equal
+            if self.parent is not None and self.parent.equal is not None:
+                equal = self.parent.equal
+            elif self.equal is not None:
+                equal = self.equal
+            else:
+                equal = True
+        if grid is None:
+            if (
+                (self.parent is not None)
+                and (self.parent.axis_control is not None)
+                and (self.parent.axis_control.grid is not None)
+            ):
+                grid = self.parent.axis_control.grid
+            else:
+                grid = True
 
         # If axis limits are not provided, clear any previous limits.
         if (x_limits == None) or (y_limits == None) or (z_limits == None):
@@ -210,8 +207,7 @@ class View3d(aph.AbstractPlotHandler):
                 self.axis.set_ylim(z_limits)
                 self.z_limits = z_limits
         # Grid.
-        if grid:
-            plt.grid()
+        self.axis.grid(visible=grid)
         # Legend.
         if legend:
             self.axis.legend()
@@ -1040,8 +1036,8 @@ class View3d(aph.AbstractPlotHandler):
         if self.view_spec["type"] == "3d":
             self.axis.plot_trisurf(x, y, z, color=surface_style.color, alpha=surface_style.alpha, **kwargs)
 
-    # TODO TJL: currently unused
-    # TODO TJL: might want to remove, this is a very slow function
+    # TODO tjlarki: currently unused
+    # TODO tjlarki: might want to remove, this is a very slow function
     def quiver(
         self,
         X: np.ndarray,
@@ -1127,22 +1123,9 @@ class View3d(aph.AbstractPlotHandler):
         """
 
         if (len(pq) != 2) and (len(pq) != 3):
-            lt.error("ERROR: In draw_pq_text(), len(pq)=", len(pq), " is not equal to 2 or 3.")
-            assert False
-        if self.view_spec["type"] == "3d":
-            lt.error(
-                "ERROR: In View3d.draw_pq_list(), incompatible view_spec['type'] = '"
-                + str(self.view_spec["type"])
-                + "' encountered."
-            )
-            assert False
-        elif (
-            (self.view_spec["type"] == "xy")
-            or (self.view_spec["type"] == "xz")
-            or (self.view_spec["type"] == "yz")
-            or (self.view_spec["type"] == "vplane")
-            or (self.view_spec["type"] == "camera")
-        ):
+            lt.error_and_raise(ValueError, "Error in View3d.draw_pq(): " + f"{len(pq)=} is not equal to 2 or 3.")
+        allowed_types = ['xy', 'xz', 'yz', 'image', 'vplane', 'camera']
+        if self.view_spec['type'] in allowed_types:
             self._plot(
                 [pq[0]],
                 [pq[1]],
@@ -1150,6 +1133,7 @@ class View3d(aph.AbstractPlotHandler):
                 label=label,
                 linestyle=None,
                 color=style.color,
+                alpha=style.markeralpha,
                 marker=style.marker,
                 markersize=style.markersize,
                 markeredgecolor=style.markeredgecolor,
@@ -1157,12 +1141,12 @@ class View3d(aph.AbstractPlotHandler):
                 markerfacecolor=style.markerfacecolor,
             )
         else:
-            lt.error(
-                "ERROR: In View3d.draw_pq(), unrecognized view_spec['type'] = '"
-                + str(self.view_spec["type"])
-                + "' encountered."
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in View3d.draw_pq(): "
+                + f"incompatible view_spec['type'] '{self.view_spec['type']}' encountered. "
+                + "Should be one of {allowed_types}.",
             )
-            assert False
 
     def draw_p_list(self, input_p_list, style=rcps.default(), label=None):
         pq_list = [(i, input_p_list[i]) for i in range(len(input_p_list))]
@@ -1222,8 +1206,8 @@ class View3d(aph.AbstractPlotHandler):
             pq_list.append(input_pq_list[0])
         else:
             pq_list = input_pq_list
-        allowed_vs_types = ["xy", "xz", "yz", "vplane", "camera"]
-        if self.view_spec["type"] not in allowed_vs_types:
+        allowed_vs_types = ['xy', 'xz', 'yz', 'image', 'vplane', 'camera']
+        if self.view_spec['type'] not in allowed_vs_types:
             lt.error_and_raise(
                 RuntimeError,
                 "ERROR: In View3d.draw_pq_list(), "

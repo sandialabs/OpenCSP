@@ -1,6 +1,4 @@
 import copy
-import os
-from PIL import Image
 import pptx
 import typing
 
@@ -30,8 +28,8 @@ class PowerpointSlide:
             texts (list[PowerpointText]): Texts that this slide should start with. Defaults to None.
         """
         self.slide_control = slide_control
-        self.images: list[PowerpointImage] = images if images != None else []
-        self.texts: list[PowerpointText] = texts if texts != None else []
+        self.images: list[PowerpointImage] = images if images is not None else []
+        self.texts: list[PowerpointText] = texts if texts is not None else []
         self.title_text_idx = None
 
         for pps_image in self.images:
@@ -48,8 +46,16 @@ class PowerpointSlide:
                 self.texts[idx] = pps_text._replace(is_title=False)
 
     @classmethod
-    def template_title(cls, title: str, authors: str, slide_control: RenderControlPowerpointSlide) -> "PowerpointSlide":
-        raise NotImplementedError
+    def template_title(
+        cls, title: str, authors: str, slide_control: RenderControlPowerpointSlide = None
+    ) -> "PowerpointSlide":
+        if slide_control == None:
+            slide_control = RenderControlPowerpointSlide(inter_cell_buffer=0.35)
+        title_slide_control = copy.copy(slide_control)
+        title_slide_control.is_title_slide = True
+        ret = cls(title_slide_control)
+        ret.set_title(title)
+        return ret
 
     @classmethod
     def template_planning(cls, slide_control: RenderControlPowerpointSlide = None) -> "PowerpointSlide":
@@ -110,7 +116,7 @@ class PowerpointSlide:
         Any space that an image isn't assigned to is assumed to be reserved
         to a text box.
         """
-        if slide_control == None:
+        if slide_control is None:
             slide_control = RenderControlPowerpointSlide(inter_cell_buffer=0.35)
         inter_cell_buffer = slide_control.inter_cell_buffer
 
@@ -155,6 +161,12 @@ class PowerpointSlide:
 
         ncells = max([len(shapes) for shapes in shape_groups])
 
+        # is this slide currently empty?
+        if ncells == 0:
+            return -1
+
+        # find the next available slot that doesn't have an image or text shape
+        # in it
         for idx in range(ncells):
             found = False
 
@@ -189,7 +201,7 @@ class PowerpointSlide:
             )
         else:
             image: PowerpointImage = PowerpointImage(image)
-        if fit_or_stretch != None:
+        if fit_or_stretch is not None:
             image.stretch = fit_or_stretch.lower() == "stretch"
         image.parent_slide = self
 
@@ -214,7 +226,7 @@ class PowerpointSlide:
             # slot the image into a given cell
             old_image = self.images[index]
             if old_image.has_val():
-                old_image.clear_tmp_render()
+                old_image.clear_tmp_save()
 
             if not image.has_dims():
                 self.images[index] = image
@@ -243,7 +255,7 @@ class PowerpointSlide:
                 if replace_or_shift == "replace":
                     old_text = self.texts[index]
                     self.texts[index] = text
-                    if text.dims == None:
+                    if text.dims is None:
                         text.dims = old_text.dims
                 else:  # replace_or_shift == "shift"
                     for i in range(len(self.texts) - 1, index - 1, -1):
@@ -262,7 +274,7 @@ class PowerpointSlide:
         return text
 
     def get_title_text(self):
-        if self.title_text_idx != None:
+        if self.title_text_idx is not None:
             return self.texts[self.title_text_idx]
         return None
 
@@ -271,7 +283,7 @@ class PowerpointSlide:
         title_text = self.get_title_text()
         if isinstance(title, str):
             slide_dims = 0, 0, *self.slide_control.slide_size
-            if title_text != None:
+            if title_text is not None:
                 dims = title_text.dims
                 text = PowerpointText(title, dims=dims, cell_dims=slide_dims, is_title=True, parent_slide=self)
             else:
@@ -284,10 +296,10 @@ class PowerpointSlide:
             text.is_title = True
 
         # add the text instance
-        if self.title_text_idx != None:
+        if self.title_text_idx is not None:
             new_title_text = self.add_text(text, self.title_text_idx, replace_or_shift="replace")
         else:
-            new_title_text = self.add_text(text, 0, replace_or_shift="shift")
+            new_title_text = self.add_text(text, -1, replace_or_shift="shift")
 
         # set all other texts to not be titles
         for other_text in self.texts:
@@ -295,7 +307,7 @@ class PowerpointSlide:
                 other_text.is_title = False
 
     def get_non_title_texts(self):
-        if self.title_text_idx != None:
+        if self.title_text_idx is not None:
             non_title_texts = self.texts[: self.title_text_idx] + self.texts[self.title_text_idx + 1 :]
             return non_title_texts
         return self.texts
@@ -386,7 +398,7 @@ class PowerpointSlide:
         prs.slide_width = pptx.util.Inches(self.slide_control.slide_size[0])
         prs.slide_height = pptx.util.Inches(self.slide_control.slide_size[1])
         slide = prs.slides.add_slide(layout)
-        if presentation.existing_presentation_path_name_ext == None:
+        if presentation.existing_presentation_path_name_ext is None:
             self.clean(slide)
 
         # add all the images
@@ -396,7 +408,7 @@ class PowerpointSlide:
                 slide.shapes.add_picture(image.get_saved_path(), *image.dims_pptx())
 
             # add the caption, if any
-            if image.caption != None:
+            if image.caption is not None:
                 x, y, w, image_height_in = image.dims
                 caption_size = 0.36  # TODO make this dependent on font point size
                 h = caption_size
@@ -416,8 +428,8 @@ class PowerpointSlide:
             non_title_texts = self.get_non_title_texts()
 
             # add the title and subtitle to the slide
-            if presentation.existing_presentation_path_name_ext != None:
-                if title_text != None:
+            if presentation.existing_presentation_path_name_ext is not None:
+                if title_text is not None:
                     title = slide.shapes.title
                     title.text = title_text.val
                 if len(non_title_texts) > 0:
@@ -447,8 +459,13 @@ class PowerpointSlide:
         return slide
 
     def to_txt_file(self, file_path_name_ext: str):
-        """Saves the images and texts for this slide in the given path
-        and saves the references to them in the given file."""
+        """
+        Serializes this instance to files. This instance can then be
+        reconstructed with the :py:meth:`from_txt_file` method.
+
+        Saves the images and texts for this slide in the given path
+        and saves the references to them in the given file.
+        """
         path, _, _ = ft.path_components(file_path_name_ext)
 
         # clean out existing files in the save directory
@@ -457,14 +474,14 @@ class PowerpointSlide:
 
         # save images and texts to the save directory
         for image in self.images:
-            image.set_save_path(path)
+            image.update_save_path(path)
         for text in self.texts:
-            text.set_save_path(path)
+            text.update_save_path(path)
         self.save()
 
         # save references to the images and texts to the save directory
         with open(file_path_name_ext, "w") as fout:
-            non_null = lambda v: v != None
+            non_null = lambda v: v is not None
             image_name_exts = list(filter(non_null, [image.save() for image in self.images]))
             text_name_exts = list(filter(non_null, [text.save() for text in self.texts]))
 
@@ -479,7 +496,11 @@ class PowerpointSlide:
 
     @classmethod
     def from_txt_file(cls, file_path_name_ext: str, slide_control: RenderControlPowerpointSlide = None):
-        if slide_control == None:
+        """
+        Deserializes a PowerpointSlide instance from a file previously used with
+        `to_txt_file`. The newly generated instance is then returned.
+        """
+        if slide_control is None:
             slide_control = RenderControlPowerpointSlide()
 
         lines = ft.read_text_file(file_path_name_ext)

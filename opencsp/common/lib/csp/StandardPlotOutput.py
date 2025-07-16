@@ -15,6 +15,7 @@ from opencsp.common.lib.geometry.RegionXY import Resolution
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
+import opencsp.common.lib.render_control.RenderControlEnclosedEnergy as rcee
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -34,7 +35,7 @@ class _OptionsSlopeVis:
     """The scale of the quiver arrows.
     Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
     (default 25)"""
-    quiver_color: str | tuple[str, str, str] = "white"
+    quiver_color: str | tuple[str, str, str] = 'white'
     """The color of the quiver arrows.
     Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
     (default 'white')"""
@@ -58,7 +59,7 @@ class _OptionsSlopeDeviationVis:
     """The scale of the quiver arrows.
     Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
     (default 25)"""
-    quiver_color: str | tuple[str, str, str] = "white"
+    quiver_color: str | tuple[str, str, str] = 'white'
     """The color of the quiver arrows.
     Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
     (default 'white')"""
@@ -103,11 +104,11 @@ class _OptionsRayTraceVis:
 class _OptionsFileOutput:
     to_save: bool = False
     """Flag to save figures or not. (default False)"""
-    output_dir: str = ""
+    output_dir: str = ''
     """Output path to save directory. (default '')"""
     save_dpi: int = 200
     """Dots Per Inch (DPI) of saved figures. (default 200)"""
-    save_format: str = "png"
+    save_format: str = 'png'
     """Saved figure format. (default 'png')"""
     close_after_save: bool = False
     """To close figures after save. (default False)"""
@@ -192,18 +193,18 @@ class StandardPlotOutput:
             self._plot_slope_measured_optic()
             self._plot_slope_reference_optic()
         else:
-            lt.info("Slope plotting turned off; skipping measured/reference optic slope plots.")
+            lt.info('Slope plotting turned off; skipping measured/reference optic slope plots.')
 
         if self.options_curvature_vis.to_plot:
             self._plot_curvature_measured_optic()
             self._plot_curvature_reference_optic()
         else:
-            lt.info("Curvature plotting turned off; skipping measured/reference optic curvature plots.")
+            lt.info('Curvature plotting turned off; skipping measured/reference optic curvature plots.')
 
         if self.options_slope_deviation_vis.to_plot:
             self._plot_slope_deviation()
         else:
-            lt.info("Slope deviation plotting turned off; skipping slope deviation plots.")
+            lt.info('Slope deviation plotting turned off; skipping slope deviation plots.')
 
         if self.options_ray_trace_vis.to_plot:
             # Perform ray tracing, if set
@@ -214,35 +215,35 @@ class StandardPlotOutput:
             self._plot_ray_trace_image_reference_optic()
             self._plot_enclosed_energy()
         else:
-            lt.info("Ray tracing turned off; skipping all ray tracing plots.")
+            lt.info('Ray tracing turned off; skipping all ray tracing plots.')
 
     def _plot_slope_measured_optic(self):
         # Plots optic slope for measured optic
         if self._has_measured_optic:
-            self._plot_slope(self.optic_measured, "measured")
+            self._plot_slope(self.optic_measured, 'measured')
         else:
-            lt.info("No measured optic; skipping measured optic slope plots.")
+            lt.info('No measured optic; skipping measured optic slope plots.')
 
     def _plot_curvature_measured_optic(self):
         # Plots optic curvature for measured optic
         if self._has_measured_optic:
-            self._plot_curvature(self.optic_measured, "measured")
+            self._plot_curvature(self.optic_measured, 'measured')
         else:
-            lt.info("No measured optic; skipping measured optic curvature plots.")
+            lt.info('No measured optic; skipping measured optic curvature plots.')
 
     def _plot_slope_reference_optic(self):
         # Plots optic slope for reference optic
         if self._has_reference_optic:
-            self._plot_slope(self.optic_reference, "reference")
+            self._plot_slope(self.optic_reference, 'reference')
         else:
-            lt.info("No reference optic; skipping reference optic slope plots.")
+            lt.info('No reference optic; skipping reference optic slope plots.')
 
     def _plot_curvature_reference_optic(self):
         # Plots optic curvature for reference optic
         if self._has_reference_optic:
-            self._plot_curvature(self.optic_reference, "reference")
+            self._plot_curvature(self.optic_reference, 'reference')
         else:
-            lt.info("No reference optic; skipping reference optic curvature plots.")
+            lt.info('No reference optic; skipping reference optic curvature plots.')
 
     def _process_plot_options(self, value) -> list:
         # If given a single value or length 1 tuple/list, returns length 3 list of the copied value.
@@ -253,7 +254,7 @@ class StandardPlotOutput:
             elif len(value) in [0, 1]:
                 return [value] * 3
             else:
-                lt.error_and_raise(ValueError, f"Plot option must be length 3 or 1, not length {len(value):d}")
+                lt.error_and_raise(ValueError, f'Plot option must be length 3 or 1, not length {len(value):d}')
         else:
             return [value] * 3
 
@@ -275,7 +276,7 @@ class StandardPlotOutput:
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
-                type_="magnitude",
+                type_='magnitude',
                 quiver_density=quiver_densities[0],
                 quiver_scale=quiver_scales[0],
                 quiver_color=quiver_colors[0],
@@ -286,7 +287,7 @@ class StandardPlotOutput:
                 fig_rec.save(
                     output_dir=self.options_file_output.output_dir,
                     dpi=self.options_file_output.save_dpi,
-                    format="png",
+                    format='png',
                     close_after_save=self.options_file_output.close_after_save,
                 )
 
@@ -300,7 +301,7 @@ class StandardPlotOutput:
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
-                type_="x",
+                type_='x',
                 quiver_density=quiver_densities[1],
                 quiver_scale=quiver_scales[1],
                 quiver_color=quiver_colors[1],
@@ -311,7 +312,7 @@ class StandardPlotOutput:
                 fig_rec.save(
                     output_dir=self.options_file_output.output_dir,
                     dpi=self.options_file_output.save_dpi,
-                    format="png",
+                    format='png',
                     close_after_save=self.options_file_output.close_after_save,
                 )
 
@@ -325,7 +326,7 @@ class StandardPlotOutput:
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
-                type_="y",
+                type_='y',
                 quiver_density=quiver_densities[2],
                 quiver_scale=quiver_scales[2],
                 quiver_color=quiver_colors[2],
@@ -336,36 +337,36 @@ class StandardPlotOutput:
                 fig_rec.save(
                     output_dir=self.options_file_output.output_dir,
                     dpi=self.options_file_output.save_dpi,
-                    format="png",
+                    format='png',
                     close_after_save=self.options_file_output.close_after_save,
                 )
         else:
-            lt.info("Do not have both measured and reference optic; skipping slope deviation plots.")
+            lt.info('Do not have both measured and reference optic; skipping slope deviation plots.')
 
     def _plot_ray_trace_image_measured_optic(self):
         # Plot ray trace image for measured optic
         if self._has_measured_ray_trace:
-            self._plot_ray_trace_image(self._ray_trace_output_measured, "measured")
+            self._plot_ray_trace_image(self._ray_trace_output_measured, 'measured')
         else:
-            lt.info("No measured ray trace data; skipping measured ray trace image.")
+            lt.info('No measured ray trace data; skipping measured ray trace image.')
 
     def _plot_ray_trace_image_reference_optic(self):
         # Plot ray trace image for reference optic
         if self._has_reference_ray_trace:
-            self._plot_ray_trace_image(self._ray_trace_output_reference, "reference")
+            self._plot_ray_trace_image(self._ray_trace_output_reference, 'reference')
         else:
-            lt.info("No reference ray trace data; skipping reference ray trace image.")
+            lt.info('No reference ray trace data; skipping reference ray trace image.')
 
     def _plot_enclosed_energy(self):
         # Makes measured and/or reference enclosed energy plots
 
         if (not self._has_reference_ray_trace) and (not self._has_measured_ray_trace):
-            lt.info("No measured or reference ray trace data; skipping enclosed energy plot.")
+            lt.info('No measured or reference ray trace data; skipping enclosed energy plot.')
             return
 
         # Make figure
         fig_rec = fm.setup_figure(
-            self.fig_control, name="Ensquared Energy", number_in_name=self.options_file_output.number_in_name
+            self.fig_control, name='Ensquared Energy', number_in_name=self.options_file_output.number_in_name
         )
 
         # Draw reference if available
@@ -377,8 +378,15 @@ class StandardPlotOutput:
                 color="k",
                 linestyle="--",
             )
+            """ widths_and_vals = list(
+                zip(
+                    self._ray_trace_output_reference.ensquared_energy_widths,
+                    self._ray_trace_output_reference.ensquared_energy_values,
+                )
+            )
+            fig_rec.view.draw_pq_list(widths_and_vals, style=rcee.default().theoretical, label='Reference') """
         else:
-            lt.info("Reference ray trace data not available, skipping reference enclosed energy curve.")
+            lt.info('Reference ray trace data not available, skipping reference enclosed energy curve.')
 
         # Draw measured if available
         if self._has_measured_ray_trace:
@@ -389,20 +397,27 @@ class StandardPlotOutput:
                 color="k",
                 linestyle="-",
             )
+            """ widths_and_vals = list(
+                zip(
+                    self._ray_trace_output_measured.ensquared_energy_widths,
+                    self._ray_trace_output_measured.ensquared_energy_values,
+                )
+            )
+            fig_rec.view.draw_pq_list(widths_and_vals, style=rcee.default().measured, label='Measured') """
         else:
-            lt.info("Measured ray trace data not available, skipping measured enclosed energy curve.")
+            lt.info('Measured ray trace data not available, skipping measured enclosed energy curve.')
 
         # Format plot
         fig_rec.axis.legend()
         fig_rec.axis.grid()
-        fig_rec.axis.set_xlabel("Semi-width (meters)")
-        fig_rec.axis.set_ylabel("Ensquared Energy")
-        fig_rec.axis.set_title("Ensquared Energy")
+        fig_rec.axis.set_xlabel('Semi-width (meters)')
+        fig_rec.axis.set_ylabel('Ensquared Energy')
+        fig_rec.axis.set_title('Ensquared Energy')
         if self.options_file_output.to_save:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -415,12 +430,12 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Curvature Combined " + suffix,
+            name='Curvature Combined ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
             res=self.options_curvature_vis.resolution,
-            type_="combined",
+            type_='combined',
             clim=self.options_curvature_vis.clim,
             axis=fig_rec.axis,
             processing=processings[0],
@@ -430,7 +445,7 @@ class StandardPlotOutput:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -438,12 +453,12 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Curvature X " + suffix,
+            name='Curvature X ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
             res=self.options_curvature_vis.resolution,
-            type_="x",
+            type_='x',
             clim=self.options_curvature_vis.clim,
             axis=fig_rec.axis,
             processing=processings[1],
@@ -453,7 +468,7 @@ class StandardPlotOutput:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -461,12 +476,12 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Curvature Y " + suffix,
+            name='Curvature Y ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
             res=self.options_curvature_vis.resolution,
-            type_="y",
+            type_='y',
             clim=self.options_curvature_vis.clim,
             axis=fig_rec.axis,
             processing=processings[2],
@@ -476,7 +491,7 @@ class StandardPlotOutput:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -495,7 +510,7 @@ class StandardPlotOutput:
         )
         optic.plot_orthorectified_slope(
             self.options_slope_vis.resolution,
-            type_="magnitude",
+            type_='magnitude',
             quiver_density=quiver_densities[0],
             quiver_scale=quiver_scales[0],
             quiver_color=quiver_colors[0],
@@ -506,7 +521,7 @@ class StandardPlotOutput:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -519,7 +534,7 @@ class StandardPlotOutput:
         )
         optic.plot_orthorectified_slope(
             self.options_slope_vis.resolution,
-            type_="x",
+            type_='x',
             quiver_density=quiver_densities[1],
             quiver_scale=quiver_scales[1],
             quiver_color=quiver_colors[1],
@@ -530,7 +545,7 @@ class StandardPlotOutput:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -543,7 +558,7 @@ class StandardPlotOutput:
         )
         optic.plot_orthorectified_slope(
             self.options_slope_vis.resolution,
-            type_="y",
+            type_='y',
             quiver_density=quiver_densities[2],
             quiver_scale=quiver_scales[2],
             quiver_color=quiver_colors[2],
@@ -554,7 +569,7 @@ class StandardPlotOutput:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -563,12 +578,12 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Ray Trace Image " + suffix,
+            name='Ray Trace Image ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         fig_rec.axis.imshow(
             ray_trace_data.histogram,
-            cmap="jet",
+            cmap='jet',
             extent=(
                 ray_trace_data.histogram_x.min(),
                 ray_trace_data.histogram_x.max(),
@@ -580,7 +595,7 @@ class StandardPlotOutput:
             fig_rec.save(
                 output_dir=self.options_file_output.output_dir,
                 dpi=self.options_file_output.save_dpi,
-                format="png",
+                format='png',
                 close_after_save=self.options_file_output.close_after_save,
             )
 
@@ -606,7 +621,7 @@ class StandardPlotOutput:
             # Save
             self._ray_trace_output_measured = _RayTraceOutput(ray_trace, image, xv, yv, ee, ws)
         else:
-            lt.info("No measured optic; skipping measured optic ray trace.")
+            lt.info('No measured optic; skipping measured optic ray trace.')
 
     def _perform_ray_trace_optic_reference(self):
         if self._has_reference_optic:
@@ -629,7 +644,7 @@ class StandardPlotOutput:
             # Save data
             self._ray_trace_output_reference = _RayTraceOutput(ray_trace, image, xv, yv, ee, ws)
         else:
-            lt.info("No reference optic; skipping reference optic ray trace.")
+            lt.info('No reference optic; skipping reference optic ray trace.')
 
     def _ray_trace_scene(self, obj: RayTraceable) -> rt.RayTrace:
         # Performs a raytrace of a simple scene with a source and an optic.

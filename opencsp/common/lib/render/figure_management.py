@@ -310,6 +310,32 @@ def _setup_figure(
     return fig_record
 
 
+def hide_axes(fig_record: RenderControlFigureRecord, figure_control: RenderControlFigure):
+    """
+    Hides the axes for the plot if axis_control.draw_axes is False. Hides the
+    whitespace around the plot if figure_control.draw_whitespace_padding is
+    False.
+
+    Parameters
+    ----------
+    fig_record : RenderControlFigureRecord
+        The figure record to be modified.
+    figure_control : RenderControlFigure
+        The control that manages if axes and whitespace are drawn.
+    """
+    axis_control = fig_record.axis_control
+
+    # hide the axes
+    if not axis_control.draw_axes:
+        fig_record.axis.axis('off')
+        fig_record.axis.axes.get_xaxis().set_visible(False)
+        fig_record.axis.axes.get_yaxis().set_visible(False)
+
+    # hide the whitespace
+    if not figure_control.draw_whitespace_padding:
+        fig_record.figure.tight_layout(pad=0)
+
+
 def setup_figure(
     figure_control: RenderControlFigure,
     axis_control=None,
@@ -394,6 +420,9 @@ def setup_figure(
     fig_record.axis = ax
     fig_record.view = view
     fig_record.add_metadata_line("View spec: " + str(view_spec["type"]))
+
+    # Hide the axes, as appropriate
+    hide_axes(fig_record, figure_control)
 
     return fig_record
 
@@ -487,6 +516,9 @@ def setup_figure_for_3d_data(
     fig_record.axis = ax
     fig_record.view = view
     fig_record.add_metadata_line("View spec: " + str(view_spec["type"]))
+
+    # Hide the axes, as appropriate
+    hide_axes(fig_record, figure_control)
 
     # Return.
     return fig_record

@@ -125,8 +125,3 @@ class RenderControlPowerpointPresentation:
     def clear_tmp():
         pps.PowerpointImage.clear_tmp_save_all()
         pps.PowerpointText.clear_tmp_save_all()
-
-    @staticmethod
-    def append_tmp_path(append_path: str):
-        pps.PowerpointImage.append_tmp_path_all(append_path)
-        pps.PowerpointText.append_tmp_path_all(append_path)
