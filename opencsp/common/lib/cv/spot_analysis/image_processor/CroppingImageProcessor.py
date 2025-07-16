@@ -1,4 +1,3 @@
-import copy
 import dataclasses
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
@@ -29,7 +28,7 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
         y2 : int
             The bottom side of the box to crop to (exclusive).
         """
-        super().__init__()
+        super().__init__(self.__class__.__name__)
 
         # validate the inputs
         self.cropped_size_str = f"[left: {x1}, right: {x2}, top: {y1}, bottom: {y2}]"
@@ -55,7 +54,7 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # check the size of the image
         h, w = image.shape[0], image.shape[1]
-        if w < self.x2 - 1 or h < self.y2 - 1:
+        if w < self.x2 or h < self.y2:
             lt.error_and_raise(
                 ValueError,
                 "Error in CroppingImageProcessor._execute(): "
@@ -66,11 +65,7 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
         cropped = image[self.y1 : self.y2, self.x1 : self.x2]
         new_primary = CacheableImage(cropped)
 
-        image_processor_notes = copy.copy(operable.image_processor_notes)
-        image_processor_notes.append(
-            ("CroppingImageProcessor", [f"{self.x1}", f"{self.x2}", f"{self.y1}", f"{self.y2}"])
-        )
-        ret = dataclasses.replace(operable, primary_image=new_primary, image_processor_notes=image_processor_notes)
+        ret = dataclasses.replace(operable, primary_image=new_primary)
         return [ret]
 
 
@@ -92,5 +87,6 @@ if __name__ == "__main__":
     processor = CroppingImageProcessor(x1, x2, y1, y2)
     for filename in ft.files_in_directory(indir):
         img = CacheableImage.from_single_source(indir + "/" + filename)
-        result = processor.process_operable(SpotAnalysisOperable(img))[0]
-        cropped = result.primary_image.save_image(outdir + "/" + filename)
+        result = processor.process_image(SpotAnalysisOperable(img))[0]
+        cropped = result.primary_image.to_image()
+        cropped.save(outdir + "/" + filename)

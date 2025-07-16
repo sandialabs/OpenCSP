@@ -154,11 +154,6 @@ class RenderControlPointSeq:
         if self._color is not None:
             return self._color.rgba()
 
-    @color.setter
-    def color(self, val: str | cl.Color | tuple[float] | None):
-        self._color = val
-        self._standardize_color_values()
-
     @property
     def markeredgecolor(self) -> tuple[float, float, float, float] | None:
         """
@@ -173,13 +168,6 @@ class RenderControlPointSeq:
         if self._markeredgecolor is not None:
             if self.markeralpha is not None:
                 return self._markeredgecolor.rgba(self.markeralpha)
-            else:
-                return self._markeredgecolor.rgb()
-
-    @markeredgecolor.setter
-    def markeredgecolor(self, val: str | cl.Color | tuple[float] | None):
-        self._markeredgecolor = val
-        self._standardize_color_values()
 
     @property
     def markerfacecolor(self) -> tuple[float, float, float, float] | None:
@@ -195,13 +183,6 @@ class RenderControlPointSeq:
         if self._markerfacecolor is not None:
             if self.markeralpha is not None:
                 return self._markerfacecolor.rgba(self.markeralpha)
-            else:
-                return self._markerfacecolor.rgb()
-
-    @markerfacecolor.setter
-    def markerfacecolor(self, val: str | cl.Color | tuple[float] | None):
-        self._markerfacecolor = val
-        self._standardize_color_values()
 
     @property
     def vector_color(self) -> tuple[float, float, float, float] | None:
@@ -217,28 +198,19 @@ class RenderControlPointSeq:
         if self._vector_color is not None:
             return self._vector_color.rgba()
 
-    @vector_color.setter
-    def vector_color(self, val: str | cl.Color | tuple[float] | None):
-        self._vector_color = val
-        self._standardize_color_values()
-
-    # MODIFICATION
-
-    def set_color(self, color: str | cl.Color | tuple[float] | None):
+    def set_color(self, color):
         """
-        Update the color values for this instance. Updates all color values to
-        the given color. Use the "color = [value]" setters to change just a
-        single color.
+        Set the primary color and update marker edge and face colors.
 
         Parameters
         ----------
-        color : str | cl.Color | tuple[float]
-            The fill color to use for a filled shape.
+        color : str | Color
+            The new color to set for the primary color and marker colors.
         """
+        # ChatGPT 4o-mini assisted with generating this doc string
         self._color = color
         self._markeredgecolor = color
         self._markerfacecolor = color
-        self._vector_color = color
 
         self._standardize_color_values()
 

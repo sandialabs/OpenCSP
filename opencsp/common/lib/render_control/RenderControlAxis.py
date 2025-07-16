@@ -6,9 +6,7 @@ class RenderControlAxis:
     Render control for plot axes.
     """
 
-    def __init__(
-        self, x_label='x', y_label='y', z_label='z', p_label='p', q_label='q', w_label='w', draw_axes=True, grid=True
-    ):
+    def __init__(self, x_label="x", y_label="y", z_label="z", p_label="p", q_label="q", w_label="w", grid=True):
         super(RenderControlAxis, self).__init__()
 
         # Axis control.
@@ -18,27 +16,19 @@ class RenderControlAxis:
         self.p_label = p_label
         self.q_label = q_label
         self.w_label = w_label
-        self.draw_axes = draw_axes
         self.grid = grid
 
 
-def meters(draw_axes=True, grid=True):
+def meters(grid=True):
     """
     Labels indicating units of meters.
     """
     return RenderControlAxis(
-        x_label='x (m)',
-        y_label='y (m)',
-        z_label='z (m)',
-        p_label='p (m)',
-        q_label='q (m)',
-        w_label='w (m)',
-        draw_axes=draw_axes,
-        grid=grid,
+        x_label="x (m)", y_label="y (m)", z_label="z (m)", p_label="p (m)", q_label="q (m)", w_label="w (m)", grid=grid
     )
 
 
-def latlon(decimal_t_degminsecs_f=True, draw_axes=True, grid=True):
+def latlon(decimal_t_degminsecs_f=True, grid=True):
     """
     Labels indicating units of latitude and longitude.
     """
@@ -50,22 +40,20 @@ def latlon(decimal_t_degminsecs_f=True, draw_axes=True, grid=True):
         p_label=f"p ({unit})",
         q_label=f"q ({unit})",
         w_label=f"w ({unit})",
-        draw_axes=draw_axes,
         grid=grid,
     )
 
 
-def image(draw_axes=True, grid=True):
+def image(grid=True):
     """
     Labels indicating image.
     """
     return RenderControlAxis(
-        x_label='x N/A',
-        y_label='y N/A',
-        z_label='z N/A',
-        p_label='x (pix)',
-        q_label='y (pix)',
-        w_label='w N/A',
-        draw_axes=draw_axes,
+        x_label="x N/A",
+        y_label="y N/A",
+        z_label="z N/A",
+        p_label="x (pix)",
+        q_label="y (pix)",
+        w_label="w N/A",
         grid=grid,
     )

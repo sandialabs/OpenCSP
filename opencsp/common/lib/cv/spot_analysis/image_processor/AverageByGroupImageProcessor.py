@@ -20,10 +20,12 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
 
     def __init__(
         self,
-        images_group_assigner: Callable[[SpotAnalysisOperable], int] = None,
+        images_group_assigner: Callable[[SpotAnalysisOperable], int],
         group_execution_trigger: Callable[[list[tuple[SpotAnalysisOperable, int]]], int | None] = None,
+        *vargs,
+        **kwargs,
     ):
-        super().__init__(images_group_assigner, group_execution_trigger)
+        super().__init__(images_group_assigner, group_execution_trigger, *vargs, **kwargs)
 
     def _execute_aggregate(
         self, group: int, operables: list[SpotAnalysisOperable], is_last: bool
@@ -51,7 +53,7 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
         image_names = [f"{operable.best_primary_pathnameext}" for operable in operables]
 
         # build the return operable from the first operable
-        averaged_cacheable = CacheableImage(averaged_image)
+        averaged_cacheable = CacheableImage(averaged_image, source_path=operables[0].primary_image.source_path)
         ret = dataclasses.replace(operables[0], primary_image=averaged_cacheable)
         ret.image_processor_notes.append(("AverageByGroupImageProcessor", f"averaged_images: {image_names}"))
 

@@ -8,7 +8,6 @@ import numpy as np
 import PIL.Image as PilImage
 
 from opencsp.common.lib.render.View3d import View3d
-import opencsp.common.lib.tool.exception_tools as et
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -94,8 +93,7 @@ class RenderControlFigureRecord:
     @title.setter
     def title(self, new_title: str):
         self._title = new_title
-        # self.axis.set_title(new_title)
-        self.figure.suptitle(new_title)
+        self.axis.set_title(new_title)
 
     def close(self):
         """Closes any matplotlib window opened with this instance's view"""
@@ -117,21 +115,15 @@ class RenderControlFigureRecord:
         if hasattr(self.axis, "get_zlabel"):
             zlabel = self.axis.get_zlabel()
 
-        # Clear the previous title
-        with et.ignored(Exception):
-            self.figure.suptitle(None)
-
-        # Clear the previous legend
-        axes = [self.axis]
-        if self.figure is not None:
-            axes = list(set(list(self.figure.axes) + axes))
-        for axis in axes:
-            legend = axis.get_legend()
-            if legend is not None:
-                legend.remove()
-
         # Clear the previous graph
         self.axis.clear()
+
+        # Clear the previous title
+        if self.axis.title is not None:
+            try:
+                self.axis.title.remove()
+            except Exception:
+                pass
 
         # Re-assign necessary data
         self.axis.set_xlabel(xlabel)
@@ -169,51 +161,17 @@ class RenderControlFigureRecord:
         for comment_line in self.comments:
             lt.info(comment_line)
 
-    def to_array(self, size: tuple[float, float] | float = None) -> np.ndarray:
+    def to_array(self):
         """
-        Renders this figure to a new numpy array at the given size. The
-        visualization figure (and thus the matplotlib window) will be
-        temporarily resized in order to accomodate this.
-
-        It is suggested to use a default default standard size of 8 inches so
-        that all sized elements of a style (markersize, linewidth,
-        markeredgewidth) are consistently sized in our rendered images.
-
-        Parameters
-        ----------
-        size : tuple[float, float] | float, optional
-            The height of the image to be returned, or the (x,y) dimensions of
-            the image to be returned, in inches. None to not adjust the figure
-            size. Default is None.
+        Convert the figure to a NumPy array.
 
         Returns
         -------
-        rendered_image: np.ndarray
-            The rendered result as a numpy array.
+        np.ndarray
+            A NumPy array representation of the figure.
         """
-        if size is not None:
-            # determine the scaling factor
-            dpi = self.figure.dpi
-            figsize = self.figure.get_size_inches()
-            if isinstance(size, tuple):
-                scale = (size[0] / figsize[0], size[1] / figsize[1])
-            else:
-                scaley = size / figsize[1]
-                scale = (scaley, scaley)
-
-            # scale up for rendering
-            self.figure.set_figwidth(figsize[0] * scale[0])
-            self.figure.set_figheight(figsize[1] * scale[1])
-
-        # render
-        ret = self.figure_to_array(self.figure)
-
-        if size is not None:
-            # scale down after rendering
-            self.figure.set_figwidth(figsize[0])
-            self.figure.set_figheight(figsize[1])
-
-        return ret
+        # ChatGPT 4o-mini assisted with generating this code
+        return self.figure_to_array(self.figure)
 
     @staticmethod
     def figure_to_array(figure: Figure):
