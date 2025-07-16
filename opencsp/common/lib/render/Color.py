@@ -290,77 +290,77 @@ class Color:
 
 def black():
     """
-        returns rgb black color
+    returns rgb black color
     """
     return Color(0.0, 0.0, 0.0, 'black', 'k')
 
 
 def dark_grey():
     """
-        returns rgb dark grey color
+    returns rgb dark grey color
     """
     return Color(0.25, 0.25, 0.25, 'dark grey', 'dg')
 
 
 def grey():
     """
-        returns rgb grey color
+    returns rgb grey color
     """
     return Color(0.5, 0.5, 0.5, 'grey', 'gy')
 
 
 def light_grey():
     """
-        returns rgb light grey color
+    returns rgb light grey color
     """
     return Color(0.75, 0.75, 0.75, 'light grey', 'lg')
 
 
 def white():
     """
-        returns rgb white color
+    returns rgb white color
     """
     return Color(1.0, 1.0, 1.0, 'white', 'w')
 
 
 def red():
     """
-        returns rgb red color
+    returns rgb red color
     """
     return Color(1.0, 0.0, 0.0, 'red', 'r')
 
 
 def green():
     """
-        returns rgb green color
+    returns rgb green color
     """
     return Color(0.0, 1.0, 0.0, 'green', 'g')
 
 
 def blue():
     """
-        returns rgb blue color
+    returns rgb blue color
     """
     return Color(0.0, 0.0, 1.0, 'blue', 'b')
 
 
 def cyan():
     """
-        returns rgb cyan color
+    returns rgb cyan color
     """
     return Color(0.0, 1.0, 1.0, 'cyan', 'c')
 
 
 def magenta():
     """
-        returns rgb magneta color
+    returns rgb magneta color
     """
     return Color(1.0, 0.0, 1.0, 'magenta', 'm')
 
 
 def yellow():
     """
-        returns rgb yellow color
+    returns rgb yellow color
     """
     return Color(1.0, 1.0, 0.0, 'yellow', 'y')
 
