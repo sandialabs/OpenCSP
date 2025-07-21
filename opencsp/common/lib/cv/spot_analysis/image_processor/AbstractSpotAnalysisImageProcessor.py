@@ -113,6 +113,12 @@ class AbstractSpotAnalysisImageProcessor:
                     except FileExistsError:
                         # probably just created this directory in another thread
                         pass
+                    except OSError:
+                        lt.error(
+                            f"Failed to create directory {self._my_tmp_dir}, "
+                            + "perhaps the opencsp settings are incorrect?"
+                        )
+                        raise
                 else:
                     i += 1
         return self._my_tmp_dir

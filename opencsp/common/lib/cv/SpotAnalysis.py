@@ -1,3 +1,7 @@
+import copy
+from dataclasses import dataclass
+import dataclasses
+import json
 import os
 from typing import Iterator
 
@@ -395,6 +399,9 @@ class SpotAnalysis(Iterator[SpotAnalysisOperable]):
 
         # Save the resulting processed image
         if save_dir != None:
+            # Create the save directory, as necessary
+            ft.create_directories_if_necessary(save_dir)
+
             # Get the original file name
             orig_image_name = ""
             orig_image_path, orig_image_name_ext = operable.get_primary_path_nameext()
@@ -413,7 +420,7 @@ class SpotAnalysis(Iterator[SpotAnalysisOperable]):
 
             # Try to save the image
             if not self._save_image(image_path_name_ext, operable.primary_image, "primary image"):
-                return
+                return None
 
             # Save supporting images
             if also_save_supporting_images:
@@ -452,6 +459,12 @@ class SpotAnalysis(Iterator[SpotAnalysisOperable]):
         ret = self.process_next()
         if ret == None:
             raise StopIteration
+        if self.save_dir is not None:
+            save_path_name_ext = self.save_image(ret)
+            if save_path_name_ext is not None:
+                image_processor_notes = copy.copy(ret.image_processor_notes)
+                image_processor_notes.append(("SpotAnalysis", [json.dumps({"save_path": save_path_name_ext})]))
+                ret = dataclasses.replace(ret, image_processor_notes=image_processor_notes)
         return ret
 
 
@@ -484,14 +497,8 @@ if __name__ == "__main__":
     # by "pulling" on the last image processor, which pulls on the previous
     # image processor, etc up the chain.
     for i, result in enumerate(sa):
-        # save out the images and associated attributes
-        save_path = sa.save_image(result)
-        if save_path is None:
-            lt.warn(f"Failed to save image. Maybe SpotAnalaysis.save_overwrite is False? ({sa.save_overwrite=})")
-        else:
-            lt.info(f"Saved image to {save_path}")
-
-        # check that the attributes were saved
+        # Images and their associated attributes should be saved automatically.
+        # Check that the attributes were saved.
         parser = SpotAnalysisOperableAttributeParser(result, sa)
         if i == 0:
             print(f"{parser.image_processors=}")
