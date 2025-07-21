@@ -1,7 +1,10 @@
-from contrib.common.lib.cv.spot_analysis.image_processor.CustomSimpleImageProcessor import CustomSimpleImageProcessor
 from contrib.common.lib.cv.spot_analysis.image_processor.BackgroundColorSubtractionImageProcessor import (
     BackgroundColorSubtractionImageProcessor,
 )
+from contrib.common.lib.cv.spot_analysis.image_processor.ColorConversionImageProcessor import (
+    ColorConversionImageProcessor,
+)
+from contrib.common.lib.cv.spot_analysis.image_processor.CustomSimpleImageProcessor import CustomSimpleImageProcessor
 from contrib.common.lib.cv.spot_analysis.image_processor.EnclosedEnergyImageProcessor import (
     EnclosedEnergyImageProcessor,
 )
@@ -22,6 +25,7 @@ from contrib.common.lib.cv.spot_analysis.image_processor.ViewHighlightImageProce
 # Make these classes available when importing cv.spot_analysis.image_processor.*
 __all__ = [
     "BackgroundColorSubtractionImageProcessor",
+    "ColorConversionImageProcessor",
     "CustomSimpleImageProcessor",
     "EnclosedEnergyImageProcessor",
     "InpaintImageProcessor",
