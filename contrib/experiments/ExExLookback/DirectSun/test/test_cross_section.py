@@ -24,7 +24,8 @@ class test_cross_section(unittest.TestCase):
         self.tmp_dir = ft.join(self.out_dir, self.test_name)
 
         # remove the results from the previous execution
-        shutil.rmtree(self.tmp_dir)
+        if os.path.exists(self.tmp_dir):
+            shutil.rmtree(self.tmp_dir)
         ft.create_directories_if_necessary(self.tmp_dir)
 
     def _notebook_runs_without_errors(self, notebook_path):
@@ -36,6 +37,10 @@ class test_cross_section(unittest.TestCase):
 
         # Ensure the notebook exists
         self.assertTrue(os.path.exists(notebook_path), f"Notebook not found at: {notebook_path}")
+
+        # Let the notebook know that we're in a unittest
+        os.environ["unittest_data_dir"] = self.in_dir
+        os.environ["unittest_out_dir"] = self.tmp_dir
 
         # Use nbconvert to execute the notebook
         python = sys.executable
