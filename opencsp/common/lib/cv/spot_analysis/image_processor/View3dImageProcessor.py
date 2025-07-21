@@ -119,7 +119,7 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
         # draw
         self.view.show(block=False)
 
-        return self.fig_record
+        return [self.fig_record]
 
     def close_figures(self):
         with et.ignored(Exception):

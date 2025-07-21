@@ -401,6 +401,24 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         base_image = self._get_image_for_visualizing(operable)
         visualizations = self.visualize_operable(operable, is_last, base_image)
 
+        # verify the returned type
+        if not isinstance(visualizations, list):
+            raise TypeError(
+                f"Error in {self.name}.visualize_operable(): "
+                + "should have returned a list of visualizations but instead returned a "
+                + str(type(visualizations))
+            )
+        for i, visualization in enumerate(visualizations):
+            if not (
+                isinstance(visualization, CacheableImage) or isinstance(visualization, rcfr.RenderControlFigureRecord)
+            ):
+                raise TypeError(
+                    f"Error in {self.name}.visualize_operable(): "
+                    + "should have returned a list of CacheableImage and RenderControlFigureRecord, but "
+                    + f"visualization {i} is a "
+                    + str(type(visualizations))
+                )
+
         # build the list of visualization images
         all_vis_images: list[CacheableImage] = []
         for cacheable_or_figure_rec in visualizations:
