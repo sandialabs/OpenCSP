@@ -187,7 +187,10 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
                 hue = angle / (2 * np.pi)
                 rgb = color.Color.from_hsv(hue, 1, 1, "Coordinate Color", "Coordinate Color").rgb_255()
                 algorithm_image = cv.line(
-                    algorithm_image, (int(coordinate1.x[0]), int(coordinate1.y[0])), (int(coordinate2.x[0]), int(coordinate2.y[0])), rgb
+                    algorithm_image,
+                    (int(coordinate1.x[0]), int(coordinate1.y[0])),
+                    (int(coordinate2.x[0]), int(coordinate2.y[0])),
+                    rgb,
                 )
 
         long_axis_idx = np.argmax([width for ang, width, cc in angle_data.values()])
@@ -197,7 +200,9 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
         # find the orthogonal width
         orthogonal_rotation = long_axis_rotation + np.pi / 2
         coordinate1 = self._find_closest_coordinate_to_angle(orthogonal_rotation, angles, half_max_pixel_locations)
-        coordinate2 = self._find_closest_coordinate_to_angle(orthogonal_rotation + np.pi, angles, half_max_pixel_locations)
+        coordinate2 = self._find_closest_coordinate_to_angle(
+            orthogonal_rotation + np.pi, angles, half_max_pixel_locations
+        )
         orthogonal_axis_width = coordinate1.distance(coordinate2)[0]
 
         # Finish the algorithm image.
@@ -222,9 +227,14 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
                 (self.name, json.dumps({"spot_width": spot_width, "spot_width_technique": self.spot_width_technique}))
             )
         elif self.spot_width_technique == "fwhm":
-            centroid, long_axis_spot_width, long_axis_rotation, long_axis_center, orthogonal_axis_width, algorithm_image = (
-                self.fwhm(operable.best_primary_pathnameext, image)
-            )
+            (
+                centroid,
+                long_axis_spot_width,
+                long_axis_rotation,
+                long_axis_center,
+                orthogonal_axis_width,
+                algorithm_image,
+            ) = self.fwhm(operable.best_primary_pathnameext, image)
             annotations.append(
                 SpotWidthAnnotation(
                     self.spot_width_technique,
@@ -239,15 +249,17 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
             notes.append(
                 (
                     self.name,
-                    [json.dumps(
-                        {
-                            "long_axis_center": long_axis_center.astuple(),
-                            "long_axis_rotation": long_axis_rotation,
-                            "orthogonal_axis_width": orthogonal_axis_width,
-                            "spot_width": long_axis_spot_width,
-                            "spot_width_technique": self.spot_width_technique,
-                        }
-                    )],
+                    [
+                        json.dumps(
+                            {
+                                "long_axis_center": long_axis_center.astuple(),
+                                "long_axis_rotation": long_axis_rotation,
+                                "orthogonal_axis_width": orthogonal_axis_width,
+                                "spot_width": long_axis_spot_width,
+                                "spot_width_technique": self.spot_width_technique,
+                            }
+                        )
+                    ],
                 )
             )
             algorithm_image = CacheableImage.from_single_source(algorithm_image)
