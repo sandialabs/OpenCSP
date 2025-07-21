@@ -260,6 +260,24 @@ If rawpy is not available, you can install it from source as follows:
     $ (venv) cd OpenCSP
     $ (venv) pip install -r requirements.txt
 
+Setup System Paths
+++++++++++++++++++
+
+.. note::
+    It is highly suggested that you do not skip this step.
+    These settings are used by OpenCSP for running tests and
+    various other pieces of functionality.
+
+Once you've installed the dependencies into the virtual environment and
+activated the venv, start OpenCSP with the 'OPENCSP_SETTINGS_COPY'
+environment variable set. This can be done on the command line with:
+
+::
+
+    $ (venv) export OPENCSP_SETTINGS_EDIT=1; python -c 'import opencsp'
+
+Follow the instructions printed to stdout to finish the setup.
+
 Running OpenCSP's test suite
 ++++++++++++++++++++++++++++
 
