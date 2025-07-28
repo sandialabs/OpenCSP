@@ -117,6 +117,13 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
         return cls(centered_location=centered_location, width=width, height=height)
 
     def crop_by_static_location(self, operable: SpotAnalysisOperable) -> tuple[CacheableImage, list]:
+        """
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            An instance of SpotAnalysisOperable containing the primary image to be cropped
+            and any associated image processor notes.
+        """
         image = operable.primary_image.nparray
 
         # check the size of the image
@@ -140,6 +147,13 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
         return new_primary, image_processor_notes
 
     def crop_around_location(self, operable: SpotAnalysisOperable) -> tuple[CacheableImage, list]:
+        """
+        Parameters
+        ----------
+        operable : SpotAnalysisOperable
+            An instance of SpotAnalysisOperable containing the primary image to be cropped
+            and any associated image processor notes.
+        """
         image = operable.primary_image.nparray
 
         # Get the image dimensions
