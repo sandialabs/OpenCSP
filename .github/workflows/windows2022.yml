@@ -45,6 +45,7 @@ jobs:
       - name: pytest-cov
         working-directory: OpenCSP/opencsp
         run: |
+          dir C:\\Users\\runneradmin\\AppData\\Local\\opencsp\\scratch\\tmp\\tmp3mqzug1q.png
           set PYTHONPATH="$PWD\.."
           echo "$PYTHONPATH"
           $env:PYTHONPATH="$PWD\.."
