@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import os, time
 import unittest
 
 import opencsp.common.lib.tool.file_tools as ft
@@ -83,9 +83,13 @@ class test_PowerpointImage(unittest.TestCase):
 
     def test_save(self):
         self.test_str_obj.save()
+        time.sleep(0.5)
         self.test_ndarray_obj.save()
+        time.sleep(0.5)
         self.test_Image_obj.save()
+        time.sleep(0.5)
         self.test_RenderControlFigureRecord_obj.save()
+        time.sleep(0.5)
 
 
 if __name__ == "__main__":
