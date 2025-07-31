@@ -15,6 +15,8 @@ import shutil
 import tempfile
 import time
 from typing import Optional
+import platform
+import subprocess
 
 # try to import as few other opencsp libraries as possible
 import opencsp.common.lib.file.CsvInterface as csvi
@@ -514,7 +516,15 @@ def delete_file(input_dir_body_ext, error_on_not_exists=True):
             + " resulted in error: "
             + e.strerror
         )
-        raise  # if this should NOT raise an exception then that should be documented, as well as the reason why it shouldn't ~BGB230119
+
+        if platform.system() == "Windows":
+            try:
+                subprocess.run(
+                    ['powershell', '-Command', f'Remove-Item -Path "{input_dir_body_ext}" -Force'], check=True
+                )
+            except subprocess.CalledProcessError as e2:
+                print("Failed to delete and force delete file")
+        # raise  # if this should NOT raise an exception then that should be documented, as well as the reason why it shouldn't ~BGB230119
 
 
 def delete_files_in_directory(input_dir: str, globexp: str, error_on_dir_not_exists=True):
@@ -723,7 +733,7 @@ def default_output_path(file_path_name_ext: Optional[str] = None) -> str:
     return _output_paths[file_path_name_ext]
 
 
-def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check_only=False, retries=20, delay=5):
+def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check_only=False, retries=20, delay=2):
     """Move a file from input to output.
 
     Verifies that input is a file, and that the output doesn't exist. We check
