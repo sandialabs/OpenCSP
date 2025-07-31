@@ -83,14 +83,9 @@ class test_PowerpointImage(unittest.TestCase):
 
     def test_save(self):
         self.test_str_obj.save()
-        time.sleep(0.5)
         self.test_ndarray_obj.save()
-        time.sleep(0.5)
         self.test_Image_obj.save()
-        time.sleep(0.5)
         self.test_RenderControlFigureRecord_obj.save()
-        time.sleep(0.5)
-
 
 if __name__ == "__main__":
     unittest.main()
