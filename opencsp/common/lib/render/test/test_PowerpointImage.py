@@ -87,5 +87,6 @@ class test_PowerpointImage(unittest.TestCase):
         self.test_Image_obj.save()
         self.test_RenderControlFigureRecord_obj.save()
 
+
 if __name__ == "__main__":
     unittest.main()
