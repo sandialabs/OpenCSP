@@ -723,7 +723,7 @@ def default_output_path(file_path_name_ext: Optional[str] = None) -> str:
     return _output_paths[file_path_name_ext]
 
 
-def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check_only=False, retries=20, delay=2):
+def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check_only=False, retries=20, delay=5):
     """Move a file from input to output.
 
     Verifies that input is a file, and that the output doesn't exist. We check
