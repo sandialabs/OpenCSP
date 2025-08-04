@@ -517,9 +517,9 @@ def delete_file(input_dir_body_ext, error_on_not_exists=True):
             + e.strerror
         )
 
-        #jhs added the below if statement on Jul 31, 2025. The Windows pipeline would fail and the reason was that 
-        #on Windows these files were locked by another process and the test would fail. I want to touch base with Ben
-        #soon and get his opinion on if this is a good solution or not.
+        # jhs added the below if statement on Jul 31, 2025. The Windows pipeline would fail and the reason was that
+        # on Windows these files were locked by another process and the test would fail. I want to touch base with Ben
+        # soon and get his opinion on if this is a good solution or not.
         if platform.system() == "Windows":
             try:
                 subprocess.run(
