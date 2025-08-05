@@ -26,6 +26,9 @@ def plot_image_figure(
     """
     Plots an image with optional annotations and saves it to disk.
 
+    This is meant to be a simplistic version of a plot. For a more standard OpenCSP plot,
+    please use something similar to the example in :py:func:`.figure_management.setup_figure`.
+
     This function creates a figure to display an image, optionally drawing annotations
     and saving the figure to a specified directory. The image can be displayed in either
     RGB or BGR format.

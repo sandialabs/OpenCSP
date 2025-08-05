@@ -51,7 +51,7 @@ class TestConvolutionImageProcessor(unittest.TestCase):
         # test the processor
         cacheable = CacheableImage.from_single_source(self.tfive_arr)
         operable = SpotAnalysisOperable(cacheable, primary_image_source_path="test_box")
-        result = processor.process_image(operable, False)[0]
+        result = processor.process_operable(operable, False)[0]
         np.testing.assert_array_equal(expected, result.primary_image.nparray)
 
     def test_box_large_diameter(self):
@@ -60,7 +60,7 @@ class TestConvolutionImageProcessor(unittest.TestCase):
         operable = SpotAnalysisOperable(cacheable, primary_image_source_path="test_box_large_diameter")
 
         with self.assertRaises(RuntimeError):
-            processor.process_image(operable)
+            processor.process_operable(operable)
 
     def test_gaussian(self):
         processor = ConvolutionImageProcessor(kernel="gaussian", diameter=3)
@@ -81,7 +81,7 @@ class TestConvolutionImageProcessor(unittest.TestCase):
         # test the processor
         cacheable = CacheableImage.from_single_source(self.tfive_arr)
         operable = SpotAnalysisOperable(cacheable, primary_image_source_path="test_gaussian")
-        result = processor.process_image(operable, False)[0]
+        result = processor.process_operable(operable, False)[0]
         np.testing.assert_array_equal(expected, result.primary_image.nparray)
 
     def test_gaussian_large_diameter(self):
@@ -90,7 +90,7 @@ class TestConvolutionImageProcessor(unittest.TestCase):
         operable = SpotAnalysisOperable(cacheable, primary_image_source_path="test_gaussian_large_diameter")
 
         with self.assertRaises(RuntimeError):
-            processor.process_image(operable)
+            processor.process_operable(operable)
 
 
 if __name__ == "__main__":

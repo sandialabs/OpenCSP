@@ -5,7 +5,7 @@ from typing import Callable
 import cv2 as cv
 import numpy as np
 
-from contrib.common.lib.cv.spot_analysis.PixelLocation import PixelOfInterest
+from contrib.common.lib.cv.spot_analysis.PixelOfInterest import PixelOfInterest
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.render.Color as color
@@ -45,9 +45,9 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         """
         Parameters
         ----------
-        center_locator: Callable[[SpotAnalysisOperable], tuple[int, int]] | tuple[int, int] | str | PixelLocation, optional
+        center_locator: Callable[[SpotAnalysisOperable], tuple[int, int]] | tuple[int, int] | str | PixelOfInterest, optional
             The pixel location in the image from which to start measureing the
-            enclosed energy. See :py:class:`PixelLocation` for more details.
+            enclosed energy. See :py:class:`PixelOfInterest` for more details.
         enclosed_shape: str, optional
             The shape to use for calculating enclosed energy. Options are
             "circle" or "square". Default is "cirle".

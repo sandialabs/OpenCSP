@@ -21,7 +21,7 @@ processing/machine vision situation.
    CroppingImageProcessor
    EchoImageProcessor
    ExposureDetectionImageProcessor
-   FalseColorImageProcessor
+   ViewFalseColorImageProcessor
    HotspotImageProcessor
    LogScaleImageProcessor
    NullImageSubtractionImageProcessor
@@ -90,7 +90,7 @@ processing/machine vision situation.
    :special-members: __init__
    :show-inheritance:
    
-.. automodule:: opencsp.common.lib.cv.spot_analysis.image_processor.FalseColorImageProcessor
+.. automodule:: opencsp.common.lib.cv.spot_analysis.image_processor.ViewFalseColorImageProcessor
    :members:
    :undoc-members:
    :special-members: __init__

@@ -148,22 +148,22 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
         coord_pairs_seen: list[tuple[p2.Pxy, p2.Pxy]] = []
         has_warned, has_infoed = False, False
         for i in range(len(half_max_pixel_locations)):
-            coord1 = half_max_pixel_locations[i]
-            coord2 = self._find_closest_coordinate_to_angle(
-                coord1.angle_from(centroid)[0] + np.pi, angles, half_max_pixel_locations
+            coordinate1 = half_max_pixel_locations[i]
+            coordinate2 = self._find_closest_coordinate_to_angle(
+                coordinate1.angle_from(centroid)[0] + np.pi, angles, half_max_pixel_locations
             )
-            if ((coord1, coord2) in coord_pairs_seen) or ((coord2, coord1) in coord_pairs_seen):
+            if ((coordinate1, coordinate2) in coord_pairs_seen) or ((coordinate2, coordinate1) in coord_pairs_seen):
                 continue
-            coord_pairs_seen.append((coord1, coord2))
+            coord_pairs_seen.append((coordinate1, coordinate2))
 
-            angle_diff = np.abs(coord1.angle_from(centroid)[0] - coord2.angle_from(centroid)[0])
+            angle_diff = np.abs(coordinate1.angle_from(centroid)[0] - coordinate2.angle_from(centroid)[0])
             info_diff_epsilon = np.pi / 4
             warn_diff_epsilon = np.pi / 3
             err_diff_epsilon = np.pi / 2
             err_msg = (
                 f"SpotWidthImageProcessor.fwhm() for image {image_name}: "
                 + f"expected all coordinates to have an opposite coordinate at ~180 degrees ({np.pi} radians), "
-                + f"but {angle_diff=} for coordinates {coord1.astuple()}, {coord2.astuple}"
+                + f"but {angle_diff=} for coordinates {coordinate1.astuple()}, {coordinate2.astuple}"
             )
             if np.abs(angle_diff - np.pi) > err_diff_epsilon:
                 lt.error("Error in " + err_msg)
@@ -176,9 +176,9 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
                     lt.info("In " + err_msg)
                     has_infoed = True
 
-            width = coord1.distance(coord2)[0]
-            angle = coord1.angle_from(centroid)[0]
-            coord_center = ((coord1 - coord2) / 2) + coord2
+            width = coordinate1.distance(coordinate2)[0]
+            angle = coordinate1.angle_from(centroid)[0]
+            coord_center = ((coordinate1 - coordinate2) / 2) + coordinate2
             angle_data[angle] = (angle, width, coord_center)
 
             # Continue the algorithm image.
@@ -187,7 +187,10 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
                 hue = angle / (2 * np.pi)
                 rgb = color.Color.from_hsv(hue, 1, 1, "Coordinate Color", "Coordinate Color").rgb_255()
                 algorithm_image = cv.line(
-                    algorithm_image, (int(coord1.x[0]), int(coord1.y[0])), (int(coord2.x[0]), int(coord2.y[0])), rgb
+                    algorithm_image,
+                    (int(coordinate1.x[0]), int(coordinate1.y[0])),
+                    (int(coordinate2.x[0]), int(coordinate2.y[0])),
+                    rgb,
                 )
 
         long_axis_idx = np.argmax([width for ang, width, cc in angle_data.values()])
@@ -196,9 +199,11 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # find the orthogonal width
         orthogonal_rotation = long_axis_rotation + np.pi / 2
-        coord1 = self._find_closest_coordinate_to_angle(orthogonal_rotation, angles, half_max_pixel_locations)
-        coord2 = self._find_closest_coordinate_to_angle(orthogonal_rotation + np.pi, angles, half_max_pixel_locations)
-        orthogonal_axis_width = coord1.distance(coord2)[0]
+        coordinate1 = self._find_closest_coordinate_to_angle(orthogonal_rotation, angles, half_max_pixel_locations)
+        coordinate2 = self._find_closest_coordinate_to_angle(
+            orthogonal_rotation + np.pi, angles, half_max_pixel_locations
+        )
+        orthogonal_axis_width = coordinate1.distance(coordinate2)[0]
 
         # Finish the algorithm image.
         # Highlight half-max pixels with a color for their angle.
@@ -222,14 +227,19 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
                 (self.name, json.dumps({"spot_width": spot_width, "spot_width_technique": self.spot_width_technique}))
             )
         elif self.spot_width_technique == "fwhm":
-            centroid, spot_width, long_axis_rotation, long_axis_center, orthogonal_axis_width, algorithm_image = (
-                self.fwhm(operable.best_primary_pathnameext, image)
-            )
+            (
+                centroid,
+                long_axis_spot_width,
+                long_axis_rotation,
+                long_axis_center,
+                orthogonal_axis_width,
+                algorithm_image,
+            ) = self.fwhm(operable.best_primary_pathnameext, image)
             annotations.append(
                 SpotWidthAnnotation(
                     self.spot_width_technique,
                     centroid,
-                    spot_width,
+                    long_axis_spot_width,
                     long_axis_rotation,
                     long_axis_center,
                     orthogonal_axis_width,
@@ -239,15 +249,17 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
             notes.append(
                 (
                     self.name,
-                    json.dumps(
-                        {
-                            "long_axis_center": long_axis_center.astuple(),
-                            "long_axis_rotation": long_axis_rotation,
-                            "orthogonal_axis_width": orthogonal_axis_width,
-                            "spot_width": spot_width,
-                            "spot_width_technique": self.spot_width_technique,
-                        }
-                    ),
+                    [
+                        json.dumps(
+                            {
+                                "long_axis_center": long_axis_center.astuple(),
+                                "long_axis_rotation": long_axis_rotation,
+                                "orthogonal_axis_width": orthogonal_axis_width,
+                                "spot_width": long_axis_spot_width,
+                                "spot_width_technique": self.spot_width_technique,
+                            }
+                        )
+                    ],
                 )
             )
             algorithm_image = CacheableImage.from_single_source(algorithm_image)

@@ -168,10 +168,52 @@ class ParallelPartitioner:
         return data[rstart:rend]
 
     def server_identifier(self):
+        """
+        Generate a zero-padded string identifier for the server index.
+
+        The length of the identifier is determined by the number of servers.
+        For example, if there are 10 servers, the identifier will be a 2-digit string.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        str
+            A zero-padded string identifier for the server index.
+
+        Examples
+        --------
+        >>> partitioner = ParallelPartitioner(nservers=10, server_idx=5)
+        >>> partitioner.server_identifier()
+        '05'
+        """
         server_idx_len = len(str(self.nservers))
         return f"%0{server_idx_len}d" % self.server_idx
 
     def cpu_identifier(self):
+        """
+        Generate a zero-padded string identifier for the CPU index.
+
+        The length of the identifier is determined by the number of CPUs.
+        For example, if there are 10 CPUs, the identifier will be a 2-digit string.
+
+        Parameters
+        ----------
+        None
+
+        Returns
+        -------
+        str
+            A zero-padded string identifier for the CPU index.
+
+        Examples
+        --------
+        >>> partitioner = ParallelPartitioner(ncpus=10, cpu_idx=5)
+        >>> partitioner.cpu_identifier()
+        '05'
+        """
         cpu_idx_len = len(str(self.ncpus))
         return f"%0{cpu_idx_len}d" % self.cpu_idx
 

@@ -1,3 +1,7 @@
+import copy
+from dataclasses import dataclass
+import dataclasses
+import json
 import os
 from typing import Iterator
 
@@ -16,15 +20,15 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream import SpotAna
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperablesStream import _SpotAnalysisOperablesStream
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperableAttributeParser import SpotAnalysisOperableAttributeParser
+from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPipeline import SpotAnalysisPipeline
 from opencsp.common.lib.cv.spot_analysis.VisualizationCoordinator import VisualizationCoordinator
 import opencsp.common.lib.render.VideoHandler as vh
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
-import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
-class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
+class SpotAnalysis(Iterator[SpotAnalysisOperable]):
     """Spot Analysis class for characterizing beams of light.
 
     This is meant to be a general beam characterization tool that receives as
@@ -32,8 +36,11 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
     numerical statistics as output. In general, there is an image processing
     step, an image analysis step, and a visualization step. Any number of
     processors and analyzers can be chained together to form a pipeline for
-    evaluation. Once defined, a SpotAnalysis instance can be used to evaluate
-    one image/video per evaluation.
+    evaluation.
+
+    Once defined, a SpotAnalysis instance can evaluate any number of input
+    images with either the :py:meth:`set_primary_images` or
+    :py:meth:`set_input_operables` methods.
 
     A list of possible use cases for this class include:
         a. BCS
@@ -95,7 +102,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         38. Filters (gaussian, box, etc) (:py:class:`.ConvoluationImageProcessor`)
         39. Peak value pixel identification (:py:class:`.HotspotImageProcessor`)
         40. Logorithmic scaling (:py:class:`.LogScaleImageProcessor`)
-        41. False color visualization (:py:class:`.FalseColorImageProcessor`)
+        41. False color visualization (:py:class:`.ViewFalseColorImageProcessor`)
         42. Over/under exposure visualization (NOT IMPLEMENTED YET)
         43. Image fill/inpainting (:py:class:`.InpaintImageProcessor`)
 
@@ -127,7 +134,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             'Noiz': ConvolutionImageProcessor(kernel="box", diameter=3),
             'Ve3d': View3dImageProcessor(crop_to_threshold=20, max_resolution=(100, 100)),
             'Stat': PopulationStatisticsImageProcessor(min_pop_size=1, initial_min=0, initial_max=255),
-            'Fclr': FalseColorImageProcessor(),
+            'Fclr': ViewFalseColorImageProcessor(),
         }
         pptx_processor = PowerpointImageProcessor(
             save_dir=outdir,
@@ -176,15 +183,12 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         cases listed above. """
         self.image_processors: list[AbstractSpotAnalysisImageProcessor] = []
         """ List of processors, one per step of the analysis. The output from
-        each processor can include one or more images (or numeric values), and
-        is made available to all subsequent processors. """
-        self._results_iter: Iterator[SpotAnalysisOperable] = None
-        """ The returned value from iter(self.image_processors[-1]). Initialized
-        on the first call to process_next(). """
-        self._prev_result: SpotAnalysisOperable = None
-        """ The previously returned result. """
+        each processor can include one or more operables, and is made available
+        to all subsequent processors. """
         self.input_stream: _SpotAnalysisOperablesStream = None
         """ The images to be processed. """
+        self._processing_pipeline: SpotAnalysisPipeline = None
+        """ The current iterator and evaluation pipeline. """
         self.save_dir: str = save_dir
         """ If not None, then primary images will be saved to the given
         directory as a PNG after having been fully processed. """
@@ -206,26 +210,23 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         all values here will be made available for processing as the default
         values. """
         self.visualization_coordinator = VisualizationCoordinator()
-        """ Shows the same image from all visualization processors at the same time. """
+        """ Manages interactive viewing of all visualization image processors. """
 
         self.set_image_processors(image_processors)
 
     def set_image_processors(self, image_processors: list[AbstractSpotAnalysisImageProcessor]):
+        """
+        Update the image processors for this instance.
+        This is typically done by passing in the image processors to the class constructor.
+        """
         self.image_processors = image_processors
-
-        # chain the image processors together
-        for i, image_processor in enumerate(self.image_processors):
-            if i == 0:
-                continue
-            image_processor.assign_inputs(self.image_processors[i - 1])
 
         # register the visualization processors
         self.visualization_coordinator.clear()
         self.visualization_coordinator.register_visualization_processors(image_processors)
 
-        # assign the input stream to the first image processor
-        if self.input_stream != None:
-            self._assign_inputs(self.input_stream)
+        # register the image processors for in-flight results
+        self._operables_in_flight = {processor: [] for processor in image_processors}
 
     @staticmethod
     def _images2stream(
@@ -237,11 +238,16 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             return ImagesIterable(images)
 
     def _assign_inputs(self, input_operables: Iterator[SpotAnalysisOperable]):
+        # sanitize arguments
         if not isinstance(input_operables, _SpotAnalysisOperablesStream):
             input_operables = _SpotAnalysisOperablesStream(input_operables)
+
+        # assign inputs
         self.input_stream = input_operables
+
+        # reset temporary values
         self._prev_result = None
-        self.image_processors[0].assign_inputs(self.input_stream)
+        self.set_image_processors(self.image_processors)
 
     def set_primary_images(self, images: list[str] | list[np.ndarray] | vh.VideoHandler | ImagesStream):
         """Assigns the images of the spot to be analyzed, in preparation for process_next().
@@ -254,10 +260,14 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             handler instance set with a video to be broken into frames, or an
             images stream.
 
-        See also: set_input_operables()"""
+        Notes
+        -----
+        Only one of set_primary_images or :py:meth:`set_input_operables` should
+        be used to assign input images.
+        """
         primary_images = self._images2stream(images)
         images_stream = SpotAnalysisImagesStream(primary_images, {})
-        self._assign_inputs(_SpotAnalysisOperablesStream(images_stream))
+        self._assign_inputs(images_stream)
 
     def set_input_operables(
         self,
@@ -265,7 +275,11 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
     ):
         """Assigns primary and supporting images, and other necessary data, in preparation for process_next().
 
-        See also: set_primary_images()"""
+        Notes
+        -----
+        Only one of set_primary_images or :py:meth:`set_input_operables` should
+        be used to assign input images.
+        """
         self._assign_inputs(input_operables)
 
     def set_default_support_images(self, support_images: dict[ImageType, CacheableImage]):
@@ -273,12 +287,28 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         default for when the support images are not otherwise from the input
         operables. Note that this does not include the primary images or other
         data."""
+        # check for state consistency
+        if self.input_stream is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SpotAnalysis.set_default_support_images(): "
+                + "must call set_input_operables() or set_primary_images() first.",
+            )
+
         self.input_stream.set_defaults(support_images, self.input_stream.default_data)
 
     def set_default_data(self, operable: SpotAnalysisOperable):
         """Provides extra data for use during image processing, as a default
         for when the data is not otherwise from the input operables. Note that
         this does not include the primary or supporting images."""
+        # check for state consistency
+        if self.input_stream is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SpotAnalysis.set_default_data(): "
+                + "must call set_input_operables() or set_primary_images() first.",
+            )
+
         self.input_stream.set_defaults(self.input_stream.default_support_images, operable)
 
     def process_next(self):
@@ -291,23 +321,22 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
             The processed primary image and other associated data. None if done
             processing.
         """
-        if self._results_iter is None:
-            self._results_iter = iter(self.image_processors[-1])
+        last_processor = self.image_processors[-1]
 
-        # Release memory from the previous result
-        if self._prev_result is not None:
-            self.image_processors[-1].cache_images_to_disk_as_necessary()
-            self._prev_result = None
+        # sanity check
+        if self.input_stream is None:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in SpotAnalysis.process_next(): "
+                + "must assign inputs via set_primary_images() or set_input_operables() first.",
+            )
 
-        # Attempt to get the next image. Raises StopIteration if there are no
-        # more results available.
-        try:
-            result = next(self._results_iter)
-        except StopIteration:
-            return None
+        # Create the processing pipeline, as necessary
+        if self._processing_pipeline is None:
+            self._initialize_processing_pipeline()
 
-        self._prev_result = result
-        return result
+        # Get the next result
+        return self._processing_pipeline.process_next()
 
     def _save_image(self, save_path_name_ext: str, image: CacheableImage, description: str):
         # check for overwrite
@@ -327,7 +356,7 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
         if save_ext in ["np", "npy"]:
             np.save(save_path_name_ext, image.nparray, allow_pickle=False)
         else:
-            it.numpy_to_image(image.nparray).save(save_path_name_ext)
+            image.to_image().save(save_path_name_ext)
 
         return True
 
@@ -370,24 +399,28 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         # Save the resulting processed image
         if save_dir != None:
+            # Create the save directory, as necessary
+            ft.create_directories_if_necessary(save_dir)
+
             # Get the original file name
-            orig_image_path_name = ""
-            if operable.primary_image.source_path != None:
-                _, orig_image_path_name, _ = ft.path_components(operable.primary_image.source_path)
-                orig_image_path_name += "_"
+            orig_image_name = ""
+            orig_image_path, orig_image_name_ext = operable.get_primary_path_nameext()
+            if orig_image_name_ext != None:
+                _, orig_image_name, orig_image_ext = ft.path_components(orig_image_name_ext)
+                orig_image_name += "_"
 
             # Get the output name of the file to save to
             sa_name_appendix = ft.convert_string_to_file_body(self.name)
-            image_name = f"{orig_image_path_name}{sa_name_appendix}"
+            image_name = f"{orig_image_name}{sa_name_appendix}"
             if image_name in self.saved_names:
-                image_name = f"{orig_image_path_name}{sa_name_appendix}_{self.save_idx}"
+                image_name = f"{orig_image_name}{sa_name_appendix}_{self.save_idx}"
                 self.save_idx += 1
             self.saved_names.add(image_name)
             image_path_name_ext = os.path.join(save_dir, f"{image_name}.{save_ext}")
 
             # Try to save the image
             if not self._save_image(image_path_name_ext, operable.primary_image, "primary image"):
-                return
+                return None
 
             # Save supporting images
             if also_save_supporting_images:
@@ -415,15 +448,23 @@ class SpotAnalysis(Iterator[tuple[SpotAnalysisOperable]]):
 
         return image_path_name_ext
 
+    def _initialize_processing_pipeline(self):
+        self._processing_pipeline = SpotAnalysisPipeline(self.image_processors, iter(self.input_stream))
+
     def __iter__(self):
-        self.save_idx = 0
-        self._prev_result = None
+        self._initialize_processing_pipeline()
         return self
 
-    def __next__(self):
+    def __next__(self) -> SpotAnalysisOperable:
         ret = self.process_next()
         if ret == None:
             raise StopIteration
+        if self.save_dir is not None:
+            save_path_name_ext = self.save_image(ret)
+            if save_path_name_ext is not None:
+                image_processor_notes = copy.copy(ret.image_processor_notes)
+                image_processor_notes.append(("SpotAnalysis", [json.dumps({"save_path": save_path_name_ext})]))
+                ret = dataclasses.replace(ret, image_processor_notes=image_processor_notes)
         return ret
 
 
@@ -445,7 +486,7 @@ if __name__ == "__main__":
         PopulationStatisticsImageProcessor(min_pop_size=-1),
         EchoImageProcessor(),
         LogScaleImageProcessor(),
-        FalseColorImageProcessor(),
+        ViewFalseColorImageProcessor(),
     ]
     sa = SpotAnalysis("BCS Test", image_processors, save_dir=outdir, save_overwrite=True)
     image_name_exts = ft.files_in_directory(indir)
@@ -456,14 +497,8 @@ if __name__ == "__main__":
     # by "pulling" on the last image processor, which pulls on the previous
     # image processor, etc up the chain.
     for i, result in enumerate(sa):
-        # save out the images and associated attributes
-        save_path = sa.save_image(result)
-        if save_path is None:
-            lt.warn(f"Failed to save image. Maybe SpotAnalaysis.save_overwrite is False? ({sa.save_overwrite=})")
-        else:
-            lt.info(f"Saved image to {save_path}")
-
-        # check that the attributes were saved
+        # Images and their associated attributes should be saved automatically.
+        # Check that the attributes were saved.
         parser = SpotAnalysisOperableAttributeParser(result, sa)
         if i == 0:
             print(f"{parser.image_processors=}")

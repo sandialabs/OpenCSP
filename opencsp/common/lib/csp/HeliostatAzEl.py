@@ -234,6 +234,19 @@ class HeliostatAzEl(HeliostatAbstract):
         return composite_transform
 
     def set_orientation_from_az_el(self, az_angle: float, el_angle: float):
+        """
+        Uses the `movement_transform(self, *args)` function to
+        set the `_self_to_parent_transform` transformation of the FacetEnsemble in heliostat.
+
+        See also :py:meth:`transform_from_az_el`, :py:meth:`set_orientation`
+
+        Parameters
+        ----------
+        az_angle : float
+            The azimuth angle, in radians.
+        el_angle : float
+            The elevation angle, in radians.
+        """
         self._az = az_angle
         self._el = el_angle
         transform = self.transform_from_az_el(az_angle, el_angle)

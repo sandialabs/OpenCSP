@@ -1,4 +1,5 @@
 import os
+import shutil
 import sys
 import unittest
 import unittest.mock
@@ -18,11 +19,23 @@ class test_sensitive_strings(unittest.TestCase):
         self.out_dir = os.path.join(path, "data", "output", "sensitive_strings")
         ft.create_directories_if_necessary(self.out_dir)
 
+        allowed_binaries_dir_in = os.path.join(self.data_dir, "per_test_allowed_binaries")
+        self.allowed_binaries_dir_tmp = os.path.join(self.out_dir, "per_test_allowed_binaries")
+        ft.create_directories_if_necessary(self.allowed_binaries_dir_tmp)
+        for f in ft.files_in_directory_by_extension(allowed_binaries_dir_in, ["csv"])["csv"]:
+            ft.copy_file(os.path.join(allowed_binaries_dir_in, f), self.allowed_binaries_dir_tmp)
+
         self.root_search_dir = os.path.join(self.data_dir, "root_search_dir")
         self.ss_dir = os.path.join(self.data_dir, "per_test_sensitive_strings")
-        self.allowed_binaries_dir = os.path.join(self.data_dir, "per_test_allowed_binaries")
-        self.all_binaries = os.path.join(self.allowed_binaries_dir, "all_binaries.csv")
-        self.no_binaries = os.path.join(self.allowed_binaries_dir, "no_binaries.csv")
+        self.all_binaries = os.path.join(self.allowed_binaries_dir_tmp, "all_binaries.csv")
+        self.no_binaries = os.path.join(self.allowed_binaries_dir_tmp, "no_binaries.csv")
+        self.single_binary = os.path.join(self.allowed_binaries_dir_tmp, "single_binary.csv")
+        self.single_expected_not_found_binary = os.path.join(
+            self.allowed_binaries_dir_tmp, "single_expected_not_found_binary.csv"
+        )
+
+    def tearDown(self):
+        ft.delete_files_in_directory(self.allowed_binaries_dir_tmp, "*.csv")
 
     def test_no_matches(self):
         sensitive_strings_csv = os.path.join(self.ss_dir, "no_matches.csv")
@@ -61,15 +74,15 @@ class test_sensitive_strings(unittest.TestCase):
 
     def test_single_unknown_binary(self):
         sensitive_strings_csv = os.path.join(self.ss_dir, "no_matches.csv")
-        single_binary_csv = os.path.join(self.allowed_binaries_dir, "single_binary.csv")
-        searcher = ss.SensitiveStringsSearcher(self.root_search_dir, sensitive_strings_csv, single_binary_csv)
+        searcher = ss.SensitiveStringsSearcher(self.root_search_dir, sensitive_strings_csv, self.single_binary)
         searcher.git_files_only = False
         self.assertEqual(searcher.search_files(), 1)
 
     def test_single_expected_not_found_binary(self):
         sensitive_strings_csv = os.path.join(self.ss_dir, "no_matches.csv")
-        single_binary_csv = os.path.join(self.allowed_binaries_dir, "single_expected_not_found_binary.csv")
-        searcher = ss.SensitiveStringsSearcher(self.root_search_dir, sensitive_strings_csv, single_binary_csv)
+        searcher = ss.SensitiveStringsSearcher(
+            self.root_search_dir, sensitive_strings_csv, self.single_expected_not_found_binary
+        )
         searcher.git_files_only = False
         # 2 unknown binaries, and 1 expected not found
         self.assertEqual(searcher.search_files(), 3)

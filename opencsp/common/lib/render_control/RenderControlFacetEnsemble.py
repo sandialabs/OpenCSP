@@ -18,6 +18,10 @@ class RenderControlFacetEnsemble:
 
     """
 
+    # TODO Change default_style, normal_vector_style, normal_vector_base_style,
+    #     outline_style, corner_normal_style, corner_normal_base_style.
+    #     Change parameter defaults to None and update with the default style within method,
+    #     don't use mutable values as parameter defaults.
     def __init__(
         self,
         default_style: rcf.RenderControlFacet = rcf.RenderControlFacet(),
@@ -51,9 +55,9 @@ class RenderControlFacetEnsemble:
         special_styles : dict[str, RenderControlFacet], optional
             A dictionary mapping facet names to their specialized rendering styles. By default, None.
         draw_centroid : bool, optional
-            Whether to draw the centroid of the facets. By default, False.
+            Whether to draw the centroid of the facet ensemble. By default, False.
         draw_normal_vector : bool, optional
-            Whether to draw the normal vector for the facets. By default, False.
+            Whether to draw the normal vector for the facet ensemble. By default, False.
         normal_vector_length : float, optional
             Length of the normal vector. By default, 4.0.
         normal_vector_style : object, optional
@@ -61,9 +65,9 @@ class RenderControlFacetEnsemble:
         normal_vector_base_style : object, optional
             Style for the base of the normal vector. By default, `rcps.marker()`.
         draw_outline : bool, optional
-            Whether to draw the outline of the facets. By default, False.
+            Whether to draw the outline of the facet ensemble. By default, False.
         outline_style : object, optional
-            Style for the outline. By default, `rcps.outline()`.
+            Style for the facet ensemble outline. By default, `rcps.outline()`.
         draw_surface_normal_at_corners : bool, optional
             Whether to draw surface normals at corners. By default, False (unimplemented).
         corner_normal_length : float, optional

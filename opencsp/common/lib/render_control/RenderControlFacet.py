@@ -1,3 +1,7 @@
+import copy
+
+import numpy as np
+
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
@@ -20,6 +24,8 @@ class RenderControlFacet:
         centroid_style=rcps.marker(),
         draw_outline=True,
         outline_style=rcps.outline(),
+        # draw_fill=False, # Removed, use mirror style for rendering the surface
+        # fill_color=None, # Removed, use mirror style for rendering the surface
         draw_surface_normal=False,
         surface_normal_length=4,
         surface_normal_style=rcps.outline(),
@@ -86,7 +92,20 @@ class RenderControlFacet:
         self.draw_mirror_curvature = draw_mirror_curvature
         self.mirror_styles = mirror_styles
 
-    def style(self, imput_name: str):
+    def style(self, input_name: str):
+        """
+        Gets the style for the given name. Always returns self for the current implement.
+
+        Parameters
+        ----------
+        input_name : str
+            The name to get the style for. Ignored in the current implementation.
+
+        Returns
+        -------
+        style : RenderControlFacet
+            The style associated with the name.
+        """
         return self
 
 

@@ -7,6 +7,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 from opencsp.common.lib.geometry.Pxyz import Pxyz
+import opencsp.common.lib.render.lib.Drawable as dw
 import opencsp.common.lib.render_control.RenderControlTower as rct
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
@@ -14,7 +15,7 @@ from opencsp.common.lib.render_control.RenderControlTower import RenderControlTo
 from opencsp.common.lib.render.View3d import View3d
 
 
-class Tower(RayTraceable):
+class Tower(RayTraceable, dw.Drawable):
     """
     Tower representation.
 

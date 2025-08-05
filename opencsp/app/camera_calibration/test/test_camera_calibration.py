@@ -5,6 +5,7 @@ Change the boolean below to True and run to regenerate all test data
 
 from glob import glob
 import os
+import unittest
 
 import numpy as np
 import cv2
@@ -13,11 +14,15 @@ import opencsp.app.camera_calibration.lib.calibration_camera as cc
 import opencsp.app.camera_calibration.lib.image_processing as ip
 import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
+import opencsp.common.lib.tool.file_tools as ft
 
 
-class TestCameraCalibration:
+_regenerate = False
+
+
+class TestCameraCalibration(unittest.TestCase):
     @classmethod
-    def setup_class(cls, regenerate=False):
+    def setUpClass(cls) -> None:
         """Calculates camera calibration.
 
         Parameters
@@ -25,12 +30,17 @@ class TestCameraCalibration:
         regenerate : bool, optional
             If true, saves data in output location instead of running unit tests, by default False
         """
+        global _regenerate
+
         # Get test data location
-        base_dir = os.path.join(os.path.dirname(__file__), "data")
+        path, name, _ = ft.path_components(__file__)
+        cls.in_dir = ft.join(path, "data/input", name.split("test_")[-1])
+        cls.out_dir = ft.join(path, "data/output", name.split("test_")[-1])
+        ft.create_directories_if_necessary(cls.out_dir)
 
         # Pattern to search for captured images
-        image_pattern = os.path.join(base_dir, "images/*.png")
-        test_data_file = os.path.join(base_dir, "data_test.h5")
+        image_pattern = os.path.join(cls.in_dir, "images/*.png")
+        test_data_file = os.path.join(cls.in_dir, "data_test.h5")
 
         # Define number of checkerboard corners
         npts = (18, 23)
@@ -98,7 +108,10 @@ class TestCameraCalibration:
         cls.calibration_error = calibration_error
         cls.reprojection_errors = np.array(errors)
 
-        if regenerate:
+        # Save the current data for regression tests
+        if _regenerate:
+            print("Building data for performing tests")
+
             # Save test data in HDF file
             data = [
                 cls.p_image_points,
@@ -115,22 +128,24 @@ class TestCameraCalibration:
             save_hdf5_datasets(data, datasets, test_data_file)
             print("Test data was created and saved to:", test_data_file)
 
-        else:
-            print("Performing tests...")
+        # Compare new data against previously generated data for regression testing
+        print("Performing tests...")
 
-            # Load saved data
-            data = load_hdf5_datasets(datasets, test_data_file)
+        # Load saved data
+        data = load_hdf5_datasets(datasets, test_data_file)
 
-            # Save expected data in class
-            cls.p_image_points_exp = data["p_image_points"]
-            cls.Pxyz_object_points_exp = data["p_object_points"]
-            cls.intrinsic_matrix_exp = data["intrinsic_matrix"]
-            cls.distortion_coeffs_exp = data["distortion_coeffs"]
-            cls.image_shape_xy_exp = data["image_shape_xy"]
-            cls.R_cam_object_exp = data["r_cam_object"]
-            cls.V_cam_object_cam_exp = data["v_cam_object_cam"]
-            cls.calibration_error_exp = data["calibration_error"]
-            cls.reprojection_errors_exp = data["reprojection_errors"]
+        # Save expected data in class
+        cls.p_image_points_exp = data["p_image_points"]
+        cls.Pxyz_object_points_exp = data["p_object_points"]
+        cls.intrinsic_matrix_exp = data["intrinsic_matrix"]
+        cls.distortion_coeffs_exp = data["distortion_coeffs"]
+        cls.image_shape_xy_exp = data["image_shape_xy"]
+        cls.R_cam_object_exp = data["r_cam_object"]
+        cls.V_cam_object_cam_exp = data["v_cam_object_cam"]
+        cls.calibration_error_exp = data["calibration_error"]
+        cls.reprojection_errors_exp = data["reprojection_errors"]
+
+        return super().setUpClass()
 
     def test_image_points(self):
         np.testing.assert_allclose(self.p_image_points, self.p_image_points_exp)
@@ -161,6 +176,6 @@ class TestCameraCalibration:
 
 
 if __name__ == "__main__":
-    # Set below boolean to True to save and overwrite new test data
-    regen = False
-    TestCameraCalibration.setup_class(regenerate=regen)
+    # Set below boolean to True to save and overwrite the regression test data
+    _regenerate = False
+    unittest.main()

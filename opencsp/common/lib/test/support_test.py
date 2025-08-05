@@ -113,7 +113,9 @@ def compare_txt_files(expected_file: str, actual_file: str) -> bool:
     return True
 
 
-def verify_output_file_matches_expected(file_created: str, actual_output_dir: str, expected_output_dir: str) -> None:
+def verify_output_file_matches_expected(
+    file_created: str, actual_output_dir: str, expected_output_dir: str, code_tag: str = None
+) -> None:
     """
     Verifies that the actual output file matches what's expected.
     """
@@ -122,53 +124,48 @@ def verify_output_file_matches_expected(file_created: str, actual_output_dir: st
     created_body_ext = created_body + created_ext
     actual_dir_body_ext = os.path.join(actual_output_dir, created_body_ext)
     expected_dir_body_ext = os.path.join(expected_output_dir, created_body_ext)
+    code_tag = "" if code_tag is None else ", test case " + code_tag
+    base_msg = (
+        "In verify_output_file_matches_expected()"
+        + code_tag
+        + ", %s\n"
+        + "    actual_dir_body_ext = "
+        + str(actual_dir_body_ext)
+        + "\n"
+        + "    expected_dir_body_ext = "
+        + str(expected_dir_body_ext)
+    )
     # Verify both files exist.
     if not ft.file_exists(actual_dir_body_ext):
-        lt.error_and_raise(
-            FileNotFoundError,
-            "In verify_output_file_matches_expected(), actual file does not exist.\n"
-            "    actual_dir_body_ext = " + str(actual_dir_body_ext),
-        )
+        lt.error_and_raise(FileNotFoundError, base_msg % "actual file does not exist.")
     if not ft.file_exists(expected_dir_body_ext):
-        lt.error_and_raise(
-            FileNotFoundError,
-            "In verify_output_file_matches_expected(), expected file does not exist.\n"
-            "    expected_dir_body_ext = " + str(expected_dir_body_ext),
-        )
+        lt.error_and_raise(FileNotFoundError, base_msg % "expected file does not exist.")
     # Verify both files are equal.
     if created_ext == ".svg":
         svg_files_are_equal = compare_svg_files(actual_dir_body_ext, expected_dir_body_ext)
         if not svg_files_are_equal:
             lt.error_and_raise(
                 ValueError,
-                "In verify_output_file_matches_expected(), actual and expected .svg files are not equal, after ignoring allowable differences.\n"
-                "    actual_dir_body_ext   = " + str(actual_dir_body_ext) + "\n"
-                "    expected_dir_body_ext = " + str(expected_dir_body_ext),
+                base_msg % "actual and expected .svg files are not equal, after ignoring allowable differences.",
             )
     elif created_ext == ".png":
         png_files_are_equal = compare_actual_expected_images(actual_dir_body_ext, expected_dir_body_ext)
         if png_files_are_equal is not None:
-            lt.error_and_raise(ValueError, "In verify_output_file_matches_expected(), " + png_files_are_equal)
-
+            lt.error_and_raise(ValueError, base_msg % png_files_are_equal)
     else:
         files_are_equal = compare_txt_files(actual_dir_body_ext, expected_dir_body_ext)
         if not files_are_equal:
-            lt.error_and_raise(
-                ValueError,
-                "In verify_output_file_matches_expected(), actual and expected files are not exactly equal.\n"
-                "    actual_dir_body_ext   = " + str(actual_dir_body_ext) + "\n"
-                "    expected_dir_body_ext = " + str(expected_dir_body_ext),
-            )
+            lt.error_and_raise(ValueError, base_msg % "actual and expected files are not exactly equal.")
 
 
 def verify_output_files_match_expected(
-    files_created: list[str], actual_output_dir: str, expected_output_dir: str
+    files_created: list[str], actual_output_dir: str, expected_output_dir: str, code_tag: str = None
 ) -> None:
     """
     Verifies that all of the output files match what's expected.
     """
     for file_created in files_created:
-        verify_output_file_matches_expected(file_created, actual_output_dir, expected_output_dir)
+        verify_output_file_matches_expected(file_created, actual_output_dir, expected_output_dir, code_tag=code_tag)
 
 
 def show_save_and_check_figure(
@@ -178,6 +175,7 @@ def show_save_and_check_figure(
     verify: bool,
     show_figs: bool = True,
     dpi=600,
+    code_tag: str = None,
 ) -> None:
     """
     Once a figure is drawn, this routine does what's needed to wrap up the test.
@@ -194,7 +192,7 @@ def show_save_and_check_figure(
     files_created = fig_record.save(actual_output_dir, format="png", dpi=dpi)  # Filename inferred from figure title.
     # Check.
     if verify:
-        verify_output_files_match_expected(files_created, actual_output_dir, expected_output_dir)
+        verify_output_files_match_expected(files_created, actual_output_dir, expected_output_dir, code_tag=code_tag)
 
 
 def save_and_check_image(
@@ -205,6 +203,7 @@ def save_and_check_image(
     output_file_body: str,
     output_ext: str,
     verify: bool,
+    code_tag: str = None,
 ) -> None:
     """
     Once an image is generated, this routine does what's needed to wrap up the test.
@@ -216,11 +215,19 @@ def save_and_check_image(
     files_created = [file_created]
     # Check.
     if verify:
-        verify_output_files_match_expected(files_created, actual_output_dir, expected_output_dir)
+        verify_output_files_match_expected(files_created, actual_output_dir, expected_output_dir, code_tag=code_tag)
 
 
 def compare_actual_expected_images(actual_location: str, expected_location: str, tolerance=0.2):
-    return mplt.compare_images(expected_location, actual_location, tolerance)
+    try:
+        return mplt.compare_images(expected_location, actual_location, tolerance)
+    except Exception as ex:
+        lt.error(
+            "In support_test.compare_actual_expected_images(): "
+            + "matplotlib.compare_images encountered exception:\n\t"
+            + str(ex)
+        )
+        return repr(ex)
 
 
 def load_solar_field_partition(heliostat_names: list, partitioned_csv_file_name: str) -> sf.SolarField:

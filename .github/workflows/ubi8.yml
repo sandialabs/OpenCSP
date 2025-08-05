@@ -19,6 +19,7 @@ concurrency:
 jobs:
   ubi8-ci:
     name: ubi8-ci
+    if: github.event.repository.fork == false
     runs-on: [ubuntu-latest]
     permissions:
       packages: read

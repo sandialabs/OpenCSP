@@ -16,6 +16,7 @@ concurrency:
 
 jobs:
   ubi8-weekly:
+    if: github.event.repository.fork == false
     runs-on: [opencsp-latest-ubi8]
     permissions:
       packages: read

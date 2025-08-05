@@ -16,9 +16,16 @@ OpenCSP uses the pytest library.
 import configparser
 import os
 import copy
+import shutil
 import sys
 import argparse
 import platform
+
+
+_ENV_VAR_SETTINGS_DIRS = "OPENCSP_SETTINGS_DIRS"
+_ENV_VAR_EDIT_SETTINGS = "OPENCSP_SETTINGS_EDIT"
+_ENV_VAR_DEBUG_SETTINGS = "OPENCSP_SETTINGS_DEBUG"
+OPENCSP_SETTINGS_FILE_NAME_EXT = "opencsp_settings.ini"
 
 
 if platform.system() == 'Darwin':
@@ -29,11 +36,86 @@ if platform.system() == 'Darwin':
     matplotlib.use('TkAgg')
 
 
+def _opencsp_system_dir() -> str:
+    """Returns the default directory for the OpenCSP settings based on the operating system."""
+    if os.name == "nt":
+        return os.path.abspath(os.path.join(os.path.expandvars("%USERPROFILE%"), ".opencsp", "settings"))
+    else:
+        return os.path.abspath(os.path.join(os.path.expanduser("~"), ".config", "opencsp", "settings"))
+
+
+def _open_ini_file_in_default_editor(file_path) -> bool:
+    """
+    Opens the specified file in its default system editor.
+    """
+    # generated with ChatGPT
+    try:
+        if os.name == "nt":  # Windows
+            os.startfile(file_path)
+        elif platform.system() == 'Darwin':  # MacOS
+            os.system(f'open {file_path}')
+        else:  # Linux
+            # For INI files, use a text editor
+            os.system(f'xdg-open {file_path} || xterm -e nano {file_path}')
+        return True
+    except Exception:
+        return False
+
+
+def _edit_opencsp_settings(default_settings_file: str):
+    """Copies the default OpenCSP settings to the default system directory and
+    opens the settings in VS Code."""
+    system_dir = _opencsp_system_dir()
+
+    # Create the directory if it doesn't exist.
+    # Note that we can't use file_tools here because OpenCSP hasn't been initialized yet.
+    if not os.path.exists(system_dir):
+        print(f"Creating default system directory \"{system_dir}\".")
+        try:
+            os.makedirs(system_dir)
+        except Exception as ex:
+            print(repr(ex), file=sys.stderr)
+            print(
+                f"Failed to create default system directory \"{system_dir}\". "
+                + "Please create this directory and try again.",
+                file=sys.stderr,
+            )
+            return False
+
+    # Copy the file if it doesn't exist
+    system_settings_file = os.path.abspath(os.path.join(system_dir, OPENCSP_SETTINGS_FILE_NAME_EXT))
+    if not os.path.exists(system_settings_file):
+        print(f"Copying default settings from \"{default_settings_file}\" to" + f"\"{system_settings_file}\".")
+        try:
+            shutil.copyfile(default_settings_file, system_settings_file)
+        except Exception as ex:
+            print(repr(ex), file=sys.stderr)
+            print(
+                f"Failed to copy default settings file from "
+                + f"\"{default_settings_file}\" to \"{system_settings_file}\". "
+                + "Please copy this file and try again.",
+                file=sys.stderr,
+            )
+            return False
+
+    # Open the file for editing
+    print(f"Opening settings file \"{system_settings_file}\" in default editor.")
+    if not _open_ini_file_in_default_editor(system_settings_file):
+        print(
+            f"Failed to open file \"{system_settings_file}\" in the default editor. "
+            + "Please edit this file and try again.",
+            file=sys.stderr,
+        )
+        return False
+
+    return True
+
+
 def _opencsp_settings_dirs() -> list[str]:
     """Returns a list of possible locations for settings files,
     from lowest to highest importance (higher importance overrides lower importance).
 
-    This function looks for the environmental variable "OPENCSP_SETTINGS_DIRS"
+    This function looks for the environmental variable _ENV_VAR_SETTINGS_DIRS
     and, if "None", returns an empty list (for running unit tests). For any
     other value of the env var, directories should be delimited with semicolons
     and are appended to the end of the returned list.
@@ -41,20 +123,19 @@ def _opencsp_settings_dirs() -> list[str]:
     ret: list[str] = []
 
     # home directories
+    ret.append(_opencsp_system_dir())
     if os.name == "nt":
-        ret.append(os.path.join(os.path.expandvars("%USERPROFILE%"), ".opencsp", "settings"))
+        pass
         # TODO add more directories?
         # ret.append(os.path.join(os.path.expandvars("%LOCALAPPDATA%"), "opencsp", "settings"))
         # ret.append(os.path.join(os.path.expandvars("%APPDATA%"), "opencsp", "settings"))
-    else:
-        ret.append(os.path.join(os.path.expanduser("~"), ".config", "opencsp", "settings"))
 
     # environmental directories
-    if "OPENCSP_SETTINGS_DIRS" in os.environ:
-        if os.environ["OPENCSP_SETTINGS_DIRS"] == "None":
+    if _ENV_VAR_SETTINGS_DIRS in os.environ:
+        if os.environ[_ENV_VAR_SETTINGS_DIRS] == "None":
             return []
         else:
-            additional_dirs = os.environ["OPENCSP_SETTINGS_DIRS"].split(";")
+            additional_dirs = os.environ[_ENV_VAR_SETTINGS_DIRS].split(";")
             for i, dir in enumerate(additional_dirs):
                 additional_dirs[i] = dir.replace("~", os.path.expanduser("~"))
             ret += additional_dirs
@@ -117,21 +198,41 @@ _settings_files: list[str] = []
 
 # default settings file
 _default_dir = os.path.dirname(__file__)
-_settings_files.append(os.path.join(_default_dir, "default_settings.ini"))
+_default_settings_file = os.path.join(_default_dir, "default_settings.ini")
+_settings_files.append(_default_settings_file)
+
+# create an initial copy of the settings file
+if os.environ.get(_ENV_VAR_EDIT_SETTINGS, "0").lower() in ["1", "true"]:
+    print(
+        "Opening the opencsp settings file. "
+        + f"Unset the environment variable \"{_ENV_VAR_EDIT_SETTINGS}\" or "
+        + "set it equal to \"0\" to skip this step."
+    )
+    if not _edit_opencsp_settings(_default_settings_file):
+        sys.exit(1)
 
 # locate other settings files
 for _dirname in _opencsp_settings_dirs():
-    _settings_file = os.path.join(_dirname, "opencsp_settings.ini")
+    _settings_file = os.path.join(_dirname, OPENCSP_SETTINGS_FILE_NAME_EXT)
     if os.path.exists(_settings_file):
         _settings_files.append(_settings_file)
 
 # load the settings
+if _ENV_VAR_DEBUG_SETTINGS in os.environ:
+    print("Loading OpenCSP settings from files:")
+    for _settings_file in _settings_files:
+        if os.path.exists(_settings_file):
+            print(f"\t{_settings_file}")
 opencsp_settings = configparser.ConfigParser(allow_no_value=True)
 opencsp_settings.read(_settings_files)
 
-for section in opencsp_settings.sections():
-    for key in opencsp_settings[section]:
-        print(f"opencsp_settings[{section}][{key}]={opencsp_settings[section][key]}")
+# debugging information
+if _ENV_VAR_DEBUG_SETTINGS in os.environ:
+    for section in opencsp_settings.sections():
+        for key in opencsp_settings[section]:
+            print(f"opencsp_settings[{section}][{key}]={opencsp_settings[section][key]}")
+if _ENV_VAR_DEBUG_SETTINGS in os.environ:
+    print(f"Set the environment variable \"{_ENV_VAR_EDIT_SETTINGS}='1'\" to edit the settings.")
 
 opencsp_settings = apply_command_line_arguments(opencsp_settings)
 __all__ = ["opencsp_settings"]

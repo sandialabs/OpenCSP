@@ -15,6 +15,7 @@ concurrency:
 jobs:
   docs-check:
     name: docs-check
+    if: github.event.repository.fork == false
     runs-on: [ubuntu-latest]
     steps:
       - name: Checkout

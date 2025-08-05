@@ -12,6 +12,9 @@ import opencsp.common.lib.tool.log_tools as lt
 # OpenCSP root directories.
 
 
+__has_warned_about_nonexistant_scratch_dir = False
+
+
 def opencsp_code_dir():
     """The directory containing the opencsp code.
 
@@ -58,9 +61,18 @@ def opencsp_scratch_dir(project_dir=None) -> str:
     designed for parallel access. When running on a cluster, this directory is a
     shared directory between multiple computers (aka network file system)."""
     scratch_dir: str = opencsp_settings["opencsp_root_path"]["scratch_dir"]
-    if scratch_dir != None and os.path.exists(scratch_dir):
-        actual_scratch_dir = os.path.join(scratch_dir, opencsp_settings["opencsp_root_path"]["scratch_name"])
-        return actual_scratch_dir if project_dir == None else os.path.join(actual_scratch_dir, project_dir)
+    if scratch_dir != None:
+        if os.path.exists(scratch_dir):
+            actual_scratch_dir = os.path.join(scratch_dir, opencsp_settings["opencsp_root_path"]["scratch_name"])
+            return actual_scratch_dir if project_dir == None else os.path.join(actual_scratch_dir, project_dir)
+        else:
+            global __has_warned_about_nonexistant_scratch_dir
+            if not __has_warned_about_nonexistant_scratch_dir:
+                lt.warn(
+                    f"Warning: in opencsp_root_path.opencsp_scratch_dir(): "
+                    + f"scratch_dir \"{scratch_dir}\" does not exist!"
+                )
+                __has_warned_about_nonexistant_scratch_dir = True
 
     if os.name == "nt":
         # Check for a scratch mirror directory on the user's computer.
