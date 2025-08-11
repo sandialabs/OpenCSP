@@ -1,7 +1,7 @@
 from PIL import Image
 import numpy as np
 import matplotlib.pyplot as plt
-import os
+import os, time
 import unittest
 
 import opencsp.common.lib.tool.file_tools as ft
