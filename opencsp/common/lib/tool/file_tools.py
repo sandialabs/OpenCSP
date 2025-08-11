@@ -529,6 +529,7 @@ def delete_file(input_dir_body_ext, error_on_not_exists=True):
                 print("Failed to delete and force delete file")
         else:
             print("Force delete is not implemented for: ", platform.system())
+            raise
         # raise  # if this should NOT raise an exception then that should be documented, as well as the reason why it shouldn't ~BGB230119
 
 
