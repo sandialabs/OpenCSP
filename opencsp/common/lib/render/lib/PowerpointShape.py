@@ -69,12 +69,14 @@ class PowerpointShape:
                         print(f"Element '{x}' is of type '{type(x).__name__}'")
                 raise TypeError(f"\"vals\" must contain only int or float values.")
         elif isinstance(vals, str):
-            str_vals = vals.split(',') # should be comma separated
+            str_vals = vals.split(',')  # should be comma separated
             ret = []
             init_type = None
-        
+
             for str_val in str_vals:
-                str_val = str_val.strip()  # Remove any leading/trailing whitespace so code doesn't break if there are spaces before or after the commas
+                str_val = (
+                    str_val.strip()
+                )  # Remove any leading/trailing whitespace so code doesn't break if there are spaces before or after the commas
                 try:
                     # Determine the type of the first valid number
                     if '.' in str_val:
@@ -90,7 +92,7 @@ class PowerpointShape:
                     ret.append(pptx.util.Inches(current_type(str_val)))
                 except ValueError:
                     raise ValueError(f"Value '{str_val}' is not a valid int or float.")
-        
+
             return ret
         else:
             vals_type = type(vals).__name__

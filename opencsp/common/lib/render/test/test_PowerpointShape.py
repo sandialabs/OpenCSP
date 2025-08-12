@@ -123,4 +123,3 @@ class test_PowerpointShape(unittest.TestCase):
         result = ppt_shape_instance._dims_to_str(dims=None)
         expected = None
         assert expected == result
-        
