@@ -69,10 +69,39 @@ class test_PowerpointShape(unittest.TestCase):
         with self.assertRaises(TypeError):
             ppt_shape_instance._pptx_inches({1, 2, 3})
 
-    def test_unsupported_type_string(self):
+    def test_bad_string(self):
+        ppt_shape_instance = PowerpointShape()
+        with self.assertRaises(ValueError):
+            ppt_shape_instance._pptx_inches("some string")
+
+    def test_int_string(self):
+        ppt_shape_instance = PowerpointShape()
+        result = ppt_shape_instance._pptx_inches(vals="1,2,3,4,5")
+        expected = [
+            pptx.util.Inches(1),
+            pptx.util.Inches(2),
+            pptx.util.Inches(3),
+            pptx.util.Inches(4),
+            pptx.util.Inches(5),
+        ]
+        assert expected == result
+
+    def test_float_string(self):
+        ppt_shape_instance = PowerpointShape()
+        result = ppt_shape_instance._pptx_inches(vals="1.0,2.0,3.0,4.0,5.0")
+        expected = [
+            pptx.util.Inches(1.0),
+            pptx.util.Inches(2.0),
+            pptx.util.Inches(3.0),
+            pptx.util.Inches(4.0),
+            pptx.util.Inches(5.0),
+        ]
+        assert expected == result
+
+    def test_mix_string(self):
         ppt_shape_instance = PowerpointShape()
         with self.assertRaises(TypeError):
-            ppt_shape_instance._pptx_inches("some string")
+            ppt_shape_instance._pptx_inches("1.0,2,3.0,4.0,5")
 
     def test_unsupported_type_dictionary(self):
         ppt_shape_instance = PowerpointShape()
@@ -88,3 +117,10 @@ class test_PowerpointShape(unittest.TestCase):
         ppt_shape_instance = PowerpointShape()
         with self.assertRaises(TypeError):
             ppt_shape_instance._pptx_inches(("unit", "test", "for", "string", "list"))
+
+    def test_dims_to_str_with_none(self):
+        ppt_shape_instance = PowerpointShape()
+        result = ppt_shape_instance._dims_to_str(dims=None)
+        expected = None
+        assert expected == result
+        
