@@ -123,3 +123,21 @@ class test_PowerpointShape(unittest.TestCase):
         result = ppt_shape_instance._dims_to_str(dims=None)
         expected = None
         assert expected == result
+
+    def test_dims_to_str_with_tuple(self):
+        ppt_shape_instance = PowerpointShape()
+        result = ppt_shape_instance._dims_to_str(dims=(5.1, 4.2, 3.3, 2.4, 1.5))
+        expected = "5.1,4.2,3.3,2.4,1.5"
+        assert expected == result
+
+    def test_str_to_dims_with_tuple(self):
+        ppt_shape_instance = PowerpointShape()
+        result = ppt_shape_instance._str_to_dims(sval="1.1,2.2,3.3,4.4,5.5")
+        expected = (1.1, 2.2, 3.3, 4.4, 5.5)
+        assert expected == result
+
+    def test_str_to_dims_with_none(self):
+        ppt_shape_instance = PowerpointShape()
+        result = ppt_shape_instance._str_to_dims(sval=None)
+        expected = None
+        assert expected == result
