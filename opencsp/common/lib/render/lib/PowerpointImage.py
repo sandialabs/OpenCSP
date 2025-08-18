@@ -439,7 +439,7 @@ class PowerpointImage(pps.PowerpointShape):
             # a temporary file and then move to our desired location.
             rec_val: rcfr.RenderControlFigureRecord = self._val
             format = ext.lstrip(".")
-            _, tmp_path_name_ext = ft.get_temporary_file(suffix=ext, text=False)
+            _, tmp_path_name_ext = ft.get_temporary_file(suffix=ext, text=False, include_file_handle=False)
             tmp_path, tmp_name, tmp_ext = ft.path_components(tmp_path_name_ext)
             tmp_path_name_ext_rcfr, _ = rec_val.save(tmp_path, tmp_name, format)
             try:

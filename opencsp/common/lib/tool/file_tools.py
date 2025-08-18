@@ -516,21 +516,7 @@ def delete_file(input_dir_body_ext, error_on_not_exists=True):
             + " resulted in error: "
             + e.strerror
         )
-
-        # jhs added the below if statement on Jul 31, 2025. The Windows pipeline would fail and the reason was that
-        # on Windows these files were locked by another process and the test would fail. I want to touch base with Ben
-        # soon and get his opinion on if this is a good solution or not.
-        if platform.system() == "Windows":
-            try:
-                subprocess.run(
-                    ['powershell', '-Command', f'Remove-Item -Path "{input_dir_body_ext}" -Force'], check=True
-                )
-            except subprocess.CalledProcessError as e2:
-                print("Failed to delete and force delete file")
-        else:
-            print("Force delete is not implemented for: ", platform.system())
-            raise
-        # raise  # if this should NOT raise an exception then that should be documented, as well as the reason why it shouldn't ~BGB230119
+        raise  # if this should NOT raise an exception then that should be documented, as well as the reason why it shouldn't ~BGB230119
 
 
 def delete_files_in_directory(input_dir: str, globexp: str, error_on_dir_not_exists=True):
@@ -979,7 +965,7 @@ def copy_file(input_dir_body_ext: str, output_dir: str, output_body_ext: str = N
     return output_body_ext
 
 
-def get_temporary_file(suffix: str = None, dir: str = None, text: bool = True) -> tuple[int, str]:
+def get_temporary_file(suffix: str = None, dir: str = None, text: bool = True, include_file_handle: bool = True) -> tuple[int, str]:
     """
     Creates a temporary file to write to. Example usage::
 
@@ -997,6 +983,7 @@ def get_temporary_file(suffix: str = None, dir: str = None, text: bool = True) -
         - dir (str): Where to save the temporary file with the list of frame names.
                      Defaults to the opencsp_temporary_dir if writable, or else the home directory if writable, or else /tmp.
         - text (bool): True to open the file in text mode. False to open it in byte mode.
+        TODO
 
     Returns:
     --------
@@ -1022,6 +1009,11 @@ def get_temporary_file(suffix: str = None, dir: str = None, text: bool = True) -
 
     if not success:
         raise FileNotFoundError(f"Could not create a tempory file in the directory '{dirname}'!")
+    
+    if not include_file_handle:
+         os.close(fd)
+         fd = None
+
     return fd, fname
 
 
