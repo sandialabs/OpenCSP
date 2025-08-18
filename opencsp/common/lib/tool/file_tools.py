@@ -985,7 +985,6 @@ def get_temporary_file(
         - dir (str): Where to save the temporary file with the list of frame names.
                      Defaults to the opencsp_temporary_dir if writable, or else the home directory if writable, or else /tmp.
         - text (bool): True to open the file in text mode. False to open it in byte mode.
-        TODO
 
     Returns:
     --------
