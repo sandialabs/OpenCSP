@@ -50,4 +50,3 @@ jobs:
           echo "$PYTHONPATH"
           $env:PYTHONPATH="$PWD\.."
           pytest --color=yes -rs -vv --cov=. --cov-report term --cov-config=.coveragerc
-          dir C:\\Users\\runneradmin\\AppData\\Local\\opencsp\\scratch\\tmp
