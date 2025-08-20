@@ -249,6 +249,7 @@ class PowerpointImage(pps.PowerpointShape):
             The dimensions of the image in inches.
         """
         # ChatGPT 4o-mini assisted with generating this doc string
+        assert self.has_dims()
         return self._pptx_inches(self.dims)
 
     @staticmethod
