@@ -1,12 +1,11 @@
 import copy
 import dataclasses
 import json
+from typing import TYPE_CHECKING
 
 import cv2 as cv
 import numpy as np
 
-from contrib.common.lib.cv.annotations.SpotWidthAnnotation import SpotWidthAnnotation
-from contrib.common.lib.cv.annotations.MomentsAnnotation import MomentsAnnotation
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.cv.image_reshapers as ir
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
@@ -19,6 +18,11 @@ import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render_control.RenderControlSpotSize as rcss
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
+
+if TYPE_CHECKING:
+    # don't import at runtime to avoid cyclic imports
+    from contrib.common.lib.cv.annotations.SpotWidthAnnotation import SpotWidthAnnotation
+    from contrib.common.lib.cv.annotations.MomentsAnnotation import MomentsAnnotation
 
 
 class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
@@ -68,6 +72,9 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
         return np.where(image == half_max)
 
     def find_centroid(self, coords: tuple[np.ndarray, np.ndarray]) -> p2.Pxy:
+        # import here to avoid cyclic imports
+        from contrib.common.lib.cv.annotations.MomentsAnnotation import MomentsAnnotation
+
         # create an image with 1s at the specified coordinates
         y_max = np.max(coords[0])
         x_max = np.max(coords[1])
@@ -215,6 +222,9 @@ class SpotWidthImageProcessor(AbstractSpotAnalysisImageProcessor):
         return centroid, long_axis_width, long_axis_rotation, long_axis_center, orthogonal_axis_width, algorithm_image
 
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
+        # import here to avoid cyclic imports
+        from contrib.common.lib.cv.annotations.SpotWidthAnnotation import SpotWidthAnnotation
+
         image = operable.primary_image.nparray
         annotations = copy.copy(operable.annotations)
         notes = copy.copy(operable.image_processor_notes)
