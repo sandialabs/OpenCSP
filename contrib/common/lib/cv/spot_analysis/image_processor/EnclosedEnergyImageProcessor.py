@@ -79,6 +79,13 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
                 "Error in EnclosedEnergyImageProcessor(): "
                 + f"enclosed_shape must be one of {allowed_shapes}, but is '{enclosed_shape}'",
             )
+        if percentages_of_interest is not None:
+            if not np.all([poi >= 0 and poi <= 1.0 for poi in percentages_of_interest]):
+                lt.error_and_raise(
+                    ValueError,
+                    "Error in EnclosedEnergyImageProcessor(): "
+                    + f"percentages_of_interest must be between 0 and 1 but {percentages_of_interest=}!",
+                )
 
         # use default values
         if enclosed_energy_style is None:
@@ -182,6 +189,9 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # Sanity checks
         assert len(enclosed_energy_sums) == max_radius + 1
+        assert np.all(
+            [enclosed_energy_sums[i] >= enclosed_energy_sums[i - 1] for i in range(1, len(enclosed_energy_sums))]
+        )
 
         if enclosed_energy_sums[-1] != total_energy:
             lt.error_and_raise(
@@ -192,7 +202,7 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         return enclosed_energy_sums, example_enclosed_image
 
-    def build_enclosed_energy_plot(self, enclosed_energy_sums: list[int]) -> np.ndarray:
+    def build_enclosed_energy_plot(self, enclosed_energy_sums: list[int]) -> tuple[np.ndarray, dict[float, int]]:
         """
         Builds a plot of the enclosed energy around the central_locator of the input image.
 
@@ -209,6 +219,9 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         -------
         plot_image: np.ndarray
             A np.ndarray containing the enclosed energy plot.
+        percentages_of_interest_radiuses: dict[float,int]
+            The radiuses (in pixels) at which the enclosed energy of
+            interest percentages are first reached.
         """
         # Determine the axes ranges
         if self.plot_x_limit_pixels > 0:
@@ -216,22 +229,25 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         else:
             x_range = len(enclosed_energy_sums)
 
-        # Build the data as a fraction of the total
+        # Build the data as a fraction of the total.
         pq_vals: list[tuple[int, int]] = []
-        enclosed_energy_fractions: list[float] = []
+        enclosed_energy_fractions: list[tuple[int, int, float]] = []
         total_enclosed_energy = enclosed_energy_sums[-1]
         for radius in range(len(enclosed_energy_sums)):
-            enclosed_energy_fractions.append(enclosed_energy_sums[radius] / total_enclosed_energy)
+            enclosed_energy_fractions.append(
+                tuple([radius, enclosed_energy_sums[radius], enclosed_energy_sums[radius] / total_enclosed_energy])
+            )
             pq_vals.append(tuple([radius, enclosed_energy_fractions[radius - 1]]))
         assert len(enclosed_energy_fractions) == len(enclosed_energy_sums)
 
         # Pad the plot for the given plot_x_limit_pixels, if any is given
         for radius in range(len(pq_vals) + 1, x_range + 1):
-            pq_vals.append(tuple(radius, enclosed_energy_fractions[-1]))
+            pq_vals.append(tuple(radius, enclosed_energy_fractions[-1][2]))
 
         # Limit the plot to the x range
+        print(f"{len(pq_vals)=}")
         pq_vals = pq_vals[: x_range + 1]
-        assert len(pq_vals) == x_range + 1
+        assert len(pq_vals) == x_range, f"{len(pq_vals)=} != {x_range=}"
 
         # Create a new figure for the plot
         figure_control = rcfg.RenderControlFigure()
@@ -247,15 +263,19 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         )
 
         # Draw the percentages of interest
+        percentages_of_interest_radii: dict[float, int] = {}
         if self.percentages_of_interest is not None:
             for poi in sorted(self.percentages_of_interest):
-                closest_radius, closest_dist = 0, np.abs(poi - enclosed_energy_fractions[0])
-                for radius, fraction in enumerate(enclosed_energy_fractions):
+                closest_radius, closest_dist = 0, np.abs(poi - enclosed_energy_fractions[0][2])
+                for radius, enclosed_energy_sum, fraction in enclosed_energy_fractions:
                     dist = np.abs(fraction - poi)
                     if dist < closest_dist:
                         closest_radius = radius
                         closest_dist = dist
+
                 lt.info(f"Percentage of interest {poi} is at radius {closest_radius}")
+                percentages_of_interest_radii[poi] = closest_radius
+
                 fig_record.view.draw_pq_list(
                     [(0, poi), (closest_radius, poi)], style=self.percentages_of_interest_style.measured
                 )
@@ -273,7 +293,7 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         # close the figure
         fig_record.close()
 
-        return plot_image
+        return plot_image, percentages_of_interest_radii
 
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         # Calculate the enclosed energy around the central_locator of the image
@@ -283,11 +303,11 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         )
 
         # Generate a visual plot of the enclosed energy
-        enclosed_energy_plot = self.build_enclosed_energy_plot(enclosed_energy_sums)
+        enclosed_energy_plot, percentages_of_interest_radii = self.build_enclosed_energy_plot(enclosed_energy_sums)
 
         # Build the new operable
         notes = copy.copy(operable.image_processor_notes)
-        notes.append(tuple([self.name, [str(v) for v in enclosed_energy_sums]]))
+        notes.append(tuple([self.name, tuple([percentages_of_interest_radii, [str(v) for v in enclosed_energy_sums]])]))
         algorithm_images = copy.copy(operable.algorithm_images)
         algorithm_images[self] = [CacheableImage.from_single_source(example_enclosed_energy_image)]
         vis_images = copy.copy(operable.visualization_images)
