@@ -12,6 +12,7 @@ import exiftool
 import numpy as np
 from PIL import Image
 
+import opencsp.common.lib.cv.CacheableImage as ci
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -39,13 +40,19 @@ pil_image_formats_supporting_exif = ["jpg", "jpeg", "png", "tiff", "webp"]
 T = TypeVar('T')
 if TYPE_CHECKING:
     ImageLike = TypeVar(
-        'ImageLike', str, np.ndarray, Image.Image, rcfr.RenderControlFigureRecord, pptimg.PowerpointImage
+        'ImageLike',
+        str,
+        np.ndarray,
+        Image.Image,
+        rcfr.RenderControlFigureRecord,
+        pptimg.PowerpointImage,
+        ci.CacheableImage,
     )
 else:
     ImageLike = TypeVar('ImageLike', str, np.ndarray, Image.Image)
 
 
-def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
+def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1) -> Image.Image:
     """Convert the numpy representation of an image to a Pillow Image.
 
     Coverts the given arr to an Image. The array is converted to an integer
@@ -468,7 +475,7 @@ def to_image(img: ImageLike, output_type: str = "numpy") -> Union[np.ndarray, Im
     elif isinstance(img, np.ndarray):
         # If the input is a NumPy array, convert to the desired output type
         if output_type == "pillow":
-            return Image.fromarray(img)
+            return numpy_to_image(img)
         else:  # output_type == "numpy"
             return img
 
@@ -486,7 +493,7 @@ def to_image(img: ImageLike, output_type: str = "numpy") -> Union[np.ndarray, Im
         if output_type == "numpy":
             return np_image
         else:
-            return Image.fromarray(np_image)
+            return to_image(np_image, output_type)
 
     elif isinstance(img, pptimg.PowerpointImage):
         # If the image is a powerpoint image, then retrieve it and convert it
@@ -496,6 +503,13 @@ def to_image(img: ImageLike, output_type: str = "numpy") -> Union[np.ndarray, Im
             lt.error_and_raise(
                 RuntimeError, "Error in image_tools.to_image(): " + f"PowerpointImage type has no value set!"
             )
+
+    elif isinstance(img, ci.CacheableImage):
+        # If the image is a cacheable image, then use it's built-in methods for retrieval
+        if output_type == "numpy":
+            return img.nparray
+        else:
+            return img.to_image()
 
     else:
         lt.error_and_raise(
