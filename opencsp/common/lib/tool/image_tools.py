@@ -6,7 +6,7 @@ Utilities for image processing.
 """
 
 import sys
-from typing import Callable, TypeVar
+from typing import Callable, TYPE_CHECKING, TypeVar, Union
 
 import exiftool
 import numpy as np
@@ -14,6 +14,12 @@ from PIL import Image
 
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
+
+if TYPE_CHECKING:
+    # don't import at runtime to avoid cyclic imports
+    import opencsp.common.lib.render.lib.PowerpointImage as pptimg
+    import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
+
 
 # disable auto formatting
 # fmt: off
@@ -31,6 +37,12 @@ pil_image_formats_supporting_exif = ["jpg", "jpeg", "png", "tiff", "webp"]
 
 
 T = TypeVar('T')
+if TYPE_CHECKING:
+    ImageLike = TypeVar(
+        'ImageLike', str, np.ndarray, Image.Image, rcfr.RenderControlFigureRecord, pptimg.PowerpointImage
+    )
+else:
+    ImageLike = TypeVar('ImageLike', str, np.ndarray, Image.Image)
 
 
 def numpy_to_image(arr: np.ndarray, rescale_or_clip='rescale', rescale_max=-1):
@@ -245,7 +257,7 @@ def image_files_in_directory(dir: str, allowable_extensions: list[str] = None, r
     Returns
     -------
     image_file_names_exts: list[str]
-        A list of the name.ext for each image file in the given directory.
+        A sorted list of the name.ext for each image file in the given directory.
     """
     # normalize input
     if allowable_extensions is None:
@@ -417,3 +429,76 @@ def set_exif_value(data_dir: str, image_path_name_ext: str, exif_val: str, exif_
             #     # Try to set the gain EXIF information again
             #     et.set_tags(image_pne, tags={"EXIF:ISO": str(gain)}, params=["-P", "-overwrite_original"])
             raise
+
+
+def to_image(img: ImageLike, output_type: str = "numpy") -> Union[np.ndarray, Image.Image]:
+    """Converts the input image from whatever type it is to the given output type.
+
+    Parameters
+    ----------
+    img : Union[str, np.ndarray, Image.Image, RenderControlFigureRecord, PowerpointImage]
+        The input image to be converted.
+    output_type : "numpy" | "pillow", optional
+        The desired output type. Can be one of "Numpy" or "Pillow". Default is "numpy".
+
+    Returns
+    -------
+    Union[np.ndarray, Image.Image]
+        The converted image in the specified output type.
+    """
+    # import here to avoid cyclic imports
+    import opencsp.common.lib.render.lib.PowerpointImage as pptimg
+    import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
+
+    # Standardize the arguments
+    if output_type.lower() in ["numpy", "np"]:
+        output_type = "numpy"
+    elif output_type.lower() in ["pillow", "pil", "image"]:
+        output_type = "pillow"
+    else:
+        raise ValueError(f"Unsupported output type: {output_type}")
+
+    if isinstance(img, Image.Image):
+        # If the input is a PIL Image, convert to the desired output type
+        if output_type == "numpy":
+            return np.array(img)
+        else:  # output_type == "pillow"
+            return img
+
+    elif isinstance(img, np.ndarray):
+        # If the input is a NumPy array, convert to the desired output type
+        if output_type == "pillow":
+            return Image.fromarray(img)
+        else:  # output_type == "numpy"
+            return img
+
+    elif isinstance(img, str):
+        # If the input is a file path, load the image and convert it
+        pil_image = Image.open(img)
+        if output_type == "numpy":
+            return np.array(pil_image)
+        else:  # output_type == "pillow"
+            return pil_image
+
+    elif isinstance(img, rcfr.RenderControlFigureRecord):
+        # If the image is a plot, then render and convert it
+        np_image = img.to_array()
+        if output_type == "numpy":
+            return np_image
+        else:
+            return Image.fromarray(np_image)
+
+    elif isinstance(img, pptimg.PowerpointImage):
+        # If the image is a powerpoint image, then retrieve it and convert it
+        if img.has_val():
+            return to_image(img.get_val(), output_type)
+        else:
+            lt.error_and_raise(
+                RuntimeError, "Error in image_tools.to_image(): " + f"PowerpointImage type has no value set!"
+            )
+
+    else:
+        lt.error_and_raise(
+            ValueError,
+            "Error in image_tools.to_image(): " + f"unrecognized type for image (type '{img.__class__.__name__}')",
+        )
