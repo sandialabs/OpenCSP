@@ -137,7 +137,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
                 lt.error_and_raise(
                     TypeError,
                     "Error in PowerpointImageProcessor.__init__(): "
-                    + f'"processors_per_slide" is a {type(processors_per_slide)}, but should be a list of lists',
+                    + f'"processors_per_slide" is a {processors_per_slide.__name__}, but should be a list of lists',
                 )
             else:
                 for i, processor_set in enumerate(processors_per_slide):
@@ -147,10 +147,9 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
                         lt.error_and_raise(
                             TypeError,
                             "Error in PowerpointImageProcessor.__init__(): "
-                            + f'"processors_per_slide[{i}]" is a {type(processor_set)}, but should be a list!',
+                            + f'"processors_per_slide[{i}]" is a {processor_set.__name__}, but should be a list!',
                         )
                     for j, processor_sel in enumerate(processor_set):
-                        processor_sel_type = type(processor_sel)
                         # normalize to use ProcOrImg
                         if not isinstance(processor_sel, ProcessorSelector):
                             if not isinstance(processor_sel, tuple):
@@ -158,12 +157,13 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
                             try:
                                 processors_per_slide[i][j] = ProcessorSelector.from_tuple(processor_sel)
                             except TypeError:
+                                processor_sel_name = processor_sel.__class__.__name__
                                 lt.error_and_raise(
                                     TypeError,
                                     "Error in PowerpointImageProcessor.__init__(): "
-                                    + f'"processors_per_slide[{i}][{j}]" is a {processor_sel_type}, '
-                                    + f"but should be an {type(AbstractSpotAnalysisImageProcessor)}, "
-                                    + f"{type(CacheableImage)}, or image-like!",
+                                    + f'"processors_per_slide[{i}][{j}]" is a {processor_sel_name}, '
+                                    + f"but should be an {AbstractSpotAnalysisImageProcessor.__name__}, "
+                                    + f"{CacheableImage.__name__}, or image-like!",
                                 )
 
         # register the rest of the input arguments

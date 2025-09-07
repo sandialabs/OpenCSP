@@ -1,20 +1,12 @@
-import matplotlib.axes
 import matplotlib.patches
 import numpy as np
 import scipy.spatial.transform
-import scipy.special
 
 from opencsp.common.lib.cv.annotations.AbstractAnnotations import AbstractAnnotations
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.geometry.RegionXY as reg
 import opencsp.common.lib.geometry.Vxy as v2
 
-import opencsp.common.lib.render.Color as color
-import opencsp.common.lib.render.figure_management as fm
-import opencsp.common.lib.render.view_spec as vs
-import opencsp.common.lib.render.View3d as v3d
-import opencsp.common.lib.render_control.RenderControlAxis as rca
-import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlSpotSize as rcss
 
