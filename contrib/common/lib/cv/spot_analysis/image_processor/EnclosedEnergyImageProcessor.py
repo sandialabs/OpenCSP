@@ -1,6 +1,6 @@
 import copy
 import dataclasses
-from typing import Callable
+from typing import Callable, TYPE_CHECKING
 
 import cv2 as cv
 import numpy as np
@@ -19,6 +19,11 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisIma
     AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.log_tools as lt
+
+
+if TYPE_CHECKING:
+    # import here to avoid cyclic imports
+    import contrib.common.lib.cv.annotations.EnclosedEnergyAnnotations as eeanno
 
 
 class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
@@ -156,13 +161,13 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
             distance = int(p2.Pxy(corner).distance(center_point))
             max_radius = int(max(max_radius, distance))
         assert max_radius <= width * height
-        enclosed_energy_sums = [0 for i in range(max_radius + 1)]
+        enclosed_energy_sums = [0 for i in range(max_radius + 2)]
 
         # Calculate the enclosed energy
         mask = np.zeros_like(image.nparray)
         example_enclosed_image = None
         example_radius = int(np.round(max_radius / 2))
-        for radius in range(1, max_radius + 1):
+        for radius in range(1, max_radius + 2):
             radius_point = p2.Pxy([radius, radius])
 
             # Create a mask using np.where to select pixels within the enclosed area
@@ -188,7 +193,7 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
                     example_enclosed_image = np.copy(image.nparray) * mask
 
         # Sanity checks
-        assert len(enclosed_energy_sums) == max_radius + 1
+        assert len(enclosed_energy_sums) == max_radius + 2
         assert np.all(
             [enclosed_energy_sums[i] >= enclosed_energy_sums[i - 1] for i in range(1, len(enclosed_energy_sums))]
         )
@@ -245,7 +250,6 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
             pq_vals.append(tuple(radius, enclosed_energy_fractions[-1][2]))
 
         # Limit the plot to the x range
-        print(f"{len(pq_vals)=}")
         pq_vals = pq_vals[: x_range + 1]
         assert len(pq_vals) == x_range, f"{len(pq_vals)=} != {x_range=}"
 
@@ -295,6 +299,39 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         return plot_image, percentages_of_interest_radii
 
+    def build_poi_annotations(
+        self, center: tuple[float, float], percentages_of_interest_radii: dict[float, int]
+    ) -> "eeanno.EnclosedEnergyAnnotations":
+        """Builds circular or square annotations to represent the radiuses
+        of the percentages of interest (poi).
+
+        Parameters
+        ----------
+        center : tuple[float, float]
+            The central location around which the percentages/radiuses were determined.
+        percentages_of_interest_radii : dict[float, int]
+            The pois to turn into annotations.
+
+        Returns
+        -------
+        EnclosedEnergyAnnotations
+            The new annotations.
+        """
+        # import here to avoid cyclic imports
+        import contrib.common.lib.cv.annotations.EnclosedEnergyAnnotations as eeanno
+
+        centers: p2.Pxy = None
+        radiuses: list[int] = []
+
+        for poi in percentages_of_interest_radii:
+            if centers is None:
+                centers = p2.Pxy(center)
+            else:
+                centers = centers.concatenate(p2.Pxy(center))
+            radiuses.append(percentages_of_interest_radii[poi])
+
+        return eeanno.EnclosedEnergyAnnotations(centers_radiuses=(centers, radiuses))
+
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         # Calculate the enclosed energy around the central_locator of the image
         center = self.center_locator.get_location(operable)
@@ -305,6 +342,9 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         # Generate a visual plot of the enclosed energy
         enclosed_energy_plot, percentages_of_interest_radii = self.build_enclosed_energy_plot(enclosed_energy_sums)
 
+        # Attach the enclosed energy annotations
+        enclosed_energy_annos = self.build_poi_annotations(center, percentages_of_interest_radii)
+
         # Build the new operable
         notes = copy.copy(operable.image_processor_notes)
         notes.append(tuple([self.name, tuple([percentages_of_interest_radii, [str(v) for v in enclosed_energy_sums]])]))
@@ -312,8 +352,14 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         algorithm_images[self] = [CacheableImage.from_single_source(example_enclosed_energy_image)]
         vis_images = copy.copy(operable.visualization_images)
         vis_images[self] = [CacheableImage.from_single_source(enclosed_energy_plot)]
+        annos = copy.copy(operable.annotations)
+        annos.append(enclosed_energy_annos)
         ret = dataclasses.replace(
-            operable, image_processor_notes=notes, algorithm_images=algorithm_images, visualization_images=vis_images
+            operable,
+            image_processor_notes=notes,
+            algorithm_images=algorithm_images,
+            visualization_images=vis_images,
+            annotations=annos,
         )
 
         return [ret]

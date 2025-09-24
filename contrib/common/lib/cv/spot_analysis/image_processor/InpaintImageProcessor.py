@@ -45,8 +45,8 @@ class InpaintImageProcessor(AbstractSpotAnalysisImageProcessor):
         Parameters
         ----------
         mask_image_path_name_ext : str
-            The path/name.ext of a binary mask where 1 indicates pixels that
-            need to be filled in and 0 indicates pixels that are valid in the
+            The path/name.ext of a binary mask where white indicates pixels that
+            need to be filled in and black indicates pixels that are valid in the
             source image.
         cache_dir : str, optional
             Directory to store intermediate results in, or None to not store

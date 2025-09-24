@@ -35,6 +35,11 @@ def inch_to_meter(value_inch: float) -> float:
     return value_inch * M_PER_INCH
 
 
+def foot_to_meter(value_foot: float) -> float:
+    """Returns a number of meters equal to a given number of feet."""
+    return inch_to_meter(value_foot * 12)
+
+
 def meter_to_inch(value_meter: float) -> float:
     """
     Convert a value in meters to inches.
@@ -58,6 +63,11 @@ def meter_to_inch(value_meter: float) -> float:
     """
     # "ChatGPT 4o" assisted with generating this docstring.
     return value_meter / M_PER_INCH
+
+
+def meter_to_foot(value_meter: float) -> float:
+    """Returns a number of feet equal to a given number of meters."""
+    return meter_to_inch(value_meter) / 12
 
 
 # Dots per Inch  <-->  Dots per Meters

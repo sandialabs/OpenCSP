@@ -8,7 +8,6 @@ import opencsp.common.lib.geometry.LineXY as l2
 import opencsp.common.lib.geometry.Pxy as p2
 import contrib.common.lib.geometry.RectXY as r2
 import opencsp.common.lib.geometry.RegionXY as reg2
-import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.PowerpointSlide as pps
@@ -52,6 +51,26 @@ class RegionDetector:
         The PowerPoint presentation control.
     slide_control : RenderControlPowerpointSlide
         The PowerPoint slide control.
+    generate_powerpoint: bool
+        Flag indicating whether to generate a PowerPoint presentation from the detected regions.
+    algimages_canny: dict[str, np.ndarray]
+        Dictionary containing Canny edge detection images for each region,
+        where the key is the region name and the value is the corresponding image.
+    algimages_blob_analysis: dict[str, np.ndarray]
+        Dictionary containing blob analysis images for each region,
+        where the key is the region name and the value is the corresponding image.
+    algimages_captions: dict[str, np.ndarray]
+        Dictionary containing caption images for each region,
+        where the key is the region name and the value is the corresponding image.
+    algimages_boundary_edges: dict[str, np.ndarray]
+        Dictionary containing boundary edge images for each region,
+        where the key is the region name and the value is the corresponding image.
+    algimages_find_edges: dict[str, np.ndarray]
+        Dictionary containing edge detection images for each region,
+        where the key is the region name and the value is the corresponding image.
+    algimages_assign_edges_and_corners: dict[str, np.ndarray]
+        Dictionary containing images with assigned edges and corners for each region,
+        where the key is the region name and the value is the corresponding image.
     """
 
     def __init__(
@@ -60,6 +79,7 @@ class RegionDetector:
         canny_edges_gradient=10,
         canny_non_edges_gradient=5,
         canny_test_gradients: list[tuple[int, int]] = None,
+        generate_powerpoint: bool = False,
     ):
         """
         Parameters
@@ -78,11 +98,15 @@ class RegionDetector:
             for Canny edge detection. Useful for setting up edge detection with
             new experiments.  For example: [(10,5), (10,10), (10,15), (20,5),
             (20,10), (20,15)].  Default None.
+        generate_powerpoint : bool, optional
+            If True, then this instance will generate a powerpoint with all
+            the algorithm images "algimages_*" in it. Default is False.
         """
         self.edge_coarse_width = edge_coarse_width
         self.canny_edges_gradient = canny_edges_gradient
         self.canny_non_edges_gradient = canny_non_edges_gradient
         self.canny_test_gradients = canny_test_gradients
+        self.generate_powerpoint = generate_powerpoint
 
         # visualization values
         self.edge_colors = {
@@ -95,9 +119,17 @@ class RegionDetector:
         self.images_to_show: list[tuple[str, np.ndarray]] = []
         self.summary_visualizations: list[tuple[str, np.ndarray]] = []
 
+        # debugging/algorithm images
+        self.algimages_canny: dict[str, np.ndarray] = None
+        self.algimages_blob_analysis: dict[str, np.ndarray] = None
+        self.algimages_captions: dict[str, np.ndarray] = None
+        self.algimages_boundary_edges: dict[str, np.ndarray] = None
+        self.algimages_find_edges: dict[str, np.ndarray] = None
+        self.algimages_assign_edges_and_corners: dict[str, np.ndarray] = None
+
         # powerpoint values
-        self.ppt_deck = rcpp.RenderControlPowerpointPresentation()
-        self.slide_control = rcps.RenderControlPowerpointSlide()
+        self.ppt_deck: rcpp.RenderControlPowerpointPresentation = None
+        self.slide_control: rcps.RenderControlPowerpointSlide = None
 
     def draw_image(self, title: str, image: np.ndarray, show=False, block=False):
         """
@@ -135,12 +167,15 @@ class RegionDetector:
                     figure_control, axis_control, view_spec_2d, title=title, code_tag=f"{__file__}", equal=False
                 )
                 fig_record.view.imshow(Image.fromarray(img))
+            if block:
+                lt.info("Showing images to user and waiting...")
             fig_record.view.show(block=block)
             if block:
                 fig_record.close()
+                lt.info("...done")
             self.images_to_show.clear()
 
-    def draw_images(self, images: list[tuple[str, np.ndarray]]):
+    def draw_images(self, images: dict[str, np.ndarray] | list[tuple[str, np.ndarray]]):
         """
         Draws multiple images and displays them.
 
@@ -149,6 +184,9 @@ class RegionDetector:
         images : list[tuple[str, np.ndarray]]
             A list of tuples containing the title and image to be drawn.
         """
+        if isinstance(images, dict):
+            images = [(title, image) for title, image in images.items()]
+
         for i, title_image in enumerate(images):
             show = i == len(images) - 1
             self.draw_image(title_image[0], title_image[1], show, show)
@@ -171,11 +209,8 @@ class RegionDetector:
             1s represent pixels that are classified as edges and 0s represent
             non-edges.
         """
-        slide = pps.PowerpointSlide.template_content_grid(nrows=2, ncols=3, slide_control=self.slide_control)
-        slide.set_title("step1_canny_edge_detection")
-
-        captions_images: list[tuple[str, np.ndarray]] = []
-        captions_images.append(("input image", image))
+        self.algimages_canny = {}
+        self.algimages_canny["input image"] = image
 
         if self.canny_test_gradients is not None:
             for i, gradients in enumerate(self.canny_test_gradients):
@@ -186,19 +221,25 @@ class RegionDetector:
 
                 image_title = f"Canny (edges gradient {edges_gradient}, non-edges gradient {non_edges_gradient})"
                 if edges_gradient == self.canny_edges_gradient and non_edges_gradient == self.canny_non_edges_gradient:
-                    self.summary_visualizations.append((image_title, canny))
                     image_title += "**"
-                captions_images.append((image_title, canny))
+                self.algimages_canny[image_title] = canny
 
         # chosen canny parameters
         canny_edges: np.ndarray = cv.Canny(image, self.canny_non_edges_gradient, self.canny_edges_gradient)
+        image_title = (
+            f"Canny (edges gradient {self.canny_edges_gradient}, non-edges gradient {self.canny_non_edges_gradient})**"
+        )
+        self.summary_visualizations.append((image_title, canny_edges))
 
-        for caption, image in captions_images:
-            image = ir.false_color_reshaper(image).astype(np.uint8)
-            slide.add_image(pps.PowerpointImage(image, caption=caption))
-        self.ppt_deck.add_slide(slide)
+        if self.generate_powerpoint:
+            slide = pps.PowerpointSlide.template_content_grid(nrows=2, ncols=3, slide_control=self.slide_control)
+            slide.set_title("step1_canny_edge_detection")
+            for caption, image in self.algimages_canny.items():
+                image = ir.false_color_reshaper(image).astype(np.uint8)
+                slide.add_image(pps.PowerpointImage(image, caption=caption))
+            self.ppt_deck.add_slide(slide)
         if debug_canny_settings or self.canny_test_gradients:
-            self.draw_images(captions_images)
+            self.draw_images(self.algimages_canny)
 
         return canny_edges
 
@@ -227,8 +268,6 @@ class RegionDetector:
             Numpy array with the same width and height as the given canny_edges
             image. Non-zero where there aren't any edges.
         """
-        slide = pps.PowerpointSlide.template_content_grid(nrows=2, ncols=3, slide_control=self.slide_control)
-        slide.set_title("step2_blob_analysis")
         slice_l, slice_s = 13, 3  # long, short
         slice_area = slice_l * slice_s  # 13*3 = 39
         slice_thresh = 10 / slice_area  # 10/39 = 0.26
@@ -261,19 +300,22 @@ class RegionDetector:
         fat_blob: np.ndarray = cv.filter2D(fat_blob, -1, np.ones((7, 7), np.float32))
         fat_blob[np.where(fat_blob > 0.5)] = 255
 
-        captions_images = [
-            ("canny_edges", canny_edges),
-            ("horizontal_mask", horizontal_mask),
-            ("vertical_mask", vertical_mask),
-            ("thin_blob", thin_blob),
-            ("fat_blob", fat_blob),
-        ]
-        for caption, image in captions_images:
-            image = ir.false_color_reshaper(image).astype(np.uint8)
-            slide.add_image(pps.PowerpointImage(image, caption=caption))
-        self.ppt_deck.add_slide(slide)
+        self.algimages_blob_analysis = {
+            "canny_edges": canny_edges,
+            "horizontal_mask": horizontal_mask,
+            "vertical_mask": vertical_mask,
+            "thin_blob": thin_blob,
+            "fat_blob": fat_blob,
+        }
+        if self.generate_powerpoint:
+            slide = pps.PowerpointSlide.template_content_grid(nrows=2, ncols=3, slide_control=self.slide_control)
+            slide.set_title("step2_blob_analysis")
+            for caption, image in self.algimages_blob_analysis.items():
+                image = ir.false_color_reshaper(image).astype(np.uint8)
+                slide.add_image(pps.PowerpointImage(image, caption=caption))
+            self.ppt_deck.add_slide(slide)
         if debug_blob_analysis:
-            self.draw_images(captions_images)
+            self.draw_images(self.algimages_blob_analysis)
 
         return horizontal_mask, vertical_mask, negative_mask
 
@@ -304,8 +346,6 @@ class RegionDetector:
         """
         niterations = 10
         nrays = 50
-        slide = pps.PowerpointSlide.template_content_grid(nrows=3, ncols=4, slide_control=self.slide_control)
-        slide.set_title("step3_ray_project_edge_intercept")
 
         # initialize/declare variables
         all_boundary_samples: p2.Pxy = None
@@ -316,7 +356,7 @@ class RegionDetector:
         """ Approximate center of the area. Updated each iteration. """
         all_area_centers: list[p2.Pxy] = []
         """ All area_center values, for debugging """
-        captions_images: list[tuple[str, np.ndarray]] = []
+        self.algimages_captions = {}
 
         # get the bounding box, to make calculating rays easier
         image_height, image_width = thin_boundaries.shape[0], thin_boundaries.shape[1]
@@ -400,7 +440,7 @@ class RegionDetector:
                 # self.draw_image(f"Ray {ray_idx} ({center_pixel=}, deg={np.rad2deg(angle)})", debug_image, True, True)
 
             # record information from this iteration
-            captions_images.append((f"Ray projection, iteration {iteration}", debug_image))
+            self.algimages_captions[f"Ray projection, iteration {iteration}"] = debug_image
             if all_boundary_samples is None:
                 all_boundary_samples = p2.Pxy.from_list(iteration_samples)
                 boundary_samples = p2.Pxy(all_boundary_samples.data)
@@ -422,25 +462,30 @@ class RegionDetector:
             average_distance = np.average(mid50)
             in_range = np.logical_and(distances > average_distance / 2, distances < average_distance * 1.5)
             boundary_samples = all_boundary_samples[np.where(in_range)]
-            lt.info(f"Sampled {len(boundary_samples)} points")
+            lt.info(f"\rSampled {len(boundary_samples)} points", end="")
 
             # update center pixel approximation
             all_area_centers.append(area_center)
             area_center = p2.Pxy(np.average(boundary_samples.data, axis=1))
 
+        lt.info("")
+
         # draw the debug_all_image with all rays and all sampled points
         for ac in all_area_centers:
             center_pixel = (int(ac.x[0]), int(ac.y[0]))
             debug_all_image = cv.drawMarker(debug_all_image, center_pixel, color=(255), markerSize=3)
-        captions_images.append((f"Ray projection, sum", debug_all_image))
+        self.algimages_captions[f"Ray projection, sum"] = debug_all_image
         self.summary_visualizations.append((f"Ray Projection", ir.false_color_reshaper(debug_all_image)))
 
-        for caption, image in captions_images:
-            image = ir.false_color_reshaper(image).astype(np.uint8)
-            slide.add_image(pps.PowerpointImage(image, caption=caption))
-        self.ppt_deck.add_slide(slide)
+        if self.generate_powerpoint:
+            slide = pps.PowerpointSlide.template_content_grid(nrows=3, ncols=4, slide_control=self.slide_control)
+            slide.set_title("step3_ray_project_edge_intercept")
+            for caption, image in self.algimages_captions.items():
+                image = ir.false_color_reshaper(image).astype(np.uint8)
+                slide.add_image(pps.PowerpointImage(image, caption=caption))
+            self.ppt_deck.add_slide(slide)
         if debug_ray_projection:
-            self.draw_images(captions_images)
+            self.draw_images(self.algimages_captions)
 
         return area_center, boundary_samples
 
@@ -466,8 +511,6 @@ class RegionDetector:
             The edge pixels close to the boundary locations. Matched edge pixels
             will be 255, all others will be 0.
         """
-        slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=3, slide_control=self.slide_control)
-        slide.set_title("step4_boundary_locations_to_edges")
         diameter = 7
 
         boundary_pixels = np.zeros_like(canny_edges)
@@ -479,17 +522,20 @@ class RegionDetector:
         matched_edges = canny_edges.copy()
         matched_edges[np.where(boundary_blob == 0)] = 0
 
-        captions_images = [
-            (f"Boundary pixels", boundary_pixels),
-            (f"Boundary blob", boundary_blob),
-            (f"Boundary edges", matched_edges),
-        ]
-        for caption, image in captions_images:
-            image = ir.false_color_reshaper(image).astype(np.uint8)
-            slide.add_image(pps.PowerpointImage(image, caption=caption))
-        self.ppt_deck.add_slide(slide)
+        self.algimages_boundary_edges = {
+            f"Boundary pixels": boundary_pixels,
+            f"Boundary blob": boundary_blob,
+            f"Boundary edges": matched_edges,
+        }
+        if self.generate_powerpoint:
+            slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=3, slide_control=self.slide_control)
+            slide.set_title("step4_boundary_locations_to_edges")
+            for caption, image in self.algimages_boundary_edges.items():
+                image = ir.false_color_reshaper(image).astype(np.uint8)
+                slide.add_image(pps.PowerpointImage(image, caption=caption))
+            self.ppt_deck.add_slide(slide)
         if debug_ray_projection:
-            self.draw_images(captions_images)
+            self.draw_images(self.algimages_boundary_edges)
 
         return matched_edges
 
@@ -517,12 +563,10 @@ class RegionDetector:
         edge_groups : tuple[list[r2.RectXY], np.ndarray]
             The four edge groups
         """
-        slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=2, slide_control=self.slide_control)
-        slide.set_title("step5_find_edge_groups")
-
         refined_edge_groups: list[r2.RectXY] = []
         width = boundary_edges.shape[1]
         height = boundary_edges.shape[0]
+        self.algimages_find_edges = {}
 
         # find initial edge groups, two per 'x' and 'y' search dir2.rections
         scan_dirs = ("y", "x")
@@ -563,7 +607,6 @@ class RegionDetector:
             ("Initial edge groups", initial_edge_groups["x"] + initial_edge_groups["y"]),
             ("Refined edge groups", refined_edge_groups),
         ]
-        captions_images: list[tuple[str, np.ndarray]] = []
         for caption, edge_groups in captions_groups:
             edge_group_image = vis_image.copy()
 
@@ -571,14 +614,17 @@ class RegionDetector:
                 tl, br = (int(edge_group.left), int(edge_group.top)), (int(edge_group.right), int(edge_group.bottom))
                 edge_group_image = cv.rectangle(edge_group_image, tl, br, color.magenta().rgb_255(), thickness=2)
 
-            captions_images.append((caption, edge_group_image))
-        self.summary_visualizations.append(("Edge Groups", captions_images[-1][1]))
+            self.algimages_find_edges[caption] = edge_group_image
+        self.summary_visualizations.append(("Edge Groups", self.algimages_find_edges["Refined edge groups"]))
 
-        for caption, image in captions_images:
-            slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption))
-        self.ppt_deck.add_slide(slide)
+        if self.generate_powerpoint:
+            slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=2, slide_control=self.slide_control)
+            slide.set_title("step5_find_edge_groups")
+            for caption, image in self.algimages_find_edges.items():
+                slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption))
+            self.ppt_deck.add_slide(slide)
         if debug_edge_groups:
-            self.draw_images(captions_images)
+            self.draw_images(self.algimages_find_edges)
 
         return refined_edge_groups
 
@@ -696,13 +742,12 @@ class RegionDetector:
         region: reg2.RegionXY
             The region described the by the corners.
         """
-        slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=2, slide_control=self.slide_control)
-        slide.set_title("step6_assign_edges_and_corners")
 
         edges: dict[str, l2.LineXY] = {"top": None, "bottom": None, "left": None, "right": None}
         corners: dict[str, p2.Pxy] = {"tl": None, "tr": None, "br": None, "bl": None}
         region: reg2.RegionXY = None
         width, height = canny.shape[1], canny.shape[0]
+        self.algimages_assign_edges_and_corners = {}
 
         # use RANSAC to assign lines to the edge groups
         lines: list[l2.LineXY] = []
@@ -759,16 +804,19 @@ class RegionDetector:
         region = reg2.RegionXY.from_vertices(vertices)
 
         edge_corners_image = self.visualize_edges_corners(canny, edges, corners)
-        captions_images = [
-            ("assigned_edges_and_corners", edge_corners_image),
-            ("Encompassing region", self.visualize_region(canny, region)),
-        ]
+        self.algimages_assign_edges_and_corners = {
+            "assigned_edges_and_corners": edge_corners_image,
+            "Encompassing region": self.visualize_region(canny, region),
+        }
         self.summary_visualizations.append(("Edges & Corners", edge_corners_image))
-        for caption, image in captions_images:
-            slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption))
-        self.ppt_deck.add_slide(slide)
+        if self.generate_powerpoint:
+            slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=2, slide_control=self.slide_control)
+            slide.set_title("step6_assign_edges_and_corners")
+            for caption, image in self.algimages_assign_edges_and_corners.items():
+                slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption))
+            self.ppt_deck.add_slide(slide)
         if debug_edge_assignment:
-            self.draw_images(captions_images)
+            self.draw_images(self.algimages_assign_edges_and_corners)
 
         return edges, corners, region
 
