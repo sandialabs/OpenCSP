@@ -309,3 +309,14 @@ class AbstractSpotAnalysisImageProcessor:
         #
         # This will return 0 immediately after being created.
         return self._num_images_processed
+
+class DoNothingImageProcessor(AbstractSpotAnalysisImageProcessor):
+    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
+        return [operable]
+
+class SetOnesImageProcessor(AbstractSpotAnalysisImageProcessor):
+    def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
+        img = copy.copy(operable.primary_image.nparray)
+        img[:, :] = 1
+        ret = dataclasses.replace(operable, primary_image=img)
+        return [ret]
