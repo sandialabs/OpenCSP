@@ -245,7 +245,6 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
             pq_vals.append(tuple(radius, enclosed_energy_fractions[-1][2]))
 
         # Limit the plot to the x range
-        print(f"{len(pq_vals)=}")
         pq_vals = pq_vals[: x_range + 1]
         assert len(pq_vals) == x_range, f"{len(pq_vals)=} != {x_range=}"
 

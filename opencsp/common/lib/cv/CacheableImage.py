@@ -128,7 +128,7 @@ class CacheableImage:
         """
         # check that all the necessary inputs have been provided
         err_msg = "Error in CacheableImage.__init__(): must provide at least one of array, cache_path, or source_path!"
-        fnfe_msg = err_msg + " %s file %s does not exist!"
+        fnfe_msg = err_msg + " %s file \"%s\" does not exist!"
         if array is None:
             if cache_path is None:
                 if source_path is None:

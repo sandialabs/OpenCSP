@@ -79,7 +79,7 @@ class RegionDetector:
         canny_edges_gradient=10,
         canny_non_edges_gradient=5,
         canny_test_gradients: list[tuple[int, int]] = None,
-        generate_powerpoint: bool = False
+        generate_powerpoint: bool = False,
     ):
         """
         Parameters
@@ -167,9 +167,12 @@ class RegionDetector:
                     figure_control, axis_control, view_spec_2d, title=title, code_tag=f"{__file__}", equal=False
                 )
                 fig_record.view.imshow(Image.fromarray(img))
+            if block:
+                lt.info("Showing images to user and waiting...")
             fig_record.view.show(block=block)
             if block:
                 fig_record.close()
+                lt.info("...done")
             self.images_to_show.clear()
 
     def draw_images(self, images: dict[str, np.ndarray] | list[tuple[str, np.ndarray]]):
@@ -223,7 +226,9 @@ class RegionDetector:
 
         # chosen canny parameters
         canny_edges: np.ndarray = cv.Canny(image, self.canny_non_edges_gradient, self.canny_edges_gradient)
-        image_title = f"Canny (edges gradient {self.canny_edges_gradient}, non-edges gradient {self.canny_non_edges_gradient})**"
+        image_title = (
+            f"Canny (edges gradient {self.canny_edges_gradient}, non-edges gradient {self.canny_non_edges_gradient})**"
+        )
         self.summary_visualizations.append((image_title, canny_edges))
 
         if self.generate_powerpoint:
@@ -457,11 +462,13 @@ class RegionDetector:
             average_distance = np.average(mid50)
             in_range = np.logical_and(distances > average_distance / 2, distances < average_distance * 1.5)
             boundary_samples = all_boundary_samples[np.where(in_range)]
-            lt.info(f"Sampled {len(boundary_samples)} points")
+            lt.info(f"\rSampled {len(boundary_samples)} points", end="")
 
             # update center pixel approximation
             all_area_centers.append(area_center)
             area_center = p2.Pxy(np.average(boundary_samples.data, axis=1))
+
+        lt.info("")
 
         # draw the debug_all_image with all rays and all sampled points
         for ac in all_area_centers:

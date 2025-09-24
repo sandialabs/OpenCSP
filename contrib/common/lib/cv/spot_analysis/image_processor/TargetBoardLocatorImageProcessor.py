@@ -50,7 +50,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         edge_coarse_width=30,
         canny_test_gradients: list[tuple[int, int]] = None,
         debug_target_locating: bool = False,
-        generate_region_detector_powerpoint: bool = True
+        generate_region_detector_powerpoint: bool = True,
     ):
         """
         Parameters
@@ -106,7 +106,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             self.canny_edges_gradient,
             self.canny_non_edges_gradient,
             self.canny_test_gradients,
-            generate_powerpoint = generate_region_detector_powerpoint
+            generate_powerpoint=generate_region_detector_powerpoint,
         )
         self.edges: dict[str, l2.LineXY] = None
         self._corners: dict[str, p2.Pxy] = None
