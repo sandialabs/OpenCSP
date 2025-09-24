@@ -50,6 +50,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         edge_coarse_width=30,
         canny_test_gradients: list[tuple[int, int]] = None,
         debug_target_locating: bool = False,
+        generate_region_detector_powerpoint: bool = True
     ):
         """
         Parameters
@@ -82,6 +83,9 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             If True, then the target locating steps from the
             :py:class:`.RegionDetector` class will be displayed upon first image
             evaluation.
+        generate_region_detector_powerpoint: bool, optional
+            If True, then build a powerpoint explaining how the region detector
+            found the target board outline. Default is True.
         """
         super().__init__()
 
@@ -98,7 +102,11 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # geometry values in the image
         self.detector: rd.RegionDetector = rd.RegionDetector(
-            self.edge_coarse_width, self.canny_edges_gradient, self.canny_non_edges_gradient, self.canny_test_gradients
+            self.edge_coarse_width,
+            self.canny_edges_gradient,
+            self.canny_non_edges_gradient,
+            self.canny_test_gradients,
+            generate_powerpoint = generate_region_detector_powerpoint
         )
         self.edges: dict[str, l2.LineXY] = None
         self._corners: dict[str, p2.Pxy] = None
