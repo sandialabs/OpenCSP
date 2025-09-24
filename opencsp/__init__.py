@@ -13,19 +13,50 @@ Tests
 OpenCSP uses the pytest library.
 """
 
+import argparse
 import configparser
-import os
 import copy
+import importlib
+import os
+import platform
 import shutil
 import sys
-import argparse
-import platform
 
 
 _ENV_VAR_SETTINGS_DIRS = "OPENCSP_SETTINGS_DIRS"
 _ENV_VAR_EDIT_SETTINGS = "OPENCSP_SETTINGS_EDIT"
 _ENV_VAR_DEBUG_SETTINGS = "OPENCSP_SETTINGS_DEBUG"
 OPENCSP_SETTINGS_FILE_NAME_EXT = "opencsp_settings.ini"
+
+
+class LazyLoader:
+    """
+    The class provides a LazyLoader for delayed importing of modules.
+    It allows for lazy loading of modules until they are actually needed,
+    which can help improve performance by reducing load times in most cases.
+    """
+
+    # written by chatgpt
+    def __init__(self, module_name, class_name):
+        self.module_name = module_name
+        self.class_name = class_name
+        self.module = None
+        self.class_instance = None
+
+    def _load(self):
+        if self.module is None:
+            self.module = importlib.import_module(self.module_name)
+        if self.class_instance is None:
+            self.class_instance = getattr(self.module, self.class_name)
+        return self.class_instance
+
+    def __call__(self, *args, **kwargs):
+        # Return an instance of the class when called
+        return self._load()(*args, **kwargs)
+
+    def __getattr__(self, name):
+        # Delegate attribute access to the class instance
+        return getattr(self._load(), name)
 
 
 if platform.system() == 'Darwin':
