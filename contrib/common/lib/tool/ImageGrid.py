@@ -12,8 +12,10 @@ from PIL import Image, ImageTk
 import tkinter as tk
 
 import numpy as np
+import cv2 as cv
 
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
+import opencsp.common.lib.render.Color as clr
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
@@ -26,6 +28,8 @@ class ImageGrid:
         *images: it.ImageLike,
         total_size: tuple[int, int] = None,
         subimage_size: tuple[int, int] = None,
+        number_images: bool | int = False,
+        numbering_color: tuple[int, int, int] | clr.Color = clr.black(),
     ):
         # validate the input
         if total_size is not None and subimage_size is not None:
@@ -40,8 +44,10 @@ class ImageGrid:
         self._ncols_nrows = ncols_nrows
         self._total_size = total_size
         self._subimage_size = subimage_size
+        self.number_images = number_images
+        self.numbering_color = numbering_color
 
-        self.images: list[it.ImageLike] = []
+        self.images: list[Image.Image] = []
         self.add_images(*images)
 
     @classmethod
@@ -104,7 +110,6 @@ class ImageGrid:
     def subimage_size(self) -> tuple[int, int]:
         if self._total_size is None:
             if self._subimage_size is None:
-                self.images = [it.to_image(img) for img in self.images]
                 min_width = np.min([img.width for img in self.images])
                 min_height = np.min([img.height for img in self.images])
                 return min_width, min_height
@@ -122,12 +127,9 @@ class ImageGrid:
                 return subimage_width, subimage_height
 
     def add_images(self, *images: it.ImageLike):
-        self.images += list(images)
+        self.images += [it.to_image(img, "pillow") for img in list(images)]
 
     def tile_images(self) -> Image:
-        # Get the images as images
-        self.images = [it.to_image(img, "pillow") for img in self.images]
-
         # Resize the images
         sub_width, sub_height = self.subimage_size
         images = [img.resize([sub_width, sub_height]) for img in self.images]
@@ -143,7 +145,27 @@ class ImageGrid:
                 image_idx = row * ncols + col
                 if image_idx >= len(images):
                     break
-                ret.paste(images[image_idx], [col * sub_width, row * sub_height])
+                subimg = images[image_idx]
+
+                # apply numbering
+                if self.number_images is not False:
+                    starting_value = 1 if self.number_images is True else self.number_images
+                    image_number = image_idx + starting_value
+                    x, y, s = int(10 / 600 * sub_height), int(30 / 600 * sub_height), 1 / 600 * sub_height
+                    subimg = np.array(subimg)
+                    subimg = cv.putText(
+                        subimg,
+                        str(image_number),
+                        (x, y),
+                        cv.FONT_HERSHEY_DUPLEX,
+                        s,
+                        self.numbering_color.rgb_255(),
+                        thickness=2,
+                    )
+                    subimg = Image.fromarray(subimg)
+
+                # add to the return value
+                ret.paste(subimg, [col * sub_width, row * sub_height])
 
         return ret
 
