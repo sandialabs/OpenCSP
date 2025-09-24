@@ -9,7 +9,11 @@ import opencsp.common.lib.cv.CacheableImage as ci
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable as sao
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
-from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import DoNothingImageProcessor, SetOnesImageProcessor
+from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
+    DoNothingImageProcessor,
+    SetOnesImageProcessor,
+)
+
 
 class test_AbstractSpotAnalysisImageProcessor(unittest.TestCase):
     @classmethod
