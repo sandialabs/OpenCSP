@@ -41,7 +41,7 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
         super().__init__(style)
 
         # validate the input
-        if self.enclosed_shape not in ["circle", "square"]:
+        if enclosed_shape not in ["circle", "square"]:
             raise RuntimeError(
                 "Error in EnclosedEnergyAnnotations.render_to_figure() "
                 + "expected enclosed shape to be one of 'circle' or 'square', "
@@ -55,8 +55,8 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
         self.label = f"En{enclosed_shape}d Energy"  # Encircled, Ensquared
 
         r = p2.Pxy((self._p2r[1], self._p2r[1]))
-        upper_left = self._p2r - r
-        lower_right = self._p2r + r
+        upper_left = self._p2r[0] - r
+        lower_right = self._p2r[0] + r
         self._representative_circle = CircularAnnotations(style, centers_radiuses, pixels_to_meters)
         self._representative_square = RectangleAnnotations(style, (upper_left, lower_right), pixels_to_meters)
 
@@ -78,10 +78,6 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
     @property
     def scale(self) -> list[float]:
         return self._representative_circle.scale
-
-    @property
-    def label(self) -> str:
-        return self.enclosed_shape
 
     def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False):
         if self.enclosed_shape == "circle":
