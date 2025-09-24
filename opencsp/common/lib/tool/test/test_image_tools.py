@@ -1,9 +1,12 @@
 import unittest
 
+import matplotlib.pyplot as plt
 import numpy as np
 import numpy.testing as nptest
 import PIL.Image as Image
 
+import opencsp.common.lib.cv.CacheableImage as ci
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
@@ -14,6 +17,8 @@ class TestImageTools(unittest.TestCase):
         path, _, _ = ft.path_components(__file__)
         self.data_dir = ft.join(path, "data", "input", "image_tools")
         self.out_dir = ft.join(path, "data", "output", "image_tools")
+        ft.create_directories_if_necessary(self.data_dir)
+        ft.create_directories_if_necessary(self.out_dir)
 
     def test_numpy_to_image_truncate(self):
         arr8i = np.array([[0, 125, 255]]).astype(np.int8)
@@ -114,6 +119,52 @@ class TestImageTools(unittest.TestCase):
                 + "40*40*3 + implementation_overhead != it.getsizeof_approx(img) "
                 + f"({40*40*3} + {implementation_overhead} != {it.getsizeof_approx(img)})"
             )
+
+    def test_to_image(self):
+        # Test with a random NumPy array
+        arr = np.random.randint(0, 256, (40, 40, 3), dtype=np.uint8)
+        np_image = it.to_image(arr, output_type="numpy")
+        pil_image = it.to_image(arr, output_type="pillow")
+
+        nptest.assert_array_equal(np_image, arr)
+        self.assertIsInstance(pil_image, Image.Image)
+
+        # Test with a PIL Image
+        pil_image_input = Image.fromarray(arr)
+        np_image_from_pil = it.to_image(pil_image_input, output_type="numpy")
+        pil_image_from_pil = it.to_image(pil_image_input, output_type="pillow")
+
+        nptest.assert_array_equal(np_image_from_pil, arr)
+        self.assertIs(pil_image_from_pil, pil_image_input)
+
+        # Test with a file path
+        file_path = ft.join(self.out_dir, "test_to_image.png")
+        pil_image_from_pil.save(file_path)
+        np_image_from_file = it.to_image(file_path, output_type="numpy")
+        pil_image_from_file = it.to_image(file_path, output_type="pillow")
+
+        self.assertIsInstance(np_image_from_file, np.ndarray)
+        self.assertIsInstance(pil_image_from_file, Image.Image)
+
+        # Test with a RenderControlFigureRecord
+        figure_record = rcfr.RenderControlFigureRecord("Test Figure", "Test Title", "Test Caption", 1, plt.figure())
+        np_image_from_record = it.to_image(figure_record, output_type="numpy")
+        pil_image_from_record = it.to_image(figure_record, output_type="pillow")
+
+        self.assertIsInstance(np_image_from_record, np.ndarray)
+        self.assertIsInstance(pil_image_from_record, Image.Image)
+
+        # Test with a CacheableImage
+        cacheable_image = ci.CacheableImage(array=arr)
+        np_image_from_cacheable = it.to_image(cacheable_image, output_type="numpy")
+        pil_image_from_cacheable = it.to_image(cacheable_image, output_type="pillow")
+
+        nptest.assert_array_equal(np_image_from_cacheable, arr)
+        self.assertIsInstance(pil_image_from_cacheable, Image.Image)
+
+        # Test with unsupported type
+        with self.assertRaises(ValueError):
+            it.to_image(12345, output_type="numpy")
 
 
 if __name__ == "__main__":

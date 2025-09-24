@@ -450,7 +450,7 @@ class CacheableImage:
         Image class and returns the converted value."""
         if self._image == None:
             # self._register_access(self) # registered in self.nparray
-            self._image = it.numpy_to_image(self.nparray)
+            self._image = it.to_image(self.nparray, output_type="pillow")
         else:
             self._register_access(self)
 

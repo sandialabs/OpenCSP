@@ -15,6 +15,8 @@ import shutil
 import tempfile
 import time
 from typing import Optional
+import platform
+import subprocess
 
 # try to import as few other opencsp libraries as possible
 import opencsp.common.lib.file.CsvInterface as csvi
@@ -963,7 +965,9 @@ def copy_file(input_dir_body_ext: str, output_dir: str, output_body_ext: str = N
     return output_body_ext
 
 
-def get_temporary_file(suffix: str = None, dir: str = None, text: bool = True) -> tuple[int, str]:
+def get_temporary_file(
+    suffix: str = None, dir: str = None, text: bool = True, include_file_handle: bool = True
+) -> tuple[int, str]:
     """
     Creates a temporary file to write to. Example usage::
 
@@ -1006,6 +1010,11 @@ def get_temporary_file(suffix: str = None, dir: str = None, text: bool = True) -
 
     if not success:
         raise FileNotFoundError(f"Could not create a tempory file in the directory '{dirname}'!")
+
+    if not include_file_handle:
+        os.close(fd)
+        fd = None
+
     return fd, fname
 
 

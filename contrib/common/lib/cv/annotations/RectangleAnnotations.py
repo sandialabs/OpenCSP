@@ -1,6 +1,3 @@
-import matplotlib.axes
-import matplotlib.collections
-import matplotlib.patches
 import numpy as np
 import scipy.spatial.transform
 
@@ -11,8 +8,8 @@ import opencsp.common.lib.geometry.RegionXY as reg
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
-import opencsp.common.lib.render.View3d as v3d
 import opencsp.common.lib.render_control.RenderControlAxis as rca
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.log_tools as lt
 

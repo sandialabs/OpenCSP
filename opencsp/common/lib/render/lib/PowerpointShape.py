@@ -44,7 +44,7 @@ class PowerpointShape:
         # Parameters
         # ----------
         # vals : int, float, or Iterable
-        #    The value(s) to convert to inches. Can be a single value or an iterable of values.
+        #    The value(s) to convert to inches. Can be a single value or an iterable of values. Iterable will be a list
         #
         # Returns
         # -------
@@ -55,13 +55,22 @@ class PowerpointShape:
         # -----
         # If a single value is provided, it returns a single integer. If an iterable is provided, it returns a list of integers.
         # "ChatGPT 4o" assisted with generating this doc
-        try:
-            ret = []
-            for val in vals:
-                ret.append(pptx.util.Inches(val))
-            return ret
-        except:
-            return pptx.util.Inches(val)
+        if isinstance(vals, int) or isinstance(vals, float):
+            return pptx.util.Inches(vals)
+        elif isinstance(vals, list) or isinstance(vals, tuple):
+            if all(isinstance(x, (int, float)) for x in vals):
+                ret = []
+                for val in vals:
+                    ret.append(pptx.util.Inches(val))
+                return ret
+            else:
+                for x in vals:
+                    if not isinstance(x, (int, float)):
+                        print(f"Element '{x}' is of type '{type(x).__name__}'")
+                raise TypeError(f"\"vals\" must contain only int or float values.")
+        else:
+            vals_type = type(vals).__name__
+            raise TypeError(f"\"vals\" of type \"{vals_type}\" is not supported.")
 
     def cell_dims_pptx(self):
         """Returns the PowerPoint-style inches that bound this shape (left, top, width, height).

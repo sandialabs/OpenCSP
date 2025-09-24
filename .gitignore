@@ -10,6 +10,9 @@
 # Virtual environment
 env/
 
+# Configuration files
+experiment_settings.ini
+
 # Ben's Sublime files.
 sftp-config.json
 
