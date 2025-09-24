@@ -1,13 +1,12 @@
 import copy
 import dataclasses
-from typing import Callable
+from typing import Callable, TYPE_CHECKING
 
 import cv2 as cv
 import numpy as np
 
 from contrib.common.lib.cv.spot_analysis.PixelOfInterest import PixelOfInterest
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-import contrib.common.lib.cv.annotations.EnclosedEnergyAnnotations as eeanno
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render.figure_management as fm
@@ -20,6 +19,11 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisIma
     AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.log_tools as lt
+
+
+if TYPE_CHECKING:
+    # import here to avoid cyclic imports
+    import contrib.common.lib.cv.annotations.EnclosedEnergyAnnotations as eeanno
 
 
 class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
@@ -297,7 +301,7 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
 
     def build_poi_annotations(
         self, center: tuple[float, float], percentages_of_interest_radii: dict[float, int]
-    ) -> eeanno.EnclosedEnergyAnnotations:
+    ) -> "eeanno.EnclosedEnergyAnnotations":
         """Builds circular or square annotations to represent the radiuses
         of the percentages of interest (poi).
 
@@ -310,9 +314,12 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         Returns
         -------
-        eeanno.EnclosedEnergyAnnotations
+        EnclosedEnergyAnnotations
             The new annotations.
         """
+        # import here to avoid cyclic imports
+        import contrib.common.lib.cv.annotations.EnclosedEnergyAnnotations as eeanno
+
         centers: p2.Pxy = None
         radiuses: list[int] = []
 
