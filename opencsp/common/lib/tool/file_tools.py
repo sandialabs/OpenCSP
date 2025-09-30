@@ -7,6 +7,7 @@ Utilities for file_handling.
 
 import csv
 from datetime import datetime
+import errno
 import glob
 import json
 import os
@@ -725,7 +726,14 @@ def default_output_path(file_path_name_ext: Optional[str] = None) -> str:
     return _output_paths[file_path_name_ext]
 
 
-def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check_only=False, retries=20, delay=2):
+def rename_file(
+    input_dir_body_ext: str,
+    output_dir_body_ext: str,
+    is_file_check_only=False,
+    nattempts=20,
+    delay=2,
+    cross_filesys_check=True,
+):
     """Move a file from input to output.
 
     Verifies that input is a file, and that the output doesn't exist. We check
@@ -738,9 +746,15 @@ def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check
         The "dir/body.ext" of the source file to be renamed.
     output_dir_body_ext: str, optional
         The destinaion "dir/body.ext" of the file.
-    is_file_check_only (bool):
+    is_file_check_only: bool, optional
         If True, then only check that input_dir_body_ext is a file. Otherwise,
         check everything. Default is False.
+    nattempts: int, optional
+        The number of times to try to save the file. Should be at least 1. Default is 20.
+    delay: float, optional
+        How many seconds to wait between a failed rename attempt and another attempt. Default is 2s.
+    cross_filesys_check: bool, optional
+        If True, then check for a cross-filesystem error after the first rename fails. If that detected as the cause then rename the file using copy_and_delete_file() instead. Default is True.
 
     See also: copy_file(), copy_and_delete_file()
     """
@@ -783,11 +797,17 @@ def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check
                 + str(os.path.dirname(output_dir_body_ext)),
             )
     # Rename the file.
-    osError = None
+    osError: OSError = None
 
-    for attempt in range(retries):
+    for attempt in range(nattempts):
         try:
-            os.rename(input_dir_body_ext, output_dir_body_ext)
+            if (attempt > 0) and (cross_filesys_check) and (osError is not None) and (osError.errno == errno.EXDEV):
+                # cross-filesystem error, try again with a different function
+                copy_and_delete_file(input_dir_body_ext, output_dir_body_ext)
+            else:  # attempt == 0 or osError.errno != 18
+                # first attempt or unknown error, try to rename
+                os.rename(input_dir_body_ext, output_dir_body_ext)
+
             # Verify the rename
             if not is_file_check_only:
                 if not os.path.exists(output_dir_body_ext):
@@ -798,7 +818,12 @@ def rename_file(input_dir_body_ext: str, output_dir_body_ext: str, is_file_check
             return
         except OSError as e:
             print(f"Attempt {attempt + 1}: {e}")
-            time.sleep(delay)
+            if (cross_filesys_check) and (e.errno == errno.EXDEV):
+                # for cross-filesystem errors, just try again right away with copy_and_delete_file
+                pass
+            else:
+                # for all other errors, wait and see if that clears the issue
+                time.sleep(delay)
             osError = e
 
     raise osError
