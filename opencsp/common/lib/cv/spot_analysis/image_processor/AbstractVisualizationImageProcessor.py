@@ -369,7 +369,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
             new_visualizations = self._visualize_operable(operable, is_last)
 
             # get the visualization images list
-            visualization_images = copy.copy(ret.visualization_images)
+            visualization_images = copy.copy(operable.visualization_images)
             if self not in visualization_images:
                 visualization_images[self] = []
             else:

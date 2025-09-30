@@ -30,6 +30,7 @@ class ImageGrid:
         subimage_size: tuple[int, int] = None,
         number_images: bool | int = False,
         numbering_color: tuple[int, int, int] | clr.Color = clr.black(),
+        numbering_outline_color: tuple[int, int, int] | clr.Color = None,
     ):
         # validate the input
         if total_size is not None and subimage_size is not None:
@@ -45,7 +46,8 @@ class ImageGrid:
         self._total_size = total_size
         self._subimage_size = subimage_size
         self.number_images = number_images
-        self.numbering_color = numbering_color
+        self.numbering_color = clr.Color.from_generic(numbering_color)
+        self.numbering_outline_color = clr.Color.from_generic(numbering_outline_color)
 
         self.images: list[Image.Image] = []
         self.add_images(*images)
@@ -153,6 +155,16 @@ class ImageGrid:
                     image_number = image_idx + starting_value
                     x, y, s = int(10 / 600 * sub_height), int(30 / 600 * sub_height), 1 / 600 * sub_height
                     subimg = np.array(subimg)
+                    if self.numbering_outline_color is not None:
+                        subimg = cv.putText(
+                            subimg,
+                            str(image_number),
+                            (x, y),
+                            cv.FONT_HERSHEY_DUPLEX,
+                            s,
+                            self.numbering_outline_color.rgb_255(),
+                            thickness=3,
+                        )
                     subimg = cv.putText(
                         subimg,
                         str(image_number),

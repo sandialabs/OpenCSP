@@ -115,7 +115,8 @@ class AbstractSpotAnalysisImageProcessor:
                         pass
                     except OSError:
                         lt.error(
-                            f"Failed to create directory {self._my_tmp_dir}, "
+                            f"Error in AbstractSpotAnalysisImageProcessor._get_save_dir() ({self.name}):"
+                            + f"failed to create directory {self._my_tmp_dir}, "
                             + "perhaps the opencsp settings are incorrect?"
                         )
                         raise
@@ -164,7 +165,7 @@ class AbstractSpotAnalysisImageProcessor:
             ret: list[SpotAnalysisOperable] = self._execute(input_operable, is_last)
         except Exception as ex:
             lt.error(
-                "Error in AbstractSpotAnalysisImageProcessor.process_operable(): "
+                f"Error in AbstractSpotAnalysisImageProcessor.process_operable() ({self.name}): "
                 + f"encountered {ex.__class__.__name__} exception while processing image {input_operable.primary_image_source_path}"
             )
             raise
@@ -256,7 +257,7 @@ class AbstractSpotAnalysisImageProcessor:
             else:
                 lt.error_and_raise(
                     TypeError,
-                    "Error in AbstractSpotAnalysisImageProcessor.process_images(): "
+                    f"Error in AbstractSpotAnalysisImageProcessor.process_images() ({self.name}): "
                     + f"expected input to be one of CacheableImage, Numpy array, or Pillow image, but is instead of type {type(images[0])}",
                 )
 

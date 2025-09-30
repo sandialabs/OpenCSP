@@ -242,9 +242,13 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             return
 
         # import here to avoid cyclic references
-        from opencsp.common.lib.cv.spot_analysis.image_processor import AverageByGroupImageProcessor
-        from opencsp.common.lib.cv.spot_analysis.image_processor import ConvolutionImageProcessor
-        from opencsp.common.lib.cv.spot_analysis.image_processor import CroppingImageProcessor
+        from opencsp.common.lib.cv.spot_analysis.image_processor.AverageByGroupImageProcessor import (
+            AverageByGroupImageProcessor,
+        )
+        from opencsp.common.lib.cv.spot_analysis.image_processor.ConvolutionImageProcessor import (
+            ConvolutionImageProcessor,
+        )
+        from opencsp.common.lib.cv.spot_analysis.image_processor.CroppingImageProcessor import CroppingImageProcessor
         from opencsp.common.lib.cv.SpotAnalysis import SpotAnalysis
 
         # Create necessary directories
