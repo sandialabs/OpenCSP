@@ -123,17 +123,23 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
 
     def validate_center(self, center_xy: tuple[int, int], operable: SpotAnalysisOperable | None, debug_name: str):
         center_x, center_y = center_xy
-        err_msg = (
-            "Error in CroppingImageProcessor.crop_around_location(): "
-            + f"centered location ({center_x}, {center_y}) is out of image bounds (width: {w}, height: {h}) "
-            + f"for {debug_name}"
-        )
 
         # verify that the center is inside the image boundaries
-        if center_x < 0 or center_x >= w or center_y < 0 or center_y >= h:
-            lt.error_and_raise(RuntimeError, err_msg)
+        if center_x < 0 or center_y < 0:
+            lt.error_and_raise(
+                RuntimeError,
+                "Error in CroppingImageProcessor.crop_around_location(): "
+                + f"centered location ({center_x}, {center_y}) is out of image bounds",
+            )
         if operable is not None:
             (h, w), _ = it.dims_and_nchannels(operable.primary_image.nparray)
+            err_msg = (
+                "Error in CroppingImageProcessor.crop_around_location(): "
+                + f"centered location ({center_x}, {center_y}) is out of image bounds (width: {w}, height: {h}) "
+                + f"for {debug_name}"
+            )
+            if center_x >= w or center_y >= h:
+                lt.error_and_raise(RuntimeError, err_msg)
             if center_x >= w or center_y >= h:
                 lt.error_and_raise(RuntimeError, err_msg)
 
