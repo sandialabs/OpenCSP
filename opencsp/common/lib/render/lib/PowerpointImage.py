@@ -653,7 +653,7 @@ class PowerpointImage(pps.PowerpointShape):
                 RuntimeError,
                 "Failed to find an empty spot to save this image to. Try using PowerpointImage.clear_tmp_save_all() to make more room.",
             )
-        lt.info(f"saving image to {image_path_name_ext}")
+        #lt.info(f"saving image to {image_path_name_ext}")
 
         # save the image
         saved_path, body_ext = self._save(image_path_name_ext)
