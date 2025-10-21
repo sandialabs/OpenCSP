@@ -189,6 +189,14 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
         cropped = image[y1:y2, x1:x2]
         new_primary = CacheableImage.from_single_source(cropped)
 
+        # apply the crop to the annotations
+        given_fiducials = operable.given_fiducials
+        found_fiducials = operable.found_fiducials
+        annotations = operable.annotations
+        for annots in [given_fiducials, found_fiducials, annotations]:
+            for i, annot in enumerate(annots):
+                annots[i] = annot.translate(p2.Pxy([x1, y1]))
+
         # apply the changes to the notes
         image_processor_notes = copy.copy(operable.image_processor_notes)
         image_processor_notes += additional_notes

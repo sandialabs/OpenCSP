@@ -1,10 +1,12 @@
 import numpy as np
 import os
 import unittest
+
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
+from opencsp.common.lib.cv.SpotAnalysis import SpotAnalysis
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.CroppingImageProcessor import CroppingImageProcessor
-
+import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.tool.file_tools as ft
 
 
@@ -58,7 +60,7 @@ class TestCroppingImageProcessor(unittest.TestCase):
 
     def test_bad_input_raises_error(self):
         tenbyfive = np.arange(50).reshape((5, 10))
-        
+
         # bad left
         with self.assertRaises(ValueError):
             processor = CroppingImageProcessor.by_region((-1, 9, 2, 4))
@@ -70,7 +72,7 @@ class TestCroppingImageProcessor(unittest.TestCase):
             processor = CroppingImageProcessor.by_region((1, 9, -1, 4))
         with self.assertRaises(ValueError):
             processor = CroppingImageProcessor.by_region((1, 9, 4, 4))
-        
+
         # bad right
         processor = CroppingImageProcessor.by_region((1, 11, 2, 4))
         with self.assertRaises(ValueError):
@@ -80,6 +82,26 @@ class TestCroppingImageProcessor(unittest.TestCase):
         processor = CroppingImageProcessor.by_region((1, 9, 2, 6))
         with self.assertRaises(ValueError):
             processor.process_operable(SpotAnalysisOperable(tenbyfive))
+
+    def test_crop_annotations(self):
+        from contrib.common.lib.cv.annotations.RectangleAnnotations import RectangleAnnotations
+
+        hundredbyhundred = CacheableImage(np.arange(100**2).reshape((100, 100)))
+        annotation0 = RectangleAnnotations(upperleft_lowerright_corners=(p2.Pxy([40, 40]), p2.Pxy([50, 50])))
+        operable0 = SpotAnalysisOperable(hundredbyhundred, "hundredbyhundred0", given_fiducials=[annotation0])
+        annotation1 = RectangleAnnotations(upperleft_lowerright_corners=(p2.Pxy([90, 90]), p2.Pxy([100, 100])))
+        operable1 = SpotAnalysisOperable(hundredbyhundred, "hundredbyhundred1", given_fiducials=[annotation1])
+
+        processor = CroppingImageProcessor.by_region((10, 90, 10, 90))
+        spot_analysis = SpotAnalysis("test_crop_annotations", image_processors=[processor])
+        spot_analysis.set_input_operables([operable0, operable1])
+        result0, result1 = tuple([r for r in spot_analysis])
+
+        new_annot0: RectangleAnnotations = result0.get_fiducials_by_type(RectangleAnnotations)[0]
+        new_annot1: RectangleAnnotations = result1.get_fiducials_by_type(RectangleAnnotations)[0]
+        self.assertEqual(new_annot0.origin.astuple(), (50, 50))
+        self.assertEqual(new_annot1.origin.astuple(), (100, 100))
+
 
 if __name__ == "__main__":
     unittest.main()

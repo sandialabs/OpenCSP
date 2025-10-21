@@ -67,6 +67,11 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
     def origin(self) -> p2.Pxy:
         return self._representative_circle.origin
 
+    def translate(self, translation: p2.Pxy):
+        centers, radiuses = self._p2r
+        centers += translation
+        return self.__class__(self.style, (centers, radiuses), self.enclosed_shape, self.pixels_to_meters)
+
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
         return self._representative_circle.rotation

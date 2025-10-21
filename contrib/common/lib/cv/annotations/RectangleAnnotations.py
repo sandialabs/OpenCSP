@@ -57,6 +57,11 @@ class RectangleAnnotations(AbstractAnnotations):
     def origin(self) -> p2.Pxy:
         return self.points[0]
 
+    def translate(self, translation: p2.Pxy):
+        upper_left = self.points[0] + translation
+        lower_right = self.points[1] + translation
+        return self.__class__(self.style, (upper_left, lower_right), self.pixels_to_meters)
+
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
         raise NotImplementedError("Orientation is not yet implemented for RectangleAnnotations")

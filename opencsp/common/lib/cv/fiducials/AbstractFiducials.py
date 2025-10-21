@@ -77,8 +77,17 @@ class AbstractFiducials(ABC):
         p2.Pxy
             The origin point(s) of the fiducial.
         """
-
         # "ChatGPT 4o" assisted with generating this docstring.
+
+    @abstractmethod
+    def translate(self, translation: p2.Pxy) -> "AbstractFiducials":
+        """Moves the location for this instance by the amount given. After this method is called, origin() should return a new value equal to the old origin + the given translation.
+
+        Parameters
+        ----------
+        translation : p2.Pxy
+            Amount to move this instance by.
+        """
 
     @property
     @abstractmethod

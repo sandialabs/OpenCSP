@@ -54,6 +54,11 @@ class CircularAnnotations(AbstractAnnotations):
     def origin(self) -> p2.Pxy:
         return self.p2r[0]
 
+    def translate(self, translation: p2.Pxy):
+        centers, radiuses = self.p2r
+        p2r = (centers + translation, radiuses)
+        return self.__class__(self.style, p2r, self.pixels_to_meters)
+
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
         raise NotImplementedError("Orientation is not yet implemented for CircularAnnotations")

@@ -77,6 +77,9 @@ class BcsFiducial(AbstractFiducials):
         # "ChatGPT 4o" assisted with generating this docstring.
         return self.origin_px
 
+    def translate(self, translation: p2.Pxy):
+        return self.__class__(self.origin_px + translation, self.radius_px, self.style, self.pixels_to_meters)
+
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
         """
