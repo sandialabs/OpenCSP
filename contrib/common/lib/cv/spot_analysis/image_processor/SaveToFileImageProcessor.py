@@ -20,10 +20,10 @@ class SaveToFileImageProcessor(AbstractSpotAnalysisImageProcessor):
         save_ext="png",
         prefix: str | Callable[[SpotAnalysisOperable], str] = None,
         suffix: str | Callable[[SpotAnalysisOperable], str] = None,
-        save_primary: str | None = "",
-        save_supporting: str | None = None,
-        save_visualizations: str | None = None,
-        save_algorithms: str | None = None,
+        save_primary: str | bool | None = "",
+        save_supporting: str | bool | None = None,
+        save_visualizations: str | bool | None = None,
+        save_algorithms: str | bool | None = None,
         primary_log_level=lt.log.INFO,
     ):
         """
@@ -39,18 +39,28 @@ class SaveToFileImageProcessor(AbstractSpotAnalysisImageProcessor):
         suffix : str or callable, optional
             The suffix for the saved image file names. If a callable, it will be
             called with the SpotAnalysisOperable as an argument. Default is None.
-        save_primary : str, optional
-            The subdirectory for saving primary images to (default is an empty string).
-        save_supporting : str, optional
-            The subdirectory for saving supporting images to (default is None).
-        save_visualizations : str, optional
-            The subdirectory for saving visualization images to (default is None).
-        save_algorithms : str, optional
-            The subdirectory for saving algorithm images to (default is None).
+        save_primary : str | bool, optional
+            The subdirectory for saving primary images to (default is an empty string). If True, then the default value "primary" is used. If False, then the primary image isn't saved.
+        save_supporting : str | bool, optional
+            The subdirectory for saving supporting images to (default is None). If True, then the default value "supporting" is used. If False, then the supporting images aren't saved.
+        save_visualizations : str | bool, optional
+            The subdirectory for saving visualization images to (default is None). If True, then the default value "visualizations" is used. If False, then the visualizations images aren't saved.
+        save_algorithms : str | bool, optional
+            The subdirectory for saving algorithm images to (default is None). If True, then the default value "algorithms" is used. If False, then the algorithms images aren't saved.
         primary_log_level : int, optional
             The log level for where the primary image is saved to (default is INFO).
         """
         super().__init__()
+
+        # normalize values
+        if save_primary == True or save_primary == False:
+            save_primary = "primary" if save_primary else None
+        if save_supporting == True or save_supporting == False:
+            save_supporting = "supporting" if save_supporting else None
+        if save_visualizations == True or save_visualizations == False:
+            save_visualizations = "visualizations" if save_visualizations else None
+        if save_algorithms == True or save_algorithms == False:
+            save_algorithms = "algorithms" if save_algorithms else None
 
         # register parameters
         self.save_dir = save_dir
