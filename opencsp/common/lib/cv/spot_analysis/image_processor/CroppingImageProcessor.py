@@ -2,11 +2,14 @@ import copy
 import dataclasses
 from typing import Callable
 
+import numpy as np
+
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImageProcessor,
 )
+import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
@@ -84,7 +87,7 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
             y1: The top side of the box to crop to (inclusive).
             y2: The bottom side of the box to crop to (exclusive).
         """
-        return cls(x1x2y1y1=x1x2y1y2)
+        return cls(x1x2y1y2=x1x2y1y2)
 
     @classmethod
     def by_center_and_size(
@@ -170,7 +173,32 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
                     + f"for {debug_name}!",
                 )
 
-    def crop_by_bounding_box(self, operable: SpotAnalysisOperable) -> tuple[CacheableImage, list]:
+    def _crop_image(
+        self,
+        operable: SpotAnalysisOperable,
+        x1: int,
+        x2: int,
+        y1: int,
+        y2: int,
+        additional_notes: list[tuple[str, str]],
+    ) -> SpotAnalysisOperable:
+        # crop the image
+        image = operable.primary_image.nparray
+        (h, w), _ = it.dims_and_nchannels(image)
+        lt.debug("In CroppingImageProcessor(): " + f"cropping image from [0:{w},0:{h}] to [{x1}:{x2},{y1}:{y2}]")
+        cropped = image[y1:y2, x1:x2]
+        new_primary = CacheableImage.from_single_source(cropped)
+
+        # apply the changes to the notes
+        image_processor_notes = copy.copy(operable.image_processor_notes)
+        image_processor_notes += additional_notes
+
+        # build the new operable
+        ret = dataclasses.replace(operable, primary_image=new_primary, image_processor_notes=image_processor_notes)
+
+        return ret
+
+    def crop_by_bounding_box(self, operable: SpotAnalysisOperable) -> SpotAnalysisOperable:
         """
         Parameters
         ----------
@@ -188,8 +216,8 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
         self.validate_x1x2y1y2((x1, x2, y1, y2), f"operable '{operable.best_primary_pathnameext}'")
 
         # check the size of the image
-        (h, w), _ = it.dims_and_nchannels(img)
-        if w < x2 - 1 or h < y2 - 1:
+        (h, w), _ = it.dims_and_nchannels(image)
+        if x1 >= w or y1 >= h or x2 > w or y2 > h:
             lt.error_and_raise(
                 ValueError,
                 "Error in CroppingImageProcessor._execute(): "
@@ -197,15 +225,12 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
             )
 
         # create the cropped image
-        cropped = image[y1:y2, x1:x2]
-        new_primary = CacheableImage(cropped)
+        new_notes = [("CroppingImageProcessor", [f"{x1}", f"{x2}", f"{y1}", f"{y2}"])]
+        new_operable = self._crop_image(operable, x1, x2, y1, y2, new_notes)
 
-        image_processor_notes = copy.copy(operable.image_processor_notes)
-        image_processor_notes.append(("CroppingImageProcessor", [f"{x1}", f"{x2}", f"{y1}", f"{y2}"]))
+        return new_operable
 
-        return new_primary, image_processor_notes
-
-    def crop_around_center(self, operable: SpotAnalysisOperable) -> tuple[CacheableImage, list]:
+    def crop_around_center(self, operable: SpotAnalysisOperable) -> SpotAnalysisOperable:
         """
         Parameters
         ----------
@@ -234,51 +259,46 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # Calculate the cropping coordinates.
         # Remember that the width and height must match the requested value.
-        half_height = height // 2
-        half_width = width // 2
+        half_height = int(np.ceil(height / 2))
+        half_width = int(np.ceil(width / 2))
 
-        y1 = max(center_y - half_height, 0)
-        center_y = y1 + half_height
         y2 = min(center_y + half_height, h)
-        center_y, y1 = y2 - half_height, y2 - height
-        x1 = max(center_x - half_width, 0)
-        center_x = x1 + half_width
+        y1 = max(y2 - height, 0)
+        y2 = min(y1 + height, h)
         x2 = min(center_x + half_width, w)
-        center_x, x1 = x2 - half_width, x2 - width
+        x1 = max(x2 - width, 0)
+        x2 = min(x1 + width, w)
 
         # Sanity check
         assert x2 > x1
         assert y2 > y1
         assert x1 >= 0
         assert y1 >= 0
+        assert x2 - x1 == width
+        assert y2 - y1 == height
 
         # Create the cropped image
-        lt.info("In CroppingImageProcessor(): " + f"cropping image from [0:{w},0:{h}] to [{x1}:{x2},{y1}:{y2}]")
-        cropped = image[y1:y2, x1:x2]
-        new_primary = CacheableImage.from_single_source(cropped)
-
-        image_processor_notes = copy.copy(operable.image_processor_notes)
-        image_processor_notes.append(
+        new_notes = [
             (
                 "CroppingImageProcessor",
                 [f"centered at ({center_x}, {center_y})", f"width: {width}", f"height: {height}"],
             )
-        )
+        ]
+        new_operable = self._crop_image(operable, x1, x2, y1, y2, new_notes)
 
-        return new_primary, image_processor_notes
+        return new_operable
 
     def _execute(self, operable: SpotAnalysisOperable, is_last: bool) -> list[SpotAnalysisOperable]:
         if self.x1x2y1y2 is not None:
-            new_primary, image_processor_notes = self.crop_by_bounding_box(operable)
+            ret = self.crop_by_bounding_box(operable)
         elif self.centered_location is not None:
-            new_primary, image_processor_notes = self.crop_around_center(operable)
+            ret = self.crop_around_center(operable)
         else:
             lt.error_and_raise(
                 ValueError,
                 "Error in CroppingImageProcessor(): " + "unknown cropping method encountered in _execute() method",
             )
 
-        ret = dataclasses.replace(operable, primary_image=new_primary, image_processor_notes=image_processor_notes)
         return [ret]
 
 
