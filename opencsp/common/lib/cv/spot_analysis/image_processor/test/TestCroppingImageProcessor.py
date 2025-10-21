@@ -99,8 +99,8 @@ class TestCroppingImageProcessor(unittest.TestCase):
 
         new_annot0: RectangleAnnotations = result0.get_fiducials_by_type(RectangleAnnotations)[0]
         new_annot1: RectangleAnnotations = result1.get_fiducials_by_type(RectangleAnnotations)[0]
-        self.assertEqual(new_annot0.origin.astuple(), (50, 50))
-        self.assertEqual(new_annot1.origin.astuple(), (100, 100))
+        self.assertEqual(new_annot0.origin.astuple(), (30, 30))
+        self.assertEqual(new_annot1.origin.astuple(), (80, 80))
 
 
 if __name__ == "__main__":

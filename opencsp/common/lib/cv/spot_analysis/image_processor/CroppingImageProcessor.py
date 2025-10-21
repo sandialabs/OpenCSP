@@ -195,7 +195,7 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
         annotations = operable.annotations
         for annots in [given_fiducials, found_fiducials, annotations]:
             for i, annot in enumerate(annots):
-                annots[i] = annot.translate(p2.Pxy([x1, y1]))
+                annots[i] = annot.translate(p2.Pxy([-x1, -y1]))
 
         # apply the changes to the notes
         image_processor_notes = copy.copy(operable.image_processor_notes)
