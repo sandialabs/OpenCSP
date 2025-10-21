@@ -23,7 +23,7 @@ class CircularAnnotations(AbstractAnnotations):
         self,
         style: rcps.RenderControlPointSeq = None,
         centers_radiuses: tuple[p2.Pxy, list[int]] = None,
-        pixels_to_meters: float = None,
+        meters_per_pixel: float = None,
     ):
         """
         Parameters
@@ -32,7 +32,7 @@ class CircularAnnotations(AbstractAnnotations):
             The rendering style, by default {magenta, no corner markers}
         centers_radiuses : tuple[Pxy, list[int]]
             The center(s) and radius(es) for this annotation, in pixels
-        pixels_to_meters : float, optional
+        meters_per_pixel : float, optional
             A simple conversion method for how many meters a pixel represents,
             for use in scale(). By default None.
         """
@@ -41,7 +41,7 @@ class CircularAnnotations(AbstractAnnotations):
         super().__init__(style)
 
         self.p2r = centers_radiuses
-        self.pixels_to_meters = pixels_to_meters
+        self.meters_per_pixel = meters_per_pixel
 
     def get_bounding_box(self, index=0) -> reg.RegionXY:
         x = self.p2r[0].x[index]
@@ -57,7 +57,7 @@ class CircularAnnotations(AbstractAnnotations):
     def translate(self, translation: p2.Pxy):
         centers, radiuses = self.p2r
         p2r = (centers + translation, radiuses)
-        return self.__class__(self.style, p2r, self.pixels_to_meters)
+        return self.__class__(self.style, p2r, self.meters_per_pixel)
 
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
@@ -69,13 +69,13 @@ class CircularAnnotations(AbstractAnnotations):
 
     @property
     def scale(self) -> list[float]:
-        if self.pixels_to_meters is None:
+        if self.meters_per_pixel is None:
             lt.error_and_raise(
                 RuntimeError,
                 "Error in CircularAnnotations.scale(): "
-                + "no pixels_to_meters conversion ratio is set, so scale can't be estimated",
+                + "no meters_per_pixel conversion ratio is set, so scale can't be estimated",
             )
-        return [d * self.pixels_to_meters for d in self.size]
+        return [d * self.meters_per_pixel for d in self.size]
 
     def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False):
         label = self.get_label(include_label)

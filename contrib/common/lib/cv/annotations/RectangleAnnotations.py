@@ -23,7 +23,7 @@ class RectangleAnnotations(AbstractAnnotations):
         self,
         style: rcps.RenderControlPointSeq = None,
         upperleft_lowerright_corners: tuple[p2.Pxy, p2.Pxy] = None,
-        pixels_to_meters: float = None,
+        meters_per_pixel: float = None,
     ):
         """
         Parameters
@@ -32,7 +32,7 @@ class RectangleAnnotations(AbstractAnnotations):
             The rendering style, by default {magenta, no corner markers}
         upperleft_lowerright_corners : Pxy
             The upper-left and lower-right corners of the bounding box for this rectangle, in pixels
-        pixels_to_meters : float, optional
+        meters_per_pixel : float, optional
             A simple conversion method for how many meters a pixel represents,
             for use in scale(). By default None.
         """
@@ -41,7 +41,7 @@ class RectangleAnnotations(AbstractAnnotations):
         super().__init__(style)
 
         self.points = upperleft_lowerright_corners
-        self.pixels_to_meters = pixels_to_meters
+        self.meters_per_pixel = meters_per_pixel
 
     def get_bounding_box(self, index=0) -> reg.RegionXY:
         x1 = self.points[0].x[index]
@@ -60,7 +60,7 @@ class RectangleAnnotations(AbstractAnnotations):
     def translate(self, translation: p2.Pxy):
         upper_left = self.points[0] + translation
         lower_right = self.points[1] + translation
-        return self.__class__(self.style, (upper_left, lower_right), self.pixels_to_meters)
+        return self.__class__(self.style, (upper_left, lower_right), self.meters_per_pixel)
 
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
@@ -74,13 +74,13 @@ class RectangleAnnotations(AbstractAnnotations):
 
     @property
     def scale(self) -> list[float]:
-        if self.pixels_to_meters is None:
+        if self.meters_per_pixel is None:
             lt.error_and_raise(
                 RuntimeError,
                 "Error in RectangeAnnotations.scale(): "
-                + "no pixels_to_meters conversion ratio is set, so scale can't be estimated",
+                + "no meters_per_pixel conversion ratio is set, so scale can't be estimated",
             )
-        return [self.size * self.pixels_to_meters]
+        return [self.size * self.meters_per_pixel]
 
     def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False):
         label = self.get_label(include_label)
