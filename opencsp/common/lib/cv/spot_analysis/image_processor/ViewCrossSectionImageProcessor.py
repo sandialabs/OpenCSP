@@ -346,7 +346,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
             # jhs modified, only the first view has actual data to display in the enclosed_energy jupyter notebook
             # example, so I am only showing that one here. Also, this is true for the target_identification example
-            if (first_view):
+            if first_view:
                 view.show(block=False, legend=legend)
             first_view = False
 
