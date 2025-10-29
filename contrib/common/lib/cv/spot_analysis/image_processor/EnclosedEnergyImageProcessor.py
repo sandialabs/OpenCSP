@@ -266,7 +266,7 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
             name="enclosed_energy",
             code_tag=f"{__file__}.build_enclosed_energy_plot()",
         )
-        
+
         # Draw the percentages of interest
         percentages_of_interest_radii: dict[float, int] = {}
         if self.percentages_of_interest is not None:
