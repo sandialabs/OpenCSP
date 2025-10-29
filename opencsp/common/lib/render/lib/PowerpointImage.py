@@ -28,7 +28,10 @@ class PowerpointImage(pps.PowerpointShape):
         6. Clean up temporary files with :py:meth:`clear_tmp_save`
     """
 
-    _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
+    #_tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp") # TODO jhs, revisit this logic
+    #_tmp_save_path = ft.join("C:/ctemp", "PowerpointImage/images/tmp")
+    #_tmp_save_path = ft.join("C:/ctemp", "OpenCSP_example_data/enclosed_energy/HeliostatsSpotSize/3_Process/PowerPointFigures")
+    _tmp_save_path = ft.join("C:/ctemp", "OpenCSP_example_data/target_identification/HeliostatsSpotSize/3_Process/PowerPointFigures")
 
     def __init__(
         self,
@@ -636,7 +639,7 @@ class PowerpointImage(pps.PowerpointShape):
         # get a temporary name to save to
         found_unused_name = False
         for tmp_slide_idx in slide_idx_range:
-            max_img_idx = 20  # probably shouldn't need more than 20 images in a slide
+            max_img_idx = 20  # probably shouldn't need more than 20 images in a slide, TODO, marked, revisit 20 image limit
             dir_name_ext_pattern = self._get_save_dir_name_ext_pattern(tmp_slide_idx)
             max_image_path_name_ext = dir_name_ext_pattern % (max_img_idx - 1)
             if ft.file_exists(max_image_path_name_ext):
@@ -653,9 +656,10 @@ class PowerpointImage(pps.PowerpointShape):
                 RuntimeError,
                 "Failed to find an empty spot to save this image to. Try using PowerpointImage.clear_tmp_save_all() to make more room.",
             )
-        #lt.info(f"saving image to {image_path_name_ext}")
+        lt.info(f"saving image to {image_path_name_ext}")
 
         # save the image
+        # saved_path, body_ext = self._save(image_path_name_ext) # jhs commented out
         saved_path, body_ext = self._save(image_path_name_ext)
         if saved_path != self._tmp_save_path:
             lt.error_and_raise(
@@ -690,6 +694,7 @@ class PowerpointImage(pps.PowerpointShape):
         # TODO verify that the path is the expected temporary path
 
         # delete the saved files
+        # TODO: jhs, commented these out in order to retain powerpoint figures for ir submission, 10/23/2025
         ft.delete_file(path_name_ext, error_on_not_exists=False)
         ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
 
