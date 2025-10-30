@@ -342,13 +342,13 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         # draw
         first_view = True
         for view in self.views:
-           legend = graphs_per_plot_cnt > 1
+            legend = graphs_per_plot_cnt > 1
 
             # jhs modified, only the first view has actual data to display in the enclosed_energy jupyter notebook
             # example, so I am only showing that one here. Also, this is true for the target_identification example
-           if first_view:
-               view.show(block=False, legend=legend)
-           first_view = False
+            if first_view:
+                view.show(block=False, legend=legend)
+            first_view = False
 
         # explicitly set the y-axis range
         if self.y_range is not None:
