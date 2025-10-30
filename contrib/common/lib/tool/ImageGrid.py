@@ -47,7 +47,7 @@ class ImageGrid:
         self._subimage_size = subimage_size
         self.number_images = number_images
         self.numbering_color = clr.Color.from_generic(numbering_color)
-        self.numbering_outline_color = clr.Color.from_generic(numbering_outline_color)
+        self.numbering_outline_color = None if numbering_outline_color is None else clr.Color.from_generic(numbering_outline_color)
 
         self.images: list[Image.Image] = []
         self.add_images(*images)
