@@ -28,12 +28,13 @@ class PowerpointImage(pps.PowerpointShape):
         6. Clean up temporary files with :py:meth:`clear_tmp_save`
     """
 
-    _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")  # TODO jhs, revisit this logic
+    # _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")  # TODO jhs, revisit this logic
     # _tmp_save_path = ft.join("C:/ctemp", "PowerpointImage/images/tmp")
     # _tmp_save_path = ft.join("C:/ctemp", "OpenCSP_example_data/enclosed_energy/HeliostatsSpotSize/3_Process/PowerPointFigures")
-    # _tmp_save_path = ft.join(
-    # "C:/ctemp", "OpenCSP_example_data/target_identification/HeliostatsSpotSize/3_Process/PowerPointFigures"
-    # )
+    #_tmp_save_path = ft.join(
+    #    "C:/ctemp", "OpenCSP_example_data/enclosed_energy/HeliostatsSpotSize/3_Process/PowerPointFigures"
+    #)
+    # _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
 
     def __init__(
         self,
@@ -44,6 +45,7 @@ class PowerpointImage(pps.PowerpointShape):
         caption: str = None,
         stretch=False,
         parent_slide=None,
+        powerpoint_figures_save_path: str = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp"), # None,
     ):
         """
         Parameters
@@ -97,7 +99,7 @@ class PowerpointImage(pps.PowerpointShape):
 
         self.parent_slide: pps.PowerpointSlide = parent_slide
 
-        self._tmp_save_path = self.__class__._tmp_save_path
+        self._tmp_save_path = powerpoint_figures_save_path # self.__class__._tmp_save_path
 
         self.set_val(val)
 
@@ -547,8 +549,8 @@ class PowerpointImage(pps.PowerpointShape):
 
         return cls(image_path_name_ext, dims, cell_dims, caption_is_above, caption, stretch)
 
-    @classmethod
-    def _get_save_dir_name_ext_pattern(cls, slide_idx: int = None, for_glob=False) -> str:
+    # @classmethod
+    def _get_save_dir_name_ext_pattern(self, slide_idx: int = None, for_glob=False) -> str:
         """
         Get the temporary file path/name.ext pattern to :py:meth:`save` image
         data to. This name will also be used for the text files that hold the
@@ -575,7 +577,7 @@ class PowerpointImage(pps.PowerpointShape):
             ret = f"{slide_idx}_%d.png"
         if for_glob:
             ret = ret.replace("%d", "*")
-        return ft.join(cls._tmp_save_path, ret)
+        return ft.join(self._tmp_save_path, ret)
 
     def update_save_path(self, save_path: str):
         """Set the path where the image and its associated serialized text will be saved.
@@ -699,12 +701,13 @@ class PowerpointImage(pps.PowerpointShape):
 
         # delete the saved files
         # TODO: jhs, commented these out in order to retain powerpoint figures for ir submission, 10/23/2025
-        ft.delete_file(path_name_ext, error_on_not_exists=False)
-        ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
+        # ft.delete_file(path_name_ext, error_on_not_exists=False)
+        # ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
 
     @classmethod
     def clear_tmp_save_all(cls):
         """Remove all temporary save files for all saved PowerpointImages"""
-        if ft.directory_exists(cls._tmp_save_path, error_if_exists_as_file=False):
-            ft.delete_files_in_directory(cls._tmp_save_path, "*.png", error_on_dir_not_exists=False)
-            ft.delete_files_in_directory(cls._tmp_save_path, "*.png.txt", error_on_dir_not_exists=False)
+        return
+        # if ft.directory_exists(cls._tmp_save_path, error_if_exists_as_file=False):
+            # ft.delete_files_in_directory(cls._tmp_save_path, "*.png", error_on_dir_not_exists=False)
+            # ft.delete_files_in_directory(cls._tmp_save_path, "*.png.txt", error_on_dir_not_exists=False)

@@ -112,6 +112,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
         processors_per_slide: (
             list[list[ProcessorSelector | ProcOrImg | tuple[ProcOrImg, str, ImageType]]] | None
         ) = None,
+        powerpoint_figures_save_path: str = None,
     ):
         super().__init__()
 
@@ -119,6 +120,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
         self.save_dir = save_dir
         self.save_name = save_name if save_name.lower().endswith(".pptx") else save_name + ".pptx"
         self.dest_path_name_ext = ft.norm_path(os.path.join(self.save_dir, self.save_name))
+        self.powerpoint_figures_save_path = powerpoint_figures_save_path
 
         # validate input
         if not ft.directory_exists(self.save_dir):
@@ -376,7 +378,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
             slide.set_title(operable.best_primary_nameext)
             for processor_sel, image in images_list:
                 caption = processor_sel.get_caption()
-                slide.add_image(pi.PowerpointImage(image.nparray, caption=caption))
+                slide.add_image(pi.PowerpointImage(image.nparray, caption=caption, powerpoint_figures_save_path=self.powerpoint_figures_save_path))
 
             # add the slide to the presentation
             slide.save_and_bake()
