@@ -414,19 +414,51 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
 
     def prepare_figure_records(
         self,
-        figure_records: list[rcfr.RenderControlFigureRecord]
+        figure_records: list[rcfr.RenderControlFigureRecord],
+        figure_shapes: list[list[int | float] | tuple | None] = (),
     ):
         """
-        Clears the figure records and sets the layout margins to "tight".
+        Clears the figure records, sets the layout margins to "tight", and
+        sets the figure record shape.
 
         Parameters
         ----------
         figure_records : list[rcfr.RenderControlFigureRecord]
             The figure records to be prepared.
+        figure_shapes : list[list[int | float] | tuple | None], optional
+            The shapes of the figure records. This can either be the desired
+            height/width of the figure in inches (if < 50), or the number of
+            rows/columns in the figure (if > 50). The figure will be resized so
+            that the width-to-height ratio matches this value.
         """
         for fig_record in figure_records:
             fig_record.figure.tight_layout()
             fig_record.clear()
+
+        for i in range(min(len(figure_records), len(figure_shapes))):
+            fig_record, fig_shape = figure_records[i], figure_shapes[i]
+            if fig_shape is None:
+                continue
+            if len(fig_shape) < 2:
+                lt.error_and_raise(
+                    ValueError,
+                    f"In AbstractVisualizationImageProcessor.prepare_figure_records ({self.name}):"
+                    + f"expected figure shape to have at least two dimensions, but {figure_shapes[i]=}",
+                )
+            curr_height = fig_record.figure.get_size_inches()[1]
+
+            if fig_shape[0] >= 50 or fig_shape[1] >= 50:
+                # Assume that fig_shape is pixel dimensions with
+                # rows (0) and columns (1), such as from array.shape
+                nrows, ncols = fig_shape[0], fig_shape[1]
+                width_to_height = ncols / nrows
+                fig_record.figure.set_size_inches(width_to_height * curr_height, curr_height)
+
+            else:
+                # Assume the the fig_shape is the height/width in inches.
+                height, width = fig_shape[0], fig_shape[1]
+                width_to_height = width / height
+                fig_record.figure.set_size_inches(width_to_height * curr_height, curr_height)
 
     def _hide_vis_window_dressings(self, fig_record: rcfr.RenderControlFigureRecord):
         # hide all the window dressings
@@ -436,7 +468,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         fig_record.title = ""
         fig_record.figure.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
 
-        return { "old_title": old_title }
+        return {"old_title": old_title}
 
     def _apply_window_dressings(self, fig_record: rcfr.RenderControlFigureRecord, window_dressings: dict[str, any]):
         # re-apply all the window dressings
