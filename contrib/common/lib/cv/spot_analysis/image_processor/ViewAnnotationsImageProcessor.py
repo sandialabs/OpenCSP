@@ -112,7 +112,7 @@ class ViewAnnotationsImageProcessor(AbstractVisualizationImageProcessor):
         to_render += filter(self._annotations_match_filter, operable.annotations)
 
         # initialize the figure
-        self.figure.clear()
+        self.prepare_figure_records([self.figure])
         self.figure.view.imshow(image)
 
         # render

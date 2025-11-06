@@ -305,8 +305,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         cs_cropped_y_mlab = cropped_height - cs_cropped_y
 
         # Clear the previous plot
-        for fig_record in self.fig_records:
-            fig_record.clear()
+        self.prepare_figure_records(self.fig_records)
 
         # Update the title
         for plot_title_prefix, fig_record in zip(self.plot_titles, self.fig_records):

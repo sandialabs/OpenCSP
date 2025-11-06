@@ -114,7 +114,7 @@ class ViewHighlightImageProcessor(AbstractVisualizationImageProcessor):
             new_image[white_selector] = highlight_color.rgb_255()
 
         # show the visualization
-        self.figure.clear()
+        self.prepare_figure_records([self.figure])
         self.figure.view.imshow(new_image)
         self.figure.view.show(block=False)
 

@@ -61,6 +61,12 @@ class SpotAnalysisOperable:
     algorithm_images
     supporting_images
     """
+    _visualization_image_no_axes: CacheableImage = None
+    """
+    The visualization image from the last AbstractVisualizationImageProcessor.
+    This value is used by the next AbstractVisualizationImageProcessor that has
+    its base_image_selector set to 'visualization', and then the value is unset.
+    """
     algorithm_images: dict["AbstractSpotAnalysisImageProcessor", list[CacheableImage]] = field(default_factory=dict)
     """
     The images produced by the image processors to explain how certain values
@@ -149,6 +155,7 @@ class SpotAnalysisOperable:
                 primary_image_source_path,
                 supporting_images,
                 self.visualization_images,
+                self._visualization_image_no_axes,
                 self.algorithm_images,
                 self.previous_operables,
                 self.given_fiducials,

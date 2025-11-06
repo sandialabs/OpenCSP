@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 import copy
 import dataclasses
 from typing import Callable
+import weakref
 
 import numpy as np
 
@@ -11,6 +12,7 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysi
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
     AbstractSpotAnalysisImageProcessor,
 )
+import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.tool.image_tools as it
@@ -47,6 +49,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         - init_figure_records()*
         - process()
         -     _execute()
+        -     _get_image_for_visualizing()
         -     visualize_operable()*
         - close_figures()*
 
@@ -141,6 +144,18 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         """
         self.initialized_figure_records = False
         """ True if init_figure_records() has been called, False otherwise. """
+        self._render_control_fig: weakref.ref[rcf.RenderControlFigure] = None
+        """
+        The figure control used in init_figure_records(). Managed as a weak
+        reference so that this reference doesn't complicating garbage collection.
+        """
+        self._include_visualization_image_no_axes: bool = False
+        """
+        If True, then the _visualization_image_no_axes image is set on the
+        returned SpotAnalysisOperable. This value is used by the next
+        visualization image processor that has its base_image_selector set to
+        'visualization', and then the value is unset.
+        """
 
     @property
     @abstractmethod
@@ -182,6 +197,9 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
             return operable.primary_image
         elif isinstance(self.base_image_selector, str):
             if self.base_image_selector.lower() == 'visualization':
+                if operable._visualization_image_no_axes is not None:
+                    print(self.name)
+                    return operable._visualization_image_no_axes
                 return list(operable.visualization_images.values())[-1][0]
             elif self.base_image_selector.lower() == 'algorithm':
                 return list(operable.algorithm_images.values())[-1][0]
@@ -231,7 +249,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         -------
         visualizations: list[CacheableImage|rcfr.RenderControlFigureRecord]
             Visualizations from this image processor as cacheable images or as
-            figure records. Empty list if there aren't any.
+            figure records. Figure records preferred. Empty list if there aren't any.
         """
         pass
 
@@ -279,6 +297,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         list[rcfr.RenderControlFigureRecord]
             The list of newly created visualization windows.
         """
+        self._render_control_fig = weakref.ref(render_control_fig)
         ret = self.init_figure_records(render_control_fig)
         self.initialized_figure_records = True
         return ret
@@ -352,6 +371,9 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         # ChatGPT 4o-mini assisted with generating this docstring, reviewed by a human
         ret: SpotAnalysisOperable = None
 
+        # Remember the _visualization_image_no_axes value so that it can be unset if unchanged.
+        previs_visualization_image_no_axes = operable._visualization_image_no_axes
+
         if self.has_visualization_coordinator:
             # Visualize the operable and block (if interactive).
             op_with_vis = self.visualization_coordinator.visualize(self, operable, is_last)
@@ -366,7 +388,7 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
                 # Create the figure to plot to
                 render_control = self.default_render_control_figure_for_operable(operable)
                 self._init_figure_records(render_control)
-            new_visualizations = self._visualize_operable(operable, is_last)
+            new_visualizations, _visualization_image_no_axes = self._visualize_operable(operable, is_last)
 
             # get the visualization images list
             visualization_images = copy.copy(operable.visualization_images)
@@ -377,11 +399,56 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
             visualization_images[self] += new_visualizations
 
             # update the return value
-            ret = dataclasses.replace(operable, visualization_images=visualization_images)
+            ret = dataclasses.replace(
+                operable,
+                visualization_images=visualization_images,
+                _visualization_image_no_axes=_visualization_image_no_axes,
+            )
+
+        # Unset the _visualization_image_no_axes if unchanged.
+        # We do this because that value is intended to be used for the next processor only.
+        if ret._visualization_image_no_axes == previs_visualization_image_no_axes:
+            ret = dataclasses.replace(ret, _visualization_image_no_axes=None)
 
         return [ret]
 
-    def _visualize_operable(self, operable: SpotAnalysisOperable, is_last: bool) -> list[CacheableImage]:
+    def prepare_figure_records(
+        self,
+        figure_records: list[rcfr.RenderControlFigureRecord]
+    ):
+        """
+        Clears the figure records and sets the layout margins to "tight".
+
+        Parameters
+        ----------
+        figure_records : list[rcfr.RenderControlFigureRecord]
+            The figure records to be prepared.
+        """
+        for fig_record in figure_records:
+            fig_record.figure.tight_layout()
+            fig_record.clear()
+
+    def _hide_vis_window_dressings(self, fig_record: rcfr.RenderControlFigureRecord):
+        # hide all the window dressings
+        if (render_control_fig := self._render_control_fig()) is not None:
+            fm.hide_axes(fig_record, render_control_fig, force_hide=True)
+        old_title = fig_record.title
+        fig_record.title = ""
+        fig_record.figure.subplots_adjust(left=0, right=1, top=1, bottom=0, wspace=0, hspace=0)
+
+        return { "old_title": old_title }
+
+    def _apply_window_dressings(self, fig_record: rcfr.RenderControlFigureRecord, window_dressings: dict[str, any]):
+        # re-apply all the window dressings
+        fig_record.figure.tight_layout()
+        if (render_control_fig := self._render_control_fig()) is not None:
+            fm.show_axes(fig_record, render_control_fig)
+        old_title: str = window_dressings["old_title"]
+        fig_record.title = old_title
+
+    def _visualize_operable(
+        self, operable: SpotAnalysisOperable, is_last: bool
+    ) -> tuple[list[CacheableImage], CacheableImage | None]:
         """
         Calls :py:meth:`visualize_operable` and collects the visualziation images.
 
@@ -421,16 +488,33 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
 
         # build the list of visualization images
         all_vis_images: list[CacheableImage] = []
-        for cacheable_or_figure_rec in visualizations:
+        _visualization_image_no_axes: CacheableImage = None
+        for i, cacheable_or_figure_rec in enumerate(visualizations):
             if isinstance(cacheable_or_figure_rec, CacheableImage):
-                all_vis_images.append(cacheable_or_figure_rec)
+                cacheable = cacheable_or_figure_rec
+
+                all_vis_images.append(cacheable)
 
             else:
+                fig_record = cacheable_or_figure_rec
+
                 # get the figure as an numpy array, using the standard 8 inches figure height
-                np_image = cacheable_or_figure_rec.to_array(8.0)
+                np_image = fig_record.to_array(8.0)
+
+                # assign the figure as the latest visualization
+                if self._include_visualization_image_no_axes:
+                    if i == 0:
+                        # hide window dressings
+                        window_dressings = self._hide_vis_window_dressings(fig_record)
+
+                        # render the undressed visualization
+                        _visualization_image_no_axes = CacheableImage.from_single_source(fig_record.to_array(8.0))
+
+                        # re-apply the window dressings
+                        self._apply_window_dressings(fig_record, window_dressings)
 
                 # add the image
                 cacheable_image = CacheableImage(np_image)
                 all_vis_images.append(cacheable_image)
 
-        return all_vis_images
+        return all_vis_images, _visualization_image_no_axes
