@@ -17,6 +17,7 @@ import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.system_tools as st
 
 
 class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, ABC):
@@ -389,6 +390,11 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
                 render_control = self.default_render_control_figure_for_operable(operable)
                 self._init_figure_records(render_control)
             new_visualizations, _visualization_image_no_axes = self._visualize_operable(operable, is_last)
+
+            # draw the visualizations
+            if not st.is_notebook():
+                for fig_record in self._init_figure_records():
+                    fig_record.figure.view.show(block=False)
 
             # get the visualization images list
             visualization_images = copy.copy(operable.visualization_images)

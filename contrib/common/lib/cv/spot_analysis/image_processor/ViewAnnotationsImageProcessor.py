@@ -120,8 +120,9 @@ class ViewAnnotationsImageProcessor(AbstractVisualizationImageProcessor):
         for fiducials in to_render:
             fiducials.render_to_figure(self.figure, image, include_label)
 
-        # show the visualization
-        self.figure.view.show(block=False, legend=include_label)
+        # show the legend
+        if include_label:
+            self.figure.figure.legend()
 
         return [self.figure]
 
