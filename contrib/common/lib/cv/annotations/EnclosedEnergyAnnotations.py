@@ -21,7 +21,7 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
         style: rcps.RenderControlPointSeq = None,
         centers_radiuses: tuple[p2.Pxy, list[int]] = None,
         enclosed_shape: str = "circle",
-        pixels_to_meters: float = None,
+        meters_per_pixel: float = None,
     ):
         """
         Parameters
@@ -32,7 +32,7 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
             The center(s) and radius(es) for this annotation, in pixels
         enclosed_shape : str, optional
             The shape used to determine the enclosed energy. Supports "circle" and "square". Default is "circle".
-        pixels_to_meters : float, optional
+        meters_per_pixel : float, optional
             A simple conversion method for how many meters a pixel represents,
             for use in scale(). By default None.
         """
@@ -50,15 +50,15 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
 
         self._p2r = centers_radiuses
         self.enclosed_shape = enclosed_shape
-        self.pixels_to_meters = pixels_to_meters
+        self.meters_per_pixel = meters_per_pixel
 
         self.label = f"En{enclosed_shape}d Energy"  # Encircled, Ensquared
 
         r = p2.Pxy((self._p2r[1], self._p2r[1]))
         upper_left = self._p2r[0] - r
         lower_right = self._p2r[0] + r
-        self._representative_circle = CircularAnnotations(style, centers_radiuses, pixels_to_meters)
-        self._representative_square = RectangleAnnotations(style, (upper_left, lower_right), pixels_to_meters)
+        self._representative_circle = CircularAnnotations(style, centers_radiuses, meters_per_pixel)
+        self._representative_square = RectangleAnnotations(style, (upper_left, lower_right), meters_per_pixel)
 
     def get_bounding_box(self, index=0) -> reg.RegionXY:
         return self._representative_circle.get_bounding_box(index)
@@ -66,6 +66,11 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
     @property
     def origin(self) -> p2.Pxy:
         return self._representative_circle.origin
+
+    def translate(self, translation: p2.Pxy):
+        centers, radiuses = self._p2r
+        centers += translation
+        return self.__class__(self.style, (centers, radiuses), self.enclosed_shape, self.meters_per_pixel)
 
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:

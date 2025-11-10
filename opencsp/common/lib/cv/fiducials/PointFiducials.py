@@ -61,6 +61,9 @@ class PointFiducials(AbstractFiducials):
         # "ChatGPT 4o" assisted with generating this docstring.
         return self.points
 
+    def translate(self, translation: p2.Pxy):
+        return self.__class__(self.style, self.points + translation)
+
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
         """
