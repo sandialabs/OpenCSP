@@ -58,6 +58,14 @@ class LazyLoader:
         # Delegate attribute access to the class instance
         return getattr(self._load(), name)
 
+    def __instancecheck__(self, instance):
+        # Delegate instance check to the class instance
+        return isinstance(instance, self._load())
+
+    def __subclasscheck__(self, instance):
+        # Delegate subclass check to the class instance
+        return issubclass(instance, self._load())
+
 
 if platform.system() == 'Darwin':
     # On Mac, force matplotlib to use the TkAgg.
