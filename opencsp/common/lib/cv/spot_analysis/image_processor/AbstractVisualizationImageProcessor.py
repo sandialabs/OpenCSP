@@ -157,6 +157,8 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         visualization image processor that has its base_image_selector set to
         'visualization', and then the value is unset.
         """
+        self._initialized_figure_records: weakref.WeakSet[rcfr.RenderControlFigureRecord] = weakref.WeakSet()
+        """ The figure records returned from init_figure_records(). """
 
     @property
     @abstractmethod
@@ -300,6 +302,9 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
         """
         self._render_control_fig = weakref.ref(render_control_fig)
         ret = self.init_figure_records(render_control_fig)
+        self._initialized_figure_records.clear()
+        for fig_record in ret:
+            self._initialized_figure_records.add(fig_record)
         self.initialized_figure_records = True
         return ret
 
@@ -393,8 +398,8 @@ class AbstractVisualizationImageProcessor(AbstractSpotAnalysisImageProcessor, AB
 
             # draw the visualizations
             if not st.is_notebook():
-                for fig_record in self._init_figure_records():
-                    fig_record.figure.view.show(block=False)
+                for fig_record in self._initialized_figure_records:
+                    fig_record.view.show(block=False)
 
             # get the visualization images list
             visualization_images = copy.copy(operable.visualization_images)
