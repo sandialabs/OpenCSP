@@ -116,9 +116,6 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
             x_mesh, y_mesh = np.meshgrid(x_arr, y_arr)
             self.view.draw_xyz_surface_customshape(x_mesh, y_mesh, image, self.rcs)
 
-        # draw
-        self.view.show(block=False)
-
         return [self.fig_record]
 
     def close_figures(self):

@@ -11,6 +11,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor import *
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.system_tools as st
 
 
 class VisualizationCoordinator:
@@ -304,6 +305,9 @@ class VisualizationCoordinator:
         processor_visualizations, _visualization_image_no_axes = visualization_processor._visualize_operable(
             operable, is_last
         )
+        if not st.is_notebook():
+            for fig_record in visualization_processor.init_figure_records():
+                fig_record.figure.view.show(block=False)
 
         # compile all visualizations together into a single operable to be returned
         if len(processor_visualizations) > 0:
