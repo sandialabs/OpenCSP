@@ -1,5 +1,17 @@
+# Cross section spot analysis example by Sandia National Laboratories.
+#
+# This example:
+#  - loads images taken of the sun
+#  - locates the sun spot within the image
+#  - measures the size of the sun spot
+#  - produces a cross section of the sun spot
+#  - produces additional visualizations
+#
+# To run this example, copy "experiment_settings_example.ini" to
+# "experiment_settings.ini" and modify the values in the ini file to point to
+# the example data on your computer.
+
 import configparser
-import os
 
 import cv2 as cv
 import numpy as np
@@ -32,30 +44,57 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
         return (int(ret[0]), int(ret[1]))
 
     def rgb2gray(operable: SpotAnalysisOperable) -> np.ndarray:
+        """Converts the input image to grayscale using the OpenCV cvtColor method."""
         grayscale_image = cv.cvtColor(operable.primary_image.nparray, cv.COLOR_RGB2GRAY)
         return grayscale_image
 
     image_processors = {
+        # This image processor just prints out the image name to the terminal,
+        # to let us know that the operations have started for the image.
         "EchoEcho": EchoImageProcessor(),
+        # This 1-pixel convolution image processor doesn't actually apply any
+        # changes to the image, but it does give us a reference that we can
+        # use to view the original image later in the Powerpoint deck.
         "Original": ConvolutionImageProcessor(diameter=1),
+        # Convert the input image to grayscale and determine the range of
+        # parameters for all input images.
         "Rgb2Gray": CustomSimpleImageProcessor(rgb2gray),
         "PopStats": PopulationStatisticsImageProcessor(),
+        # Find the centroid of the image. Because the sun is so much brighter
+        # than anything else in the sky this should get us pretty close to the
+        # sun's location in the image. Crop the image down to this location.
         "Centroid": MomentsImageProcessor(
             include_visualization=True, centroid_style=rcps.default(color=color.cyan(), markersize=20)
         ),
         "VFalseCl": ViewFalseColorImageProcessor(),
         "VCentOrg": ViewAnnotationsImageProcessor(base_image_selector='visualization'),
         "CropCent": CroppingImageProcessor(centered_location=centroid_pixel_locator, width_height=(1500, 1500)),
+        # Use the hotspot locator to find the actual sun in the image. We use
+        # this locator instead of a centroid because lens reflections will
+        # cause a centroid to produce an invalid location. For this example
+        # a simple 'brightest pixel' locator would also work but would be less
+        # robust. Using the hotspot also makes this example applicable to
+        # other less bright light sources such as a reflection, flashlight, or
+        # laser pointer.
         "HotSpotS": HotspotImageProcessor(
             21, draw_debug_view=False, record_visualization=False, record_debug_view=False
         ),
         "VFalseC2": ViewFalseColorImageProcessor(),
         "VHotspot": ViewAnnotationsImageProcessor([HotspotAnnotation], base_image_selector='visualization'),
+        # We know approximately the size of the sun in the image. Crop down to
+        # that size to exclude lens reflections.
         "CropHots": CroppingImageProcessor(centered_location=hotspot_pixel_locator, width_height=(250, 250)),
+        # Now we can use a centroid to find the center of the sun.
         "Centrod2": MomentsImageProcessor(
             include_visualization=True, centroid_style=rcps.default(color=color.cyan(), markersize=20)
         ),
+        # Get the size of the sun in the image with the full width half maximum
+        # technique, which works well for light sources that are roughly
+        # gaussian.
         "SpotSize": SpotWidthImageProcessor(spot_width_technique="fwhm"),
+        # Visualize the sun spot, including the false color spectrum, over and
+        # under exposed pixels, the centroid and hotspot location, a cross
+        # section of the sun spot, and a 3D view of the spot.
         "VFalseC3": ViewFalseColorImageProcessor(),
         "VOverExp": ViewHighlightImageProcessor(black_highlight_color=(70, 0, 70), white_highlight_color=(70, 70, 0)),
         "VAnnotat": ViewAnnotationsImageProcessor(base_image_selector='visualization'),
@@ -64,7 +103,19 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
         ),
         'Ve3d': View3dImageProcessor(max_resolution=(100, 100)),
     }
-    _p = image_processors
+
+    # Create the PowerpointImageProcessor which will generate the Powerpoint
+    # deck with the results from the image processors.
+    #
+    # In this example, there will be three slides per input image, and each
+    # slide will contain multiple results. If the referenced image processor
+    # is a visualization image processor (name starts with "View"), then all
+    # visualization images from that processor will be included.
+    #
+    # For each image processor included in a slide, a secondary parameter can
+    # be provided for a caption to be applied to the images for that processor.
+    # If no caption is provided, then a default caption is applied.
+    _p = image_processors  # shortened variable name for readability
     # fmt: off
     processors_per_slide = [
         [
@@ -89,8 +140,10 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
     image_processors["PowerPnt"] = PowerpointImageProcessor(
         results_dir, experiment_name, processors_per_slide=processors_per_slide
     )
-    image_processors_list = list(image_processors.values())
 
+    # Create the SpotAnalysis instance that will coordinate and evaluate all
+    # the spot analysis image processors.
+    image_processors_list = list(image_processors.values())
     spot_analysis = SpotAnalysis(experiment_name, image_processors_list, save_dir=results_dir)
     spot_analysis.set_primary_images(input_images)
 
