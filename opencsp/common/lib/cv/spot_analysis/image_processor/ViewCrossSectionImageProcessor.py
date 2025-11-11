@@ -328,7 +328,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         # Draw the image w/ cross section line overlays
         i_view = self.views[0]
-        i_view.draw_image(base_image.nparray, (0, 0), (cropped_width, cropped_height))
+        i_view.draw_image(base_image, (0, 0), (cropped_width, cropped_height))
         i_view.draw_pq_list([(cs_cropped_x, 0), (cs_cropped_x, cropped_height)], style=vstyle)
         i_view.draw_pq_list([(0, cs_cropped_y_mlab), (cropped_width, cs_cropped_y_mlab)], style=hstyle)
 

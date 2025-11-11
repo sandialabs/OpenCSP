@@ -148,6 +148,10 @@ class ViewFalseColorImageProcessor(AbstractVisualizationImageProcessor):
         else:
             ret = [self.apply_mapping_jet(operable, base_image)]
 
+        # draw the image
+        self.prepare_figure_records([self.figure], [ret[0].nparray.shape])
+        self.figure.view.imshow(ret[0])
+
         return ret
 
     def close_figures(self):
