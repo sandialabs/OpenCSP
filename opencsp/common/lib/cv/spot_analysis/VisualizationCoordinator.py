@@ -306,8 +306,8 @@ class VisualizationCoordinator:
             operable, is_last
         )
         if not st.is_notebook():
-            for fig_record in visualization_processor.init_figure_records():
-                fig_record.figure.view.show(block=False)
+            for fig_record in visualization_processor._initialized_figure_records:
+                fig_record.view.show(block=False)
 
         # compile all visualizations together into a single operable to be returned
         if len(processor_visualizations) > 0:
