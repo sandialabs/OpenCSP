@@ -378,7 +378,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
             slide.set_title(operable.best_primary_nameext)
             for processor_sel, image in images_list:
                 caption = processor_sel.get_caption()
-                slide.add_image(pi.PowerpointImage(image.nparray, caption=caption, powerpoint_figures_save_path=self.powerpoint_figures_save_path))
+                slide.add_image(pi.PowerpointImage(image.nparray, caption=caption, figures_save_path=self.powerpoint_figures_save_path))
 
             # add the slide to the presentation
             slide.save_and_bake()

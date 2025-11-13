@@ -28,14 +28,6 @@ class PowerpointImage(pps.PowerpointShape):
         6. Clean up temporary files with :py:meth:`clear_tmp_save`
     """
 
-    # _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")  # TODO jhs, revisit this logic
-    # _tmp_save_path = ft.join("C:/ctemp", "PowerpointImage/images/tmp")
-    # _tmp_save_path = ft.join("C:/ctemp", "OpenCSP_example_data/enclosed_energy/HeliostatsSpotSize/3_Process/PowerPointFigures")
-    #_tmp_save_path = ft.join(
-    #    "C:/ctemp", "OpenCSP_example_data/enclosed_energy/HeliostatsSpotSize/3_Process/PowerPointFigures"
-    #)
-    # _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
-
     def __init__(
         self,
         val: str | np.ndarray | Image.Image | rcfr.RenderControlFigureRecord = None,
@@ -45,7 +37,7 @@ class PowerpointImage(pps.PowerpointShape):
         caption: str = None,
         stretch=False,
         parent_slide=None,
-        powerpoint_figures_save_path: str = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp"), # None,
+        figures_save_path: str = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp"), # Setting to the default location if not user / config provided
     ):
         """
         Parameters
@@ -73,6 +65,10 @@ class PowerpointImage(pps.PowerpointShape):
         parent_slide: PowerpointSlide
             The slide containing this image. Used for fitting within the slide
             format. If None then the default format will be used. Default None.
+        powerpoint_figures_save_path: str
+            This is the path that we want to save the powerpoint figures to. This
+            decision is prompted by the fact that we want to provide users with
+            the figures that are in the powerpoint for their own viewing or citations.
         """
         # ChatGPT 4o-mini assisted with generating this doc string, reviewed by a human
         super().__init__(cell_dims)
@@ -99,7 +95,7 @@ class PowerpointImage(pps.PowerpointShape):
 
         self.parent_slide: pps.PowerpointSlide = parent_slide
 
-        self._tmp_save_path = powerpoint_figures_save_path # self.__class__._tmp_save_path
+        self._tmp_save_path = figures_save_path # self.__class__._tmp_save_path
 
         self.set_val(val)
 
@@ -665,7 +661,6 @@ class PowerpointImage(pps.PowerpointShape):
         lt.info(f"saving image to {image_path_name_ext}")
 
         # save the image
-        # saved_path, body_ext = self._save(image_path_name_ext) # jhs commented out
         saved_path, body_ext = self._save(image_path_name_ext)
         if saved_path != self._tmp_save_path:
             lt.error_and_raise(
@@ -682,6 +677,7 @@ class PowerpointImage(pps.PowerpointShape):
 
         return self.get_text_file_path()
 
+    
     def clear_tmp_save(self):
         """
         Reloads the image for this instance from the temporary save file, then
@@ -711,3 +707,4 @@ class PowerpointImage(pps.PowerpointShape):
         # if ft.directory_exists(cls._tmp_save_path, error_if_exists_as_file=False):
             # ft.delete_files_in_directory(cls._tmp_save_path, "*.png", error_on_dir_not_exists=False)
             # ft.delete_files_in_directory(cls._tmp_save_path, "*.png.txt", error_on_dir_not_exists=False)
+    

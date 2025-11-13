@@ -51,6 +51,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         canny_test_gradients: list[tuple[int, int]] = None,
         debug_target_locating: bool = False,
         generate_region_detector_powerpoint: bool = True,
+        target_board_figures_save_path: str = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp"),
     ):
         """
         Parameters
@@ -100,12 +101,15 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         self.canny_test_gradients = canny_test_gradients
         self.debug_target_locating = debug_target_locating
 
+        self.target_board_figures_save_path = target_board_figures_save_path
+
         # geometry values in the image
         self.detector: rd.RegionDetector = rd.RegionDetector(
             self.edge_coarse_width,
             self.canny_edges_gradient,
             self.canny_non_edges_gradient,
             self.canny_test_gradients,
+            self.target_board_figures_save_path,
             generate_powerpoint=generate_region_detector_powerpoint,
         )
         self.edges: dict[str, l2.LineXY] = None
@@ -118,6 +122,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # assignments
         self.reference_image_dir_or_file = reference_image_dir_or_file
+
 
     @classmethod
     def from_corners(

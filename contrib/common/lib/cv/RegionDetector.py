@@ -79,6 +79,7 @@ class RegionDetector:
         canny_edges_gradient=10,
         canny_non_edges_gradient=5,
         canny_test_gradients: list[tuple[int, int]] = None,
+        target_board_figures_save_path: str = None,
         generate_powerpoint: bool = False,
     ):
         """
@@ -107,6 +108,7 @@ class RegionDetector:
         self.canny_non_edges_gradient = canny_non_edges_gradient
         self.canny_test_gradients = canny_test_gradients
         self.generate_powerpoint = generate_powerpoint
+        self.target_board_figures_save_path = target_board_figures_save_path
 
         # visualization values
         self.edge_colors = {
@@ -236,7 +238,7 @@ class RegionDetector:
             slide.set_title("step1_canny_edge_detection")
             for caption, image in self.algimages_canny.items():
                 image = ir.false_color_reshaper(image).astype(np.uint8)
-                slide.add_image(pps.PowerpointImage(image, caption=caption))
+                slide.add_image(pps.PowerpointImage(image, caption=caption, figures_save_path=self.target_board_figures_save_path))
             self.ppt_deck.add_slide(slide)
         if debug_canny_settings or self.canny_test_gradients:
             self.draw_images(self.algimages_canny)
@@ -312,7 +314,7 @@ class RegionDetector:
             slide.set_title("step2_blob_analysis")
             for caption, image in self.algimages_blob_analysis.items():
                 image = ir.false_color_reshaper(image).astype(np.uint8)
-                slide.add_image(pps.PowerpointImage(image, caption=caption))
+                slide.add_image(pps.PowerpointImage(image, caption=caption, figures_save_path=self.target_board_figures_save_path))
             self.ppt_deck.add_slide(slide)
         if debug_blob_analysis:
             self.draw_images(self.algimages_blob_analysis)
@@ -482,7 +484,7 @@ class RegionDetector:
             slide.set_title("step3_ray_project_edge_intercept")
             for caption, image in self.algimages_captions.items():
                 image = ir.false_color_reshaper(image).astype(np.uint8)
-                slide.add_image(pps.PowerpointImage(image, caption=caption))
+                slide.add_image(pps.PowerpointImage(image, caption=caption, figures_save_path=self.target_board_figures_save_path))
             self.ppt_deck.add_slide(slide)
         if debug_ray_projection:
             self.draw_images(self.algimages_captions)
@@ -532,7 +534,7 @@ class RegionDetector:
             slide.set_title("step4_boundary_locations_to_edges")
             for caption, image in self.algimages_boundary_edges.items():
                 image = ir.false_color_reshaper(image).astype(np.uint8)
-                slide.add_image(pps.PowerpointImage(image, caption=caption))
+                slide.add_image(pps.PowerpointImage(image, caption=caption, figures_save_path=self.target_board_figures_save_path))
             self.ppt_deck.add_slide(slide)
         if debug_ray_projection:
             self.draw_images(self.algimages_boundary_edges)
@@ -621,7 +623,7 @@ class RegionDetector:
             slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=2, slide_control=self.slide_control)
             slide.set_title("step5_find_edge_groups")
             for caption, image in self.algimages_find_edges.items():
-                slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption))
+                slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption, figures_save_path=self.target_board_figures_save_path))
             self.ppt_deck.add_slide(slide)
         if debug_edge_groups:
             self.draw_images(self.algimages_find_edges)
@@ -813,7 +815,7 @@ class RegionDetector:
             slide = pps.PowerpointSlide.template_content_grid(nrows=1, ncols=2, slide_control=self.slide_control)
             slide.set_title("step6_assign_edges_and_corners")
             for caption, image in self.algimages_assign_edges_and_corners.items():
-                slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption))
+                slide.add_image(pps.PowerpointImage(image.astype(np.uint8), caption=caption, figures_save_path=self.target_board_figures_save_path))
             self.ppt_deck.add_slide(slide)
         if debug_edge_assignment:
             self.draw_images(self.algimages_assign_edges_and_corners)

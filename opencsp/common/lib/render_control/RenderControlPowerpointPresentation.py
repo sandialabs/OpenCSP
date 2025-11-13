@@ -171,5 +171,6 @@ class RenderControlPowerpointPresentation:
         """
         Clears the temporary files associated with rendering the presentation.
         """
-        pps.PowerpointImage.clear_tmp_save_all()
-        pps.PowerpointText.clear_tmp_save_all()
+        return
+        #pps.PowerpointImage.clear_tmp_save_all()
+        #pps.PowerpointText.clear_tmp_save_all()
