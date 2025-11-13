@@ -127,15 +127,6 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
     def validate_center(self, center_xy: tuple[int, int], operable: SpotAnalysisOperable | None, debug_name: str):
         center_x, center_y = center_xy
 
-        # # verify that the center is inside the image boundaries
-        # if center_x < 0 or center_x >= w or center_y < 0 or center_y >= h:
-        #     lt.error_and_raise(RuntimeError, err_msg)
-        # if operable is not None:
-        #     (h, w), _ = it.dims_and_nchannels(operable.primary_image.nparray)
-        #     if center_x >= w or center_y >= h:
-        #         lt.error_and_raise(RuntimeError, err_msg)
-
-        # TODO RCB REVISED CODE BELOW
         # verify that the center is inside the image boundaries
         if center_x < 0 or center_y < 0:
             lt.error_and_raise(
