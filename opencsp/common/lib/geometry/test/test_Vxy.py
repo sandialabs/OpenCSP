@@ -80,6 +80,23 @@ class TestVxy(unittest.TestCase):
         self.assertEqual(d9.x.tolist(), [0, 1, 4, 5, 6, 10, 11, 12, 13])
         self.assertEqual(d9.y.tolist(), [2, 3, 7, 8, 9, 14, 15, 16, 17])
 
+        # test mixed Vxy and non-Vxy instances
+        a1 = [0, 1]
+        b1 = Vxy([2, 3])
+        c2 = Vxy.from_list([a1, b1])
+        self.assertEqual(len(c2), 2)
+        self.assertEqual(c2.x.tolist(), [0, 2])
+        self.assertEqual(c2.y.tolist(), [1, 3])
+
+        # test multi-valued non-Vxy instances
+        a2 = [[0, 1], [2, 3]]
+        b3 = Vxy([[4, 5, 6], [7, 8, 9]])
+        c4 = [[10, 11, 12, 13], (14, 15, 16, 17)]
+        d9 = Vxy.from_list([a2, b3, c4])
+        self.assertEqual(len(d9), 9)
+        self.assertEqual(d9.x.tolist(), [0, 1, 4, 5, 6, 10, 11, 12, 13])
+        self.assertEqual(d9.y.tolist(), [2, 3, 7, 8, 9, 14, 15, 16, 17])
+
     def test_xy(self):
         assert self.V1.x[0] == self.V1_array[0]
         assert self.V1.y[0] == self.V1_array[1]

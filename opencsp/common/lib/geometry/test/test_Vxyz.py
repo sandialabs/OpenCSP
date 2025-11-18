@@ -74,6 +74,16 @@ class TestVxyz(unittest.TestCase):
         self.assertEqual(d9.y.tolist(), [1, 4, 7, 10, 13, 16, 19, 22, 25])
         self.assertEqual(d9.z.tolist(), [2, 5, 8, 11, 14, 17, 20, 23, 26])
 
+        # test mixed multi-valued Vxyz and list instances
+        a2 = Vxyz(list(zip([0, 1, 2], [3, 4, 5])))
+        b3 = [[6, 7, 8], [9, 10, 11], [12, 13, 14]]
+        c4 = [(15, 16, 17), (18, 19, 20), (21, 22, 23), (24, 25, 26)]
+        d9 = Vxyz.from_list([a2, b3, c4])
+        self.assertEqual(len(d9), 9)
+        self.assertEqual(d9.x.tolist(), [0, 3, 6, 9, 12, 15, 18, 21, 24])
+        self.assertEqual(d9.y.tolist(), [1, 4, 7, 10, 13, 16, 19, 22, 25])
+        self.assertEqual(d9.z.tolist(), [2, 5, 8, 11, 14, 17, 20, 23, 26])
+
     def test_xyz(self):
         assert self.V1.x[0] == self.V1_array[0]
         assert self.V1.y[0] == self.V1_array[1]
