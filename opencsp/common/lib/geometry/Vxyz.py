@@ -149,8 +149,8 @@ class Vxyz:
         return cls(data, dtype)
 
     @classmethod
-    def from_list(cls, vals: list[Union["Vxyz", tuple]]):
-        """Builds a single Vxyz instance from a list of Vxyz instances."""
+    def from_list(cls, vals: list[Union["Vxy", tuple]]):
+        """Builds a single Vxy instance from a list of Vxy or (x,y) instances."""
         xs, ys, zs = [], [], []
         for val in vals:
             if isinstance(val, Vxyz):
@@ -166,22 +166,6 @@ class Vxyz:
                 ys.append(val[1])
                 zs.append(val[2])
         return cls((xs, ys, zs))
-
-    @classmethod
-    def from_list(cls, vals: list[Union["Vxy", tuple]]):
-        """Builds a single Vxy instance from a list of Vxy or (x,y) instances."""
-        xs, ys = [], []
-        for val in vals:
-            if isinstance(val, Vxy):
-                xs += val.x.tolist()
-                ys += val.y.tolist()
-            elif hasattr(val[0], "__iter__"):
-                xs += list(val[0])
-                ys += list(val[1])
-            else:
-                xs.append(val[0])
-                ys.append(val[1])
-        return cls((xs, ys))
 
     def _check_is_Vxyz(self, v_in):
         """
