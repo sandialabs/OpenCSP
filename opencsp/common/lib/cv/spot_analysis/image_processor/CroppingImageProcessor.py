@@ -3,6 +3,7 @@ import dataclasses
 from typing import Callable
 
 import numpy as np
+import sympy
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
@@ -197,12 +198,30 @@ class CroppingImageProcessor(AbstractSpotAnalysisImageProcessor):
             for i, annot in enumerate(annots):
                 annots[i] = annot.translate(p2.Pxy([-x1, -y1]))
 
+        # apply the changes to the image coordinates
+        if operable.x_coordinates_transform is None:
+            x_coordinates_transform = sympy.sympify(f"x + {x1}")
+            y_coordinates_transform = sympy.sympify(f"y + {y1}")
+        else:
+            x, y = sympy.symbols('x y')
+            get_points = lambda t, s, v0, v1: (t.evalf(subs={s: v0}), t.evalf(subs={s: v1}))
+            xstart, xend = get_points(operable.x_coordinates_transform, x, 0, x1)
+            ystart, yend = get_points(operable.y_coordinates_transform, y, 0, y1)
+            x_coordinates_transform = operable.x_coordinates_transform + (xend - xstart)
+            y_coordinates_transform = operable.y_coordinates_transform + (yend - ystart)
+
         # apply the changes to the notes
         image_processor_notes = copy.copy(operable.image_processor_notes)
         image_processor_notes += additional_notes
 
         # build the new operable
-        ret = dataclasses.replace(operable, primary_image=new_primary, image_processor_notes=image_processor_notes)
+        ret = dataclasses.replace(
+            operable,
+            primary_image=new_primary,
+            x_coordinates_transform=x_coordinates_transform,
+            y_coordinates_transform=y_coordinates_transform,
+            image_processor_notes=image_processor_notes,
+        )
 
         return ret
 
