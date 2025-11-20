@@ -696,7 +696,7 @@ class PowerpointImage(pps.PowerpointShape):
         # TODO verify that the path is the expected temporary path
 
         # delete the saved files
-        # ft.delete_file(path_name_ext, error_on_not_exists=False)
+        # ft.delete_file(path_name_ext, error_on_not_exists=False) # jhs, commented out in order to retain powerpoint figures
         # ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
 
     @classmethod
