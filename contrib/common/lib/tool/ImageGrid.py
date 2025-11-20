@@ -49,11 +49,7 @@ class ImageGrid:
         self.numbering_color = clr.Color.from_generic(numbering_color)
         self.numbering_outline_color = (
             None if numbering_outline_color is None else clr.Color.from_generic(numbering_outline_color)
-<<<<<<< Updated upstream
         )
-=======
-        ) #clr.Color.from_generic(numbering_outline_color)
->>>>>>> Stashed changes
 
         self.images: list[Image.Image] = []
         self.add_images(*images)
