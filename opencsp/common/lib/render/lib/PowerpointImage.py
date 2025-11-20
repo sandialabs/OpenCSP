@@ -30,7 +30,7 @@ class PowerpointImage(pps.PowerpointShape):
 
     _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
     # _tmp_save_path = ft.join(
-        # "C:/ctemp", "OpenCSP_example_data/target_identification/HeliostatsSpotSize/3_Process/PowerPointFigures"
+    # "C:/ctemp", "OpenCSP_example_data/target_identification/HeliostatsSpotSize/3_Process/PowerPointFigures"
     # )
 
     def __init__(
@@ -696,8 +696,8 @@ class PowerpointImage(pps.PowerpointShape):
         # TODO verify that the path is the expected temporary path
 
         # delete the saved files
-        #ft.delete_file(path_name_ext, error_on_not_exists=False)
-        #ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
+        # ft.delete_file(path_name_ext, error_on_not_exists=False)
+        # ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
 
     @classmethod
     def clear_tmp_save_all(cls):
