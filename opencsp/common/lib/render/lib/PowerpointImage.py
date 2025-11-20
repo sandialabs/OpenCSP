@@ -28,12 +28,17 @@ class PowerpointImage(pps.PowerpointShape):
         6. Clean up temporary files with :py:meth:`clear_tmp_save`
     """
 
+<<<<<<< Updated upstream
     _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")  # TODO jhs, revisit this logic
     # _tmp_save_path = ft.join("C:/ctemp", "PowerpointImage/images/tmp")
     # _tmp_save_path = ft.join("C:/ctemp", "OpenCSP_example_data/enclosed_energy/HeliostatsSpotSize/3_Process/PowerPointFigures")
     # _tmp_save_path = ft.join(
     # "C:/ctemp", "OpenCSP_example_data/target_identification/HeliostatsSpotSize/3_Process/PowerPointFigures"
     # )
+=======
+    #_tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
+    _tmp_save_path = ft.join("C:/ctemp", "OpenCSP_example_data/enclosed_energy/HeliostatsSpotSize/3_Process/PowerPointFigures")
+>>>>>>> Stashed changes
 
     def __init__(
         self,
@@ -698,9 +703,14 @@ class PowerpointImage(pps.PowerpointShape):
         # TODO verify that the path is the expected temporary path
 
         # delete the saved files
+<<<<<<< Updated upstream
         # TODO: jhs, commented these out in order to retain powerpoint figures for ir submission, 10/23/2025
         ft.delete_file(path_name_ext, error_on_not_exists=False)
         ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
+=======
+        #ft.delete_file(path_name_ext, error_on_not_exists=False)
+        #ft.delete_file(path_name_ext_serialized, error_on_not_exists=False)
+>>>>>>> Stashed changes
 
     @classmethod
     def clear_tmp_save_all(cls):
