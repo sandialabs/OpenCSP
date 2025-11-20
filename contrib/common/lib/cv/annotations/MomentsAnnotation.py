@@ -50,6 +50,83 @@ class MomentsAnnotation(AbstractAnnotations):
     def origin(self) -> p2.Pxy:
         return self.centroid
 
+    def translate(self, translations: p2.Pxy):
+        old_m00 = self.moments["m00"]
+        old_m10 = self.moments["m10"]
+        old_m01 = self.moments["m01"]
+        old_u11 = self.central_moment(1, 1)
+        old_u20 = self.central_moment(2, 0)
+        old_u02 = self.central_moment(0, 2)
+        old_u21 = self.central_moment(2, 1)
+        old_u12 = self.central_moment(1, 2)
+        old_u30 = self.central_moment(3, 0)
+        old_u03 = self.central_moment(0, 3)
+
+        Tx = translations.x[0]
+        Ty = translations.y[0]
+
+        # Example calculated values for an elipse at 135 degrees, size 100x50:
+        # center at 50, 50       at 60, 70
+        # m00    1031985.0       1031985.0
+        # m10    51626280.0      61946130.0
+        # m01    51634950.0      72274650.0
+        # m11    2825640210.0    4580912310.0
+        # m20    2994052920.0    4129777020.0
+        # m02    2995071900.0    5473263900.0
+        # m12    174088606080.0  362497365480.0
+        # m21    174061884630.0  318333724230.0
+        # m30    190942591890.0  297284048490.0
+        # m03    191033689110.0  440955823110.0
+        # u00    1031985.0       1031985.0
+        # u01    0               0
+        # u10    0               0
+        # u11    242540274.9369  242540274.9369
+        # u20    411386712.0237  411386712.0237
+        # u02    411538165.0111  411538165.0111
+        # u21    -11069058.1853  -11069058.1854
+        # u12    -14244705.8617  -14244705.8616
+        # u30    1303451.534790  1303451.534790
+        # u03    -5805601.44134  -5805601.44128
+
+        # central_moment formulas:
+        # u00 = m00
+        # u01 = 0
+        # u10 = 0
+        # u11 = m11 - m01 / m00 * m10
+        # u20 = m20 - m10**2 / m00
+        # u02 = m02 - m01**2 / m00
+        # u21 = m21 - 2 * m10 / m00 * m11 - m01 / m00 * m20 + 2 * m10**2 / m00**2 * m01
+        # u12 = m12 - 2 * m01 / m00 * m11 - m10 / m00 * m02 + 2 * m01**2 / m00**2 * m10
+        # u30 = m30 - 3 * m10 / m00 * m20 + 2 * m10**3 / m00**2
+        # u03 = m03 - 3 * m01 / m00 * m02 + 2 * m01**3 / m00**2
+
+        # fmt: off
+        new_m00 = old_m00
+        new_m10 = old_m10 + old_m00 * Tx
+        new_m01 = old_m01 + old_m00 * Ty
+        new_m11 = old_u11 + new_m01 / new_m00 * new_m10
+        new_m20 = old_u20 + new_m10**2 / new_m00
+        new_m02 = old_u02 + new_m01**2 / new_m00
+        new_m21 = old_u21 + 2 * new_m10 / new_m00 * new_m11 + new_m01 / new_m00 * new_m20 - 2 * new_m10**2 / new_m00**2 * new_m01
+        new_m12 = old_u12 + 2 * new_m01 / new_m00 * new_m11 + new_m10 / new_m00 * new_m02 - 2 * new_m01**2 / new_m00**2 * new_m10
+        new_m30 = old_u30 + 3 * new_m10 / new_m00 * new_m20 - 2 * new_m10**3 / new_m00**2
+        new_m03 = old_u03 + 3 * new_m01 / new_m00 * new_m02 - 2 * new_m01**3 / new_m00**2
+        # fmt: on
+
+        new_moments = copy.copy(self.moments)
+        new_moments["m00"] = new_m00
+        new_moments["m10"] = new_m10
+        new_moments["m01"] = new_m01
+        new_moments["m11"] = new_m11
+        new_moments["m20"] = new_m20
+        new_moments["m02"] = new_m02
+        new_moments["m21"] = new_m21
+        new_moments["m12"] = new_m12
+        new_moments["m30"] = new_m30
+        new_moments["m03"] = new_m03
+
+        return self.__class__(new_moments, self.style, self.rotation_style)
+
     @cached_property
     def rotation_angle_2d(self) -> float:
         # from https://en.wikipedia.org/wiki/Image_moment
