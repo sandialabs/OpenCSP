@@ -19,6 +19,7 @@ import opencsp.common.lib.geometry.RegionXY as reg2
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -257,7 +258,9 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # Compile a list of all reference images
         if os.path.isdir(self.reference_image_dir_or_file):
-            image_filenames = ft.files_in_directory(self.reference_image_dir_or_file, files_only=True)
+            image_filenames = it.image_files_in_directory(
+                self.reference_image_dir_or_file, it.pil_image_formats_readable
+            )
             image_files: list[str] = []
             for filename in image_filenames:
                 file_path_name_ext = os.path.join(self.reference_image_dir_or_file, filename)
