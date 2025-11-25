@@ -80,6 +80,12 @@ class PerspectiveTransform:
         self._pixels_to_meters_transform = cv.getPerspectiveTransform(px_xy, m_xy)
         self.pixels_to_millimeters_transform = cv.getPerspectiveTransform(px_xy, mm_xy)
 
+        # unset the old conversions
+        self.pnt_x_forward_func = None
+        self.pnt_x_forward_func = None
+        self.pnt_x_backward_func = None
+        self.pnt_y_backward_func = None
+
     @property
     def width_meters(self) -> float:
         """
