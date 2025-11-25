@@ -109,7 +109,7 @@ class TestPerspectiveTransform(unittest.TestCase):
                 msg=f"Forward transform ({px}, {py}) -> {txy.astuple()} instead of the expected ({mx}, {my})",
             )
 
-    def test_coordinates_transform_forward(self):
+    def test_coordinates_conversion_forward(self):
         """Tests that transformed locations can be determined using sympy."""
         pixel_xs = [20, 90, 99, 5]
         pixel_ys = [20, 10, 99, 85]
@@ -117,7 +117,7 @@ class TestPerspectiveTransform(unittest.TestCase):
         meters_ys = [0, 0, 1, 1]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
-        tx, ty = persp_xform.pixels_to_meters_transforms()
+        tx, ty = persp_xform.pixels_to_meters_conversions()
 
         for i, (px, py) in enumerate(zip(pixel_xs, pixel_ys)):
             mx, my = list(zip(meters_xs, meters_ys))[i]
@@ -126,17 +126,17 @@ class TestPerspectiveTransform(unittest.TestCase):
             self.assertAlmostEqual(
                 txy[0],
                 mx,
-                msg=f"Forward transform ({px}, {py}) -> {txy} instead of the expected ({mx}, {my})",
+                msg=f"Forward conversion ({px}, {py}) -> {txy} instead of the expected ({mx}, {my})",
                 delta=1e-5,
             )
             self.assertAlmostEqual(
                 txy[1],
                 my,
-                msg=f"Forward transform ({px}, {py}) -> {txy} instead of the expected ({mx}, {my})",
+                msg=f"Forward conversion ({px}, {py}) -> {txy} instead of the expected ({mx}, {my})",
                 delta=1e-5,
             )
 
-    def test_coordinates_transform_backward(self):
+    def test_meters_to_pixels(self):
         """Tests that original locations can be determined on a single-point basis."""
         pixel_xs = [20, 90, 99, 5]
         pixel_ys = [20, 10, 99, 85]
@@ -159,7 +159,7 @@ class TestPerspectiveTransform(unittest.TestCase):
                 msg=f"Backward transform ({mx}, {my}) -> {txy.astuple()} instead of the expected ({px}, {py})",
             )
 
-    def test_coordinates_transform_backward(self):
+    def test_coordinates_conversion_backward(self):
         """Tests that transformed locations can be determined using sympy."""
         pixel_xs = [20, 90, 99, 5]
         pixel_ys = [20, 10, 99, 85]
@@ -167,7 +167,7 @@ class TestPerspectiveTransform(unittest.TestCase):
         meters_ys = [0, 0, 1, 1]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
-        tx, ty = persp_xform.meters_to_pixel_transforms()
+        tx, ty = persp_xform.meters_to_pixels_conversions()
 
         for i, (mx, my) in enumerate(zip(meters_xs, meters_ys)):
             px, py = list(zip(pixel_xs, pixel_ys))[i]
@@ -176,13 +176,13 @@ class TestPerspectiveTransform(unittest.TestCase):
             self.assertAlmostEqual(
                 txy[0],
                 px,
-                msg=f"Forward transform ({mx}, {my}) -> {txy} instead of the expected ({px}, {py})",
+                msg=f"Forward conversion ({mx}, {my}) -> {txy} instead of the expected ({px}, {py})",
                 delta=1e-5,
             )
             self.assertAlmostEqual(
                 txy[1],
                 py,
-                msg=f"Forward transform ({mx}, {my}) -> {txy} instead of the expected ({px}, {py})",
+                msg=f"Forward conversion ({mx}, {my}) -> {txy} instead of the expected ({px}, {py})",
                 delta=1e-5,
             )
 

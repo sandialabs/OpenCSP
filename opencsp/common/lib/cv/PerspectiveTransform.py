@@ -151,12 +151,12 @@ class PerspectiveTransform:
                     distances.append(np.abs(data[i] - data[j]))
             return np.max(distances)
 
-    def pixels_to_meters_transforms(self) -> tuple[sympy.Expr, sympy.Expr]:
+    def pixels_to_meters_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
         """Sympy transform for converting values in pixels to values in meters.
 
         Example usage:
 
-            tx_p2m, ty_p2m = persp_xform.pixels_to_meters_transforms()
+            tx_p2m, ty_p2m = persp_xform.pixels_to_meters_conversions()
             x, y = sympy.symbols("x y")
             mxy = tx_p2m.evalf(subs={x: px, y: py}), ty_p2m.evalf(subs={x: px, y: py})
 
@@ -250,12 +250,12 @@ class PerspectiveTransform:
 
         return self.pnt_x_forward_func, self.pnt_y_forward_func
 
-    def meters_to_pixel_transforms(self) -> tuple[sympy.Expr, sympy.Expr]:
+    def meters_to_pixels_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
         """Sympy transform for converting values in meters to values in pixels.
 
         Example usage:
 
-            tx_m2p, ty_m2p = persp_xform.meters_to_pixel_transforms()
+            tx_m2p, ty_m2p = persp_xform.meters_to_pixels_conversions()
             x, y = sympy.symbols("x y")
             pxy = tx_m2p.evalf(subs={x: mx, y: my}), ty_m2p.evalf(subs={x: mx, y: my})
 
@@ -267,7 +267,7 @@ class PerspectiveTransform:
             The sympy expression that can be evaluated to get the transformed y value.
         """
         if self.pnt_x_backward_func is None:
-            self.pixels_to_meters_transforms()
+            self.pixels_to_meters_conversions()
         return self.pnt_x_backward_func, self.pnt_y_backward_func
 
     def transform_image(self, image: np.ndarray, buffer_width_px: int = 0, full_image=False) -> np.ndarray:
