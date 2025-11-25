@@ -70,6 +70,44 @@ class TestTargetBoardLocatorImageProcessor(unittest.TestCase):
         expected = Image.open(ft.join(self.data_dir, "09W01_transformed.png"))
         npt.assert_array_equal(np.array(result), np.array(expected))
 
+    def test_coordinate_transform(self):
+        corners = {
+            "tl": p2.Pxy([35.7295165, 29.26274199]),
+            "tr": p2.Pxy([625.25789369, 45.87442367]),
+            "br": p2.Pxy([605.83119206, 633.02880323]),
+            "bl": p2.Pxy([16.30514864, 616.74420236]),
+        }
+        processor = TargetBoardLocatorImageProcessor.from_corners(
+            corners, target_width_meters=2.44, target_height_meters=2.44
+        )
+        lighted = CacheableImage.from_single_source(Image.open(ft.join(self.data_dir, "09W01.png")))
+        operable = SpotAnalysisOperable(lighted, "lighted")
+        dewarped_operable = processor.process_operable(operable, is_last=True)[0]
+        dewarped_image = dewarped_operable.primary_image.nparray
+        (h, w), _ = it.dims_and_nchannels(dewarped_image)
+
+        # Check that we get the expected values from the transforms.
+        # First, sanity check.
+        tx = operable.transform_coordinates
+        self.assertEqual(tx(p2.Pxy([0, 0]))[0], False)
+        self.assertEqual(tx(p2.Pxy([1108, 0]))[0], False)
+        self.assertEqual(tx(p2.Pxy([1108, 857]))[0], False)
+        self.assertEqual(tx(p2.Pxy([0, 857]))[0], False)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([0, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([1108, 0]))[1]._data, p2.Pxy([1108, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([1108, 857]))[1]._data, p2.Pxy([1108, 857])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 857]))[1]._data, p2.Pxy([0, 857])._data)
+        # Now check that the cropped transform is correct.
+        tcx = dewarped_operable.transform_coordinates
+        self.assertEqual(tcx(p2.Pxy([0, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([w, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([w, h]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([0, h]))[0], True)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([0, 0])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([w, 0]))[1]._data, p2.Pxy([2.44, 0])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([w, h]))[1]._data, p2.Pxy([2.44, 2.44])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, h]))[1]._data, p2.Pxy([0, 2.44])._data)
+
 
 if __name__ == "__main__":
     unittest.main()

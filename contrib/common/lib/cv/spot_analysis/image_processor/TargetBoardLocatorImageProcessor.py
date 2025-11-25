@@ -5,6 +5,7 @@ import numpy as np
 import os
 
 from numpy._typing._array_like import NDArray
+import sympy
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.cv.PerspectiveTransform as pt
@@ -363,6 +364,13 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         # target board images
         my_visualization_images = [annotated_cacheable]
 
+        # apply the changes to the image coordinates
+        x, y = sympy.symbols('x y')
+        x_coordinates_transform, y_coordinates_transform = self.transform.transformed_pixels_to_meters_conversions()
+        if operable.x_coordinates_transform is not None:
+            x_coordinates_transform = x_coordinates_transform.subs({x: operable.x_coordinates_transform})
+            y_coordinates_transform = y_coordinates_transform.subs({y: operable.y_coordinates_transform})
+
         visualization_images = copy.copy(operable.visualization_images)
         visualization_images[self] = my_visualization_images
         algorithm_images = copy.copy(operable.algorithm_images)
@@ -372,5 +380,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             primary_image=isolated_cacheable,
             visualization_images=visualization_images,
             algorithm_images=algorithm_images,
+            x_coordinates_transform=x_coordinates_transform,
+            y_coordinates_transform=y_coordinates_transform,
         )
         return [ret]
