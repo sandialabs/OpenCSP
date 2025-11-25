@@ -200,7 +200,7 @@ class PerspectiveTransform:
             backward_y: sympy.Expr = Y / W
 
             t = self._pixels_to_meters_transform
-            tp = np.linalg.inv(t)
+            tp = np.linalg.inv(t)  # t' (t "prime")
             self.pnt_x_forward_func = forward_x.subs(
                 {
                     h11: t[0, 0],
@@ -272,9 +272,39 @@ class PerspectiveTransform:
         ty_m2p : sympy.Expr
             The sympy expression that can be evaluated to get the transformed y value.
         """
-        if self.pnt_x_backward_func is None:
-            self.pixels_to_meters_conversions()
+        self.pixels_to_meters_conversions()
         return self.pnt_x_backward_func, self.pnt_y_backward_func
+
+    def transformed_pixels_to_meters_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
+        """
+        Returns the x and y transforms from the transformed image (as in the image from the
+        "transform_image" function) to meters.
+
+        Returns
+        -------
+        tuple[sympy.Expr, sympy.Expr]
+            The x and y transforms to go from a pixel coordinate in the transformed image to a meters coordinate.
+        """
+        tx_t2m = sympy.sympify("x / 1000")
+        ty_t2m = sympy.sympify("y / 1000")
+        return tx_t2m, ty_t2m
+
+    def transformed_pixels_to_pixels_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
+        """
+        Returns the x and y transforms from the transformed image (as in the image from the
+        "transform_image" function) to the original image pixels.
+
+        Returns
+        -------
+        tuple[sympy.Expr, sympy.Expr]
+            The x and y transforms to go from a pixel coordinate in the transformed image to a pixels coordinate in the original image.
+        """
+        tx_t2m, ty_t2m = self.transformed_pixels_to_meters_conversions()
+        tx_m2p, ty_m2p = self.meters_to_pixels_conversions()
+        x, y = sympy.symbols("x y")
+        tx_t2p = tx_m2p.subs({x: tx_t2m, y: ty_t2m})
+        ty_t2p = ty_m2p.subs({x: tx_t2m, y: ty_t2m})
+        return tx_t2p, ty_t2p
 
     def transform_image(self, image: np.ndarray, buffer_width_px: int = 0, full_image=False) -> np.ndarray:
         """

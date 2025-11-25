@@ -154,6 +154,46 @@ class TestPerspectiveTransform(unittest.TestCase):
             self.assertAlmostEqual(pxy[0], px, msg=err_msg, delta=1e-5)
             self.assertAlmostEqual(pxy[1], py, msg=err_msg, delta=1e-5)
 
+    def test_coordinates_conversion_transformed2meters(self):
+        """Tests that transformed locations can be determined using sympy."""
+        pixel_xs = [20, 90, 99, 5]
+        pixel_ys = [20, 10, 99, 85]
+        meters_xs = [0, 2.4, 2.4, 0]
+        meters_ys = [0, 0, 2.4, 2.4]
+        transformed_xs = [0, 2400, 2400, 0]
+        transformed_ys = [0, 0, 2400, 2400]
+
+        persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
+        cx, cy = persp_xform.transformed_pixels_to_meters_conversions()
+
+        for i, (mx, my) in enumerate(zip(meters_xs, meters_ys)):
+            tx, ty = list(zip(transformed_xs, transformed_ys))[i]
+            x, y = sympy.symbols("x y")
+            mxy = cx.evalf(subs={x: tx, y: ty}), cy.evalf(subs={x: tx, y: ty})
+            err_msg = f"Forward transform ({tx}, {ty}) -> {mxy} instead of the expected ({mx}, {my})"
+            self.assertAlmostEqual(mxy[0], mx, msg=err_msg, delta=1e-5)
+            self.assertAlmostEqual(mxy[1], my, msg=err_msg, delta=1e-5)
+
+    def test_coordinates_conversion_transformed2pixels(self):
+        """Tests that transformed locations can be determined using sympy."""
+        pixel_xs = [20, 90, 99, 5]
+        pixel_ys = [20, 10, 99, 85]
+        meters_xs = [0, 2.4, 2.4, 0]
+        meters_ys = [0, 0, 2.4, 2.4]
+        transformed_xs = [0, 2400, 2400, 0]
+        transformed_ys = [0, 0, 2400, 2400]
+
+        persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
+        cx, cy = persp_xform.transformed_pixels_to_pixels_conversions()
+
+        for i, (px, py) in enumerate(zip(pixel_xs, pixel_ys)):
+            tx, ty = list(zip(transformed_xs, transformed_ys))[i]
+            x, y = sympy.symbols("x y")
+            pxy = cx.evalf(subs={x: tx, y: ty}), cy.evalf(subs={x: tx, y: ty})
+            err_msg = f"Forward transform ({tx}, {ty}) -> {pxy} instead of the expected ({px}, {py})"
+            self.assertAlmostEqual(pxy[0], px, msg=err_msg, delta=1e-5)
+            self.assertAlmostEqual(pxy[1], py, msg=err_msg, delta=1e-5)
+
 
 if __name__ == "__main__":
     # t = TestPerspectiveTransform()
