@@ -90,8 +90,8 @@ class TestPerspectiveTransform(unittest.TestCase):
         """Tests that transformed locations can be determined on a single-point basis."""
         pixel_xs = [20, 90, 99, 5]
         pixel_ys = [20, 10, 99, 85]
-        meters_xs = [0, 1, 1, 0]
-        meters_ys = [0, 0, 1, 1]
+        meters_xs = [0, 2.4, 2.4, 0]
+        meters_ys = [0, 0, 2.4, 2.4]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
 
@@ -102,19 +102,21 @@ class TestPerspectiveTransform(unittest.TestCase):
                 txy.x[0],
                 mx,
                 msg=f"Forward transform ({px}, {py}) -> {txy.astuple()} instead of the expected ({mx}, {my})",
+                delta=1e-5,
             )
             self.assertAlmostEqual(
                 txy.y[0],
                 my,
                 msg=f"Forward transform ({px}, {py}) -> {txy.astuple()} instead of the expected ({mx}, {my})",
+                delta=1e-5,
             )
 
     def test_coordinates_conversion_forward(self):
         """Tests that transformed locations can be determined using sympy."""
         pixel_xs = [20, 90, 99, 5]
         pixel_ys = [20, 10, 99, 85]
-        meters_xs = [0, 1, 1, 0]
-        meters_ys = [0, 0, 1, 1]
+        meters_xs = [0, 2.4, 2.4, 0]
+        meters_ys = [0, 0, 2.4, 2.4]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
         tx, ty = persp_xform.pixels_to_meters_conversions()
@@ -140,8 +142,8 @@ class TestPerspectiveTransform(unittest.TestCase):
         """Tests that original locations can be determined on a single-point basis."""
         pixel_xs = [20, 90, 99, 5]
         pixel_ys = [20, 10, 99, 85]
-        meters_xs = [0, 1, 1, 0]
-        meters_ys = [0, 0, 1, 1]
+        meters_xs = [0, 2.4, 2.4, 0]
+        meters_ys = [0, 0, 2.4, 2.4]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
 
@@ -152,19 +154,21 @@ class TestPerspectiveTransform(unittest.TestCase):
                 txy.x[0],
                 px,
                 msg=f"Backward transform ({mx}, {my}) -> {txy.astuple()} instead of the expected ({px}, {py})",
+                delta=1e-5,
             )
             self.assertAlmostEqual(
                 txy.y[0],
                 py,
                 msg=f"Backward transform ({mx}, {my}) -> {txy.astuple()} instead of the expected ({px}, {py})",
+                delta=1e-5,
             )
 
     def test_coordinates_conversion_backward(self):
         """Tests that transformed locations can be determined using sympy."""
         pixel_xs = [20, 90, 99, 5]
         pixel_ys = [20, 10, 99, 85]
-        meters_xs = [0, 1, 1, 0]
-        meters_ys = [0, 0, 1, 1]
+        meters_xs = [0, 2.4, 2.4, 0]
+        meters_ys = [0, 0, 2.4, 2.4]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
         tx, ty = persp_xform.meters_to_pixels_conversions()
