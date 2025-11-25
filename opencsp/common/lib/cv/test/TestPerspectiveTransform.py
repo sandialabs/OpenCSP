@@ -97,17 +97,17 @@ class TestPerspectiveTransform(unittest.TestCase):
 
         for i, (px, py) in enumerate(zip(pixel_xs, pixel_ys)):
             mx, my = list(zip(meters_xs, meters_ys))[i]
-            txy = persp_xform.pixels_to_meters(p2.Pxy([px, py]))
+            mxy = persp_xform.pixels_to_meters(p2.Pxy([px, py]))
             self.assertAlmostEqual(
-                txy.x[0],
+                mxy.x[0],
                 mx,
-                msg=f"Forward transform ({px}, {py}) -> {txy.astuple()} instead of the expected ({mx}, {my})",
+                msg=f"Forward transform ({px}, {py}) -> {mxy.astuple()} instead of the expected ({mx}, {my})",
                 delta=1e-5,
             )
             self.assertAlmostEqual(
-                txy.y[0],
+                mxy.y[0],
                 my,
-                msg=f"Forward transform ({px}, {py}) -> {txy.astuple()} instead of the expected ({mx}, {my})",
+                msg=f"Forward transform ({px}, {py}) -> {mxy.astuple()} instead of the expected ({mx}, {my})",
                 delta=1e-5,
             )
 
@@ -119,22 +119,22 @@ class TestPerspectiveTransform(unittest.TestCase):
         meters_ys = [0, 0, 2.4, 2.4]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
-        tx, ty = persp_xform.pixels_to_meters_conversions()
+        cx, cy = persp_xform.pixels_to_meters_conversions()
 
         for i, (px, py) in enumerate(zip(pixel_xs, pixel_ys)):
             mx, my = list(zip(meters_xs, meters_ys))[i]
             x, y = sympy.symbols("x y")
-            txy = tx.evalf(subs={x: px, y: py}), ty.evalf(subs={x: px, y: py})
+            mxy = cx.evalf(subs={x: px, y: py}), cy.evalf(subs={x: px, y: py})
             self.assertAlmostEqual(
-                txy[0],
+                mxy[0],
                 mx,
-                msg=f"Forward conversion ({px}, {py}) -> {txy} instead of the expected ({mx}, {my})",
+                msg=f"Forward conversion ({px}, {py}) -> {mxy} instead of the expected ({mx}, {my})",
                 delta=1e-5,
             )
             self.assertAlmostEqual(
-                txy[1],
+                mxy[1],
                 my,
-                msg=f"Forward conversion ({px}, {py}) -> {txy} instead of the expected ({mx}, {my})",
+                msg=f"Forward conversion ({px}, {py}) -> {mxy} instead of the expected ({mx}, {my})",
                 delta=1e-5,
             )
 
@@ -149,17 +149,17 @@ class TestPerspectiveTransform(unittest.TestCase):
 
         for i, (mx, my) in enumerate(zip(meters_xs, meters_ys)):
             px, py = list(zip(pixel_xs, pixel_ys))[i]
-            txy = persp_xform.meters_to_pixels(p2.Pxy([mx, my]))
+            pxy = persp_xform.meters_to_pixels(p2.Pxy([mx, my]))
             self.assertAlmostEqual(
-                txy.x[0],
+                pxy.x[0],
                 px,
-                msg=f"Backward transform ({mx}, {my}) -> {txy.astuple()} instead of the expected ({px}, {py})",
+                msg=f"Backward transform ({mx}, {my}) -> {pxy.astuple()} instead of the expected ({px}, {py})",
                 delta=1e-5,
             )
             self.assertAlmostEqual(
-                txy.y[0],
+                pxy.y[0],
                 py,
-                msg=f"Backward transform ({mx}, {my}) -> {txy.astuple()} instead of the expected ({px}, {py})",
+                msg=f"Backward transform ({mx}, {my}) -> {pxy.astuple()} instead of the expected ({px}, {py})",
                 delta=1e-5,
             )
 
@@ -171,22 +171,22 @@ class TestPerspectiveTransform(unittest.TestCase):
         meters_ys = [0, 0, 2.4, 2.4]
 
         persp_xform = PerspectiveTransform(p2.Pxy((pixel_xs, pixel_ys)), p2.Pxy((meters_xs, meters_ys)))
-        tx, ty = persp_xform.meters_to_pixels_conversions()
+        cx, cy = persp_xform.meters_to_pixels_conversions()
 
         for i, (mx, my) in enumerate(zip(meters_xs, meters_ys)):
             px, py = list(zip(pixel_xs, pixel_ys))[i]
             x, y = sympy.symbols("x y")
-            txy = tx.evalf(subs={x: mx, y: my}), ty.evalf(subs={x: mx, y: my})
+            pxy = cx.evalf(subs={x: mx, y: my}), cy.evalf(subs={x: mx, y: my})
             self.assertAlmostEqual(
-                txy[0],
+                pxy[0],
                 px,
-                msg=f"Forward conversion ({mx}, {my}) -> {txy} instead of the expected ({px}, {py})",
+                msg=f"Forward conversion ({mx}, {my}) -> {pxy} instead of the expected ({px}, {py})",
                 delta=1e-5,
             )
             self.assertAlmostEqual(
-                txy[1],
+                pxy[1],
                 py,
-                msg=f"Forward conversion ({mx}, {my}) -> {txy} instead of the expected ({px}, {py})",
+                msg=f"Forward conversion ({mx}, {my}) -> {pxy} instead of the expected ({px}, {py})",
                 delta=1e-5,
             )
 
