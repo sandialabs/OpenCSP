@@ -98,18 +98,9 @@ class TestPerspectiveTransform(unittest.TestCase):
         for i, (px, py) in enumerate(zip(pixel_xs, pixel_ys)):
             mx, my = list(zip(meters_xs, meters_ys))[i]
             mxy = persp_xform.pixels_to_meters(p2.Pxy([px, py]))
-            self.assertAlmostEqual(
-                mxy.x[0],
-                mx,
-                msg=f"Forward transform ({px}, {py}) -> {mxy.astuple()} instead of the expected ({mx}, {my})",
-                delta=1e-5,
-            )
-            self.assertAlmostEqual(
-                mxy.y[0],
-                my,
-                msg=f"Forward transform ({px}, {py}) -> {mxy.astuple()} instead of the expected ({mx}, {my})",
-                delta=1e-5,
-            )
+            err_msg = f"Forward transform ({px}, {py}) -> {mxy.astuple()} instead of the expected ({mx}, {my})"
+            self.assertAlmostEqual(mxy.x[0], mx, msg=err_msg, delta=1e-5)
+            self.assertAlmostEqual(mxy.y[0], my, msg=err_msg, delta=1e-5)
 
     def test_coordinates_conversion_forward(self):
         """Tests that transformed locations can be determined using sympy."""
@@ -125,18 +116,9 @@ class TestPerspectiveTransform(unittest.TestCase):
             mx, my = list(zip(meters_xs, meters_ys))[i]
             x, y = sympy.symbols("x y")
             mxy = cx.evalf(subs={x: px, y: py}), cy.evalf(subs={x: px, y: py})
-            self.assertAlmostEqual(
-                mxy[0],
-                mx,
-                msg=f"Forward conversion ({px}, {py}) -> {mxy} instead of the expected ({mx}, {my})",
-                delta=1e-5,
-            )
-            self.assertAlmostEqual(
-                mxy[1],
-                my,
-                msg=f"Forward conversion ({px}, {py}) -> {mxy} instead of the expected ({mx}, {my})",
-                delta=1e-5,
-            )
+            err_msg = f"Forward conversion ({px}, {py}) -> {mxy} instead of the expected ({mx}, {my})"
+            self.assertAlmostEqual(mxy[0], mx, msg=err_msg, delta=1e-5)
+            self.assertAlmostEqual(mxy[1], my, msg=err_msg, delta=1e-5)
 
     def test_meters_to_pixels(self):
         """Tests that original locations can be determined on a single-point basis."""
@@ -150,18 +132,9 @@ class TestPerspectiveTransform(unittest.TestCase):
         for i, (mx, my) in enumerate(zip(meters_xs, meters_ys)):
             px, py = list(zip(pixel_xs, pixel_ys))[i]
             pxy = persp_xform.meters_to_pixels(p2.Pxy([mx, my]))
-            self.assertAlmostEqual(
-                pxy.x[0],
-                px,
-                msg=f"Backward transform ({mx}, {my}) -> {pxy.astuple()} instead of the expected ({px}, {py})",
-                delta=1e-5,
-            )
-            self.assertAlmostEqual(
-                pxy.y[0],
-                py,
-                msg=f"Backward transform ({mx}, {my}) -> {pxy.astuple()} instead of the expected ({px}, {py})",
-                delta=1e-5,
-            )
+            err_msg = f"Backward transform ({mx}, {my}) -> {pxy.astuple()} instead of the expected ({px}, {py})"
+            self.assertAlmostEqual(pxy.x[0], px, msg=err_msg, delta=1e-5)
+            self.assertAlmostEqual(pxy.y[0], py, msg=err_msg, delta=1e-5)
 
     def test_coordinates_conversion_backward(self):
         """Tests that transformed locations can be determined using sympy."""
@@ -177,18 +150,9 @@ class TestPerspectiveTransform(unittest.TestCase):
             px, py = list(zip(pixel_xs, pixel_ys))[i]
             x, y = sympy.symbols("x y")
             pxy = cx.evalf(subs={x: mx, y: my}), cy.evalf(subs={x: mx, y: my})
-            self.assertAlmostEqual(
-                pxy[0],
-                px,
-                msg=f"Forward conversion ({mx}, {my}) -> {pxy} instead of the expected ({px}, {py})",
-                delta=1e-5,
-            )
-            self.assertAlmostEqual(
-                pxy[1],
-                py,
-                msg=f"Forward conversion ({mx}, {my}) -> {pxy} instead of the expected ({px}, {py})",
-                delta=1e-5,
-            )
+            err_msg = f"Forward conversion ({mx}, {my}) -> {pxy} instead of the expected ({px}, {py})"
+            self.assertAlmostEqual(pxy[0], px, msg=err_msg, delta=1e-5)
+            self.assertAlmostEqual(pxy[1], py, msg=err_msg, delta=1e-5)
 
 
 if __name__ == "__main__":
