@@ -703,7 +703,7 @@ class PowerpointImage(pps.PowerpointShape):
     @classmethod
     def clear_tmp_save_all(cls):
         """Remove all temporary save files for all saved PowerpointImages"""
-        return
+        return # added a return here, didn't want to delete this logic since it would be useful if we want to delete images, need to work on a elegant way to handle that.
         # if ft.directory_exists(cls._tmp_save_path, error_if_exists_as_file=False):
             # ft.delete_files_in_directory(cls._tmp_save_path, "*.png", error_on_dir_not_exists=False)
             # ft.delete_files_in_directory(cls._tmp_save_path, "*.png.txt", error_on_dir_not_exists=False)
