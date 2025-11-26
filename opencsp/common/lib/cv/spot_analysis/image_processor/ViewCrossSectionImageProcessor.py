@@ -2,17 +2,16 @@ import copy
 from typing import Callable, Literal
 
 import matplotlib.axes
-import matplotlib.backend_bases
 import numpy as np
 
 from contrib.common.lib.cv.spot_analysis.PixelOfInterest import PixelOfInterest
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-import opencsp.common.lib.cv.image_reshapers as ir
 from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractVisualizationImageProcessor import (
     AbstractVisualizationImageProcessor,
 )
+import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
@@ -22,7 +21,6 @@ import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.exception_tools as et
-import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
 
 
@@ -173,6 +171,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
     def _draw_cross_section(
         self,
+        operable: SpotAnalysisOperable,
         np_image: np.ndarray,
         cs_loc: tuple[int, int],
         cropped_region: tuple[int, int, int, int],
@@ -187,6 +186,8 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         Parameters
         ----------
+        operable : SpotAnalysisOperable
+            The operable used to transform the drawn coordinates
         np_image : np.ndarray
             The image to grab the cross section data from. Should already be cropped according to the cropped_region.
         cs_loc : tuple[int, int]
@@ -240,6 +241,10 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
             v_p_list = [i + crop_top for i in v_p_list]
             h_p_list = [i + crop_left for i in h_p_list]
 
+        # Adjust the coordinates to match the operable coordinates transforms
+        v_p_list = operable.transform_coordinates(p2.Pxy(([cs_loc_x] * len(v_p_list), v_p_list)))[1].y
+        h_p_list = operable.transform_coordinates(p2.Pxy((h_p_list, [cs_loc_y] * len(h_p_list))))[1].x
+
         # Draw the cross section graphs
         v_fig_record, h_fig_record = self._figure_records
         v_fig_record.view.draw_pq_list(zip(v_p_list, v_cross_section), style=vstyle, label=vlabel)
@@ -267,7 +272,9 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
             # add the no-sun cross sections to the plots
             label = "No Sun"
-            return self._draw_cross_section(no_sun_image, cs_loc, cropped_region, vstyle, hstyle, label, label)
+            return self._draw_cross_section(
+                operable, no_sun_image, cs_loc, cropped_region, vstyle, hstyle, label, label
+            )
 
         else:
             return 0
@@ -301,9 +308,6 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         cropped_region = tuple([x_start, y_start, x_end, y_end])
         cs_loc_cropped = tuple([cs_cropped_x, cs_cropped_y])
 
-        # matplotlib puts the origin in the bottom left instead of the top left
-        cs_cropped_y_mlab = cropped_height - cs_cropped_y
-
         # Clear the previous plot
         for fig_record in self.fig_records:
             fig_record.clear()
@@ -329,15 +333,19 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         # Draw the image w/ cross section line overlays
         i_view = self.views[0]
-        i_view.draw_image(base_image.nparray, (0, 0), (cropped_width, cropped_height))
-        i_view.draw_pq_list([(cs_cropped_x, 0), (cs_cropped_x, cropped_height)], style=vstyle)
-        i_view.draw_pq_list([(0, cs_cropped_y_mlab), (cropped_width, cs_cropped_y_mlab)], style=hstyle)
+        tc = lambda x, y: operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple()
+        img_xy, img_xy2 = tc(0, 0), tc(cropped_width, cropped_height)
+        i_view.draw_image(
+            base_image.nparray, img_xy, (img_xy2[0] - img_xy[0], img_xy2[1] - img_xy[1]), invert_ylim=True
+        )
+        i_view.draw_pq_list([tc(cs_cropped_x, 0), tc(cs_cropped_x, cropped_height)], style=vstyle)
+        i_view.draw_pq_list([tc(0, cs_cropped_y), tc(cropped_width, cs_cropped_y)], style=hstyle)
 
         # Draw the cross sections for the no-sun image.
         # Draw the cross sections for the primary image using the same axes.
         graphs_per_plot_cnt = 0
         graphs_per_plot_cnt += self._draw_null_image_cross_section(operable, cs_loc_cropped, cropped_region)
-        graphs_per_plot_cnt += self._draw_cross_section(np_image, cs_loc, cropped_region)
+        graphs_per_plot_cnt += self._draw_cross_section(operable, np_image, cs_loc, cropped_region)
 
         # draw
         for view in self.views:
