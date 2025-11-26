@@ -128,7 +128,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         )
 
         if self.single_plot:
-            plot_titles = ["Image"]
+            plot_titles = ["Image", "Cross Section"]
         else:
             plot_titles = ["Image", "Horizontal CS: ", "Vertical CS: "]
 
