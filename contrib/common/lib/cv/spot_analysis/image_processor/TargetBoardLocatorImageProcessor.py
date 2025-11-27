@@ -5,9 +5,10 @@ import numpy as np
 import os
 
 from numpy._typing._array_like import NDArray
+import sympy
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
-import contrib.common.lib.cv.PerspectiveTransform as pt
+import opencsp.common.lib.cv.PerspectiveTransform as pt
 import contrib.common.lib.cv.RegionDetector as rd
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisImageProcessor import (
@@ -19,6 +20,7 @@ import opencsp.common.lib.geometry.RegionXY as reg2
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.tool.file_tools as ft
+import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
 
@@ -257,7 +259,9 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # Compile a list of all reference images
         if os.path.isdir(self.reference_image_dir_or_file):
-            image_filenames = ft.files_in_directory(self.reference_image_dir_or_file, files_only=True)
+            image_filenames = it.image_files_in_directory(
+                self.reference_image_dir_or_file, it.pil_image_formats_readable
+            )
             image_files: list[str] = []
             for filename in image_filenames:
                 file_path_name_ext = os.path.join(self.reference_image_dir_or_file, filename)
@@ -360,6 +364,13 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
         # target board images
         my_visualization_images = [annotated_cacheable]
 
+        # apply the changes to the image coordinates
+        x, y = sympy.symbols('x y')
+        x_coordinates_transform, y_coordinates_transform = self.transform.transformed_pixels_to_meters_conversions()
+        if operable.x_coordinates_transform is not None:
+            x_coordinates_transform = x_coordinates_transform.subs({x: operable.x_coordinates_transform})
+            y_coordinates_transform = y_coordinates_transform.subs({y: operable.y_coordinates_transform})
+
         visualization_images = copy.copy(operable.visualization_images)
         visualization_images[self] = my_visualization_images
         algorithm_images = copy.copy(operable.algorithm_images)
@@ -369,5 +380,7 @@ class TargetBoardLocatorImageProcessor(AbstractSpotAnalysisImageProcessor):
             primary_image=isolated_cacheable,
             visualization_images=visualization_images,
             algorithm_images=algorithm_images,
+            x_coordinates_transform=x_coordinates_transform,
+            y_coordinates_transform=y_coordinates_transform,
         )
         return [ret]

@@ -72,7 +72,7 @@ def scene_reconstruction(dir_output, dir_input):
     # Save points as CSV
     cal_scene_recon.save_data_as_csv(join(dir_output, 'point_locations.csv'))
 
-    # Save calibrtion figures
+    # Save calibration figures
     for fig in cal_scene_recon.figures:
         fig.savefig(join(dir_output, fig.get_label() + '.png'))
 
@@ -84,7 +84,7 @@ def example_driver(dir_output_fixture, dir_input_fixture):
     if dir_input_fixture:
         dir_input = dir_input_fixture
     if dir_output_fixture:
-        dir_output = dir_input_fixture
+        dir_output = dir_output_fixture
 
     # Define output directory
     ft.create_directories_if_necessary(dir_input)

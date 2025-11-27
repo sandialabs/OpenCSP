@@ -113,7 +113,12 @@ class ViewAnnotationsImageProcessor(AbstractVisualizationImageProcessor):
 
         # initialize the figure
         self.prepare_figure_records([self.figure], [image.shape])
-        self.figure.view.imshow(image)
+        tc = lambda x, y: operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple()
+        (height, width), _ = it.dims_and_nchannels(image)
+        img_xy, img_xy2 = tc(0, 0), tc(width, height)
+        self.figure.view.draw_image(
+            base_image.nparray, img_xy, (img_xy2[0] - img_xy[0], img_xy2[1] - img_xy[1]), invert_ylim=True
+        )
 
         # render
         include_label = len(to_render) > 1

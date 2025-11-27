@@ -1,5 +1,6 @@
 import cv2 as cv
 import numpy as np
+import sympy
 
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.tool.log_tools as lt
@@ -44,10 +45,16 @@ class PerspectiveTransform:
         self.millimeters_coordinates = p2.Pxy(self.meters_coordinates.data * 1000.0)
 
         # transform matrices
-        self.meters_to_pixels_transform: np.ndarray = None
+        self._meters_to_pixels_transform: np.ndarray = None
         self.millimeters_to_pixels_transform: np.ndarray = None
-        self.pixels_to_meters_transform: np.ndarray = None
+        self._pixels_to_meters_transform: np.ndarray = None
         self.pixels_to_millimeters_transform: np.ndarray = None
+
+        # transform equations
+        self.pnt_x_forward_func: sympy.Expr = None
+        self.pnt_y_forward_func: sympy.Expr = None
+        self.pnt_x_backward_func: sympy.Expr = None
+        self.pnt_y_backward_func: sympy.Expr = None
 
         self._find_transforms()
 
@@ -68,10 +75,16 @@ class PerspectiveTransform:
         mm_xy = mm_xy.astype(np.float32)
 
         # find the transforms
-        self.meters_to_pixels_transform = cv.getPerspectiveTransform(m_xy, px_xy)
+        self._meters_to_pixels_transform = cv.getPerspectiveTransform(m_xy, px_xy)
         self.millimeters_to_pixels_transform = cv.getPerspectiveTransform(mm_xy, px_xy)
-        self.pixels_to_meters_transform = cv.getPerspectiveTransform(px_xy, m_xy)
+        self._pixels_to_meters_transform = cv.getPerspectiveTransform(px_xy, m_xy)
         self.pixels_to_millimeters_transform = cv.getPerspectiveTransform(px_xy, mm_xy)
+
+        # unset the old conversions
+        self.pnt_x_forward_func = None
+        self.pnt_x_forward_func = None
+        self.pnt_x_backward_func = None
+        self.pnt_y_backward_func = None
 
     @property
     def width_meters(self) -> float:
@@ -144,7 +157,180 @@ class PerspectiveTransform:
                     distances.append(np.abs(data[i] - data[j]))
             return np.max(distances)
 
+    def pixels_to_meters_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
+        """Sympy transform for converting values in pixels to values in meters.
+
+        Example usage:
+
+            tx_p2m, ty_p2m = persp_xform.pixels_to_meters_conversions()
+            x, y = sympy.symbols("x y")
+            mxy = tx_p2m.evalf(subs={x: px, y: py}), ty_p2m.evalf(subs={x: px, y: py})
+
+        Returns
+        -------
+        tx_p2m : sympy.Expr
+            The sympy expression that can be evaluated to get the transformed x value.
+        ty_p2m : sympy.Expr
+            The sympy expression that can be evaluated to get the transformed y value.
+        """
+        if self.pnt_x_forward_func is None:
+            # This code is largely from Google Gemini circa Nov 2025
+            # 1. Define symbols for the points and the transformation matrix elements
+            x, y = sympy.symbols('x y')
+            h11, h12, h13, h21, h22, h23, h31, h32, h33 = sympy.symbols('h11 h12 h13 h21 h22 h23 h31 h32 h33')
+
+            # 2. Define the source point as a SymPy Matrix (homogeneous coordinates)
+            source_point = sympy.Matrix([[x], [y], [1]])
+
+            # 3. Define the 3x3 perspective transform matrix (homography matrix)
+            H = sympy.Matrix([[h11, h12, h13], [h21, h22, h23], [h31, h32, h33]])
+
+            # 4. Perform the matrix multiplication
+            # projective_point will be a 3x1 matrix with elements X, Y, W
+            projective_point = H * source_point
+
+            X: sympy.Expr = projective_point[0]
+            Y: sympy.Expr = projective_point[1]
+            W: sympy.Expr = projective_point[2]
+
+            # 5. Get the normalized target coordinates (x', y') as SymPy expressions
+            forward_x: sympy.Expr = X / W
+            forward_y: sympy.Expr = Y / W
+            backward_x: sympy.Expr = X / W
+            backward_y: sympy.Expr = Y / W
+
+            t = self._pixels_to_meters_transform
+            tp = np.linalg.inv(t)  # t' (t "prime")
+            self.pnt_x_forward_func = forward_x.subs(
+                {
+                    h11: t[0, 0],
+                    h12: t[0, 1],
+                    h13: t[0, 2],
+                    h21: t[1, 0],
+                    h22: t[1, 1],
+                    h23: t[1, 2],
+                    h31: t[2, 0],
+                    h32: t[2, 1],
+                    h33: t[2, 2],
+                }
+            )
+            self.pnt_y_forward_func = forward_y.subs(
+                {
+                    h11: t[0, 0],
+                    h12: t[0, 1],
+                    h13: t[0, 2],
+                    h21: t[1, 0],
+                    h22: t[1, 1],
+                    h23: t[1, 2],
+                    h31: t[2, 0],
+                    h32: t[2, 1],
+                    h33: t[2, 2],
+                }
+            )
+            self.pnt_x_backward_func = backward_x.subs(
+                {
+                    h11: tp[0, 0],
+                    h12: tp[0, 1],
+                    h13: tp[0, 2],
+                    h21: tp[1, 0],
+                    h22: tp[1, 1],
+                    h23: tp[1, 2],
+                    h31: tp[2, 0],
+                    h32: tp[2, 1],
+                    h33: tp[2, 2],
+                }
+            )
+            self.pnt_y_backward_func = backward_y.subs(
+                {
+                    h11: tp[0, 0],
+                    h12: tp[0, 1],
+                    h13: tp[0, 2],
+                    h21: tp[1, 0],
+                    h22: tp[1, 1],
+                    h23: tp[1, 2],
+                    h31: tp[2, 0],
+                    h32: tp[2, 1],
+                    h33: tp[2, 2],
+                }
+            )
+
+        return self.pnt_x_forward_func, self.pnt_y_forward_func
+
+    def meters_to_pixels_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
+        """Sympy transform for converting values in meters to values in pixels.
+
+        Example usage:
+
+            tx_m2p, ty_m2p = persp_xform.meters_to_pixels_conversions()
+            x, y = sympy.symbols("x y")
+            pxy = tx_m2p.evalf(subs={x: mx, y: my}), ty_m2p.evalf(subs={x: mx, y: my})
+
+        Returns
+        -------
+        tx_m2p : sympy.Expr
+            The sympy expression that can be evaluated to get the transformed x value.
+        ty_m2p : sympy.Expr
+            The sympy expression that can be evaluated to get the transformed y value.
+        """
+        self.pixels_to_meters_conversions()
+        return self.pnt_x_backward_func, self.pnt_y_backward_func
+
+    def transformed_pixels_to_meters_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
+        """
+        Returns the x and y transforms from the transformed image (as in the image from the
+        "transform_image" function) to meters.
+
+        Returns
+        -------
+        tuple[sympy.Expr, sympy.Expr]
+            The x and y transforms to go from a pixel coordinate in the transformed image to a meters coordinate.
+        """
+        tx_t2m = sympy.sympify("x / 1000")
+        ty_t2m = sympy.sympify("y / 1000")
+        return tx_t2m, ty_t2m
+
+    def transformed_pixels_to_pixels_conversions(self) -> tuple[sympy.Expr, sympy.Expr]:
+        """
+        Returns the x and y transforms from the transformed image (as in the image from the
+        "transform_image" function) to the original image pixels.
+
+        Returns
+        -------
+        tuple[sympy.Expr, sympy.Expr]
+            The x and y transforms to go from a pixel coordinate in the transformed image to a pixels coordinate in the original image.
+        """
+        tx_t2m, ty_t2m = self.transformed_pixels_to_meters_conversions()
+        tx_m2p, ty_m2p = self.meters_to_pixels_conversions()
+        x, y = sympy.symbols("x y")
+        tx_t2p = tx_m2p.subs({x: tx_t2m, y: ty_t2m})
+        ty_t2p = ty_m2p.subs({x: tx_t2m, y: ty_t2m})
+        return tx_t2p, ty_t2p
+
     def transform_image(self, image: np.ndarray, buffer_width_px: int = 0, full_image=False) -> np.ndarray:
+        """
+        Applies the forward transform to the given image, effectively
+        de-warping the image. The resulting image will contain 1000 pixels
+        per meter (aka a 1x1 meter target will be 1000x1000 pixels big).
+
+        Only the pixels from within the original pixel_coordinates used to
+        create the class are included in the de-warped image, unless either
+        buffer_width_px or full_image are specified.
+
+        Parameters
+        ----------
+        image : np.ndarray
+            The input image to be transformed.
+        buffer_width_px : int, optional
+            Extra pixels to include from around the original pixel coordinate.
+            If set, then full_image is ignored. Default is 0.
+        full_image : bool, optional
+            If True, then include all pixels from the given image. By default False.
+
+        Returns
+        -------
+        np.ndarray
+            The transformed version of the input image.
+        """
         if buffer_width_px != 0:
             xs = self.pixel_coordinates.x.copy()
             ys = self.pixel_coordinates.y.copy()
@@ -181,9 +367,11 @@ class PerspectiveTransform:
         return p2.Pxy((b_x_vals, b_y_vals))
 
     def pixels_to_meters(self, pixel_coordinate: p2.Pxy) -> p2.Pxy:
-        meters_coordinate = self._a_to_b(pixel_coordinate, self.pixels_to_meters_transform)
+        """Converts the given pixel coordinates into meters."""
+        meters_coordinate = self._a_to_b(pixel_coordinate, self._pixels_to_meters_transform)
         return p2.Pxy(meters_coordinate.data)
 
     def meters_to_pixels(self, meter_coordinate: p2.Pxy) -> p2.Pxy:
+        """Converts the given meter coordinates into pixels."""
         meters_coordinate = p2.Pxy(meter_coordinate.data)
-        return self._a_to_b(meters_coordinate, self.meters_to_pixels_transform)
+        return self._a_to_b(meters_coordinate, self._meters_to_pixels_transform)

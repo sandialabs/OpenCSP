@@ -4,7 +4,9 @@ import numpy as np
 import numpy.typing as npt
 import os
 import sys
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Iterable
+
+import sympy
 
 import opencsp.common.lib.csp.LightSource as ls
 import opencsp.common.lib.cv.annotations.AbstractAnnotations as aa
@@ -12,6 +14,7 @@ import opencsp.common.lib.cv.fiducials.AbstractFiducials as af
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.spot_analysis.ImageType import ImageType
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisPopulationStatistics import SpotAnalysisPopulationStatistics
+import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
@@ -106,6 +109,12 @@ class SpotAnalysisOperable:
     image_processor_notes: list[tuple[str, list[str]]] = field(default_factory=list)
     """ Notes from specific image processors. These notes are generally intended for human use, but it is recommended
     that they maintain a consistent formatting so that they can also be used programmatically. """
+    x_coordinates_transform: sympy.Expr = None
+    """ The expression to convert from (x,y) image values to real-world x
+    coordinates, in meters. If None, then the input x value will be returned. """
+    y_coordinates_transform: sympy.Expr = None
+    """ The expression to convert from (x,y) image values to real-world y
+    coordinates, in meters. If None, then the input y value will be returned. """
 
     def __post_init__(self):
         # We use this method to sanitize the inputs to the constructor.
@@ -147,6 +156,16 @@ class SpotAnalysisOperable:
                 primary_image_source_path = primary_image.cache_path
             if primary_image_source_path is not None:
                 requires_update = True
+
+        # check that either no transform is set, or both transforms are set
+        if (self.x_coordinates_transform is None and self.y_coordinates_transform is not None) or (
+            self.x_coordinates_transform is not None and self.y_coordinates_transform is None
+        ):
+            raise RuntimeError(
+                "Error in SpotAnalysisOperable(): "
+                + "either both of x_coordinates_transform and y_coordinates_transform must be set or they must both be unset, "
+                + f"but {self.x_coordinates_transform=} and {self.y_coordinates_transform=}!"
+            )
 
         if requires_update:
             # use __init__ to update frozen values
@@ -345,6 +364,32 @@ class SpotAnalysisOperable:
                 return True
 
         return False
+
+    def transform_coordinates(self, xy_pixels: p2.Pxy) -> tuple[bool, p2.Pxy]:
+        """
+        Given a set of (x,y) pixel coordinates, get the (x,y) location in real-world meters.
+        If self.xy_coordinates_transform is None, then the input pixel value will be returned.
+
+        Parameters
+        ----------
+        xy_pixels : Pxy
+            The pixel coordinates to be transformed.
+
+        Returns
+        -------
+        transformed : bool
+            True if xy_meters is in meters, False if it is in pixels.
+        xy_meters : Pxy
+            The transformed coordinates in meters, or the input xy_pixels.
+        """
+        if self.x_coordinates_transform is None:
+            return False, xy_pixels
+        else:
+            fx = sympy.lambdify(sympy.symbols('x y'), self.x_coordinates_transform, "numpy")
+            fy = sympy.lambdify(sympy.symbols('x y'), self.y_coordinates_transform, "numpy")
+            f = lambda x, y: (fx(x, y), fy(x, y))
+            xy_meters = [f(xy_pixels.x[i], xy_pixels.y[i]) for i in range(len(xy_pixels))]
+            return True, p2.Pxy.from_list(xy_meters)
 
     def __sizeof__(self) -> int:
         """
