@@ -123,7 +123,7 @@ class ViewAnnotationsImageProcessor(AbstractVisualizationImageProcessor):
         # render
         include_label = len(to_render) > 1
         for fiducials in to_render:
-            fiducials.render_to_figure(self.figure, image, include_label)
+            fiducials.render_to_figure(self.figure, image, include_label, operable)
 
         # show the legend
         if include_label:

@@ -26,6 +26,7 @@ import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
+import opencsp.common.lib.tool.log_tools as lt
 
 
 def main(input_images: list[str], results_dir: str, experiment_name: str):
@@ -86,7 +87,7 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
         "CropHots": CroppingImageProcessor(centered_location=hotspot_pixel_locator, width_height=(250, 250)),
         # Now we can use a centroid to find the center of the sun.
         "Centrod2": MomentsImageProcessor(
-            include_visualization=True, centroid_style=rcps.default(color=color.cyan(), markersize=20)
+            include_visualization=True, centroid_style=rcps.default(color=color.green(), markersize=20)
         ),
         # Get the size of the sun in the image with the full width half maximum
         # technique, which works well for light sources that are roughly
@@ -149,6 +150,9 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
 
     for result in spot_analysis:
         pass
+
+    ppt: PowerpointImageProcessor = image_processors["PowerPnt"]
+    lt.info(f"Powerpoint deck saved to {ppt.dest_path_name_ext}")
 
 
 if __name__ == "__main__":
