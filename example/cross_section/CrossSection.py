@@ -101,6 +101,9 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
         # Visualize the sun spot, including over and under exposed pixels, the
         # centroid and hotspot location, a cross section of the sun spot, and a
         # 3D view of the spot.
+        # We start by tossing out annotations that are outside the cropped area
+        # as a workaround to viewing the cross section correctly.
+        "TossAnno": DiscardAnnotationsImageProcessor(outside_boundaries=True),
         "VOverEx2": ViewHighlightImageProcessor(black_highlight_color=(70, 0, 70), white_highlight_color=(70, 70, 0)),
         "VAnnotat": ViewAnnotationsImageProcessor(base_image_selector='visualization'),
         "VCrosSec": ViewCrossSectionImageProcessor(
