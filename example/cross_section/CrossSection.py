@@ -20,6 +20,7 @@ from contrib.common.lib.cv.spot_analysis.image_processor import *
 from opencsp.common.lib.cv.SpotAnalysis import SpotAnalysis
 from opencsp.common.lib.cv.annotations.HotspotAnnotation import HotspotAnnotation
 from contrib.common.lib.cv.annotations.MomentsAnnotation import MomentsAnnotation
+from opencsp.common.lib.cv.fiducials.AbstractFiducials import AbstractFiducials
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor import *
 import opencsp.common.lib.render.Color as color
@@ -70,6 +71,8 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
         "VFalseCl": ViewFalseColorImageProcessor(),
         "VCentOrg": ViewAnnotationsImageProcessor(base_image_selector='visualization'),
         "CropCent": CroppingImageProcessor(centered_location=centroid_pixel_locator, width_height=(1500, 1500)),
+        "VFalseC2": ViewFalseColorImageProcessor(),
+        "VCentCrp": ViewAnnotationsImageProcessor([MomentsAnnotation], base_image_selector='visualization'),
         # Use the hotspot locator to find the actual sun in the image. We use
         # this locator instead of a centroid because lens reflections will
         # cause a centroid to produce an invalid location. For this example
@@ -80,11 +83,13 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
         "HotSpotS": HotspotImageProcessor(
             21, draw_debug_view=False, record_visualization=False, record_debug_view=False
         ),
-        "VFalseC2": ViewFalseColorImageProcessor(),
+        "VFalseC3": ViewFalseColorImageProcessor(),
         "VHotspot": ViewAnnotationsImageProcessor([HotspotAnnotation], base_image_selector='visualization'),
         # We know approximately the size of the sun in the image. Crop down to
         # that size to exclude lens reflections.
         "CropHots": CroppingImageProcessor(centered_location=hotspot_pixel_locator, width_height=(250, 250)),
+        "VFalseC4": ViewFalseColorImageProcessor(),
+        "VHotCrop": ViewAnnotationsImageProcessor([HotspotAnnotation], base_image_selector='visualization'),
         # Now we can use a centroid to find the center of the sun.
         "Centrod2": MomentsImageProcessor(
             include_visualization=True, centroid_style=rcps.default(color=color.green(), markersize=20)
@@ -93,16 +98,15 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
         # technique, which works well for light sources that are roughly
         # gaussian.
         "SpotSize": SpotWidthImageProcessor(spot_width_technique="fwhm"),
-        # Visualize the sun spot, including the false color spectrum, over and
-        # under exposed pixels, the centroid and hotspot location, a cross
-        # section of the sun spot, and a 3D view of the spot.
-        "VFalseC3": ViewFalseColorImageProcessor(),
-        "VOverExp": ViewHighlightImageProcessor(black_highlight_color=(70, 0, 70), white_highlight_color=(70, 70, 0)),
+        # Visualize the sun spot, including over and under exposed pixels, the
+        # centroid and hotspot location, a cross section of the sun spot, and a
+        # 3D view of the spot.
+        "VOverEx2": ViewHighlightImageProcessor(black_highlight_color=(70, 0, 70), white_highlight_color=(70, 70, 0)),
         "VAnnotat": ViewAnnotationsImageProcessor(base_image_selector='visualization'),
         "VCrosSec": ViewCrossSectionImageProcessor(
             centroid_pixel_locator, single_plot=False, y_range=(0, 255), base_image_selector='visualization'
         ),
-        'Ve3d': View3dImageProcessor(max_resolution=(100, 100)),
+        "V3dImage": View3dImageProcessor(max_resolution=(100, 100)),
     }
 
     # Create the PowerpointImageProcessor which will generate the Powerpoint
@@ -123,18 +127,19 @@ def main(input_images: list[str], results_dir: str, experiment_name: str):
             (_p["Original"], "Original"),
             (_p["Rgb2Gray"], "Grayscale"),
             (_p["Centroid"], "Centroid & Principle Axis"),
-            (_p["CropCent"], "Cropped to Centroid"),
+            (_p["VCentCrp"], "Cropped to Centroid"),
         ],
         [
-            (_p["VFalseC2"], "Cropped to Centroid"),
+            (_p["VCentCrp"], "Cropped to Centroid"),
             (_p["VHotspot"], "Hotspot"),
             (_p["CropHots"], "Cropped to Hotspot"),
+            (_p["VHotCrop"], "Cropped to Hotspot"),
         ],
         [
-            (_p["CropHots"], "Cropped Image"),
-            _p["VAnnotat"],
+            (_p["CropHots"], "Cropped to Hotspot"),
+            (_p["VAnnotat"], "Cropped Annotations"),
             _p["VCrosSec"],
-            _p["Ve3d"]
+            _p["V3dImage"]
         ],
     ]
     # fmt: on
