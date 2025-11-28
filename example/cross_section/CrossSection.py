@@ -175,7 +175,7 @@ if __name__ == "__main__":
     input_images = [ft.join(input_dir, fn) for fn in it.image_files_in_directory(input_dir)]
 
     if ft.directory_exists(process_dir):
-        if True:
+        if False:
             ft.delete_files_in_directory(process_dir, "*.pptx")
             ft.delete_files_in_directory(process_dir, "*.jpg")
             ft.delete_files_in_directory(process_dir, "*.png")
