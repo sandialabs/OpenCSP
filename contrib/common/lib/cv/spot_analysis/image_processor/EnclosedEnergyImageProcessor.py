@@ -19,6 +19,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisIma
     AbstractSpotAnalysisImageProcessor,
 )
 import opencsp.common.lib.tool.log_tools as lt
+import matplotlib.pyplot as plt
 
 
 if TYPE_CHECKING:
@@ -296,7 +297,6 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
 
         # close the figure
         fig_record.close()
-
         return plot_image, percentages_of_interest_radii
 
     def build_poi_annotations(
@@ -342,8 +342,14 @@ class EnclosedEnergyImageProcessor(AbstractSpotAnalysisImageProcessor):
         # Generate a visual plot of the enclosed energy
         enclosed_energy_plot, percentages_of_interest_radii = self.build_enclosed_energy_plot(enclosed_energy_sums)
 
+        plt.imshow(enclosed_energy_plot)
+        plt.show()
+
         # Attach the enclosed energy annotations
         enclosed_energy_annos = self.build_poi_annotations(center, percentages_of_interest_radii)
+
+        plt.imshow(example_enclosed_energy_image, cmap="grey")
+        plt.show()
 
         # Build the new operable
         notes = copy.copy(operable.image_processor_notes)
