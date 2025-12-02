@@ -1,6 +1,9 @@
 import numpy as np
+import numpy.testing as npt
 import os
 import unittest
+
+import sympy
 
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
 from opencsp.common.lib.cv.SpotAnalysis import SpotAnalysis
@@ -101,6 +104,79 @@ class TestCroppingImageProcessor(unittest.TestCase):
         new_annot1: RectangleAnnotations = result1.get_fiducials_by_type(RectangleAnnotations)[0]
         self.assertEqual(new_annot0.origin.astuple(), (30, 30))
         self.assertEqual(new_annot1.origin.astuple(), (80, 80))
+
+    def test_coordinate_transform_raw(self):
+        """
+        Tests that the resulting operable's coordinate transforms take the crop
+        location into account.
+        """
+        # get the cropped operable
+        tenbyfive = CacheableImage(np.arange(50).reshape((5, 10)))
+        operable = SpotAnalysisOperable(tenbyfive, "tenbyfive")
+        processor = CroppingImageProcessor.by_region((1, 9, 2, 4))
+        cropped_operable = processor.process_operable(operable)[0]
+
+        # Check that we get the expected values from the transforms.
+        # First, sanity check.
+        tx = operable.transform_coordinates
+        self.assertEqual(tx(p2.Pxy([0, 0]))[0], False)
+        self.assertEqual(tx(p2.Pxy([9, 0]))[0], False)
+        self.assertEqual(tx(p2.Pxy([9, 4]))[0], False)
+        self.assertEqual(tx(p2.Pxy([0, 4]))[0], False)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([0, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 0]))[1]._data, p2.Pxy([9, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 4]))[1]._data, p2.Pxy([9, 4])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 4]))[1]._data, p2.Pxy([0, 4])._data)
+        # Now check that the cropped transform is correct.
+        tcx = cropped_operable.transform_coordinates
+        self.assertEqual(tcx(p2.Pxy([0, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 1]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([0, 1]))[0], True)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([1, 2])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 0]))[1]._data, p2.Pxy([8, 2])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 1]))[1]._data, p2.Pxy([8, 3])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 1]))[1]._data, p2.Pxy([1, 3])._data)
+
+    def test_coordinate_transform_complex(self):
+        """
+        Tests that the resulting operable's coordinate transforms take the crop
+        location into account.
+        """
+        # get the cropped operable
+        tenbyfive = CacheableImage(np.arange(50).reshape((5, 10)))
+        x_coordinates_transform = sympy.sympify("x / 10")
+        y_coordinates_transform = sympy.sympify("y / 10")
+        operable = SpotAnalysisOperable(
+            tenbyfive,
+            "tenbyfive",
+            x_coordinates_transform=x_coordinates_transform,
+            y_coordinates_transform=y_coordinates_transform,
+        )
+        processor = CroppingImageProcessor.by_region((1, 9, 2, 4))
+        cropped_operable = processor.process_operable(operable)[0]
+
+        # Check that we get the expected values from the transforms.
+        # First, sanity check.
+        tx = operable.transform_coordinates
+        self.assertEqual(tx(p2.Pxy([0, 0]))[0], True)
+        self.assertEqual(tx(p2.Pxy([9, 0]))[0], True)
+        self.assertEqual(tx(p2.Pxy([9, 4]))[0], True)
+        self.assertEqual(tx(p2.Pxy([0, 4]))[0], True)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([0, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 0]))[1]._data, p2.Pxy([9 / 10, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 4]))[1]._data, p2.Pxy([9 / 10, 4 / 10])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 4]))[1]._data, p2.Pxy([0, 4 / 10])._data)
+        # Now check that the cropped transform is correct.
+        tcx = cropped_operable.transform_coordinates
+        self.assertEqual(tcx(p2.Pxy([0, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 1]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([0, 1]))[0], True)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([1 / 10, 2 / 10])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 0]))[1]._data, p2.Pxy([8 / 10, 2 / 10])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 1]))[1]._data, p2.Pxy([8 / 10, 3 / 10])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 1]))[1]._data, p2.Pxy([1 / 10, 3 / 10])._data)
 
 
 if __name__ == "__main__":

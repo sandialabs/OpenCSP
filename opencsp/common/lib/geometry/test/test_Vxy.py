@@ -3,6 +3,7 @@ import unittest
 
 import matplotlib.pyplot as plt
 import numpy as np
+import numpy.testing as npt
 
 import opencsp.common.lib.geometry.angle as geo_angle
 from opencsp.common.lib.geometry.Vxy import Vxy
@@ -79,6 +80,26 @@ class TestVxy(unittest.TestCase):
         self.assertEqual(len(d9), 9)
         self.assertEqual(d9.x.tolist(), [0, 1, 4, 5, 6, 10, 11, 12, 13])
         self.assertEqual(d9.y.tolist(), [2, 3, 7, 8, 9, 14, 15, 16, 17])
+
+        # test mixed Vxy and non-Vxy instances
+        a1 = [0, 1]
+        b1 = Vxy([2, 3])
+        c2 = Vxy.from_list([a1, b1])
+        self.assertEqual(len(c2), 2)
+        self.assertEqual(c2.x.tolist(), [0, 2])
+        self.assertEqual(c2.y.tolist(), [1, 3])
+
+        # test multi-valued non-Vxy instances
+        # points (0,1) and (2,3)
+        a2 = Vxy(list(zip([0, 1], [2, 3])))
+        # points (4,5), (6,7) and (8,9)
+        b3 = [[4, 6, 8], [5, 7, 9]]
+        # points (10,11), (12,13), (14,15), and (16,17)
+        c4 = [[10, 11], [12, 13], [14, 15], [16, 17]]
+        d9 = Vxy.from_list([a2, b3] + c4)
+        self.assertEqual(len(d9), 9)
+        npt.assert_array_almost_equal(d9.x, np.array([0, 2, 4, 6, 8, 10, 12, 14, 16]))
+        npt.assert_array_almost_equal(d9.y, np.array([1, 3, 5, 7, 9, 11, 13, 15, 17]))
 
     def test_xy(self):
         assert self.V1.x[0] == self.V1_array[0]
