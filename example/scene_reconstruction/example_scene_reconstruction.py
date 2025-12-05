@@ -94,7 +94,6 @@ import opencsp.common.lib.tool.log_tools as lt
 
 
 def scene_reconstruction(dir_input, dir_output, verbose):
-def scene_reconstruction(dir_input, dir_output, verbose):
     """
     Reconstructs the XYZ locations of Aruco markers in a scene.
 
