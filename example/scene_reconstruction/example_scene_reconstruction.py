@@ -127,85 +127,44 @@ if __name__ == '__main__':
     # Retrieved 2025-12-04, License - CC BY-SA 4.0
     parser = argparse.ArgumentParser(
         prog=__file__.rstrip(".py"),
-        description="Sensitive strings searcher with defaults in help",
-        # ... other options ...
+        description="Example scene reconstruction calculation.  Given photos with Aruco markers, find marker and camera 3-d positions.",
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
+    # parser.add_argument(
+    #     "--verbose",
+    #     action="store_true",
+    #     dest="verbose",
+    #     help="Print more information while running. Overrides '--progress'.",
+    # )
     parser.add_argument(
-        "--no-interactive",
-        action="store_true",
-        dest="ninteractive",
-        help="Don't interactively ask the user about unknown binary files. Simply fail instead.",
-    )
-    parser.add_argument(
-        "--accept-all",
-        action="store_true",
-        dest="acceptall",
-        help="Don't interactively ask the user about unknown binary files. Simply accept all as verified on the user's behalf. "
-        + "This can be useful when you're confident that the only changes have been that the binary files have moved but not changed.",
-    )
-    parser.add_argument(
-        "--accept-unfound",
-        action="store_true",
-        dest="acceptunfound",
-        help="Don't fail because of unfound expected binary files. Instead remove the expected files from the list of allowed binaries. "
-        + "This can be useful when you're confident that the only changes have been that the binary files have moved but not changed.",
-    )
-    parser.add_argument(
-        "--progress", action="store_true", dest="print_progress", help="Draw the progress while scanning."
-    )
-    parser.add_argument(
-        "--verbose",
-        action="store_true",
-        dest="verbose",
-        help="Print more information while running. Overrides '--progress'.",
-    )
-    parser.add_argument(
-        "--base-path",
+        "-s",
+        "--settings_dir_body_ext",
         required=False,
-        dest="basepath",
-        default="C:\\ctemp",
-        help="The directory to open images relative to.",
+        dest="settings_dir_body_ext",
+        default=None,
+        help="The directory root for reading data and writing output for this run.",
     )
-    parser.add_argument("paths", nargs="+", type=str, help="Paths to images")
     args = parser.parse_args()
-    not_interactive: bool = args.ninteractive
-    accept_all: bool = args.acceptall
-    remove_unfound_binaries: bool = args.acceptunfound
-    print_progress: bool = args.print_progress
-    verbose: bool = args.verbose
-    basepath: str = args.basepath
-    paths: list[str] = list(args.paths)
+    settings_dir_body_ext: str = args.settings_dir_body_ext
+    print("arg: settings_dir_body_ext = ", settings_dir_body_ext)
     # End argparse
-    # Begin print argparse
-    print("not_interactive = ", not_interactive)
-    print("accept_all = ", accept_all)
-    print("remove_unfound_binaries = ", remove_unfound_binaries)
-    print("print_progress = ", print_progress)
-    print("verbose = ", verbose)
-    print("basepath = ", basepath)
-    print("paths = ", paths)
-    # End print argparse
 
-    print("current_working_directory = ", os.getcwd())
-    experiment_settings_file = "DUMMY_experiment_settings.ini"
-    print("experiment_settings_file = ", experiment_settings_file)
-    experiment_settings_dir_body_ext = os.path.join(basepath, experiment_settings_file)
-    print("experiment_settings_dir_body_ext = ", experiment_settings_dir_body_ext)
-    experiment_settings = configparser.ConfigParser()
-    #    experiment_settings.read(experiment_settings_file)
-    experiment_settings.read(experiment_settings_dir_body_ext)
-    print("experiment_settings = ", experiment_settings)
-    process_dir = experiment_settings["Default"]["process_dir"]
-    print("process_dir = ", process_dir)
-    bcs_images_dir = experiment_settings["Default"]["bcs_images_dir"]
-    print("bcs_images_dir = ", bcs_images_dir)
-    dir_main_input = experiment_settings["Default"]["dir_input"]
-    print("dir_main_input = ", dir_main_input)
-    dir_main_output = experiment_settings["Default"]["dir_output"]
-    print("dir_main_output = ", dir_main_output)
+    if settings_dir_body_ext is None:
+        dir_main_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
+        dir_main_output = join(dirname(__file__), 'data/output/scene_reconstruction')
+        write_full_data = False
+    else:
+        print("current_working_directory = ", os.getcwd())
+        print("settings_dir_body_ext = ", settings_dir_body_ext)
+        print("ft.file_exists(settings_dir_body_ext) = ", ft.file_exists(settings_dir_body_ext))
+        settings = configparser.ConfigParser()
+        settings.read(settings_dir_body_ext)
+        dir_main_input = settings["Default"]["dir_input"]
+        dir_main_output = settings["Default"]["dir_output"]
+        write_full_data = settings["Default"]["write_full_data"]
     # assert False
     # ?? RCB SCAFFOLDING RCB -- END SCAFFOLDING
-    # dir_main_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
-    # dir_main_output = join(dirname(__file__), 'data/output/scene_reconstruction')
+    print("Before calling driver, dir_main_input  = ", dir_main_input)
+    print("Before calling driver, dir_main_output = ", dir_main_output)
+    print("Before calling driver, write_full_data = ", write_full_data)
     example_scene_reconstruction_driver(dir_main_input, dir_main_output)
