@@ -26,11 +26,19 @@ Supports these use cases:
 
    f. Using pytest as the vehicle for full-scale example execution.
       In OpenCSP\example directory:
+<<<<<<< HEAD
       pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\data_measurement --dir_output=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\output  --verbose=True
 
    g. Using pytest as the vehicle for example execution on user data.
       In OpenCSP\example directory:
       pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=<user_input_dir> --dir_output=<user_output_dir> --verbose=<user_choice_or_omit_argument>
+=======
+      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\data_measurement --dir_output=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\output  --write_full_data=True
+
+   g. Using pytest as the vehicle for example execution on user data.
+      In OpenCSP\example directory:
+      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=<user_input_dir> --dir_output=<user_output_dir> --write_full_data=<user_choice_or_omit_argument>
+>>>>>>> f8d52164 (Finished upgrading example_scene_reconstruction.py to accept arguments either for command line or pytest.)
 
 2. Running the example from the command line.
    Purpose:  To apply the example calculation to new data.
@@ -54,9 +62,15 @@ Supports these use cases:
              In OpenCSP\example\scene_reconstruction directory:
              python .\example_scene_reconstruction.py --settings_dir_body_ext "\\<network_path>\OpenCSP_<net_name>\example_scene_reconstruction_settings_<net_name>.ini"
       ii. Output levels:
+<<<<<<< HEAD
          (1) Output only newly computed information.  In .ini: verbose = False
          (2) Output full beginning-to-end data corpus in a linear set of directories.
              In .ini: verbose = True
+=======
+         (1) Output only newly computed information.  In .ini: write_full_data = False
+         (2) Output full beginning-to-end data corpus in a linear set of directories.
+             In .ini: write_full_data = True
+>>>>>>> f8d52164 (Finished upgrading example_scene_reconstruction.py to accept arguments either for command line or pytest.)
 
    c. Review command-line options:
       In OpenCSP\example\scene_reconstruction directory:
@@ -232,12 +246,6 @@ if __name__ == '__main__':
         description='Example scene reconstruction calculation.  Given photos with Aruco markers, find marker and camera 3-d positions.  See "example_scene_reconstruction_README.md" for details.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    # parser.add_argument(
-    #     "--verbose",
-    #     action="store_true",
-    #     dest="verbose",
-    #     help="Print more information while running. Overrides '--progress'.",
-    # )
     parser.add_argument(
         "-s",
         "--settings_dir_body_ext",
