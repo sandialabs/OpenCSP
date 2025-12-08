@@ -309,8 +309,7 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         cs_loc_cropped = tuple([cs_cropped_x, cs_cropped_y])
 
         # Clear the previous plot
-        for fig_record in self.fig_records:
-            fig_record.clear()
+        self.prepare_figure_records(self.fig_records, [base_image.nparray.shape, None, None])
 
         # Update the title
         for plot_title_prefix, fig_record in zip(self.plot_titles, self.fig_records):
