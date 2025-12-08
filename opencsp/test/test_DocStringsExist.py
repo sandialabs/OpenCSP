@@ -103,6 +103,7 @@ import opencsp.common.lib.cv.fiducials.PointFiducials
 import opencsp.common.lib.cv.image_filters
 import opencsp.common.lib.cv.image_reshapers
 import opencsp.common.lib.cv.OpticalFlow
+import opencsp.common.lib.cv.PerspectiveTransform
 import opencsp.common.lib.cv.spot_analysis.ImagesStream
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisImagesStream
 import opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable
@@ -390,6 +391,7 @@ class test_Docstrings(unittest.TestCase):
     cv_class_list = [
         opencsp.common.lib.cv.CacheableImage.CacheableImage,
         opencsp.common.lib.cv.OpticalFlow.OpticalFlow,
+        opencsp.common.lib.cv.PerspectiveTransform.PerspectiveTransform,
         opencsp.common.lib.cv.SpotAnalysis.SpotAnalysis,
         opencsp.common.lib.cv.image_filters,
         opencsp.common.lib.cv.image_reshapers,

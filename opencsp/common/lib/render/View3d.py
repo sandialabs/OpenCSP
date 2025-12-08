@@ -502,6 +502,7 @@ class View3d(aph.AbstractPlotHandler):
         width_height: tuple[float, float] = None,
         cmap: str | matplotlib.colors.Colormap = None,
         draw_on_top: int | bool | None = True,
+        invert_ylim: bool = False,
     ):
         """
         Draw an image on top of an existing plot.
@@ -527,6 +528,10 @@ class View3d(aph.AbstractPlotHandler):
             If True, then draw this image on top of other plots. If False, then
             draw below. A specific zorder can be used by setting this to be an
             integer. None to use the matplotlib default. Default is True.
+        invert_ylim : bool, optional
+            If True, then invert the y axis limits so that they are are in
+            large to small order instead of small to large order. This
+            effectively puts the origin for the graph at the top.
         """
         if isinstance(path_or_array, str):
             img = mpimg.imread(path_or_array)
@@ -564,7 +569,17 @@ class View3d(aph.AbstractPlotHandler):
         else:
             zorder = None
 
+        # invert the y draw to match the inverted y limits
+        if invert_ylim:
+            ydraw = [ydraw[1], ydraw[0]]
+
         self.axis.imshow(img, extent=[xdraw[0], xdraw[1], ydraw[0], ydraw[1]], zorder=zorder, cmap=cmap)
+
+        # invert the y limits
+        if invert_ylim:
+            ystart, ystop = self.axis.get_ylim()
+            if ystart < ystop:
+                self.axis.set_ylim(ystop, ystart)
 
     def pcolormesh(self, *args, colorbar=False, **kwargs) -> None:
         """Allows plotting like imshow, with the additional option of sizing the boxes at will.
