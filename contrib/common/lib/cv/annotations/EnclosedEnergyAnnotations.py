@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 import numpy as np
 import scipy.spatial.transform
 
@@ -9,6 +10,10 @@ import opencsp.common.lib.geometry.RegionXY as reg
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
+
+if TYPE_CHECKING:
+    # don't import at runtime in order to avoid cyclic dependencies
+    from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class EnclosedEnergyAnnotations(AbstractAnnotations):
@@ -84,11 +89,17 @@ class EnclosedEnergyAnnotations(AbstractAnnotations):
     def scale(self) -> list[float]:
         return self._representative_circle.scale
 
-    def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False):
+    def render_to_figure(
+        self,
+        fig: rcfr.RenderControlFigureRecord,
+        image: np.ndarray = None,
+        include_label=False,
+        operable: "SpotAnalysisOperable" = None,
+    ):
         if self.enclosed_shape == "circle":
-            return self._representative_circle.render_to_figure(fig, image, include_label)
+            return self._representative_circle.render_to_figure(fig, image, include_label, operable)
         elif self.enclosed_shape == "square":
-            return self._representative_square.render_to_figure(fig, image, include_label)
+            return self._representative_square.render_to_figure(fig, image, include_label, operable)
         else:
             raise RuntimeError(
                 "Error in EnclosedEnergyAnnotations.render_to_figure() "

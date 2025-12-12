@@ -115,7 +115,13 @@ class ViewHighlightImageProcessor(AbstractVisualizationImageProcessor):
 
         # show the visualization
         self.prepare_figure_records([self.figure], [new_image.shape])
-        self.figure.view.imshow(new_image)
+        tc = lambda x, y: operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple()
+        (height, width), _ = it.dims_and_nchannels(new_image)
+        img_xy, img_xy2 = tc(0, 0), tc(width, height)
+        self.figure.view.draw_image(
+            base_image.nparray, img_xy, (img_xy2[0] - img_xy[0], img_xy2[1] - img_xy[1]), invert_ylim=True
+        )
+        self.figure.view.show(block=False)
 
         # build the return value
         cacheable_image = CacheableImage(new_image)
