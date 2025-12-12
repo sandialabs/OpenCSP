@@ -12,6 +12,7 @@ from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysi
 from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractVisualizationImageProcessor import (
     AbstractVisualizationImageProcessor,
 )
+import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.View3d as v3d
 import opencsp.common.lib.render_control.RenderControlAxis as rca
@@ -100,24 +101,23 @@ class View3dImageProcessor(AbstractVisualizationImageProcessor):
             image = cv.resize(image, (height, width), interpolation=cv.INTER_AREA)
 
         # Clear the previous data
-        self.fig_record.clear()
+        self.prepare_figure_records([self.fig_record])
 
         # Update the title
         self.fig_record.title = operable.best_primary_nameext
 
         # Draw the new data
+        (height, width), _ = it.dims_and_nchannels(image)
         if self.crop_to_threshold is None and self.max_resolution is None:
-            self.view.draw_xyz_surface(image, self.rcs)
+            x_arr = np.arange(0, width)
+            y_arr = np.arange(0, height)
         else:
-            width = image.shape[1]
-            height = image.shape[0]
             x_arr = (np.arange(0, width) * (x_end - x_start) / width) + x_start
             y_arr = (np.arange(0, height) * (y_end - y_start) / height) + y_start
-            x_mesh, y_mesh = np.meshgrid(x_arr, y_arr)
-            self.view.draw_xyz_surface_customshape(x_mesh, y_mesh, image, self.rcs)
-
-        # draw
-        self.view.show(block=False)
+        x_arr = operable.transform_coordinates(p2.Pxy((x_arr, [0] * x_arr.size)))[1].x
+        y_arr = operable.transform_coordinates(p2.Pxy(([0] * y_arr.size, y_arr)))[1].y
+        x_mesh, y_mesh = np.meshgrid(x_arr, y_arr)
+        self.view.draw_xyz_surface_customshape(x_mesh, y_mesh, image, self.rcs)
 
         return [self.fig_record]
 

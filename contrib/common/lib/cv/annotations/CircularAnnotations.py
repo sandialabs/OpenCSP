@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 import numpy as np
 import scipy.spatial.transform
 
@@ -12,6 +13,10 @@ import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.log_tools as lt
+
+if TYPE_CHECKING:
+    # don't import at runtime in order to avoid cyclic dependencies
+    from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class CircularAnnotations(AbstractAnnotations):
@@ -77,7 +82,13 @@ class CircularAnnotations(AbstractAnnotations):
             )
         return [d * self.meters_per_pixel for d in self.size]
 
-    def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False):
+    def render_to_figure(
+        self,
+        fig: rcfr.RenderControlFigureRecord,
+        image: np.ndarray = None,
+        include_label=False,
+        operable: "SpotAnalysisOperable" = None,
+    ):
         label = self.get_label(include_label)
 
         # draw the circles
@@ -93,6 +104,8 @@ class CircularAnnotations(AbstractAnnotations):
             for seg in range(nverticies):
                 p = (np.sin(seg / nverticies * np.pi * 2) * r) + x
                 q = (np.cos(seg / nverticies * np.pi * 2) * r) + y
+                if operable is not None:
+                    p, q = operable.transform_coordinates(p2.Pxy((p, q)))[1].astuple()
                 pq_list.append((p, q))
 
             fig.view.draw_pq_list(pq_list, close=True, style=self.style, label=label)

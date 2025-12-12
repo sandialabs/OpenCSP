@@ -310,7 +310,7 @@ def _setup_figure(
     return fig_record
 
 
-def hide_axes(fig_record: RenderControlFigureRecord, figure_control: RenderControlFigure):
+def hide_axes(fig_record: RenderControlFigureRecord, figure_control: RenderControlFigure, force_hide: bool = False):
     """
     Hides the axes for the plot if axis_control.draw_axes is False. Hides the
     whitespace around the plot if figure_control.draw_whitespace_padding is
@@ -322,18 +322,50 @@ def hide_axes(fig_record: RenderControlFigureRecord, figure_control: RenderContr
         The figure record to be modified.
     figure_control : RenderControlFigure
         The control that manages if axes and whitespace are drawn.
+    force_hide : bool, optional
+        True to hide the axes and whitespace regardless of the axis_control
+        and figure_control settings. Default is False.
     """
     axis_control = fig_record.axis_control
 
     # hide the axes
-    if not axis_control.draw_axes:
+    if (not axis_control.draw_axes) or (force_hide):
         fig_record.axis.axis('off')
         fig_record.axis.axes.get_xaxis().set_visible(False)
         fig_record.axis.axes.get_yaxis().set_visible(False)
 
     # hide the whitespace
-    if not figure_control.draw_whitespace_padding:
+    if (not figure_control.draw_whitespace_padding) or (force_hide):
         fig_record.figure.tight_layout(pad=0)
+
+
+def show_axes(fig_record: RenderControlFigureRecord, figure_control: RenderControlFigure, force_show: bool = False):
+    """
+    Shows the axes for the plot if axis_control.draw_axes is True. Shows the
+    whitespace around the plot if figure_control.draw_whitespace_padding is
+    True.
+
+    Parameters
+    ----------
+    fig_record : RenderControlFigureRecord
+        The figure record to be modified.
+    figure_control : RenderControlFigure
+        The control that manages if axes and whitespace are drawn.
+    force_show : bool, optional
+        True to show the axes and whitespace regardless of the axis_control
+        and figure_control settings. Default is False.
+    """
+    axis_control = fig_record.axis_control
+
+    # show the axes
+    if axis_control.draw_axes or force_show:
+        fig_record.axis.axis('on')
+        fig_record.axis.axes.get_xaxis().set_visible(True)
+        fig_record.axis.axes.get_yaxis().set_visible(True)
+
+    # show the whitespace
+    if figure_control.draw_whitespace_padding or force_show:
+        fig_record.figure.tight_layout()
 
 
 def setup_figure(

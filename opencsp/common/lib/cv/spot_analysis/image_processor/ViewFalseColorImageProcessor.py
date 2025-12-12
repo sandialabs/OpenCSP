@@ -148,11 +148,17 @@ class ViewFalseColorImageProcessor(AbstractVisualizationImageProcessor):
         else:
             ret = [self.apply_mapping_jet(operable, base_image)]
 
+<<<<<<< HEAD
         processed_image = ret[0].nparray
 
         self.figure.clear()
         self.figure.view.imshow(processed_image)
         self.figure.view.show(block=False)
+=======
+        # draw the image
+        self.prepare_figure_records([self.figure], [ret[0].nparray.shape])
+        self.figure.view.imshow(ret[0])
+>>>>>>> 11cd34554cc1e98d1a884f72f035e5c3e0b9e17c
 
         return ret
 

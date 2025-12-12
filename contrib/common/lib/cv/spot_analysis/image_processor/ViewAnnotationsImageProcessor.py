@@ -112,16 +112,22 @@ class ViewAnnotationsImageProcessor(AbstractVisualizationImageProcessor):
         to_render += filter(self._annotations_match_filter, operable.annotations)
 
         # initialize the figure
-        self.figure.clear()
-        self.figure.view.imshow(image)
+        self.prepare_figure_records([self.figure], [image.shape])
+        tc = lambda x, y: operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple()
+        (height, width), _ = it.dims_and_nchannels(image)
+        img_xy, img_xy2 = tc(0, 0), tc(width, height)
+        self.figure.view.draw_image(
+            base_image.nparray, img_xy, (img_xy2[0] - img_xy[0], img_xy2[1] - img_xy[1]), invert_ylim=True
+        )
 
         # render
         include_label = len(to_render) > 1
         for fiducials in to_render:
-            fiducials.render_to_figure(self.figure, image, include_label)
+            fiducials.render_to_figure(self.figure, image, include_label, operable)
 
-        # show the visualization
-        self.figure.view.show(block=False, legend=include_label)
+        # show the legend
+        if include_label:
+            self.figure.figure.legend()
 
         return [self.figure]
 
