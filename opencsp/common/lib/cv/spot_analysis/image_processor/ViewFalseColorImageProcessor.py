@@ -139,7 +139,7 @@ class ViewFalseColorImageProcessor(AbstractVisualizationImageProcessor):
             lt.error_and_raise(
                 ValueError,
                 f"Error in {self.name}.visualize_operable(): "
-                + f"image should be in grayscale, but {nchannels} color channels were found ({base_image.shape=})!",
+                + f"image should be in grayscale, but {nchannels} color channels were found ({base_image.nparray.shape=})!",
             )
 
         # apply the false color mapping

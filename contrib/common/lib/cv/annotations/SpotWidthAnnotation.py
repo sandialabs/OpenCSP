@@ -71,6 +71,19 @@ class SpotWidthAnnotation(AbstractAnnotations):
     def origin(self) -> p2.Pxy:
         return self.centroid_loc
 
+    def translate(self, translation: p2.Pxy):
+        centroid_loc = self.centroid_loc + translation
+        long_axis_center = self.long_axis_center + translation
+        return self.__class__(
+            self.spot_width_technique,
+            centroid_loc,
+            self.width,
+            self.long_axis_rotation,
+            long_axis_center,
+            self.orthogonal_axis_width,
+            self.style,
+        )
+
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
         if self.spot_width_technique == "fwhm":

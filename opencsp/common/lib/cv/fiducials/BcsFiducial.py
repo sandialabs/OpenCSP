@@ -18,7 +18,7 @@ class BcsFiducial(AbstractFiducials):
     """
 
     def __init__(
-        self, origin_px: p2.Pxy, radius_px: float, style: rcb.RenderControlBcs = None, pixels_to_meters: float = 0.1
+        self, origin_px: p2.Pxy, radius_px: float, style: rcb.RenderControlBcs = None, meters_per_pixel: float = 0.1
     ):
         """
         Initializes the BcsFiducial with the specified origin, radius, style, and pixel-to-meter conversion.
@@ -31,7 +31,7 @@ class BcsFiducial(AbstractFiducials):
             The radius of the BCS target, in pixels.
         style : rcb.RenderControlBcs, optional
             The rendering style for the fiducial. Defaults to None.
-        pixels_to_meters : float, optional
+        meters_per_pixel : float, optional
             A conversion factor for how many meters a pixel represents, for use in scale(). Defaults to 0.1.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
@@ -39,7 +39,7 @@ class BcsFiducial(AbstractFiducials):
         super().__init__(style=style)
         self.origin_px = origin_px
         self.radius_px = radius_px
-        self.pixels_to_meters = pixels_to_meters
+        self.meters_per_pixel = meters_per_pixel
 
     def get_bounding_box(self, index=0) -> reg.RegionXY:
         """
@@ -76,6 +76,9 @@ class BcsFiducial(AbstractFiducials):
         """
         # "ChatGPT 4o" assisted with generating this docstring.
         return self.origin_px
+
+    def translate(self, translation: p2.Pxy):
+        return self.__class__(self.origin_px + translation, self.radius_px, self.style, self.meters_per_pixel)
 
     @property
     def rotation(self) -> scipy.spatial.transform.Rotation:
@@ -114,7 +117,7 @@ class BcsFiducial(AbstractFiducials):
             A list containing a single value: the size of the BCS target, in meters.
         """
         # "ChatGPT 4o" assisted with generating this docstring.
-        return [self.size * self.pixels_to_meters]
+        return [self.size * self.meters_per_pixel]
 
     def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray, include_label=False):
         # This method adds a circle and a marker to the axes based on the style defined for the fiducial.

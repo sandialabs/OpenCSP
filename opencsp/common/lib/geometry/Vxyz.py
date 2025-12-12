@@ -1,15 +1,21 @@
 """Three dimensional vector representation"""
 
-from typing import Callable, Union
+from typing import Callable, Union, TYPE_CHECKING
 
 import numpy as np
 import numpy.typing as npt
 from scipy.spatial.transform import Rotation
 
 from opencsp.common.lib.geometry.Vxy import Vxy
-import opencsp.common.lib.render.View3d as v3d
-import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
-import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
+
+if TYPE_CHECKING:
+    # import while developing to enable type hints
+    from opencsp.common.lib.render.View3d import View3d
+    from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
+    from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
+else:
+    # don't import at runtime to avoid cyclic dependencies
+    View3d, RenderControlFigureRecord, RenderControlPointSeq = None, None, None
 
 
 class Vxyz:
@@ -143,13 +149,22 @@ class Vxyz:
         return cls(data, dtype)
 
     @classmethod
-    def from_list(cls, vals: list["Vxyz"]):
-        """Builds a single Vxyz instance from a list of Vxyz instances."""
+    def from_list(cls, vals: list[Union["Vxy", tuple]]):
+        """Builds a single Vxy instance from a list of Vxy or (x,y) instances."""
         xs, ys, zs = [], [], []
         for val in vals:
-            xs += val.x.tolist()
-            ys += val.y.tolist()
-            zs += val.z.tolist()
+            if isinstance(val, Vxyz):
+                xs += val.x.tolist()
+                ys += val.y.tolist()
+                zs += val.z.tolist()
+            elif hasattr(val[0], "__iter__"):
+                xs += list(val[0])
+                ys += list(val[1])
+                zs += list(val[2])
+            else:
+                xs.append(val[0])
+                ys.append(val[1])
+                zs.append(val[2])
         return cls((xs, ys, zs))
 
     def _check_is_Vxyz(self, v_in):
@@ -567,9 +582,9 @@ class Vxyz:
 
     def draw_line(
         self,
-        figure: rcfr.RenderControlFigureRecord | v3d.View3d,
+        figure: Union[RenderControlFigureRecord, View3d],
         close: bool = None,
-        style: rcps.RenderControlPointSeq = None,
+        style: RenderControlPointSeq = None,
         label: str = None,
     ) -> None:
         """
@@ -579,30 +594,33 @@ class Vxyz:
 
         Parameters
         ----------
-        figure : rcfr.RenderControlFigureRecord or v3d.View3d
+        figure : RenderControlFigureRecord or View3d
             The figure to draw to.
         close : bool, optional
             True to add the first point again at the end of the plot, thereby
             drawing this set of points as a closed polygon. None or False to not
             add another point at the end (draw_xyz_list default)
-        style : rcps.RenderControlPointSeq, optional
+        style : RenderControlPointSeq, optional
             The style to use for the points and lines, or None for
             :py:meth:`RenderControlPointSequence.default`.
         label : str, optional
             A string used to label this plot in the legend, or None for no label.
         """
+        # import here to avoid cyclic dependencies
+        from opencsp.common.lib.render.View3d import View3d
+
         kwargs = dict()
         for key, val in [("close", close), ("style", style), ("label", label)]:
             if val is not None:
                 kwargs[key] = val
 
-        view = figure if isinstance(figure, v3d.View3d) else figure.view
+        view = figure if isinstance(figure, View3d) else figure.view
         view.draw_xyz_list(self.data.T, **kwargs)
 
     def draw_points(
         self,
-        figure: rcfr.RenderControlFigureRecord | v3d.View3d,
-        style: rcps.RenderControlPointSeq = None,
+        figure: Union[RenderControlFigureRecord, View3d],
+        style: RenderControlPointSeq = None,
         labels: list[str] = None,
     ) -> None:
         """
@@ -612,20 +630,23 @@ class Vxyz:
 
         Parameters
         ----------
-        figure : rcfr.RenderControlFigureRecord | v3d.View3d
+        figure : RenderControlFigureRecord | View3d
             The figure to draw to.
         close : bool, optional
             True to add the first point again at the end of the plot, thereby
             drawing this set of points as a closed polygon. None or False to not
             add another point at the end (draw_xyz_list default).
-        style : rcps.RenderControlPointSeq, optional
+        style : RenderControlPointSeq, optional
             The style to use for the points and lines, or None for
             :py:meth:`RenderControlPointSequence.default`.
         label : str, optional
             A string used to label this plot in the legend, or None for no label.
         """
+        # import here to avoid cyclic dependencies
+        from opencsp.common.lib.render.View3d import View3d
+
         if labels is None:
             labels = [None] * len(self)
-        view = figure if isinstance(figure, v3d.View3d) else figure.view
+        view = figure if isinstance(figure, View3d) else figure.view
         for x, y, z, label in zip(self.x, self.y, self.z, labels):
             view.draw_xyz((x, y, z), style, label)

@@ -1,10 +1,15 @@
 import numpy as np
+import numpy.testing as npt
 import os
 import unittest
+
+import sympy
+
 from opencsp.common.lib.cv.CacheableImage import CacheableImage
+from opencsp.common.lib.cv.SpotAnalysis import SpotAnalysis
 from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 from opencsp.common.lib.cv.spot_analysis.image_processor.CroppingImageProcessor import CroppingImageProcessor
-
+import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.tool.file_tools as ft
 
 
@@ -16,29 +21,162 @@ class TestCroppingImageProcessor(unittest.TestCase):
         ft.create_directories_if_necessary(self.data_dir)
         ft.create_directories_if_necessary(self.out_dir)
 
-    def test_valid_crop(self):
+    def test_crop_by_region(self):
         tenbyfive = CacheableImage(np.arange(50).reshape((5, 10)))
         # [[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9],
         #  [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
         #  [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
         #  [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
         #  [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]]
-
-        processor = CroppingImageProcessor(x1=1, x2=9, y1=2, y2=4)
+        expected = np.array([[21, 22, 23, 24, 25, 26, 27, 28], [31, 32, 33, 34, 35, 36, 37, 38]])
         operable = SpotAnalysisOperable(tenbyfive, "tenbyfive")
+
+        # crop with a static value
+        processor = CroppingImageProcessor.by_region((1, 9, 2, 4))
         result = processor.process_operable(operable)[0]
         cropped_image = result.primary_image.nparray
-
-        expected = np.array([[21, 22, 23, 24, 25, 26, 27, 28], [31, 32, 33, 34, 35, 36, 37, 38]])
-
         np.testing.assert_array_equal(cropped_image, expected)
+
+        # crop with a callable
+        processor = CroppingImageProcessor.by_region(lambda op: (1, 9, 2, 4))
+        result = processor.process_operable(operable)[0]
+        cropped_image = result.primary_image.nparray
+        np.testing.assert_array_equal(cropped_image, expected)
+
+    def test_crop_by_center_and_size(self):
+        tenbyfive = CacheableImage(np.arange(50).reshape((5, 10)))
+        # [[ 0,  1,  2,  3,  4,  5,  6,  7,  8,  9],
+        #  [10, 11, 12, 13, 14, 15, 16, 17, 18, 19],
+        #  [20, 21, 22, 23, 24, 25, 26, 27, 28, 29],
+        #  [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
+        #  [40, 41, 42, 43, 44, 45, 46, 47, 48, 49]]
+        expected = np.array([[21, 22, 23, 24]])
+        operable = SpotAnalysisOperable(tenbyfive, "tenbyfive")
+
+        # crop with static and dynamic values
+        for center in [(3, 2), (lambda op: (3, 2))]:
+            for width_height in [(4, 1), (lambda op: (4, 1))]:
+                processor = CroppingImageProcessor.by_center_and_size(center, width_height)
+                result = processor.process_operable(operable)[0]
+                cropped_image = result.primary_image.nparray
+                np.testing.assert_array_equal(cropped_image, expected)
 
     def test_bad_input_raises_error(self):
         tenbyfive = np.arange(50).reshape((5, 10))
 
-        processor = CroppingImageProcessor(x1=1, x2=90, y1=2, y2=40)
+        # bad left
+        with self.assertRaises(ValueError):
+            processor = CroppingImageProcessor.by_region((-1, 9, 2, 4))
+        with self.assertRaises(ValueError):
+            processor = CroppingImageProcessor.by_region((9, 9, 2, 4))
+
+        # bad top
+        with self.assertRaises(ValueError):
+            processor = CroppingImageProcessor.by_region((1, 9, -1, 4))
+        with self.assertRaises(ValueError):
+            processor = CroppingImageProcessor.by_region((1, 9, 4, 4))
+
+        # bad right
+        processor = CroppingImageProcessor.by_region((1, 11, 2, 4))
         with self.assertRaises(ValueError):
             processor.process_operable(SpotAnalysisOperable(tenbyfive))
+
+        # bad bottom
+        processor = CroppingImageProcessor.by_region((1, 9, 2, 6))
+        with self.assertRaises(ValueError):
+            processor.process_operable(SpotAnalysisOperable(tenbyfive))
+
+    def test_crop_annotations(self):
+        from contrib.common.lib.cv.annotations.RectangleAnnotations import RectangleAnnotations
+
+        hundredbyhundred = CacheableImage(np.arange(100**2).reshape((100, 100)))
+        annotation0 = RectangleAnnotations(upperleft_lowerright_corners=(p2.Pxy([40, 40]), p2.Pxy([50, 50])))
+        operable0 = SpotAnalysisOperable(hundredbyhundred, "hundredbyhundred0", given_fiducials=[annotation0])
+        annotation1 = RectangleAnnotations(upperleft_lowerright_corners=(p2.Pxy([90, 90]), p2.Pxy([100, 100])))
+        operable1 = SpotAnalysisOperable(hundredbyhundred, "hundredbyhundred1", given_fiducials=[annotation1])
+
+        processor = CroppingImageProcessor.by_region((10, 90, 10, 90))
+        spot_analysis = SpotAnalysis("test_crop_annotations", image_processors=[processor])
+        spot_analysis.set_input_operables([operable0, operable1])
+        result0, result1 = tuple([r for r in spot_analysis])
+
+        new_annot0: RectangleAnnotations = result0.get_fiducials_by_type(RectangleAnnotations)[0]
+        new_annot1: RectangleAnnotations = result1.get_fiducials_by_type(RectangleAnnotations)[0]
+        self.assertEqual(new_annot0.origin.astuple(), (30, 30))
+        self.assertEqual(new_annot1.origin.astuple(), (80, 80))
+
+    def test_coordinate_transform_raw(self):
+        """
+        Tests that the resulting operable's coordinate transforms take the crop
+        location into account.
+        """
+        # get the cropped operable
+        tenbyfive = CacheableImage(np.arange(50).reshape((5, 10)))
+        operable = SpotAnalysisOperable(tenbyfive, "tenbyfive")
+        processor = CroppingImageProcessor.by_region((1, 9, 2, 4))
+        cropped_operable = processor.process_operable(operable)[0]
+
+        # Check that we get the expected values from the transforms.
+        # First, sanity check.
+        tx = operable.transform_coordinates
+        self.assertEqual(tx(p2.Pxy([0, 0]))[0], False)
+        self.assertEqual(tx(p2.Pxy([9, 0]))[0], False)
+        self.assertEqual(tx(p2.Pxy([9, 4]))[0], False)
+        self.assertEqual(tx(p2.Pxy([0, 4]))[0], False)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([0, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 0]))[1]._data, p2.Pxy([9, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 4]))[1]._data, p2.Pxy([9, 4])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 4]))[1]._data, p2.Pxy([0, 4])._data)
+        # Now check that the cropped transform is correct.
+        tcx = cropped_operable.transform_coordinates
+        self.assertEqual(tcx(p2.Pxy([0, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 1]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([0, 1]))[0], True)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([1, 2])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 0]))[1]._data, p2.Pxy([8, 2])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 1]))[1]._data, p2.Pxy([8, 3])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 1]))[1]._data, p2.Pxy([1, 3])._data)
+
+    def test_coordinate_transform_complex(self):
+        """
+        Tests that the resulting operable's coordinate transforms take the crop
+        location into account.
+        """
+        # get the cropped operable
+        tenbyfive = CacheableImage(np.arange(50).reshape((5, 10)))
+        x_coordinates_transform = sympy.sympify("x / 10")
+        y_coordinates_transform = sympy.sympify("y / 10")
+        operable = SpotAnalysisOperable(
+            tenbyfive,
+            "tenbyfive",
+            x_coordinates_transform=x_coordinates_transform,
+            y_coordinates_transform=y_coordinates_transform,
+        )
+        processor = CroppingImageProcessor.by_region((1, 9, 2, 4))
+        cropped_operable = processor.process_operable(operable)[0]
+
+        # Check that we get the expected values from the transforms.
+        # First, sanity check.
+        tx = operable.transform_coordinates
+        self.assertEqual(tx(p2.Pxy([0, 0]))[0], True)
+        self.assertEqual(tx(p2.Pxy([9, 0]))[0], True)
+        self.assertEqual(tx(p2.Pxy([9, 4]))[0], True)
+        self.assertEqual(tx(p2.Pxy([0, 4]))[0], True)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([0, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 0]))[1]._data, p2.Pxy([9 / 10, 0])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([9, 4]))[1]._data, p2.Pxy([9 / 10, 4 / 10])._data)
+        npt.assert_array_almost_equal(tx(p2.Pxy([0, 4]))[1]._data, p2.Pxy([0, 4 / 10])._data)
+        # Now check that the cropped transform is correct.
+        tcx = cropped_operable.transform_coordinates
+        self.assertEqual(tcx(p2.Pxy([0, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 0]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([7, 1]))[0], True)
+        self.assertEqual(tcx(p2.Pxy([0, 1]))[0], True)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 0]))[1]._data, p2.Pxy([1 / 10, 2 / 10])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 0]))[1]._data, p2.Pxy([8 / 10, 2 / 10])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([7, 1]))[1]._data, p2.Pxy([8 / 10, 3 / 10])._data)
+        npt.assert_array_almost_equal(tcx(p2.Pxy([0, 1]))[1]._data, p2.Pxy([1 / 10, 3 / 10])._data)
 
 
 if __name__ == "__main__":
