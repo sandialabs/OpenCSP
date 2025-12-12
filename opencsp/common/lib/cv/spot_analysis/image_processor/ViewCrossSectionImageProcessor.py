@@ -346,23 +346,10 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         graphs_per_plot_cnt += self._draw_null_image_cross_section(operable, cs_loc_cropped, cropped_region)
         graphs_per_plot_cnt += self._draw_cross_section(operable, np_image, cs_loc, cropped_region)
 
-<<<<<<< HEAD
-        # draw
-        first_view = True
-        for view in self.views:
-            legend = graphs_per_plot_cnt > 1
-
-            # jhs modified, only the first view has actual data to display in the enclosed_energy jupyter notebook
-            # example, so I am only showing that one here. Also, this is true for the target_identification example
-            if first_view:
-                view.show(block=False, legend=legend)
-            first_view = False
-=======
         # add the legend
         if graphs_per_plot_cnt > 1:
             for fig_record in self._figure_records:
                 fig_record.figure.legend()
->>>>>>> 11cd34554cc1e98d1a884f72f035e5c3e0b9e17c
 
         # explicitly set the y-axis range
         if self.y_range is not None:
