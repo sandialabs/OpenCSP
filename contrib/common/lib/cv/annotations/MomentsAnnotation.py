@@ -1,5 +1,6 @@
 import copy
 from functools import cache, cached_property
+from typing import TYPE_CHECKING
 
 import numpy as np
 import scipy.spatial.transform
@@ -14,6 +15,10 @@ import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
+
+if TYPE_CHECKING:
+    # don't import at runtime in order to avoid cyclic dependencies
+    from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class MomentsAnnotation(AbstractAnnotations):
@@ -252,11 +257,18 @@ class MomentsAnnotation(AbstractAnnotations):
     # other uses of moments...
 
     def render_to_figure(
-        self, fig_record: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label: bool = False
+        self,
+        fig_record: rcfr.RenderControlFigureRecord,
+        image: np.ndarray = None,
+        include_label: bool = False,
+        operable: "SpotAnalysisOperable" = None,
     ):
         # draw the centroid marker
         label = None if not include_label else "centroid"
-        fig_record.view.draw_pq(([self.cX], [self.cY]), self.style, label=label)
+        cX, cY = self.cX, self.cY
+        if operable is not None:
+            cX, cY = operable.transform_coordinates(p2.Pxy((cX, cY)))[1].astuple()
+        fig_record.view.draw_pq(([cX], [cY]), self.style, label=label)
 
         # start by assuming that the plot is >= 30 pixels
         height, width, rotation_arrow_dist = None, None, 30
@@ -288,6 +300,11 @@ class MomentsAnnotation(AbstractAnnotations):
 
             if len(intersections) > 0:
                 rotation_endpoints_list = [(intersections.x[i], intersections.y[i]) for i in range(len(intersections))]
+
+        # transform coordinates for the operable
+        if operable is not None:
+            for i, (p, q) in enumerate(rotation_endpoints_list):
+                rotation_endpoints_list[i] = operable.transform_coordinates(p2.Pxy((p, q)))[1].astuple()
 
         # draw the rotation as an arrow
         style = copy.deepcopy(self.rotation_style)

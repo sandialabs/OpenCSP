@@ -11,6 +11,7 @@ from opencsp.common.lib.cv.spot_analysis.image_processor import *
 import opencsp.common.lib.render_control.RenderControlFigure as rcf
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.system_tools as st
 
 
 class VisualizationCoordinator:
@@ -204,6 +205,13 @@ class VisualizationCoordinator:
                 # register this figure for coordinated management
                 self.figures.append(weakref.ref(fig_record))
 
+        # set up no_axes dependencies
+        previous_processor = self.visualization_processors[0]
+        for processor in self.visualization_processors[1:]:
+            if processor.base_image_selector == 'visualization':
+                previous_processor._include_visualization_image_no_axes = True
+            previous_processor = processor
+
     def _get_figures(self) -> list[rcfr.RenderControlFigureRecord]:
         """
         Get strong references to the figure_records from the registered
@@ -294,7 +302,12 @@ class VisualizationCoordinator:
         self.initialize_vis_processors(operable)
 
         # render the visualization image processor
-        processor_visualizations = visualization_processor._visualize_operable(operable, is_last)
+        processor_visualizations, _visualization_image_no_axes = visualization_processor._visualize_operable(
+            operable, is_last
+        )
+        if not st.is_notebook():
+            for fig_record in visualization_processor._initialized_figure_records:
+                fig_record.view.show(block=False)
 
         # compile all visualizations together into a single operable to be returned
         if len(processor_visualizations) > 0:
@@ -309,7 +322,9 @@ class VisualizationCoordinator:
             all_vis_images[visualization_processor] += processor_visualizations
 
             # update the operable
-            operable = dataclasses.replace(operable, visualization_images=all_vis_images)
+            operable = dataclasses.replace(
+                operable, visualization_images=all_vis_images, _visualization_image_no_axes=_visualization_image_no_axes
+            )
         else:
             # update the operable
             operable = dataclasses.replace(operable)

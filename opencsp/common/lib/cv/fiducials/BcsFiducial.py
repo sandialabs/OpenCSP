@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 import matplotlib.axes
 import matplotlib.patches
 import numpy as np
@@ -10,6 +11,10 @@ import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.geometry.Vxyz as v3
 import opencsp.common.lib.render_control.RenderControlBcs as rcb
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
+
+if TYPE_CHECKING:
+    # don't import at runtime in order to avoid cyclic dependencies
+    from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class BcsFiducial(AbstractFiducials):
@@ -119,13 +124,23 @@ class BcsFiducial(AbstractFiducials):
         # "ChatGPT 4o" assisted with generating this docstring.
         return [self.size * self.meters_per_pixel]
 
-    def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray, include_label=False):
+    def render_to_figure(
+        self,
+        fig: rcfr.RenderControlFigureRecord,
+        image: np.ndarray,
+        include_label=False,
+        operable: "SpotAnalysisOperable" = None,
+    ):
         # This method adds a circle and a marker to the axes based on the style defined for the fiducial.
         label = self.get_label(include_label)
 
         if self.style.linestyle is not None:
+            center = self.origin.data.tolist()
+            if operable is not None:
+                center = operable.transform_coordinates(center)
+
             circ = matplotlib.patches.Circle(
-                self.origin.data.tolist(),
+                center,
                 self.radius_px,
                 color=self.style.color,
                 linestyle=self.style.linestyle,
