@@ -5,6 +5,28 @@ import socket
 from opencsp import opencsp_settings
 
 
+def is_notebook() -> bool:
+    """
+    Is this code running in a notebook. From
+    https://stackoverflow.com/questions/15411967/how-can-i-check-if-code-is-executed-in-the-ipython-notebook
+
+    Returns
+    -------
+    bool
+        True if this code is executing in a Jypter notebook, or False otherwise.
+    """
+    try:
+        shell = get_ipython().__class__.__name__  # type: ignore
+        if shell == 'ZMQInteractiveShell':
+            return True  # Jupyter notebook or qtconsole
+        elif shell == 'TerminalInteractiveShell':
+            return False  # Terminal running IPython
+        else:
+            return False  # Other type (?)
+    except NameError:
+        return False  # Probably standard Python interpreter
+
+
 def is_solo():
     """Determines if this computer is one of the Solo HPC nodes.
 

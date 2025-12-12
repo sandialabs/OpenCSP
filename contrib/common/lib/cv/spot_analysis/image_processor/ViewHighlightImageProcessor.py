@@ -116,7 +116,6 @@ class ViewHighlightImageProcessor(AbstractVisualizationImageProcessor):
         # show the visualization
         self.prepare_figure_records([self.figure], [new_image.shape])
         self.figure.view.imshow(new_image)
-        self.figure.view.show(block=False)
 
         # build the return value
         cacheable_image = CacheableImage(new_image)

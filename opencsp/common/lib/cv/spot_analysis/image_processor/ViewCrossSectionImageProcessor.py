@@ -332,13 +332,9 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         # Draw the image w/ cross section line overlays
         i_view = self.views[0]
-        tc = lambda x, y: operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple()
-        img_xy, img_xy2 = tc(0, 0), tc(cropped_width, cropped_height)
-        i_view.draw_image(
-            base_image.nparray, img_xy, (img_xy2[0] - img_xy[0], img_xy2[1] - img_xy[1]), invert_ylim=True
-        )
-        i_view.draw_pq_list([tc(cs_cropped_x, 0), tc(cs_cropped_x, cropped_height)], style=vstyle)
-        i_view.draw_pq_list([tc(0, cs_cropped_y), tc(cropped_width, cs_cropped_y)], style=hstyle)
+        i_view.draw_image(base_image, (0, 0), (cropped_width, cropped_height))
+        i_view.draw_pq_list([(cs_cropped_x, 0), (cs_cropped_x, cropped_height)], style=vstyle)
+        i_view.draw_pq_list([(0, cs_cropped_y_mlab), (cropped_width, cs_cropped_y_mlab)], style=hstyle)
 
         # Draw the cross sections for the no-sun image.
         # Draw the cross sections for the primary image using the same axes.
@@ -346,16 +342,10 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
         graphs_per_plot_cnt += self._draw_null_image_cross_section(operable, cs_loc_cropped, cropped_region)
         graphs_per_plot_cnt += self._draw_cross_section(operable, np_image, cs_loc, cropped_region)
 
-        # draw
-        first_view = True
-        for view in self.views:
-            legend = graphs_per_plot_cnt > 1
-
-            # jhs modified, only the first view has actual data to display in the enclosed_energy jupyter notebook
-            # example, so I am only showing that one here. Also, this is true for the target_identification example
-            if first_view:
-                view.show(block=False, legend=legend)
-            first_view = False
+        # add the legend
+        if graphs_per_plot_cnt > 1:
+            for fig_record in self._figure_records:
+                fig_record.figure.legend()
 
         # explicitly set the y-axis range
         if self.y_range is not None:

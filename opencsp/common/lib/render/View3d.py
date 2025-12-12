@@ -16,6 +16,7 @@ from PIL import Image
 import scipy.ndimage
 from typing import TYPE_CHECKING
 
+from opencsp.common.lib.cv.CacheableImage import CacheableImage
 import opencsp.common.lib.render.axis_3d as ax3d
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlHeatmap as rcheat
@@ -486,6 +487,8 @@ class View3d(aph.AbstractPlotHandler):
                 img = args[0]
                 args = list(args)
                 args[0] = load_as_necessary(img)
+                if isinstance(args[0], CacheableImage):
+                    args[0] = args[0].nparray
 
             im = self.axis.imshow(*args, interpolation="none", **kwargs)
             if self.equal:
@@ -497,7 +500,7 @@ class View3d(aph.AbstractPlotHandler):
 
     def draw_image(
         self,
-        path_or_array: str | np.ndarray,
+        path_or_array_or_cacheable: str | np.ndarray | CacheableImage,
         xy_location: tuple[float, float] = None,
         width_height: tuple[float, float] = None,
         cmap: str | matplotlib.colors.Colormap = None,
@@ -513,7 +516,7 @@ class View3d(aph.AbstractPlotHandler):
 
         Parameters
         ----------
-        path_or_array : str | np.ndarray
+        path_or_array_or_cacheable : str | np.ndarray | CacheableImage
             The image to be drawn.
         xy_location : tuple[float, float], optional
             The location at which to draw the image, in graph coordinate units.
@@ -533,10 +536,12 @@ class View3d(aph.AbstractPlotHandler):
             large to small order instead of small to large order. This
             effectively puts the origin for the graph at the top.
         """
-        if isinstance(path_or_array, str):
-            img = mpimg.imread(path_or_array)
+        if isinstance(path_or_array_or_cacheable, str):
+            img = mpimg.imread(path_or_array_or_cacheable)
+        elif isinstance(path_or_array_or_cacheable, CacheableImage):
+            img = path_or_array_or_cacheable.nparray
         else:
-            img: np.ndarray = path_or_array
+            img: np.ndarray = path_or_array_or_cacheable
         imgw, imgh = img.shape[1], img.shape[0]
         xbnd, ybnd = self.axis.get_xbound(), self.axis.get_ybound()
         xdraw, ydraw = xbnd, ybnd
