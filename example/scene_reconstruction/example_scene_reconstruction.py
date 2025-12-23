@@ -30,7 +30,7 @@ Supports these use cases:
 
    g. Using pytest as the vehicle for example execution on user data.
       In OpenCSP\example directory:
-      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=<user_input_dir> --dir_output=<user_output_dir> --write_full_data=<user_choice_or_omit_argument>
+      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=<user_input_dir> --dir_output=<user_output_dir> --verbose=<user_choice_or_omit_argument>
 
 2. Running the example from the command line.
    Purpose:  To apply the example calculation to new data.
