@@ -26,11 +26,11 @@ Supports these use cases:
 
    f. Using pytest as the vehicle for full-scale example execution.
       In OpenCSP\example directory:
-      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\data_measurement --dir_output=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\output  --write_full_data=True
+      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\data_measurement --dir_output=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\output  --verbose=True
 
    g. Using pytest as the vehicle for example execution on user data.
       In OpenCSP\example directory:
-      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=<user_input_dir> --dir_output=<user_output_dir> --write_full_data=<user_choice_or_omit_argument>
+      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=<user_input_dir> --dir_output=<user_output_dir> --verbose=<user_choice_or_omit_argument>
 
 2. Running the example from the command line.
    Purpose:  To apply the example calculation to new data.
@@ -54,9 +54,9 @@ Supports these use cases:
              In OpenCSP\example\scene_reconstruction directory:
              python .\example_scene_reconstruction.py --settings_dir_body_ext "\\<network_path>\OpenCSP_<net_name>\example_scene_reconstruction_settings_<net_name>.ini"
       ii. Output levels:
-         (1) Output only newly computed information.  In .ini: write_full_data = False
+         (1) Output only newly computed information.  In .ini: verbose = False
          (2) Output full beginning-to-end data corpus in a linear set of directories.
-             In .ini: write_full_data = True
+             In .ini: verbose = True
 
    c. Review command-line options:
       In OpenCSP\example\scene_reconstruction directory:
@@ -78,7 +78,7 @@ Supports these use cases:
 
 """
 
-from os.path import join, basename, dirname
+from os.path import join, basename, dirname, splitext
 
 import argparse
 import configparser
@@ -92,7 +92,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def scene_reconstruction(dir_input, dir_output, write_full_data):
+def scene_reconstruction(dir_input, dir_output, verbose):
     """
     Reconstructs the XYZ locations of Aruco markers in a scene.
 
@@ -108,8 +108,8 @@ def scene_reconstruction(dir_input, dir_output, write_full_data):
         - 'alignment_points.csv': CSV file with alignment points.
     dir_output : str
         The directory where the output files, including point locations and calibration figures, will be saved.
-    write_full_data : bool
-        If true, write out a directory structure including all input data.  Otherwise only write generated output.
+    verbose : bool
+        If true, write out detailed information.
 
     Notes
     -----
@@ -165,43 +165,59 @@ def scene_reconstruction(dir_input, dir_output, write_full_data):
         fig.savefig(figure_path_body)
 
 
-def example_scene_reconstruction_driver(dir_input_fixture, dir_output_fixture, write_full_data_fixture):
+def example_scene_reconstruction_driver(arg_settings_dir_body_ext: str = None, verbose_param=None):
     """
     Sets up and runs the scene_reconstruction() routine.
 
     Parameters
     ----------
-    dir_input_fixture : str
-        Directory to read input.  Has fixture suffix because it might be provided by pytest.
-    dir_output_fixture : str
-        Directory to write output.  Has fixture suffix because it might be provided by pytest.
-    fixture_dir_write_full_data : bool
-        If true, write out a directory structure including all input data.  Otherwise only write generated output.
-        Has fixture suffix because it might be provided by pytest.
+    arg_settings_dir_body_ext : str
+        Full path and filename for settings file, containing inputand output directories, plot control settings, etc.
+         Optional.  If not provided, internal defaults are used.
+        See code for options sought within file.
     """
-    dir_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
-    dir_output = join(dirname(__file__), 'data/output/scene_reconstruction')
-    write_full_data = False
-    if dir_input_fixture:
-        dir_input = dir_input_fixture
-    if dir_output_fixture:
-        dir_output = dir_output_fixture
-    if write_full_data_fixture:
-        write_full_data = write_full_data_fixture
+    # Get settings
+    if arg_settings_dir_body_ext is None:
+        print("Using default control settings.")
+        dir_input = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
+        dir_output = join(dirname(__file__), 'data/output/scene_reconstruction')
+        if verbose_param is None:
+            verbose = False
+        else:
+            verbose = verbose_param
+    else:
+        print("Loading control from settings file:", arg_settings_dir_body_ext)
+        if not ft.file_exists(arg_settings_dir_body_ext):
+            print("ERROR: In " + basename(__file__) + ", settings file does not exist. Settings file:")
+            print("   ", arg_settings_dir_body_ext)
+            assert False
+        settings = configparser.ConfigParser()
+        settings.read(arg_settings_dir_body_ext)
+        dir_input = settings["Default"]["dir_input"]
+        dir_output = settings["Default"]["dir_output"]
+        verbose_setting = settings["Default"]["verbose"]
+        if verbose_param is None:
+            verbose = verbose_setting
+        else:
+            verbose = verbose_param
 
     # Ensure output directory is ready
     ft.create_directories_if_necessary(dir_output)
 
     # Set up logger
-    logfile_dir_body_ext = join(dir_output, 'log.txt')
+    logfile_dir_body_ext = join(dir_output, splitext(basename(__file__))[0] + '_log.txt')
+    print("logfile_dir_body_ext = ", logfile_dir_body_ext)
     lt.logger(logfile_dir_body_ext, lt.log.INFO)
+    # Output standard lines.
+    if verbose:
+        lt.info_strings_from_file(join(dirname(__file__), splitext(basename(__file__))[0] + '_README.md'))
     lt.info('Starting program ' + __file__)
-
     lt.info('dir_input = ' + dir_input)
     lt.info('dir_output = ' + dir_output)
-    lt.info('write_full_data = ' + str(write_full_data))
-    lt.info('Calling routine scene_reconstruction(dir_input, dir_output, write_full_data)...')
-    scene_reconstruction(dir_input, dir_output, write_full_data)
+    lt.info('verbose = ' + str(verbose))
+    if verbose:
+        lt.info('Calling routine scene_reconstruction(dir_input, dir_output, verbose)...')
+    scene_reconstruction(dir_input, dir_output, verbose)
 
 
 if __name__ == '__main__':
@@ -213,7 +229,7 @@ if __name__ == '__main__':
     # Retrieved 2025-12-04, License - CC BY-SA 4.0
     parser = argparse.ArgumentParser(
         prog=__file__.rstrip(".py"),
-        description="Example scene reconstruction calculation.  Given photos with Aruco markers, find marker and camera 3-d positions.",
+        description='Example scene reconstruction calculation.  Given photos with Aruco markers, find marker and camera 3-d positions.  See "example_scene_reconstruction_README.md" for details.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
     parser.add_argument(
@@ -222,33 +238,21 @@ if __name__ == '__main__':
         required=False,
         dest="settings_dir_body_ext",
         default=None,
-        help="The directory root for reading data and writing output for this run.",
+        help="Settings file defining run parameters (input/output directories, etc).",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        dest="verbose",
+        help="Output detailed information reporting run progress and calculations.",
     )
     args = parser.parse_args()
     arg_settings_dir_body_ext: str = args.settings_dir_body_ext
-    print("arg: settings_dir_body_ext = ", arg_settings_dir_body_ext)
+    verbose: bool = args.verbose
 
-    # Get settings
-    if arg_settings_dir_body_ext is None:
-        print("Using default control settings.")
-        dir_input_main = join(opencsp_code_dir(), 'app/scene_reconstruction/test/data/data_measurement')
-        dir_output_main = join(dirname(__file__), 'data/output/scene_reconstruction')
-        write_full_data_main = False
-    else:
-        print("Loading control from settings file:", arg_settings_dir_body_ext)
-        if not ft.file_exists(arg_settings_dir_body_ext):
-            print("ERROR: In " + basename(__file__) + ", settings file does not exist. Settings file:")
-            print("   ", arg_settings_dir_body_ext)
-            assert False
-        settings = configparser.ConfigParser()
-        settings.read(arg_settings_dir_body_ext)
-        dir_input_main = settings["Default"]["dir_input"]
-        dir_output_main = settings["Default"]["dir_output"]
-        write_full_data_main = settings["Default"]["write_full_data"]
+    # Manual override for use when debugging.  Comment this line for normal runs.
+    # verbose: bool = True
 
-    # Call driver, noting status first.
-    print("Calling driver:")
-    print("    dir_main_input  = ", dir_input_main)
-    print("    dir_main_output = ", dir_output_main)
-    print("    write_full_data = ", write_full_data_main)
-    example_scene_reconstruction_driver(dir_input_main, dir_output_main, write_full_data_main)
+    # Call driver.
+    example_scene_reconstruction_driver(arg_settings_dir_body_ext, verbose)

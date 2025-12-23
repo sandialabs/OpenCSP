@@ -531,3 +531,25 @@ def log_progress(
             return log_progress(int(np.round(percentage)), carriage_return, prev_percentage)
         else:
             return log_progress(int(np.round(percentage * 100)), carriage_return, prev_percentage)
+
+
+def info_strings_from_file(input_strings_file: str) -> None:
+    """
+    Reads strings from input file and writes them to the log as INFO.
+
+    Parameters
+    ----------
+    input_strings_file : str
+        Text file containing strings to log.
+    """
+    # import here instead of at the top of the file to avoid cyclic import issues
+    import opencsp.common.lib.tool.file_tools as ft
+
+    if not ft.file_exists(input_strings_file):
+        error_and_raise(
+            RuntimeError,
+            f'Error: in log_tools.info_strings_from_file: input file does not exist: "{input_strings_file}"',
+        )
+    with open(input_strings_file, "r") as f:
+        for line in f:
+            info(line.rstrip())
