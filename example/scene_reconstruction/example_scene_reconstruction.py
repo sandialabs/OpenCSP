@@ -79,7 +79,6 @@ Supports these use cases:
 """
 
 from os.path import join, basename, dirname, splitext
-from os.path import join, basename, dirname, splitext
 
 import argparse
 import configparser
@@ -233,12 +232,6 @@ if __name__ == '__main__':
         description='Example scene reconstruction calculation.  Given photos with Aruco markers, find marker and camera 3-d positions.  See "example_scene_reconstruction_README.md" for details.',
         formatter_class=argparse.ArgumentDefaultsHelpFormatter,
     )
-    # parser.add_argument(
-    #     "--verbose",
-    #     action="store_true",
-    #     dest="verbose",
-    #     help="Print more information while running. Overrides '--progress'.",
-    # )
     parser.add_argument(
         "-s",
         "--settings_dir_body_ext",
