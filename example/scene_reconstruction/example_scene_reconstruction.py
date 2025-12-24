@@ -24,14 +24,6 @@ Supports these use cases:
       In OpenCSP\example directory:
       pytest .\scene_reconstruction\example_scene_reconstruction.py
 
-   f. Using pytest as the vehicle for full-scale example execution.
-      In OpenCSP\example directory:
-      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\data_measurement --dir_output=C:\ctemp\OpenCSP_ctemp\example_data_large\scene_reconstruction\output  --verbose=True
-
-   g. Using pytest as the vehicle for example execution on user data.
-      In OpenCSP\example directory:
-      pytest .\scene_reconstruction\example_scene_reconstruction.py --dir_input=<user_input_dir> --dir_output=<user_output_dir> --verbose=<user_choice_or_omit_argument>
-
 2. Running the example from the command line.
    Purpose:  To apply the example calculation to new data.
 
@@ -54,9 +46,8 @@ Supports these use cases:
              In OpenCSP\example\scene_reconstruction directory:
              python .\example_scene_reconstruction.py --settings_dir_body_ext "\\<network_path>\OpenCSP_<net_name>\example_scene_reconstruction_settings_<net_name>.ini"
       ii. Output levels:
-         (1) Output only newly computed information.  In .ini: verbose = False
-         (2) Output full beginning-to-end data corpus in a linear set of directories.
-             In .ini: verbose = True
+         (1) Output only minimal progress updates.  Omit --verbose flag.
+         (2) Output full progress and calculation updates.  Add --verbose flag.
 
    c. Review command-line options:
       In OpenCSP\example\scene_reconstruction directory:
@@ -66,7 +57,7 @@ Supports these use cases:
    Purpose:  To utilize the example calculation within a larger computation or application.
 
    a. Arbitrary context and general data.
-      In calling file, import example_scenario_reconstruction, call driver.  (??other name??)
+      In calling file, import example_scenario_reconstruction, call driver.
 
 4. Running an example with the Visual Studio Code debugger.
    Purpose:  To interact with the code execution (break points, check stack variables, etc), either for study or fixing an error.  Could apply to either 2 or 3 above.
@@ -74,7 +65,7 @@ Supports these use cases:
    a. Use default settings, running on default data.  In VS Code, press F5 key.
 
    b. Temporarily modify internal variable values to test specific data computation.
-      Edit in VS Code, then press F5 key.
+      Make a scratch copy somewhere else, edit in VS Code, then press F5 key.
 
 """
 
