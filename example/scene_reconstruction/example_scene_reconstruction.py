@@ -162,10 +162,14 @@ def example_scene_reconstruction_driver(arg_settings_dir_body_ext: str = None, v
 
     Parameters
     ----------
+
     arg_settings_dir_body_ext : str
         Full path and filename for settings file, containing inputand output directories, plot control settings, etc.
          Optional.  If not provided, internal defaults are used.
         See code for options sought within file.
+
+    verbose : bool
+        If true, output detailed progress and calculation output.
     """
     # Get settings
     if arg_settings_dir_body_ext is None:

@@ -27,7 +27,10 @@ Notes
 """
 
 import json
-from os.path import join, dirname
+from os.path import join, basename, dirname, splitext
+
+import argparse
+import configparser
 
 import imageio.v3 as imageio
 
@@ -51,7 +54,16 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_process_single_facet():
+def example_process_single_facet(
+    verbose: bool,
+    file_camera: str,
+    file_display: str,
+    file_orientation: str,
+    file_facet: str,
+    file_calibration: str,
+    file_measurement: str,
+    dir_save: str,
+):
     """Performs processing of previously collected SOFAST data of single facet mirror.
 
     1. Load saved single facet SOFAST collection data from HDF5 file
@@ -63,37 +75,11 @@ def example_process_single_facet():
     # General setup
     # =============
 
-    # Define save dir
-    dir_save = join(dirname(__file__), "data/output/single_facet")
+    # Set up save dir
     ft.create_directories_if_necessary(dir_save)
 
     # Set up logger
     lt.logger(join(dir_save, "log.txt"), lt.log.WARN)
-
-    # Define sample data directory
-    dir_data_sofast = join(opencsp_code_dir(), "test/data/sofast_fringe")
-    dir_data_common = join(opencsp_code_dir(), "test/data/sofast_common")
-
-    # Directory Setup
-    file_measurement = join(dir_data_sofast, "data_measurement/measurement_facet.h5")
-    file_camera = join(dir_data_common, "camera_sofast_downsampled.h5")
-    file_display = join(dir_data_common, "display_distorted_2d.h5")
-    file_orientation = join(dir_data_common, "spatial_orientation.h5")
-    file_calibration = join(dir_data_sofast, "data_measurement/image_calibration.h5")
-    file_facet = join(dir_data_common, "Facet_NSTTF.json")
-
-    # Or, optionally, process high-resolution  SOFAST sample data by uncommenting the lines below
-    #
-    # dir_data_sofast = 'path/to/sample_data/sofast/sandia_lab/sofast_fringe'
-    # dir_data_common = 'path/to/sample_data/sofast/sandia_lab/sofast_common'
-    # file_measurement = join(dir_data_sofast, 'data_measurement/facet_landscape_rectangular.h5')
-    # file_camera = join(dir_data_common, 'camera_sofast_optics_lab_landscape.h5')
-    # file_display = join(dir_data_common, 'display_shape_optics_lab_landscape_rectangular_distorted_2d_11x11.h5')
-    # file_orientation = join(dir_data_common, 'spatial_orientation_optics_lab_landscape.h5')
-    # file_calibration = join(
-    #     dir_data_sofast, 'data_measurement/image_calibration_scaling_nominal_optics_lab_landscape.h5'
-    # )
-    # file_facet = join(dir_data_common, 'facet_NSTTF.json')
 
     # 1. Load saved single facet Sofast collection data
     # =================================================
@@ -209,5 +195,125 @@ def example_process_single_facet():
     plots.plot()
 
 
+def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, verbose_param=None):
+    """
+    Sets up and runs the example_process_single_facet() routine.
+
+    Parameters
+    ----------
+
+    arg_settings_dir_body_ext : str
+        Full path and filename for settings file, containing inputand output directories, plot control settings, etc.
+         Optional.  If not provided, internal defaults are used.
+        See code for options sought within file.
+
+    verbose : bool
+        If true, output detailed progress and calculation output.
+    """
+    # Get settings
+    if arg_settings_dir_body_ext is None:
+        print("Using default control settings.")
+        # Verbose control
+        if verbose_param is None:
+            verbose = False
+        else:
+            verbose = verbose_param
+        # Define sample data directories
+        dir_data_sofast = join(opencsp_code_dir(), "test/data/sofast_fringe")
+        dir_data_common = join(opencsp_code_dir(), "test/data/sofast_common")
+        # Input files
+        file_camera = join(dir_data_common, "camera_sofast_downsampled.h5")
+        file_display = join(dir_data_common, "display_distorted_2d.h5")
+        file_orientation = join(dir_data_common, "spatial_orientation.h5")
+        file_facet = join(dir_data_common, "Facet_NSTTF.json")
+        file_calibration = join(dir_data_sofast, "data_measurement/image_calibration.h5")
+        file_measurement = join(dir_data_sofast, "data_measurement/measurement_facet.h5")
+        # Define save dir
+        dir_save = join(dirname(__file__), "data/output/single_facet")
+
+    else:
+        print("Loading control from settings file:", arg_settings_dir_body_ext)
+        if not ft.file_exists(arg_settings_dir_body_ext):
+            print("ERROR: In " + basename(__file__) + ", settings file does not exist. Settings file:")
+            print("   ", arg_settings_dir_body_ext)
+            assert False
+        settings = configparser.ConfigParser()
+        settings.read(arg_settings_dir_body_ext)
+        # Verbose control
+        verbose_setting = settings["Default"]["verbose"]
+        if verbose_param is None:
+            verbose = verbose_setting
+        else:
+            verbose = verbose_param
+        # Input files
+        file_camera = settings["Default"]["file_camera"]
+        file_display = settings["Default"]["file_display"]
+        file_orientation = settings["Default"]["file_orientation"]
+        file_facet = settings["Default"]["file_facet"]
+        file_calibration = settings["Default"]["file_calibration"]
+        file_measurement = settings["Default"]["file_measurement"]
+        # Define save dir
+        dir_save = settings["Default"]["dir_save"]
+
+    # Ensure output directory is ready
+    ft.create_directories_if_necessary(dir_save)
+
+    # Set up logger
+    logfile_dir_body_ext = join(dir_save, splitext(basename(__file__))[0] + '_log.txt')
+    print("logfile_dir_body_ext = ", logfile_dir_body_ext)
+    lt.logger(logfile_dir_body_ext, lt.log.INFO)
+    # Output standard lines.
+    if verbose:
+        lt.info_strings_from_file(join(dirname(__file__), splitext(basename(__file__))[0] + '_README.md'))
+        lt.info('Starting program ' + __file__)
+        lt.info('verbose = ' + str(verbose))
+        lt.info('file_camera = ' + str(file_camera))
+        lt.info('file_display = ' + str(file_display))
+        lt.info('file_orientation = ' + str(file_orientation))
+        lt.info('file_facet = ' + str(file_facet))
+        lt.info('file_calibration = ' + str(file_calibration))
+        lt.info('file_measurement = ' + str(file_measurement))
+        lt.info('dir_save = ' + str(dir_save))
+    if verbose:
+        lt.info('Calling routine example_process_single_facet(...)...')
+    example_process_single_facet(
+        verbose, file_camera, file_display, file_orientation, file_facet, file_calibration, file_measurement, dir_save
+    )
+
+
 if __name__ == "__main__":
-    example_process_single_facet()
+    # Parse command-line arguments, if any.
+    # Execute "python <this_file>.py --help" to see usage tips.
+    #
+    # Source - https://stackoverflow.com/a
+    # Posted by Martijn Pieters, modified by community. See post 'Timeline' for change history
+    # Retrieved 2025-12-04, License - CC BY-SA 4.0
+    parser = argparse.ArgumentParser(
+        prog=__file__.rstrip(".py"),
+        description='Analyze SOFAST measurement of a single facet, image processing, fitting, and producing analysis plots.  See "example_process_single_facet_README.md" for details.',
+        formatter_class=argparse.ArgumentDefaultsHelpFormatter,
+    )
+    parser.add_argument(
+        "-s",
+        "--settings_dir_body_ext",
+        required=False,
+        dest="settings_dir_body_ext",
+        default=None,
+        help="Settings file defining run parameters (input/output directories, etc).",
+    )
+    parser.add_argument(
+        "-v",
+        "--verbose",
+        action="store_true",
+        dest="verbose",
+        help="Output detailed information reporting run progress and calculations.",
+    )
+    args = parser.parse_args()
+    arg_settings_dir_body_ext: str = args.settings_dir_body_ext
+    verbose: bool = args.verbose
+
+    # Manual override for use when debugging.  Comment this line for normal runs.
+    # verbose: bool = True
+
+    # Call driver.
+    example_process_single_facet_driver(arg_settings_dir_body_ext, verbose)
