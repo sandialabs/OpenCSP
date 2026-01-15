@@ -1,4 +1,3 @@
-from typing import TYPE_CHECKING
 import numpy as np
 import scipy.spatial.transform
 
@@ -13,10 +12,6 @@ import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.log_tools as lt
-
-if TYPE_CHECKING:
-    # don't import at runtime in order to avoid cyclic dependencies
-    from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class RectangleAnnotations(AbstractAnnotations):
@@ -87,13 +82,7 @@ class RectangleAnnotations(AbstractAnnotations):
             )
         return [self.size * self.meters_per_pixel]
 
-    def render_to_figure(
-        self,
-        fig: rcfr.RenderControlFigureRecord,
-        image: np.ndarray = None,
-        include_label=False,
-        operable: "SpotAnalysisOperable" = None,
-    ):
+    def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False):
         label = self.get_label(include_label)
 
         # get the corner vertices for each bounding box
@@ -103,8 +92,6 @@ class RectangleAnnotations(AbstractAnnotations):
             for loop in bbox.loops:
                 loop_verts = list(zip(loop.vertices.x, loop.vertices.y))
                 loop_verts = [(int(x), int(y)) for x, y in loop_verts]
-                if operable is not None:
-                    loop_verts = [operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple() for x, y in loop_verts]
                 draw_loops.append(loop_verts)
 
         # draw the bounding boxes

@@ -8,7 +8,6 @@ base_package = "contrib.common.lib.cv.spot_analysis.image_processor."
 BackgroundColorSubtractionImageProcessor = _LazyLoader(base_package + "BackgroundColorSubtractionImageProcessor", "BackgroundColorSubtractionImageProcessor")
 ColorConversionImageProcessor = _LazyLoader(base_package + "ColorConversionImageProcessor", "ColorConversionImageProcessor")
 CustomSimpleImageProcessor = _LazyLoader(base_package + "CustomSimpleImageProcessor", "CustomSimpleImageProcessor")
-DiscardAnnotationsImageProcessor = _LazyLoader(base_package + "DiscardAnnotationsImageProcessor", "DiscardAnnotationsImageProcessor")
 EnclosedEnergyImageProcessor = _LazyLoader(base_package + "EnclosedEnergyImageProcessor", "EnclosedEnergyImageProcessor")
 InpaintImageProcessor = _LazyLoader(base_package + "InpaintImageProcessor", "InpaintImageProcessor")
 MomentsImageProcessor = _LazyLoader(base_package + "MomentsImageProcessor", "MomentsImageProcessor")
@@ -26,7 +25,6 @@ if _TYPE_CHECKING:
     from contrib.common.lib.cv.spot_analysis.image_processor.BackgroundColorSubtractionImageProcessor import BackgroundColorSubtractionImageProcessor
     from contrib.common.lib.cv.spot_analysis.image_processor.ColorConversionImageProcessor import ColorConversionImageProcessor
     from contrib.common.lib.cv.spot_analysis.image_processor.CustomSimpleImageProcessor import CustomSimpleImageProcessor
-    from contrib.common.lib.cv.spot_analysis.image_processor.DiscardAnnotationsImageProcessor import DiscardAnnotationsImageProcessor
     from contrib.common.lib.cv.spot_analysis.image_processor.EnclosedEnergyImageProcessor import EnclosedEnergyImageProcessor
     from contrib.common.lib.cv.spot_analysis.image_processor.InpaintImageProcessor import InpaintImageProcessor
     from contrib.common.lib.cv.spot_analysis.image_processor.MomentsImageProcessor import MomentsImageProcessor
@@ -44,7 +42,6 @@ __all__ = [
     "BackgroundColorSubtractionImageProcessor",
     "ColorConversionImageProcessor",
     "CustomSimpleImageProcessor",
-    "DiscardAnnotationsImageProcessor",
     "EnclosedEnergyImageProcessor",
     "InpaintImageProcessor",
     "MomentsImageProcessor",

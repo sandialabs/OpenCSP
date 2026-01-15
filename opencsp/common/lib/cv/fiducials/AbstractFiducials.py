@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import TYPE_CHECKING, Callable
+from typing import Callable
 
 import matplotlib.axes
 import matplotlib.figure
@@ -20,10 +20,6 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
-
-if TYPE_CHECKING:
-    # don't import at runtime in order to avoid cyclic dependencies
-    from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class AbstractFiducials(ABC):
@@ -200,11 +196,7 @@ class AbstractFiducials(ABC):
         return label
 
     def render_to_figure(
-        self,
-        fig_record: rcfr.RenderControlFigureRecord,
-        image: np.ndarray = None,
-        include_label=False,
-        operable: "SpotAnalysisOperable" = None,
+        self, fig_record: rcfr.RenderControlFigureRecord, image: np.ndarray = None, include_label=False
     ):
         """
         Renders a visual representation of this fiducial to the given fig_record.
@@ -229,17 +221,9 @@ class AbstractFiducials(ABC):
         include_label: bool, optional
             True if this fiducial should add a label during it's plot method. By
             default False.
-        operable: SpotAnalysisOperable, optional
-            The operable to adjust the position of the rendering element to. If
-            provided, then the position of this fiducial should adjust its
-            position to match the coordinates given from the operable's
-            coordinate transform. Default is None.
         """
         label = self.get_label(include_label)
-        xy = self.origin
-        if operable is not None:
-            xy = operable.transform_coordinates(xy)[1]
-        fig_record.view.draw_pq(([xy.x[0]], [xy.y[0]]), style=self.style, label=label)
+        fig_record.view.draw_pq(([self.origin.x[0]], [self.origin.y[0]]), style=self.style, label=label)
 
     def render_to_image(self, image: np.ndarray) -> np.ndarray:
         """
