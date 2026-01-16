@@ -43,7 +43,7 @@ class AverageByGroupImageProcessor(AbstractAggregateImageProcessor):
                     + f"First image is '{operables[0].primary_image_source_path}', current image is '{operable.primary_image_source_path}'.",
                 )
             averaged_image += other_image
-        averaged_image = averaged_image.astype(np.float_)
+        averaged_image = averaged_image.astype(np.float64)
         averaged_image /= len(operables)
         averaged_image = averaged_image.astype(operables[0].primary_image.nparray.dtype)
 

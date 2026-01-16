@@ -313,7 +313,7 @@ class SpotAnalysisOperable:
         return os.path.join(*self.get_primary_path_nameext())
 
     @property
-    def max_popf(self) -> npt.NDArray[np.float_]:
+    def max_popf(self) -> npt.NDArray[np.float64]:
         """Returns the maximum population float value, if it exists. Otherwise
         returns the maximum value for this instance's primary image."""
         if self.population_statistics is not None:
@@ -322,7 +322,7 @@ class SpotAnalysisOperable:
             return np.max(self.primary_image.nparray)
 
     @property
-    def min_popf(self) -> npt.NDArray[np.float_]:
+    def min_popf(self) -> npt.NDArray[np.float64]:
         """Returns the minimum population float value, if it exists. Otherwise
         returns the minimum value for this instance's primary image."""
         if self.population_statistics is not None:

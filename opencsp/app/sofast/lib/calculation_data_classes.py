@@ -269,7 +269,7 @@ class CalculationFacetEnsemble(hdf5_tools.HDF5_SaveAbstract):
     """
 
     trans_facet_ensemble: TransformXYZ = None
-    slopes_ensemble_xy: npt.NDArray[np.float_] = None
+    slopes_ensemble_xy: npt.NDArray[np.float64] = None
     v_surf_points_ensemble: Vxyz = None
     v_facet_pointing_ensemble: Vxyz = None
 

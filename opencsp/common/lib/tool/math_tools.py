@@ -301,7 +301,7 @@ def gaussian_convolution(num_points: int):
     return y_vals
 
 
-def rolling_average(data: list[float] | npt.NDArray[np.float_], window_size: int):
+def rolling_average(data: list[float] | npt.NDArray[np.float64], window_size: int):
     """Compute the rolling average over all values in the given list.
 
     For each point x at index i, assign a new value equal to sum([i-w/2:i+w/2]) / 2.

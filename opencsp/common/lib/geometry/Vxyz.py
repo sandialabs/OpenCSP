@@ -265,7 +265,7 @@ class Vxyz:
         """
         self._data /= self._magnitude_with_zero_check()
 
-    def magnitude(self) -> npt.NDArray[np.float_]:
+    def magnitude(self) -> npt.NDArray[np.float64]:
         """
         Returns magnitude of each vector as a new array.
 
