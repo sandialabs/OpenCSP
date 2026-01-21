@@ -54,7 +54,7 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 
 
-def example_process_single_facet(
+def process_single_facet(
     verbose: bool,
     file_camera: str,
     file_display: str,
@@ -276,7 +276,7 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         lt.info('dir_save = ' + str(dir_save))
     if verbose:
         lt.info('Calling routine example_process_single_facet(...)...')
-    example_process_single_facet(
+    process_single_facet(
         verbose, file_camera, file_display, file_orientation, file_facet, file_calibration, file_measurement, dir_save
     )
 
