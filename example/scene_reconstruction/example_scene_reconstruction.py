@@ -243,11 +243,11 @@ if __name__ == '__main__':
         help="Output detailed information reporting run progress and calculations.",
     )
     args = parser.parse_args()
-    arg_settings_dir_body_ext: str = args.settings_dir_body_ext
-    verbose: bool = args.verbose
+    arg_settings_dir_body_ext_main: str = args.settings_dir_body_ext
+    verbose_main: bool = args.verbose
 
     # Manual override for use when debugging.  Comment this line for normal runs.
     # verbose: bool = True
 
     # Call driver.
-    example_scene_reconstruction_driver(arg_settings_dir_body_ext, verbose)
+    example_scene_reconstruction_driver(arg_settings_dir_body_ext_main, verbose_main)
