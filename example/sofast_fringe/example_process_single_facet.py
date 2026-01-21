@@ -63,6 +63,9 @@ def process_single_facet(
     file_calibration: str,
     file_measurement: str,
     dir_save: str,
+    measurement_id: str,
+    post_process_id: str,
+    plots: StandardPlotOutput,
 ):
     """Performs processing of previously collected SOFAST data of single facet mirror.
 
@@ -78,8 +81,8 @@ def process_single_facet(
     # Set up save dir
     ft.create_directories_if_necessary(dir_save)
 
-    # Set up logger
-    lt.logger(join(dir_save, "log.txt"), lt.log.WARN)
+    # Construct output file prefix
+    output_file_prefix = measurement_id + "_" + post_process_id + "_"
 
     # 1. Load saved single facet Sofast collection data
     # =================================================
@@ -99,11 +102,11 @@ def process_single_facet(
     # Save y images
     for idx_image in range(measurement.num_y_ims):
         image = images[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, f"y_{idx_image:02d}.png"), image)
+        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
     # Save x images
     for idx_image in range(measurement.num_x_ims):
         image = images[..., measurement.num_y_ims + idx_image]
-        imageio.imwrite(join(dir_save_cur, f"x_{idx_image:02d}.png"), image)
+        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
 
     # 3. Save captured sinusoidal fringe images and mask images to PNG format
     # =======================================================================
@@ -113,15 +116,15 @@ def process_single_facet(
     # Save mask (like a pixel mask value (all 0s, all 255s)) images
     for idx_image in [0, 1]:
         image = measurement.mask_images[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, f"mask_{idx_image:02d}.png"), image)
+        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"mask_{idx_image:02d}.png"), image)
     # Save y images (when lines were vertical, e.g.)
     for idx_image in range(measurement.num_y_ims):
         image = measurement.fringe_images_y[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, f"y_{idx_image:02d}.png"), image)
+        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
     # Save x images (when lines were horizontal, e.g.)
     for idx_image in range(measurement.num_x_ims):
         image = measurement.fringe_images_x[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, f"x_{idx_image:02d}.png"), image)
+        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
 
     # 4. Processes data with Sofast and save processed data to HDF5
     # =============================================================
@@ -140,16 +143,16 @@ def process_single_facet(
     # Process
     sofast.process_optic_singlefacet(facet_data, surface)
 
-    # Save processed data to HDF5 format
-    sofast.save_to_hdf(join(dir_save_cur, "data_sofast_processed.h5"))
-
-    # Save measurement statistics to JSON
+    # Get measurement statistics
     config = SofastConfiguration()
     config.load_sofast_object(sofast)
     measurement_stats = config.get_measurement_stats()
 
+    # Save processed data to HDF5 format
+    sofast.save_to_hdf(join(dir_save_cur, output_file_prefix + "data_sofast_processed.h5"))
+
     # Save measurement stats as JSON
-    with open(join(dir_save_cur, "measurement_statistics.json"), "w", encoding="utf-8") as f:
+    with open(join(dir_save_cur, output_file_prefix + "measurement_statistics.json"), "w", encoding="utf-8") as f:
         json.dump(measurement_stats, f, indent=3)
 
     # 5. Generate plot suite and save images files
@@ -161,35 +164,11 @@ def process_single_facet(
     mirror_measured = sofast.get_optic().mirror.no_parent_copy()
     mirror_reference = MirrorParametric.generate_symmetric_paraboloid(100, mirror_measured.region)
 
-    # Define viewing/illumination geometry
-    v_target_center = Vxyz((0, 0, 100))
-    v_target_normal = Vxyz((0, 0, -1))
-    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
-
-    # Save optic objects
-    plots = StandardPlotOutput()
+    # Save optic objects and output destination
     plots.optic_measured = mirror_measured
     plots.optic_reference = mirror_reference
-
-    # Update visualization parameters
-    plots.options_slope_vis.clim = 7
-    plots.options_slope_vis.resolution = 0.001
-
-    plots.options_slope_deviation_vis.clim = 1.5
-    plots.options_slope_deviation_vis.resolution = 0.001
-
-    plots.options_curvature_vis.resolution = 0.001
-
-    plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
-
-    plots.options_file_output.to_save = True
-    plots.options_file_output.number_in_name = False
     plots.options_file_output.output_dir = dir_save_cur
-
-    # Define ray trace parameters
-    plots.params_ray_trace.source = source
-    plots.params_ray_trace.v_target_center = v_target_center
-    plots.params_ray_trace.v_target_normal = v_target_normal
+    plots.options_file_output.file_prefix = output_file_prefix
 
     # Create standard output plots
     plots.plot()
@@ -230,6 +209,9 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         file_measurement = join(dir_data_sofast, "data_measurement/measurement_facet.h5")
         # Define save dir
         dir_save = join(dirname(__file__), "data/output/single_facet")
+        # Strings denoting computation.
+        measurement_id = "Time_Mirror_InstrumentMode"
+        post_process_id = "PostSpec"
 
     else:
         print("Loading control from settings file:", arg_settings_dir_body_ext)
@@ -254,15 +236,20 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         file_measurement = settings["Default"]["file_measurement"]
         # Define save dir
         dir_save = settings["Default"]["dir_save"]
+        # Strings denoting computation.
+        measurement_id = settings["Default"]["measurement_id"]
+        post_process_id = settings["Default"]["post_process_id"]
 
     # Ensure output directory is ready
     ft.create_directories_if_necessary(dir_save)
 
     # Set up logger
-    logfile_dir_body_ext = join(dir_save, splitext(basename(__file__))[0] + '_log.txt')
+    logfile_dir_body_ext = join(
+        dir_save, measurement_id + "_" + post_process_id + "_" + splitext(basename(__file__))[0] + '_log.txt'
+    )
     print("logfile_dir_body_ext = ", logfile_dir_body_ext)
     lt.logger(logfile_dir_body_ext, lt.log.INFO)
-    # Output standard lines.
+    # Output standard lines
     if verbose:
         lt.info_strings_from_file(join(dirname(__file__), splitext(basename(__file__))[0] + '_README.md'))
         lt.info('Starting program ' + __file__)
@@ -274,10 +261,51 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         lt.info('file_calibration = ' + str(file_calibration))
         lt.info('file_measurement = ' + str(file_measurement))
         lt.info('dir_save = ' + str(dir_save))
+        lt.info('measurement_id = ' + str(measurement_id))
+        lt.info('post_process_id = ' + str(post_process_id))
     if verbose:
         lt.info('Calling routine example_process_single_facet(...)...')
+
+    # Define viewing/illumination geometry
+    v_target_center = Vxyz((0, 0, 100))
+    v_target_normal = Vxyz((0, 0, -1))
+    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
+
+    # Setup plot control
+    plots = StandardPlotOutput()
+
+    # Update visualization parameters
+    plots.options_slope_vis.clim = 7
+    plots.options_slope_vis.resolution = 0.001
+
+    plots.options_slope_deviation_vis.clim = 1.5
+    plots.options_slope_deviation_vis.resolution = 0.001
+
+    plots.options_curvature_vis.resolution = 0.001
+
+    plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
+
+    plots.options_file_output.to_save = True
+    plots.options_file_output.number_in_name = False
+
+    # Define ray trace parameters
+    plots.params_ray_trace.source = source
+    plots.params_ray_trace.v_target_center = v_target_center
+    plots.params_ray_trace.v_target_normal = v_target_normal
+
+    # Process and output
     process_single_facet(
-        verbose, file_camera, file_display, file_orientation, file_facet, file_calibration, file_measurement, dir_save
+        verbose,
+        file_camera,
+        file_display,
+        file_orientation,
+        file_facet,
+        file_calibration,
+        file_measurement,
+        dir_save,
+        measurement_id,
+        post_process_id,
+        plots,
     )
 
 

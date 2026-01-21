@@ -114,6 +114,8 @@ class _OptionsFileOutput:
     """To close figures after save. (default False)"""
     number_in_name: bool = True
     """To keep figure number in save name. (default True)"""
+    file_prefix: str = None
+    """String to prefix each output file, including separator"""
 
 
 @dataclass
@@ -270,7 +272,7 @@ class StandardPlotOutput:
             fig_rec = fm.setup_figure(
                 self.fig_control,
                 self.axis_control,
-                name="Slope Deviation Magnitude",
+                name=self.options_file_output.file_prefix + "Slope Deviation Magnitude",
                 number_in_name=self.options_file_output.number_in_name,
             )
             self.optic_measured.plot_orthorectified_slope_error(
@@ -295,7 +297,7 @@ class StandardPlotOutput:
             fig_rec = fm.setup_figure(
                 self.fig_control,
                 self.axis_control,
-                name="Slope Deviation X",
+                name=self.options_file_output.file_prefix + "Slope Deviation X",
                 number_in_name=self.options_file_output.number_in_name,
             )
             self.optic_measured.plot_orthorectified_slope_error(
@@ -320,7 +322,7 @@ class StandardPlotOutput:
             fig_rec = fm.setup_figure(
                 self.fig_control,
                 self.axis_control,
-                name="Slope Deviation Y",
+                name=self.options_file_output.file_prefix + "Slope Deviation Y",
                 number_in_name=self.options_file_output.number_in_name,
             )
             self.optic_measured.plot_orthorectified_slope_error(
@@ -366,7 +368,9 @@ class StandardPlotOutput:
 
         # Make figure
         fig_rec = fm.setup_figure(
-            self.fig_control, name='Ensquared Energy', number_in_name=self.options_file_output.number_in_name
+            self.fig_control,
+            name=self.options_file_output.file_prefix + 'Ensquared Energy',
+            number_in_name=self.options_file_output.number_in_name,
         )
 
         # Draw reference if available
@@ -430,7 +434,7 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Curvature Combined ' + suffix,
+            name=self.options_file_output.file_prefix + 'Curvature Combined ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
@@ -453,7 +457,7 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Curvature X ' + suffix,
+            name=self.options_file_output.file_prefix + 'Curvature X ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
@@ -476,7 +480,7 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Curvature Y ' + suffix,
+            name=self.options_file_output.file_prefix + 'Curvature Y ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
@@ -505,7 +509,7 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Slope Magnitude " + suffix,
+            name=self.options_file_output.file_prefix + "Slope Magnitude " + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_slope(
@@ -529,7 +533,7 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Slope X " + suffix,
+            name=self.options_file_output.file_prefix + "Slope X " + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_slope(
@@ -553,7 +557,7 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Slope Y " + suffix,
+            name=self.options_file_output.file_prefix + "Slope Y " + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_slope(
@@ -578,7 +582,7 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Ray Trace Image ' + suffix,
+            name=self.options_file_output.file_prefix + 'Ray Trace Image ' + suffix,
             number_in_name=self.options_file_output.number_in_name,
         )
         fig_rec.axis.imshow(
