@@ -94,7 +94,7 @@ def process_single_facet(
     # ========================================================
     fringes = Fringes(measurement.fringe_periods_x, measurement.fringe_periods_y)
     images = fringes.get_frames(640, 320, "uint8", [0, 255])  # writes images we projected from sofast projector to disk
-    dir_save_cur = join(dir_save, "1_images_fringes_projected")
+    dir_save_cur = join(dir_save, "B1_projected_fringes")
     ft.create_directories_if_necessary(dir_save_cur)
     # Save y images
     for idx_image in range(measurement.num_y_ims):
@@ -107,7 +107,7 @@ def process_single_facet(
 
     # 3. Save captured sinusoidal fringe images and mask images to PNG format
     # =======================================================================
-    dir_save_cur = join(dir_save, "2_images_captured")
+    dir_save_cur = join(dir_save, "B2_captured_fringes")
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Save mask (like a pixel mask value (all 0s, all 255s)) images
@@ -125,7 +125,7 @@ def process_single_facet(
 
     # 4. Processes data with Sofast and save processed data to HDF5
     # =============================================================
-    dir_save_cur = join(dir_save, "3_processed_data")
+    dir_save_cur = join(dir_save, "B3_output_analysis")
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Define surface definition (parabolic surface), this is the mirror
@@ -154,7 +154,7 @@ def process_single_facet(
 
     # 5. Generate plot suite and save images files
     # ============================================
-    dir_save_cur = join(dir_save, "4_processed_output_figures")
+    dir_save_cur = join(dir_save, "B4_output_figures")
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Get measured and reference optics
