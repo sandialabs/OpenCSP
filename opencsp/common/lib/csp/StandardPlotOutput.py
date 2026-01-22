@@ -1,7 +1,7 @@
 """Class used to display/save the suite of standard output plots after measuring a CSP Optic object."""
 
+import configparser
 from dataclasses import dataclass, field
-
 import numpy as np
 
 import opencsp.common.lib.render_control.RenderControlAxis as rca
@@ -17,6 +17,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlEnclosedEnergy as rcee
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.string_tools as st
 
 
 @dataclass
@@ -184,6 +185,87 @@ class StandardPlotOutput:
     @property
     def _has_reference_ray_trace(self) -> bool:
         return self._ray_trace_output_reference is not None
+
+    def set_plot_control_from_settings(self, settings: configparser.ConfigParser):
+        """
+        Fills in plot control fields that are provided in settings.
+        If the settings does not contain a key, then the corresponding plot control field is left unchanged.
+        """
+
+        # File output control.
+        if ("Default" in settings) and ("plots.options_file_output.to_save" in settings["Default"]):
+            self.options_file_output.to_save = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_file_output.to_save"]
+            )
+        if ("Default" in settings) and ("plots.options_file_output.number_in_name" in settings["Default"]):
+            self.options_file_output.number_in_name = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_file_output.number_in_name"]
+            )
+
+        # Slope plot control.
+        if ("Default" in settings) and ("plots.options_slope_vis.clim" in settings["Default"]):
+            self.options_slope_vis.clim = float(settings["Default"]["plots.options_slope_vis.clim"])
+        if ("Default" in settings) and ("plots.options_slope_vis.resolution" in settings["Default"]):
+            self.options_slope_vis.resolution = float(settings["Default"]["plots.options_slope_vis.resolution"])
+
+        # Slope deviation plot control.
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.clim" in settings["Default"]):
+            self.options_slope_deviation_vis.clim = float(settings["Default"]["plots.options_slope_deviation_vis.clim"])
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.resolution" in settings["Default"]):
+            self.options_slope_deviation_vis.resolution = float(
+                settings["Default"]["plots.options_slope_deviation_vis.resolution"]
+            )
+
+        # Curvature plot control.
+        if ("Default" in settings) and ("plots.options_curvature_vis.resolution" in settings["Default"]):
+            self.options_curvature_vis.resolution = float(settings["Default"]["plots.options_curvature_vis.resolution"])
+
+        # Ray trace control.
+        # Light source.
+        if (
+            ("Default" in settings)
+            and ("plots.options_ray_trace_vis.sun_direction_x" in settings["Default"])
+            and ("plots.options_ray_trace_vis.sun_direction_y" in settings["Default"])
+            and ("plots.options_ray_trace_vis.sun_direction_z" in settings["Default"])
+            and ("plots.options_ray_trace_vis.sun_sample_resolution" in settings["Default"])
+        ):
+            sun_direction_x = float(settings["Default"]["plots.options_ray_trace_vis.sun_direction_x"])
+            sun_direction_y = float(settings["Default"]["plots.options_ray_trace_vis.sun_direction_y"])
+            sun_direction_z = float(settings["Default"]["plots.options_ray_trace_vis.sun_direction_z"])
+            sun_direction = Uxyz((sun_direction_x, sun_direction_y, sun_direction_z))
+            sun_sample_resolution = int(settings["Default"]["plots.options_ray_trace_vis.sun_sample_resolution"])
+            self.params_ray_trace.source = LightSourceSun.from_given_sun_position(
+                sun_direction, resolution=sun_sample_resolution
+            )
+        # Target center.
+        if (
+            ("Default" in settings)
+            and ("plots.options_ray_trace_vis.v_target_center_x" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_center_y" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_center_z" in settings["Default"])
+        ):
+            v_target_center_x = float(settings["Default"]["plots.options_ray_trace_vis.v_target_center_x"])
+            v_target_center_y = float(settings["Default"]["plots.options_ray_trace_vis.v_target_center_y"])
+            v_target_center_z = float(settings["Default"]["plots.options_ray_trace_vis.v_target_center_z"])
+            self.params_ray_trace.v_target_center = Vxyz((v_target_center_x, v_target_center_y, v_target_center_z))
+        # Target normal.
+        if (
+            ("Default" in settings)
+            and ("plots.options_ray_trace_vis.v_target_normal_x" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_normal_y" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_normal_z" in settings["Default"])
+        ):
+            v_target_normal_x = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_x"])
+            v_target_normal_y = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_y"])
+            v_target_normal_z = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_z"])
+            self.params_ray_trace.v_target_normal = Vxyz((v_target_normal_x, v_target_normal_y, v_target_normal_z))
+        # Enclosed energy plot semi-width.
+        if ("Default" in settings) and (
+            "plots.options_ray_trace_vis.enclosed_energy_max_semi_width" in settings["Default"]
+        ):
+            self.options_ray_trace_vis.enclosed_energy_max_semi_width = float(
+                settings["Default"]["plots.options_ray_trace_vis.enclosed_energy_max_semi_width"]
+            )
 
     def plot(self):
         """Creates standard output plot suite"""

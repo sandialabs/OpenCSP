@@ -52,6 +52,7 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.string_tools as st
 
 
 def process_single_facet(
@@ -189,6 +190,9 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
     verbose : bool
         If true, output detailed progress and calculation output.
     """
+    # Setup plot control, whcih might have some values set from settings, if provided.
+    plots = StandardPlotOutput()
+
     # Get settings
     if arg_settings_dir_body_ext is None:
         print("Using default control settings.")
@@ -212,6 +216,25 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         # Strings denoting computation.
         measurement_id = "Time_Mirror_InstrumentMode"
         post_process_id = "PostSpec"
+        # Set plot control parameters to the values we want for the default example.
+        plots.options_slope_vis.clim = 7
+        plots.options_slope_vis.resolution = 0.001
+        plots.options_slope_deviation_vis.clim = 1.5
+        plots.options_slope_deviation_vis.resolution = 0.001
+        plots.options_curvature_vis.resolution = 0.001
+        plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
+        plots.options_file_output.to_save = True
+        plots.options_file_output.number_in_name = False
+
+        # Define viewing/illumination geometry
+        v_target_center = Vxyz((0, 0, 100))
+        v_target_normal = Vxyz((0, 0, -1))
+        source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
+
+        # Define ray trace parameters
+        plots.params_ray_trace.source = source
+        plots.params_ray_trace.v_target_center = v_target_center
+        plots.params_ray_trace.v_target_normal = v_target_normal
 
     else:
         print("Loading control from settings file:", arg_settings_dir_body_ext)
@@ -236,9 +259,11 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         file_measurement = settings["Default"]["file_measurement"]
         # Define save dir
         dir_save = settings["Default"]["dir_save"]
-        # Strings denoting computation.
-        measurement_id = settings["Default"]["measurement_id"]
-        post_process_id = settings["Default"]["post_process_id"]
+        # Strings denoting computation
+        measurement_id = st.verify_contiguous(settings["Default"]["measurement_id"])
+        post_process_id = st.verify_contiguous(settings["Default"]["post_process_id"])
+        # Set plot control parameters
+        plots.set_plot_control_from_settings(settings)
 
     # Ensure output directory is ready
     ft.create_directories_if_necessary(dir_save)
@@ -265,33 +290,6 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         lt.info('post_process_id = ' + str(post_process_id))
     if verbose:
         lt.info('Calling routine example_process_single_facet(...)...')
-
-    # Define viewing/illumination geometry
-    v_target_center = Vxyz((0, 0, 100))
-    v_target_normal = Vxyz((0, 0, -1))
-    source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
-
-    # Setup plot control
-    plots = StandardPlotOutput()
-
-    # Update visualization parameters
-    plots.options_slope_vis.clim = 7
-    plots.options_slope_vis.resolution = 0.001
-
-    plots.options_slope_deviation_vis.clim = 1.5
-    plots.options_slope_deviation_vis.resolution = 0.001
-
-    plots.options_curvature_vis.resolution = 0.001
-
-    plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
-
-    plots.options_file_output.to_save = True
-    plots.options_file_output.number_in_name = False
-
-    # Define ray trace parameters
-    plots.params_ray_trace.source = source
-    plots.params_ray_trace.v_target_center = v_target_center
-    plots.params_ray_trace.v_target_normal = v_target_normal
 
     # Process and output
     process_single_facet(
