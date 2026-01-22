@@ -212,7 +212,7 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         file_calibration = join(dir_data_sofast, "data_measurement/image_calibration.h5")
         file_measurement = join(dir_data_sofast, "data_measurement/measurement_facet.h5")
         # Define save dir
-        dir_save = join(dirname(__file__), "data/output/single_facet")
+        dir_save = join(dirname(__file__), "../data/output/single_facet")
         # Strings denoting computation.
         measurement_id = "Time_Mirror_InstrumentMode"
         post_process_id = "PostSpec"

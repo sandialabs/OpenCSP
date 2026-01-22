@@ -21,6 +21,24 @@ import opencsp.common.lib.tool.string_tools as st
 
 
 @dataclass
+class _OptionsFileOutput:
+    to_save: bool = False
+    """Flag to save figures or not. (default False)"""
+    output_dir: str = ''
+    """Output path to save directory. (default '')"""
+    save_dpi: int = 200
+    """Dots Per Inch (DPI) of saved figures. (default 200)"""
+    save_format: str = 'png'
+    """Saved figure format. (default 'png')"""
+    close_after_save: bool = False
+    """To close figures after save. (default False)"""
+    number_in_name: bool = True
+    """To keep figure number in save name. (default True)"""
+    file_prefix: str = None
+    """String to prefix each output file, including separator"""
+
+
+@dataclass
 class _OptionsSlopeVis:
     resolution: float = 0.01
     """Plot x/y sample resolution (meters) (default 0.01)"""
@@ -77,7 +95,7 @@ class _OptionsCurvatureVis:
     Can be single value of tuple of three values to map to [x, y, combined] plots individually. (default 50)"""
     processing: list[str] | tuple[list[str], list[str], list[str]] = field(default_factory=list)
     """Processing string to apply when in MirrorAbstract.plot_orthorectified_curvature().
-    Can be single value of tuple of three values to map to [x, y, combined] plots individually.
+    Can be single value or tuple of three values to map to [x, y, combined] plots individually.
     (default [])"""
     smooth_kernel_width: float | tuple[float, float, float] = 1
     """Width of square smoothing kernel (pixels) to apply to curvature images in MirrorAbstract.plot_orthorectified_curvature().
@@ -99,24 +117,6 @@ class _OptionsRayTraceVis:
     """The max semi-width of square aperture (meters) used when computing enclosed energy plots. (default 2)"""
     to_plot: bool = True
     """Flag to produce plots or not. (default True)"""
-
-
-@dataclass
-class _OptionsFileOutput:
-    to_save: bool = False
-    """Flag to save figures or not. (default False)"""
-    output_dir: str = ''
-    """Output path to save directory. (default '')"""
-    save_dpi: int = 200
-    """Dots Per Inch (DPI) of saved figures. (default 200)"""
-    save_format: str = 'png'
-    """Saved figure format. (default 'png')"""
-    close_after_save: bool = False
-    """To close figures after save. (default False)"""
-    number_in_name: bool = True
-    """To keep figure number in save name. (default True)"""
-    file_prefix: str = None
-    """String to prefix each output file, including separator"""
 
 
 @dataclass
@@ -193,34 +193,136 @@ class StandardPlotOutput:
         """
 
         # File output control.
+        # This should be kept in synch with class _OptionsFileOutput above.
         if ("Default" in settings) and ("plots.options_file_output.to_save" in settings["Default"]):
             self.options_file_output.to_save = st.convert_true_false_string_to_boolean(
                 settings["Default"]["plots.options_file_output.to_save"]
+            )
+        # We expect output_dir to be handled by other routines.
+        if ("Default" in settings) and ("plots.options_file_output.save_dpi" in settings["Default"]):
+            self.options_file_output.save_dpi = int(settings["Default"]["plots.options_file_output.save_dpi"])
+        if ("Default" in settings) and ("plots.options_file_output.save_format" in settings["Default"]):
+            self.options_file_output.save_format = str(settings["Default"]["plots.options_file_output.save_format"])
+        if ("Default" in settings) and ("plots.options_file_output.close_after_save" in settings["Default"]):
+            self.options_file_output.close_after_save = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_file_output.close_after_save"]
             )
         if ("Default" in settings) and ("plots.options_file_output.number_in_name" in settings["Default"]):
             self.options_file_output.number_in_name = st.convert_true_false_string_to_boolean(
                 settings["Default"]["plots.options_file_output.number_in_name"]
             )
+        # We expect file_prefix to be handled by other routines.
 
         # Slope plot control.
-        if ("Default" in settings) and ("plots.options_slope_vis.clim" in settings["Default"]):
-            self.options_slope_vis.clim = float(settings["Default"]["plots.options_slope_vis.clim"])
+        # This should be kept in synch with class _OptionsSlopeVis above.
         if ("Default" in settings) and ("plots.options_slope_vis.resolution" in settings["Default"]):
             self.options_slope_vis.resolution = float(settings["Default"]["plots.options_slope_vis.resolution"])
+        if ("Default" in settings) and ("plots.options_slope_vis.clim" in settings["Default"]):
+            self.options_slope_vis.clim = float(settings["Default"]["plots.options_slope_vis.clim"])
+        if ("Default" in settings) and ("plots.options_slope_vis.quiver_density" in settings["Default"]):
+            self.options_slope_vis.quiver_density = float(settings["Default"]["plots.options_slope_vis.quiver_density"])
+        if ("Default" in settings) and ("plots.options_slope_vis.quiver_scale" in settings["Default"]):
+            self.options_slope_vis.quiver_scale = float(settings["Default"]["plots.options_slope_vis.quiver_scale"])
+        if ("Default" in settings) and ("plots.options_slope_vis.quiver_color" in settings["Default"]):
+            self.options_slope_vis.quiver_color = str(settings["Default"]["plots.options_slope_vis.quiver_color"])
+        if ("Default" in settings) and ("plots.options_slope_vis.to_plot" in settings["Default"]):
+            self.options_slope_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_slope_vis.to_plot"]
+            )
 
         # Slope deviation plot control.
-        if ("Default" in settings) and ("plots.options_slope_deviation_vis.clim" in settings["Default"]):
-            self.options_slope_deviation_vis.clim = float(settings["Default"]["plots.options_slope_deviation_vis.clim"])
+        # This should be kept in synch with class _OptionsSlopeDeviationVis above.
         if ("Default" in settings) and ("plots.options_slope_deviation_vis.resolution" in settings["Default"]):
             self.options_slope_deviation_vis.resolution = float(
                 settings["Default"]["plots.options_slope_deviation_vis.resolution"]
             )
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.clim" in settings["Default"]):
+            self.options_slope_deviation_vis.clim = float(settings["Default"]["plots.options_slope_deviation_vis.clim"])
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.quiver_density" in settings["Default"]):
+            self.options_slope_deviation_vis.quiver_density = float(
+                settings["Default"]["plots.options_slope_deviation_vis.quiver_density"]
+            )
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.quiver_scale" in settings["Default"]):
+            self.options_slope_deviation_vis.quiver_scale = float(
+                settings["Default"]["plots.options_slope_deviation_vis.quiver_scale"]
+            )
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.quiver_color" in settings["Default"]):
+            self.options_slope_deviation_vis.quiver_color = settings["Default"][
+                "plots.options_slope_deviation_vis.quiver_color"
+            ]
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.to_plot" in settings["Default"]):
+            self.options_slope_deviation_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_slope_deviation_vis.to_plot"]
+            )
 
         # Curvature plot control.
+        # This should be kept in synch with class _OptionsCurvatureVis above.
         if ("Default" in settings) and ("plots.options_curvature_vis.resolution" in settings["Default"]):
             self.options_curvature_vis.resolution = float(settings["Default"]["plots.options_curvature_vis.resolution"])
+        if ("Default" in settings) and ("plots.options_curvature_vis.clim" in settings["Default"]):
+            self.options_curvature_vis.clim = float(settings["Default"]["plots.options_curvature_vis.clim"])
+        processing = []
+        processing_options = [
+            "log",
+            "smooth",
+        ]  # See VisualizeOrthorectifiedSlopeAbstract.py, routine plot_orthorectified_curvature().
+        if ("Default" in settings) and ("plots.options_curvature_vis.processing_1" in settings["Default"]):
+            processing_1 = settings["Default"]["plots.options_curvature_vis.processing_1"]
+            if processing_1 in processing_options:
+                processing.append(processing_1)
+            elif processing_1 == "None":
+                pass
+            else:
+                lt.error_and_raise(
+                    ValueError, f'Curvature procesing option "{processing_1}" is not one of {processing_options}.'
+                )
+        if ("Default" in settings) and ("plots.options_curvature_vis.processing_2" in settings["Default"]):
+            processing_2 = settings["Default"]["plots.options_curvature_vis.processing_2"]
+            if processing_2 in processing_options:
+                processing.append(processing_2)
+            elif processing_2 == "None":
+                pass
+            else:
+                lt.error_and_raise(
+                    ValueError, f'Curvature procesing option "{processing_2}" is not one of {processing_options}.'
+                )
+        self.options_curvature_vis.processing = processing
+        if ("Default" in settings) and ("plots.options_curvature_vis.smooth_kernel_width" in settings["Default"]):
+            self.options_curvature_vis.smooth_kernel_width = float(
+                settings["Default"]["plots.options_curvature_vis.smooth_kernel_width"]
+            )
+        if ("Default" in settings) and ("plots.options_curvature_vis.to_plot" in settings["Default"]):
+            self.options_curvature_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_curvature_vis.to_plot"]
+            )
 
         # Ray trace control.
+        # This should be kept in synch with class _OptionsRayTraceVis above.
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.ray_trace_optic_res" in settings["Default"]):
+            self.options_ray_trace_vis.ray_trace_optic_res = float(
+                settings["Default"]["plots.options_ray_trace_vis.ray_trace_optic_res"]
+            )
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.hist_bin_res" in settings["Default"]):
+            self.options_ray_trace_vis.hist_bin_res = float(
+                settings["Default"]["plots.options_ray_trace_vis.hist_bin_res"]
+            )
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.hist_extent" in settings["Default"]):
+            self.options_ray_trace_vis.hist_extent = float(
+                settings["Default"]["plots.options_ray_trace_vis.hist_extent"]
+            )
+        if ("Default" in settings) and (
+            "plots.options_ray_trace_vis.enclosed_energy_max_semi_width" in settings["Default"]
+        ):
+            self.options_ray_trace_vis.enclosed_energy_max_semi_width = float(
+                settings["Default"]["plots.options_ray_trace_vis.enclosed_energy_max_semi_width"]
+            )
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.to_plot" in settings["Default"]):
+            self.options_ray_trace_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_ray_trace_vis.to_plot"]
+            )
+
+        # Ray trace parameters.
+        # This should be kept in synch with class _RayTraceParameters above.
         # Light source.
         if (
             ("Default" in settings)
@@ -259,13 +361,6 @@ class StandardPlotOutput:
             v_target_normal_y = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_y"])
             v_target_normal_z = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_z"])
             self.params_ray_trace.v_target_normal = Vxyz((v_target_normal_x, v_target_normal_y, v_target_normal_z))
-        # Enclosed energy plot semi-width.
-        if ("Default" in settings) and (
-            "plots.options_ray_trace_vis.enclosed_energy_max_semi_width" in settings["Default"]
-        ):
-            self.options_ray_trace_vis.enclosed_energy_max_semi_width = float(
-                settings["Default"]["plots.options_ray_trace_vis.enclosed_energy_max_semi_width"]
-            )
 
     def plot(self):
         """Creates standard output plot suite"""
@@ -338,7 +433,9 @@ class StandardPlotOutput:
             elif len(value) in [0, 1]:
                 return [value] * 3
             else:
-                lt.error_and_raise(ValueError, f'Plot option must be length 3 or 1, not length {len(value):d}')
+                lt.error_and_raise(
+                    ValueError, f'Plot option "{value}" must be length 3 or 1, not length {len(value):d}'
+                )
         else:
             return [value] * 3
 
