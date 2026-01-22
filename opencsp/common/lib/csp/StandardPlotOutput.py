@@ -34,7 +34,7 @@ class _OptionsFileOutput:
     """To close figures after save. (default False)"""
     number_in_name: bool = True
     """To keep figure number in save name. (default True)"""
-    file_prefix: str = None
+    file_prefix: str = ''
     """String to prefix each output file, including separator"""
 
 
