@@ -17,6 +17,10 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
 
+# Mirror surface types
+PLANO = "plano"
+SYMMETRIC_PARABOLOID = "symmetric_paraboloid"
+
 
 class MirrorParametric(MirrorAbstract):
     """

@@ -44,9 +44,10 @@ from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
+from opencsp.common.lib.csp.MirrorParametric import MirrorParametric, PLANO, SYMMETRIC_PARABOLOID
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
+from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
@@ -57,15 +58,27 @@ import opencsp.common.lib.tool.string_tools as st
 
 def process_single_facet(
     verbose: bool,
+    # Input data
     file_camera: str,
     file_display: str,
     file_orientation: str,
     file_facet: str,
     file_calibration: str,
     file_measurement: str,
+    # Output file control
     dir_save: str,
     measurement_id: str,
     post_process_id: str,
+    # Analysis control
+    fit_initial_focal_length_x: float,
+    fit_initial_focal_length_y: float,
+    fit_robust_least_squares: bool,
+    fit_downsample: int,
+    # Reference mirror surface
+    reference_mirror_surface_type: str,
+    reference_mirror_focal_length: float,
+    # Output rendering control
+    output_fringe_images: bool,
     plots: StandardPlotOutput,
 ):
     """Performs processing of previously collected SOFAST data of single facet mirror.
@@ -94,38 +107,43 @@ def process_single_facet(
     calibration = ImageCalibrationScaling.load_from_hdf(file_calibration)
     facet_data = DefinitionFacet.load_from_json(file_facet)
 
-    # 2. Save projected sinusoidal fringe images to PNG format
-    # ========================================================
-    fringes = Fringes(measurement.fringe_periods_x, measurement.fringe_periods_y)
-    images = fringes.get_frames(640, 320, "uint8", [0, 255])  # writes images we projected from sofast projector to disk
-    dir_save_cur = join(dir_save, "B1_projected_fringes")
-    ft.create_directories_if_necessary(dir_save_cur)
-    # Save y images
-    for idx_image in range(measurement.num_y_ims):
-        image = images[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
-    # Save x images
-    for idx_image in range(measurement.num_x_ims):
-        image = images[..., measurement.num_y_ims + idx_image]
-        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
+    if not output_fringe_images:
+        lt.info("Fringe image output turned off; skipping output of projected and captured fringe images.")
+    else:
+        # 2. Save projected sinusoidal fringe images to PNG format
+        # ========================================================
+        fringes = Fringes(measurement.fringe_periods_x, measurement.fringe_periods_y)
+        images = fringes.get_frames(
+            640, 320, "uint8", [0, 255]
+        )  # writes images we projected from sofast projector to disk
+        dir_save_cur = join(dir_save, "B1_projected_fringes")
+        ft.create_directories_if_necessary(dir_save_cur)
+        # Save y images
+        for idx_image in range(measurement.num_y_ims):
+            image = images[..., idx_image]
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
+        # Save x images
+        for idx_image in range(measurement.num_x_ims):
+            image = images[..., measurement.num_y_ims + idx_image]
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
 
-    # 3. Save captured sinusoidal fringe images and mask images to PNG format
-    # =======================================================================
-    dir_save_cur = join(dir_save, "B2_captured_fringes")
-    ft.create_directories_if_necessary(dir_save_cur)
+        # 3. Save captured sinusoidal fringe images and mask images to PNG format
+        # =======================================================================
+        dir_save_cur = join(dir_save, "B2_captured_fringes")
+        ft.create_directories_if_necessary(dir_save_cur)
 
-    # Save mask (like a pixel mask value (all 0s, all 255s)) images
-    for idx_image in [0, 1]:
-        image = measurement.mask_images[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"mask_{idx_image:02d}.png"), image)
-    # Save y images (when lines were vertical, e.g.)
-    for idx_image in range(measurement.num_y_ims):
-        image = measurement.fringe_images_y[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
-    # Save x images (when lines were horizontal, e.g.)
-    for idx_image in range(measurement.num_x_ims):
-        image = measurement.fringe_images_x[..., idx_image]
-        imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
+        # Save mask (like a pixel mask value (all 0s, all 255s)) images
+        for idx_image in [0, 1]:
+            image = measurement.mask_images[..., idx_image]
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"mask_{idx_image:02d}.png"), image)
+        # Save y images (when lines were vertical, e.g.)
+        for idx_image in range(measurement.num_y_ims):
+            image = measurement.fringe_images_y[..., idx_image]
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
+        # Save x images (when lines were horizontal, e.g.)
+        for idx_image in range(measurement.num_x_ims):
+            image = measurement.fringe_images_x[..., idx_image]
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
 
     # 4. Processes data with Sofast and save processed data to HDF5
     # =============================================================
@@ -133,7 +151,20 @@ def process_single_facet(
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Define surface definition (parabolic surface), this is the mirror
-    surface = Surface2DParabolic(initial_focal_lengths_xy=(300.0, 300.0), robust_least_squares=True, downsample=10)
+    if reference_mirror_surface_type == SYMMETRIC_PARABOLOID:
+        fit_surface = Surface2DParabolic(
+            initial_focal_lengths_xy=(fit_initial_focal_length_x, fit_initial_focal_length_y),
+            robust_least_squares=fit_robust_least_squares,
+            downsample=fit_downsample,
+        )
+    elif reference_mirror_surface_type == PLANO:
+        fit_surface = Surface2DPlano(robust_least_squares=fit_robust_least_squares, downsample=fit_downsample)
+    else:
+        lt.error_and_raise(
+            ValueError,
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{PLANO}", "{SYMMETRIC_PARABOLOID}"].',
+        )
+        fit_surface = None  # Eliminate Pylint error message.  Never executes.
 
     # Calibrate fringes - (aka sinosoidal image)
     measurement.calibrate_fringe_images(calibration)
@@ -142,7 +173,7 @@ def process_single_facet(
     sofast = Sofast(measurement, orientation, camera, display)
 
     # Process
-    sofast.process_optic_singlefacet(facet_data, surface)
+    sofast.process_optic_singlefacet(facet_data, fit_surface)
 
     # Get measurement statistics
     config = SofastConfiguration()
@@ -163,7 +194,18 @@ def process_single_facet(
 
     # Get measured and reference optics
     mirror_measured = sofast.get_optic().mirror.no_parent_copy()
-    mirror_reference = MirrorParametric.generate_symmetric_paraboloid(100, mirror_measured.region)
+    if reference_mirror_surface_type == SYMMETRIC_PARABOLOID:
+        mirror_reference = MirrorParametric.generate_symmetric_paraboloid(
+            reference_mirror_focal_length, mirror_measured.region
+        )
+    elif reference_mirror_surface_type == PLANO:
+        mirror_reference = MirrorParametric.generate_flat(mirror_measured.region)
+    else:
+        lt.error_and_raise(
+            ValueError,
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{PLANO}", "{SYMMETRIC_PARABOLOID}"].',
+        )
+        mirror_reference = None  # Eliminate Pylint error message.  Never executes.
 
     # Save optic objects and output destination
     plots.optic_measured = mirror_measured
@@ -216,6 +258,18 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         # Strings denoting computation.
         measurement_id = "Time_Mirror_InstrumentMode"
         post_process_id = "PostSpec"
+        # Analysis control
+        fit_initial_focal_length_x = 300.0
+        fit_initial_focal_length_y = 300.0
+        fit_robust_least_squares = True
+        fit_downsample = 10
+        # Reference mirror surface
+        reference_mirror_surface_type = (
+            "symmetric_paraboloid"  # Values from MirrorParametric.py: PLANO or SYMMETRIC_PARABOLOID
+        )
+        reference_mirror_focal_length = 100.0
+        # Output rendering control
+        output_fringe_images = True
         # Set plot control parameters to the values we want for the default example.
         plots.options_slope_vis.clim = 7
         plots.options_slope_vis.resolution = 0.001
@@ -225,12 +279,10 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         plots.options_ray_trace_vis.enclosed_energy_max_semi_width = 1
         plots.options_file_output.to_save = True
         plots.options_file_output.number_in_name = False
-
         # Define viewing/illumination geometry
         v_target_center = Vxyz((0, 0, 100))
         v_target_normal = Vxyz((0, 0, -1))
         source = LightSourceSun.from_given_sun_position(Uxyz((0, 0, -1)), resolution=40)
-
         # Define ray trace parameters
         plots.params_ray_trace.source = source
         plots.params_ray_trace.v_target_center = v_target_center
@@ -250,6 +302,9 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
             verbose = verbose_setting
         else:
             verbose = verbose_param
+        # Strings denoting computation
+        measurement_id = st.verify_contiguous(settings["Default"]["measurement_id"])
+        post_process_id = st.verify_contiguous(settings["Default"]["post_process_id"])
         # Input files
         file_camera = settings["Default"]["file_camera"]
         file_display = settings["Default"]["file_display"]
@@ -258,10 +313,26 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         file_calibration = settings["Default"]["file_calibration"]
         file_measurement = settings["Default"]["file_measurement"]
         # Define save dir
-        dir_save = settings["Default"]["dir_save"]
-        # Strings denoting computation
-        measurement_id = st.verify_contiguous(settings["Default"]["measurement_id"])
-        post_process_id = st.verify_contiguous(settings["Default"]["post_process_id"])
+        dir_save_root = settings["Default"]["dir_save_root"]
+        dir_save = dir_save_root + '_' + post_process_id
+        # Analysis control
+        fit_initial_focal_length_x = float(settings["Default"]["fit_initial_focal_length_x"])
+        fit_initial_focal_length_y = float(settings["Default"]["fit_initial_focal_length_y"])
+        fit_robust_least_squares = st.convert_true_false_string_to_boolean(
+            settings["Default"]["fit_robust_least_squares"]
+        )
+        fit_downsample = int(settings["Default"]["fit_downsample"])
+        # Reference mirror surface
+        reference_mirror_surface_type = str(settings["Default"]["reference_mirror_surface_type"])
+        if reference_mirror_surface_type == PLANO:
+            reference_mirror_focal_length = None
+        else:
+            reference_mirror_focal_length = float(settings["Default"]["reference_mirror_focal_length"])
+        # Output rendering control
+        if "output_fringe_images" in settings["Default"]:
+            output_fringe_images = st.convert_true_false_string_to_boolean(settings["Default"]["output_fringe_images"])
+        else:
+            output_fringe_images = True
         # Set plot control parameters
         plots.set_plot_control_from_settings(settings)
 
@@ -288,21 +359,43 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         lt.info('dir_save = ' + str(dir_save))
         lt.info('measurement_id = ' + str(measurement_id))
         lt.info('post_process_id = ' + str(post_process_id))
+        lt.info('dir_save = ' + str(dir_save))
+        lt.info('measurement_id = ' + str(measurement_id))
+        lt.info('post_process_id = ' + str(post_process_id))
+        lt.info('fit_initial_focal_length_x = ' + str(fit_initial_focal_length_x))
+        lt.info('fit_initial_focal_length_y = ' + str(fit_initial_focal_length_y))
+        lt.info('fit_robust_least_squares = ' + str(fit_robust_least_squares))
+        lt.info('fit_downsample = ' + str(fit_downsample))
+        lt.info('reference_mirror_surface_type = ' + str(reference_mirror_surface_type))
+        lt.info('reference_mirror_focal_length = ' + str(reference_mirror_focal_length))
+        lt.info('output_fringe_images = ' + str(output_fringe_images))
     if verbose:
         lt.info('Calling routine example_process_single_facet(...)...')
 
     # Process and output
     process_single_facet(
         verbose,
+        # Input data
         file_camera,
         file_display,
         file_orientation,
         file_facet,
         file_calibration,
         file_measurement,
+        # Output file control
         dir_save,
         measurement_id,
         post_process_id,
+        # Analysis control
+        fit_initial_focal_length_x,
+        fit_initial_focal_length_y,
+        fit_robust_least_squares,
+        fit_downsample,
+        # Reference mirror surface
+        reference_mirror_surface_type,
+        reference_mirror_focal_length,
+        # Output rendering control
+        output_fringe_images,
         plots,
     )
 
