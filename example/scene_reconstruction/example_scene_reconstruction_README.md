@@ -11,11 +11,11 @@ To run this as a pytest on the built-in input:
        or
           pytest scene_reconstruction\example_scene_reconstruction.py
 
-To run this on the default built-in input, omit the -s option:
+To run this on the default built-in input:
    1. cd to the directory containing the script "example_scene_reconstruction.py".
    2. Run the script:
               python example_scene_reconstruction.py --verbose
-       The "--verbose" flag is optional.'
+       The "--verbose" flag is optional.
 
 To run this on new input, use the -s option and point to a settings control file.
 For an example settings file, see:
