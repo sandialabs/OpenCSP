@@ -44,7 +44,7 @@ from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
-from opencsp.common.lib.csp.MirrorParametric import MirrorParametric, PLANO, SYMMETRIC_PARABOLOID
+from opencsp.common.lib.csp.MirrorParametric import MirrorParametric, SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, PLANO
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
@@ -76,7 +76,8 @@ def process_single_facet(
     fit_downsample: int,
     # Reference mirror surface
     reference_mirror_surface_type: str,
-    reference_mirror_focal_length: float,
+    reference_mirror_focal_length_x: float,
+    reference_mirror_focal_length_y: float,
     # Output rendering control
     output_fringe_images: bool,
     plots: StandardPlotOutput,
@@ -151,7 +152,9 @@ def process_single_facet(
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Define surface definition (parabolic surface), this is the mirror
-    if reference_mirror_surface_type == SYMMETRIC_PARABOLOID:
+    if (reference_mirror_surface_type == SYMMETRIC_PARABOLOID) or (
+        reference_mirror_surface_type == ASTIGMATIC_PARABOLOID
+    ):
         fit_surface = Surface2DParabolic(
             initial_focal_lengths_xy=(fit_initial_focal_length_x, fit_initial_focal_length_y),
             robust_least_squares=fit_robust_least_squares,
@@ -162,7 +165,7 @@ def process_single_facet(
     else:
         lt.error_and_raise(
             ValueError,
-            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{PLANO}", "{SYMMETRIC_PARABOLOID}"].',
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}", "{ASTIGMATIC_PARABOLOID}, "{PLANO}"].',
         )
         fit_surface = None  # Eliminate Pylint error message.  Never executes.
 
@@ -196,14 +199,18 @@ def process_single_facet(
     mirror_measured = sofast.get_optic().mirror.no_parent_copy()
     if reference_mirror_surface_type == SYMMETRIC_PARABOLOID:
         mirror_reference = MirrorParametric.generate_symmetric_paraboloid(
-            reference_mirror_focal_length, mirror_measured.region
+            reference_mirror_focal_length_x, mirror_measured.region
+        )
+    elif reference_mirror_surface_type == ASTIGMATIC_PARABOLOID:
+        mirror_reference = MirrorParametric.generate_astigmatic_xy_paraboloid(
+            reference_mirror_focal_length_x, reference_mirror_focal_length_y, mirror_measured.region
         )
     elif reference_mirror_surface_type == PLANO:
         mirror_reference = MirrorParametric.generate_flat(mirror_measured.region)
     else:
         lt.error_and_raise(
             ValueError,
-            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{PLANO}", "{SYMMETRIC_PARABOLOID}"].',
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}", "{ASTIGMATIC_PARABOLOID}, "{PLANO}"].',
         )
         mirror_reference = None  # Eliminate Pylint error message.  Never executes.
 
@@ -232,7 +239,7 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
     verbose : bool
         If true, output detailed progress and calculation output.
     """
-    # Setup plot control, whcih might have some values set from settings, if provided.
+    # Setup plot control, which might have some values set from settings, if provided.
     plots = StandardPlotOutput()
 
     # Get settings
@@ -264,10 +271,9 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         fit_robust_least_squares = True
         fit_downsample = 10
         # Reference mirror surface
-        reference_mirror_surface_type = (
-            "symmetric_paraboloid"  # Values from MirrorParametric.py: PLANO or SYMMETRIC_PARABOLOID
-        )
-        reference_mirror_focal_length = 100.0
+        reference_mirror_surface_type = SYMMETRIC_PARABOLOID  # Strings from MirrorParametric.py: SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, or PLANO
+        reference_mirror_focal_length_x = 100.0  # Ignored if plano
+        reference_mirror_focal_length_y = 100.0  # Ignored if plano or symmetric paraboloid
         # Output rendering control
         output_fringe_images = True
         # Set plot control parameters to the values we want for the default example.
@@ -325,9 +331,11 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         # Reference mirror surface
         reference_mirror_surface_type = str(settings["Default"]["reference_mirror_surface_type"])
         if reference_mirror_surface_type == PLANO:
-            reference_mirror_focal_length = None
+            reference_mirror_focal_length_x = None
+            reference_mirror_focal_length_y = None
         else:
-            reference_mirror_focal_length = float(settings["Default"]["reference_mirror_focal_length"])
+            reference_mirror_focal_length_x = st.float_or_none(settings["Default"]["reference_mirror_focal_length_x"])
+            reference_mirror_focal_length_y = st.float_or_none(settings["Default"]["reference_mirror_focal_length_y"])
         # Output rendering control
         if "output_fringe_images" in settings["Default"]:
             output_fringe_images = st.convert_true_false_string_to_boolean(settings["Default"]["output_fringe_images"])
@@ -367,7 +375,8 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         lt.info('fit_robust_least_squares = ' + str(fit_robust_least_squares))
         lt.info('fit_downsample = ' + str(fit_downsample))
         lt.info('reference_mirror_surface_type = ' + str(reference_mirror_surface_type))
-        lt.info('reference_mirror_focal_length = ' + str(reference_mirror_focal_length))
+        lt.info('reference_mirror_focal_length_x = ' + str(reference_mirror_focal_length_x))
+        lt.info('reference_mirror_focal_length_y = ' + str(reference_mirror_focal_length_y))
         lt.info('output_fringe_images = ' + str(output_fringe_images))
     if verbose:
         lt.info('Calling routine example_process_single_facet(...)...')
@@ -393,7 +402,8 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         fit_downsample,
         # Reference mirror surface
         reference_mirror_surface_type,
-        reference_mirror_focal_length,
+        reference_mirror_focal_length_x,
+        reference_mirror_focal_length_y,
         # Output rendering control
         output_fringe_images,
         plots,

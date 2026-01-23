@@ -4,6 +4,8 @@ Example SOFAST data processing for a single facet measurement.
 Given a stored measurement file from a SOFAST data acquisition, process the file to 
 construct a slope map and generate the standard plot output suite.
 
+This file can be run in several different modes, explained below.
+
 Run Pytest
 ----------
 
@@ -14,6 +16,7 @@ To run this as a pytest on the built-in input:
           pytest
        or
           pytest sofast_fringe\single_facet\example_process_single_facet.py
+
 
 Default Run on Built-In Data
 ----------------------------
@@ -31,17 +34,41 @@ the repository, this input data has been downsampled to reduce its size.
 Run on Other Data
 -----------------
 
-To run this on new input, use the -s option and point to a settings control file.
-For an example settings file designed for exploration, see:
+The built-in data described above enables automatic testing to verify code execution, 
+but the data is heavily downsampled and thus not representative of realistic output.
+Also the built-in input and output files are in obscure locations that don't correspond 
+to how one would organize data when using SOFAST in practice.
+
+The example_process_single_facet.py file provides a -s option that points to a settings 
+control file.  This text file is easy to edit, and enables you to point to your preferred 
+location of input data, and also direct output to your preferred location.  You can also 
+control program execution and output simply by editing the settings file.  This avoids 
+the need to modify source code simply to run a new problem (which is highly discouraged).
+
+You can easily create a settings file for your data, with your run preferences, 
+and then execute it without modifying the example_process_single_facet.py file or 
+other code.
+
+To see example settings files, see:
 
     <OpenCSP_code_dir>\example\sofast_fringe\single_facet\
 
 There are several files there with a ".ini" extension, which execute the code in 
-different scenarios.
+different scenarios.  These scenarios include information exploration on your local 
+computer, or more organized measurement campaigns either on your local computer 
+or in a network server environment.
+
+OpenCSP provides full-size example data which can be used for both of these scenarios, 
+enabling you to learn how the code should run and what its output should look like.  
+This experience will give you familiarity with the process when you run the code on 
+your own measurement data.  Below we explain how to use these settings and example 
+data files for both informal exploration and a more structured measurement campaign.
 
 
-Local Exploration Using OpenCSP Example Data
---------------------------------------------
+Local Exploration
+-----------------
+
+For an example settings file designed for exploration, see:
 
 <?? PUT Ctemp SCENARIO EXPLANATION HERE ??>
 
@@ -70,12 +97,12 @@ see the variation files:
 
     dir:   <OpenCSP_code_dir>\example\sofast_fringe\single_facet\
     file:  20250818_163443_SNLTF-A_OLSLrsqw_p002_fast_process_single_facet_settings_Q.ini
-    file:  
-    file:  
+    file:  20250818_163443_SNLTF-A_OLSLrsqw_p003_ref_25m_process_single_facet_settings_Q.ini
+    file:  20250818_163443_SNLTF-A_OLSLrsqw_p004_ref_plano_process_single_facet_settings_Q.ini
 
-Note that these files have a different "_p00x_xx_" substring, which is the post_process_id denoting 
-a particular set of processing and output settings.  This provides a means for running the code 
-under different settings, adn then comparing the results.
+Note that these files each have a different "_p00x_xx_" substring, which is the "post_process_id"
+denoting a particular set of processing and output settings.  This provides a means for running 
+the code under different settings, and then comparing the results.
 
 Also note that the files have a "Q" suffix, indicating that they assume a mapped drive "Q:".  
 This enables you to put the input and output data in your preferred location, map the Q: drive 
