@@ -332,9 +332,13 @@ class ViewCrossSectionImageProcessor(AbstractVisualizationImageProcessor):
 
         # Draw the image w/ cross section line overlays
         i_view = self.views[0]
-        i_view.draw_image(base_image, (0, 0), (cropped_width, cropped_height))
-        i_view.draw_pq_list([(cs_cropped_x, 0), (cs_cropped_x, cropped_height)], style=vstyle)
-        i_view.draw_pq_list([(0, cs_cropped_y_mlab), (cropped_width, cs_cropped_y_mlab)], style=hstyle)
+        tc = lambda x, y: operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple()
+        img_xy, img_xy2 = tc(0, 0), tc(cropped_width, cropped_height)
+        i_view.draw_image(
+            base_image.nparray, img_xy, (img_xy2[0] - img_xy[0], img_xy2[1] - img_xy[1]), invert_ylim=True
+        )
+        i_view.draw_pq_list([tc(cs_cropped_x, 0), tc(cs_cropped_x, cropped_height)], style=vstyle)
+        i_view.draw_pq_list([tc(0, cs_cropped_y), tc(cropped_width, cs_cropped_y)], style=hstyle)
 
         # Draw the cross sections for the no-sun image.
         # Draw the cross sections for the primary image using the same axes.
