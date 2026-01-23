@@ -1,3 +1,4 @@
+from typing import TYPE_CHECKING
 import matplotlib.patches
 import numpy as np
 import scipy.spatial.transform
@@ -9,6 +10,10 @@ import opencsp.common.lib.geometry.Vxy as v2
 
 import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlSpotSize as rcss
+
+if TYPE_CHECKING:
+    # don't import at runtime in order to avoid cyclic dependencies
+    from opencsp.common.lib.cv.spot_analysis.SpotAnalysisOperable import SpotAnalysisOperable
 
 
 class SpotWidthAnnotation(AbstractAnnotations):
@@ -94,7 +99,13 @@ class SpotWidthAnnotation(AbstractAnnotations):
     def size(self) -> list[float]:
         raise NotImplementedError
 
-    def render_to_figure(self, fig: rcfr.RenderControlFigureRecord, image: np.ndarray, include_label=False):
+    def render_to_figure(
+        self,
+        fig: rcfr.RenderControlFigureRecord,
+        image: np.ndarray,
+        include_label=False,
+        operable: "SpotAnalysisOperable" = None,
+    ):
         label = self.get_label(include_label)
 
         # draw the full-width boundary
@@ -109,8 +120,11 @@ class SpotWidthAnnotation(AbstractAnnotations):
             }
             label = None
             if self.spot_width_technique == "fwhm":
+                center = self.long_axis_center
+                if operable is not None:
+                    center = operable.transform_coordinates(center)[1]
                 ellipse = matplotlib.patches.Ellipse(
-                    xy=self.long_axis_center.astuple(),
+                    xy=center.astuple(),
                     width=self.width,
                     height=self.orthogonal_axis_width,
                     angle=np.rad2deg(self.long_axis_rotation),
@@ -118,8 +132,11 @@ class SpotWidthAnnotation(AbstractAnnotations):
                 )
                 fig.view.axis.add_patch(ellipse)
             else:
+                center = self.centroid_loc
+                if operable is not None:
+                    center = operable.transform_coordinates(center)[1]
                 ellipse = matplotlib.patches.Ellipse(
-                    xy=self.centroid_loc.astuple(), width=self.width, height=self.width, **style_params
+                    xy=center.astuple(), width=self.width, height=self.width, **style_params
                 )
                 fig.view.axis.add_patch(ellipse)
 
@@ -129,10 +146,15 @@ class SpotWidthAnnotation(AbstractAnnotations):
             for loop in bbox.loops:
                 loop_verts = list(zip(loop.vertices.x, loop.vertices.y))
                 loop_verts = [(int(x), int(y)) for x, y in loop_verts]
+                if operable is not None:
+                    loop_verts = [operable.transform_coordinates(p2.Pxy((x, y)))[1].astuple() for x, y in loop_verts]
                 fig.view.draw_pq_list(loop_verts, close=True, style=self.style.bounding_box_style, label=label)
                 label = None
 
         # draw the centroid
         if self.style.center_style != "None":
-            fig.view.draw_pq(self.centroid_loc.data, self.style.center_style, label=label)
+            xy = self.centroid_loc
+            if operable is not None:
+                xy = operable.transform_coordinates(xy)[1]
+            fig.view.draw_pq(xy.data, self.style.center_style, label=label)
             label = None
