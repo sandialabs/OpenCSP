@@ -45,6 +45,7 @@ from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric, SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, PLANO
+from opencsp.common.lib.csp.MirrorPoint import NEAREST_INTERPOLATION
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
@@ -74,6 +75,8 @@ def process_single_facet(
     fit_initial_focal_length_y: float,
     fit_robust_least_squares: bool,
     fit_downsample: int,
+    # Measured mirror surface
+    measured_interpolation_type: str,
     # Reference mirror surface
     reference_mirror_surface_type: str,
     reference_mirror_focal_length_x: float,
@@ -196,7 +199,9 @@ def process_single_facet(
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Get measured and reference optics
-    mirror_measured = sofast.get_optic().mirror.no_parent_copy()
+    # Measured mirror
+    mirror_measured = sofast.get_optic(measured_interpolation_type).mirror.no_parent_copy()
+    # Reference mirror
     if reference_mirror_surface_type == SYMMETRIC_PARABOLOID:
         mirror_reference = MirrorParametric.generate_symmetric_paraboloid(
             reference_mirror_focal_length_x, mirror_measured.region
@@ -270,6 +275,9 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         fit_initial_focal_length_y = 300.0
         fit_robust_least_squares = True
         fit_downsample = 10
+        # Measured mirror surface
+        measured_interpolation_type = NEAREST_INTERPOLATION  # Strings from MirrorPoint.py: GIVEN_INTERPOLATION, BILINEAR_INTERPOLATION, CLOUGH_TOCHER_INTERPOLATION, or NEAREST_INTERPOLATION
+
         # Reference mirror surface
         reference_mirror_surface_type = SYMMETRIC_PARABOLOID  # Strings from MirrorParametric.py: SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, or PLANO
         reference_mirror_focal_length_x = 100.0  # Ignored if plano
@@ -328,6 +336,8 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
             settings["Default"]["fit_robust_least_squares"]
         )
         fit_downsample = int(settings["Default"]["fit_downsample"])
+        # Measured mirror surface
+        measured_interpolation_type = str(settings["Default"]["measured_interpolation_type"])
         # Reference mirror surface
         reference_mirror_surface_type = str(settings["Default"]["reference_mirror_surface_type"])
         if reference_mirror_surface_type == PLANO:
@@ -374,6 +384,7 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         lt.info('fit_initial_focal_length_y = ' + str(fit_initial_focal_length_y))
         lt.info('fit_robust_least_squares = ' + str(fit_robust_least_squares))
         lt.info('fit_downsample = ' + str(fit_downsample))
+        lt.info('measured_interpolation_type = ' + str(measured_interpolation_type))
         lt.info('reference_mirror_surface_type = ' + str(reference_mirror_surface_type))
         lt.info('reference_mirror_focal_length_x = ' + str(reference_mirror_focal_length_x))
         lt.info('reference_mirror_focal_length_y = ' + str(reference_mirror_focal_length_y))
@@ -400,6 +411,8 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         fit_initial_focal_length_y,
         fit_robust_least_squares,
         fit_downsample,
+        # Measured mirror surface
+        measured_interpolation_type,
         # Reference mirror surface
         reference_mirror_surface_type,
         reference_mirror_focal_length_x,
