@@ -1,6 +1,8 @@
-"""Module for processing and analyzing SOFAST data for a single facet mirror.
+"""
+Module for processing and analyzing SOFAST data for a single facet mirror.
 
 This script performs the following steps:
+
 1. Load saved single facet SOFAST collection data from an HDF5 file.
 2. Save projected sinusoidal fringe images to PNG format.
 3. Save captured sinusoidal fringe images and mask images to PNG format.
@@ -13,17 +15,15 @@ To run the script, simply execute it as a standalone program:
 
 >>> python example_process_single_facet.py
 
-This will perform the processing steps and save the results to the data/output/single_facet directory
+This will perform the processing steps and save the results to the `data/output/single_facet` directory
 with the following subfolders:
-1_images_fringes_projected - The patterns sent to the display during the SOFAST measurement of the optic.
-2_images_captured - The captured images of the displayed patterns as seen by the SOFAST camera
-3_processed_data - The processed data from SOFAST.
-4_processed_output_figures - The output figure suite from a SOFAST characterization.
 
-Notes
------
-- The script assumes that the input data files are located in the specified directories.
-- Chat GPT 40 assisted with the generation of some docstrings in this file.
+1. **1_images_fringes_projected** - The patterns sent to the display during the SOFAST measurement of the optic.
+2. **2_images_captured** - The captured images of the displayed patterns as seen by the SOFAST camera.
+3. **3_processed_data** - The processed data from SOFAST.
+4. **4_processed_output_figures** - The output figure suite from a SOFAST characterization.
+
+
 """
 
 import json
@@ -238,7 +238,7 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
 
     arg_settings_dir_body_ext : str
         Full path and filename for settings file, containing inputand output directories, plot control settings, etc.
-         Optional.  If not provided, internal defaults are used.
+        Optional.  If not provided, internal defaults are used.
         See code for options sought within file.
 
     verbose : bool

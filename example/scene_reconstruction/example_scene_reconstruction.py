@@ -33,21 +33,27 @@ Supports these use cases:
 
    b. With an argument to read a user-specified settings file to define input sources, output locations, and execution details.
       i. Data source/sink options:
-         (1) Data built into the repository.  No argument.
+
+         (1) Data built into the repository. No argument.
              In OpenCSP\example\scene_reconstruction directory:
              python .\example_scene_reconstruction.py
-         (2) Community data on local machine.  myfile_ctemp.ini
+
+         (2) Community data on local machine. myfile_ctemp.ini
              In OpenCSP\example\scene_reconstruction directory:
              python .\example_scene_reconstruction.py --settings_dir_body_ext "C:\ctemp\OpenCSP_ctemp\example_scene_reconstruction_settings_ctemp.ini"
-         (3) Data on local machine, but in user-owned location.  myfile_<user_id>.ini
+
+         (3) Data on local machine, but in user-owned location. myfile_<user_id>.ini
              In OpenCSP\example\scene_reconstruction directory:
              python .\example_scene_reconstruction.py --settings_dir_body_ext "C:\Users\<user_id>\OpenCSP\OpenCSP_<user_id>\example_scene_reconstruction_settings_<user_id>.ini"
-         (4) General network location.  myfile_<network_location>.ini
+
+         (4) General network location. myfile_<network_location>.ini
              In OpenCSP\example\scene_reconstruction directory:
              python .\example_scene_reconstruction.py --settings_dir_body_ext "\\<network_path>\OpenCSP_<net_name>\example_scene_reconstruction_settings_<net_name>.ini"
+
       ii. Output levels:
-         (1) Output only minimal progress updates.  Omit --verbose flag.
-         (2) Output full progress and calculation updates.  Add --verbose flag.
+
+         (1) Output only minimal progress updates. Omit --verbose flag.
+         (2) Output full progress and calculation updates. Add --verbose flag.
 
    c. Review command-line options:
       In OpenCSP\example\scene_reconstruction directory:
@@ -165,7 +171,7 @@ def example_scene_reconstruction_driver(arg_settings_dir_body_ext: str = None, v
 
     arg_settings_dir_body_ext : str
         Full path and filename for settings file, containing inputand output directories, plot control settings, etc.
-         Optional.  If not provided, internal defaults are used.
+        Optional.  If not provided, internal defaults are used.
         See code for options sought within file.
 
     verbose : bool
