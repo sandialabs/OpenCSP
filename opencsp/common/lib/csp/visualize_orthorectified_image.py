@@ -79,5 +79,6 @@ def plot_orthorectified_image(
     """
     plt_im = axis.imshow(image, cmap, origin="lower", extent=extent)
     plt_im.set_clim(clims)
+    axis.set_aspect('equal')
     plt_cmap = plt.colorbar(plt_im, ax=axis)
     plt_cmap.ax.set_ylabel(cmap_title, rotation=270, labelpad=15)

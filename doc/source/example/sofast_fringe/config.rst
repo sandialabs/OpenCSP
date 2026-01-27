@@ -1,9 +1,9 @@
 Single Facet Data Process
 =========================
 
-.. currentmodule:: example.sofast_fringe.example_process_single_facet
+.. currentmodule:: example.sofast_fringe.single_facet.example_process_single_facet
 
-.. automodule:: example.sofast_fringe.example_process_single_facet
+.. automodule:: example.sofast_fringe.single_facet.example_process_single_facet
    :members:
    :show-inheritance:
 

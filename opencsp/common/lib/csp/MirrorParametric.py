@@ -17,6 +17,11 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
 
+# Mirror surface types
+SYMMETRIC_PARABOLOID = "symmetric_paraboloid"
+ASTIGMATIC_PARABOLOID = "astigmatic_paraboloid"
+PLANO = "plano"
+
 
 class MirrorParametric(MirrorAbstract):
     """
@@ -141,6 +146,35 @@ class MirrorParametric(MirrorAbstract):
 
         def surface_function(x, y):
             return a * (x**2 + y**2)
+
+        return cls(surface_function, shape)
+
+    @classmethod
+    def generate_astigmatic_xy_paraboloid(
+        cls, focal_length_x: float, focal_length_y: float, shape: RegionXY
+    ) -> "MirrorParametric":
+        """Generate an astigmatic parabolic mirror with the given focal lengths in x and y.
+        Rotation of astigmatism is axis-aligned with the x and y axes.
+
+        Parameters
+        ----------
+        focal_length_x : float
+            Focal length in x direction
+        focal_length_y : float
+            Focal length in y direction
+        shape : RegionXY
+            Mirror top-down region.
+
+        Returns
+        -------
+        MirrorParametric
+        """
+        # Create surface function
+        a = 1.0 / (4 * focal_length_x)
+        b = 1.0 / (4 * focal_length_y)
+
+        def surface_function(x, y):
+            return (a * (x**2)) + (b * (y**2))
 
         return cls(surface_function, shape)
 
