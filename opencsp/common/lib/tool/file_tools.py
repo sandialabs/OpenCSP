@@ -582,7 +582,7 @@ def delete_files_in_directory(input_dir: str, globexp: str, error_on_dir_not_exi
 
 def create_directories_if_necessary(input_dir):
     """
-    Ensures that the given directory existins, along with all of its parents.
+    Ensures that the given directory exists, along with all of its parents.
     """
     # Check input.
     if os.path.isfile(input_dir):
