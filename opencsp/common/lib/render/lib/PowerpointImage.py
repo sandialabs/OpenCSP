@@ -1,5 +1,6 @@
 from PIL import Image
 import numpy as np
+import os
 import time
 
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
@@ -29,9 +30,6 @@ class PowerpointImage(pps.PowerpointShape):
     """
 
     _tmp_save_path = ft.join(orp.opencsp_temporary_dir(), "PowerpointImage/images/tmp")
-    # _tmp_save_path = ft.join(
-    # "C:/ctemp", "OpenCSP_example_data/target_identification/HeliostatsSpotSize/3_Process/PowerPointFigures"
-    # )
 
     def __init__(
         self,
@@ -42,6 +40,7 @@ class PowerpointImage(pps.PowerpointShape):
         caption: str = None,
         stretch=False,
         parent_slide=None,
+        persistent_save_path=None,
     ):
         """
         Parameters
@@ -96,6 +95,8 @@ class PowerpointImage(pps.PowerpointShape):
         self.parent_slide: pps.PowerpointSlide = parent_slide
 
         self._tmp_save_path = self.__class__._tmp_save_path
+
+        self.persistent_save_path = persistent_save_path
 
         self.set_val(val)
 
@@ -379,7 +380,8 @@ class PowerpointImage(pps.PowerpointShape):
             The path to the text file containing metadata for the saved image.
         """
         # ChatGPT 4o-mini assisted with generating this doc string
-        return self.get_saved_path() + ".txt"
+        saved_path_body, ext = os.path.splitext(self.get_saved_path())
+        return saved_path_body + ".txt"
 
     def is_saved_to_file(self):
         """Check if the image has been saved to a file.
@@ -439,7 +441,7 @@ class PowerpointImage(pps.PowerpointShape):
             pil_val.save(path_name_ext)
 
         elif isinstance(self._val, rcfr.RenderControlFigureRecord):
-            # Figure records add extra stuffs to the image names. Save them to
+            # Figure records add extra stuff to the image names. Save them to
             # a temporary file and then move to our desired location.
             rec_val: rcfr.RenderControlFigureRecord = self._val
             format = ext.lstrip(".")
@@ -473,7 +475,10 @@ class PowerpointImage(pps.PowerpointShape):
         return path, ft.body_ext_given_file_dir_body_ext(path_name_ext)
 
     def _to_txt_file(self):
-        """Serializes the non-image values of this instance to a file alongside the saved image file."""
+        """
+        Serializes the non-image values of this instance to a file alongside the saved image file.
+        Returns output text file path.
+        """
         image_name_ext = None
         if self.has_val():
             image_name_ext = ft.body_ext_given_file_dir_body_ext(self.get_saved_path())
@@ -494,6 +499,8 @@ class PowerpointImage(pps.PowerpointShape):
                 self.stretch,
             ]:
                 fout.write(f"{v}\n")
+
+        return path_name_ext
 
     @classmethod
     def from_txt_file(cls, path_name_ext: str):
@@ -640,7 +647,7 @@ class PowerpointImage(pps.PowerpointShape):
         found_unused_name = False
         for tmp_slide_idx in slide_idx_range:
             max_img_idx = (
-                20  # probably shouldn't need more than 20 images in a slide, TODO, marked, revisit 20 image limit
+                40  # probably shouldn't need more than 40 images in a slide, TODO, marked, revisit 40 image limit
             )
             dir_name_ext_pattern = self._get_save_dir_name_ext_pattern(tmp_slide_idx)
             max_image_path_name_ext = dir_name_ext_pattern % (max_img_idx - 1)
@@ -658,7 +665,7 @@ class PowerpointImage(pps.PowerpointShape):
                 RuntimeError,
                 "Failed to find an empty spot to save this image to. Try using PowerpointImage.clear_tmp_save_all() to make more room.",
             )
-        lt.info(f"saving image to {image_path_name_ext}")
+        lt.info(f"Saving temporary image to:     {image_path_name_ext}")
 
         # save the image
         # saved_path, body_ext = self._save(image_path_name_ext) # jhs commented out
@@ -666,7 +673,7 @@ class PowerpointImage(pps.PowerpointShape):
         if saved_path != self._tmp_save_path:
             lt.error_and_raise(
                 RuntimeError,
-                f"Error: in PowerpointImage.save(): programmer error, "
+                'Error: in PowerpointImage.save(): programmer error, '
                 + f'should have saved the temporary image to "{self._tmp_save_path}"'
                 + f'but instead saved it to "{saved_path}"!',
             )
@@ -674,7 +681,19 @@ class PowerpointImage(pps.PowerpointShape):
         self._test_saved_path()
 
         # save the serialization values for this class
-        self._to_txt_file()
+        text_path_name_ext = self._to_txt_file()
+
+        # Keep persistent copy if desired.
+        if self.persistent_save_path is not None:
+            ft.create_directories_if_necessary(self.persistent_save_path)
+            image_body_ext = ft.body_ext_given_file_dir_body_ext(image_path_name_ext)
+            text_body_ext = ft.body_ext_given_file_dir_body_ext(text_path_name_ext)
+            persistent_image_path_body_ext = ft.join(self.persistent_save_path, image_body_ext)
+            persistent_text_path_body_ext = ft.join(self.persistent_save_path, text_body_ext)
+            lt.info("Saving persistent image to:   ", persistent_image_path_body_ext)
+            ft.copy_file(image_path_name_ext, self.persistent_save_path)
+            lt.info("Saving persistent metadata to:", persistent_text_path_body_ext)
+            ft.copy_file(text_path_name_ext, self.persistent_save_path)
 
         return self.get_text_file_path()
 
