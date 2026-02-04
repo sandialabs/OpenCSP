@@ -239,7 +239,15 @@ class RenderControlFigureRecord:
         # Convert the buffer to a numpy array
         return np.asarray(figure.canvas.buffer_rgba())
 
-    def save(self, output_dir: str, output_file_body: str = None, format: str = None, dpi=600, close_after_save=True):
+    def save(
+        self,
+        output_dir: str,
+        output_file_body: str = None,
+        format: str = None,
+        dpi=600,
+        close_after_save=True,
+        include_view_suffix=True,
+    ):
         """
         Saves this figure record to an image file.
 
@@ -287,7 +295,9 @@ class RenderControlFigureRecord:
 
             # If this is a 3-d plot, add the projection choice.
             if self.view != None:
-                output_figure_dir_body_ext = self.view.save(output_dir, output_figure_body, format=format, dpi=dpi)
+                output_figure_dir_body_ext = self.view.save(
+                    output_dir, output_figure_body, format=format, dpi=dpi, include_view_suffix=include_view_suffix
+                )
             else:
                 # Make the figure current.
                 plt.figure(self.name)

@@ -470,6 +470,7 @@ class StandardPlotOutput:
                     dpi=self.options_file_output.save_dpi,
                     format='png',
                     close_after_save=self.options_file_output.close_after_save,
+                    include_view_suffix=False,
                 )
 
             # Slope x
@@ -495,6 +496,7 @@ class StandardPlotOutput:
                     dpi=self.options_file_output.save_dpi,
                     format='png',
                     close_after_save=self.options_file_output.close_after_save,
+                    include_view_suffix=False,
                 )
 
             # Slope Y
@@ -520,6 +522,7 @@ class StandardPlotOutput:
                     dpi=self.options_file_output.save_dpi,
                     format='png',
                     close_after_save=self.options_file_output.close_after_save,
+                    include_view_suffix=False,
                 )
         else:
             lt.info('Do not have both measured and reference optic; skipping slope deviation plots.')
@@ -602,6 +605,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
     def _plot_curvature(self, optic: MirrorAbstract, which_data: str):
@@ -630,6 +634,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # Curvature X
@@ -653,6 +658,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # Curvature Y
@@ -676,6 +682,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
     def _plot_slope(self, optic: MirrorAbstract, which_data: str):
@@ -706,6 +713,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # X Slope
@@ -730,6 +738,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # Y Slope
@@ -754,6 +763,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
     def _plot_ray_trace_image(self, ray_trace_data: _RayTraceOutput, which_data: str):
@@ -780,6 +790,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
     def _perform_ray_trace_optic_measured(self):
