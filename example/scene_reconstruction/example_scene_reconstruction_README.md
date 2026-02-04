@@ -32,19 +32,12 @@ To run this on the published OpenCSP full-size example input:
           --> SceneReconstruction
           --> SceneReconstructionData_v1.1.zip
 
-   2. Unzip and place the enclosed directory within the directory:
+   2. Unzip and place the enclosed "scene_reconstruction" directory within the 
+      "OpenCSP_example" directory, producing:
 
-          C:\ctemp\OpenCSP_example_data\enclosed_energy\
+          C:\ctemp\OpenCSP_example_data\scene_reconstruction\
 
-   3. This will produce a directory structure:
-
-          C:\ctemp\OpenCSP_example_data\enclosed_energy\EnclosedEnergyData_v1.1\
-
-   4. Then rename "EnclosedEnergyData_v1.1" to "input", producing:
-
-          C:\ctemp\OpenCSP_example_data\enclosed_energy\input\
-
-   5. After this, the "example_scene_reconstruction.py" script should run without modification, 
+   3. After this, the "example_scene_reconstruction.py" script should run without modification, 
       by executing the following:
           5.1. Start a powershell.
           5.2. Ensure the OpenCSP virtual environment is activated.
