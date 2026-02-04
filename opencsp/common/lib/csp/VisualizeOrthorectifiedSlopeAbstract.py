@@ -71,7 +71,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         self,
         reference: "VisualizeOrthorectifiedSlopeAbstract",
         res: float = 0.1,
-        type_: Literal["x", "y", "magnitude"] = "magnitude",
+        type_: Literal["x", "y", "xy"] = "xy",
         clim: float | None = None,
         axis: plt.Axes | None = None,
         quiver_density: float | None = None,
@@ -88,10 +88,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
         res : float, optional
             The xy resolution of the plot, meters, by default 0.1
         type_ : str
-            Type of slope image to generate - 'x', 'y', 'magnitude'
+            Type of slope image to generate - 'x', 'y', 'xy'
         clim : float | None
             Colorbar limit. Converts to [-clim, clim] for type 'x' and 'y'
-            and [0, clim] for type 'magnitude.' Units in mrad. None to use default.
+            and [0, clim] for type 'xy.' Units in mrad. None to use default.
         axis : plt.Axes | None
             Axes to plot on. Default is None. If None, uses plt.gca().
         quiver_density : bool | None
@@ -102,7 +102,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
             Color of quiver arrows.
         """
         # Check inputs
-        if type_ not in ["x", "y", "magnitude"]:
+        if type_ not in ["x", "y", "xy"]:
             raise ValueError(f"Given type_ {type_} not supported.")
         if (quiver_density is not None) and (res > quiver_density):
             raise ValueError("Quiver density cannot be less than image resolution.")
@@ -134,7 +134,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = "X Slope Error"
+            title = "Slope Error X"
             cmap = "seismic"
         elif type_ == "y":
             image = slopes_diff[1] * 1000  # mrad
@@ -144,9 +144,9 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = "Y Slope Error"
+            title = "Slope Error X"
             cmap = "seismic"
-        elif type_ == "magnitude":
+        elif type_ == "xy":
             x_image = slopes_diff[0] * 1000  # mrad
             y_image = slopes_diff[1] * 1000  # mrad
             image = np.sqrt((x_image**2 + y_image**2) / 2)  # mrad
@@ -154,7 +154,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [0, clim]
             else:
                 clims = clim
-            title = "Slope Error Magnitude"
+            title = "Slope Error XY"
             cmap = "jet"
 
         # Plot image on axis
@@ -171,7 +171,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
     def plot_orthorectified_slope(
         self,
         res: float = 0.1,
-        type_: Literal["x", "y", "magnitude"] = "magnitude",
+        type_: Literal["x", "y", "xy"] = "xy",
         clim: float | None = None,
         axis: plt.Axes | None = None,
         quiver_density: float | None = None,
@@ -185,10 +185,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
         res : float, optional
             The xy resolution of the plot, meters, by default 0.1
         type_ : str
-            Type of slope image to generate - 'x', 'y', 'magnitude'
+            Type of slope image to generate - 'x', 'y', 'xy'
         clim : float | None
             Colorbar limit. Converts to [-clim, clim] for type 'x' and 'y'
-            and [0, clim] for type 'magnitude.' Units in mrad. None to use default.
+            and [0, clim] for type 'xy.' Units in mrad. None to use default.
         axis : plt.Axes | None
             Axes to plot on. Default is None. If None, uses plt.gca().
         quiver_density : bool | None
@@ -199,7 +199,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
             Color of quiver arrows.
         """
         # Check inputs
-        if type_ not in ["x", "y", "magnitude"]:
+        if type_ not in ["x", "y", "xy"]:
             raise ValueError(f"Given type_ {type_} not supported.")
         if (quiver_density is not None) and (res > quiver_density):
             raise ValueError("Quiver density cannot be less than image resolution.")
@@ -220,7 +220,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = "X Slope"
+            title = "Slope X"
         elif type_ == "y":
             image = slopes[1] * 1000  # mrad
             y_image = image
@@ -229,8 +229,8 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [-clim, clim]
             else:
                 clims = clim
-            title = "Y Slope"
-        elif type_ == "magnitude":
+            title = "Slope Y"
+        elif type_ == "xy":
             x_image = slopes[0] * 1000  # mrad
             y_image = slopes[1] * 1000  # mrad
             image = np.sqrt(x_image**2 + y_image**2)  # mrad
@@ -238,7 +238,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
                 clims = [0, clim]
             else:
                 clims = clim
-            title = "Slope Magnitude"
+            title = "Slope XY"
 
         # Plot image on axes
         left, right, bottom, top = self.axis_aligned_bounding_box
@@ -255,7 +255,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
     def plot_orthorectified_curvature(
         self,
         res: float = 0.1,
-        type_: Literal["x", "y", "combined"] = "combined",
+        type_: Literal["x", "y", "xy"] = "xy",
         clim: float | None = None,
         axis: plt.Axes | None = None,
         processing: list[Literal["log", "smooth"]] = None,
@@ -269,10 +269,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
         res : float, optional
             The xy resolution of the plot, meters, by default 0.1
         type_ : str
-            Type of slope image to generate - 'x', 'y', 'combined'
+            Type of slope image to generate - 'x', 'y', 'xy'
         clim : float | None
             Colorbar limit. Converts to [-clim, clim] for type 'x' and 'y'
-            and [0, clim] for type 'combined.' Units in mrad. None to use default.
+            and [0, clim] for type 'xy.' Units in mrad. None to use default.
         axis : plt.Axes | None
             Axes to plot on. Default is None. If None, uses plt.gca().
         processing : list[str]
@@ -284,7 +284,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
             By default, 1.
         """
         # Check inputs
-        if type_ not in ["x", "y", "combined"]:
+        if type_ not in ["x", "y", "xy"]:
             raise ValueError(f"Given type_ {type_} not supported.")
         if processing is None:
             processing = []
@@ -315,23 +315,23 @@ class VisualizeOrthorectifiedSlopeAbstract:
             clims = clim
 
         # Calculate slope image
-        if type_ in ["x", "combined"]:
+        if type_ in ["x", "xy"]:
             image_x = np.diff(slopes[0] * 1000, axis=1)  # mrad / sample
             image_x /= x_del_vec[None, :]  # mrad / meter
             image = image_x
-            title = "X Curvature"
+            title = "Curvature X"
             extent = (left, right, bottom - res / 2, top + res / 2)
 
-        if type_ in ["y", "combined"]:
+        if type_ in ["y", "xy"]:
             image_y = np.diff(slopes[1] * 1000, axis=0)  # mrad / sample
             image_y /= y_del_vec[:, None]  # mrad / meter
             image = image_y
-            title = "Y Curvature"
+            title = "Curvature Y"
             extent = (left - res / 2, right + res / 2, bottom, top)
 
-        if type_ == "combined":
+        if type_ == "xy":
             image = (image_x[1:, :] + image_y[:, 1:]) / 2  # mrad / meter
-            title = "Combined Curvature"
+            title = "Curvature XY"
             extent = (left, right, bottom, top)
 
         # Apply processing steps
