@@ -409,7 +409,7 @@ class View3d(aph.AbstractPlotHandler):
         # Save all figures, including this one.
         self.save(output_dir, output_figure_body, format=format, dpi=dpi)
 
-    def save(self, output_dir, output_figure_body, format="png", dpi=300) -> str:
+    def save(self, output_dir, output_figure_body, format="png", dpi=300, include_view_suffix=True) -> str:
         """
         Saves this view to an image file.
 
@@ -433,7 +433,8 @@ class View3d(aph.AbstractPlotHandler):
         if not (os.path.exists(output_dir)):
             os.makedirs(output_dir)
         # Add the projection choice.
-        output_figure_body += "_" + self.view_spec["type"]
+        if include_view_suffix:
+            output_figure_body += "_" + self.view_spec["type"]
         # Add axis limit suffix.
         output_figure_body += self.limit_suffix()
         # Join with output directory.

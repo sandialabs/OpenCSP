@@ -1,0 +1,7 @@
+Metadata:
+Figure number: 18
+Name: Meas Ray Trace Image
+Title: None
+Code tag: None
+View spec: xy
+

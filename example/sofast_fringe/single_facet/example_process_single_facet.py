@@ -18,11 +18,10 @@ To run the script, simply execute it as a standalone program:
 This will perform the processing steps and save the results to the `data/output/single_facet` directory
 with the following subfolders:
 
-1. **1_images_fringes_projected** - The patterns sent to the display during the SOFAST measurement of the optic.
-2. **2_images_captured** - The captured images of the displayed patterns as seen by the SOFAST camera.
-3. **3_processed_data** - The processed data from SOFAST.
-4. **4_processed_output_figures** - The output figure suite from a SOFAST characterization.
-
+    B1_projected_fringes - The patterns sent to the display during the SOFAST measurement of the optic.
+    B2_captured_fringes - The captured images of the displayed patterns as seen by the SOFAST camera.
+    B3_analysis - The processed data from SOFAST.
+    B4_plots - The output figure suite from a SOFAST characterization.
 
 """
 
@@ -151,7 +150,7 @@ def process_single_facet(
 
     # 4. Processes data with Sofast and save processed data to HDF5
     # =============================================================
-    dir_save_cur = join(dir_save, "B3_output_analysis")
+    dir_save_cur = join(dir_save, "B3_analysis")
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Define surface definition (parabolic surface), this is the mirror
@@ -195,7 +194,7 @@ def process_single_facet(
 
     # 5. Generate plot suite and save images files
     # ============================================
-    dir_save_cur = join(dir_save, "B4_output_figures")
+    dir_save_cur = join(dir_save, "B4_plots")
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Get measured and reference optics
