@@ -67,7 +67,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         # Create image
         fig, ax = self._get_axes()
         self.test_mirror_bilinear.plot_orthorectified_slope_error(
-            self.reference, 0.005, "magnitude", 100, ax, 0.1, 1000, "black"
+            self.reference, 0.005, "xy", 100, ax, 0.1, 1000, "black"
         )
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
@@ -81,7 +81,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         # Create image
         fig, ax = self._get_axes()
         self.test_mirror_nearest.plot_orthorectified_slope_error(
-            self.reference, 0.005, "magnitude", 100, ax, 0.1, 1000, "black"
+            self.reference, 0.005, "xy", 100, ax, 0.1, 1000, "black"
         )
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
@@ -94,7 +94,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         file_in = join(self.dir_input, "slope_linear.png")
         # Create image
         fig, ax = self._get_axes()
-        self.test_mirror_bilinear.plot_orthorectified_slope(0.005, "magnitude", 100, ax, 0.1, 1000, "black")
+        self.test_mirror_bilinear.plot_orthorectified_slope(0.005, "xy", 100, ax, 0.1, 1000, "black")
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
         # Test
@@ -106,7 +106,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         file_in = join(self.dir_input, "slope_nearest.png")
         # Create image
         fig, ax = self._get_axes()
-        self.test_mirror_nearest.plot_orthorectified_slope(0.005, "magnitude", 100, ax, 0.1, 1000, "black")
+        self.test_mirror_nearest.plot_orthorectified_slope(0.005, "xy", 100, ax, 0.1, 1000, "black")
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
         # Test
@@ -118,7 +118,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         file_in = join(self.dir_input, "curvature_linear.png")
         # Create image
         fig, ax = self._get_axes()
-        self.test_mirror_bilinear.plot_orthorectified_curvature(0.005, "combined", 100, ax)
+        self.test_mirror_bilinear.plot_orthorectified_curvature(0.005, "xy", 100, ax)
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
         # Test
@@ -130,7 +130,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         file_in = join(self.dir_input, "curvature_nearest.png")
         # Create image
         fig, ax = self._get_axes()
-        self.test_mirror_nearest.plot_orthorectified_curvature(0.005, "combined", 100, ax)
+        self.test_mirror_nearest.plot_orthorectified_curvature(0.005, "xy", 100, ax)
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
         # Test
@@ -143,7 +143,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         # Create image
         fig, ax = self._get_axes()
         self.test_mirror_bilinear.plot_orthorectified_curvature(
-            0.005, "combined", 100, ax, processing=["smooth"], smooth_kernel_width=5
+            0.005, "xy", 100, ax, processing=["smooth"], smooth_kernel_width=5
         )
         fig.savefig(file_out, dpi=300)
         plt.close(fig)
@@ -157,7 +157,7 @@ class TestVisualizeOrthorectifiedSlopeAbstract(unittest.TestCase):
         # Create image
         fig, ax = self._get_axes()
         self.test_mirror_bilinear.plot_orthorectified_curvature(
-            0.005, "combined", 100, ax, processing=["smooth", "log"], smooth_kernel_width=5
+            0.005, "xy", 100, ax, processing=["smooth", "log"], smooth_kernel_width=5
         )
         fig.savefig(file_out, dpi=300)
         plt.close(fig)

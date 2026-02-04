@@ -1,0 +1,7 @@
+Metadata:
+Figure number: 14
+Name: Ref Curvature Y
+Title: None
+Code tag: None
+View spec: xy
+

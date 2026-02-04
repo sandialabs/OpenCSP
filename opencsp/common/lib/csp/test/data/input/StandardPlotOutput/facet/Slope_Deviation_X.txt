@@ -1,0 +1,7 @@
+Metadata:
+Figure number: 16
+Name: Slope Deviation X
+Title: None
+Code tag: None
+View spec: xy
+

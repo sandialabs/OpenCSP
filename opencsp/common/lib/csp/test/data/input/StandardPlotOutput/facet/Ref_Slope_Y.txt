@@ -1,0 +1,7 @@
+Metadata:
+Figure number: 8
+Name: Ref Slope Y
+Title: None
+Code tag: None
+View spec: xy
+
