@@ -16,6 +16,12 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
 
+# Interpolation types
+GIVEN_INTERPOLATION = "given"
+BILINEAR_INTERPOLATION = "bilinear"
+CLOUGH_TOCHER_INTERPOLATION = "clough_tocher"
+NEAREST_INTERPOLATION = "nearest"
+
 
 class MirrorPoint(MirrorAbstract):
     """
@@ -32,7 +38,8 @@ class MirrorPoint(MirrorAbstract):
         surface_points: Pxyz,
         normal_vectors: Uxyz,
         shape: RegionXY,
-        interpolation_type: Literal["given", "bilinear", "clough_tocher", "nearest"] = "nearest",
+        #        interpolation_type: Literal["given", "bilinear", "clough_tocher", "nearest"] = "nearest",
+        interpolation_type: str = NEAREST_INTERPOLATION,
     ) -> None:
         """
         Initializes a MirrorPoint object with the specified surface points and normal vectors.
@@ -88,7 +95,7 @@ class MirrorPoint(MirrorAbstract):
             If given interpolation type is not supported.
         """
         # Interpolate
-        if interpolation_type == "bilinear":
+        if interpolation_type == BILINEAR_INTERPOLATION:
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
@@ -96,7 +103,7 @@ class MirrorPoint(MirrorAbstract):
             # Normal vector interpolation object
             Z_N = self.normal_vectors.data.T
             self.normals_function = interp.LinearNDInterpolator(points_xy, Z_N, np.nan)
-        elif interpolation_type == "clough_tocher":
+        elif interpolation_type == CLOUGH_TOCHER_INTERPOLATION:
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
@@ -104,7 +111,7 @@ class MirrorPoint(MirrorAbstract):
             # Normal vector interpolation object
             Z_N = self.normal_vectors.data.T
             self.normals_function = interp.CloughTocher2DInterpolator(points_xy, Z_N, np.nan)
-        elif interpolation_type == "nearest":
+        elif interpolation_type == NEAREST_INTERPOLATION:
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
@@ -112,7 +119,7 @@ class MirrorPoint(MirrorAbstract):
             # Normal vector interpolatin object
             Z_N = self.normal_vectors.data.T
             self.normals_function = interp.NearestNDInterpolator(points_xy, Z_N)
-        elif interpolation_type == "given":
+        elif interpolation_type == GIVEN_INTERPOLATION:
             # Z coordinate lookup function
             points_lookup = {
                 (x, y): z for x, y, z in zip(self.surface_points.x, self.surface_points.y, self.surface_points.z)

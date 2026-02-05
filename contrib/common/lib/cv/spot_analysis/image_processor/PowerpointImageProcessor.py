@@ -112,6 +112,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
         processors_per_slide: (
             list[list[ProcessorSelector | ProcOrImg | tuple[ProcOrImg, str, ImageType]]] | None
         ) = None,
+        persistent_save_path=None,
     ):
         super().__init__()
 
@@ -172,6 +173,7 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
         self.overwrite = overwrite
         self.operable_title_slides = operable_title_slides_todo
         self.processors_per_slide = processors_per_slide
+        self.persistent_save_path = persistent_save_path
 
         # internal values
         self.is_first_operable = True
@@ -376,7 +378,9 @@ class PowerpointImageProcessor(AbstractSpotAnalysisImageProcessor):
             slide.set_title(operable.best_primary_nameext)
             for processor_sel, image in images_list:
                 caption = processor_sel.get_caption()
-                slide.add_image(pi.PowerpointImage(image.nparray, caption=caption))
+                slide.add_image(
+                    pi.PowerpointImage(image.nparray, caption=caption, persistent_save_path=self.persistent_save_path)
+                )
 
             # add the slide to the presentation
             slide.save_and_bake()

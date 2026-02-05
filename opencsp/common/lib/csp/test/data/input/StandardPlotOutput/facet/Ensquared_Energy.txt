@@ -1,0 +1,7 @@
+Metadata:
+Figure number: 20
+Name: Ensquared Energy
+Title: None
+Code tag: None
+View spec: xy
+

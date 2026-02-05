@@ -1,0 +1,7 @@
+Metadata:
+Figure number: 11
+Name: Meas Curvature Y
+Title: None
+Code tag: None
+View spec: xy
+

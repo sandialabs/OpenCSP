@@ -1,0 +1,7 @@
+Metadata:
+Figure number: 3
+Name: Meas Slope XY
+Title: None
+Code tag: None
+View spec: xy
+

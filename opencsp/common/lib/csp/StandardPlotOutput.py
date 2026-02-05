@@ -1,7 +1,7 @@
 """Class used to display/save the suite of standard output plots after measuring a CSP Optic object."""
 
+import configparser
 from dataclasses import dataclass, field
-
 import numpy as np
 
 import opencsp.common.lib.render_control.RenderControlAxis as rca
@@ -17,6 +17,25 @@ from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlEnclosedEnergy as rcee
 import opencsp.common.lib.tool.log_tools as lt
+import opencsp.common.lib.tool.string_tools as st
+
+
+@dataclass
+class _OptionsFileOutput:
+    to_save: bool = False
+    """Flag to save figures or not. (default False)"""
+    output_dir: str = ''
+    """Output path to save directory. (default '')"""
+    save_dpi: int = 200
+    """Dots Per Inch (DPI) of saved figures. (default 200)"""
+    save_format: str = 'png'
+    """Saved figure format. (default 'png')"""
+    close_after_save: bool = False
+    """To close figures after save. (default False)"""
+    number_in_name: bool = True
+    """To keep figure number in save name. (default True)"""
+    file_prefix: str = ''
+    """String to prefix each output file, including separator"""
 
 
 @dataclass
@@ -24,20 +43,20 @@ class _OptionsSlopeVis:
     resolution: float = 0.01
     """Plot x/y sample resolution (meters) (default 0.01)"""
     clim: float | tuple[float, float, float] = 5
-    """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope magnitude plots.
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope xy plots.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 5)"""
     quiver_density: float | tuple[float, float, float] = 0.1
     """The density of the quiver arrows (meters).
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 0.1)"""
     quiver_scale: float | tuple[float, float, float] = 25
     """The scale of the quiver arrows.
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 25)"""
     quiver_color: str | tuple[str, str, str] = 'white'
     """The color of the quiver arrows.
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 'white')"""
     to_plot: bool = True
     """Flag to produce plots or not. (default True)"""
@@ -48,20 +67,20 @@ class _OptionsSlopeDeviationVis:
     resolution: float = 0.01
     """Plot x/y sample resolution (meters) (default 0.01)"""
     clim: float | tuple[float, float, float] = 5
-    """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope magnitude plots.
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    """Sets colorbar limits (mrad). Plot limits set to [-clim, clim] for x or y slope plots and [0, clim] for slope xy plots.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 5)"""
     quiver_density: float | tuple[float, float, float] = 0.1
     """The density of the quiver arrows (meters).
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 0.1)"""
     quiver_scale: float | tuple[float, float, float] = 25
     """The scale of the quiver arrows.
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 25)"""
     quiver_color: str | tuple[str, str, str] = 'white'
     """The color of the quiver arrows.
-    Can be single value of tuple of three values to map to [x, y, magnitude] plots individually.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 'white')"""
     to_plot: bool = True
     """Flag to produce plots or not. (default True)"""
@@ -73,14 +92,14 @@ class _OptionsCurvatureVis:
     """Plot x/y sample resolution (meters) (default 0.01)"""
     clim: float | tuple[float, float, float] = 50
     """Sets colorbar limits (mrad/meter). Plot limits set to [-clim, clim].
-    Can be single value of tuple of three values to map to [x, y, combined] plots individually. (default 50)"""
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually. (default 50)"""
     processing: list[str] | tuple[list[str], list[str], list[str]] = field(default_factory=list)
     """Processing string to apply when in MirrorAbstract.plot_orthorectified_curvature().
-    Can be single value of tuple of three values to map to [x, y, combined] plots individually.
+    Can be single value or tuple of three values to map to [x, y, xy] plots individually.
     (default [])"""
     smooth_kernel_width: float | tuple[float, float, float] = 1
     """Width of square smoothing kernel (pixels) to apply to curvature images in MirrorAbstract.plot_orthorectified_curvature().
-    Can be single value of tuple of three values to map to [x, y, combined] plots individually.
+    Can be single value of tuple of three values to map to [x, y, xy] plots individually.
     (default 1)"""
     to_plot: bool = True
     """Flag to produce plots or not. (default True)"""
@@ -98,22 +117,6 @@ class _OptionsRayTraceVis:
     """The max semi-width of square aperture (meters) used when computing enclosed energy plots. (default 2)"""
     to_plot: bool = True
     """Flag to produce plots or not. (default True)"""
-
-
-@dataclass
-class _OptionsFileOutput:
-    to_save: bool = False
-    """Flag to save figures or not. (default False)"""
-    output_dir: str = ''
-    """Output path to save directory. (default '')"""
-    save_dpi: int = 200
-    """Dots Per Inch (DPI) of saved figures. (default 200)"""
-    save_format: str = 'png'
-    """Saved figure format. (default 'png')"""
-    close_after_save: bool = False
-    """To close figures after save. (default False)"""
-    number_in_name: bool = True
-    """To keep figure number in save name. (default True)"""
 
 
 @dataclass
@@ -183,6 +186,182 @@ class StandardPlotOutput:
     def _has_reference_ray_trace(self) -> bool:
         return self._ray_trace_output_reference is not None
 
+    def set_plot_control_from_settings(self, settings: configparser.ConfigParser):
+        """
+        Fills in plot control fields that are provided in settings.
+        If the settings does not contain a key, then the corresponding plot control field is left unchanged.
+        """
+
+        # File output control.
+        # This should be kept in synch with class _OptionsFileOutput above.
+        if ("Default" in settings) and ("plots.options_file_output.to_save" in settings["Default"]):
+            self.options_file_output.to_save = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_file_output.to_save"]
+            )
+        # We expect output_dir to be handled by other routines.
+        if ("Default" in settings) and ("plots.options_file_output.save_dpi" in settings["Default"]):
+            self.options_file_output.save_dpi = int(settings["Default"]["plots.options_file_output.save_dpi"])
+        if ("Default" in settings) and ("plots.options_file_output.save_format" in settings["Default"]):
+            self.options_file_output.save_format = str(settings["Default"]["plots.options_file_output.save_format"])
+        if ("Default" in settings) and ("plots.options_file_output.close_after_save" in settings["Default"]):
+            self.options_file_output.close_after_save = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_file_output.close_after_save"]
+            )
+        if ("Default" in settings) and ("plots.options_file_output.number_in_name" in settings["Default"]):
+            self.options_file_output.number_in_name = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_file_output.number_in_name"]
+            )
+        # We expect file_prefix to be handled by other routines.
+
+        # Slope plot control.
+        # This should be kept in synch with class _OptionsSlopeVis above.
+        if ("Default" in settings) and ("plots.options_slope_vis.resolution" in settings["Default"]):
+            self.options_slope_vis.resolution = float(settings["Default"]["plots.options_slope_vis.resolution"])
+        if ("Default" in settings) and ("plots.options_slope_vis.clim" in settings["Default"]):
+            self.options_slope_vis.clim = float(settings["Default"]["plots.options_slope_vis.clim"])
+        if ("Default" in settings) and ("plots.options_slope_vis.quiver_density" in settings["Default"]):
+            self.options_slope_vis.quiver_density = float(settings["Default"]["plots.options_slope_vis.quiver_density"])
+        if ("Default" in settings) and ("plots.options_slope_vis.quiver_scale" in settings["Default"]):
+            self.options_slope_vis.quiver_scale = float(settings["Default"]["plots.options_slope_vis.quiver_scale"])
+        if ("Default" in settings) and ("plots.options_slope_vis.quiver_color" in settings["Default"]):
+            self.options_slope_vis.quiver_color = str(settings["Default"]["plots.options_slope_vis.quiver_color"])
+        if ("Default" in settings) and ("plots.options_slope_vis.to_plot" in settings["Default"]):
+            self.options_slope_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_slope_vis.to_plot"]
+            )
+
+        # Slope deviation plot control.
+        # This should be kept in synch with class _OptionsSlopeDeviationVis above.
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.resolution" in settings["Default"]):
+            self.options_slope_deviation_vis.resolution = float(
+                settings["Default"]["plots.options_slope_deviation_vis.resolution"]
+            )
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.clim" in settings["Default"]):
+            self.options_slope_deviation_vis.clim = float(settings["Default"]["plots.options_slope_deviation_vis.clim"])
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.quiver_density" in settings["Default"]):
+            self.options_slope_deviation_vis.quiver_density = float(
+                settings["Default"]["plots.options_slope_deviation_vis.quiver_density"]
+            )
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.quiver_scale" in settings["Default"]):
+            self.options_slope_deviation_vis.quiver_scale = float(
+                settings["Default"]["plots.options_slope_deviation_vis.quiver_scale"]
+            )
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.quiver_color" in settings["Default"]):
+            self.options_slope_deviation_vis.quiver_color = settings["Default"][
+                "plots.options_slope_deviation_vis.quiver_color"
+            ]
+        if ("Default" in settings) and ("plots.options_slope_deviation_vis.to_plot" in settings["Default"]):
+            self.options_slope_deviation_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_slope_deviation_vis.to_plot"]
+            )
+
+        # Curvature plot control.
+        # This should be kept in synch with class _OptionsCurvatureVis above.
+        if ("Default" in settings) and ("plots.options_curvature_vis.resolution" in settings["Default"]):
+            self.options_curvature_vis.resolution = float(settings["Default"]["plots.options_curvature_vis.resolution"])
+        if ("Default" in settings) and ("plots.options_curvature_vis.clim" in settings["Default"]):
+            self.options_curvature_vis.clim = float(settings["Default"]["plots.options_curvature_vis.clim"])
+        processing = []
+        processing_options = [
+            "log",
+            "smooth",
+        ]  # See VisualizeOrthorectifiedSlopeAbstract.py, routine plot_orthorectified_curvature().
+        if ("Default" in settings) and ("plots.options_curvature_vis.processing_1" in settings["Default"]):
+            processing_1 = settings["Default"]["plots.options_curvature_vis.processing_1"]
+            if processing_1 in processing_options:
+                processing.append(processing_1)
+            elif processing_1 == "None":
+                pass
+            else:
+                lt.error_and_raise(
+                    ValueError, f'Curvature procesing option "{processing_1}" is not one of {processing_options}.'
+                )
+        if ("Default" in settings) and ("plots.options_curvature_vis.processing_2" in settings["Default"]):
+            processing_2 = settings["Default"]["plots.options_curvature_vis.processing_2"]
+            if processing_2 in processing_options:
+                processing.append(processing_2)
+            elif processing_2 == "None":
+                pass
+            else:
+                lt.error_and_raise(
+                    ValueError, f'Curvature procesing option "{processing_2}" is not one of {processing_options}.'
+                )
+        self.options_curvature_vis.processing = processing
+        if ("Default" in settings) and ("plots.options_curvature_vis.smooth_kernel_width" in settings["Default"]):
+            self.options_curvature_vis.smooth_kernel_width = float(
+                settings["Default"]["plots.options_curvature_vis.smooth_kernel_width"]
+            )
+        if ("Default" in settings) and ("plots.options_curvature_vis.to_plot" in settings["Default"]):
+            self.options_curvature_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_curvature_vis.to_plot"]
+            )
+
+        # Ray trace control.
+        # This should be kept in synch with class _OptionsRayTraceVis above.
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.ray_trace_optic_res" in settings["Default"]):
+            self.options_ray_trace_vis.ray_trace_optic_res = float(
+                settings["Default"]["plots.options_ray_trace_vis.ray_trace_optic_res"]
+            )
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.hist_bin_res" in settings["Default"]):
+            self.options_ray_trace_vis.hist_bin_res = float(
+                settings["Default"]["plots.options_ray_trace_vis.hist_bin_res"]
+            )
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.hist_extent" in settings["Default"]):
+            self.options_ray_trace_vis.hist_extent = float(
+                settings["Default"]["plots.options_ray_trace_vis.hist_extent"]
+            )
+        if ("Default" in settings) and (
+            "plots.options_ray_trace_vis.enclosed_energy_max_semi_width" in settings["Default"]
+        ):
+            self.options_ray_trace_vis.enclosed_energy_max_semi_width = float(
+                settings["Default"]["plots.options_ray_trace_vis.enclosed_energy_max_semi_width"]
+            )
+        if ("Default" in settings) and ("plots.options_ray_trace_vis.to_plot" in settings["Default"]):
+            self.options_ray_trace_vis.to_plot = st.convert_true_false_string_to_boolean(
+                settings["Default"]["plots.options_ray_trace_vis.to_plot"]
+            )
+
+        # Ray trace parameters.
+        # This should be kept in synch with class _RayTraceParameters above.
+        # Light source.
+        if (
+            ("Default" in settings)
+            and ("plots.options_ray_trace_vis.sun_direction_x" in settings["Default"])
+            and ("plots.options_ray_trace_vis.sun_direction_y" in settings["Default"])
+            and ("plots.options_ray_trace_vis.sun_direction_z" in settings["Default"])
+            and ("plots.options_ray_trace_vis.sun_sample_resolution" in settings["Default"])
+        ):
+            sun_direction_x = float(settings["Default"]["plots.options_ray_trace_vis.sun_direction_x"])
+            sun_direction_y = float(settings["Default"]["plots.options_ray_trace_vis.sun_direction_y"])
+            sun_direction_z = float(settings["Default"]["plots.options_ray_trace_vis.sun_direction_z"])
+            sun_direction = Uxyz((sun_direction_x, sun_direction_y, sun_direction_z))
+            sun_sample_resolution = int(settings["Default"]["plots.options_ray_trace_vis.sun_sample_resolution"])
+            self.params_ray_trace.source = LightSourceSun.from_given_sun_position(
+                sun_direction, resolution=sun_sample_resolution
+            )
+        # Target center.
+        if (
+            ("Default" in settings)
+            and ("plots.options_ray_trace_vis.v_target_center_x" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_center_y" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_center_z" in settings["Default"])
+        ):
+            v_target_center_x = float(settings["Default"]["plots.options_ray_trace_vis.v_target_center_x"])
+            v_target_center_y = float(settings["Default"]["plots.options_ray_trace_vis.v_target_center_y"])
+            v_target_center_z = float(settings["Default"]["plots.options_ray_trace_vis.v_target_center_z"])
+            self.params_ray_trace.v_target_center = Vxyz((v_target_center_x, v_target_center_y, v_target_center_z))
+        # Target normal.
+        if (
+            ("Default" in settings)
+            and ("plots.options_ray_trace_vis.v_target_normal_x" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_normal_y" in settings["Default"])
+            and ("plots.options_ray_trace_vis.v_target_normal_z" in settings["Default"])
+        ):
+            v_target_normal_x = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_x"])
+            v_target_normal_y = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_y"])
+            v_target_normal_z = float(settings["Default"]["plots.options_ray_trace_vis.v_target_normal_z"])
+            self.params_ray_trace.v_target_normal = Vxyz((v_target_normal_x, v_target_normal_y, v_target_normal_z))
+
     def plot(self):
         """Creates standard output plot suite"""
         # This function checks if plotting is turned on
@@ -220,28 +399,28 @@ class StandardPlotOutput:
     def _plot_slope_measured_optic(self):
         # Plots optic slope for measured optic
         if self._has_measured_optic:
-            self._plot_slope(self.optic_measured, 'measured')
+            self._plot_slope(self.optic_measured, 'Meas')
         else:
             lt.info('No measured optic; skipping measured optic slope plots.')
 
     def _plot_curvature_measured_optic(self):
         # Plots optic curvature for measured optic
         if self._has_measured_optic:
-            self._plot_curvature(self.optic_measured, 'measured')
+            self._plot_curvature(self.optic_measured, 'Meas')
         else:
             lt.info('No measured optic; skipping measured optic curvature plots.')
 
     def _plot_slope_reference_optic(self):
         # Plots optic slope for reference optic
         if self._has_reference_optic:
-            self._plot_slope(self.optic_reference, 'reference')
+            self._plot_slope(self.optic_reference, 'Ref')
         else:
             lt.info('No reference optic; skipping reference optic slope plots.')
 
     def _plot_curvature_reference_optic(self):
         # Plots optic curvature for reference optic
         if self._has_reference_optic:
-            self._plot_curvature(self.optic_reference, 'reference')
+            self._plot_curvature(self.optic_reference, 'Ref')
         else:
             lt.info('No reference optic; skipping reference optic curvature plots.')
 
@@ -254,7 +433,9 @@ class StandardPlotOutput:
             elif len(value) in [0, 1]:
                 return [value] * 3
             else:
-                lt.error_and_raise(ValueError, f'Plot option must be length 3 or 1, not length {len(value):d}')
+                lt.error_and_raise(
+                    ValueError, f'Plot option "{value}" must be length 3 or 1, not length {len(value):d}'
+                )
         else:
             return [value] * 3
 
@@ -266,17 +447,17 @@ class StandardPlotOutput:
             quiver_scales = self._process_plot_options(self.options_slope_vis.quiver_scale)
             quiver_colors = self._process_plot_options(self.options_slope_vis.quiver_color)
 
-            # Slope magnitude
+            # Slope deviation magnitude
             fig_rec = fm.setup_figure(
                 self.fig_control,
                 self.axis_control,
-                name="Slope Deviation Magnitude",
+                name=self.options_file_output.file_prefix + "Slope Deviation XY",
                 number_in_name=self.options_file_output.number_in_name,
             )
             self.optic_measured.plot_orthorectified_slope_error(
                 self.optic_reference,
                 self.options_slope_vis.resolution,
-                type_='magnitude',
+                type_='xy',
                 quiver_density=quiver_densities[0],
                 quiver_scale=quiver_scales[0],
                 quiver_color=quiver_colors[0],
@@ -289,13 +470,14 @@ class StandardPlotOutput:
                     dpi=self.options_file_output.save_dpi,
                     format='png',
                     close_after_save=self.options_file_output.close_after_save,
+                    include_view_suffix=False,
                 )
 
             # Slope x
             fig_rec = fm.setup_figure(
                 self.fig_control,
                 self.axis_control,
-                name="Slope Deviation X",
+                name=self.options_file_output.file_prefix + "Slope Deviation X",
                 number_in_name=self.options_file_output.number_in_name,
             )
             self.optic_measured.plot_orthorectified_slope_error(
@@ -314,13 +496,14 @@ class StandardPlotOutput:
                     dpi=self.options_file_output.save_dpi,
                     format='png',
                     close_after_save=self.options_file_output.close_after_save,
+                    include_view_suffix=False,
                 )
 
             # Slope Y
             fig_rec = fm.setup_figure(
                 self.fig_control,
                 self.axis_control,
-                name="Slope Deviation Y",
+                name=self.options_file_output.file_prefix + "Slope Deviation Y",
                 number_in_name=self.options_file_output.number_in_name,
             )
             self.optic_measured.plot_orthorectified_slope_error(
@@ -339,6 +522,7 @@ class StandardPlotOutput:
                     dpi=self.options_file_output.save_dpi,
                     format='png',
                     close_after_save=self.options_file_output.close_after_save,
+                    include_view_suffix=False,
                 )
         else:
             lt.info('Do not have both measured and reference optic; skipping slope deviation plots.')
@@ -346,14 +530,14 @@ class StandardPlotOutput:
     def _plot_ray_trace_image_measured_optic(self):
         # Plot ray trace image for measured optic
         if self._has_measured_ray_trace:
-            self._plot_ray_trace_image(self._ray_trace_output_measured, 'measured')
+            self._plot_ray_trace_image(self._ray_trace_output_measured, 'Meas')
         else:
             lt.info('No measured ray trace data; skipping measured ray trace image.')
 
     def _plot_ray_trace_image_reference_optic(self):
         # Plot ray trace image for reference optic
         if self._has_reference_ray_trace:
-            self._plot_ray_trace_image(self._ray_trace_output_reference, 'reference')
+            self._plot_ray_trace_image(self._ray_trace_output_reference, 'Ref')
         else:
             lt.info('No reference ray trace data; skipping reference ray trace image.')
 
@@ -366,7 +550,9 @@ class StandardPlotOutput:
 
         # Make figure
         fig_rec = fm.setup_figure(
-            self.fig_control, name='Ensquared Energy', number_in_name=self.options_file_output.number_in_name
+            self.fig_control,
+            name=self.options_file_output.file_prefix + 'Ensquared Energy',
+            number_in_name=self.options_file_output.number_in_name,
         )
 
         # Draw reference if available
@@ -419,23 +605,24 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
-    def _plot_curvature(self, optic: MirrorAbstract, suffix: str):
+    def _plot_curvature(self, optic: MirrorAbstract, which_data: str):
         # Separate outputs
         processings = self._process_plot_options(self.options_curvature_vis.processing)
         widths = self._process_plot_options(self.options_curvature_vis.smooth_kernel_width)
 
-        # Curvature combined
+        # Curvature XY
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Curvature Combined ' + suffix,
+            name=self.options_file_output.file_prefix + which_data + ' Curvature XY',
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
             res=self.options_curvature_vis.resolution,
-            type_='combined',
+            type_='xy',
             clim=self.options_curvature_vis.clim,
             axis=fig_rec.axis,
             processing=processings[0],
@@ -447,13 +634,14 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # Curvature X
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Curvature X ' + suffix,
+            name=self.options_file_output.file_prefix + which_data + ' Curvature X',
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
@@ -470,13 +658,14 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # Curvature Y
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Curvature Y ' + suffix,
+            name=self.options_file_output.file_prefix + which_data + ' Curvature Y',
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_curvature(
@@ -493,9 +682,10 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
-    def _plot_slope(self, optic: MirrorAbstract, suffix: str):
+    def _plot_slope(self, optic: MirrorAbstract, which_data: str):
         # Separate outputs
         quiver_densities = self._process_plot_options(self.options_slope_vis.quiver_density)
         quiver_scales = self._process_plot_options(self.options_slope_vis.quiver_scale)
@@ -505,12 +695,12 @@ class StandardPlotOutput:
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Slope Magnitude " + suffix,
+            name=self.options_file_output.file_prefix + which_data + ' Slope XY',
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_slope(
             self.options_slope_vis.resolution,
-            type_='magnitude',
+            type_='xy',
             quiver_density=quiver_densities[0],
             quiver_scale=quiver_scales[0],
             quiver_color=quiver_colors[0],
@@ -523,13 +713,14 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # X Slope
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Slope X " + suffix,
+            name=self.options_file_output.file_prefix + which_data + ' Slope X',
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_slope(
@@ -547,13 +738,14 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
         # Y Slope
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name="Slope Y " + suffix,
+            name=self.options_file_output.file_prefix + which_data + ' Slope Y',
             number_in_name=self.options_file_output.number_in_name,
         )
         optic.plot_orthorectified_slope(
@@ -571,14 +763,15 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
-    def _plot_ray_trace_image(self, ray_trace_data: _RayTraceOutput, suffix: str):
+    def _plot_ray_trace_image(self, ray_trace_data: _RayTraceOutput, which_data: str):
         # Draw sun image on target
         fig_rec = fm.setup_figure(
             self.fig_control,
             self.axis_control,
-            name='Ray Trace Image ' + suffix,
+            name=self.options_file_output.file_prefix + which_data + ' Ray Trace Image',
             number_in_name=self.options_file_output.number_in_name,
         )
         fig_rec.axis.imshow(
@@ -597,6 +790,7 @@ class StandardPlotOutput:
                 dpi=self.options_file_output.save_dpi,
                 format='png',
                 close_after_save=self.options_file_output.close_after_save,
+                include_view_suffix=False,
             )
 
     def _perform_ray_trace_optic_measured(self):
