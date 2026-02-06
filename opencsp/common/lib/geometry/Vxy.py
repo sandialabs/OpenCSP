@@ -258,7 +258,7 @@ class Vxy:
         """
         return np.sqrt(np.sum(self._data**2, 0))
 
-    def angle(self) -> npt.NDArray[np.float_]:
+    def angle(self) -> npt.NDArray[np.float64]:
         """
         Returns the orientation relative to the origin for each vector, in
         radians in the standard coordinate system (0 on the x-axis to the right,

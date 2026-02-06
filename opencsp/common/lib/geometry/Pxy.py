@@ -29,7 +29,7 @@ class Pxy(Vxy):
     def __repr__(self):
         return "2D Point:\n" + self._data.__repr__()
 
-    def distance(self, data_in: "Pxy") -> npt.NDArray[np.float_]:
+    def distance(self, data_in: "Pxy") -> npt.NDArray[np.float64]:
         """
         Calculates the Euclidean distance between this point and another Pxy point.
 
@@ -59,7 +59,7 @@ class Pxy(Vxy):
 
         return (self - data_in).magnitude()
 
-    def angle_from(self, origin: "Pxy") -> npt.NDArray[np.float_]:
+    def angle_from(self, origin: "Pxy") -> npt.NDArray[np.float64]:
         """
         Returns the rotation angle in which this point lies relative to the
         given origin point.
