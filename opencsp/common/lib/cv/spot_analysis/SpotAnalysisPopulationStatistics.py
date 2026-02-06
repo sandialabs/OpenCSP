@@ -5,11 +5,11 @@ import numpy.typing as npt
 
 @dataclass
 class SpotAnalysisPopulationStatistics:
-    maxf: npt.NDArray[np.float_] = None
+    maxf: npt.NDArray[np.float64] = None
     """ Maximum value seen across images. None if not yet calculated. """
-    minf: npt.NDArray[np.float_] = None
+    minf: npt.NDArray[np.float64] = None
     """ Minimum value seen across images. None if not yet calculated. """
-    avgf_rolling_window: npt.NDArray[np.float_] = None
+    avgf_rolling_window: npt.NDArray[np.float64] = None
     """ Average value seen across images. None if not yet calculated. """
 
     window_size: int = 1

@@ -167,12 +167,12 @@ def normalize(angle: float) -> float:
 
 
 @overload
-def normalize(angles: npt.NDArray[np.float_] | Iterable) -> npt.NDArray[np.float_]:
+def normalize(angles: npt.NDArray[np.float64] | Iterable) -> npt.NDArray[np.float64]:
     """Normalizes an array of angles to the range [0, 2π]."""
     # "ChatGPT 4o" assisted with generating this docstring.
 
 
-def normalize(angle_or_angles: float | npt.NDArray[np.float_] | Iterable) -> float | npt.NDArray[np.float_]:
+def normalize(angle_or_angles: float | npt.NDArray[np.float64] | Iterable) -> float | npt.NDArray[np.float64]:
     """
     Adjusts the given angle or angles to be in the range [0, 2π].
 
@@ -181,12 +181,12 @@ def normalize(angle_or_angles: float | npt.NDArray[np.float_] | Iterable) -> flo
 
     Parameters
     ----------
-    angle_or_angles : float or :py:meth:`npt.NDArray[np.float_]` or Iterable
+    angle_or_angles : float or :py:meth:`npt.NDArray[np.float64]` or Iterable
         A single angle or an array/iterable of angles to normalize.
 
     Returns
     -------
-    float or py:meth:`npt.NDArray[np.float_]`
+    float or py:meth:`npt.NDArray[np.float64]`
         The normalized angle or array of normalized angles.
     """
     # "ChatGPT 4o" assisted with generating this docstring.

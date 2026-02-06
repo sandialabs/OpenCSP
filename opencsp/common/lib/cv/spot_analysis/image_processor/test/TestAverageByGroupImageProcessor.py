@@ -49,7 +49,7 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         self.assertEqual(1, len(operables))
 
         operable = operables[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.a1_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.a1_img.nparray.astype(np.float64))
 
     def test_two_images_one_group(self):
         operables = self.processor.process_operable(self.a1)
@@ -60,7 +60,7 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         self.assertEqual(1, len(operables))
 
         operable = operables[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([15], dtype=np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([15], dtype=np.float64))
 
     def test_two_images_two_groups(self):
         operables = self.processor.process_operable(self.a1)
@@ -71,9 +71,9 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         self.assertEqual(1, len(operables_b))
 
         operable = operables_a[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.a1_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.a1_img.nparray.astype(np.float64))
         operable = operables_b[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float64))
 
     def test_three_images_two_groups(self):
         operables = self.processor.process_operable(self.a1)
@@ -86,9 +86,9 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         self.assertEqual(1, len(operables_b))
 
         operable = operables_a[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([15], dtype=np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([15], dtype=np.float64))
         operable = operables_b[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float64))
 
     def test_four_images_two_groups(self):
         operables = self.processor.process_operable(self.a1)
@@ -103,9 +103,9 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         self.assertEqual(1, len(operables_b))
 
         operable = operables_a[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([15], dtype=np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([15], dtype=np.float64))
         operable = operables_b[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([35], dtype=np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, np.array([35], dtype=np.float64))
 
     def test_four_images_alternating_group(self):
         operables = self.processor.process_operable(self.a1)
@@ -120,13 +120,13 @@ class TestAverageByGroupImageProcessor(unittest.TestCase):
         self.assertEqual(1, len(operables_b2))
 
         operable = operables_a1[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.a1_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.a1_img.nparray.astype(np.float64))
         operable = operables_a2[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.a2_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.a2_img.nparray.astype(np.float64))
         operable = operables_b1[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.b1_img.nparray.astype(np.float64))
         operable = operables_b2[0]
-        np.testing.assert_array_equal(operable.primary_image.nparray, self.b2_img.nparray.astype(np.float_))
+        np.testing.assert_array_equal(operable.primary_image.nparray, self.b2_img.nparray.astype(np.float64))
 
 
 if __name__ == "__main__":
