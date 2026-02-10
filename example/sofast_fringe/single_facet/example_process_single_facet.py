@@ -33,6 +33,8 @@ import configparser
 
 import imageio.v3 as imageio
 
+import numpy as np
+
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.Fringes import Fringes
@@ -138,15 +140,17 @@ def process_single_facet(
         # Save mask (like a pixel mask value (all 0s, all 255s)) images
         for idx_image in [0, 1]:
             image = measurement.mask_images[..., idx_image]
-            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"mask_{idx_image:02d}.png"), image)
+            imageio.imwrite(
+                join(dir_save_cur, output_file_prefix + f"mask_{idx_image:02d}.png"), image.astype(np.uint8)
+            )
         # Save y images (when lines were vertical, e.g.)
         for idx_image in range(measurement.num_y_ims):
             image = measurement.fringe_images_y[..., idx_image]
-            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image.astype(np.uint8))
         # Save x images (when lines were horizontal, e.g.)
         for idx_image in range(measurement.num_x_ims):
             image = measurement.fringe_images_x[..., idx_image]
-            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image.astype(np.uint8))
 
     # 4. Processes data with Sofast and save processed data to HDF5
     # =============================================================
