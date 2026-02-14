@@ -94,6 +94,7 @@ def process_single_facet(
     4. Processes data with SOFAST and save processed data to HDF5
     5. Generate plot suite and save image files
     """
+
     # General setup
     # =============
 
@@ -152,10 +153,16 @@ def process_single_facet(
             image = measurement.fringe_images_x[..., idx_image]
             imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image.astype(np.uint8))
 
-    # 4. Processes data with Sofast and save processed data to HDF5
-    # =============================================================
-    dir_save_cur = join(dir_save, "B3_analysis")
+    # 4. Review and check input
+    # =========================
+    # Diagnostic output directory
+    dir_save_cur = join(dir_save, "B3_diagnostics")
     ft.create_directories_if_necessary(dir_save_cur)
+
+    # &&&& DELETE-SCAFFOLDING
+    print("In process_single_facet(), facet_data.v_facet_corners =", facet_data.v_facet_corners)
+    print("In process_single_facet(), facet_data.v_facet_centroid =", facet_data.v_facet_centroid)
+    # &&&& DELETE-SCAFFOLDING
 
     # Define surface definition (parabolic surface), this is the mirror
     if (reference_mirror_surface_type == SYMMETRIC_PARABOLOID) or (
@@ -175,19 +182,71 @@ def process_single_facet(
         )
         fit_surface = None  # Eliminate Pylint error message.  Never executes.
 
+    # &&&& DELETE-SCAFFOLDING -- BEGIN ADD PLOT OF REFERENCE MIRROR
+    # view_spec_list = [vs.view_spec_3d(), vs.view_spec_xy(), vs.view_spec_xz(), vs.view_spec_yz()]
+    # for view_spec in view_spec_list:
+    #     ems.setup_draw_and_save_mirror_and_embedding_mirror(
+    #         figure_control=fig_control,
+    #         parametric_mirror=m1_pentagon,
+    #         title=title,
+    #         output_dir=output_dir,
+    #         view_spec=view_spec,
+    #         transform=transform,
+    #     )
+    # &&&& DELETE-SCAFFOLDING -- END ADD PLOT OF REFERENCE MIRROR
+
     # Calibrate fringes - (aka sinosoidal image)
     measurement.calibrate_fringe_images(calibration)
+
+    # &&&& DELETE-SCAFFOLDING -- ADD PLOT OF CALIBRATION
+
+    # 5. Process data with Sofast
+    # =============================
 
     # Instantiate sofast object
     sofast = Sofast(measurement, orientation, camera, display)
 
-    # Process
-    sofast.process_optic_singlefacet(facet_data, fit_surface)
+    # Turn on debug mode
+    # if verbose:
+    if True:  # &&&& DELETE-SCAFFOLDING
+        sofast.params.debug_geometry.debug_active = True
+        sofast.params.debug_geometry.save_dir = dir_save_cur
+        sofast.params.debug_geometry.figure_idx = 0
+        sofast.params.debug_slope_solver.debug_active = True
+        sofast.params.debug_slope_solver.save_dir = dir_save_cur
+        sofast.params.debug_slope_solver.figure_idx = 100
 
+    # # Process SOFAST
+    sofast.process_optic_singlefacet(facet_data, fit_surface)
     # Get measurement statistics
     config = SofastConfiguration()
     config.load_sofast_object(sofast)
     measurement_stats = config.get_measurement_stats()
+    # try:
+    #     # Process
+    #     sofast.process_optic_singlefacet(facet_data, fit_surface)
+    #     # Get measurement statistics
+    #     config = SofastConfiguration()
+    #     config.load_sofast_object(sofast)
+    #     measurement_stats = config.get_measurement_stats()
+    # except ValueError:
+    #     # Save all debug figures
+    #     lt.info(f'An error occured when processing SOFAST data. Saving all debug figures to {dir_save_cur}.')
+    #     for idx, fig in enumerate(sofast.params.debug_geometry.figures):
+    #         debug_geometry_figure_dir_body_ext = join(dir_save_cur, f'debug_geometry_{idx:02d}.png')
+    #         print("In process_single_facet(), saving debug_geometry figure:", debug_geometry_figure_dir_body_ext)
+    #         fig.savefig(debug_geometry_figure_dir_body_ext)
+    #     for idx_2, fig in enumerate(sofast.params.debug_slope_solver.slope_solver_figures):
+    #         debug_slope_solver_figure_dir_body_ext = join(dir_save, f'debug_slope_solver_{idx_2:02d}.png')
+    #         print(
+    #             "In process_single_facet(), saving debug_slope_solver figure:", debug_slope_solver_figure_dir_body_ext
+    #         )
+    #         fig.savefig(debug_slope_solver_figure_dir_body_ext)
+
+    # 6. Save processed data to HDF5
+    # =============================================================
+    dir_save_cur = join(dir_save, "B4_analysis")
+    ft.create_directories_if_necessary(dir_save_cur)
 
     # Save processed data to HDF5 format
     sofast.save_to_hdf(join(dir_save_cur, output_file_prefix + "data_sofast_processed.h5"))
@@ -196,9 +255,9 @@ def process_single_facet(
     with open(join(dir_save_cur, output_file_prefix + "measurement_statistics.json"), "w", encoding="utf-8") as f:
         json.dump(measurement_stats, f, indent=3)
 
-    # 5. Generate plot suite and save images files
+    # 7. Generate plot suite and save images files
     # ============================================
-    dir_save_cur = join(dir_save, "B4_plots")
+    dir_save_cur = join(dir_save, "B5_plots")
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Get measured and reference optics
@@ -251,7 +310,10 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
     plots = StandardPlotOutput()
 
     # Get settings
+    # &&&& DELETE-SCAFFOLDING
     if arg_settings_dir_body_ext is None:
+        # if False:
+        # &&&& DELETE-SCAFFOLDING
         print("Using default control settings.")
         # Verbose control
         if verbose_param is None:

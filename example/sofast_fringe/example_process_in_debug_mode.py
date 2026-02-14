@@ -74,6 +74,8 @@ def example_process_in_debug_mode():
     # Define save dir
     dir_save = join(dirname(__file__), "data/output/sofast_with_debug_mode_on")
     ft.create_directories_if_necessary(dir_save)
+    dir_save_debug = join(dir_save, "debug")
+    ft.create_directories_if_necessary(dir_save_debug)
 
     # Set up logger
     lt.logger(join(dir_save, "log.txt"), lt.log.INFO)
@@ -112,6 +114,12 @@ def example_process_in_debug_mode():
 
     # Turn on debug mode
     sofast.params.debug_geometry.debug_active = True
+    sofast.params.debug_geometry.debug_active = True
+    sofast.params.debug_geometry.save_dir = dir_save_debug
+    sofast.params.debug_geometry.figure_idx = 0
+    sofast.params.debug_slope_solver.debug_active = True
+    sofast.params.debug_slope_solver.save_dir = dir_save_debug
+    sofast.params.debug_slope_solver.figure_idx = 100
 
     # Process
     try:

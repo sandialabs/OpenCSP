@@ -41,7 +41,7 @@ from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Intersection import Intersection
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
@@ -172,7 +172,7 @@ class TestFluxMaps(to.TestOutput):
             code_tag=self.code_tag,
         )
         mirror_style = rcm.RenderControlMirror()
-        mirror.draw(fig_record.view, mirror_style)
+        mirror.draw(view=fig_record.view, mirror_style=mirror_style)
         trace_style = rcrt.init_current_lengths(current_len=6)
         trace.draw(fig_record.view, trace_style)
         square(4).draw_line(fig_record.view, close=True, style=rcps.RenderControlPointSeq(color="b", marker=","))

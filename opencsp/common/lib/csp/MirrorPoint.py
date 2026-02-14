@@ -1,4 +1,8 @@
-from typing import Literal
+"""Point mirror representing a single reflective surface defined
+by a collection of points.
+"""
+
+from typing import Callable, Literal
 from warnings import warn
 
 import numpy as np
@@ -15,6 +19,7 @@ from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d
 from opencsp.common.lib.render_control.RenderControlMirror import RenderControlMirror
+import opencsp.common.lib.tool.log_tools as lt
 
 # Interpolation types
 GIVEN_INTERPOLATION = "given"
@@ -99,38 +104,38 @@ class MirrorPoint(MirrorAbstract):
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
-            self.surface_function = interp.LinearNDInterpolator(points_xy, Z, np.nan)
+            self._surface_function = interp.LinearNDInterpolator(points_xy, Z, np.nan)
             # Normal vector interpolation object
             Z_N = self.normal_vectors.data.T
-            self.normals_function = interp.LinearNDInterpolator(points_xy, Z_N, np.nan)
+            self._normals_function = interp.LinearNDInterpolator(points_xy, Z_N, np.nan)
         elif interpolation_type == CLOUGH_TOCHER_INTERPOLATION:
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
-            self.surface_function = interp.CloughTocher2DInterpolator(points_xy, Z, np.nan)
+            self._surface_function = interp.CloughTocher2DInterpolator(points_xy, Z, np.nan)
             # Normal vector interpolation object
             Z_N = self.normal_vectors.data.T
-            self.normals_function = interp.CloughTocher2DInterpolator(points_xy, Z_N, np.nan)
+            self._normals_function = interp.CloughTocher2DInterpolator(points_xy, Z_N, np.nan)
         elif interpolation_type == NEAREST_INTERPOLATION:
             # Z coordinate interpolation object
             points_xy = self.surface_points.projXY().data.T  # Nx2 array
             Z = self.surface_points.z
-            self.surface_function = interp.NearestNDInterpolator(points_xy, Z)
+            self._surface_function = interp.NearestNDInterpolator(points_xy, Z)
             # Normal vector interpolatin object
             Z_N = self.normal_vectors.data.T
-            self.normals_function = interp.NearestNDInterpolator(points_xy, Z_N)
+            self._normals_function = interp.NearestNDInterpolator(points_xy, Z_N)
         elif interpolation_type == GIVEN_INTERPOLATION:
             # Z coordinate lookup function
             points_lookup = {
                 (x, y): z for x, y, z in zip(self.surface_points.x, self.surface_points.y, self.surface_points.z)
             }
-            self.surface_function = FXYD(points_lookup)
+            self._surface_function = FXYD(points_lookup)
             # Normal vector lookup function
             normals_lookup = {
                 (x, y): normal
                 for x, y, normal in zip(self.surface_points.x, self.surface_points.y, self.normal_vectors.data.T)
             }
-            self.normals_function = FXYD(normals_lookup)
+            self._normals_function = FXYD(normals_lookup)
             # Assert that there are no duplicate (x,y) pairs
             if len(points_lookup) != len(self.surface_points):
                 raise ValueError("All (x,y) pairs must be unique.")
@@ -166,7 +171,7 @@ class MirrorPoint(MirrorAbstract):
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         self._check_in_bounds(p)
-        pts = self.normals_function(p.x, p.y)
+        pts = self._normals_function(p.x, p.y)
         return Vxyz(pts.T).normalize()
 
     def surface_displacement_at(self, p: Pxy) -> np.ndarray:
@@ -190,7 +195,7 @@ class MirrorPoint(MirrorAbstract):
         """
         # "ChatGPT 4o-mini" assisted with generating this docstring.
         self._check_in_bounds(p)
-        return self.surface_function(p.x, p.y)
+        return self._surface_function(p.x, p.y)
 
     def survey_of_points(
         self, resolution: int = 1, resolution_type: str = "pixelX", random_seed: int | None = None
@@ -292,4 +297,4 @@ class MirrorPoint(MirrorAbstract):
 
         # If surface is interpolated, draw mirror using MirrorAbstract method
         else:
-            super().draw(view, mirror_style, transform)
+            super().draw(view=view, mirror_style=mirror_style, transform=transform)

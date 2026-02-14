@@ -115,6 +115,10 @@ class MirrorParametric(MirrorAbstract):
         if not all(self.in_bounds(p_samp)):
             raise ValueError("Not all points are within mirror perimeter.")
 
+    def surface_function(self) -> Callable:
+        """Returns the surface function, making this protected member accessible."""
+        return self._surface_function
+
     def surface_norm_at(self, p: Pxy) -> Vxyz:
         if not issubclass(type(p), Vxy):
             raise TypeError(f"Sample point must be type {Vxy}, not type {type(p)}")

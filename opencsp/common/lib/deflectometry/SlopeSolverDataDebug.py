@@ -27,3 +27,7 @@ class SlopeSolverDataDebug:
         self.slope_solver_single_plot: bool = False
         """Flag to plot all iterations of the slope solving algorithm on one plot (True) or create a separate
         plot for each iteration (False). Default False (new plot for each iteration)"""
+        self.save_dir = None
+        """Where to save figure objects."""
+        self.figure_idx = 0
+        """Incrementing figure index, so figures appear in order created."""

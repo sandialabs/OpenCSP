@@ -9,3 +9,7 @@ class DebugOpticsGeometry:
         """To activate geometry debugging. Default False"""
         self.figures: list = []
         """List to hold figure objects once created."""
+        self.save_dir = None
+        """Where to save figure objects."""
+        self.figure_idx = 0
+        """Incrementing figure index, so figures appear in order created."""

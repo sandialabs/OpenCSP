@@ -1,7 +1,6 @@
 from abc import abstractmethod
 
-from scipy.spatial.transform import Rotation
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 

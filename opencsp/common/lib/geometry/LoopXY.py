@@ -7,7 +7,7 @@ import numpy as np
 from opencsp.common.lib.geometry.EdgeXY import EdgeXY
 from opencsp.common.lib.geometry.LineXY import LineXY
 from opencsp.common.lib.geometry.Vxy import Vxy
-import opencsp.common.lib.render.View3d as v3d
+from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.log_tools as lt
@@ -80,14 +80,14 @@ class LoopXY:
 
     def _vertex_to_vertex_angles(self):
         """
-        Calculates the sin of the angle between the straight line drawn from
+        Calculates the sine of the angle between the straight line drawn from
         vertex to vertex.
 
         """
         cross_prod_data = np.zeros(self.num_edges)
         for idx1 in range(self.num_edges):
             idx2 = np.mod(idx1 + 1, self.num_edges)
-            # Calcualte edge vectors
+            # Calculate edge vectors
             V_1 = (self._edges[idx1]._vertices[1] - self._edges[idx1]._vertices[0]).normalize()
             V_2 = (self._edges[idx2]._vertices[1] - self._edges[idx2]._vertices[0]).normalize()
             # Calculate cross product
@@ -331,7 +331,7 @@ class LoopXY:
         # Draw arrows
         first_vert_np = np.array([self.vertices.x[:1], self.vertices.y[:1]])
         closed_loop_verts = Vxy(np.concatenate((self.vertices.data, first_vert_np), axis=1))
-        view = v3d.View3d(ax.figure, ax, vs.view_spec_xy())
+        view = View3d(ax.figure, ax, vs.view_spec_xy())
         view.draw_pq((closed_loop_verts.x, closed_loop_verts.y), style)
 
         # Plot starting point as green dot

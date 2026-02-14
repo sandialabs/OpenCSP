@@ -3,12 +3,8 @@ Demonstrate Solar Field Plotting Routines
 
 """
 
-from datetime import datetime
-import matplotlib.pyplot as plt
 import numpy as np
-import os
 
-from opencsp.common.lib.csp.HeliostatConfiguration import HeliostatConfiguration
 import opencsp.common.lib.csp.SolarField as sf
 from opencsp.common.lib.csp.SolarField import SolarField
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
@@ -16,23 +12,14 @@ import opencsp.common.lib.geo.lon_lat_nsttf as lln
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
-import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
-import opencsp.common.lib.render_control.RenderControlAxis as rca
-from opencsp.common.lib.render_control.RenderControlAxis import RenderControlAxis
-import opencsp.common.lib.render_control.RenderControlEnsemble as rce
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
-import opencsp.common.lib.render_control.RenderControlFigure as rcfg
-from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
-from opencsp.common.lib.render_control.RenderControlFigureRecord import RenderControlFigureRecord
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
 import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
-import opencsp.common.lib.test.support_test as stest
 import opencsp.common.lib.test.TestOutput as to
-import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 
@@ -46,12 +33,16 @@ STOW = Vxyz([-1, 0, -11.4]).normalize()  # !!!!!
 
 
 class ExampleSolarFieldOutput(to.TestOutput):
+    """
+    Example rendering of solar field objects under different configurations
+    and render settings.
+    """
 
     @classmethod
     def setUpClass(
         self,
         source_file_body: str = 'ExampleSolarFieldOutput',  # Set these here, because pytest calls
-        figure_prefix_root: str = 'tsfo',  # setup_class() with no arguments.
+        figure_prefix_root: str = 'esfo',  # setup_class() with no arguments.
         interactive: bool = False,
         verify: bool = True,
     ):
@@ -888,15 +879,18 @@ class ExampleSolarFieldOutput(to.TestOutput):
         self.show_save_and_check_figure(fig_record)
 
 
-def example_driver():
+def example_driver(verify=True):
     # Control flags.
     interactive = False
     # Set verify to False when you want to generate all figures and then copy
     # them into the expected_output directory.
-    # (Does not affect pytest, which uses default value.)
+    # Or, just run the pytest example, and then move the newly created
+    # output\ExampleSolarFieldOutput directory to the location
+    # input\ExampleSolarFieldOutput.
+
     # Setup.
     example_object = ExampleSolarFieldOutput()
-    example_object.setUpClass(interactive=interactive, verify=False)
+    example_object.setUpClass(interactive=interactive, verify=verify)
     example_object.setUp()
 
     # Tests.
@@ -920,4 +914,5 @@ def example_driver():
 
 # MAIN EXECUTION
 if __name__ == "__main__":
-    example_driver()
+    # When running from the debugger, we typically do not want verify turned on.
+    example_driver(verify=False)
