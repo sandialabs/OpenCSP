@@ -44,15 +44,19 @@ from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as So
 from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
+import opencsp.common.lib.csp.embedding_mirror_surface as ems
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric, SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, PLANO
 from opencsp.common.lib.csp.MirrorPoint import NEAREST_INTERPOLATION
+from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+import opencsp.common.lib.render.view_spec as vs
+import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
@@ -164,35 +168,49 @@ def process_single_facet(
     print("In process_single_facet(), facet_data.v_facet_centroid =", facet_data.v_facet_centroid)
     # &&&& DELETE-SCAFFOLDING
 
-    # Define surface definition (parabolic surface), this is the mirror
-    if (reference_mirror_surface_type == SYMMETRIC_PARABOLOID) or (
-        reference_mirror_surface_type == ASTIGMATIC_PARABOLOID
-    ):
+    # Construct the expected mirror and initial fit surface
+    # based on the input nominal optic definition.
+    facet_vertices = facet_data.v_facet_corners.projXY()
+    facet_region = RegionXY.from_vertices(facet_vertices)
+    if reference_mirror_surface_type == SYMMETRIC_PARABOLOID:
+        mirror_reference = MirrorParametric.generate_symmetric_paraboloid(reference_mirror_focal_length_x, facet_region)
+        fit_surface = Surface2DParabolic(
+            initial_focal_lengths_xy=(fit_initial_focal_length_x, fit_initial_focal_length_x),
+            robust_least_squares=fit_robust_least_squares,
+            downsample=fit_downsample,
+        )
+    elif reference_mirror_surface_type == ASTIGMATIC_PARABOLOID:
+        mirror_reference = MirrorParametric.generate_astigmatic_xy_paraboloid(
+            reference_mirror_focal_length_x, reference_mirror_focal_length_y, facet_region
+        )
         fit_surface = Surface2DParabolic(
             initial_focal_lengths_xy=(fit_initial_focal_length_x, fit_initial_focal_length_y),
             robust_least_squares=fit_robust_least_squares,
             downsample=fit_downsample,
         )
     elif reference_mirror_surface_type == PLANO:
+        mirror_reference = MirrorParametric.generate_flat(facet_region)
         fit_surface = Surface2DPlano(robust_least_squares=fit_robust_least_squares, downsample=fit_downsample)
     else:
         lt.error_and_raise(
             ValueError,
-            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}", "{ASTIGMATIC_PARABOLOID}, "{PLANO}"].',
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}," "{ASTIGMATIC_PARABOLOID}," or "{PLANO}"].',
         )
+        mirror_reference = None  # Eliminate Pylint error message.  Never executes.
         fit_surface = None  # Eliminate Pylint error message.  Never executes.
 
     # &&&& DELETE-SCAFFOLDING -- BEGIN ADD PLOT OF REFERENCE MIRROR
-    # view_spec_list = [vs.view_spec_3d(), vs.view_spec_xy(), vs.view_spec_xz(), vs.view_spec_yz()]
-    # for view_spec in view_spec_list:
-    #     ems.setup_draw_and_save_mirror_and_embedding_mirror(
-    #         figure_control=fig_control,
-    #         parametric_mirror=m1_pentagon,
-    #         title=title,
-    #         output_dir=output_dir,
-    #         view_spec=view_spec,
-    #         transform=transform,
-    #     )
+    fig_control = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
+    view_spec_list = [vs.view_spec_3d(), vs.view_spec_xy(), vs.view_spec_xz(), vs.view_spec_yz()]
+    for view_spec in view_spec_list:
+        ems.setup_draw_and_save_mirror_and_embedding_mirror(
+            figure_control=fig_control,
+            parametric_mirror=mirror_reference,
+            title='Expected Mirror',
+            output_dir=dir_save_cur,
+            view_spec=view_spec,
+            #            transform=transform,
+        )
     # &&&& DELETE-SCAFFOLDING -- END ADD PLOT OF REFERENCE MIRROR
 
     # Calibrate fringes - (aka sinosoidal image)
@@ -243,6 +261,17 @@ def process_single_facet(
     #         )
     #         fig.savefig(debug_slope_solver_figure_dir_body_ext)
 
+    # Save all debug figures
+    lt.info(f'Saving all debug figures to {dir_save_cur}.')
+    for idx, fig in enumerate(sofast.params.debug_geometry.figures):
+        debug_geometry_figure_dir_body_ext = join(dir_save_cur, f'debug_geometry_{idx:02d}.png')
+        print("In process_single_facet(), saving debug_geometry figure:", debug_geometry_figure_dir_body_ext)
+        fig.savefig(debug_geometry_figure_dir_body_ext)
+    for idx_2, fig in enumerate(sofast.params.debug_slope_solver.slope_solver_figures):
+        debug_slope_solver_figure_dir_body_ext = join(dir_save, f'debug_slope_solver_{idx_2:02d}.png')
+        print("In process_single_facet(), saving debug_slope_solver figure:", debug_slope_solver_figure_dir_body_ext)
+        fig.savefig(debug_slope_solver_figure_dir_body_ext)
+
     # 6. Save processed data to HDF5
     # =============================================================
     dir_save_cur = join(dir_save, "B4_analysis")
@@ -277,7 +306,7 @@ def process_single_facet(
     else:
         lt.error_and_raise(
             ValueError,
-            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}", "{ASTIGMATIC_PARABOLOID}, "{PLANO}"].',
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}," "{ASTIGMATIC_PARABOLOID}," or "{PLANO}"].',
         )
         mirror_reference = None  # Eliminate Pylint error message.  Never executes.
 
@@ -335,18 +364,19 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         # Strings denoting computation.
         measurement_id = "Time_Mirror_InstrumentMode"
         post_process_id = "PostSpec"
+        # Reference mirror surface
+        reference_mirror_surface_type = SYMMETRIC_PARABOLOID  # Strings from MirrorParametric.py: SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, or PLANO
+        reference_mirror_focal_length_x = 2.0  # 100.0  # Ignored if plano
+        reference_mirror_focal_length_y = 2.0  # 100.0  # Ignored if plano or symmetric paraboloid
         # Analysis control
-        fit_initial_focal_length_x = 300.0
-        fit_initial_focal_length_y = 300.0
+        initial_fit_factor = 2.0  # Dimensionless
+        fit_initial_focal_length_x = reference_mirror_focal_length_x * initial_fit_factor  # 300.0
+        fit_initial_focal_length_y = reference_mirror_focal_length_y * initial_fit_factor  # 300.0
         fit_robust_least_squares = True
         fit_downsample = 10
         # Measured mirror surface
         measured_interpolation_type = NEAREST_INTERPOLATION  # Strings from MirrorPoint.py: GIVEN_INTERPOLATION, BILINEAR_INTERPOLATION, CLOUGH_TOCHER_INTERPOLATION, or NEAREST_INTERPOLATION
 
-        # Reference mirror surface
-        reference_mirror_surface_type = SYMMETRIC_PARABOLOID  # Strings from MirrorParametric.py: SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, or PLANO
-        reference_mirror_focal_length_x = 100.0  # Ignored if plano
-        reference_mirror_focal_length_y = 100.0  # Ignored if plano or symmetric paraboloid
         # Output rendering control
         output_fringe_images = True
         # Set plot control parameters to the values we want for the default example.
