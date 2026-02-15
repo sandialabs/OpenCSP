@@ -13,6 +13,7 @@ from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ, identity_tran
 from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlAxis as rca
+import opencsp.common.lib.render_control.RenderControlFigureRecord as rcfr
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
 import opencsp.common.lib.render_control.RenderControlMirrorEmbedded as rcme
 import opencsp.common.lib.render_control.RenderControlMirrorProjected as rcmp
@@ -183,6 +184,66 @@ def draw_mirror_and_embedding_mirror(
     )
 
 
+def setup_and_draw_mirror_and_embedding_mirror(
+    # Required parameters.
+    figure_control: RenderControlFigure,
+    parametric_mirror: MirrorParametric,
+    title: str,
+    # Options.
+    axis_control: rca.RenderControlAxis = None,
+    view_spec: dict = None,
+    number_in_name: bool = False,
+    input_prefix: str = None,
+    caption: str = None,
+    comments: list[str] = [],
+    code_tag: str = None,
+    mirror_style: rcm.RenderControlMirror = rcm.RenderControlMirror(),
+    draw_projection: bool = True,
+    projected_style: rcmp.RenderControlMirrorProjected = rcmp.mirror_boundary(),
+    embedding_style: rcme.RenderControlMirrorEmbedded = rcme.standard_embedding_mirror(),
+    transform: TransformXYZ | None = None,
+) -> rcfr.RenderControlFigureRecord:
+    """
+    This function wraps function draw_mirror_and_embedding_mirror() above,
+    creating and drawing a figure for testing and other use.
+    It returns the figure so additional material can be added.
+    """
+    # Ensure all parameters are set.
+    if axis_control is None:
+        axis_control = rca.meters(grid=False)  # Drawing axis grid and surface grid is confusing.
+    if view_spec is None:
+        view_spec = vs.view_spec_3d()
+    if transform is None:
+        transform = identity_transform()
+
+    # Setup figure.
+    fig_record = fm.setup_figure_for_3d_data(
+        figure_control=figure_control,
+        axis_control=axis_control,
+        view_spec=view_spec,
+        number_in_name=number_in_name,
+        input_prefix=input_prefix,
+        title=title,
+        caption=caption,
+        comments=comments,
+        code_tag=code_tag,
+    )
+
+    # Draw.
+    draw_mirror_and_embedding_mirror(
+        parametric_mirror,
+        view=fig_record.view,
+        mirror_style=mirror_style,
+        draw_projection=draw_projection,
+        projected_style=projected_style,
+        embedding_style=embedding_style,
+        transform=transform,
+    )
+
+    # Return figure so more can be added.
+    return fig_record
+
+
 def setup_draw_and_save_mirror_and_embedding_mirror(
     # Required parameters.
     figure_control: RenderControlFigure,
@@ -208,35 +269,24 @@ def setup_draw_and_save_mirror_and_embedding_mirror(
     close_after_save: bool = True,
     include_view_suffix: bool = True,
     include_limit_suffix: bool = False,
-):
+) -> None:
     """
     This function wraps function draw_mirror_and_embedding_mirror() above,
     creating and saving a figure for testing and other use.
     """
-    # Ensure all parameters are set.
-    if axis_control is None:
-        axis_control = rca.meters(grid=False)  # Drawing axis grid and surface grid is confusing.
-    if view_spec is None:
-        view_spec = vs.view_spec_3d()
-    if transform is None:
-        transform = identity_transform()
 
-    # Setup figure.
-    fig_record = fm.setup_figure_for_3d_data(
+    # Setup and draw.
+    fig_record = setup_and_draw_mirror_and_embedding_mirror(
         figure_control=figure_control,
+        parametric_mirror=parametric_mirror,
+        title=title,
         axis_control=axis_control,
         view_spec=view_spec,
         number_in_name=number_in_name,
         input_prefix=input_prefix,
-        title=title,
         caption=caption,
         comments=comments,
         code_tag=code_tag,
-    )
-
-    draw_mirror_and_embedding_mirror(
-        parametric_mirror,
-        view=fig_record.view,
         mirror_style=mirror_style,
         draw_projection=draw_projection,
         projected_style=projected_style,
