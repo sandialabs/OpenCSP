@@ -839,8 +839,9 @@ class MirrorAbstract(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOr
     ) -> None:
         """Draws a mesh on the mirror surface, optionally with projected slice correspondence.
 
-        If "project_..." is true, the the corresponding slices are drawn including their
-        projection onto the (x,y) plane, with correspondence lines for coarse vertices.
+        If any arguments that control projection rendering are true (for example, project_slices_x),
+        then the corresponding slices are drawn including their projection onto the (x,y) plane,
+        with correspondence lines for coarse vertices.
 
         Parameters
         ----------
