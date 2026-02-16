@@ -44,7 +44,7 @@ from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricR
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.csp.SolarField import SolarField
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
@@ -245,7 +245,7 @@ class TestRayTraceOutput(to.TestOutput):
         view1_yz = fig_record.view
 
         trace1.draw(view1_yz, RenderControlRayTrace(light_path_control=light_path_control))
-        m1.draw(view1_yz, mirror_control)
+        m1.draw(view=view1_yz, mirror_style=mirror_control)
 
         # Output.
         self.show_save_and_check_figure(fig_record)

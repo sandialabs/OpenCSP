@@ -248,3 +248,15 @@ class TransformXYZ:
     def copy(self) -> "TransformXYZ":
         """Returns a copy of the transform"""
         return TransformXYZ(self.matrix.copy())
+
+
+# Common transforms
+
+
+def identity_transform() -> TransformXYZ:
+    """Return a transform that does not change position or orientation."""
+    # There is probably a batter way to do this, but I don't have time
+    # to figure it out right now. -RCB
+    rotation = Rotation.from_euler('x', 0, True)
+    translation = Vxyz([0, 0, 0])
+    return TransformXYZ.from_R_V(rotation, translation)

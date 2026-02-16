@@ -1,29 +1,35 @@
+"""
+Demonstrate mirror plotting routines.
+"""
+
 import copy
 import datetime
 from typing import Callable
 
-import matplotlib
 import numpy as np
 import pytz
 from scipy.spatial.transform import Rotation
+import opencsp.common.lib.csp.embedding_mirror_surface as ems
 from opencsp.common.lib.csp.FacetEnsemble import FacetEnsemble
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
+from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render.view_spec as vs
-import opencsp.common.lib.render_control.RenderControlEnsemble as rce
+import opencsp.common.lib.render_control.RenderControlAxis as rca
 import opencsp.common.lib.render_control.RenderControlFacet as rcf
+import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
 import opencsp.common.lib.render_control.RenderControlHeliostat as rch
-import opencsp.common.lib.render_control.RenderControlMirror as rcm
-import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
 import opencsp.common.lib.render_control.RenderControlLightPath as rclp
-import opencsp.common.lib.render_control.RenderControlRayTrace as rcrt
+import opencsp.common.lib.render_control.RenderControlMirror as rcm
+import opencsp.common.lib.render_control.RenderControlMirrorEmbedded as rcme
+import opencsp.common.lib.render_control.RenderControlMirrorProjected as rcmp
+import opencsp.common.lib.render_control.RenderControlSolarField as rcsf
 import opencsp.common.lib.test.TestOutput as to
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
@@ -32,9 +38,7 @@ from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricRectangular
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 from opencsp.common.lib.csp.SolarField import SolarField
-import opencsp.common.lib.render_control.RenderControlFacetEnsemble as rcfe
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
-import opencsp.common.lib.csp.RayTrace as rt
 
 
 PI = np.pi
@@ -51,7 +55,7 @@ class ExampleMirrorOutput(to.TestOutput):
     def setUpClass(
         cls,
         source_file_body: str = 'ExampleMirrorOutput',  # Set these here, because pytest calls
-        figure_prefix_root: str = 'tmo',
+        figure_prefix_root: str = 'emo',
         interactive: bool = False,
         verify: bool = True,
     ):
@@ -65,14 +69,12 @@ class ExampleMirrorOutput(to.TestOutput):
         )
 
     def setUp(self):
-        # create a scnene for placing optics
+        # Create a scene for placing optics.
         self.scene = Scene()
 
         # Mirror, based on a parameteric model.
         self.m1_focal_length = 2.0  # meters
-        self.m1_fxn = self.lambda_symmetric_paraboloid(
-            self.m1_focal_length
-        )  # Include self as a parameter, because this setup_class() function is a @classmethod.
+        self.m1_fxn = self.lambda_symmetric_paraboloid(self.m1_focal_length)
         self.m1_len_x = 2.0  # m
         self.m1_len_y = 3.0  # m
         self.m1_rectangle_xy = (self.m1_len_x, self.m1_len_y)
@@ -97,6 +99,35 @@ class ExampleMirrorOutput(to.TestOutput):
         )
         pentagon_region = RegionXY.from_vertices(pentagon_vertices)
         self.m_pentagon = MirrorParametric(self.m1_fxn, pentagon_region)
+        self.m_pentagon_shape_description = 'pentagon'
+        self.m_pentagon_title = (
+            'Mirror (' + self.m_pentagon_shape_description + ', f=' + str(self.m1_focal_length) + 'm)'
+        )
+        self.m_pentagon_caption = (
+            'A single mirror of shape ('
+            + self.m_pentagon_shape_description
+            + '), analytically defined with focal length f='
+            + str(self.m1_focal_length)
+            + 'm.'
+        )
+        self.m_pentagon_comments = []
+
+        # Deep pentagonal mirror, based on a parametric model.
+        self.m_deep_focal_length = 1.0  # meters
+        self.m_deep_fxn = self.lambda_symmetric_paraboloid(self.m_deep_focal_length)
+        self.m_deep_pentagon = MirrorParametric(self.m_deep_fxn, pentagon_region)
+        self.m_deep_pentagon_shape_description = 'pentagon'
+        self.m_deep_pentagon_title = (
+            'Mirror (' + self.m_pentagon_shape_description + ', f=' + str(self.m_deep_focal_length) + 'm)'
+        )
+        self.m_deep_pentagon_caption = (
+            'A single mirror of shape ('
+            + self.m_pentagon_shape_description
+            + '), analytically defined with focal length f='
+            + str(self.m_deep_focal_length)
+            + 'm.'
+        )
+        self.m_deep_pentagon_comments = []
 
         # Facet, based on a parameteric mirror.
         self.f1 = Facet(self.m1)
@@ -117,7 +148,7 @@ class ExampleMirrorOutput(to.TestOutput):
         self.h2x2_f4 = Facet(copy.deepcopy(self.m1))
         fe2x2 = FacetEnsemble([self.h2x2_f1, self.h2x2_f2, self.h2x2_f3, self.h2x2_f4])
         facet_positions = Pxyz([[-1.1, 1.1, -1.1, 1.1], [1.6, 1.6, -1.6, -1.6], [0, 0, 0, 0]])
-        fe2x2.set_facet_positions(facet_positions)  # fe2x2 := facet emsenble, two by two
+        fe2x2.set_facet_positions(facet_positions)  # fe2x2 := facet ensemble, two by two
 
         # Set canting angles.
         cos5 = np.cos(np.deg2rad(8))
@@ -200,31 +231,37 @@ class ExampleMirrorOutput(to.TestOutput):
             comments=local_comments,
             code_tag=self.code_tag,
         )
-        self.m1.draw(fig_record.view, mirror_control)
+        self.m1.draw(view=fig_record.view, mirror_style=mirror_control)
 
         # Output.
         self.show_save_and_check_figure(fig_record)
 
-    def example_mirror_halfpi_rotation(self) -> None:
+    def example_pentagon_elevation_30deg(self) -> None:
         """
-        Draws a pentagonal mirror that is rotated 90 deg in space. Should look like a mirror with its normal parallel in the xy plane.
+        Draws a pentagonal mirror that is rotated 30 deg in space.
+        Should look like a mirror with its normal pointing 30 degrees above the xy plane.
         """
         # Initialize test.
         self.start_test()
-        local_comments = self.m1_comments.copy()
+        local_comments = self.m_pentagon_comments.copy()
 
         # Position/Rotation in space.
         tran = Vxyz([0, 0, 0])
-        rot = Rotation.from_euler('x', 45, True)
+        # Rotation about x rotates face-up surface normal down from zenith,
+        # so we rotate by (90-30) degrees.
+        desired_elevation_deg = 30.0
+        rot = Rotation.from_euler('x', (90.0 - desired_elevation_deg), True)
         transform = TransformXYZ.from_R_V(rot, tran)
+        # Copy the mirror because we will want to use it again later without the rotation.
+        m_pentagon_copy = copy.deepcopy(self.m_pentagon)
 
-        local_comments.append('Oriented face 45 deg up from level.')
-        self.scene.add_object(self.m_pentagon)
-        self.scene.set_position_in_space(self.m_pentagon, transform)
+        local_comments.append('Oriented face 30 deg up from level.')
+        self.scene.add_object(m_pentagon_copy)
+        self.scene.set_position_in_space(m_pentagon_copy, transform)
 
         # Setup render control.
         mirror_control = rcm.RenderControlMirror()
-        local_comments.append('Render surface only.')
+        local_comments.append('Render mirror surface only.')
 
         # Draw.
         fig_record = fm.setup_figure_for_3d_data(
@@ -234,12 +271,113 @@ class ExampleMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
             input_prefix=self.figure_prefix(2),
-            title=self.m1_title + ', Face Horizon',
-            caption=st.add_to_last_sentence(self.m1_caption, ', facing the horizon'),
+            title=self.m_pentagon_title + ', Elevation 30 Degrees',
+            caption=st.add_to_last_sentence(self.m_pentagon_caption, ', facing 30 degrees above the horizon'),
             comments=local_comments,
             code_tag=self.code_tag,
         )
-        self.m_pentagon.draw(fig_record.view, mirror_control)
+        m_pentagon_copy.draw(view=fig_record.view, mirror_style=mirror_control)
+
+        # Output.
+        self.show_save_and_check_figure(fig_record)
+
+    def example_deep_pentagon_elevation_60deg_embedding(self) -> None:
+        """
+        Draws a deep pentagonal mirror that is rotated 60 deg in space.
+        Should look like a mirror with its normal pointing 60 degrees
+        above the xy plane.
+        Also demonstrates embedding surface and slice drawing, all
+        including transform.
+        """
+        # Initialize test.
+        self.start_test()
+        local_comments = self.m_deep_pentagon_comments.copy()
+
+        # Position/Rotation in space.
+        tran = Vxyz([0, 0, 0.6])
+        # Rotation about x rotates face-up surface normal down from zenith,
+        # so we rotate by (90-30) degrees.
+        desired_elevation_deg = 60.0
+        rot = Rotation.from_euler('x', (90.0 - desired_elevation_deg), True)
+        transform = TransformXYZ.from_R_V(rot, tran)
+        # Copy the mirror because we will want to use it again later without the rotation.
+        m_deep_pentagon_copy = copy.deepcopy(self.m_deep_pentagon)
+
+        local_comments.append('Oriented face 60 deg up from level.')
+        self.scene.add_object(m_deep_pentagon_copy)
+        self.scene.set_position_in_space(m_deep_pentagon_copy, transform)
+
+        # Setup render control.
+        mirror_control = rcm.RenderControlMirror()
+        # See below for multi-part projection and slice control settings.
+
+        # Draw.
+        fig_record = fm.setup_figure_for_3d_data(
+            figure_control=self.figure_control,
+            axis_control=rca.meters(grid=False),  # Drawing axis grid and surface grid is confusing.
+            view_spec=vs.view_spec_3d(),
+            # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            number_in_name=False,
+            input_prefix=self.figure_prefix(10),
+            title=self.m_deep_pentagon_title + ', Elevation 60 Degrees, Embedding Surface',
+            caption=st.add_to_last_sentence(self.m_deep_pentagon_caption, ', facing 60 degrees above the horizon'),
+            comments=local_comments,
+            code_tag=self.code_tag,
+        )
+        m_deep_pentagon_copy.draw(view=fig_record.view, mirror_style=mirror_control)
+        ems.draw_mirror_and_embedding_mirror(
+            m_deep_pentagon_copy,
+            view=fig_record.view,
+            mirror_style=rcm.RenderControlMirror(),
+            draw_projection=True,
+            projected_style=rcmp.mirror_boundary(),
+            embedding_style=rcme.standard_embedding_mirror(),
+            transform=transform,
+        )
+
+        # Output.
+        self.show_save_and_check_figure(fig_record)
+
+    def example_deep_pentagon_elevation_face_up_embedding(self, view_spec: dict, figure_idx) -> None:
+        """
+        Draws a deep pentagonal mirror that is face up, with embedding
+        surface and origin slices.
+        """
+        # Initialize test.
+        self.start_test()
+        local_comments = self.m_deep_pentagon_comments.copy()
+
+        # Position/Rotation in space.
+        local_comments.append('Oriented face up.')
+
+        # Setup render control.
+        mirror_control = rcm.RenderControlMirror()
+        # See below for multi-part projection and slice control settings.
+
+        # Draw.
+        fig_record = fm.setup_figure_for_3d_data(
+            figure_control=self.figure_control,
+            axis_control=rca.meters(grid=False),  # Drawing axis grid and surface grid is confusing.
+            view_spec=view_spec,
+            # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
+            number_in_name=False,
+            input_prefix=self.figure_prefix(figure_idx),
+            title=self.m_deep_pentagon_title + ', Face Up, Embedding Surface',
+            caption=st.add_to_last_sentence(
+                self.m_deep_pentagon_caption, ', facing up, with embedding suraface and origin slices'
+            ),
+            comments=local_comments,
+            code_tag=self.code_tag,
+        )
+        self.m_deep_pentagon.draw(view=fig_record.view, mirror_style=mirror_control)
+        ems.draw_mirror_and_embedding_mirror(
+            self.m_deep_pentagon,
+            view=fig_record.view,
+            mirror_style=rcm.RenderControlMirror(),
+            draw_projection=True,
+            projected_style=rcmp.mirror_boundary(),
+            embedding_style=rcme.standard_embedding_mirror(),
+        )
 
         # Output.
         self.show_save_and_check_figure(fig_record)
@@ -280,7 +418,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(4),
+            input_prefix=self.figure_prefix(20),
             title=self.f1_title,
             caption=self.f1_caption,
             comments=local_comments,
@@ -322,7 +460,7 @@ class ExampleMirrorOutput(to.TestOutput):
             # Figure numbers needed because titles may be identical.
             # Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(6),
+            input_prefix=self.figure_prefix(21),
             title=self.h2x2_title,
             caption=self.h2x2_caption,
             comments=local_comments,
@@ -380,7 +518,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(7),
+            input_prefix=self.figure_prefix(30),
             title=self.sf2x2_title,
             caption=self.sf2x2_caption,
             comments=local_comments,
@@ -535,7 +673,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_xy(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(17),
+            input_prefix=self.figure_prefix(40),
             title=title_5W01 + ' (long normals)',
             caption=caption_5W01,
             comments=comments,
@@ -551,7 +689,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_xy(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(18),
+            input_prefix=self.figure_prefix(41),
             title=title_14W01 + ' (long normals)',
             caption=caption_14W01,
             comments=comments,
@@ -590,7 +728,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_yz(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(19),
+            input_prefix=self.figure_prefix(42),
             title=title_sf + ' (very long normals)',
             caption=caption_sf,
             comments=comments,
@@ -636,7 +774,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(20),
+            input_prefix=self.figure_prefix(50),
             title=title_5W01 + ' (exaggerated z)',
             caption=caption_5W01,
             comments=comments,
@@ -653,7 +791,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_yz(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(21),
+            input_prefix=self.figure_prefix(51),
             title=title_5W01 + ' (exaggerated z)',
             caption=caption_5W01,
             comments=comments,
@@ -673,7 +811,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(22),
+            input_prefix=self.figure_prefix(52),
             title=title_14W01 + ' (exaggerated z)',
             caption=caption_14W01,
             comments=comments,
@@ -690,7 +828,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_yz(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(23),
+            input_prefix=self.figure_prefix(53),
             title=title_14W01 + ' (exaggerated z)',
             caption=caption_14W01,
             comments=comments,
@@ -771,7 +909,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(24),
+            input_prefix=self.figure_prefix(60),
             title=title + ', Without Canting',
             caption=st.add_to_last_sentence(caption, ' without canting'),
             comments=comments,
@@ -800,7 +938,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(25),
+            input_prefix=self.figure_prefix(61),
             title=title + ', Canted and Lifted',
             caption=st.add_to_last_sentence(caption, ' with canting angle and lifted'),
             comments=comments,
@@ -818,7 +956,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(26),
+            input_prefix=self.figure_prefix(62),
             title=title + ', With Canting',
             caption=st.add_to_last_sentence(caption, ' with canting'),
             comments=comments,
@@ -837,7 +975,7 @@ class ExampleMirrorOutput(to.TestOutput):
             vs.view_spec_3d(),
             # Figure numbers needed because titles may be identical. Hard-code number because test order is unpredictable.
             number_in_name=False,
-            input_prefix=self.figure_prefix(27),
+            input_prefix=self.figure_prefix(63),
             title=title + ', With Canting and Tracking',
             caption=st.add_to_last_sentence(caption, ' with canting and tracking'),
             comments=comments,
@@ -847,28 +985,41 @@ class ExampleMirrorOutput(to.TestOutput):
         self.show_save_and_check_figure(fig_record)
 
 
-# MAIN EXECUTION
-if __name__ == "__main__":
+def example_driver(verify=True):
     # Control flags.
     interactive = False
     # Set verify to False when you want to generate all figures and then copy
     # them into the expected_output directory.
-    # (Does not affect pytest, which uses default value.)
+    # Or, just run the pytest example, and then move the newly created
+    # output\ExampleMirrorOutput directory to the location
+    # input\ExampleMirrorOutput.
+
     # Setup.
     example_object = ExampleMirrorOutput()
-    example_object.setUpClass(interactive=interactive, verify=False)
+    example_object.setUpClass(interactive=interactive, verify=verify)
     example_object.setUp()
-    # Examples.
-    lt.info('Beginning examples...')
+
+    # Tests.
+    lt.info('Beginning tests...')
     example_object.example_mirror()
-    example_object.example_mirror_halfpi_rotation()
+    example_object.example_pentagon_elevation_30deg()
+    example_object.example_deep_pentagon_elevation_60deg_embedding()
+    example_object.example_deep_pentagon_elevation_face_up_embedding(vs.view_spec_3d(), 11)
+    example_object.example_deep_pentagon_elevation_face_up_embedding(vs.view_spec_xy(), 12)
+    example_object.example_deep_pentagon_elevation_face_up_embedding(vs.view_spec_xz(), 13)
+    example_object.example_deep_pentagon_elevation_face_up_embedding(vs.view_spec_yz(), 14)
     example_object.example_facet()
     example_object.example_heliostat_surface_normals()
     example_object.example_solar_field()
     example_object.example_heliostat_05W01_and_14W01()
     example_object.example_heliostat_stages()
-    lt.info('All examples complete.')
+    lt.info('All tests complete.')
     # Cleanup.
     if interactive:
         input("Press Enter...")
-    example_object.tearDown()
+
+
+# MAIN EXECUTION
+if __name__ == "__main__":
+    # When running from the debugger, we typically do not want verify turned on.
+    example_driver(verify=False)

@@ -1,0 +1,17 @@
+Metadata:
+Figure number: 1
+Name: emo002_Mirror (pentagon, f=2.0m), Elevation 30 Degrees
+Title: Mirror (pentagon, f=2.0m), Elevation 30 Degrees
+Code tag: ExampleMirrorOutput.example_pentagon_elevation_30deg()
+View spec: 3d
+
+Title:
+Mirror (pentagon, f=2.0m), Elevation 30 Degrees
+
+Caption:
+A single mirror of shape (pentagon), analytically defined with focal length f=2.0m, facing 30 degrees above the horizon.
+
+Comments:
+Oriented face 30 deg up from level.
+Render mirror surface only.
+

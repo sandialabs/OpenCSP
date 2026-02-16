@@ -2,11 +2,17 @@
 representing a single reflective surface defined by an algebraic function.
 """
 
+import numpy as np
+
 from typing import Callable
 
 from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
+from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
+from opencsp.common.lib.render.View3d import View3d
+import opencsp.common.lib.render_control.RenderControlMirrorProjected as rcmp
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
 
 class MirrorParametricRectangular(MirrorParametric):
@@ -26,7 +32,7 @@ class MirrorParametricRectangular(MirrorParametric):
             side lengths equal to size. If input length is 2, size is interpreted as
             size=(x, y) where x is the x side lengths and y is the y side lengths.
         """
-        self.surface_function = surface_function
+        self._surface_function = surface_function
 
         # Use the XY size to make a rectangular region
         region = RegionXY.rectangle(size)

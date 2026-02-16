@@ -64,7 +64,7 @@ from opencsp.common.lib.csp.Tower import Tower
 from opencsp.common.lib.geometry.FunctionXYContinuous import FunctionXYContinuous
 from opencsp.common.lib.geometry.Intersection import Intersection
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz

@@ -1,0 +1,16 @@
+Metadata:
+Figure number: 1
+Name: emo012_Mirror (pentagon, f=1.0m), Face Up, Embedding Surface
+Title: Mirror (pentagon, f=1.0m), Face Up, Embedding Surface
+Code tag: ExampleMirrorOutput.example_deep_pentagon_elevation_face_up_embedding()
+View spec: xy
+
+Title:
+Mirror (pentagon, f=1.0m), Face Up, Embedding Surface
+
+Caption:
+A single mirror of shape (pentagon), analytically defined with focal length f=1.0m, facing up, with embedding suraface and origin slices.
+
+Comments:
+Oriented face up.
+

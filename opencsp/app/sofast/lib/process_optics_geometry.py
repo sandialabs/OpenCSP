@@ -1,6 +1,7 @@
 """Library of functions used to process the geometry of a deflectometry setup."""
 
-from copy import copy
+import copy
+import os.path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -89,7 +90,7 @@ def process_singlefacet_geometry(
     data_error = cdc.CalculationError()
 
     # Make copy of orientation
-    ori = copy(orientation)
+    ori = copy.copy(orientation)
 
     # Get optic data
     v_facet_corners: Vxyz = facet_data.v_facet_corners  # Corners of facet in facet coordinates
@@ -102,12 +103,32 @@ def process_singlefacet_geometry(
     if debug.debug_active:
         fig = plt.figure()
         debug.figures.append(fig)
+        figure_title = "Raw Mask"
+        figure_file_body = figure_title.replace(' ', '_')
+        figure_dir_body_ext = os.path.join(debug.save_dir, f'{debug.figure_idx:02d}_geometry_{figure_file_body}.png')
+        debug.figure_idx += 1
         plt.imshow(mask_raw, cmap="gray")
-        plt.title("Raw Mask")
+        plt.title(figure_title)
+        lt.info(f"In process_singlefacet_geometry(), saving figure '{figure_title}' to:\n   {figure_dir_body_ext}")
+        fig.savefig(figure_dir_body_ext)
 
     # Find edges of mask
     v_edges_image = ip.edges_from_mask(mask_raw)
     data_image_processing_general.v_edges_image = v_edges_image
+
+    # Plot mask edges
+    if debug.debug_active:
+        fig = plt.figure()
+        debug.figures.append(fig)
+        figure_title = "Mask Edges"
+        figure_file_body = figure_title.replace(' ', '_')
+        figure_dir_body_ext = os.path.join(debug.save_dir, f'{debug.figure_idx:02d}_geometry_{figure_file_body}.png')
+        debug.figure_idx += 1
+        plt.imshow(mask_raw, cmap="gray")
+        plt.scatter(*v_edges_image.data, marker=".", c='red', s=0.05)
+        plt.title(figure_title)
+        lt.info(f"In process_singlefacet_geometry(), saving figure '{figure_title}' to:\n   {figure_dir_body_ext}")
+        fig.savefig(figure_dir_body_ext)
 
     # Find centroid of processed mask
     v_mask_centroid_image = ip.centroid_mask(mask_raw)
@@ -117,9 +138,15 @@ def process_singlefacet_geometry(
     if debug.debug_active:
         fig = plt.figure()
         debug.figures.append(fig)
-        plt.imshow(mask_raw)
-        plt.scatter(*v_mask_centroid_image.data, marker="x")
-        plt.title("Mask Centroid")
+        figure_title = "Mask Centroid"
+        figure_file_body = figure_title.replace(' ', '_')
+        figure_dir_body_ext = os.path.join(debug.save_dir, f'{debug.figure_idx:02d}_geometry_{figure_file_body}.png')
+        debug.figure_idx += 1
+        plt.imshow(mask_raw, cmap="gray")
+        plt.scatter(*v_mask_centroid_image.data, marker="x", c='red')
+        plt.title(figure_title)
+        lt.info(f"In process_singlefacet_geometry(), saving figure '{figure_title}' to:\n   {figure_dir_body_ext}")
+        fig.savefig(figure_dir_body_ext)
 
     # Find expected position of optic centroid
     v_cam_optic_centroid_cam_exp = sp.t_from_distance(
@@ -131,11 +158,18 @@ def process_singlefacet_geometry(
     if debug.debug_active:
         fig = plt.figure()
         debug.figures.append(fig)
-        plt.imshow(mask_raw)
-        plt.scatter(
-            *camera.project(v_cam_optic_centroid_cam_exp, Rotation.identity(), Vxyz((0, 0, 0))).data, marker="."
-        )
-        plt.title("Expected Optic Centroid")
+        figure_title = "Expected Optic Centroid"
+        figure_file_body = figure_title.replace(' ', '_')
+        figure_dir_body_ext = os.path.join(debug.save_dir, f'{debug.figure_idx:02d}_geometry_{figure_file_body}.png')
+        debug.figure_idx += 1
+        plt.imshow(mask_raw, cmap="gray")
+        plt.scatter(*v_mask_centroid_image.data, marker="x", c='red', s=45, label='Mask Centroid')
+        expected_centroid = camera.project(v_cam_optic_centroid_cam_exp, Rotation.identity(), Vxyz((0, 0, 0)))
+        plt.scatter(*expected_centroid.data, marker=".", c='blue', s=35, label='Expected Centroid')
+        plt.title(figure_title)
+        plt.legend()
+        lt.info(f"In process_singlefacet_geometry(), saving figure '{figure_title}' to:\n   {figure_dir_body_ext}")
+        fig.savefig(figure_dir_body_ext)
 
     # Find expected orientation of optic
     r_cam_optic_exp = sp.r_from_position(v_cam_optic_centroid_cam_exp, ori.v_cam_screen_cam)
@@ -145,17 +179,34 @@ def process_singlefacet_geometry(
     v_cam_optic_cam_exp = v_cam_optic_centroid_cam_exp - v_centroid_facet.rotate(r_cam_optic_exp.inv())
     data_geometry_general.v_cam_optic_cam_exp = v_cam_optic_cam_exp
 
-    # Find expected optic loop in pixels
+    # Find expected optic vertices
     v_optic_corners_image_exp = camera.project(v_facet_corners, r_cam_optic_exp.inv(), v_cam_optic_cam_exp)
-    loop_optic_image_exp = LoopXY.from_vertices(v_optic_corners_image_exp)
-    data_image_processing_general.loop_optic_image_exp = loop_optic_image_exp
 
     # Plot expected optic corners
     if debug.debug_active:
         fig = plt.figure()
         debug.figures.append(fig)
+        figure_title = "Expected Optic Corners"
+        figure_file_body = figure_title.replace(' ', '_')
+        figure_dir_body_ext = os.path.join(debug.save_dir, f'{debug.figure_idx:02d}_geometry_{figure_file_body}.png')
+        debug.figure_idx += 1
         plt.imshow(mask_raw)
         _plot_labeled_points(v_optic_corners_image_exp)
+        plt.title(figure_title)
+        lt.info(f"In process_singlefacet_geometry(), saving figure '{figure_title}' to:\n   {figure_dir_body_ext}")
+        fig.savefig(figure_dir_body_ext)
+
+    # Construct expected optic loop in pixels
+    loop_optic_image_exp = LoopXY.from_vertices(v_optic_corners_image_exp)
+    data_image_processing_general.loop_optic_image_exp = loop_optic_image_exp
+
+    # Plot expected optic loop
+    if debug.debug_active:
+        fig = plt.figure()
+        debug.figures.append(fig)
+        plt.imshow(mask_raw)
+        _plot_labeled_points(v_optic_corners_image_exp)
+        # *** ADD LOOP EDGES ***
         plt.title("Expected Optic Corners")
 
     # Refine locations of optic corners with mask

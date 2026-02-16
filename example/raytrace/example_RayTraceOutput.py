@@ -18,7 +18,7 @@ from scipy.spatial.transform import Rotation
 import opencsp.common.lib.csp.RayTrace as rt
 import opencsp.common.lib.csp.SolarField as sf
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 import opencsp.common.lib.opencsp_path.data_path_for_test as dpft
 import opencsp.common.lib.render.figure_management as fm
@@ -250,7 +250,7 @@ class ExampleRayTraceOutput(to.TestOutput):
         view1 = fig_record.view
 
         trace1.draw(view1, RenderControlRayTrace(light_path_control=light_path_control))
-        m1.draw(view1, mirror_control)
+        m1.draw(view=view1, mirror_style=mirror_control)
 
         # Output.
         self.show_save_and_check_figure(fig_record)

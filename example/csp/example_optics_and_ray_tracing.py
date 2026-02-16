@@ -23,7 +23,8 @@ from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 import opencsp.common.lib.csp.RayTrace as rt
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxy import Vxy

@@ -1,7 +1,7 @@
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 from opencsp.common.lib.render_control.RenderControlPointSeq import RenderControlPointSeq
 from opencsp.common.lib.render_control.RenderControlSurface import RenderControlSurface
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 
 
 class RenderControlMirror:

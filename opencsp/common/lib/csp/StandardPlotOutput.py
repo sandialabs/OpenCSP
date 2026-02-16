@@ -11,7 +11,7 @@ from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 import opencsp.common.lib.csp.RayTrace as rt
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.csp.Scene import Scene
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 import opencsp.common.lib.render.figure_management as fm

@@ -15,7 +15,7 @@ class DefinitionFacet:
         ----------------------
         v_facet_corners : Vxyz
             Corners of facet in facet coordinates
-        v_centroid_facet : Vxyz
+        v_facet_centroid : Vxyz
             Centroid of facet in facet coordinates
 
         NOTE: "facet" coordinates are defined as +x to right and +y up when
