@@ -223,6 +223,16 @@ class Vxyz:
     def __neg__(self):
         return self._from_data(-self._data, dtype=self.dtype)
 
+    def len(self) -> int:
+        """Return the number of points in the Vxy.
+
+        Returns
+        -------
+        int
+            Number of points in the Vxy.
+        """
+        return self.__len__()
+
     def _magnitude_with_zero_check(self) -> np.ndarray:
         """
         Returns magnitude of each vector as a new array.
@@ -650,3 +660,36 @@ class Vxyz:
         view = figure if isinstance(figure, View3d) else figure.view
         for x, y, z, label in zip(self.x, self.y, self.z, labels):
             view.draw_xyz((x, y, z), style, label)
+
+
+def connection_lines(xyz_sequence_1: Vxyz, xyz_sequence_2: Vxyz) -> [Vxyz]:
+    """Given two sequences of (x,y,z) points, return a list
+    of line segments connecting them.
+
+    Throws an error if point sequences are not the same length.
+
+    Parameters
+    ----------
+    xyz_sequence_1 : Vxyz
+        Sequence of (x,y,z) points.
+    xyz_sequence_2 : Vxyz
+        Sequence of (x,y,z) points.
+
+    Returns
+    -------
+    [Vxyz]
+        List of line segments connecting corresponding points.
+    """
+    n_points = xyz_sequence_1.len()
+    if xyz_sequence_2.len() != n_points:
+        raise ValueError("xyz_1 and xyz_2 are not the same length.")
+
+    list_of_line_segments = []
+    for idx in range(n_points):
+        xyz_point_1 = Vxyz(xyz_sequence_1.data[:, idx])
+        xyz_point_2 = Vxyz(xyz_sequence_2.data[:, idx])
+        line_segment_xyz = xyz_point_1.copy()
+        line_segment_xyz = line_segment_xyz.concatenate(xyz_point_2)
+        list_of_line_segments.append(line_segment_xyz)
+
+    return list_of_line_segments

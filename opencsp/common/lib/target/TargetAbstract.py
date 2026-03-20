@@ -158,7 +158,7 @@ class TargetAbstract(ABC):
     #     Parameters:
     #     -----------
     #         view: A view 3d object that holds the figure.
-    #         mirror_styles: A RenderControlMirror object that holds attibutes about the graph.
+    #         mirror_styles: A RenderControlMirror object that holds attributes about the graph.
     #     """
     #     resolution = mirror_style.resolution
 

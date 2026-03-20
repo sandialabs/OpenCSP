@@ -688,7 +688,7 @@ class test_Docstrings(unittest.TestCase):
 
         n_undocumented_methods = sum([len(v) for v in undocumented_methods.values()])
         if n_undocumented_methods > 0:
-            print(f"\nFound {n_undocumented_methods} total undocumented metshods!\n")
+            print(f"\nFound {n_undocumented_methods} total undocumented methods!\n")
             for class_module_name, class_ums in undocumented_methods.items():
                 print(f"Undocumented methods in {class_module_name} ({len(class_ums)}):")
                 for class_um in class_ums:

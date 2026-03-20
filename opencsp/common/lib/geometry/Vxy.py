@@ -225,6 +225,16 @@ class Vxy:
 
         return mag
 
+    def len(self) -> int:
+        """Return the number of points in the Vxy.
+
+        Returns
+        -------
+        int
+            Number of points in the Vxy.
+        """
+        return self.__len__()
+
     def normalize(self):
         """
         Returns copy of normalized vector.

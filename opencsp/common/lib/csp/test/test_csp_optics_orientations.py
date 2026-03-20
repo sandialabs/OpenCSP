@@ -8,7 +8,8 @@ from opencsp.common.lib.csp.HeliostatAzEl import HeliostatAzEl
 from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 from opencsp.common.lib.csp.Scene import Scene
-from opencsp.common.lib.geometry.RegionXY import RegionXY, Resolution
+from opencsp.common.lib.geometry.RegionXY import RegionXY
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz

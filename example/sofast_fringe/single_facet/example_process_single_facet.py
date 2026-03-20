@@ -20,8 +20,9 @@ with the following subfolders:
 
     B1_projected_fringes - The patterns sent to the display during the SOFAST measurement of the optic.
     B2_captured_fringes - The captured images of the displayed patterns as seen by the SOFAST camera.
-    B3_analysis - The processed data from SOFAST.
-    B4_plots - The output figure suite from a SOFAST characterization.
+    B3_diagnostics - Output reporting the progress of SOFAST.
+    B4_analysis - The processed data from SOFAST.
+    B5_plots - The output figure suite from a SOFAST characterization.
 
 """
 
@@ -33,6 +34,8 @@ import configparser
 
 import imageio.v3 as imageio
 
+import numpy as np
+
 from opencsp.app.sofast.lib.DisplayShape import DisplayShape as Display
 from opencsp.app.sofast.lib.DefinitionFacet import DefinitionFacet
 from opencsp.app.sofast.lib.Fringes import Fringes
@@ -42,15 +45,22 @@ from opencsp.app.sofast.lib.ProcessSofastFringe import ProcessSofastFringe as So
 from opencsp.app.sofast.lib.SofastConfiguration import SofastConfiguration
 from opencsp.app.sofast.lib.SpatialOrientation import SpatialOrientation
 from opencsp.common.lib.camera.Camera import Camera
+import opencsp.common.lib.csp.embedding_mirror_surface as ems
 from opencsp.common.lib.csp.LightSourceSun import LightSourceSun
 from opencsp.common.lib.csp.MirrorParametric import MirrorParametric, SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, PLANO
 from opencsp.common.lib.csp.MirrorPoint import NEAREST_INTERPOLATION
+from opencsp.common.lib.geometry.RegionXY import RegionXY
 from opencsp.common.lib.csp.StandardPlotOutput import StandardPlotOutput
 from opencsp.common.lib.deflectometry.Surface2DParabolic import Surface2DParabolic
 from opencsp.common.lib.deflectometry.Surface2DPlano import Surface2DPlano
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.opencsp_path.opencsp_root_path import opencsp_code_dir
+import opencsp.common.lib.render.view_spec as vs
+import opencsp.common.lib.render_control.RenderControlFigure as rcfg
+import opencsp.common.lib.render_control.RenderControlMirror as rcm
+import opencsp.common.lib.render_control.RenderControlMirrorEmbedded as rcme
+import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
@@ -92,6 +102,7 @@ def process_single_facet(
     4. Processes data with SOFAST and save processed data to HDF5
     5. Generate plot suite and save image files
     """
+
     # General setup
     # =============
 
@@ -138,52 +149,127 @@ def process_single_facet(
         # Save mask (like a pixel mask value (all 0s, all 255s)) images
         for idx_image in [0, 1]:
             image = measurement.mask_images[..., idx_image]
-            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"mask_{idx_image:02d}.png"), image)
+            imageio.imwrite(
+                join(dir_save_cur, output_file_prefix + f"mask_{idx_image:02d}.png"), image.astype(np.uint8)
+            )
         # Save y images (when lines were vertical, e.g.)
         for idx_image in range(measurement.num_y_ims):
             image = measurement.fringe_images_y[..., idx_image]
-            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image)
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"y_{idx_image:02d}.png"), image.astype(np.uint8))
         # Save x images (when lines were horizontal, e.g.)
         for idx_image in range(measurement.num_x_ims):
             image = measurement.fringe_images_x[..., idx_image]
-            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image)
+            imageio.imwrite(join(dir_save_cur, output_file_prefix + f"x_{idx_image:02d}.png"), image.astype(np.uint8))
 
-    # 4. Processes data with Sofast and save processed data to HDF5
-    # =============================================================
-    dir_save_cur = join(dir_save, "B3_analysis")
+    # 4. Review and check input
+    # =========================
+    # Diagnostic output directory
+    dir_save_cur = join(dir_save, "B3_diagnostics")
     ft.create_directories_if_necessary(dir_save_cur)
 
-    # Define surface definition (parabolic surface), this is the mirror
-    if (reference_mirror_surface_type == SYMMETRIC_PARABOLOID) or (
-        reference_mirror_surface_type == ASTIGMATIC_PARABOLOID
-    ):
+    # Construct the expected mirror and initial fit surface
+    # based on the input nominal optic definition.
+    facet_vertices = facet_data.v_facet_corners.projXY()
+    facet_region = RegionXY.from_vertices(facet_vertices)
+    if reference_mirror_surface_type == SYMMETRIC_PARABOLOID:
+        mirror_reference = MirrorParametric.generate_symmetric_paraboloid(reference_mirror_focal_length_x, facet_region)
+        fit_surface = Surface2DParabolic(
+            initial_focal_lengths_xy=(fit_initial_focal_length_x, fit_initial_focal_length_x),
+            robust_least_squares=fit_robust_least_squares,
+            downsample=fit_downsample,
+        )
+    elif reference_mirror_surface_type == ASTIGMATIC_PARABOLOID:
+        mirror_reference = MirrorParametric.generate_astigmatic_xy_paraboloid(
+            reference_mirror_focal_length_x, reference_mirror_focal_length_y, facet_region
+        )
         fit_surface = Surface2DParabolic(
             initial_focal_lengths_xy=(fit_initial_focal_length_x, fit_initial_focal_length_y),
             robust_least_squares=fit_robust_least_squares,
             downsample=fit_downsample,
         )
     elif reference_mirror_surface_type == PLANO:
+        mirror_reference = MirrorParametric.generate_flat(facet_region)
         fit_surface = Surface2DPlano(robust_least_squares=fit_robust_least_squares, downsample=fit_downsample)
     else:
         lt.error_and_raise(
             ValueError,
-            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}", "{ASTIGMATIC_PARABOLOID}, "{PLANO}"].',
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}," "{ASTIGMATIC_PARABOLOID}," or "{PLANO}"].',
         )
+        mirror_reference = None  # Eliminate Pylint error message.  Never executes.
         fit_surface = None  # Eliminate Pylint error message.  Never executes.
+
+    # &&&& DELETE-SCAFFOLDING -- ADD EXAGGERATED Z
+
+    # Draw plot of reference mirror, to enable review of what is requested.
+    fig_control = rcfg.RenderControlFigure(tile_array=(2, 1), tile_square=True)
+    view_spec_list = [vs.view_spec_3d(), vs.view_spec_xy(), vs.view_spec_xz(), vs.view_spec_yz()]
+    debug_figure_idx = 0
+    for view_spec in view_spec_list:
+        # Draw the expected mirror and its embedding surface.
+        fig_record = ems.setup_and_draw_mirror_and_embedding_mirror(
+            figure_control=fig_control,
+            parametric_mirror=mirror_reference,
+            title='Expected Mirror',
+            view_spec=view_spec,
+            mirror_style=rcm.RenderControlMirror(),
+            embedding_style=rcme.RenderControlMirrorEmbedded(margin=0.01, round_to=0.25),
+        )
+        # Draw the expected mirror centroid defined by the facet definition file.
+        facet_data.v_facet_centroid.draw_points(figure=fig_record, style=rcps.marker())
+        # Save.
+        figure_file_body = fig_record.title.replace(' ', '_')
+        figure_dir_body_ext = join(dir_save_cur, f'{debug_figure_idx:02d}_input_{figure_file_body}.png')
+        debug_figure_idx += 1
+        fig_record.save(
+            output_dir=dir_save_cur,
+            output_file_body=figure_dir_body_ext,
+            dpi=200,
+            format='png',
+            close_after_save=True,
+            include_view_suffix=True,
+            include_limit_suffix=False,
+        )
 
     # Calibrate fringes - (aka sinosoidal image)
     measurement.calibrate_fringe_images(calibration)
 
+    # &&&& DELETE-SCAFFOLDING -- ADD PLOT OF CALIBRATION
+
+    # 5. Process data with Sofast
+    # =============================
+
     # Instantiate sofast object
     sofast = Sofast(measurement, orientation, camera, display)
 
-    # Process
-    sofast.process_optic_singlefacet(facet_data, fit_surface)
+    # Turn on debug mode
+    if verbose:
+        sofast.params.debug_geometry.debug_active = True
+        sofast.params.debug_geometry.save_dir = dir_save_cur
+        sofast.params.debug_geometry.figure_idx = debug_figure_idx
+        sofast.params.debug_slope_solver.debug_active = True
+        sofast.params.debug_slope_solver.save_dir = dir_save_cur
+        sofast.params.debug_slope_solver.figure_idx = 100
 
-    # Get measurement statistics
-    config = SofastConfiguration()
-    config.load_sofast_object(sofast)
-    measurement_stats = config.get_measurement_stats()
+    # Process SOFAST
+    try:
+        # Process
+        sofast.process_optic_singlefacet(facet_data, fit_surface)
+        # Get measurement statistics
+        config = SofastConfiguration()
+        config.load_sofast_object(sofast)
+        measurement_stats = config.get_measurement_stats()
+    except ValueError:
+        # Save all debug figures
+        save_all_debug_figures(dir_save_cur, sofast)
+        return
+
+    # Save all debug figures
+    save_all_debug_figures(dir_save_cur, sofast)
+
+    # 6. Save processed data to HDF5
+    # =============================================================
+    dir_save_cur = join(dir_save, "B4_analysis")
+    ft.create_directories_if_necessary(dir_save_cur)
 
     # Save processed data to HDF5 format
     sofast.save_to_hdf(join(dir_save_cur, output_file_prefix + "data_sofast_processed.h5"))
@@ -192,9 +278,9 @@ def process_single_facet(
     with open(join(dir_save_cur, output_file_prefix + "measurement_statistics.json"), "w", encoding="utf-8") as f:
         json.dump(measurement_stats, f, indent=3)
 
-    # 5. Generate plot suite and save images files
+    # 7. Generate plot suite and save images files
     # ============================================
-    dir_save_cur = join(dir_save, "B4_plots")
+    dir_save_cur = join(dir_save, "B5_plots")
     ft.create_directories_if_necessary(dir_save_cur)
 
     # Get measured and reference optics
@@ -214,7 +300,7 @@ def process_single_facet(
     else:
         lt.error_and_raise(
             ValueError,
-            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}", "{ASTIGMATIC_PARABOLOID}, "{PLANO}"].',
+            f'Reference mirror surface type {reference_mirror_surface_type} is not one of ["{SYMMETRIC_PARABOLOID}," "{ASTIGMATIC_PARABOLOID}," or "{PLANO}"].',
         )
         mirror_reference = None  # Eliminate Pylint error message.  Never executes.
 
@@ -226,6 +312,18 @@ def process_single_facet(
 
     # Create standard output plots
     plots.plot()
+
+
+def save_all_debug_figures(dir_save_cur: str, sofast: Sofast) -> None:
+    lt.info(f'Saving all debug figures to {dir_save_cur}.')
+    for idx, fig in enumerate(sofast.params.debug_geometry.figures):
+        debug_geometry_figure_dir_body_ext = join(dir_save_cur, f'debug_geometry_{idx:02d}.png')
+        print("In process_single_facet(), saving debug_geometry figure:", debug_geometry_figure_dir_body_ext)
+        fig.savefig(debug_geometry_figure_dir_body_ext)
+    for idx_2, fig in enumerate(sofast.params.debug_slope_solver.slope_solver_figures):
+        debug_slope_solver_figure_dir_body_ext = join(dir_save_cur, f'debug_slope_solver_{idx_2:02d}.png')
+        print("In process_single_facet(), saving debug_slope_solver figure:", debug_slope_solver_figure_dir_body_ext)
+        fig.savefig(debug_slope_solver_figure_dir_body_ext)
 
 
 def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, verbose_param=None):
@@ -269,18 +367,19 @@ def example_process_single_facet_driver(arg_settings_dir_body_ext: str = None, v
         # Strings denoting computation.
         measurement_id = "Time_Mirror_InstrumentMode"
         post_process_id = "PostSpec"
+        # Reference mirror surface
+        reference_mirror_surface_type = SYMMETRIC_PARABOLOID  # Strings from MirrorParametric.py: SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, or PLANO
+        reference_mirror_focal_length_x = 100.0  # Ignored if plano
+        reference_mirror_focal_length_y = 100.0  # Ignored if plano or symmetric paraboloid
         # Analysis control
-        fit_initial_focal_length_x = 300.0
-        fit_initial_focal_length_y = 300.0
+        initial_fit_factor = 2.0  # Dimensionless
+        fit_initial_focal_length_x = reference_mirror_focal_length_x * initial_fit_factor  # 300.0
+        fit_initial_focal_length_y = reference_mirror_focal_length_y * initial_fit_factor  # 300.0
         fit_robust_least_squares = True
         fit_downsample = 10
         # Measured mirror surface
         measured_interpolation_type = NEAREST_INTERPOLATION  # Strings from MirrorPoint.py: GIVEN_INTERPOLATION, BILINEAR_INTERPOLATION, CLOUGH_TOCHER_INTERPOLATION, or NEAREST_INTERPOLATION
 
-        # Reference mirror surface
-        reference_mirror_surface_type = SYMMETRIC_PARABOLOID  # Strings from MirrorParametric.py: SYMMETRIC_PARABOLOID, ASTIGMATIC_PARABOLOID, or PLANO
-        reference_mirror_focal_length_x = 100.0  # Ignored if plano
-        reference_mirror_focal_length_y = 100.0  # Ignored if plano or symmetric paraboloid
         # Output rendering control
         output_fringe_images = True
         # Set plot control parameters to the values we want for the default example.

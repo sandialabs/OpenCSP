@@ -11,7 +11,7 @@ from opencsp.common.lib.csp.MirrorParametricRectangular import MirrorParametricR
 from opencsp.common.lib.csp.RayTrace import RayTrace
 from opencsp.common.lib.csp.Scene import Scene
 from opencsp.common.lib.geometry.Intersection import Intersection
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.Pxyz import Pxyz
 from opencsp.common.lib.geometry.Uxyz import Uxyz
 from opencsp.common.lib.geometry.Vxyz import Vxyz

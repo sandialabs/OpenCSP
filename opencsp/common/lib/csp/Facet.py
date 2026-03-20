@@ -6,7 +6,7 @@ from opencsp.common.lib.csp.MirrorAbstract import MirrorAbstract
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.csp.VisualizeOrthorectifiedSlopeAbstract import VisualizeOrthorectifiedSlopeAbstract
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.Vxy import Vxy
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
@@ -156,7 +156,7 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
         view : View3d
             A view 3d object that holds the figure.
         mirror_styles : RenderControlMirror
-            Holds attibutes about the 3d graph.
+            Holds attributes about the 3d graph.
         transform : TransformXYZ
             3d transform used to position points in the mirror's base coordinate
             reference frame in space. If None, defaults to position points
@@ -220,4 +220,8 @@ class Facet(RayTraceable, VisualizeOrthorectifiedSlopeAbstract, OpticOrientation
             view.draw_xyz_text(origin.data.T[0], self.name, style=facet_style.name_style)
 
         if facet_style.draw_mirror_curvature:
-            self.mirror.draw(view, facet_style.mirror_styles, transform * self.mirror._self_to_parent_transform)
+            self.mirror.draw(
+                view=view,
+                mirror_style=facet_style.mirror_styles,
+                transform=transform * self.mirror._self_to_parent_transform,
+            )

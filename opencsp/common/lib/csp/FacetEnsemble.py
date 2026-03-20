@@ -9,7 +9,7 @@ from opencsp.common.lib.csp.Facet import Facet
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
 from opencsp.common.lib.geometry.Pxy import Pxy
 from opencsp.common.lib.geometry.Pxyz import Pxyz
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 from opencsp.common.lib.geometry.TransformXYZ import TransformXYZ
 from opencsp.common.lib.geometry.Vxyz import Vxyz
 from opencsp.common.lib.render.View3d import View3d

@@ -7,7 +7,7 @@ import numpy as np
 from opencsp.common.lib.geometry.EdgeXY import EdgeXY
 from opencsp.common.lib.geometry.LineXY import LineXY
 from opencsp.common.lib.geometry.Vxy import Vxy
-import opencsp.common.lib.render.View3d as v3d
+from opencsp.common.lib.render.View3d import View3d
 import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.tool.log_tools as lt
@@ -70,28 +70,48 @@ class LoopXY:
 
     def _check_convex(self) -> None:
         """
-        Checks that straight lines connecting each vertex makes convex loop.
-
+        Checks that the sequence of straight lines connecting each vertex makes a convex loop.
+        Throws an error if not.
         """
         vertex_angles = self._vertex_to_vertex_angles()
         vertex_positive = np.unique(vertex_angles > 0)
+        # If all corner angles are positive, then vertex_postiive will have one element:  True.
+        # If all corner angles are negative, then vertex_postiive will have one element:  False.
+        # Either way, the size of vertex_positive will be 1.
+        # If the size of vertex_positive is greater than 1, it indicates that the corner angles
+        # have differing sign; this reversal indicates non-convexity.
+        # Note that this works whether the corner angles are either all less than zero or
+        # all greater than zero.  Thus it should work for vertex orders either clockwise
+        # or counter-clockwise.
+        #
+        # But corner angles equal to zero can lead to problematic behavior.  Consider a
+        # convex region including a corner that has angle zero (that is, two collinear edges
+        # meeting at a corner).  Further suppose that in this calculation, all corner angles
+        # are positive, except for the collinear vertex which has corner angle zero.
+        # The collinear vertex with corner angle zero does not have a corner angle > 0 m,
+        # so the resulting vertex_positive has elements [True, False] .  This has length > 1,
+        # so the routine flags the region as non-convex.
+        #
+        # To prevent this, avoid input with vertices connecting collinear edges.
         if vertex_positive.size > 1:
             raise ValueError("Loop may not be convex or edges cross within loop.")
 
     def _vertex_to_vertex_angles(self):
         """
-        Calculates the sin of the angle between the straight line drawn from
+        Calculates the sine of the angle between the straight line drawn from
         vertex to vertex.
 
         """
         cross_prod_data = np.zeros(self.num_edges)
         for idx1 in range(self.num_edges):
             idx2 = np.mod(idx1 + 1, self.num_edges)
-            # Calcualte edge vectors
+            # Calculate edge vectors
             V_1 = (self._edges[idx1]._vertices[1] - self._edges[idx1]._vertices[0]).normalize()
             V_2 = (self._edges[idx2]._vertices[1] - self._edges[idx2]._vertices[0]).normalize()
             # Calculate cross product
-            cross_prod_data[idx2] = V_1.cross(V_2)[0]
+            cross_product = V_1.cross(V_2)[0]
+            cross_prod_data[idx2] = cross_product
+        #            cross_prod_data[idx2] = V_1.cross(V_2)[0]
 
         return cross_prod_data
 
@@ -331,7 +351,7 @@ class LoopXY:
         # Draw arrows
         first_vert_np = np.array([self.vertices.x[:1], self.vertices.y[:1]])
         closed_loop_verts = Vxy(np.concatenate((self.vertices.data, first_vert_np), axis=1))
-        view = v3d.View3d(ax.figure, ax, vs.view_spec_xy())
+        view = View3d(ax.figure, ax, vs.view_spec_xy())
         view.draw_pq((closed_loop_verts.x, closed_loop_verts.y), style)
 
         # Plot starting point as green dot

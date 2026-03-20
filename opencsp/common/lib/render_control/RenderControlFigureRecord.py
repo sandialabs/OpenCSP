@@ -245,8 +245,9 @@ class RenderControlFigureRecord:
         output_file_body: str = None,
         format: str = None,
         dpi=600,
-        close_after_save=True,
-        include_view_suffix=True,
+        close_after_save: bool = True,
+        include_view_suffix: bool = True,
+        include_limit_suffix: bool = True,
     ):
         """
         Saves this figure record to an image file.
@@ -263,6 +264,10 @@ class RenderControlFigureRecord:
             Dots per inch used to format the figure. Defaults to 600.
         close_after_save : bool, optional
             If True, closes the plot after saving. Defaults to True.
+        include_view_suffix : bool, optional
+            If True, adds view type (xy, 3-d, etc) to filename. Defaults to True.
+        include_limit_suffix : bool, optional
+            If True, adds plot limits to filename. Defaults to True.
 
         Returns
         -------
@@ -296,7 +301,12 @@ class RenderControlFigureRecord:
             # If this is a 3-d plot, add the projection choice.
             if self.view != None:
                 output_figure_dir_body_ext = self.view.save(
-                    output_dir, output_figure_body, format=format, dpi=dpi, include_view_suffix=include_view_suffix
+                    output_dir,
+                    output_figure_body,
+                    format=format,
+                    dpi=dpi,
+                    include_view_suffix=include_view_suffix,
+                    include_limit_suffix=include_limit_suffix,
                 )
             else:
                 # Make the figure current.

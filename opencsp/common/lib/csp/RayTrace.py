@@ -16,7 +16,7 @@ from opencsp.common.lib.csp.LightPath import LightPath
 from opencsp.common.lib.csp.LightPathEnsemble import LightPathEnsemble
 from opencsp.common.lib.csp.LightSource import LightSource
 from opencsp.common.lib.csp.RayTraceable import RayTraceable
-from opencsp.common.lib.geometry.RegionXY import Resolution
+from opencsp.common.lib.geometry.Resolution import Resolution
 import opencsp.common.lib.csp.Scene as scn
 from opencsp.common.lib.geometry.FunctionXYGrid import FunctionXYGrid
 from opencsp.common.lib.geometry.Pxyz import Pxyz

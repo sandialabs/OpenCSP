@@ -8,7 +8,7 @@ import numpy as np
 import scipy.spatial
 
 import opencsp.common.lib.geometry.Pxy as p2
-import opencsp.common.lib.geometry.RegionXY as reg
+from opencsp.common.lib.geometry.RegionXY import RegionXY
 import opencsp.common.lib.geometry.Vxyz as v3
 import opencsp.common.lib.render.Color as color
 import opencsp.common.lib.render.figure_management as fm
@@ -53,7 +53,7 @@ class AbstractFiducials(ABC):
         self.pixels_to_meters = pixels_to_meters
 
     @abstractmethod
-    def get_bounding_box(self, index=0) -> reg.RegionXY:
+    def get_bounding_box(self, index=0) -> RegionXY:
         """
         Get the X/Y bounding box of this instance, in pixels.
 
@@ -64,7 +64,7 @@ class AbstractFiducials(ABC):
 
         Returns
         -------
-        reg.RegionXY
+        RegionXY
             The bounding box of the fiducial.
         """
 
