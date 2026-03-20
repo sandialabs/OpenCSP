@@ -104,9 +104,9 @@ class LineXY:
             else:
                 # use the original two points to determine the positivity of the slope
                 if self._original_two_points[1].y[0] > self._original_two_points[0].y[0]:
-                    return np.PINF
+                    return np.inf
                 else:
-                    return np.NINF
+                    return -np.inf
 
         # return the slope
         return -self.A / self.B
