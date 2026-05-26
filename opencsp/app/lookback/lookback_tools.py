@@ -13,7 +13,6 @@ from logging import DEBUG, ERROR
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
-# from moviepy import VideoFileClip
 from zoneinfo import ZoneInfo
 from datetime import datetime, timezone, timedelta
 import skyfield.api as skf

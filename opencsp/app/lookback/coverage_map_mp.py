@@ -1,7 +1,7 @@
 import os
 import gc
 from logging import INFO
-from concurrent.futures import ThreadPoolExecutor
+from concurrent.futures import ThreadPoolExecutor, as_completed
 
 # from concurrent.futures import ProcessPoolExecutor
 import numpy as np
@@ -109,6 +109,21 @@ def compile_binary_maps(output_folder, threshold_fractions, prefix):
         print(f"Compiled binary map for threshold {threshold_fraction} saved to {output_path}")
 
 
+def _close_memmap(arr):
+    # arr is a numpy.memmap
+    try:
+        arr.flush()
+    except Exception:
+        pass
+    # Close underlying mmap handle if present (important on Windows)
+    mm = getattr(arr, "_mmap", None)
+    if mm is not None:
+        try:
+            mm.close()
+        except Exception:
+            pass
+
+
 def process_images_in_batches(
     image_files, threshold_fractions, max_intensity, is_raw, batch_num, output_folder, prefix
 ):
@@ -129,118 +144,56 @@ def process_images_in_batches(
     """
     # Initialize binary maps for each threshold
     first_image = imageio.imread(image_files[0]) if not is_raw else rawpy.imread(image_files[0]).postprocess()
-    binary_maps = {
-        threshold: np.memmap(
-            os.path.join(output_folder, f"{prefix}_binary_map_{int(threshold * 100):02d}_{batch_num}.png"),
-            dtype=bool,
-            mode="w+",
-            shape=(first_image.shape[0], first_image.shape[1]),
-        )
-        for threshold in threshold_fractions
-    }
-    '''
-    binary_maps = {
-        threshold: np.zeros((first_image.shape[0], first_image.shape[1]), dtype=bool)
-        for threshold in threshold_fractions
-    }
-    '''
+    H, W = first_image.shape[0], first_image.shape[1]
 
-    # Process images in batches
+    # IMPORTANT: back memmaps with a non-PNG file
+    binary_maps = {}
+    memmap_paths = {}
+    for threshold in threshold_fractions:
+        mm_path = os.path.join(output_folder, f"{prefix}_binary_map_{int(threshold * 100):02d}_{batch_num}.dat")
+        memmap_paths[threshold] = mm_path
+        binary_maps[threshold] = np.memmap(mm_path, dtype=np.bool_, mode="w+", shape=(H, W))
+        binary_maps[threshold].fill(False)
+
     with ThreadPoolExecutor(max_workers=4) as executor:
-        futures = {
-            executor.submit(process_image, os.path.normpath(file), threshold_fractions, max_intensity, is_raw): file
-            for file in image_files
-        }
+        futures = [
+            executor.submit(process_image, os.path.normpath(f), threshold_fractions, max_intensity, is_raw)
+            for f in image_files
+        ]
 
-        # Initialize tqdm progress bar for the batch
-        with tqdm(total=len(image_files), desc=f"Coverage Map Batch {batch_num}", unit="images") as pbar:
-            for future in futures:
+        with tqdm(total=len(futures), desc=f"Coverage Map Batch {batch_num}", unit="images") as pbar:
+            for fut in as_completed(futures):
+                result = None
                 try:
-                    result = future.result()
+                    result = fut.result()
                     if result:
-                        for threshold_fraction in threshold_fractions:
-                            binary_maps[threshold_fraction] = np.maximum(
-                                binary_maps[threshold_fraction], result[threshold_fraction]
-                            )
-                    pbar.update(1)
+                        for t in threshold_fractions:
+                            # In-place OR to avoid temporary arrays
+                            np.maximum(binary_maps[t], result[t], out=binary_maps[t])
                 except Exception as e:
                     logger.error("Error processing image: %s", e, exc_info=True)
-
-                # Explicitly release memory for the processed image and intermediate results
-                del result
-
-    # Save binary maps for the batch
-    for threshold_fraction, binary_map in binary_maps.items():
-        output_path = os.path.join(
-            output_folder, f"{prefix}_binary_map_{int(threshold_fraction * 100):02d}_{batch_num}.png"
-        )
-        bin_image = (binary_map * 255).astype('uint8')
-        image = Image.fromarray(bin_image)
-        image.save(output_path)
-        # imageio.imwrite(output_path, binary_map)
-        print(f"Binary map for threshold {threshold_fraction} saved to {output_path}")
-
-    # Final memory cleanup after processing the batch
-    del binary_maps, image
-    gc.collect()  # Force garbage collection to free memory
-
-
-def process_images_in_batches_pp(
-    image_files, threshold_fractions, max_intensity, is_raw, batch_num, output_folder, prefix
-):
-    """
-    Process images in batches using ProcessPoolExecutor.
-    """
-    # Initialize binary maps for each threshold
-    first_image = imageio.imread(image_files[0]) if not is_raw else rawpy.imread(image_files[0]).postprocess()
-    binary_maps = {
-        threshold: np.memmap(
-            f"{prefix}_binary_map_{int(threshold * 100)}_{batch_num}.dat",
-            dtype=bool,
-            mode="w+",
-            shape=(first_image.shape[0], first_image.shape[1]),
-        )
-        for threshold in threshold_fractions
-    }
-
-    # Process images in batches using ProcessPoolExecutor
-    with ProcessPoolExecutor(max_workers=4) as executor:
-        futures = {
-            executor.submit(process_image, os.path.normpath(file), threshold_fractions, max_intensity, is_raw): file
-            for file in image_files
-        }
-
-        # Initialize tqdm progress bar for the batch
-        with tqdm(total=len(image_files), desc=f"Coverage Map Batch {batch_num}", unit="images") as pbar:
-            for future in futures:
-                try:
-                    result = future.result()
-                    if result:
-                        for threshold_fraction in threshold_fractions:
-                            binary_maps[threshold_fraction] = np.maximum(
-                                binary_maps[threshold_fraction], result[threshold_fraction]
-                            )
+                finally:
+                    # ensure ref dropped even on exceptions
+                    result = None
                     pbar.update(1)
-                except Exception as e:
-                    # Log error (replace with your logger)
-                    print(f"Error processing image: {e}")
 
-                # Explicitly release memory for the processed image and intermediate results
-                del result
-                gc.collect()
+    # Write PNG outputs exactly as before
+    for t, binary_map in binary_maps.items():
+        output_path = os.path.join(output_folder, f"{prefix}_binary_map_{int(t * 100):02d}_{batch_num}.png")
+        bin_image = np.asarray(binary_map, dtype=np.uint8) * 255
+        Image.fromarray(bin_image).save(output_path)
+        print(f"Binary map for threshold {t} saved to {output_path}")
 
-    # Save binary maps for the batch
-    for threshold_fraction, binary_map in binary_maps.items():
-        output_path = os.path.join(
-            output_folder, f"{prefix}_binary_map_{int(threshold_fraction * 100)}_{batch_num}.png"
-        )
-        bin_image = (binary_map * 255).astype('uint8')
-        image = Image.fromarray(bin_image)
-        image.save(output_path)
-        print(f"Binary map for threshold {threshold_fraction} saved to {output_path}")
+    # Explicitly flush/close and remove memmap backing files
+    for t, mm in binary_maps.items():
+        _close_memmap(mm)
+        # Remove the .dat file to keep behavior similar (only PNG outputs remain)
+        try:
+            os.remove(memmap_paths[t])
+        except OSError:
+            pass
 
-    # Final memory cleanup after processing the batch
-    del binary_maps, image
+    binary_maps.clear()
     gc.collect()
 
 
@@ -318,7 +271,7 @@ def construct_binary_maps_parallel(
             )
 
             # Update checkpoint
-            checkpoint_data["processed_images"].extend(file_names)
+            checkpoint_data["processed_images"].extend(batch_files)
             checkpoint_data["current_batch"] = batch_start + batch_size
             checkpoint_data["prefix"] = "traditional"
             lbt.save_checkpoint(checkpoint_folder, checkpoint_file, checkpoint_data)
@@ -359,7 +312,7 @@ def construct_binary_maps_parallel(
             )
 
             # Update checkpoint
-            checkpoint_data["processed_images"].extend(file_names)
+            checkpoint_data["processed_images"].extend(batch_files)
             checkpoint_data["current_batch"] = batch_start + batch_size
             checkpoint_data["prefix"] = "raw"
             lbt.save_checkpoint(checkpoint_folder, checkpoint_file, checkpoint_data)
