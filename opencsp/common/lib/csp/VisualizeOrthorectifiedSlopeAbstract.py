@@ -77,7 +77,9 @@ class VisualizeOrthorectifiedSlopeAbstract:
         quiver_density: float | None = None,
         quiver_scale: float | None = 10,
         quiver_color: str = "white",
-    ) -> None:
+        return_data: bool = False  # New parameter
+
+    ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:  # Updated return type
         """Plots slope difference with respect to a reference
         mirror on axes. Error defined as (self - reference).
 
@@ -168,6 +170,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
         # Label axes
         axis.set_title(title)
 
+        # Return data if requested
+        if return_data:
+            return x_vec, y_vec, image
+        
     def plot_orthorectified_slope(
         self,
         res: float = 0.1,
@@ -177,7 +183,9 @@ class VisualizeOrthorectifiedSlopeAbstract:
         quiver_density: float | None = None,
         quiver_scale: float | None = 50,
         quiver_color: str = "white",
-    ) -> None:
+        return_data: bool = False  # New parameter
+
+    ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:  # Updated return type
         """Plots orthorectified image of mirror slope
 
         Parameters
@@ -252,6 +260,10 @@ class VisualizeOrthorectifiedSlopeAbstract:
         # Label axes
         axis.set_title(title)
 
+        # Return data if requested
+        if return_data:
+            return x_vec, y_vec, image
+        
     def plot_orthorectified_curvature(
         self,
         res: float = 0.1,
@@ -260,7 +272,9 @@ class VisualizeOrthorectifiedSlopeAbstract:
         axis: plt.Axes | None = None,
         processing: list[Literal["log", "smooth"]] = None,
         smooth_kernel_width: int = 1,
-    ):
+        return_data: bool = False  # New parameter
+
+    ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:  # Updated return type
         """Plots orthorectified curvature (1st derivative of slope) image
         on axes.
 
@@ -352,3 +366,114 @@ class VisualizeOrthorectifiedSlopeAbstract:
 
         # Label axes
         axis.set_title(title)
+
+        # Return data if requested
+        if return_data:
+            return x_vec, y_vec, image
+        
+
+    def plot_orthorectified_curvature_error(
+        self,
+        reference: "VisualizeOrthorectifiedSlopeAbstract",
+        res: float = 0.1,
+        type_: Literal["x", "y", "xy"] = "xy",
+        clim: float | None = None,
+        axis: plt.Axes | None = None,
+        processing: list[Literal["log", "smooth"]] = None,
+        smooth_kernel_width: int = 1,
+        return_data: bool = False
+    ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:
+        """
+        Plots curvature difference (error) image on axes.
+        Error defined as (self curvature - reference curvature).
+
+        Parameters
+        ----------
+        reference : VisualizeOrthorectifiedSlopeAbstract
+            Reference optic object supporting VisualizeOrthorectifiedSlopeAbstract.
+        res : float, optional
+            The xy resolution of the plot, meters, by default 0.1.
+        type_ : str
+            Type of curvature image to generate - 'x', 'y', 'xy'.
+        clim : float | None
+            Colorbar limit. Converts to [-clim, clim] for 'x' and 'y',
+            and [0, clim] for 'xy'. Units in mrad/meter. None to use default.
+        axis : plt.Axes | None
+            Axes to plot on. Default is None. If None, uses plt.gca().
+        processing : list[str]
+            Processing steps to apply ('log', 'smooth').
+        smooth_kernel_width : int
+            Kernel width for smoothing, default 1.
+        return_data : bool
+            If True, returns (x_vec, y_vec, curvature_error_image).
+
+        Returns
+        -------
+        None or tuple[np.ndarray, np.ndarray, np.ndarray]
+            Returns (x_vec, y_vec, curvature_error_image) if return_data is True.
+        """
+        if type_ not in ["x", "y", "xy"]:
+            raise ValueError(f"Given type_ {type_} not supported.")
+        if processing is None:
+            processing = []
+
+        if axis is None:
+            axis = plt.gca()
+
+        # Create interpolation axes
+        left, right, bottom, top = self.axis_aligned_bounding_box
+        x_vec = np.arange(left, right, res)
+        y_vec = np.arange(bottom, top, res)
+
+        # Calculate slopes for self and reference
+        slopes_self = self.orthorectified_slope_array(x_vec, y_vec)
+        slopes_ref = reference.orthorectified_slope_array(x_vec, y_vec)
+
+        # Calculate curvature for self
+        x_del_vec = np.diff(x_vec)
+        y_del_vec = np.diff(y_vec)
+
+        if type_ in ["x", "xy"]:
+            image_x_self = np.diff(slopes_self[0] * 1000, axis=1) / x_del_vec[None, :]
+        if type_ in ["y", "xy"]:
+            image_y_self = np.diff(slopes_self[1] * 1000, axis=0) / y_del_vec[:, None]
+
+        # Calculate curvature for reference
+        if type_ in ["x", "xy"]:
+            image_x_ref = np.diff(slopes_ref[0] * 1000, axis=1) / x_del_vec[None, :]
+        if type_ in ["y", "xy"]:
+            image_y_ref = np.diff(slopes_ref[1] * 1000, axis=0) / y_del_vec[:, None]
+
+        # Calculate curvature error
+        if type_ == "x":
+            image = image_x_self - image_x_ref
+            title = "Curvature Error X"
+            extent = (left, right, bottom - res / 2, top + res / 2)
+        elif type_ == "y":
+            image = image_y_self - image_y_ref
+            title = "Curvature Error Y"
+            extent = (left - res / 2, right + res / 2, bottom, top)
+        elif type_ == "xy":
+            image = ((image_x_self - image_x_ref)[1:, :] + (image_y_self - image_y_ref)[:, 1:]) / 2
+            title = "Curvature Error XY"
+            extent = (left, right, bottom, top)
+
+        # Apply processing steps
+        for proc in processing:
+            if proc == "log":
+                image = np.abs(image)
+                image[image == 0] = np.nan
+                image = np.log(image)
+                image[np.isinf(image)] = np.nan
+            elif proc == "smooth":
+                ker = np.ones((smooth_kernel_width, smooth_kernel_width)) / smooth_kernel_width**2
+                from scipy.signal import convolve2d
+                image = convolve2d(image, ker, mode="same", boundary="symm")
+
+        # Plot image on axes
+        plot_orthorectified_image(image, axis, "seismic", extent, clim, "mrad/meter")
+
+        axis.set_title(title)
+
+        if return_data:
+            return x_vec, y_vec, image
