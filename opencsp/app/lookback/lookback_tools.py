@@ -69,6 +69,46 @@ def frame_number_from_img_name(image_name_str):
     return int(frame)
 
 
+def maximum_frame_range(frame_ranges):
+    """
+    Calculates the maximum range (duration) between sequential frames
+    where the transition type alternates between bright (1) and dark (0).
+
+    Parameters:
+        frame_ranges (list of tuples): Each tuple contains (transition_type, frame_number).
+                                       transition_type is 1 for bright and 0 for dark.
+                                       frame_number is an integer representing the frame number.
+
+    Returns:
+        tuple: A tuple containing:
+            - max_range_frames (list): The two tuples representing the start and end of the maximum range.
+            - max_duration (int): The maximum duration between sequential frames.
+    """
+    # Ensure the input list is sorted by frame_number
+    frame_ranges = sorted(frame_ranges, key=lambda x: x[1])
+
+    # Initialize variables to track the maximum duration and corresponding frame range
+    max_duration = 0
+    max_range_frames = None
+
+    # Iterate through the sorted list to calculate differences between sequential frames
+    for i in range(len(frame_ranges) - 1):
+        current_frame = frame_ranges[i]
+        next_frame = frame_ranges[i + 1]
+
+        # Check if the transition types alternate (bright -> dark or dark -> bright)
+        if current_frame[0] != next_frame[0]:
+            # Calculate the duration between the current and next frame
+            duration = abs(next_frame[1] - current_frame[1])
+
+            # Update the maximum duration and corresponding frame range if needed
+            if duration > max_duration:
+                max_duration = duration
+                max_range_frames = [current_frame, next_frame]
+
+    return max_range_frames, max_duration
+
+
 def lat_long_to_decimal(input):
     decimal = input[0] + input[1] / 60 + input[2] / 3600
     return decimal

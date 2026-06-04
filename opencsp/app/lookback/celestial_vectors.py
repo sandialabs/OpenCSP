@@ -13,6 +13,7 @@ matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 
 import opencsp.app.lookback.lookback_tools as lbt
+import opencsp.common.lib.tool.file_tools as ft
 
 # Specify the folder where the log file should be saved
 logger = lbt.logging_setup(
@@ -22,7 +23,57 @@ logger = lbt.logging_setup(
 )
 
 
-def calculate_vectors_celestial_observer(celestial_object_name, target_location, observer_location, observation_time):
+def load_de430_ephemeris(ephemeris_path=None, filename="de430t.bsp"):
+    """
+    Load the DE430 ephemeris, optionally from a user-specified location.
+
+    Behavior:
+      1) If ephemeris_path is provided:
+           - If it's a directory: looks for <dir>/<filename>
+           - If it's a file: uses it directly
+         If found, loads from that explicit path.
+      2) Otherwise (or if not found there), falls back to the default Skyfield load:
+           skf.load(filename)
+
+    Parameters
+    ----------
+    ephemeris_path : str | pathlib.Path | None
+        Path to a directory containing the ephemeris file, or a full path to the file.
+    filename : str
+        Ephemeris filename to look for (default: "de430t.bsp").
+
+    Returns
+    -------
+    eph
+        Loaded ephemeris object from skyfield.api.Loader.load().
+
+    Raises
+    ------
+    FileNotFoundError
+        If an explicit path was provided but doesn't exist / isn't valid, and fallback also fails.
+    """
+    # 1) Try user-provided location (if any)
+    if ephemeris_path is not None:
+        p = ft.norm_path(ephemeris_path)
+
+        # If user provided a directory, append filename
+        if os.path.isdir(p):
+            candidate = ft.join(p, filename)
+        else:
+            candidate = p
+
+        if ft.file_exists(candidate, error_if_exists_as_dir=True):
+            # Use string path for widest compatibility with loaders
+            return skf.load(str(candidate))
+        # If not found, fall through to default behavior
+
+    # 2) Fallback to Skyfield's normal lookup/download/cache behavior
+    return skf.load(filename)
+
+
+def calculate_vectors_celestial_observer(
+    celestial_object_name, target_location, observer_location, observation_time, ephemeris_file_path
+):
     """
     Calculates vectors from a celestial object to a target point and from the target point to an observer.
 
@@ -37,7 +88,8 @@ def calculate_vectors_celestial_observer(celestial_object_name, target_location,
             - "target_to_observer": Vector from the target point to the observer (normalized).
     """
     # Load ephemeris data (DE430 dataset)
-    eph = skf.load("de430t.bsp")  # DE430 ephemeris file
+    # eph = skf.load("de430t.bsp")  # DE430 ephemeris file
+    eph = load_de430_ephemeris(ephemeris_file_path)
 
     # Define celestial object
     celestial_object = eph[celestial_object_name]
@@ -141,6 +193,7 @@ def process_pixel(args):
         target_location,
         observer_location,
         tzone,
+        ephem_path,
     ) = args
 
     checkpoint_data = {"processed_pixels": [], "pixels_with_data": [], "pixels_without_data": []}
@@ -167,7 +220,7 @@ def process_pixel(args):
                 frame_range_all.append(tuple((1, lbt.frame_number_from_img_name(transition['to_frame']))))
             elif transition["transition"] == "dark":
                 frame_range_all.append(tuple((0, lbt.frame_number_from_img_name(transition['to_frame']))))
-        frame_range, frame_diff = maximum_frame_range(frame_ranges=frame_range_all)
+        frame_range, frame_diff = lbt.maximum_frame_range(frame_ranges=frame_range_all)
 
     elapsed_time_bright = frame_diff / video_metadata['frame_rate']
     elapsed_time_start = frame_range[0][1] / video_metadata['frame_rate']
@@ -183,12 +236,14 @@ def process_pixel(args):
         target_location=target_location,
         observer_location=observer_location,
         observation_time=obsv_time_utc_start,
+        ephemeris_file_path=ephem_path,
     )
     end_vector = calculate_vectors_celestial_observer(
         celestial_object_name=celestial_object_name,
         target_location=target_location,
         observer_location=observer_location,
         observation_time=obsv_time_utc_end,
+        ephemeris_file_path=ephem_path,
     )
     points = np.array([[0, 0, 0], start_vector['cel_to_target_cartesian'], end_vector['cel_to_target_cartesian']])
     radii = np.array([1, start_vector['angular_size_radians'] / 2, end_vector['angular_size_radians'] / 2])
@@ -278,6 +333,7 @@ def extract_pixel_timing_and_celestial_vectors_parallel(
     checkpoint_folder,
     checkpoint_file,
     batch_size=5000,  # Number of pixels to process in each batch
+    ephem_path=None,
 ):
     if os.path.exists(os.path.join(output_folder, output_json_name)):
         logger.info("Compiled output file already exists, skipping code block")
@@ -324,6 +380,7 @@ def extract_pixel_timing_and_celestial_vectors_parallel(
                     target_location,
                     observer_location,
                     timezone,
+                    ephem_path,
                 )
                 for pixel, transitions in filtered_batch_data
             ]
@@ -724,43 +781,3 @@ def trilaterate(positions: np.ndarray, radii: np.ndarray, raise_on_no_solution: 
 
     # Step 7: Return the solutions
     return np.stack((solution_a, solution_b))  # Return both intersection points as a 2x3 array
-
-
-def maximum_frame_range(frame_ranges):
-    """
-    Calculates the maximum range (duration) between sequential frames
-    where the transition type alternates between bright (1) and dark (0).
-
-    Parameters:
-        frame_ranges (list of tuples): Each tuple contains (transition_type, frame_number).
-                                       transition_type is 1 for bright and 0 for dark.
-                                       frame_number is an integer representing the frame number.
-
-    Returns:
-        tuple: A tuple containing:
-            - max_range_frames (list): The two tuples representing the start and end of the maximum range.
-            - max_duration (int): The maximum duration between sequential frames.
-    """
-    # Ensure the input list is sorted by frame_number
-    frame_ranges = sorted(frame_ranges, key=lambda x: x[1])
-
-    # Initialize variables to track the maximum duration and corresponding frame range
-    max_duration = 0
-    max_range_frames = None
-
-    # Iterate through the sorted list to calculate differences between sequential frames
-    for i in range(len(frame_ranges) - 1):
-        current_frame = frame_ranges[i]
-        next_frame = frame_ranges[i + 1]
-
-        # Check if the transition types alternate (bright -> dark or dark -> bright)
-        if current_frame[0] != next_frame[0]:
-            # Calculate the duration between the current and next frame
-            duration = abs(next_frame[1] - current_frame[1])
-
-            # Update the maximum duration and corresponding frame range if needed
-            if duration > max_duration:
-                max_duration = duration
-                max_range_frames = [current_frame, next_frame]
-
-    return max_range_frames, max_duration

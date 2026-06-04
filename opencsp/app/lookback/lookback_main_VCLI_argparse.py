@@ -31,6 +31,8 @@ logger = lbt.logging_setup(
     log_folder=ft.join(os.getcwd(), "error_logs"), log_file_name="error_log_lookback_main_debug.txt", log_type=DEBUG
 )
 
+PATH_KEYS = {"primary_folder", "og_video_path", "file_camera", "video_path", "ephem_path"}
+
 
 def select_file(window_title="Select a File", file_types=None):
     """
@@ -129,7 +131,7 @@ def serialize_value(value):
         return str(value)
 
 
-def write_ini_file_from_args(args_namespace, additional_values, output_path, section_name="Default"):
+def write_ini_file_from_args(args_namespace, additional_values, output_path, section_name="DEFAULT"):
     """
     Write an INI file combining argparse inputs and additional values, compatible with configparser.
 
@@ -137,7 +139,7 @@ def write_ini_file_from_args(args_namespace, additional_values, output_path, sec
         args_namespace (argparse.Namespace): Parsed CLI arguments.
         additional_values (dict): Additional key-value pairs to include.
         output_path (str): Full path to write the ini file.
-        section_name (str): Section name in the INI file (default: "Default").
+        section_name (str): Section name in the INI file (default: "DEFAULT").
 
     Returns:
         None
@@ -161,6 +163,258 @@ def write_ini_file_from_args(args_namespace, additional_values, output_path, sec
     print(f"INI file written to: {output_path}")
 
 
+def fraction_to_key(values):
+    """
+    Convert level specifications to a 2-digit percent key string ("00".."100").
+
+    Accepts:
+      - single value or list/tuple/set
+      - values may be:
+          * fraction floats/ints: 0.5, 1.0, 0
+          * percent values as ints/floats: 50, 95, 100
+          * percent keys as strings: "50", "05", "100"
+          * fraction strings: "0.5", "1", "0.05"
+
+    Returns:
+      - str if input is scalar
+      - list[str] if input is list/tuple/set
+
+    Raises:
+      - ValueError if a value cannot be parsed or is out of range.
+    """
+
+    def one_to_key(v):
+        # parse strings
+        if isinstance(v, str):
+            s = v.strip()
+            if s == "":
+                raise ValueError("Empty string is not a valid level.")
+            # pure digits -> interpret as percent key/value
+            if s.isdigit():
+                p = int(s)
+                if not (0 <= p <= 100):
+                    raise ValueError(f"Percent key {p} out of range [0, 100].")
+                return f"{p:02d}"
+            # otherwise interpret as numeric (fraction-like)
+            try:
+                v = float(s)
+            except ValueError as e:
+                raise ValueError(f"Could not parse level value {v!r}.") from e
+
+        # parse numbers
+        if isinstance(v, (int, float)):
+            x = float(v)
+            # Heuristic matches normalize_to_fractions:
+            #   x <= 1 -> fraction
+            #   x >  1 -> percent
+            if x <= 1.0:
+                if x < 0.0:
+                    raise ValueError(f"Fraction {x} out of range [0, 1].")
+                p = int(round(x * 100))
+            else:
+                if not (0.0 <= x <= 100.0):
+                    raise ValueError(f"Percent value {x} out of range [0, 100].")
+                p = int(round(x))
+
+            # validate after rounding
+            if not (0 <= p <= 100):
+                raise ValueError(f"Percent key {p} out of range [0, 100].")
+            return f"{p:02d}"
+
+        raise ValueError(f"Unsupported type for level value: {type(v).__name__}")
+
+    is_iterable = isinstance(values, (list, tuple, set))
+    if is_iterable:
+        return [one_to_key(v) for v in values]
+    return one_to_key(values)
+
+
+def normalize_to_fractions(values):
+    """
+    Normalize level specifications to fractions in [0, 1].
+
+    Accepts:
+      - single value or list/tuple/set
+      - values may be:
+          * fraction floats/ints: 0.5, 1.0, 0
+          * percent keys as ints: 50, 95, 100
+          * percent keys as strings: "50", "05", "100"
+          * fraction strings: "0.5", "1", "0.05"
+
+    Returns:
+      - list[float]: fractions in [0, 1] (order preserved for list-like input)
+
+    Raises:
+      - ValueError if a value cannot be parsed or is out of range.
+    """
+
+    def one_to_fraction(v):
+        # parse strings
+        if isinstance(v, str):
+            s = v.strip()
+            if s == "":
+                raise ValueError("Empty string is not a valid level.")
+            # pure digits -> interpret as percent key (e.g., "50" => 0.5)
+            if s.isdigit():
+                p = int(s)
+                if not (0 <= p <= 100):
+                    raise ValueError(f"Percent key {p} out of range [0, 100].")
+                return p / 100.0
+            # otherwise interpret as numeric (fraction-like)
+            try:
+                v = float(s)
+            except ValueError as e:
+                raise ValueError(f"Could not parse level value {v!r}.") from e
+
+        # parse numbers
+        if isinstance(v, (int, float)):
+            x = float(v)
+            # Heuristic:
+            #   x <= 1 -> already a fraction
+            #   x >  1 -> treat as percent key (e.g., 50 -> 0.5)
+            if x <= 1.0:
+                if x < 0.0:
+                    raise ValueError(f"Fraction {x} out of range [0, 1].")
+                return x
+            else:
+                if not (0.0 <= x <= 100.0):
+                    raise ValueError(f"Percent value {x} out of range [0, 100].")
+                return x / 100.0
+
+        raise ValueError(f"Unsupported type for level value: {type(v).__name__}")
+
+    # accept scalar or iterable
+    if isinstance(values, (list, tuple, set)):
+        out = [one_to_fraction(v) for v in values]
+    else:
+        out = [one_to_fraction(values)]
+
+    # final clamp check (no silent clamping; just validate)
+    for f in out:
+        if not (0.0 <= f <= 1.0):
+            raise ValueError(f"Normalized fraction {f} out of range [0, 1].")
+
+    return out
+
+
+def checkpoint_has_new_levels(
+    checkpoint_main_data: dict,
+    cam_intensity_fractions,
+    analysis_fractions,
+    *,
+    key_func=None,
+    require_subset: bool = True,
+):
+    """
+    Compare requested fraction levels (from args/ini) against levels recorded in a checkpoint.
+
+    Handles checkpoint lists that may be nested, e.g. [['50','60']] or [[0.5, 0.6]].
+
+    Returns:
+        (flags, details)
+
+        flags (dict[str, bool]):
+            Per-section boolean: True means this section has NEW requested levels not present
+            in the checkpoint list and therefore should run.
+
+        details (dict[str, dict]):
+            Per-section info: requested, completed, missing (all as sorted lists of level keys).
+    """
+
+    def default_key_func(x):
+        def _one(v):
+            # Normalize: accept "50", 50, 0.5, "0.5"
+            if isinstance(v, str):
+                s = v.strip()
+                if s.isdigit():
+                    return f"{int(s):02d}"
+                try:
+                    v = float(s)
+                except ValueError:
+                    return s  # fallback: raw string compare
+            if isinstance(v, (int, float)):
+                xf = float(v)
+                # treat <= 1 as fraction, > 1 as percent key
+                if xf <= 1.0:
+                    return f"{int(round(xf * 100)):02d}"
+                return f"{int(round(xf)):02d}"
+            return str(v)
+
+        if isinstance(x, (list, tuple, set)):
+            return {_one(v) for v in x}
+        else:
+            return _one(x)
+
+    key_func = default_key_func if key_func is None else key_func
+
+    def _flatten(seq):
+        """Flatten arbitrarily nested lists/tuples/sets (but not strings/bytes)."""
+        if seq is None:
+            return
+        if isinstance(seq, (list, tuple, set)):
+            for item in seq:
+                yield from _flatten(item)
+        else:
+            yield seq
+
+    def to_key_set(seq):
+        """
+        Convert scalars, lists, or nested-lists into a flat set of normalized level keys.
+        Examples:
+          "50" -> {"50"}
+          ["50","60"] -> {"50","60"}
+          [["50","60"]] -> {"50","60"}
+          [0.5, 0.6] -> {"50","60"}
+        """
+        if seq is None:
+            return set()
+
+        # Treat non-iterable scalar as one item
+        if not isinstance(seq, (list, tuple, set)):
+            seq = [seq]
+
+        out = set()
+        for v in _flatten(seq):
+            kv = key_func(v)
+            # key_func may return a set if v is iterable (defensive)
+            if isinstance(kv, set):
+                out |= kv
+            else:
+                out.add(kv)
+        return out
+
+    cam_req = to_key_set(cam_intensity_fractions)
+    ana_req = to_key_set(analysis_fractions)
+
+    if require_subset and not ana_req.issubset(cam_req):
+        raise ValueError(
+            f"analysis_fractions levels {sorted(ana_req)} must be a subset of "
+            f"cam_intensity_fractions levels {sorted(cam_req)}."
+        )
+
+    section_map = {
+        "coverage_maps_levels": cam_req,
+        "time_history_levels": cam_req,
+        "pixel_transition_levels": ana_req,
+        "pixel_transition_plot_levels": ana_req,
+        "celestial_vectors_data_levels": ana_req,
+        "celestial_vectors_plots_levels": ana_req,
+        "lookfast_camera_adjust_levels": ana_req,
+    }
+
+    flags = {}
+    details = {}
+
+    for ckpt_key, requested in section_map.items():
+        completed = to_key_set(checkpoint_main_data.get(ckpt_key, []))
+        missing = requested - completed
+
+        flags[ckpt_key] = len(missing) > 0
+        details[ckpt_key] = {"requested": sorted(requested), "completed": sorted(completed), "missing": sorted(missing)}
+
+    return flags, details
+
+
 def main(args):
 
     if args.primary_folder is None:
@@ -168,6 +422,7 @@ def main(args):
         primary_folder = args.primary_folder
     else:
         primary_folder = args.primary_folder
+        ft.create_directories_if_necessary(primary_folder)
 
     if args.og_video_path is None:
         args.og_video_path = select_file(
@@ -175,6 +430,12 @@ def main(args):
         )
         ft.copy_file(input_dir_body_ext=args.og_video_path, output_dir=args.primary_folder)
         og_vid_dir, og_vid_name, og_vid_ext = ft.path_components(args.og_video_path)
+    elif os.path.exists(args.og_video_path):
+        og_vid_dir, og_vid_name, og_vid_ext = ft.path_components(args.og_video_path)
+        if ft.file_exists(input_dir_body_ext=ft.join(args.primary_folder, og_vid_name + og_vid_ext)):
+            pass
+        else:
+            ft.copy_file(input_dir_body_ext=args.og_video_path, output_dir=args.primary_folder)
     else:
         og_vid_dir, og_vid_name, og_vid_ext = ft.path_components(args.og_video_path)
 
@@ -201,7 +462,16 @@ def main(args):
     # Load checkpoint if it exists
     checkpoint_main_data = lbt.load_checkpoint(checkpoint_folder, checkpoint_main_name)
     if checkpoint_main_data is None:
-        checkpoint_main_data = {"Completed_Steps": []}
+        checkpoint_main_data = {
+            "Completed_Steps": [],
+            "coverage_maps_levels": [],
+            "time_history_levels": [],
+            "pixel_transition_levels": [],
+            "pixel_transition_plot_levels": [],
+            "celestial_vectors_data_levels": [],
+            "celestial_vectors_plots_levels": [],
+            "lookfast_camera_adjust_levels": [],
+        }
 
     start_time = time.time()
     logger.info("Code Start Time: %s", str(time.ctime(start_time)))
@@ -210,6 +480,17 @@ def main(args):
     fractions = args.cam_intensity_fractions
     analysis_fractions = args.analysis_fractions
 
+    cam_level_keys = [fraction_to_key(f) for f in args.cam_intensity_fractions]
+    analysis_level_keys = [fraction_to_key(f) for f in args.analysis_fractions]
+
+    has_new, chkpt_args_diff = checkpoint_has_new_levels(
+        checkpoint_main_data=checkpoint_main_data,
+        cam_intensity_fractions=cam_level_keys,
+        analysis_fractions=analysis_level_keys,
+        require_subset=True,
+    )
+
+    celestial_database_path = args.ephem_path
     celestial_object = args.celestial_object
     video_metadata = lbt.extract_detailed_video_metadata(ft.join(primary_folder, og_vid_name + og_vid_ext))
     timezone = args.timezone
@@ -271,6 +552,9 @@ def main(args):
             video_path=ft.join(primary_folder, og_vid_name + og_vid_ext),
             dest_path=ft.join(primary_folder, "1_video_frames"),
             frame_subset_dir=ft.join(primary_folder, "3_specific_cropped_frames"),
+            start_frame=args.start_frame if args.start_frame else None,
+            end_frame=args.end_frame if args.end_frame else None,
+            reference_pixel=args.reference_pixel if args.reference_pixel else None,
         )
         reference_pixel_key = scrubber_details['reference_pixel']
         lbt.write_json(scrubber_details, ft.join(primary_folder, "interactive_scrubber_selections.json"))
@@ -285,18 +569,24 @@ def main(args):
 
         write_ini_file_from_args(args, scrubber_details, ft.join(primary_folder, "full_processing_settings.ini"))
 
-    if "coverage_maps" in checkpoint_main_data["Completed_Steps"] or args.coverage_maps is False:
+    if ("coverage_maps" in checkpoint_main_data["Completed_Steps"] or args.coverage_maps is False) and has_new[
+        "coverage_maps_levels"
+    ] is False:
         logger.info("Skipped Already Completed Coverage Maps : %s", str(time.time() - start_time))
         if ft.file_exists(ft.join(primary_folder, "threshold_bmap_mask_paths.json")):
             thresh_maps_paths = lbt.read_json(ft.join(primary_folder, "threshold_bmap_mask_paths.json"))
     else:
+        missing_levels = fractions
+        if has_new["coverage_maps_levels"] is True:
+            missing_levels = chkpt_args_diff["coverage_maps_levels"]["missing"]
+
         cvg_map.construct_binary_maps_parallel(
             image_folder=ft.join(primary_folder, "3_specific_cropped_frames"),
             output_folder=ft.join(primary_folder, "4_coverage_map"),
             checkpoint_folder=checkpoint_folder,
-            threshold_fractions=fractions,
-            batch_size=1000,
-            max_workers=4,
+            threshold_fractions=normalize_to_fractions(missing_levels),
+            batch_size=1000,  # I think I fixed memory leaks, so this could be increased.
+            max_workers=4,  # I think I fixed memory leaks, so this could be increased.
             checkpoint_file="coverage_map_mp_checkpoint.json",
         )
         binary_maps = ft.files_in_directory(
@@ -307,6 +597,7 @@ def main(args):
         lbt.write_json(thresh_maps_paths, ft.join(primary_folder, "threshold_bmap_mask_paths.json"))
 
         checkpoint_main_data["Completed_Steps"].append("coverage_maps")
+        checkpoint_main_data["coverage_maps_levels"].extend(missing_levels)
         lbt.save_checkpoint(
             checkpoint_folder=checkpoint_folder,
             checkpoint_file_name=checkpoint_main_name,
@@ -333,12 +624,18 @@ def main(args):
         )
         logger.info("Time to Complete Accelerated Video: %s", str(time.time() - start_time))
 
-    if "time_history" in checkpoint_main_data["Completed_Steps"] or args.time_history is False:
+    if ("time_history" in checkpoint_main_data["Completed_Steps"] or args.time_history is False) and has_new[
+        "time_history_levels"
+    ] is False:
         logger.info("Skipped Already Completed Time History: %s", str(time.time() - start_time))
     else:
+        missing_levels = fractions
+        if has_new["time_history_levels"] is True:
+            missing_levels = chkpt_args_diff["time_history_levels"]["missing"]
+        # This function is still memory hungry, room for improvement here...
         time_hist.create_binary_pixel_array_parallel_with_multiprocessing(
             image_folder_path=ft.join(primary_folder, "3_specific_cropped_frames"),
-            percentages=fractions,
+            percentages=normalize_to_fractions(missing_levels),
             output_folder=ft.join(primary_folder, "6_time_history_output"),
             checkpoint_folder=checkpoint_folder,
             batch_size=500,
@@ -347,6 +644,7 @@ def main(args):
             num_workers=4,
         )
         checkpoint_main_data["Completed_Steps"].append("time_history")
+        checkpoint_main_data["time_history_levels"].extend(missing_levels)
         lbt.save_checkpoint(
             checkpoint_folder=checkpoint_folder,
             checkpoint_file_name=checkpoint_main_name,
@@ -354,12 +652,22 @@ def main(args):
         )
         logger.info("Time to Complete Time History Arrays: %s", str(time.time() - start_time))
 
-    if "pixel_transitions" in checkpoint_main_data["Completed_Steps"] or args.pixel_transitions is False:
+    if ("pixel_transitions" in checkpoint_main_data["Completed_Steps"] or args.pixel_transitions is False) and has_new[
+        "pixel_transition_levels"
+    ] is False:
         logger.info("Skipped Already Completed Transition History: %s", str(time.time() - start_time))
     else:
-        for level in analysis_fractions:
-            mask_key = f"{int(level*100):02d}"
+        missing_levels = analysis_level_keys
+        if has_new["pixel_transition_levels"] is True:
+            missing_levels = chkpt_args_diff["pixel_transition_levels"]["missing"]
+
+        for mask_key in missing_levels:
+            # mask_key = fraction_to_key(mask)
             mask_file_path = [fp for fp in thresh_maps_paths if mask_key in os.path.basename(fp)]
+
+            if mask_key in checkpoint_main_data["pixel_transition_levels"]:
+                logger.info("Skipping completed analysis fraction pixel transitions: %s", str(mask_key))
+                continue
 
             if len(mask_file_path) > 1:
                 raise ValueError("Too many binary map mask files match the analysis fraction key")
@@ -376,19 +684,36 @@ def main(args):
                     checkpoint_folder=checkpoint_folder,
                     checkpoint_file_name="time_history_transition_checkpoint_mp.json",
                 )
-                checkpoint_main_data["Completed_Steps"].append("pixel_transitions")
+
+                checkpoint_main_data["pixel_transition_levels"].extend([mask_key])
                 lbt.save_checkpoint(
                     checkpoint_folder=checkpoint_folder,
                     checkpoint_file_name=checkpoint_main_name,
                     checkpoint_data=checkpoint_main_data,
                 )
                 logger.info("Time to Complete Time History Transitions: %s", str(time.time() - start_time))
+        checkpoint_main_data["Completed_Steps"].append("pixel_transitions")
+        lbt.save_checkpoint(
+            checkpoint_folder=checkpoint_folder,
+            checkpoint_file_name=checkpoint_main_name,
+            checkpoint_data=checkpoint_main_data,
+        )
 
-    if "pixel_transition_plots" in checkpoint_main_data["Completed_Steps"] or args.pixel_transition_plots is False:
+    if (
+        "pixel_transition_plots" in checkpoint_main_data["Completed_Steps"] or args.pixel_transition_plots is False
+    ) and has_new["pixel_transition_plot_levels"] is False:
         logger.info("Skipped Already Completed Transition Plots: %s", str(time.time() - start_time))
     else:
-        for level in analysis_fractions:
-            mask_key = f"{int(level*100):02d}"
+        missing_levels = analysis_level_keys
+        if "pixel_transition_plot_levels" in has_new:
+            missing_levels = chkpt_args_diff["pixel_transition_plot_levels"]["missing"]
+
+        for mask_key in missing_levels:
+            # mask_key = fraction_to_key(level)
+
+            if mask_key in checkpoint_main_data["pixel_transition_plot_levels"]:
+                logger.info("Skipping completed analysis fraction pixel transition plots: %s", str(mask_key))
+                continue
 
             transitions.create_timing_plots_json_parallel(
                 compiled_json=ft.join(
@@ -402,20 +727,37 @@ def main(args):
                 checkpoint_folder=checkpoint_folder,
                 checkpoint_file="pixel_timing_plots_checkpoint_mp.json",
             )
-            checkpoint_main_data["Completed_Steps"].append("pixel_transition_plots")
+
+            checkpoint_main_data["pixel_transition_plot_levels"].extend([mask_key])
             lbt.save_checkpoint(
                 checkpoint_folder=checkpoint_folder,
                 checkpoint_file_name=checkpoint_main_name,
                 checkpoint_data=checkpoint_main_data,
             )
             logger.info("Time to Complete Timing Plots: %s", str(time.time() - start_time))
+        checkpoint_main_data["Completed_Steps"].append("pixel_transition_plots")
+        lbt.save_checkpoint(
+            checkpoint_folder=checkpoint_folder,
+            checkpoint_file_name=checkpoint_main_name,
+            checkpoint_data=checkpoint_main_data,
+        )
 
-    if "celestial_vectors_data" in checkpoint_main_data["Completed_Steps"] or args.celestial_vectors_data is False:
+    if (
+        "celestial_vectors_data" in checkpoint_main_data["Completed_Steps"] or args.celestial_vectors_data is False
+    ) and has_new["celestial_vectors_data_levels"] is False:
         logger.info("Skipped Already Completed Celestial Vector Processing: %s", str(time.time() - start_time))
     else:
-        for level in analysis_fractions:
-            mask_key = f"{int(level*100):02d}"
+        missing_levels = analysis_level_keys
+        if "celestial_vectors_data_levels" in has_new:
+            missing_levels = chkpt_args_diff["celestial_vectors_data_levels"]["missing"]
+
+        for mask_key in missing_levels:
+            # mask_key = fraction_to_key(level)
             mask_file_path = [fp for fp in thresh_maps_paths if mask_key in os.path.basename(fp)]
+
+            if mask_key in checkpoint_main_data["celestial_vectors_data_levels"]:
+                logger.info("Skipping completed analysis fraction celestial vectors data: %s", str(mask_key))
+                continue
 
             if len(mask_file_path) > 1:
                 raise ValueError("Too many binary map mask files match the analysis fraction key")
@@ -439,9 +781,10 @@ def main(args):
                     checkpoint_folder=checkpoint_folder,
                     checkpoint_file="celestial_vector_data_checkpoint_mp.json",
                     batch_size=5000,
+                    ephem_path=celestial_database_path,
                 )
 
-                checkpoint_main_data["Completed_Steps"].append("celestial_vectors_data")
+                checkpoint_main_data["celestial_vectors_data_levels"].extend([mask_key])
                 lbt.save_checkpoint(
                     checkpoint_folder=checkpoint_folder,
                     checkpoint_file_name=checkpoint_main_name,
@@ -449,12 +792,29 @@ def main(args):
                 )
                 logger.info("Time to Complete Celestial Vector Calculations: %s", str(time.time() - start_time))
 
-    if "celestial_vectors_plots" in checkpoint_main_data["Completed_Steps"] or args.celestial_vectors_plots is False:
+        checkpoint_main_data["Completed_Steps"].append("celestial_vectors_data")
+        lbt.save_checkpoint(
+            checkpoint_folder=checkpoint_folder,
+            checkpoint_file_name=checkpoint_main_name,
+            checkpoint_data=checkpoint_main_data,
+        )
+
+    if (
+        "celestial_vectors_plots" in checkpoint_main_data["Completed_Steps"] or args.celestial_vectors_plots is False
+    ) and has_new["celestial_vectors_plots_levels"] is False:
         logger.info("Skipped Already Completed Celestial Vector Plotting: %s", str(time.time() - start_time))
     else:
-        for level in analysis_fractions:
-            mask_key = f"{int(level*100):02d}"
+        missing_levels = analysis_level_keys
+        if "celestial_vectors_plots_levels" in has_new:
+            missing_levels = chkpt_args_diff["celestial_vectors_plots_levels"]["missing"]
+
+        for mask_key in missing_levels:
+            # mask_key = fraction_to_key(level)
             mask_file_path = [fp for fp in thresh_maps_paths if mask_key in os.path.basename(fp)]
+
+            if mask_key in checkpoint_main_data["celestial_vectors_plots_levels"]:
+                logger.info("Skipping completed analysis fraction celestial vectors plots: %s", str(mask_key))
+                continue
 
             if len(mask_file_path) > 1:
                 raise ValueError("Too many binary map mask files match the analysis fraction key")
@@ -477,7 +837,7 @@ def main(args):
                     batch_size=1000,
                 )
 
-                checkpoint_main_data["Completed_Steps"].append("celestial_vectors_plots")
+                checkpoint_main_data["celestial_vectors_plots_levels"].extend([mask_key])
                 lbt.save_checkpoint(
                     checkpoint_folder=checkpoint_folder,
                     checkpoint_file_name=checkpoint_main_name,
@@ -485,12 +845,29 @@ def main(args):
                 )
                 logger.info("Time to Complete Celestial Vector Plots: %s", str(time.time() - start_time))
 
-    if "lookfast_camera_adjust" in checkpoint_main_data["Completed_Steps"] or args.lookfast_camera_adjust is False:
+        checkpoint_main_data["Completed_Steps"].append("celestial_vectors_plots")
+        lbt.save_checkpoint(
+            checkpoint_folder=checkpoint_folder,
+            checkpoint_file_name=checkpoint_main_name,
+            checkpoint_data=checkpoint_main_data,
+        )
+
+    if (
+        "lookfast_camera_adjust" in checkpoint_main_data["Completed_Steps"] or args.lookfast_camera_adjust is False
+    ) and has_new["lookfast_camera_adjust_levels"] is False:
         logger.info("Skipped Already Completed Lookfast Camera Adjustments: %s", str(time.time() - start_time))
     else:
-        for level in analysis_fractions:
-            mask_key = f"{int(level*100):02d}"
+        missing_levels = analysis_level_keys
+        if "lookfast_camera_adjust_levels" in has_new:
+            missing_levels = chkpt_args_diff["lookfast_camera_adjust_levels"]["missing"]
+
+        for mask_key in missing_levels:
+            # mask_key = fraction_to_key(level)
             mask_file_path = [fp for fp in thresh_maps_paths if mask_key in os.path.basename(fp)]
+
+            if mask_key in checkpoint_main_data["lookfast_camera_adjust_levels"]:
+                logger.info("Skipping completed analysis fraction lookfast camera adjust levels: %s", str(mask_key))
+                continue
 
             if len(mask_file_path) > 1:
                 raise ValueError("Too many binary map mask files match the analysis fraction key")
@@ -512,7 +889,7 @@ def main(args):
                     checkpoint_file="rotate_translate_camera_adjust_checkpoint.json",
                 )
 
-                checkpoint_main_data["Completed_Steps"].append("lookfast_camera_adjust")
+                checkpoint_main_data["lookfast_camera_adjust_levels"].extend([mask_key])
                 lbt.save_checkpoint(
                     checkpoint_folder=checkpoint_folder,
                     checkpoint_file_name=checkpoint_main_name,
@@ -522,8 +899,15 @@ def main(args):
                     "Time to Complete Rotate/Translate Adjustment Calculations: %s", str(time.time() - start_time)
                 )
 
-    print("here")
-    # Need Lookfast camera adjust v2 section
+        checkpoint_main_data["Completed_Steps"].append("lookfast_camera_adjust")
+        lbt.save_checkpoint(
+            checkpoint_folder=checkpoint_folder,
+            checkpoint_file_name=checkpoint_main_name,
+            checkpoint_data=checkpoint_main_data,
+        )
+
+    print("Finished LookFast Processing Script")
+    print(time.strftime("%H:%M:%S", time.localtime()))
 
 
 def parse_value(value):
@@ -538,9 +922,6 @@ def parse_value(value):
     except (ValueError, SyntaxError):
         # Return as string if not a Python literal
         return value
-
-
-PATH_KEYS = {"primary_folder", "og_video_path", "file_camera", "video_path"}
 
 
 def parse_config(config_file_path):
@@ -616,6 +997,13 @@ def build_parser():
         dest="video_path",
         default=None,
         help="File path of copied video, may be automatically added to ini file when run interactively. Not necessary to specify.",
+    )
+    p.add_argument(
+        "-eph_path",
+        "--ephemeris_database_path",
+        dest="ephem_path",
+        default=None,
+        help="File path of de430t.bsp ephemeris file for celestial body references.",
     )
 
     p.add_argument(
@@ -728,7 +1116,7 @@ def build_parser():
         "--reference-pixel",
         dest="reference_pixel",
         default=None,
-        help="Reference pixel closest to measured point with data to align coordinate systems.",
+        help="Reference pixel closest to measured point with data to align coordinate systems. Input as (row, column) which is measured with the origin at the top left corner of the image and row increasing going down and column increasing going to the right.",
     )
 
     # code sections to run

@@ -300,7 +300,14 @@ def shuttil_frames(image_folder, destination_folder, start_frame, end_frame):
             continue
 
 
-def interactive_video_select(video_path, dest_path, frame_subset_dir):
+def interactive_video_select(
+    video_path,
+    dest_path,
+    frame_subset_dir,
+    start_frame=None,
+    end_frame=None,
+    reference_pixel=None,  # expected as (col, row) to match your existing app storage
+):
     is_video = os.path.exists(video_path)
     if not is_video:
         raise ValueError("Invalid Path to Video File")
@@ -308,23 +315,44 @@ def interactive_video_select(video_path, dest_path, frame_subset_dir):
     os.makedirs(dest_path, exist_ok=True)
     os.makedirs(frame_subset_dir, exist_ok=True)
 
-    root = tk.Tk()
-    vid_scrub_app = VideoScrubber(root, video_path=video_path)
-    root.title("LookFast Video Scrubber")
-    root.mainloop()
+    # Decide whether to skip interaction
+    have_all_inputs = start_frame is not None and end_frame is not None and reference_pixel is not None
+    if have_all_inputs:
+        # Basic validation (tighten as needed)
+        start_frame = int(start_frame)
+        end_frame = int(end_frame)
+        if start_frame < 0 or end_frame < 0:
+            raise ValueError("start_frame/end_frame must be >= 0")
+        if end_frame < start_frame:
+            raise ValueError("end_frame must be >= start_frame")
+        if not isinstance(reference_pixel, (tuple, list)) or len(reference_pixel) != 2:
+            raise ValueError("reference_pixel must be a 2-tuple like (col, row)")
+
+        chosen_start = start_frame
+        chosen_end = end_frame
+        chosen_ref_pixel = f"({reference_pixel[0]}, {reference_pixel[1]})"  # (row, col) from input
+        chosen_video_path = video_path
+    else:
+
+        root = tk.Tk()
+        vid_scrub_app = VideoScrubber(root, video_path=video_path)
+        root.title("LookFast Video Scrubber")
+        root.mainloop()
+
+        chosen_start = int(vid_scrub_app.start_frame)
+        chosen_end = int(vid_scrub_app.end_frame)
+        chosen_ref_pixel = f"({vid_scrub_app.reference_pixel[1]}, {vid_scrub_app.reference_pixel[0]})"  # (row, col)
+        chosen_video_path = vid_scrub_app.video_path
 
     extract_all_frames(source_vid_path=video_path, frame_dest_path=dest_path)
     shuttil_frames(
-        image_folder=dest_path,
-        destination_folder=frame_subset_dir,
-        start_frame=int(vid_scrub_app.start_frame),
-        end_frame=int(vid_scrub_app.end_frame),
+        image_folder=dest_path, destination_folder=frame_subset_dir, start_frame=chosen_start, end_frame=chosen_end
     )
     return {
-        "start_frame": vid_scrub_app.start_frame,
-        "end_frame": vid_scrub_app.end_frame,
-        "video_path": vid_scrub_app.video_path,
-        "reference_pixel": f"({vid_scrub_app.reference_pixel[1]}, {vid_scrub_app.reference_pixel[0]})",
+        "start_frame": chosen_start,
+        "end_frame": chosen_end,
+        "video_path": chosen_video_path,
+        "reference_pixel": chosen_ref_pixel,
     }
 
 
@@ -336,3 +364,4 @@ if __name__ == "__main__":
     app = VideoScrubber(root)
     root.title("LookFast Pre Processing")
     root.mainloop()
+    print("Completed Stand Alone Script")

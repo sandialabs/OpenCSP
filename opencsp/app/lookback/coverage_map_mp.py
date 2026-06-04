@@ -208,8 +208,21 @@ def construct_binary_maps_parallel(
 ):
     """
     Constructs a series of binary maps of pixels that exceeded intensity thresholds across all images,
-    including traditional formats and RAW image files, using parallel processing and batching.
+    including traditional formats using parallel processing and batching.
     Supports restarting from a checkpoint.
+
+    Checkpoint behavior update:
+      - If new threshold fractions are requested that are NOT in checkpoint_data["completed_thresholds"],
+        the function resets per-image progress ("processed_images", "current_batch") and re-processes
+        the whole dataset for the union of (old completed + new requested) thresholds.
+      - After completion, checkpoint_data["completed_thresholds"] is extended (union) and
+        "processed_images" is repopulated to reflect the completed processing pass.
+
+    Notes/assumptions:
+      - This is the "minimal change" approach: when new thresholds are requested, we re-run the
+        batch processing for *all* images (not just the new thresholds), because the per-image
+        products are threshold-dependent.
+      - completed_thresholds is treated as a *set* of fraction values (with float tolerance via rounding).
 
     Parameters:
         image_folder (str): Path to the folder containing the sequence of images.
@@ -223,10 +236,42 @@ def construct_binary_maps_parallel(
     Returns:
         None
     """
+
+    # ----------------------------
+    # helpers
+    # ----------------------------
+    def _flatten(seq):
+        """Flatten arbitrarily nested lists/tuples/sets (but not strings/bytes)."""
+        if seq is None:
+            return
+        if isinstance(seq, (list, tuple, set)):
+            for item in seq:
+                yield from _flatten(item)
+        else:
+            yield seq
+
     # Load checkpoint if it exists
     checkpoint_data = lbt.load_checkpoint(checkpoint_folder, checkpoint_file)
     if checkpoint_data is None:
         checkpoint_data = {"processed_images": [], "current_batch": 0, "completed_thresholds": [], "prefix": None}
+
+    requested_thr = _flatten(threshold_fractions)
+    completed_thr = _flatten(checkpoint_data.get("completed_thresholds", []))
+
+    requested_set = set(requested_thr)
+    completed_set = set(completed_thr)
+
+    new_thresholds = sorted(requested_set - completed_set)
+    needs_rerun = len(new_thresholds) > 0
+
+    # If anything new was requested, wipe progress and rerun using union thresholds
+    if needs_rerun:
+        checkpoint_data["processed_images"] = []
+        checkpoint_data["current_batch"] = 0
+        # keep completed_thresholds as-is for now; only update after successful compile
+        lbt.save_checkpoint(checkpoint_folder, checkpoint_file, checkpoint_data)
+    else:
+        union_thresholds = requested_thr  # nothing new; run normally / continue if interrupted
 
     # List all image files in the folder
     image_files_all = os.listdir(image_folder)
@@ -250,7 +295,7 @@ def construct_binary_maps_parallel(
         first_image = imageio.imread(image_files[0])
         max_intensity = np.iinfo(first_image.dtype).max if np.issubdtype(first_image.dtype, np.integer) else 1.0
 
-        # Filter out already processed images
+        # If we did not wipe progress, continue from checkpoint; otherwise run from scratch
         unprocessed_images = [img for img in image_files if img not in checkpoint_data["processed_images"]]
 
         # Process images in batches
@@ -258,11 +303,11 @@ def construct_binary_maps_parallel(
             batch_end = min(batch_start + batch_size, len(unprocessed_images))
             batch_files = unprocessed_images[batch_start:batch_end]
             # Extract file names
-            file_names = [os.path.basename(file) for file in batch_files]
+            # file_names = [os.path.basename(file) for file in batch_files]
 
             process_images_in_batches(
                 batch_files,
-                threshold_fractions,
+                new_thresholds,
                 max_intensity,
                 is_raw=False,
                 batch_num=batch_start // batch_size + 1,
@@ -277,11 +322,13 @@ def construct_binary_maps_parallel(
             lbt.save_checkpoint(checkpoint_folder, checkpoint_file, checkpoint_data)
 
         # Compile binary maps for traditional images
-        if "traditional" not in checkpoint_data["completed_thresholds"]:
-            compile_binary_maps(output_folder, threshold_fractions, prefix="traditional")
-            checkpoint_data["completed_thresholds"].append("traditional")
+        if new_thresholds not in checkpoint_data["completed_thresholds"]:
+            compile_binary_maps(output_folder, new_thresholds, prefix="traditional")
+            checkpoint_data["completed_thresholds"].extend(new_thresholds)
             lbt.save_checkpoint(checkpoint_folder, checkpoint_file, checkpoint_data)
 
+
+'''
     # Process RAW images
     if image_files_raw:
         # Determine the maximum possible intensity value for RAW images
@@ -322,3 +369,5 @@ def construct_binary_maps_parallel(
             compile_binary_maps(output_folder, threshold_fractions, prefix="raw")
             checkpoint_data["completed_thresholds"].append("raw")
             lbt.save_checkpoint(checkpoint_folder, checkpoint_file, checkpoint_data)
+
+'''

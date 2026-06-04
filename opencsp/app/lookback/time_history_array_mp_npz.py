@@ -129,7 +129,12 @@ def create_binary_pixel_array_parallel_with_multiprocessing(
             batches.append((batch_start // (batch_size - overlap) + 1, image_paths[batch_start:batch_end]))
 
         # Process batches in parallel using multiprocessing
-        processed_batches = set(checkpoint_data["processed_batches"][percentage_key])
+        if percentage_key in checkpoint_data["processed_batches"]:
+            processed_batches = set(checkpoint_data["processed_batches"][percentage_key])
+        else:
+            checkpoint_data["processed_batches"][percentage_key] = []
+            processed_batches = set(checkpoint_data["processed_batches"][percentage_key])
+
         args = [
             (batch_index, batch_paths, percentage, output_folder, percentage_key)
             for batch_index, batch_paths in batches
