@@ -2752,17 +2752,31 @@ def main(
         cam_solution_set_1, cam_solution_set_2 = plot_heat_maps_camera_looking_up_coords(
             vector_data, control_pts_cam, output_dir=ft.join(output_directory, "camera_RT_align"), debug_plots=True
         )
+        lbt.write_compressed_json(
+            data=cam_solution_set_1,
+            file_path=ft.join(output_directory, "camera_RT_align", "cam_solution_set_1.json.gz"),
+        )
+        lbt.write_compressed_json(
+            data=cam_solution_set_2,
+            file_path=ft.join(output_directory, "camera_RT_align", "cam_solution_set_2.json.gz"),
+        )
         checkpoint_data["Lookfast_RT_Alignment"].append("camera_RT_align")
         lbt.save_checkpoint(checkpoint_directory, checkpoint_file, checkpoint_data, print_path=False)
-        # What to do with the solution set data?
 
     if "mirror_RT_align" not in checkpoint_data["Lookfast_RT_Alignment"]:
         mir_solution_set_1, mir_solution_set_2 = plot_heat_maps_mirror_looking_up_coords(
             vector_data, output_dir=ft.join(output_directory, "mirror_RT_align"), debug_plots=True
         )
+        lbt.write_compressed_json(
+            data=mir_solution_set_1,
+            file_path=ft.join(output_directory, "mirror_RT_align", "mir_solution_set_1.json.gz"),
+        )
+        lbt.write_compressed_json(
+            data=mir_solution_set_2,
+            file_path=ft.join(output_directory, "mirror_RT_align", "mir_solution_set_2.json.gz"),
+        )
         checkpoint_data["Lookfast_RT_Alignment"].append("mirror_RT_align")
         lbt.save_checkpoint(checkpoint_directory, checkpoint_file, checkpoint_data, print_path=False)
-        # What to do with the solution set data?
 
 
 def main_original_script():

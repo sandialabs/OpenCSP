@@ -450,6 +450,7 @@ def main(args):
         r'7_pixel_timing_interrogation',
         r'8_pixel_vector_information',
         r'9_sofast_data_compare',
+        r'10_pointing_estimate',
         r'reference_images',
     ]
 

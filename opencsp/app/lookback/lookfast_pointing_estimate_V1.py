@@ -1279,10 +1279,11 @@ def extract_vertical_shift_parallel(
     sun_trav_rad_s,
     pad,
     trav_direction=0,
-    show_full_maps=False,
+    render=False,
     cmap="coolwarm",
     nan_color="white",
     max_workers=None,  # None -> os.cpu_count()
+    show=False,
 ):
     rmin_p, rmax_p, cmin_p, cmax_p = _cropped_bbox_from_keys(pixel_dict, pad=pad)
     nrows = (rmax_p - rmin_p) + 1
@@ -1317,6 +1318,8 @@ def extract_vertical_shift_parallel(
     # Build shift0/shift1 maps (vectorized-ish)
     shift0 = np.full((nrows, ncols), np.nan, dtype=float)
     shift1 = np.full((nrows, ncols), np.nan, dtype=float)
+    shiftmin = np.full((nrows, ncols), np.nan, dtype=float)
+    shiftmax = np.full((nrows, ncols), np.nan, dtype=float)
 
     for i in range(nrows):
         for j in range(ncols):
@@ -1324,33 +1327,55 @@ def extract_vertical_shift_parallel(
             if isinstance(t, tuple) and len(t) >= 2:
                 shift0[i, j] = t[0]
                 shift1[i, j] = t[1]
+                shiftmin[i, j] = np.min(t)
+                shiftmax[i, j] = np.max(t)
 
-    if show_full_maps:
+    vmin = np.nanmin(shiftmin)
+    vmax = np.nanmax(shiftmax)
+
+    if render:
         extent = _extent_from_bbox(rmin_p, rmax_p, cmin_p, cmax_p, "upper")
         cm = plt.colormaps[cmap].copy()
         cm.set_bad(nan_color)
 
-        fig, (ax0, ax1) = plt.subplots(1, 2, figsize=(12, 5), constrained_layout=True)
+        fig, ((ax0, ax1), (ax2, ax3)) = plt.subplots(2, 2, figsize=(8, 8))
 
-        im0 = ax0.imshow(shift0, origin="upper", cmap=cm, extent=extent, aspect="equal")
-        ax0.set_title("Shift map (tuple[0])")
+        im0 = ax0.imshow(shift0, origin="upper", cmap=cm, extent=extent, aspect="equal", vmin=vmin, vmax=vmax)
+        ax0.set_title(value_key + " Shift map First")
         ax0.set_xlabel("col")
         ax0.set_ylabel("row")
         ax0.set_xlim(cmin_p - 0.5, cmax_p + 0.5)
         ax0.set_ylim(rmax_p + 0.5, rmin_p - 0.5)
         fig.colorbar(im0, ax=ax0, shrink=0.9)
 
-        im1 = ax1.imshow(shift1, origin="upper", cmap=cm, extent=extent, aspect="equal")
-        ax1.set_title("Shift map (tuple[1])")
+        im1 = ax1.imshow(shift1, origin="upper", cmap=cm, extent=extent, aspect="equal", vmin=vmin, vmax=vmax)
+        ax1.set_title(value_key + " Shift map Second")
         ax1.set_xlabel("col")
         ax1.set_ylabel("row")
         ax1.set_xlim(cmin_p - 0.5, cmax_p + 0.5)
         ax1.set_ylim(rmax_p + 0.5, rmin_p - 0.5)
         fig.colorbar(im1, ax=ax1, shrink=0.9)
 
-        plt.show()
+        im2 = ax2.imshow(shiftmin, origin="upper", cmap=cm, extent=extent, aspect="equal", vmin=vmin, vmax=vmax)
+        ax2.set_title(value_key + " Shift map Min")
+        ax2.set_xlabel("col")
+        ax2.set_ylabel("row")
+        ax2.set_xlim(cmin_p - 0.5, cmax_p + 0.5)
+        ax2.set_ylim(rmax_p + 0.5, rmin_p - 0.5)
+        fig.colorbar(im2, ax=ax2, shrink=0.9)
 
-    return ch_lengths, shifts_map, shift0, shift1
+        im3 = ax3.imshow(shiftmax, origin="upper", cmap=cm, extent=extent, aspect="equal", vmin=vmin, vmax=vmax)
+        ax3.set_title(value_key + " Shift map Max")
+        ax3.set_xlabel("col")
+        ax3.set_ylabel("row")
+        ax3.set_xlim(cmin_p - 0.5, cmax_p + 0.5)
+        ax3.set_ylim(rmax_p + 0.5, rmin_p - 0.5)
+        fig.colorbar(im3, ax=ax3, shrink=0.9)
+
+        if show:
+            plt.show()
+
+    return fig if fig else None, ch_lengths, shifts_map, shift0, shift1, shiftmin, shiftmax
 
 
 def extract_vertical_shift(
@@ -1511,9 +1536,143 @@ def extract_horizontal_shift(
     return fig, ax, {"array": arr, "extent": extent, **meta}
 
 
+def array_statistics(x, *, ignore_nan=True, percentiles=(1, 5, 10, 25, 50, 75, 90, 95, 99)):
+    """
+    Compute a dictionary of useful summary statistics for a numpy array.
+
+    Parameters
+    ----------
+    x : array-like
+        Input data (any shape). Will be flattened for summary stats.
+    ignore_nan : bool, default True
+        If True, use NaN-aware stats (nanmean, nanpercentile, etc.).
+    percentiles : tuple of numbers
+        Percentiles to compute (0-100).
+
+    Returns
+    -------
+    stats : dict
+        Dictionary of statistics. If all values are NaN (or input empty),
+        many fields will be NaN and counts will reflect that.
+    """
+    a = np.asarray(x).ravel()
+
+    # Handle empty input early
+    if a.size == 0:
+        return {
+            "count_total": 0,
+            "count_finite": 0,
+            "count_nan": 0,
+            "min": np.nan,
+            "max": np.nan,
+            "mean": np.nan,
+            "median": np.nan,
+            "std": np.nan,
+            "var": np.nan,
+            "iqr": np.nan,
+            "range": np.nan,
+            "percentiles": {p: np.nan for p in percentiles},
+        }
+
+    finite_mask = np.isfinite(a)
+    n_total = a.size
+    n_finite = int(finite_mask.sum())
+    n_nan = int(np.isnan(a).sum())
+
+    # Choose reduction functions
+    if ignore_nan:
+        amin = np.nanmin
+        amax = np.nanmax
+        amean = np.nanmean
+        amedian = np.nanmedian
+        astd = np.nanstd
+        avar = np.nanvar
+        aperc = np.nanpercentile
+        data_for_geom = a[finite_mask]
+    else:
+        amin = np.min
+        amax = np.max
+        amean = np.mean
+        amedian = np.median
+        astd = np.std
+        avar = np.var
+        aperc = np.percentile
+        data_for_geom = a
+
+    # If ignoring NaNs and nothing is finite, return mostly NaNs
+    if ignore_nan and n_finite == 0:
+        return {
+            "count_total": n_total,
+            "count_finite": 0,
+            "count_nan": n_nan,
+            "min": np.nan,
+            "max": np.nan,
+            "mean": np.nan,
+            "median": np.nan,
+            "std": np.nan,
+            "var": np.nan,
+            "iqr": np.nan,
+            "range": np.nan,
+            "mad": np.nan,
+            "percentiles": {p: np.nan for p in percentiles},
+        }
+
+    # Core stats
+    minv = float(amin(a))
+    maxv = float(amax(a))
+    meanv = float(amean(a))
+    medv = float(amedian(a))
+    stdv = float(astd(a))
+    varv = float(avar(a))
+
+    # Quartiles + IQR
+    q25, q50, q75 = aperc(a, [25, 50, 75])
+    iqr = float(q75 - q25)
+
+    # Median absolute deviation (robust spread). "raw" MAD (no scaling).
+    # (If you want approx std for normal data: mad_sigma ≈ 1.4826 * MAD)
+    mad = float(amean(np.abs((a if not ignore_nan else a[finite_mask]) - medv))) if False else None
+    # Use true MAD definition:
+    if ignore_nan:
+        mad = float(np.nanmedian(np.abs(a - medv)))
+    else:
+        mad = float(np.median(np.abs(a - medv)))
+
+    # Percentiles (including quartiles if included in percentiles list)
+    pvals = aperc(a, list(percentiles))
+    percentiles_dict = {float(p): float(v) for p, v in zip(percentiles, pvals)}
+
+    # A couple of commonly useful extras
+    rng = float(maxv - minv)
+    sem = float(stdv / np.sqrt(n_finite if ignore_nan else n_total))
+
+    stats = {
+        "count_total": n_total,
+        "count_finite": n_finite,
+        "count_nan": n_nan,
+        "min": minv,
+        "max": maxv,
+        "range": rng,
+        "mean": meanv,
+        "median": medv,
+        "std": stdv,
+        "var": varv,
+        "sem": sem,  # standard error of the mean
+        "q25": float(q25),
+        "q50": float(q50),
+        "q75": float(q75),
+        "iqr": iqr,
+        "mad": mad,  # median absolute deviation (robust)
+        "percentiles": percentiles_dict,
+    }
+
+    return stats
+
+
 if __name__ == "__main__":
     timing_data_temp_location = r"\\snl\Collaborative\NSTTF_Optics\Projects\_Directories\NSTTF_Optics_LookbackExEx\Experiments\2025-06_05_NsttfTunedFacetScan1dof\3_Post\ini_script_test_3\7_pixel_timing_interrogation\50\time_history_transition_parallel_50_final.json.gz"
     video_temp_path = r"\\snl\Collaborative\NSTTF_Optics\Projects\_Directories\NSTTF_Optics_LookbackExEx\Experiments\2025-06_05_NsttfTunedFacetScan1dof\3_Post\ini_script_test_3\DSC_0025.MOV"
+    output_dir = r"\\snl\Collaborative\NSTTF_Optics\Projects\_Directories\NSTTF_Optics_LookbackExEx\Experiments\2025-06_05_NsttfTunedFacetScan1dof\3_Post\ini_script_test_3\10_pointing_estimate"
     video_metadata_temp = lbt.extract_detailed_video_metadata(video_temp_path)
     camera_time_shift_temp = timedelta(0, 0, 0)
     timezone_temp = "America/Denver"
@@ -1534,7 +1693,7 @@ if __name__ == "__main__":
 
     Ideal_spot = reflected_sun_spot_ellipse(
         distance,
-        angular_diameter_rad=9.3e-3,
+        angular_diameter_rad=1.2 * 9.3e-3,
         axis_ratio=1,  # circle special case is ratio of 1
         orientation_deg=0,  # major axis aligned with +x (irrelevant if circle)
         center_xy=(0, 0),
@@ -1565,10 +1724,11 @@ if __name__ == "__main__":
     fig_ito, axes_ito, arrays_ito = plot_midpoint_offset_heatmap_tz(
         results, ideal_mid_time=ideal_time, tz=tz, pad=2, units="seconds", show=False
     )
+    fig_ito.savefig(ft.join(output_dir, "ideal_time_midpoint_offset_full.png"))
     # fig_mid, axes_mid, arrays_mid = plot_midpoint_offset_heatmap_autoideal(
     #     results, tz=tz, pad=2, units="seconds", show=False
     # )
-    fig_horz, ax_horz, array_horz = extract_horizontal_shift(
+    fig_horz_full, ax_horz_full, array_horz_full = extract_horizontal_shift(
         distance_ref=distance,
         sun_trav_rad_s=omega,
         pixel_dict=results,
@@ -1579,8 +1739,12 @@ if __name__ == "__main__":
         cmap="coolwarm",
         show=False,
     )
+    fig_horz_full.savefig(ft.join(output_dir, "ideal_time_midpoint_offset_distance_full.png"))
 
-    fig_horz, ax_horz, array_horz = extract_horizontal_shift(
+    array_horz_full_stats = array_statistics(array_horz_full['array'])
+    lbt.write_json(array_horz_full_stats, ft.join(output_dir, "ideal_time_midpoint_offset_distance_full_stats.json"))
+
+    fig_horz_ana, ax_horz_ana, array_horz_ana = extract_horizontal_shift(
         distance_ref=distance,
         sun_trav_rad_s=omega,
         pixel_dict=results,
@@ -1591,8 +1755,19 @@ if __name__ == "__main__":
         cmap="coolwarm",
         show=False,
     )
+    fig_horz_ana.savefig(ft.join(output_dir, "ideal_time_midpoint_offset_distance_analysis.png"))
+    array_horz_ana_stats = array_statistics(array_horz_ana['array'])
+    lbt.write_json(array_horz_ana_stats, ft.join(output_dir, "ideal_time_midpoint_offset_distance_analysis_stats.json"))
 
-    ch_len_full, v_shift_map_full, v_shift_full_0, v_shift_full_1 = extract_vertical_shift_parallel(
+    (
+        fig_v_shift_map_full,
+        ch_len_full,
+        v_shift_map_full,
+        v_shift_full_0,
+        v_shift_full_1,
+        v_shift_full_min,
+        v_shift_full_max,
+    ) = extract_vertical_shift_parallel(
         pixel_dict=results,
         value_key="light_duration",
         ideal_spot=Ideal_spot,
@@ -1600,23 +1775,37 @@ if __name__ == "__main__":
         sun_trav_rad_s=omega,
         pad=2,
         trav_direction=traverse_direction,
-        show_full_maps=True,
+        render=True,
+        show=False,
     )
+    fig_v_shift_map_full.savefig(ft.join(output_dir, "vertical_shift_full.png"))
+    v_shift_full_min_stats = array_statistics(v_shift_full_min)
+    lbt.write_json(v_shift_full_min_stats, ft.join(output_dir, "vertical_shift_full_minimum_stats.json"))
+    v_shift_full_max_stats = array_statistics(v_shift_full_max)
+    lbt.write_json(v_shift_full_max_stats, ft.join(output_dir, "vertical_shift_full_maximum_stats.json"))
 
-    ch_len_ana, v_shift_map_ana, v_shift_ana_0, v_shift_ana_1 = extract_vertical_shift_parallel(
-        pixel_dict=results,
-        value_key="light_duration_analysis",
-        ideal_spot=Ideal_spot,
-        distance_ref=distance,
-        sun_trav_rad_s=omega,
-        pad=2,
-        trav_direction=traverse_direction,
-        show_full_maps=True,
+    fig_v_shift_map_ana, ch_len_ana, v_shift_map_ana, v_shift_ana_0, v_shift_ana_1, v_shift_ana_min, v_shift_ana_max = (
+        extract_vertical_shift_parallel(
+            pixel_dict=results,
+            value_key="light_duration_analysis",
+            ideal_spot=Ideal_spot,
+            distance_ref=distance,
+            sun_trav_rad_s=omega,
+            pad=2,
+            trav_direction=traverse_direction,
+            render=True,
+            show=False,
+        )
     )
+    fig_v_shift_map_full.savefig(ft.join(output_dir, "vertical_shift_analysis.png"))
+    v_shift_ana_min_stats = array_statistics(v_shift_ana_min)
+    lbt.write_json(v_shift_ana_min_stats, ft.join(output_dir, "vertical_shift_analysis_minimum_stats.json"))
+    v_shift_ana_max_stats = array_statistics(v_shift_ana_max)
+    lbt.write_json(v_shift_ana_max_stats, ft.join(output_dir, "vertical_shift_analysis_maximum_stats.json"))
 
     # fig_time, axes_time, arrays_time = plot_light_maps_cropped(results, tz=tz, pad=2, show=False)
     # duration (scalar)
-    fig_mmdur, axes_mmdur, array_mmdur = plot_scalar_map_cropped(
+    fig_mmdur, axes_mmdur, dat_mmdur = plot_scalar_map_cropped(
         results,
         value_key="light_duration",
         title="Light Duration (s)",
@@ -1626,8 +1815,9 @@ if __name__ == "__main__":
         show=False,
         data_range=(0, 200),
     )
+    fig_mmdur.savefig(ft.join(output_dir, "light_duration_full.png"))
 
-    fig_mmdur_ana, axes_mmdur_ana, array_mmdur_ana = plot_scalar_map_cropped(
+    fig_mmdur_ana, axes_mmdur_ana, dat_mmdur_ana = plot_scalar_map_cropped(
         results,
         value_key="light_duration_analysis",
         title="Light Duration Analysis (s)",
@@ -1637,37 +1827,43 @@ if __name__ == "__main__":
         show=False,
         data_range=(0, 200),
     )
-    '''
+    fig_mmdur_ana.savefig(ft.join(output_dir, "light_duration_analysis.png"))
+
     # start time (datetime)
-    _ = plot_time_map_cropped(
+    fig_lst, ax_lst, dat_lst = plot_time_map_cropped(
         results, time_key="light_start_time", title="Light start time", pad=2, cmap="cool", show=False
     )
+    fig_lst.savefig(ft.join(output_dir, "light_start_time_full.png"))
 
     # end time (datetime)
-    _ = plot_time_map_cropped(
+    fig_let, ax_let, dat_let = plot_time_map_cropped(
         results, time_key="light_end_time", title="Light end time", pad=2, cmap="cool", show=False
     )
+    fig_let.savefig(ft.join(output_dir, "light_end_time_full.png"))
 
     # start time (datetime)
-    _ = plot_time_map_cropped(
+    fig_lst_ana, ax_lst_ana, dat_lst_ana = plot_time_map_cropped(
         results, time_key="cel_vec_light_start_time", title="Analysis Light start time", pad=2, cmap="cool", show=False
     )
+    fig_lst_ana.savefig(ft.join(output_dir, "light_start_time_analysis.png"))
 
     # end time (datetime)
-    _ = plot_time_map_cropped(
+    fig_let_ana, ax_let_ana, dat_let_ana = plot_time_map_cropped(
         results, time_key="cel_vec_light_end_time", title="Analysis Light end time", pad=2, cmap="cool", show=False
     )
-    '''
+    fig_let_ana.savefig(ft.join(output_dir, "light_end_time_analysis.png"))
 
-    '''
     fig_scatter, axes_scatter = scatter_start_time_vs_duration(results, tz=tz, show=False)
+    fig_scatter.savefig(ft.join(output_dir, "light_start_time_vs_duration_full.png"))
+
     fig_scat_ana, axes_scat_ana = scatter_start_time_vs_duration(
         results, tz=tz, color="C3", duration_key="light_duration_analysis", show=False
     )
+    fig_scat_ana.savefig(ft.join(output_dir, "light_start_time_vs_duration_analysis.png"))
     fig_scat_delta, axes_scat_delta = scatter_start_time_vs_duration(
         results, tz=tz, color="C2", duration_key="light_duration_delta", show=False
     )
-    '''
+    fig_scat_delta.savefig(ft.join(output_dir, "delta_between_durations_full_and_analysis_interval.png"))
 
     plt.show()
     print("stop here")
