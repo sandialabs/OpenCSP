@@ -1,0 +1,231 @@
+# =============================================================================
+# FFIAM Project .gitignore
+# =============================================================================
+
+# =============================================================================
+# C++ / CUDA Build Artifacts
+# =============================================================================
+
+# Build directories
+build/
+build_vs/
+build-*/
+cmake-build-*/
+out/
+**/out/*
+
+# Object files
+*.o
+*.obj
+*.ko
+*.elf
+
+# Precompiled headers
+*.gch
+*.pch
+
+# Libraries
+*.lib
+*.a
+*.la
+*.lo
+
+# Shared objects
+*.dll
+!pyffiam/src/pyffiam/external/ffiam_lib.dll
+*.so
+*.so.*
+*.dylib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# Debug symbols
+*.pdb
+*.ilk
+
+# CUDA specific
+*.cubin
+*.fatbin
+*.ptx
+*.gpu
+*.i
+*.ii
+
+# =============================================================================
+# Visual Studio / MSVC
+# =============================================================================
+
+.vs/
+**.vs**
+*.vcxproj.user
+*.suo
+*.sdf
+*.opensdf
+*.cachefile
+*.VC.db
+*.VC.opendb
+ipch/
+x64/
+x86/
+Debug/
+Release/
+CudaFFIAM/x64/
+
+# =============================================================================
+# CMake
+# =============================================================================
+
+CMakeCache.txt
+CMakeFiles/
+cmake_install.cmake
+Makefile
+*.cmake
+!CMakeLists.txt
+!**/tools/CMake/*.cmake
+compile_commands.json
+CTestTestfile.cmake
+CMakeUserPresets.json
+
+# =============================================================================
+# JetBrains IDEs (CLion, PyCharm)
+# =============================================================================
+
+.idea/
+
+# =============================================================================
+# Python
+# =============================================================================
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+# Note: lib/ omitted to avoid conflict with build output directories
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+envs/
+
+# PyInstaller
+*.manifest
+*.spec
+
+# Installer logs
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+*.py,cover
+.hypothesis/
+.pytest_cache/
+cover/
+
+# mypy
+.mypy_cache/
+.dmypy.json
+dmypy.json
+
+# Jupyter Notebook
+.ipynb_checkpoints
+
+# =============================================================================
+# Project Specific
+# =============================================================================
+
+# Temporary files
+**/temp/
+*.tmp
+
+# Data files (keep structure, ignore large data)
+*.csv
+!**/data/*.csv
+*.kml
+
+# Log files
+*.log
+
+# =============================================================================
+# OS Generated
+# =============================================================================
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+$RECYCLE.BIN/
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+._*
+
+# Linux
+*~
+.directory
+
+# =============================================================================
+# Editor / IDE
+# =============================================================================
+
+# VSCode
+.vscode/
+*.code-workspace
+
+# Sublime Text
+*.sublime-workspace
+*.sublime-project
+
+# Vim
+*.swp
+*.swo
+*~
+
+# Emacs
+*~
+\#*\#
+/.emacs.desktop
+/.emacs.desktop.lock
+auto-save-list
+tramp
+.\#*
+scratch.txt
