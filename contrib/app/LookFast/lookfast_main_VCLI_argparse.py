@@ -456,6 +456,11 @@ def main(args):
     else:
         og_vid_dir, og_vid_name, og_vid_ext = ft.path_components(args.og_video_path)
 
+    if args.file_camera is None:
+        args.file_camera = select_file(
+            window_title="Select OpenCSP camera calibration file for dataset", file_types="*.h5"
+        )
+
     data_output_folders = [
         r'0_checkpoints',
         r'1_video_frames',

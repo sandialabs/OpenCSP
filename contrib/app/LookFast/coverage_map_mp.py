@@ -248,8 +248,11 @@ def construct_binary_maps_parallel(
 
     # Load checkpoint if it exists
     checkpoint_data = lbt.load_checkpoint(checkpoint_folder, checkpoint_file)
+
     if checkpoint_data is None:
         checkpoint_data = {"processed_images": [], "current_batch": 0, "completed_thresholds": [], "prefix": None}
+    else:
+        checkpoint_data["processed_images"] = [os.path.basename(p) for p in checkpoint_data.get("processed_images", [])]
 
     requested_thr = _flatten(threshold_fractions)
     completed_thr = _flatten(checkpoint_data.get("completed_thresholds", []))
@@ -292,7 +295,9 @@ def construct_binary_maps_parallel(
         max_intensity = np.iinfo(first_image.dtype).max if np.issubdtype(first_image.dtype, np.integer) else 1.0
 
         # If we did not wipe progress, continue from checkpoint; otherwise run from scratch
-        unprocessed_images = [img for img in image_files if img not in checkpoint_data["processed_images"]]
+        unprocessed_images = [
+            img for img in image_files if os.path.basename(img) not in checkpoint_data["processed_images"]
+        ]
 
         # Process images in batches
         for batch_start in range(checkpoint_data["current_batch"], len(unprocessed_images), batch_size):
@@ -312,7 +317,7 @@ def construct_binary_maps_parallel(
             )
 
             # Update checkpoint
-            checkpoint_data["processed_images"].extend(batch_files)
+            checkpoint_data["processed_images"].extend(os.path.basename(f) for f in batch_files)
             checkpoint_data["current_batch"] = batch_start + batch_size
             checkpoint_data["prefix"] = "traditional"
             lbt.save_checkpoint(checkpoint_folder, checkpoint_file, checkpoint_data)
