@@ -1,0 +1,19 @@
+GB = 1024 ** 3
+MB = 1024 ** 2
+
+MAX_NUM_HELIOSTATS = 11600
+MAX_HEIGHT = 310
+MIN_HEIGHT = 0
+MAX_FIELD_RADIUS = 1700
+
+# Voxel size constraints
+MIN_VOXEL_SIZE = 1
+MAX_VOXEL_SIZE = 10
+MAX_VOXELS = 500_000_000  # ~2 GB at float32
+VOXEL_POOL_SIZE = 2 * GB
+
+app_name = "FFIAM"
+app_author = "SimsIndustries"
+
+FFIAM_VERSION = "3.0"
+
