@@ -31,4 +31,4 @@ actual_output/
 # documentation generation
 doc/html/
 de430t.bsp
-error_logs/
+error_logs/*
