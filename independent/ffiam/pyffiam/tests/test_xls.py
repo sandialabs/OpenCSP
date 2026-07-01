@@ -28,6 +28,7 @@ from pyffiam.xls import ExcelWriter
 # Recording stubs — capture sheet writes for assertion
 # =============================================================================
 
+
 @dataclass
 class RecordedWrite:
     method: str
@@ -104,6 +105,7 @@ class RecordingWorkbook:
 # AnalysisData stub — only the fields each ExcelWriter method actually reads.
 # =============================================================================
 
+
 def _make_als_stub(**overrides):
     """Minimum AnalysisData-shaped stub for ExcelWriter methods."""
     base = SimpleNamespace(
@@ -146,6 +148,7 @@ def _make_als_stub(**overrides):
 # =============================================================================
 # Tests
 # =============================================================================
+
 
 @pytest.fixture
 def wb():
@@ -225,8 +228,7 @@ def test_write_results_includes_metadata_and_thresholds(wb):
 
 def test_write_results_point_aim_writes_three_components(wb):
     """Point aim writes three numeric components (x, y, z) on one row."""
-    als = _make_als_stub(aim_strategy=AimType.Point,
-                         aim_parameters=np.array([12.0, 34.0, 56.0]))
+    als = _make_als_stub(aim_strategy=AimType.Point, aim_parameters=np.array([12.0, 34.0, 56.0]))
     writer = ExcelWriter(wb)
     writer.write_results(als, has_gifs=False)
     sheet = wb.sheets[0]
@@ -238,8 +240,7 @@ def test_write_results_point_aim_writes_three_components(wb):
 
 def test_write_results_ring_aim_writes_offset_and_height(wb):
     """Ring/SplitRing aim writes 'Ring offset' and 'Ring height' rows."""
-    als = _make_als_stub(aim_strategy=AimType.Ring,
-                         aim_parameters=np.array([25.0, 80.0, 0.0]))
+    als = _make_als_stub(aim_strategy=AimType.Ring, aim_parameters=np.array([25.0, 80.0, 0.0]))
     writer = ExcelWriter(wb)
     writer.write_results(als, has_gifs=False)
     sheet = wb.sheets[0]
@@ -261,6 +262,14 @@ def test_excel_writer_formats_constructed(wb):
     """ExcelWriter must build format handles in __init__ (not lazily)."""
     writer = ExcelWriter(wb)
     # All eight formats must exist and be xlsxwriter Format instances.
-    for attr in ("header_fmt", "bold_fmt", "unit_fmt", "right_fmt",
-                 "center_fmt", "bigfloat_fmt", "smallfloat_fmt", "superscript_fmt"):
+    for attr in (
+        "header_fmt",
+        "bold_fmt",
+        "unit_fmt",
+        "right_fmt",
+        "center_fmt",
+        "bigfloat_fmt",
+        "smallfloat_fmt",
+        "superscript_fmt",
+    ):
         assert getattr(writer, attr) is not None

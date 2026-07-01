@@ -20,6 +20,7 @@ def slug(in_str: str) -> str:
 
 def print_params(func: Callable) -> Callable:
     """Decorator to print parameters passed to a function."""
+
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         print(f"\nFunction '{func.__name__}' called with:")
         if args:
@@ -27,6 +28,7 @@ def print_params(func: Callable) -> Callable:
         if kwargs:
             print("Kwargs:", kwargs)
         return func(*args, **kwargs)
+
     return wrapper
 
 
@@ -53,7 +55,8 @@ def load_preset_sites_from_json() -> Dict[CspSite, Dict[str, Any]]:
         file_path = data_path.joinpath(filename)
         if not file_path.exists():
             raise FileNotFoundError(
-                f"Preset configuration file not found ({file_path.as_posix()}). Verify setup of FFIAM.")
+                f"Preset configuration file not found ({file_path.as_posix()}). Verify setup of FFIAM."
+            )
 
         file_content = file_path.read_text()
 
@@ -64,8 +67,10 @@ def load_preset_sites_from_json() -> Dict[CspSite, Dict[str, Any]]:
             site_data = json.loads(file_content)
             results[site_key] = site_data
         except json.JSONDecodeError as e:
-            raise ValueError(f"Invalid JSON in preset configuration file {file_path.as_posix()}: {str(e)}\n"
-                             f"First 100 characters of file: {file_content[:100]!r}")
+            raise ValueError(
+                f"Invalid JSON in preset configuration file {file_path.as_posix()}: {str(e)}\n"
+                f"First 100 characters of file: {file_content[:100]!r}"
+            )
     return results
 
 
@@ -155,8 +160,10 @@ def get_site_config_dict_from_json(filepath: Path) -> Dict[str, Any]:
             raise e
 
     if isinstance(json_dict, list):
-        print("Error: Expected a single site configuration, not a list. "
-              "Use separate JSON files to analyze a list of sites.")
+        print(
+            "Error: Expected a single site configuration, not a list. "
+            "Use separate JSON files to analyze a list of sites."
+        )
         return {}
 
     run_id = json_dict.pop("RunId", "Unidentified site")
@@ -173,8 +180,7 @@ def get_site_config_dict_from_json(filepath: Path) -> Dict[str, Any]:
 
     if 'create_gifs' in json_dict:
         if not isinstance(json_dict['create_gifs'], bool):
-            print(f"Warning for {run_id}: 'create_gifs' should be boolean. "
-                  f"Got: {json_dict['create_gifs']}")
+            print(f"Warning for {run_id}: 'create_gifs' should be boolean. " f"Got: {json_dict['create_gifs']}")
             result['create_gifs'] = False
         else:
             result['create_gifs'] = json_dict['create_gifs']
@@ -183,9 +189,7 @@ def get_site_config_dict_from_json(filepath: Path) -> Dict[str, Any]:
 
 
 def get_reduced_voxels_with_irrads(
-    voxel_xs: NDArray[np.floating],
-    voxel_ys: NDArray[np.floating],
-    irrads: NDArray[np.floating],
+    voxel_xs: NDArray[np.floating], voxel_ys: NDArray[np.floating], irrads: NDArray[np.floating]
 ) -> NDArray[np.floating]:
     """Flatten 3D voxel positions into 2D with max irradiance values for each x-y."""
     xy_irrads_flat = np.array([voxel_xs, voxel_ys, irrads]).T
@@ -195,15 +199,10 @@ def get_reduced_voxels_with_irrads(
     return xy_irrads_max.T
 
 
-def get_voxel_loc_from_index(
-    idx: int,
-    vox_size: int,
-    field_r: int,
-    field_zmin: int,
-) -> NDArray[np.floating]:
+def get_voxel_loc_from_index(idx: int, vox_size: int, field_r: int, field_zmin: int) -> NDArray[np.floating]:
     """Convert flat voxel index to [x, y, z] center coordinates (meters)."""
     n_per_side = field_r * 2 / vox_size
-    n_per_plane = n_per_side ** 2
+    n_per_plane = n_per_side**2
     base_z = idx / n_per_plane
     rem = idx - base_z * n_per_plane
     base_y = rem / n_per_side
@@ -217,14 +216,11 @@ def get_voxel_loc_from_index(
 
 
 def get_voxel_locs_from_indexes(
-    ids: NDArray[np.integer],
-    vox_size: int,
-    field_r: int,
-    field_zmin: int,
+    ids: NDArray[np.integer], vox_size: int, field_r: int, field_zmin: int
 ) -> NDArray[np.floating]:
     """Convert array of voxel indices to (N, 3) [x, y, z] coordinates (meters)."""
     n_per_side = field_r * 2 / vox_size
-    n_per_plane = n_per_side ** 2
+    n_per_plane = n_per_side**2
     base_zs = (ids / n_per_plane).astype(int)
     rem = ids - base_zs * n_per_plane
     base_ys = (rem / n_per_side).astype(int)
@@ -237,12 +233,7 @@ def get_voxel_locs_from_indexes(
     return result
 
 
-def compute_vox_locs(
-    n_voxels: int,
-    vox_size: int,
-    field_r: int,
-    field_zmin: int,
-) -> NDArray[np.floating]:
+def compute_vox_locs(n_voxels: int, vox_size: int, field_r: int, field_zmin: int) -> NDArray[np.floating]:
     """Return (n_voxels, 3) array of [x, y, z] voxel center coordinates (meters)."""
     ids = np.arange(n_voxels)
     locs = get_voxel_locs_from_indexes(ids, vox_size, field_r, field_zmin)
@@ -250,15 +241,12 @@ def compute_vox_locs(
 
 
 def get_voxel_indexes_from_locs(
-    locs: NDArray[np.floating],
-    vox_size: int,
-    field_r: int,
-    field_zmin: int,
+    locs: NDArray[np.floating], vox_size: int, field_r: int, field_zmin: int
 ) -> NDArray[np.floating]:
     """Convert (N, 3) [x, y, z] coordinates to flat voxel indices."""
     xs, ys, zs = locs.T
     n_per_side = field_r * 2 / vox_size
-    n_per_plane = n_per_side ** 2
+    n_per_plane = n_per_side**2
     new_zs = np.floor((zs - field_zmin) / vox_size)
     new_ys = np.floor((ys + field_r) / vox_size)
     new_xs = np.floor((xs + field_r) / vox_size)
@@ -285,10 +273,7 @@ def interpolate_3d(
     return interpolated_points
 
 
-def sample_2d_with_constrained_median(
-    array: NDArray[np.floating],
-    step_size: int,
-) -> NDArray[np.floating]:
+def sample_2d_with_constrained_median(array: NDArray[np.floating], step_size: int) -> NDArray[np.floating]:
     """Downsample a 2D array using median over the inner 70% of each block.
 
     Uses max instead of median when median is near zero - important near the
@@ -320,7 +305,6 @@ def sample_2d_with_constrained_median(
             result[i, j] = final_val
 
     return result
-
 
 
 def conv_ffiam_to_dataframe(
@@ -374,9 +358,7 @@ def conv_ffiam_to_dataframe(
 
 
 def combine_datasets_for_parity(
-    ff_sets: Tuple[NDArray[np.floating], ...],
-    st_sets: Tuple[NDArray[np.floating], ...],
-    skip_zeros: bool = False,
+    ff_sets: Tuple[NDArray[np.floating], ...], st_sets: Tuple[NDArray[np.floating], ...], skip_zeros: bool = False
 ) -> Tuple[NDArray[np.floating], NDArray[np.floating]]:
     """Concatenate FFIAM and SolTrace dataset tuples for parity comparison."""
     ff_comb = np.concatenate(ff_sets)
@@ -399,9 +381,7 @@ def combine_datasets_for_parity(
 
 
 def combine_datasets_for_parity_aligned(
-    ff_sets: Tuple[pd.Series, ...],
-    st_sets: Tuple[pd.Series, ...],
-    skip_zeros: bool = False,
+    ff_sets: Tuple[pd.Series, ...], st_sets: Tuple[pd.Series, ...], skip_zeros: bool = False
 ) -> Tuple[NDArray[np.floating], NDArray[np.floating]]:
     """Like combine_datasets_for_parity but aligns by x-coordinate index first.
 
@@ -457,21 +437,26 @@ def add_trendline(
 ) -> None:
     """Add a linear best-fit line with R² label to a plotly subplot."""
     slope, y_int, r_value, p_value, std_err = scipy.stats.linregress(xs, ys)
-    r2 = r_value ** 2
+    r2 = r_value**2
     if ln_name in ['', None]:
         label = f"Best Fit: {slope:,.1f}x + {y_int:,.1f}, R<sup>2</sup> = {r2:.1f}"
     else:
         label = f"Best Fit ({ln_name}): {slope:,.1f}x + {y_int:,.1f}, R<sup>2</sup> = {r2:.1f}"
     bestfit_vals = slope * xs + y_int
-    fig.add_trace(row=row, col=col, trace=go.Scatter(name=label,
-                                                     x=xs,
-                                                     y=bestfit_vals,
-                                                     mode='lines',
-                                                     line_color='royalblue',
-                                                     line_width=2,
-                                                     legendgroup=group,
-                                                     legendgrouptitle_text=grouptitle
-                                                     ))
+    fig.add_trace(
+        row=row,
+        col=col,
+        trace=go.Scatter(
+            name=label,
+            x=xs,
+            y=bestfit_vals,
+            mode='lines',
+            line_color='royalblue',
+            line_width=2,
+            legendgroup=group,
+            legendgrouptitle_text=grouptitle,
+        ),
+    )
 
 
 def add_parity_data(
@@ -484,33 +469,25 @@ def add_parity_data(
     """Add scatter data with y=x reference line and best-fit trendline."""
     xmax = np.max(xs) * 1.2
     yx_lc = 'slategrey'
-    fig.add_trace(row=1, col=col, trace=go.Scatter(x=[0, xmax],
-                                                   y=[0, xmax],
-                                                   mode='lines',
-                                                   line_color=yx_lc,
-                                                   showlegend=False))
-    fig.add_annotation(row=1, col=col,
-                       x=xmax, y=xmax,
-                       xref='x', yref='y', text='y=x', showarrow=False,
-                       xshift=-12, yshift=-25)
+    fig.add_trace(
+        row=1, col=col, trace=go.Scatter(x=[0, xmax], y=[0, xmax], mode='lines', line_color=yx_lc, showlegend=False)
+    )
+    fig.add_annotation(
+        row=1, col=col, x=xmax, y=xmax, xref='x', yref='y', text='y=x', showarrow=False, xshift=-12, yshift=-25
+    )
 
     if type(xs) is np.ndarray:
         add_trendline(fig, row=1, col=col, xs=xs, ys=ys, ln_name=line_name)
     else:
         add_trendline(fig, row=1, col=col, xs=xs.values, ys=ys.values, ln_name=line_name)
 
-    fig.add_trace(row=1, col=col, trace=go.Scatter(mode='markers',
-                                                   x=xs,
-                                                   y=ys,
-                                                   showlegend=False,
-                                                   marker=dict(color='steelblue')))
+    fig.add_trace(
+        row=1, col=col, trace=go.Scatter(mode='markers', x=xs, y=ys, showlegend=False, marker=dict(color='steelblue'))
+    )
 
 
 def estimate_voxel_memory(
-    field_radius: int,
-    min_height: int,
-    max_height: int,
-    voxel_size: int,
+    field_radius: int, min_height: int, max_height: int, voxel_size: int
 ) -> Tuple[int, float, bool]:
     """Return (num_voxels, memory_gb, is_valid) for the given grid configuration."""
     num_voxels_x = 2 * field_radius // voxel_size
@@ -522,19 +499,13 @@ def estimate_voxel_memory(
     return num_voxels, memory_gb, is_valid
 
 
-def print_voxel_config_table(
-    field_radius: int,
-    min_height: int,
-    max_height: int,
-) -> None:
+def print_voxel_config_table(field_radius: int, min_height: int, max_height: int) -> None:
     """Print voxel count and memory for common voxel sizes. Handy for choosing grid resolution."""
     print(f"Voxel configuration options for {field_radius}m radius, {min_height}-{max_height}m altitude:")
     print(f"{'Voxel Size':<11}| {'Voxels':<12}| {'Memory':<8}| Status")
     print("-" * 11 + "|" + "-" * 13 + "|" + "-" * 9 + "|" + "-" * 8)
 
     for voxel_size in [1, 2, 3, 4, 5, 8, 10]:
-        num_voxels, memory_gb, is_valid = estimate_voxel_memory(
-            field_radius, min_height, max_height, voxel_size
-        )
+        num_voxels, memory_gb, is_valid = estimate_voxel_memory(field_radius, min_height, max_height, voxel_size)
         status = "OK" if is_valid else "TOO LARGE"
         print(f"{voxel_size}m{'':<9}| {num_voxels:<12,}| {memory_gb:.2f} GB  | {status}")

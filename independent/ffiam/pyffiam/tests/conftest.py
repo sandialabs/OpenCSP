@@ -19,10 +19,7 @@ def _has_cuda_runtime() -> bool:
 
 
 def pytest_configure(config):
-    config.addinivalue_line(
-        "markers",
-        "requires_cuda: skip when no CUDA runtime is present",
-    )
+    config.addinivalue_line("markers", "requires_cuda: skip when no CUDA runtime is present")
 
 
 def pytest_collection_modifyitems(config, items):
@@ -32,6 +29,7 @@ def pytest_collection_modifyitems(config, items):
     for item in items:
         if "requires_cuda" in item.keywords:
             item.add_marker(skip_cuda)
+
 
 from pyffiam.ffiam_types import CspSite, AimType
 from pyffiam.config import (
@@ -44,18 +42,14 @@ from pyffiam.config import (
     VoxelConfig,
     OpticalConfig,
 )
-from pyffiam.results import (
-    AnalysisResults,
-    HeliostatResults,
-    IrradianceResults,
-    ThresholdResults,
-)
+from pyffiam.results import AnalysisResults, HeliostatResults, IrradianceResults, ThresholdResults
 from pyffiam.cpp_interface import RawResults
 
 
 # =============================================================================
 # Configuration Fixtures
 # =============================================================================
+
 
 @pytest.fixture
 def sample_time_config() -> TimeConfig:
@@ -72,36 +66,21 @@ def sample_location_config() -> LocationConfig:
 @pytest.fixture
 def sample_field_config() -> FieldConfig:
     """Sample field configuration with typical parameters."""
-    return FieldConfig(
-        radius=600,
-        num_heliostats=218,
-        min_height=4,
-        max_height=200,
-        tower_height=90.0,
-    )
+    return FieldConfig(radius=600, num_heliostats=218, min_height=4, max_height=200, tower_height=90.0)
 
 
 @pytest.fixture
 def sample_heliostat_config() -> HeliostatConfig:
     """Sample heliostat configuration."""
     return HeliostatConfig(
-        num_facets=25,
-        num_facet_cols=5,
-        facet_width=1.2,
-        facet_height=1.2,
-        heliostat_file="",
-        facet_file="",
+        num_facets=25, num_facet_cols=5, facet_width=1.2, facet_height=1.2, heliostat_file="", facet_file=""
     )
 
 
 @pytest.fixture
 def sample_aim_config() -> AimConfig:
     """Sample aim configuration with point aiming."""
-    return AimConfig(
-        strategy=AimType.Point,
-        parameters=np.array([0.0, 0.0, 90.0]),
-        aim_file="",
-    )
+    return AimConfig(strategy=AimType.Point, parameters=np.array([0.0, 0.0, 90.0]), aim_file="")
 
 
 @pytest.fixture
@@ -113,13 +92,7 @@ def sample_voxel_config() -> VoxelConfig:
 @pytest.fixture
 def sample_optical_config() -> OpticalConfig:
     """Sample optical configuration."""
-    return OpticalConfig(
-        reflectivity=0.9,
-        peak_dni=0.1,
-        sun_angle=0.0093,
-        slope_error=0.0012,
-        beta=0.0094,
-    )
+    return OpticalConfig(reflectivity=0.9, peak_dni=0.1, sun_angle=0.0093, slope_error=0.0012, beta=0.0094)
 
 
 @pytest.fixture
@@ -151,6 +124,7 @@ def sample_analysis_config(
 # Mock Data Fixtures (for testing without GPU)
 # =============================================================================
 
+
 @pytest.fixture
 def mock_heliostat_locations() -> np.ndarray:
     """Generate mock heliostat locations in a grid pattern."""
@@ -159,11 +133,7 @@ def mock_heliostat_locations() -> np.ndarray:
     x = np.linspace(-200, 200, 10)
     y = np.linspace(-200, 200, 10)
     xx, yy = np.meshgrid(x, y)
-    locations = np.column_stack([
-        xx.flatten(),
-        yy.flatten(),
-        np.zeros(n_heliostats),  # All at ground level
-    ])
+    locations = np.column_stack([xx.flatten(), yy.flatten(), np.zeros(n_heliostats)])  # All at ground level
     return locations
 
 
@@ -181,11 +151,7 @@ def mock_voxel_locations() -> np.ndarray:
     z = np.arange(min_height, max_height, voxel_size)
 
     xx, yy, zz = np.meshgrid(x, y, z, indexing='ij')
-    locations = np.column_stack([
-        xx.flatten(),
-        yy.flatten(),
-        zz.flatten(),
-    ])
+    locations = np.column_stack([xx.flatten(), yy.flatten(), zz.flatten()])
     return locations
 
 
@@ -201,11 +167,7 @@ def mock_irradiance_values(mock_voxel_locations) -> np.ndarray:
 
 
 @pytest.fixture
-def mock_raw_results(
-    mock_heliostat_locations,
-    mock_voxel_locations,
-    mock_irradiance_values,
-) -> RawResults:
+def mock_raw_results(mock_heliostat_locations, mock_voxel_locations, mock_irradiance_values) -> RawResults:
     """Create mock RawResults for testing without GPU.
 
     This fixture provides synthetic results that can be used to test
@@ -226,6 +188,7 @@ def mock_raw_results(
 # =============================================================================
 # Results Fixtures
 # =============================================================================
+
 
 @pytest.fixture
 def sample_heliostat_results(mock_heliostat_locations) -> HeliostatResults:
@@ -250,21 +213,14 @@ def sample_irradiance_results(mock_irradiance_values) -> IrradianceResults:
 # Utility Fixtures
 # =============================================================================
 
+
 @pytest.fixture
 def small_voxel_params() -> dict:
     """Parameters for a small voxel grid used in utility tests."""
-    return {
-        'vox_size': 2,
-        'field_r': 10,
-        'field_zmin': 4,
-    }
+    return {'vox_size': 2, 'field_r': 10, 'field_zmin': 4}
 
 
 @pytest.fixture
 def standard_voxel_params() -> dict:
     """Parameters for a standard voxel grid."""
-    return {
-        'vox_size': 2,
-        'field_r': 600,
-        'field_zmin': 4,
-    }
+    return {'vox_size': 2, 'field_r': 600, 'field_zmin': 4}

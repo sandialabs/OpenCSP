@@ -13,6 +13,7 @@ from pyffiam.ffiam_types import CspSite, AimType
 @dataclass(frozen=True)
 class TimeConfig:
     """Date and time configuration for analysis."""
+
     year: int
     month: int
     day: int
@@ -30,6 +31,7 @@ class TimeConfig:
 @dataclass(frozen=True)
 class LocationConfig:
     """Geographic location configuration."""
+
     latitude: float
     longitude: float
     timezone: float  # UTC offset
@@ -38,22 +40,24 @@ class LocationConfig:
 @dataclass(frozen=True)
 class FieldConfig:
     """CSP field configuration."""
-    radius: int              # Field radius in meters
-    num_heliostats: int      # Number of heliostats
-    min_height: int          # Minimum analysis height (m)
-    max_height: int          # Maximum analysis height (m)
-    tower_height: float      # Receiver tower height (m)
+
+    radius: int  # Field radius in meters
+    num_heliostats: int  # Number of heliostats
+    min_height: int  # Minimum analysis height (m)
+    max_height: int  # Maximum analysis height (m)
+    tower_height: float  # Receiver tower height (m)
 
 
 @dataclass(frozen=True)
 class HeliostatConfig:
     """Heliostat design parameters."""
-    num_facets: int          # Total facets per heliostat
-    num_facet_cols: int      # Facet columns per heliostat
-    facet_width: float       # Individual facet width (m)
-    facet_height: float      # Individual facet height (m)
-    heliostat_file: str = "" # CSV file with heliostat positions
-    facet_file: str = ""     # CSV file with facet positions
+
+    num_facets: int  # Total facets per heliostat
+    num_facet_cols: int  # Facet columns per heliostat
+    facet_width: float  # Individual facet width (m)
+    facet_height: float  # Individual facet height (m)
+    heliostat_file: str = ""  # CSV file with heliostat positions
+    facet_file: str = ""  # CSV file with facet positions
 
     @property
     def heliostat_width(self) -> float:
@@ -63,9 +67,10 @@ class HeliostatConfig:
 @dataclass(frozen=True)
 class AimConfig:
     """Aiming strategy configuration."""
+
     strategy: AimType
-    parameters: np.ndarray   # Strategy-specific parameters [3]
-    aim_file: str = ""       # Optional CSV file with per-heliostat aim data
+    parameters: np.ndarray  # Strategy-specific parameters [3]
+    aim_file: str = ""  # Optional CSV file with per-heliostat aim data
 
     class Config:
         # Allow numpy arrays in frozen dataclass
@@ -75,7 +80,8 @@ class AimConfig:
 @dataclass(frozen=True)
 class VoxelConfig:
     """Voxel grid configuration."""
-    size: int = 2            # Voxel edge length in meters
+
+    size: int = 2  # Voxel edge length in meters
 
     def compute_layout(self, field_radius: int, min_height: int, max_height: int) -> tuple:
         """Return (nx, ny, nz) voxel grid dimensions for the given field and height range."""
@@ -91,21 +97,22 @@ class VoxelConfig:
 
     @property
     def area(self) -> float:
-        return self.size ** 2
+        return self.size**2
 
     @property
     def volume(self) -> float:
-        return self.size ** 3
+        return self.size**3
 
 
 @dataclass(frozen=True)
 class OpticalConfig:
     """Optical and environmental parameters."""
-    reflectivity: float = 0.9      # Heliostat reflectivity
-    peak_dni: float = 0.1          # Peak direct normal irradiance (W/cm²)
-    sun_angle: float = 0.0093      # Solar disk angle (radians)
-    slope_error: float = 0.0012    # Mirror slope error (radians)
-    beta: float = 0.0094           # Beam spread coefficient
+
+    reflectivity: float = 0.9  # Heliostat reflectivity
+    peak_dni: float = 0.1  # Peak direct normal irradiance (W/cm²)
+    sun_angle: float = 0.0093  # Solar disk angle (radians)
+    slope_error: float = 0.0012  # Mirror slope error (radians)
+    beta: float = 0.0094  # Beam spread coefficient
 
 
 @dataclass
@@ -115,25 +122,26 @@ class AnalysisConfig:
     Acts as a structured alternative to the flat kwargs accepted by analysis().
     Build directly or use the from_params() convenience constructor.
     """
+
     # Identification
-    name: str        # Display name for this analysis run
-    site: CspSite    # Preset site enum; CspSite.Custom requires all sub-configs to be filled manually
+    name: str  # Display name for this analysis run
+    site: CspSite  # Preset site enum; CspSite.Custom requires all sub-configs to be filled manually
 
     # Sub-configurations (each groups a logical set of parameters)
-    time: TimeConfig           # Date and decimal hour
-    location: LocationConfig   # Lat/lng/timezone
-    field: FieldConfig         # Field radius, heliostat count, height bounds, tower height
-    heliostat: HeliostatConfig # Facet geometry and optional position CSV files
-    aim: AimConfig             # Aiming strategy enum, parameter array, and optional aim CSV
-    voxel: VoxelConfig         # Voxel edge length (m)
-    optical: OpticalConfig     # Reflectivity, DNI, beam spread coefficient
+    time: TimeConfig  # Date and decimal hour
+    location: LocationConfig  # Lat/lng/timezone
+    field: FieldConfig  # Field radius, heliostat count, height bounds, tower height
+    heliostat: HeliostatConfig  # Facet geometry and optional position CSV files
+    aim: AimConfig  # Aiming strategy enum, parameter array, and optional aim CSV
+    voxel: VoxelConfig  # Voxel edge length (m)
+    optical: OpticalConfig  # Reflectivity, DNI, beam spread coefficient
 
     # Analysis parameters
-    threshold: float           # Irradiance threshold for glare reporting (kW/m²); voxels below this are excluded in outputs
+    threshold: float  # Irradiance threshold for glare reporting (kW/m²); voxels below this are excluded in outputs
 
     # Path analysis (optional UAS exposure analysis)
-    paths: Optional[List] = None         # List of polyline paths, each a sequence of (x, y, z) waypoints (m)
-    path_speeds: Optional[List] = None   # Travel speed (m/s) for each path in `paths`
+    paths: Optional[List] = None  # List of polyline paths, each a sequence of (x, y, z) waypoints (m)
+    path_speeds: Optional[List] = None  # Travel speed (m/s) for each path in `paths`
 
     # Metadata
     created_at: datetime = field(default_factory=datetime.now)
@@ -145,6 +153,7 @@ class AnalysisConfig:
     @property
     def slug(self) -> str:
         from pyffiam.utils import slug
+
         return slug(self.name)
 
     @property
@@ -205,11 +214,7 @@ class AnalysisConfig:
                 heliostat_file=heliostat_file,
                 facet_file=facet_file,
             ),
-            aim=AimConfig(
-                strategy=aim_strategy,
-                parameters=aim_parameters,
-                aim_file=aim_file,
-            ),
+            aim=AimConfig(strategy=aim_strategy, parameters=aim_parameters, aim_file=aim_file),
             voxel=VoxelConfig(size=voxel_size),
             optical=OpticalConfig(reflectivity=reflectivity, peak_dni=peak_dni),
             threshold=threshold,

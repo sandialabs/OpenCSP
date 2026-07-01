@@ -19,27 +19,25 @@ from .ffiam_types import AimType, Direction
 @dataclass
 class AnimationFrameData:
     """Data for a single GIF animation frame."""
+
     vox_xs: NDArray[np.floating]
     vox_ys: NDArray[np.floating]
     vox_irrads: NDArray[np.floating]
     depth_value: float
-    depth_label: str                       # e.g. "Altitude", "North", "East"
+    depth_label: str  # e.g. "Altitude", "North", "East"
     base_title: str
     xlims: Tuple[float, float]
     ylims: Tuple[float, float]
     marker_size: float
     color_range: Tuple[float, float]
 
+
 ZOOM_SPAN = 100
 PLOT_W_PX_DEFAULT = 700
 PLOT_SCALE_DEFAULT = 2
 
 
-def get_zoom_lims(
-    aim_strat: AimType,
-    aim: NDArray[np.floating],
-    dim: Direction,
-) -> Tuple[float, float]:
+def get_zoom_lims(aim_strat: AimType, aim: NDArray[np.floating], dim: Direction) -> Tuple[float, float]:
     """Axis limits for the zoomed plot, centered on the aim point."""
     half_span = ZOOM_SPAN / 2
 
@@ -94,9 +92,9 @@ def create_path_cumsum_plot(
 
     fig.add_trace(go.Scatter(x=time_arr, y=cumulative_exposures, mode='lines', name="ECDF"))
     fig.update_layout(
-            title=f'Radiant Exposure Along Path {path_id}',
-            xaxis_title='Time (s)',
-            yaxis_title='Radiant Exposure (J/m<sup>2</sup>)',
+        title=f'Radiant Exposure Along Path {path_id}',
+        xaxis_title='Time (s)',
+        yaxis_title='Radiant Exposure (J/m<sup>2</sup>)',
     )
     fig.write_image(plot_fpath, format='png')
     return plot_fpath
@@ -105,6 +103,7 @@ def create_path_cumsum_plot(
 #
 # HEAT MAP PLOTS
 #
+
 
 def create_profile_plots(
     hel_locs: NDArray[np.floating],
@@ -153,8 +152,9 @@ def create_profile_plots(
     all_xlocs_reduced = np.concatenate((h_plot_xs, red_plot_xs))
     all_ylocs_reduced = np.concatenate((h_plot_ys, red_plot_ys))
 
-    hel_mkr_size, vox_mkr_size, hel_mkr_size_zoom, vox_mkr_size_zoom = \
-        _calculate_plot_parameters(all_xlocs_reduced, all_ylocs_reduced, hel_size, vox_size)
+    hel_mkr_size, vox_mkr_size, hel_mkr_size_zoom, vox_mkr_size_zoom = _calculate_plot_parameters(
+        all_xlocs_reduced, all_ylocs_reduced, hel_size, vox_size
+    )
 
     base_filename = filename if filename else f"{slug(site)}_{slug1}{slug2}"
     thres_label = f"{threshold} kW/m<sup>2</sup> threshold"
@@ -172,25 +172,46 @@ def create_profile_plots(
     plot_zoom_fpath = out_dir.joinpath(base_filename + "_zoom.png")
     gif_fpath = out_dir.joinpath(base_filename + ".gif") if create_gif else None
 
-    dim2_is_up = (dim2 == Direction.Up)
+    dim2_is_up = dim2 == Direction.Up
     xtitle_str = f"{label1} (m)"
     ytitle_str = f"{label2} (m)"
 
-    _create_static_plot(plot_fpath,
-                        h_plot_xs, h_plot_ys, hel_mkr_size,
-                        red_plot_xs, red_plot_ys, red_irrads, vox_mkr_size,
-                        main_plot_title, xtitle_str, ytitle_str,
-                        tower_h=tower_h, dim2_is_up=dim2_is_up)
+    _create_static_plot(
+        plot_fpath,
+        h_plot_xs,
+        h_plot_ys,
+        hel_mkr_size,
+        red_plot_xs,
+        red_plot_ys,
+        red_irrads,
+        vox_mkr_size,
+        main_plot_title,
+        xtitle_str,
+        ytitle_str,
+        tower_h=tower_h,
+        dim2_is_up=dim2_is_up,
+    )
 
     if create_zoomed:
         xlims_zoom = get_zoom_lims(aim_strat, aim_params, dim1)
         ylims_zoom = get_zoom_lims(aim_strat, aim_params, dim2)
-        _create_static_plot(plot_zoom_fpath,
-                            h_plot_xs, h_plot_ys, hel_mkr_size_zoom,
-                            red_plot_xs, red_plot_ys, red_irrads, vox_mkr_size_zoom,
-                            zoomed_plot_title, xtitle_str, ytitle_str,
-                            xlims=xlims_zoom, ylims=ylims_zoom,
-                            tower_h=tower_h, dim2_is_up=dim2_is_up) # Tower might be out of zoom
+        _create_static_plot(
+            plot_zoom_fpath,
+            h_plot_xs,
+            h_plot_ys,
+            hel_mkr_size_zoom,
+            red_plot_xs,
+            red_plot_ys,
+            red_irrads,
+            vox_mkr_size_zoom,
+            zoomed_plot_title,
+            xtitle_str,
+            ytitle_str,
+            xlims=xlims_zoom,
+            ylims=ylims_zoom,
+            tower_h=tower_h,
+            dim2_is_up=dim2_is_up,
+        )  # Tower might be out of zoom
 
     if create_gif:
         all_xlocs_full = np.concatenate((h_plot_xs, plot_xs_all))
@@ -202,12 +223,26 @@ def create_profile_plots(
 
         gif_base_title = f"{site}: {label1}-{label2}\n{thres_label}"
 
-        _create_animation_gif(gif_fpath,
-                              h_plot_xs, h_plot_ys, hel_mkr_size,
-                              plot_xs_all, plot_ys_all, gif_depth_coords, irrads,
-                              gif_base_title, xtitle_str, ytitle_str, label3,
-                              gif_xlims, gif_ylims, vox_mkr_size, gif_color_range,
-                              tower_h=tower_h, dim2_is_up=dim2_is_up)
+        _create_animation_gif(
+            gif_fpath,
+            h_plot_xs,
+            h_plot_ys,
+            hel_mkr_size,
+            plot_xs_all,
+            plot_ys_all,
+            gif_depth_coords,
+            irrads,
+            gif_base_title,
+            xtitle_str,
+            ytitle_str,
+            label3,
+            gif_xlims,
+            gif_ylims,
+            vox_mkr_size,
+            gif_color_range,
+            tower_h=tower_h,
+            dim2_is_up=dim2_is_up,
+        )
 
     returned_gif_fpath = gif_fpath if create_gif else None
     return plot_fpath, plot_zoom_fpath, returned_gif_fpath
@@ -216,6 +251,7 @@ def create_profile_plots(
 #
 # PLOT HELPERS
 #
+
 
 def _add_scatter(
     fig: go.Figure,
@@ -236,24 +272,24 @@ def _add_scatter(
         xmax = np.nanmax(xs) + 5
         marker_size = int((xmax - xmin) / 4)
 
-    mkr_dict = dict(size=marker_size,
-                    symbol='square',
-                    color=colors,
-                    colorscale='YlOrRd',
-                    colorbar=dict(title="Irradiance (kW/m<sup>2</sup>)"),
-                    showscale=True)
+    mkr_dict = dict(
+        size=marker_size,
+        symbol='square',
+        color=colors,
+        colorscale='YlOrRd',
+        colorbar=dict(title="Irradiance (kW/m<sup>2</sup>)"),
+        showscale=True,
+    )
     if color_range is not None:
         mkr_dict['cmin'] = color_range[0]
         mkr_dict['cmax'] = color_range[1]
 
-    fig.add_trace(go.Scattergl(
-            x=xs,
-            y=ys,
-            mode='markers',
-            marker=mkr_dict, name="voxels"))
+    fig.add_trace(go.Scattergl(x=xs, y=ys, mode='markers', marker=mkr_dict, name="voxels"))
 
     fig.update_xaxes(title_text=xtitle, range=xlims, constrain="domain")
-    fig.update_yaxes(title_text=ytitle, range=ylims, scaleanchor="x", scaleratio=1)  # , range=[-20, 20]) # scaleanchor="x", scaleratio=1)
+    fig.update_yaxes(
+        title_text=ytitle, range=ylims, scaleanchor="x", scaleratio=1
+    )  # , range=[-20, 20]) # scaleanchor="x", scaleratio=1)
     # fig.update_layout(title=title, height=800, showlegend=False)
     fig.update_layout(title=title, showlegend=False)
 
@@ -270,21 +306,23 @@ def _update_scatter(
     title: Optional[str] = None,
 ) -> None:
     """Update scatter data in existing plot during GIF creation."""
-    fig.update_traces(go.Scattergl(
+    fig.update_traces(
+        go.Scattergl(
             x=xs,
             y=ys,
             mode='markers',
             marker=dict(
-                    size=mkr_size,
-                    symbol='square',
-                    color=colors,
-                    colorscale='YlOrRd',
-                    cmin=color_range[0],
-                    cmax=color_range[1],
-                    # colorbar=dict(title="Irradiance (kW/m<sup>2</sup>)"),
-                    # showscale=True
-            )),
-            selector={"name": "voxels"}
+                size=mkr_size,
+                symbol='square',
+                color=colors,
+                colorscale='YlOrRd',
+                cmin=color_range[0],
+                cmax=color_range[1],
+                # colorbar=dict(title="Irradiance (kW/m<sup>2</sup>)"),
+                # showscale=True
+            ),
+        ),
+        selector={"name": "voxels"},
     )
     fig.update_xaxes(range=xlims, constrain="domain")
     fig.update_yaxes(range=ylims, scaleanchor="x", scaleratio=1)
@@ -294,38 +332,24 @@ def _update_scatter(
 
 
 def _add_heliostats(
-    fig: go.Figure,
-    xs: NDArray[np.floating],
-    ys: NDArray[np.floating],
-    marker_size: float = 10,
-    color: str = "#0099C6",
+    fig: go.Figure, xs: NDArray[np.floating], ys: NDArray[np.floating], marker_size: float = 10, color: str = "#0099C6"
 ) -> None:
     """Plot heliostat representations as squares in existing figure."""
-    fig.add_trace(go.Scattergl(
-            x=xs,
-            y=ys,
-            mode='markers',
-            marker=dict(size=int(marker_size), symbol='square', color=color)
-    ))
+    fig.add_trace(
+        go.Scattergl(x=xs, y=ys, mode='markers', marker=dict(size=int(marker_size), symbol='square', color=color))
+    )
 
 
 def _add_tower(fig: go.Figure, h: float, w: float = 5) -> None:
     """Plot CSP tower representation as filled rectangle."""
     tower_color = "#bab0ac"  # "#6E899C"
-    fig.add_trace(go.Scattergl(
-            x=[-w, -w, w, w],
-            y=[0, h, h, 0],
-            fill="toself",
-            fillcolor=tower_color,
-            line_width=0,
-            mode="none"
-    ))
+    fig.add_trace(
+        go.Scattergl(x=[-w, -w, w, w], y=[0, h, h, 0], fill="toself", fillcolor=tower_color, line_width=0, mode="none")
+    )
 
 
 def _get_axis_plotting_data(
-    dim_enum: Direction,
-    hel_locs: NDArray[np.floating],
-    vox_locs: NDArray[np.floating],
+    dim_enum: Direction, hel_locs: NDArray[np.floating], vox_locs: NDArray[np.floating]
 ) -> Tuple[NDArray[np.floating], NDArray[np.floating], str, str]:
     """Return (voxel_coords, helio_coords, label, slug) for the given axis."""
     if dim_enum == Direction.East:
@@ -364,7 +388,8 @@ def _calculate_plot_parameters(
 ) -> Tuple[float, float, float, float]:
     """Return pixel marker sizes for (heliostats, voxels, heliostats_zoom, voxels_zoom)."""
     plot_w_m = 1.4 * (np.nanmax(all_xlocs) - np.nanmin(all_xlocs))
-    if plot_w_m == 0: plot_w_m = 1.0
+    if plot_w_m == 0:
+        plot_w_m = 1.0
 
     m_to_px = plot_w_px / plot_w_m
     m_to_px_zoom = plot_w_px / (1.9 * zoom_span)
@@ -392,7 +417,7 @@ def _create_static_plot(
     ytitle_str: str,
     xlims: Optional[Tuple[float, float]] = None,
     ylims: Optional[Tuple[float, float]] = None,
-    tower_h: float = 0.,
+    tower_h: float = 0.0,
     dim2_is_up: bool = False,
     plot_width: Optional[int] = None,
     plot_scale: int = PLOT_SCALE_DEFAULT,
@@ -404,23 +429,22 @@ def _create_static_plot(
     if dim2_is_up and tower_h > 0.1:
         _add_tower(fig, h=int(tower_h), w=5)
 
-    _add_scatter(fig,
-                 xs=vox_plot_xs,
-                 ys=vox_plot_ys,
-                 colors=vox_plot_colors,
-                 xlims=xlims,
-                 ylims=ylims,
-                 title=title_str,
-                 xtitle=xtitle_str,
-                 ytitle=ytitle_str,
-                 marker_size=vox_marker_size)
+    _add_scatter(
+        fig,
+        xs=vox_plot_xs,
+        ys=vox_plot_ys,
+        colors=vox_plot_colors,
+        xlims=xlims,
+        ylims=ylims,
+        title=title_str,
+        xtitle=xtitle_str,
+        ytitle=ytitle_str,
+        marker_size=vox_marker_size,
+    )
     fig.write_image(filepath, format='png', width=plot_width, scale=plot_scale)
 
 
-def render_animation_frame(
-    fig: go.Figure,
-    frame_data: AnimationFrameData,
-) -> NDArray[np.uint8]:
+def render_animation_frame(fig: go.Figure, frame_data: AnimationFrameData) -> NDArray[np.uint8]:
     """Render one GIF frame. Extracted from _create_animation_gif for testability."""
     frame_title = f"{frame_data.base_title}, {frame_data.depth_label} {int(frame_data.depth_value)} m"
 
@@ -455,7 +479,7 @@ def _create_animation_gif(
     gif_ylims: Tuple[float, float],
     base_vox_mkr_size: float,
     gif_color_range: Tuple[float, float],
-    tower_h: float = 0.,
+    tower_h: float = 0.0,
     dim2_is_up: bool = False,
 ) -> None:
     """Create and save animated GIF for profile plots."""
@@ -464,14 +488,19 @@ def _create_animation_gif(
     if dim2_is_up and tower_h > 0.1:
         _add_tower(gfig, h=tower_h, w=5)
 
-    _add_scatter(gfig, xs=[], ys=[], colors=[],
-                 title=gif_base_title,
-                 xlims=gif_xlims,
-                 ylims=gif_ylims,
-                 marker_size=base_vox_mkr_size,
-                 color_range=gif_color_range,
-                 xtitle=gif_xtitle,
-                 ytitle=gif_ytitle)
+    _add_scatter(
+        gfig,
+        xs=[],
+        ys=[],
+        colors=[],
+        title=gif_base_title,
+        xlims=gif_xlims,
+        ylims=gif_ylims,
+        marker_size=base_vox_mkr_size,
+        color_range=gif_color_range,
+        xtitle=gif_xtitle,
+        ytitle=gif_ytitle,
+    )
     gfig.update_layout(template="plotly_dark")
 
     unique_depth_values = np.unique(vox_data_depth_coords)
@@ -489,18 +518,20 @@ def _create_animation_gif(
     frame_data_list: List[AnimationFrameData] = []
     for depth_val in depth_values_list:
         mask = vox_data_depth_coords == depth_val
-        frame_data_list.append(AnimationFrameData(
-            vox_xs=vox_data_xs[mask],
-            vox_ys=vox_data_ys[mask],
-            vox_irrads=vox_data_irrads[mask],
-            depth_value=depth_val,
-            depth_label=gif_depth_label,
-            base_title=initial_title,
-            xlims=gif_xlims,
-            ylims=gif_ylims,
-            marker_size=base_vox_mkr_size,
-            color_range=gif_color_range,
-        ))
+        frame_data_list.append(
+            AnimationFrameData(
+                vox_xs=vox_data_xs[mask],
+                vox_ys=vox_data_ys[mask],
+                vox_irrads=vox_data_irrads[mask],
+                depth_value=depth_val,
+                depth_label=gif_depth_label,
+                base_title=initial_title,
+                xlims=gif_xlims,
+                ylims=gif_ylims,
+                marker_size=base_vox_mkr_size,
+                color_range=gif_color_range,
+            )
+        )
 
     frame_index = [0]  # mutable container so the closure can increment it
 
@@ -514,5 +545,3 @@ def _create_animation_gif(
 
     animation = VideoClip(_make_frame, duration=duration).resized(2)
     animation.write_gif(gif_fpath, fps=fps)
-
-

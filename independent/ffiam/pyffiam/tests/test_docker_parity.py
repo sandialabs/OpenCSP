@@ -48,15 +48,15 @@ def _run_docker(params_str):
     snippet = _DOCKER_SNIPPET.format(params=params_str)
     proc = subprocess.run(
         ["docker", "run", "--rm", "--gpus", "all", DOCKER_IMAGE, "-c", snippet],
-        capture_output=True, text=True, timeout=300,
+        capture_output=True,
+        text=True,
+        timeout=300,
     )
     if proc.returncode != 0:
-        raise RuntimeError(
-            f"Docker failed (exit {proc.returncode}):\n{proc.stdout[-3000:]}\n{proc.stderr[-3000:]}"
-        )
+        raise RuntimeError(f"Docker failed (exit {proc.returncode}):\n{proc.stdout[-3000:]}\n{proc.stderr[-3000:]}")
     for line in proc.stdout.splitlines():
         if line.startswith("RESULT:"):
-            return json.loads(line[len("RESULT:"):]), proc.stdout
+            return json.loads(line[len("RESULT:") :]), proc.stdout
     raise RuntimeError(f"No RESULT line in Docker output:\n{proc.stdout[-3000:]}")
 
 
@@ -103,9 +103,15 @@ CASES = [
     {
         "name": "nsttf_point",
         "kwargs": dict(
-            site=CspSite.NSTTF, year=2025, month=6, day=21, hour=13,
-            aim_strat=AimType.Point, aim_params=np.array([0, 0, 100]),
-            threshold=4, voxel_size=4,
+            site=CspSite.NSTTF,
+            year=2025,
+            month=6,
+            day=21,
+            hour=13,
+            aim_strat=AimType.Point,
+            aim_params=np.array([0, 0, 100]),
+            threshold=4,
+            voxel_size=4,
         ),
         "params_str": (
             "site=CspSite.NSTTF, year=2025, month=6, day=21, hour=13, "
@@ -116,9 +122,15 @@ CASES = [
     {
         "name": "nsttf_ring",
         "kwargs": dict(
-            site=CspSite.NSTTF, year=2025, month=6, day=21, hour=13,
-            aim_strat=AimType.Ring, aim_params=np.array([30, 90, 0]),
-            threshold=4, voxel_size=4,
+            site=CspSite.NSTTF,
+            year=2025,
+            month=6,
+            day=21,
+            hour=13,
+            aim_strat=AimType.Ring,
+            aim_params=np.array([30, 90, 0]),
+            threshold=4,
+            voxel_size=4,
         ),
         "params_str": (
             "site=CspSite.NSTTF, year=2025, month=6, day=21, hour=13, "
@@ -129,9 +141,15 @@ CASES = [
     {
         "name": "sample_v1_point",
         "kwargs": dict(
-            site=CspSite.SampleV1, year=2025, month=6, day=21, hour=13,
-            aim_strat=AimType.Point, aim_params=np.array([0, 0, 100]),
-            threshold=4, voxel_size=4,
+            site=CspSite.SampleV1,
+            year=2025,
+            month=6,
+            day=21,
+            hour=13,
+            aim_strat=AimType.Point,
+            aim_params=np.array([0, 0, 100]),
+            threshold=4,
+            voxel_size=4,
         ),
         "params_str": (
             "site=CspSite.SampleV1, year=2025, month=6, day=21, hour=13, "
@@ -142,9 +160,15 @@ CASES = [
     {
         "name": "radial_point",
         "kwargs": dict(
-            site=CspSite.Radial, year=2025, month=6, day=21, hour=13,
-            aim_strat=AimType.Point, aim_params=np.array([0, 0, 100]),
-            threshold=4, voxel_size=4,
+            site=CspSite.Radial,
+            year=2025,
+            month=6,
+            day=21,
+            hour=13,
+            aim_strat=AimType.Point,
+            aim_params=np.array([0, 0, 100]),
+            threshold=4,
+            voxel_size=4,
         ),
         "params_str": (
             "site=CspSite.Radial, year=2025, month=6, day=21, hour=13, "
@@ -155,9 +179,15 @@ CASES = [
     {
         "name": "radial_stow",
         "kwargs": dict(
-            site=CspSite.Radial, year=2025, month=6, day=21, hour=13,
-            aim_strat=AimType.Vector, aim_params=np.array([0, 0, 1]),
-            threshold=4, voxel_size=4,
+            site=CspSite.Radial,
+            year=2025,
+            month=6,
+            day=21,
+            hour=13,
+            aim_strat=AimType.Vector,
+            aim_params=np.array([0, 0, 1]),
+            threshold=4,
+            voxel_size=4,
         ),
         "params_str": (
             "site=CspSite.Radial, year=2025, month=6, day=21, hour=13, "
@@ -174,10 +204,7 @@ class DockerParityTest(unittest.TestCase):
     def setUpClass(cls):
         if os.path.exists("/.dockerenv"):
             raise unittest.SkipTest("Skipping docker-parity tests when running inside a container.")
-        result = subprocess.run(
-            ["docker", "image", "inspect", DOCKER_IMAGE],
-            capture_output=True, timeout=30,
-        )
+        result = subprocess.run(["docker", "image", "inspect", DOCKER_IMAGE], capture_output=True, timeout=30)
         if result.returncode != 0:
             raise unittest.SkipTest(f"Docker image '{DOCKER_IMAGE}' not found.")
 

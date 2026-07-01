@@ -45,13 +45,13 @@ class ApiCase(unittest.TestCase):
         self._lib = cts.cdll.LoadLibrary(lib_path.as_posix())
 
     def test_sample_add_func(self):
-        """ Tests that sample c function is accessible from python. """
+        """Tests that sample c function is accessible from python."""
         result = self._lib.Py_TestAdd(3, 5)
         self.assertEqual(type(result), int)
         self.assertEqual(result, 8)
 
     def test_sample_numpy_func(self):
-        """ Verify accessing c array from numpy via pointer """
+        """Verify accessing c array from numpy via pointer"""
         arr_size = 10
         libc = cts.CDLL("msvcrt")
         libc.malloc.restype = cts.c_void_p
@@ -73,4 +73,3 @@ class ApiCase(unittest.TestCase):
         # numpy doesn't own its memory so must explicitly free
         del arr
         libc.free(data_ptr)
-

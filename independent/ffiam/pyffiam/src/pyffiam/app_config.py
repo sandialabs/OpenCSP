@@ -1,5 +1,5 @@
-GB = 1024 ** 3
-MB = 1024 ** 2
+GB = 1024**3
+MB = 1024**2
 
 MAX_NUM_HELIOSTATS = 11600
 MAX_HEIGHT = 310
@@ -16,4 +16,3 @@ app_name = "FFIAM"
 app_author = "SimsIndustries"
 
 FFIAM_VERSION = "3.0"
-

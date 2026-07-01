@@ -54,13 +54,7 @@ class ExcelWriter:
         return row + 1
 
     def _write_num(
-        self,
-        sheet: Worksheet,
-        row: int,
-        title: str,
-        val: float,
-        unit: str = '',
-        fmt: Optional[Format] = None,
+        self, sheet: Worksheet, row: int, title: str, val: float, unit: str = '', fmt: Optional[Format] = None
     ) -> int:
         """Write numeric parameter with label to worksheet."""
         if fmt is None:
@@ -83,11 +77,7 @@ class ExcelWriter:
             sheet.write_rich_string(row, UNIT_COL, 'kW/m', self.superscript_fmt, "2", self.center_fmt)
 
     def _write_position(
-        self,
-        sheet: Worksheet,
-        row: int,
-        pos: NDArray[np.floating],
-        fmt: Optional[Format] = None,
+        self, sheet: Worksheet, row: int, pos: NDArray[np.floating], fmt: Optional[Format] = None
     ) -> int:
         """Write XYZ position to worksheet row."""
         if fmt is None:
@@ -149,7 +139,9 @@ class ExcelWriter:
         sheet.write(row, TITLE_COL, "HELIOSTAT PARAMETERS", self.bold_fmt)
         row += 1
         row = self._write_num(sheet, row, "Num facets", als.num_facets)
-        row = self._write_str(sheet, row, "Facet rows x cols", f"{int(als.num_facets / als.num_facet_cols)} x {als.num_facet_cols}")
+        row = self._write_str(
+            sheet, row, "Facet rows x cols", f"{int(als.num_facets / als.num_facet_cols)} x {als.num_facet_cols}"
+        )
         row = self._write_num(sheet, row, "Facet width", als.facet_width, 'm', self.smallfloat_fmt)
         row = self._write_num(sheet, row, "Facet height", als.facet_height, 'm', self.smallfloat_fmt)
         row = self._write_num(sheet, row, "Total movement", als.movement, 'deg')
@@ -169,7 +161,9 @@ class ExcelWriter:
         sheet.write(row, TITLE_COL, "IRRADIANCE RESULTS", self.bold_fmt)
         row += 1
 
-        sheet.write_rich_string(row, TITLE_COL, "Voxels above specified thresholds (kW/m", self.superscript_fmt, "2", "):")
+        sheet.write_rich_string(
+            row, TITLE_COL, "Voxels above specified thresholds (kW/m", self.superscript_fmt, "2", "):"
+        )
         row += 1
         row = self._write_num(sheet, row, f"# above {als.threshold} (custom)", np.nansum(als.irrads > als.threshold))
         row += 1
