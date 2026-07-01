@@ -1,0 +1,10 @@
+# Normalize text line endings to LF (LFS binaries below stay -text)
+* text=auto eol=lf
+
+# Unreal Engine binary asset types — route through Git LFS
+*.uasset filter=lfs diff=lfs merge=lfs -text
+*.umap   filter=lfs diff=lfs merge=lfs -text
+*.uexp   filter=lfs diff=lfs merge=lfs -text
+*.ubulk  filter=lfs diff=lfs merge=lfs -text
+*.upk    filter=lfs diff=lfs merge=lfs -text
+*.udk    filter=lfs diff=lfs merge=lfs -text
