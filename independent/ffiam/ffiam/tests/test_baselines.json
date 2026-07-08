@@ -1,0 +1,130 @@
+{
+  "nsttf_point": {
+    "site": "NSTTF",
+    "aim_strategy": "Point",
+    "aim_params": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "date": {
+      "year": 2025,
+      "month": 6,
+      "day": 21,
+      "hour": 12
+    },
+    "threshold": 4,
+    "total_irrad": 1239649.0,
+    "peak_irrad": 14912.7587890625,
+    "n_glaring_voxels": 14639,
+    "num_heliostats": 218,
+    "field_radius": 600.0,
+    "tower_height": 61.5
+  },
+  "nsttf_ring": {
+    "site": "NSTTF",
+    "aim_strategy": "Ring",
+    "aim_params": [
+      30.0,
+      90.0,
+      0.0
+    ],
+    "date": {
+      "year": 2025,
+      "month": 6,
+      "day": 21,
+      "hour": 12
+    },
+    "threshold": 4,
+    "total_irrad": 1263449.0,
+    "peak_irrad": 3753.443115234375,
+    "n_glaring_voxels": 15544,
+    "num_heliostats": 218
+  },
+  "samplev1_point": {
+    "site": "SampleV1",
+    "aim_strategy": "Point",
+    "aim_params": [
+      0.0,
+      0.0,
+      120.0
+    ],
+    "date": {
+      "year": 2025,
+      "month": 6,
+      "day": 21,
+      "hour": 12
+    },
+    "threshold": 4,
+    "total_irrad": 1679676.0,
+    "peak_irrad": 211.5526123046875,
+    "n_glaring_voxels": 78431,
+    "num_heliostats": 1000,
+    "field_radius": 650.0,
+    "tower_height": 100.0
+  },
+  "nsttf_morning": {
+    "site": "NSTTF",
+    "aim_strategy": "Point",
+    "aim_params": [
+      0.0,
+      0.0,
+      90.0
+    ],
+    "date": {
+      "year": 2025,
+      "month": 6,
+      "day": 21,
+      "hour": 9
+    },
+    "threshold": 4,
+    "total_irrad": 1031657.0,
+    "peak_irrad": 12523.0087890625,
+    "n_glaring_voxels": 12229,
+    "num_heliostats": 218
+  },
+  "samplev3_point": {
+    "site": "SampleV3",
+    "aim_strategy": "Point",
+    "aim_params": [
+      0.0,
+      0.0,
+      120.0
+    ],
+    "date": {
+      "year": 2025,
+      "month": 6,
+      "day": 21,
+      "hour": 12
+    },
+    "threshold": 4,
+    "total_irrad": 63394180.0,
+    "peak_irrad": 24524.060546875,
+    "n_glaring_voxels": 1438337,
+    "num_heliostats": 11000,
+    "field_radius": 1600.0,
+    "tower_height": 100.0
+  },
+  "radial_small_point": {
+    "site": "RadialSmall",
+    "aim_strategy": "Point",
+    "aim_params": [
+      0.0,
+      0.0,
+      100.0
+    ],
+    "date": {
+      "year": 2025,
+      "month": 6,
+      "day": 21,
+      "hour": 12
+    },
+    "threshold": 4,
+    "total_irrad": 69197792.0,
+    "peak_irrad": 128972.328125,
+    "n_glaring_voxels": 2588809,
+    "num_heliostats": 6400,
+    "field_radius": 1000.0,
+    "tower_height": 100.0
+  }
+}
