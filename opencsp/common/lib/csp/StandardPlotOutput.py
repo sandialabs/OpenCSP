@@ -8,7 +8,7 @@ import h5py
 import opencsp.common.lib.render.view_spec as vs
 import matplotlib.pyplot as plt
 import matplotlib.cm as cm
-from typing import List
+from typing import List, Optional, Tuple
 
 import opencsp.common.lib.render_control.RenderControlAxis as rca
 from opencsp.common.lib.render_control.RenderControlFigure import RenderControlFigure
@@ -49,7 +49,7 @@ class _OptionsSave:
     """Save curvature deviation data in HDF5 format"""
     slope_deviation: bool = True
     """Save slope deviation data in HDF5 format"""
-    enclosed_energy: bool = False
+    enclosed_energy: bool = True
     """Save enclosed energy data in HDF5 format"""
     curvature: bool = True
     """Save curvature data for both measured and reference in HDF5 format"""
@@ -64,12 +64,28 @@ class _OptionsSliceOutput:
     """X slice locations for slice output data"""
     slice_y_loc: List[float] = field(default_factory=lambda: [0])
     """Y slice locations for slice output data"""
-    plot_x_offset: float = 0
-    """Plot offset for X slice output"""
-    plot_y_offset: float = 0
-    """Plot offset for Y slice output"""
+    plot_x_slope_offset: float = 0
+    """Plot offset for slope X slice output"""
+    plot_y_slope_offset: float = 0
+    """Plot offset for slope Y slice output"""
+    plot_x_slope_deviation_offset: float = 0
+    """Plot offset for slope deviation X slice output"""
+    plot_y_slope_deviation_offset: float = 0
+    """Plot offset for slope deviation Y slice output"""
+    plot_x_curvature_offset: float = 0
+    """Plot offset for curvature X slice output"""
+    plot_y_curvature_offset: float = 0
+    """Plot offset for curvature Y slice output"""
+    plot_x_curvature_deviation_offset: float = 0
+    """Plot offset for curvature deviation X slice output"""
+    plot_y_curvature_deviation_offset: float = 0
+    """Plot offset for curvature deviation Y slice output"""
     uncertainty_to_plot: bool = False
     """Plot uncertainty bars on slice output"""
+    xlim: Optional[Tuple[float, float]] = None
+    """Plot xlim on X slice output"""
+    ylim: Optional[Tuple[float, float]] = None
+    """Plot xlim on Y slice output"""
 
 @dataclass
 class _OptionsSlopeVis:
@@ -289,14 +305,22 @@ class StandardPlotOutput:
                 self.options_slice_output.slice_y_loc = slice_y_loc_list
             except Exception as e:
                 lt.error_and_raise(ValueError, f"Failed to parse slice_x_loc: {e}")
-#        if ("Default" in settings) and ("plots.options_slice_output.slice_x_loc" in settings["Default"]):
-#            self.options_slice_output.slice_x_loc = float(settings["Default"]["plots.options_slice_output.slice_x_loc"])
-#        if ("Default" in settings) and ("plots.options_slice_output.slice_y_loc" in settings["Default"]):
-#            self.options_slice_output.slice_y_loc= float(settings["Default"]["plots.options_slice_output.slice_y_loc"])
-        if ("Default" in settings) and ("plots.options_slice_output.plot_x_offset" in settings["Default"]):
-            self.options_slice_output.plot_x_offset = float(settings["Default"]["plots.options_slice_output.plot_x_offset"])
-        if ("Default" in settings) and ("plots.options_slice_output.plot_y_offset" in settings["Default"]):
-            self.options_slice_output.plot_y_offset = float(settings["Default"]["plots.options_slice_output.plot_y_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_x_slope_offset" in settings["Default"]):
+            self.options_slice_output.plot_x_slope_offset = float(settings["Default"]["plots.options_slice_output.plot_x_slope_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_y_slope_offset" in settings["Default"]):
+            self.options_slice_output.plot_y_slope_offset = float(settings["Default"]["plots.options_slice_output.plot_y_slope_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_x_slope_deviation_offset" in settings["Default"]):
+            self.options_slice_output.plot_x_slope_deviation_offset = float(settings["Default"]["plots.options_slice_output.plot_x_slope_deviation_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_y_slope_deviation_offset" in settings["Default"]):
+            self.options_slice_output.plot_y_slope_deviation_offset = float(settings["Default"]["plots.options_slice_output.plot_y_slope_deviation_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_x_curvature_offset" in settings["Default"]):
+            self.options_slice_output.plot_x_curvature_offset = float(settings["Default"]["plots.options_slice_output.plot_x_curvature_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_y_curvature_offset" in settings["Default"]):
+            self.options_slice_output.plot_y_curvature_offset = float(settings["Default"]["plots.options_slice_output.plot_y_curvature_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_x_curvature_deviation_offset" in settings["Default"]):
+            self.options_slice_output.plot_x_curvature_deviation_offset = float(settings["Default"]["plots.options_slice_output.plot_x_curvature_deviation_offset"])
+        if ("Default" in settings) and ("plots.options_slice_output.plot_y_curvature_deviation_offset" in settings["Default"]):
+            self.options_slice_output.plot_y_curvature_deviation_offset = float(settings["Default"]["plots.options_slice_output.plot_y_curvature_deviation_offset"])  
         if ("Default" in settings) and ("plots.options_slice_output.to_plot" in settings["Default"]):
             self.options_slice_output.to_plot = st.convert_true_false_string_to_boolean(
                 settings["Default"]["plots.options_slice_output.to_plot"]
@@ -305,6 +329,27 @@ class StandardPlotOutput:
             self.options_slice_output.uncertainty_to_plot = st.convert_true_false_string_to_boolean(
                 settings["Default"]["plots.options_slice_output.uncertainty_to_plot"]
             )
+        if ("Default" in settings) and ("plots.options_slice_output.xlim" in settings["Default"]):
+            xlim_str = settings["Default"]["plots.options_slice_output.xlim"]
+            try:
+                xlim_vals = [float(x.strip()) for x in xlim_str.split(',')]
+                if len(xlim_vals) == 2:
+                    self.options_slice_output.xlim = (xlim_vals[0], xlim_vals[1])
+                else:
+                    lt.error_and_raise(ValueError, "xlim must have exactly two float values")
+            except Exception as e:
+                lt.error_and_raise(ValueError, f"Failed to parse xlim: {e}")
+
+        if ("Default" in settings) and ("plots.options_slice_output.ylim" in settings["Default"]):
+            ylim_str = settings["Default"]["plots.options_slice_output.ylim"]
+            try:
+                ylim_vals = [float(y.strip()) for y in ylim_str.split(',')]
+                if len(ylim_vals) == 2:
+                    self.options_slice_output.ylim = (ylim_vals[0], ylim_vals[1])
+                else:
+                    lt.error_and_raise(ValueError, "ylim must have exactly two float values")
+            except Exception as e:
+                lt.error_and_raise(ValueError, f"Failed to parse ylim: {e}")
 
         # Slope plot control.
         # This should be kept in synch with class _OptionsSlopeVis above.
@@ -466,7 +511,7 @@ class StandardPlotOutput:
             self._plot_slope_reference_optic()
 
             # Call the combined slope plotting function after individual plots
-            if self.options_slice_output.to_plot
+            if self.options_slice_output.to_plot:
                 self.plot_combined_measured_reference_slopes('MeasRef')
 
         else:
@@ -541,13 +586,20 @@ class StandardPlotOutput:
 
     def plot_combined_measured_reference_slopes(self, which_data: str):
 
+        measured_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_x_all_Meas.csv"
+        x1 = pd.read_csv(measured_x_csv)
+        measured_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_x_all_Meas.csv"
+        y1 = pd.read_csv(measured_x_csv)
+        num_slices = max(len(x1.columns),len(y1.columns))-1
+        cmap = cm.get_cmap('tab10', num_slices)
+
         # Paths to saved CSV files for measured and reference slopes
-        measured_x_csv = f"{self.options_file_output.output_dir}/slope_data_y_x_all_Meas.csv"
-        reference_x_csv = f"{self.options_file_output.output_dir}/slope_data_y_x_all_Ref.csv"
-        measured_y_csv = f"{self.options_file_output.output_dir}/slope_data_y_y_all_Meas.csv"
-        reference_y_csv = f"{self.options_file_output.output_dir}/slope_data_y_y_all_Ref.csv"
-        measured_mag_csv = f"{self.options_file_output.output_dir}/slope_data_y_mag_all_Meas.csv"
-        reference_mag_csv = f"{self.options_file_output.output_dir}/slope_data_y_mag_all_Ref.csv"
+        measured_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_x_all_Meas.csv"
+        reference_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_x_all_Ref.csv"
+        measured_y_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_y_all_Meas.csv"
+        reference_y_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_y_all_Ref.csv"
+        measured_mag_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_mag_all_Meas.csv"
+        reference_mag_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_mag_all_Ref.csv"
 
         # Load data
         meas_x = pd.read_csv(measured_x_csv)
@@ -557,21 +609,21 @@ class StandardPlotOutput:
         meas_mag = pd.read_csv(measured_mag_csv)
         ref_mag = pd.read_csv(reference_mag_csv)
 
-        num_slices = len(meas_x.columns)-1
-
-        colors = cm.get_cmap('tab10', num_slices)
-
         # Combined X slope plot
         plt.figure(figsize=(10, 6))
         i = 0
         for col in meas_x.columns[1:]:
-            color = colors(i)
+            color = cmap(i)
+
             plt.plot(meas_x.iloc[:, 0], meas_x[col], linestyle='-', color=color, label=f'Measured {col}')
             plt.plot(ref_x.iloc[:, 0], ref_x[col], linestyle='--', color=color, label=f'Reference {col}')
             i += 1
         plt.xlabel('Coordinate (meters)')
         plt.ylabel('X Slope (mrad)')
         plt.title('Combined Measured and Reference X Slopes (Y Slices)')
+        ax = plt.gca()
+        if self.options_slice_output.xlim is not None:
+            ax.set_xlim(self.options_slice_output.xlim)
         plt.legend()
         plt.grid()
         plt.savefig(f"{self.options_file_output.output_dir}/combined_slope_y_x_{which_data}.png", dpi=self.options_file_output.save_dpi)
@@ -580,13 +632,16 @@ class StandardPlotOutput:
         plt.figure(figsize=(10, 6))
         i = 0
         for col in meas_y.columns[1:]:
-            color = colors(i)
+            color = cmap(i)
             plt.plot(meas_y.iloc[:, 0], meas_y[col], linestyle='-', color=color, label=f'Measured {col}')
             plt.plot(ref_y.iloc[:, 0], ref_y[col], linestyle='--', color=color, label=f'Reference {col}')
             i += 1
         plt.xlabel('Coordinate (meters)')
         plt.ylabel('Y Slope (mrad)')
         plt.title('Combined Measured and Reference Y Slopes (Y Slices)')
+        ax = plt.gca()
+        if self.options_slice_output.xlim is not None:
+            ax.set_xlim(self.options_slice_output.xlim)
         plt.legend()
         plt.grid()
         plt.savefig(f"{self.options_file_output.output_dir}/combined_slope_y_y_{which_data}.png", dpi=self.options_file_output.save_dpi)
@@ -595,24 +650,27 @@ class StandardPlotOutput:
         plt.figure(figsize=(10, 6))
         i = 0
         for col in meas_mag.columns[1:]:
-            color = colors(i)
+            color = cmap(i)
             plt.plot(meas_mag.iloc[:, 0], meas_mag[col], linestyle='-', color=color, label=f'Measured {col}')
             plt.plot(ref_mag.iloc[:, 0], ref_mag[col], linestyle='--', color=color, label=f'Reference {col}')
             i += 1
         plt.xlabel('Coordinate (meters)')
         plt.ylabel('Slope Magnitude (mrad)')
         plt.title('Combined Measured and Reference Slope Magnitudes (Y Slices)')
+        ax = plt.gca()
+        if self.options_slice_output.xlim is not None:
+            ax.set_xlim(self.options_slice_output.xlim)
         plt.legend()
         plt.grid()
         plt.savefig(f"{self.options_file_output.output_dir}/combined_slope_y_magnitude_{which_data}.png", dpi=self.options_file_output.save_dpi)
 
         # Paths to saved CSV files for measured and reference slopes
-        measured_x_csv = f"{self.options_file_output.output_dir}/slope_data_x_x_all_Meas.csv"
-        reference_x_csv = f"{self.options_file_output.output_dir}/slope_data_x_x_all_Ref.csv"
-        measured_y_csv = f"{self.options_file_output.output_dir}/slope_data_x_y_all_Meas.csv"
-        reference_y_csv = f"{self.options_file_output.output_dir}/slope_data_x_y_all_Ref.csv"
-        measured_mag_csv = f"{self.options_file_output.output_dir}/slope_data_x_mag_all_Meas.csv"
-        reference_mag_csv = f"{self.options_file_output.output_dir}/slope_data_x_mag_all_Ref.csv"
+        measured_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_x_all_Meas.csv"
+        reference_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_x_all_Ref.csv"
+        measured_y_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_y_all_Meas.csv"
+        reference_y_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_y_all_Ref.csv"
+        measured_mag_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_mag_all_Meas.csv"
+        reference_mag_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_mag_all_Ref.csv"
 
         # Load data
         meas_x = pd.read_csv(measured_x_csv)
@@ -622,21 +680,20 @@ class StandardPlotOutput:
         meas_mag = pd.read_csv(measured_mag_csv)
         ref_mag = pd.read_csv(reference_mag_csv)
 
-        num_slices = len(meas_x.columns)-1
-
-        colors = cm.get_cmap('tab10', num_slices)
-
         # Combined X slope plot
         plt.figure(figsize=(10, 6))
         i = 0
         for col in meas_x.columns[1:]:
-            color = colors(i)
+            color = cmap(i)
             plt.plot(meas_x.iloc[:, 0], meas_x[col], linestyle='-', color=color, label=f'Measured {col}')
             plt.plot(ref_x.iloc[:, 0], ref_x[col], linestyle='--', color=color, label=f'Reference {col}')
             i += 1
         plt.xlabel('Coordinate (meters)')
         plt.ylabel('X Slope (mrad)')
         plt.title('Combined Measured and Reference X Slopes (X Slices)')
+        ax = plt.gca()
+        if self.options_slice_output.ylim is not None:
+            ax.set_xlim(self.options_slice_output.ylim)
         plt.legend()
         plt.grid()
         plt.savefig(f"{self.options_file_output.output_dir}/combined_slope_x_x_{which_data}.png", dpi=self.options_file_output.save_dpi)
@@ -645,13 +702,16 @@ class StandardPlotOutput:
         plt.figure(figsize=(10, 6))
         i = 0
         for col in meas_y.columns[1:]:
-            color = colors(i)
+            color = cmap(i)
             plt.plot(meas_y.iloc[:, 0], meas_y[col], linestyle='-', color=color, label=f'Measured {col}')
             plt.plot(ref_y.iloc[:, 0], ref_y[col], linestyle='--', color=color, label=f'Reference {col}')
             i += 1
         plt.xlabel('Coordinate (meters)')
         plt.ylabel('Y Slope (mrad)')
         plt.title('Combined Measured and Reference Y Slopes (X Slices)')
+        ax = plt.gca()
+        if self.options_slice_output.ylim is not None:
+            ax.set_xlim(self.options_slice_output.ylim)
         plt.legend()
         plt.grid()
         plt.savefig(f"{self.options_file_output.output_dir}/combined_slope_x_y_{which_data}.png", dpi=self.options_file_output.save_dpi)
@@ -660,13 +720,16 @@ class StandardPlotOutput:
         plt.figure(figsize=(10, 6))
         i = 0
         for col in meas_mag.columns[1:]:
-            color = colors(i)
+            color = cmap(i)
             plt.plot(meas_mag.iloc[:, 0], meas_mag[col], linestyle='-', color=color, label=f'Measured {col}')
             plt.plot(ref_mag.iloc[:, 0], ref_mag[col], linestyle='--', color=color, label=f'Reference {col}')
             i += 1
         plt.xlabel('Coordinate (meters)')
         plt.ylabel('Slope Magnitude (mrad)')
         plt.title('Combined Measured and Reference Slope Magnitudes (X Slices)')
+        ax = plt.gca()
+        if self.options_slice_output.ylim is not None:
+            ax.set_xlim(self.options_slice_output.ylim)
         plt.legend()
         plt.grid()
         plt.savefig(f"{self.options_file_output.output_dir}/combined_slope_x_magnitude_{which_data}.png", dpi=self.options_file_output.save_dpi)
@@ -779,6 +842,294 @@ class StandardPlotOutput:
                     h5f.create_dataset('y_vec', data=y_vec)
                     h5f.create_dataset('image_y', data=image_y)
 
+            if self.options_slice_output.to_plot:
+        
+                x_coords = self.options_slice_output.slice_x_loc
+                x_indices = coords_to_indices(x_coords, x_vec)
+
+                y_coords = self.options_slice_output.slice_y_loc
+                y_indices = coords_to_indices(y_coords, y_vec)
+
+                offset_x = self.options_slice_output.plot_x_curvature_deviation_offset # mrad offset between x slices
+                offset_y = self.options_slice_output.plot_y_curvature_deviation_offset # mrad offset between y slices
+                offset_counter_x = 0 # Initialize counter
+                offset_counter_y = 0 # Initialize counter
+
+                # Plot contour plot with slice locations
+                x_slices = [x_vec[idx] for idx in x_indices]  # x coordinate values for slices
+                y_slices = [y_vec[idx] for idx in y_indices]  # y coordinate values for slices
+
+                num_slices = max(len(x_indices), len(y_indices))
+                cmap = cm.get_cmap('tab10', num_slices) 
+
+                # Initialize lists to accumulate data for all y slices
+                all_slice_data_x = []
+                all_slice_data_y = []
+                all_slice_data_mag = []
+
+                # Create separate figures for X curvature, Y curvature, and Magnitude
+                plt.figure(figsize=(10, 6))
+                plt.title('2D Line Plot of X Curvature Deviation')
+                plt.xlabel('X Coordinate (meters)')
+                plt.ylabel('Curvature Deviation (mrad/m)')
+                plt.grid()
+
+                plt.figure(figsize=(10, 6))
+                plt.title('2D Line Plot of Y Curvature Deviation')
+                plt.xlabel('X Coordinate (meters)')
+                plt.ylabel('Curvature Deviation (mrad/m)')
+                plt.grid()
+
+                plt.figure(figsize=(10, 6))
+                plt.title('2D Line Plot of Curvature Deviation Magnitude')
+                plt.xlabel('X Coordinate (meters)')
+                plt.ylabel('Curvature Deviation (mrad/m)')
+                plt.grid()
+
+                # Store figure handles to plot on them
+                fig_x = plt.gcf()
+                fig_y = plt.gcf()
+                fig_mag = plt.gcf()
+
+                # Actually, we need separate figure objects for each plot, so create them explicitly:
+                fig_x, ax_x = plt.subplots(figsize=(10, 6))
+                fig_y, ax_y = plt.subplots(figsize=(10, 6))
+                fig_mag, ax_mag = plt.subplots(figsize=(10, 6))
+
+                i = 0
+
+                for y_coordinate_index in y_indices:
+                    # Extract the slices
+                    slice_data_x1 = image_x[y_coordinate_index, :]  # X slope 
+                    slice_data_y1 = image_y[y_coordinate_index, :]  # Y slope
+                    slice_data1 = image[y_coordinate_index, :]
+                    coordinate_label1 = f"Y Location = {y_vec[y_coordinate_index]:.4f}"
+                    x_values1 = x_vec  # Use x_vec for x-axis           
+
+                    offset1 = offset_counter_y * offset_y
+
+                    if self.options_slice_output.uncertainty_to_plot:
+
+                        # Define subset range for error bars
+                        indx = [50, 150, 250, 350]
+                        x_un = x_values1[indx]
+                        yx_un = slice_data_x1[indx]
+                        yy_un = slice_data_y1[indx]
+                        y_un = slice_data1[indx]
+                        profx_un = [1, 0.5, 1, 0.75]
+                        profy_un = [1, 0.5, 1, 0.75]
+                        prof_un = [1, 0.5, 1, 0.75]
+
+                    # Get color from colormap
+                    color = cmap(i)
+
+                    # Plot on separate axes
+                    line_x, = ax_x.plot(x_values1[1:], slice_data_x1 + offset1, label=f'{coordinate_label1}', color=color, linestyle='-')
+                    line_y, = ax_y.plot(x_values1, slice_data_y1 + offset1, label=f'{coordinate_label1}', color=color, linestyle='-')
+                    line_mag, = ax_mag.plot(x_values1[1:], slice_data1 + offset1, label=f'{coordinate_label1}', color=color, linestyle='-')
+
+                    if self.options_slice_output.uncertainty_to_plot:
+                        ax_x.errorbar(x_un, yx_un + offset1, yerr=profx_un, fmt='none', ecolor=color, capsize=3)
+                        ax_y.errorbar(x_un, yy_un + offset1, yerr=profy_un, fmt='none', ecolor=color, capsize=3)
+                        ax_mag.errorbar(x_un, y_un + offset1, yerr=prof_un, fmt='none', ecolor=color, capsize=3)
+
+                    # Accumulate data for saving
+                    all_slice_data_x.append(slice_data_x1)
+                    all_slice_data_y.append(slice_data_y1)
+                    all_slice_data_mag.append(slice_data1)
+
+                    offset_counter_y +=1 # Increase counter
+                    i += 1
+                    
+                # Finalize X curvature plot
+                ax_x.set_xlabel('X Coordinate (meters)')
+                ax_x.set_ylabel('Curvature Deviation (mrad/m)')
+                ax_x.set_title('X Curvature Deviation (Y Slices)')
+                if self.options_slice_output.xlim is not None:
+                    ax_x.set_xlim(self.options_slice_output.xlim)
+                ax_x.legend()
+                ax_x.grid()
+                fig_x.savefig(f"{self.options_file_output.output_dir}/curvature_deviation_slice_y_x_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_x)
+
+                # Finalize Y curvature plot
+                ax_y.set_xlabel('X Coordinate (meters)')
+                ax_y.set_ylabel('Curvature Deviation (mrad/m)')
+                ax_y.set_title('Y Curvature Deviation (Y Slices)')
+                if self.options_slice_output.xlim is not None:
+                    ax_y.set_xlim(self.options_slice_output.xlim)
+                ax_y.legend()
+                ax_y.grid()
+                fig_y.savefig(f"{self.options_file_output.output_dir}/curvature_deviation_slice_y_y_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_y)
+
+                # Finalize Magnitude plot
+                ax_mag.set_xlabel('X Coordinate (meters)')
+                ax_mag.set_ylabel('Curvature Deviation (mrad/m)')
+                ax_mag.set_title('Curvature Deviation Magnitude (Y Slices)')
+                if self.options_slice_output.xlim is not None:
+                    ax_mag.set_xlim(self.options_slice_output.xlim)
+                ax_mag.legend()
+                ax_mag.grid()
+                fig_mag.savefig(f"{self.options_file_output.output_dir}/curvature_deviation_slice_y_mag_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_mag)
+
+                # Convert accumulated lists to arrays (shape: num_slices x slice_length)
+                all_slice_data_x = np.array(all_slice_data_x)
+                all_slice_data_y = np.array(all_slice_data_y)
+                all_slice_data_mag = np.array(all_slice_data_mag)
+
+                # Save X curvature data (all slices) to CSV and HDF5
+                header_x = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
+                data_to_save = np.column_stack((x_vec[1:].flatten(), all_slice_data_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_y_x_all.csv",
+                        data_to_save, header=header_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_y_x_all.h5", 'w') as h5f:
+                    h5f.create_dataset('X Values', data=x_vec[1:].flatten())
+                    h5f.create_dataset('Y Indices', data=np.array(y_indices))
+                    h5f.create_dataset('X Curvature Deviation', data=all_slice_data_x)
+
+                # Save Y curvature data (all slices) to CSV and HDF5
+                header_y = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
+                data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_y.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_y_y_all.csv",
+                        data_to_save, header=header_y, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_y_y_all.h5", 'w') as h5f:
+                    h5f.create_dataset('X Values', data=x_vec.flatten())
+                    h5f.create_dataset('Y Indices', data=np.array(y_indices))
+                    h5f.create_dataset('Y Curvature Deviation', data=all_slice_data_y)
+
+                # Save Magnitude data (all slices) to CSV and HDF5
+                header_mag = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
+                data_to_save = np.column_stack((x_vec[1:].flatten(), all_slice_data_mag.T))       
+                np.savetxt(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_y_mag_all.csv",
+                        data_to_save, header=header_mag, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_y_mag_all.h5", 'w') as h5f:
+                    h5f.create_dataset('X Values', data=x_vec[1:].flatten())
+                    h5f.create_dataset('Y Indices', data=np.array(y_indices))
+                    h5f.create_dataset('Curvature Deviation Magnitude', data=all_slice_data_mag)
+
+                # Initialize lists to accumulate data for all x slices
+                all_slice_data_x_x = []
+                all_slice_data_y_x = []
+                all_slice_data_mag_x = []
+
+                # Create separate figures for X curvature, Y curvature, and Magnitude (x slices)
+                fig_x_x, ax_x_x = plt.subplots(figsize=(10, 6))
+                fig_y_x, ax_y_x = plt.subplots(figsize=(10, 6))
+                fig_mag_x, ax_mag_x = plt.subplots(figsize=(10, 6))
+
+                i = 0
+                for x_coordinate_index in x_indices:
+                    # Extract the slices
+                    slice_data_x2 = image_x[:, x_coordinate_index]  # X slope difference
+                    slice_data_y2 = image_y[:, x_coordinate_index]  # Y slope difference
+                    slice_data2 = image[:, x_coordinate_index]      # Slope magnitude
+                    coordinate_label2 = f"X Location = {x_vec[x_coordinate_index]:.4f}"
+                    x_values2 = y_vec  # Use y_vec for x-axis
+
+                    offset2 = offset_counter_x * offset_x
+
+                    if self.options_slice_output.uncertainty_to_plot:
+                        # Define subset range for error bars
+                        indx = [50, 150, 250, 350]
+                        x_un = x_values2[indx]
+                        yx_un = slice_data_x2[indx]
+                        yy_un = slice_data_y2[indx]
+                        y_un = slice_data2[indx]
+                        profx_un = [1, 0.5, 1, 0.75]
+                        profy_un = [1, 0.5, 1, 0.75]
+                        prof_un = [1, 0.5, 1, 0.75]
+
+                    # Get color from colormap
+                    color = cmap(i)
+
+                    # Plot on separate axes
+                    ax_x_x.plot(x_values2, slice_data_x2 + offset2, label=f'{coordinate_label2}', color=color, linestyle='-')
+                    ax_y_x.plot(x_values2[1:], slice_data_y2 + offset2, label=f'{coordinate_label2}', color=color, linestyle='-')
+                    ax_mag_x.plot(x_values2[1:], slice_data2 + offset2, label=f'{coordinate_label2}', color=color, linestyle='-')
+
+                    if self.options_slice_output.uncertainty_to_plot:
+                        ax_x_x.errorbar(x_un, yx_un + offset2, yerr=profx_un, fmt='none', ecolor=color, capsize=3)
+                        ax_y_x.errorbar(x_un, yy_un + offset2, yerr=profy_un, fmt='none', ecolor=color, capsize=3)
+                        ax_mag_x.errorbar(x_un, y_un + offset2, yerr=prof_un, fmt='none', ecolor=color, capsize=3)
+
+                    # Accumulate data for saving
+                    all_slice_data_x_x.append(slice_data_x2)
+                    all_slice_data_y_x.append(slice_data_y2)
+                    all_slice_data_mag_x.append(slice_data2)
+
+                    offset_counter_x += 1 # Increase counter
+                    i += 1
+
+                # Finalize X curvature plot (x slices)
+                ax_x_x.set_xlabel('Y Coordinate (meters)')
+                ax_x_x.set_ylabel('Curvature Deviation (mrad/m)')
+                ax_x_x.set_title('X Curvature Deviation (X slices)')
+                if self.options_slice_output.ylim is not None:
+                    ax_x_x.set_xlim(self.options_slice_output.ylim)
+                ax_x_x.legend()
+                ax_x_x.grid()
+                fig_x_x.savefig(f"{self.options_file_output.output_dir}/curvature_deviation_slice_x_x_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_x_x)
+
+                # Finalize Y curvature plot (x slices)
+                ax_y_x.set_xlabel('Y Coordinate (meters)')
+                ax_y_x.set_ylabel('Curvature Deviation (mrad/m)')
+                ax_y_x.set_title('Y Curvature Deviation (X slices)')
+                if self.options_slice_output.ylim is not None:
+                    ax_y_x.set_xlim(self.options_slice_output.ylim)
+                ax_y_x.legend()
+                ax_y_x.grid()
+                fig_y_x.savefig(f"{self.options_file_output.output_dir}/curvature_deviation_slice_x_y_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_y_x)
+
+                # Finalize Magnitude plot (x slices)
+                ax_mag_x.set_xlabel('Y Coordinate (meters)')
+                ax_mag_x.set_ylabel('Curvature Deviation (mrad/m)')
+                ax_mag_x.set_title('Curvature Deviation Magnitude (X slices)')
+                if self.options_slice_output.ylim is not None:
+                    ax_mag_x.set_xlim(self.options_slice_output.ylim)
+                ax_mag_x.legend()
+                ax_mag_x.grid()
+                fig_mag_x.savefig(f"{self.options_file_output.output_dir}/curvature_deviation_slice_x_mag_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_mag_x)
+
+                # Convert accumulated lists to arrays (shape: num_slices x slice_length)
+                all_slice_data_x_x = np.array(all_slice_data_x_x)
+                all_slice_data_y_x = np.array(all_slice_data_y_x)
+                all_slice_data_mag_x = np.array(all_slice_data_mag_x)
+
+                # Save X curvature data (all x slices) to CSV and HDF5
+                header_x_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
+                data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_x_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_x_x_all.csv",
+                        data_to_save, header=header_x_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_x_x_all.h5", 'w') as h5f:
+                    h5f.create_dataset('Y Values', data=y_vec.flatten())
+                    h5f.create_dataset('X Indices', data=np.array(x_indices))
+                    h5f.create_dataset('X Curvature Deviation', data=all_slice_data_x_x)
+
+                # Save Y curvature data (all x slices) to CSV and HDF5
+                header_y_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
+                data_to_save = np.column_stack((y_vec[1:].flatten(), all_slice_data_y_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_x_y_all.csv",
+                        data_to_save, header=header_y_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_x_y_all.h5", 'w') as h5f:
+                    h5f.create_dataset('Y Values', data=y_vec[1:].flatten())
+                    h5f.create_dataset('X Indices', data=np.array(x_indices))
+                    h5f.create_dataset('Y Curvature Deviation', data=all_slice_data_y_x)
+
+                # Save Magnitude data (all x slices) to CSV and HDF5
+                header_mag_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
+                data_to_save = np.column_stack((y_vec[1:].flatten(), all_slice_data_mag_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_x_mag_all.csv",
+                        data_to_save, header=header_mag_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/curvature_deviation_slice_data_x_mag_all.h5", 'w') as h5f:
+                    h5f.create_dataset('Y Values', data=y_vec[1:].flatten())
+                    h5f.create_dataset('X Indices', data=np.array(x_indices))
+                    h5f.create_dataset('Curvature Deviation Magnitude', data=all_slice_data_mag_x)
+
     def _plot_slope_deviation(self):
         # Plots slope deviation
         if self._has_measured_optic and self._has_reference_optic:
@@ -890,6 +1241,295 @@ class StandardPlotOutput:
                     h5f.create_dataset('x_vec', data=x_vec)
                     h5f.create_dataset('y_vec', data=y_vec)
                     h5f.create_dataset('image_y', data=image_y)
+
+        
+            if self.options_slice_output.to_plot:
+        
+                x_coords = self.options_slice_output.slice_x_loc
+                x_indices = coords_to_indices(x_coords, x_vec)
+
+                y_coords = self.options_slice_output.slice_y_loc
+                y_indices = coords_to_indices(y_coords, y_vec)
+
+                offset_x = self.options_slice_output.plot_x_slope_deviation_offset # mrad offset between x slices
+                offset_y = self.options_slice_output.plot_y_slope_deviation_offset # mrad offset between y slices
+                offset_counter_x = 0 # Initialize counter
+                offset_counter_y = 0 # Initialize counter
+
+                # Plot contour plot with slice locations
+                x_slices = [x_vec[idx] for idx in x_indices]  # x coordinate values for slices
+                y_slices = [y_vec[idx] for idx in y_indices]  # y coordinate values for slices
+
+                num_slices = max(len(x_indices), len(y_indices))
+                cmap = cm.get_cmap('tab10', num_slices) 
+
+                # Initialize lists to accumulate data for all y slices
+                all_slice_data_x = []
+                all_slice_data_y = []
+                all_slice_data_mag = []
+
+                # Create separate figures for X slope, Y slope, and Magnitude
+                plt.figure(figsize=(10, 6))
+                plt.title('2D Line Plot of X Slope Deviation')
+                plt.xlabel('X Coordinate (meters)')
+                plt.ylabel('Slope Deviation (mrad)')
+                plt.grid()
+
+                plt.figure(figsize=(10, 6))
+                plt.title('2D Line Plot of Y Slope Deviation')
+                plt.xlabel('X Coordinate (meters)')
+                plt.ylabel('Slope Deviation (mrad)')
+                plt.grid()
+
+                plt.figure(figsize=(10, 6))
+                plt.title('2D Line Plot of Slope Deviation Magnitude')
+                plt.xlabel('X Coordinate (meters)')
+                plt.ylabel('Slope Deviation (mrad)')
+                plt.grid()
+
+                # Store figure handles to plot on them
+                fig_x = plt.gcf()
+                fig_y = plt.gcf()
+                fig_mag = plt.gcf()
+
+                # Actually, we need separate figure objects for each plot, so create them explicitly:
+                fig_x, ax_x = plt.subplots(figsize=(10, 6))
+                fig_y, ax_y = plt.subplots(figsize=(10, 6))
+                fig_mag, ax_mag = plt.subplots(figsize=(10, 6))
+
+                i = 0
+
+                for y_coordinate_index in y_indices:
+                    # Extract the slices
+                    slice_data_x1 = image_x[y_coordinate_index, :]  # X slope 
+                    slice_data_y1 = image_y[y_coordinate_index, :]  # Y slope
+                    slice_data1 = image[y_coordinate_index, :]
+                    coordinate_label1 = f"Y Location = {y_vec[y_coordinate_index]:.4f}"
+                    x_values1 = x_vec  # Use x_vec for x-axis           
+
+                    offset1 = offset_counter_y * offset_y
+
+                    if self.options_slice_output.uncertainty_to_plot:
+
+                        # Define subset range for error bars
+                        indx = [50, 150, 250, 350]
+                        x_un = x_values1[indx]
+                        yx_un = slice_data_x1[indx]
+                        yy_un = slice_data_y1[indx]
+                        y_un = slice_data1[indx]
+                        profx_un = [1, 0.5, 1, 0.75]
+                        profy_un = [1, 0.5, 1, 0.75]
+                        prof_un = [1, 0.5, 1, 0.75]
+
+                    # Get color from colormap
+                    color = cmap(i)
+
+                    # Plot on separate axes
+                    line_x, = ax_x.plot(x_values1, slice_data_x1 + offset1, label=f'{coordinate_label1}', color=color, linestyle='-')
+                    line_y, = ax_y.plot(x_values1, slice_data_y1 + offset1, label=f'{coordinate_label1}', color=color, linestyle='-')
+                    line_mag, = ax_mag.plot(x_values1, slice_data1 + offset1, label=f'{coordinate_label1}', color=color, linestyle='-')
+
+                    if self.options_slice_output.uncertainty_to_plot:
+                        ax_x.errorbar(x_un, yx_un + offset1, yerr=profx_un, fmt='none', ecolor=color, capsize=3)
+                        ax_y.errorbar(x_un, yy_un + offset1, yerr=profy_un, fmt='none', ecolor=color, capsize=3)
+                        ax_mag.errorbar(x_un, y_un + offset1, yerr=prof_un, fmt='none', ecolor=color, capsize=3)
+
+                    # Accumulate data for saving
+                    all_slice_data_x.append(slice_data_x1)
+                    all_slice_data_y.append(slice_data_y1)
+                    all_slice_data_mag.append(slice_data1)
+
+                    offset_counter_y +=1 # Increase counter
+                    i += 1
+                    
+                # Finalize X slope plot
+                ax_x.set_xlabel('X Coordinate (meters)')
+                ax_x.set_ylabel('Slope Deviation (mrad)')
+                ax_x.set_title('X Slope Deviation (Y Slices)')
+                if self.options_slice_output.xlim is not None:
+                    ax_x.set_xlim(self.options_slice_output.xlim)
+                ax_x.legend()
+                ax_x.grid()
+                fig_x.savefig(f"{self.options_file_output.output_dir}/slope_deviation_slice_y_x_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_x)
+
+                # Finalize Y slope plot
+                ax_y.set_xlabel('X Coordinate (meters)')
+                ax_y.set_ylabel('Slope Deviation (mrad)')
+                ax_y.set_title('Y Slope Deviation (Y Slices)')
+                if self.options_slice_output.xlim is not None:
+                    ax_y.set_xlim(self.options_slice_output.xlim)
+                ax_y.legend()
+                ax_y.grid()
+                fig_y.savefig(f"{self.options_file_output.output_dir}/slope_deviation_slice_y_y_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_y)
+
+                # Finalize Magnitude plot
+                ax_mag.set_xlabel('X Coordinate (meters)')
+                ax_mag.set_ylabel('Slope Deviation (mrad)')
+                ax_mag.set_title('Slope Deviation Magnitude (Y Slices)')
+                if self.options_slice_output.xlim is not None:
+                    ax_mag.set_xlim(self.options_slice_output.xlim)
+                ax_mag.legend()
+                ax_mag.grid()
+                fig_mag.savefig(f"{self.options_file_output.output_dir}/slope_deviation_slice_y_mag_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_mag)
+
+                # Convert accumulated lists to arrays (shape: num_slices x slice_length)
+                all_slice_data_x = np.array(all_slice_data_x)
+                all_slice_data_y = np.array(all_slice_data_y)
+                all_slice_data_mag = np.array(all_slice_data_mag)
+
+                # Save X slope data (all slices) to CSV and HDF5
+                header_x = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
+                data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_y_x_all.csv",
+                        data_to_save, header=header_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_y_x_all.h5", 'w') as h5f:
+                    h5f.create_dataset('X Values', data=x_vec.flatten())
+                    h5f.create_dataset('Y Indices', data=np.array(y_indices))
+                    h5f.create_dataset('X Slope Deviation', data=all_slice_data_x)
+
+                # Save Y slope data (all slices) to CSV and HDF5
+                header_y = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
+                data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_y.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_y_y_all.csv",
+                        data_to_save, header=header_y, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_y_y_all.h5", 'w') as h5f:
+                    h5f.create_dataset('X Values', data=x_vec.flatten())
+                    h5f.create_dataset('Y Indices', data=np.array(y_indices))
+                    h5f.create_dataset('Y Slope Deviation', data=all_slice_data_y)
+
+                # Save Magnitude data (all slices) to CSV and HDF5
+                header_mag = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
+                data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_mag.T))       
+                np.savetxt(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_y_mag_all.csv",
+                        data_to_save, header=header_mag, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_y_mag_all.h5", 'w') as h5f:
+                    h5f.create_dataset('X Values', data=x_vec.flatten())
+                    h5f.create_dataset('Y Indices', data=np.array(y_indices))
+                    h5f.create_dataset('Slope Deviation Magnitude', data=all_slice_data_mag)
+
+                # Initialize lists to accumulate data for all x slices
+                all_slice_data_x_x = []
+                all_slice_data_y_x = []
+                all_slice_data_mag_x = []
+
+                # Create separate figures for X slope, Y slope, and Magnitude (x slices)
+                fig_x_x, ax_x_x = plt.subplots(figsize=(10, 6))
+                fig_y_x, ax_y_x = plt.subplots(figsize=(10, 6))
+                fig_mag_x, ax_mag_x = plt.subplots(figsize=(10, 6))
+
+                i = 0
+                for x_coordinate_index in x_indices:
+                    # Extract the slices
+                    slice_data_x2 = image_x[:, x_coordinate_index]  # X slope difference
+                    slice_data_y2 = image_y[:, x_coordinate_index]  # Y slope difference
+                    slice_data2 = image[:, x_coordinate_index]      # Slope magnitude
+                    coordinate_label2 = f"X Location = {x_vec[x_coordinate_index]:.4f}"
+                    x_values2 = y_vec  # Use y_vec for x-axis
+
+                    offset2 = offset_counter_x * offset_x
+
+                    if self.options_slice_output.uncertainty_to_plot:
+                        # Define subset range for error bars
+                        indx = [50, 150, 250, 350]
+                        x_un = x_values2[indx]
+                        yx_un = slice_data_x2[indx]
+                        yy_un = slice_data_y2[indx]
+                        y_un = slice_data2[indx]
+                        profx_un = [1, 0.5, 1, 0.75]
+                        profy_un = [1, 0.5, 1, 0.75]
+                        prof_un = [1, 0.5, 1, 0.75]
+
+                    # Get color from colormap
+                    color = cmap(i)
+
+                    # Plot on separate axes
+                    ax_x_x.plot(x_values2, slice_data_x2 + offset2, label=f'{coordinate_label2}', color=color, linestyle='-')
+                    ax_y_x.plot(x_values2, slice_data_y2 + offset2, label=f'{coordinate_label2}', color=color, linestyle='-')
+                    ax_mag_x.plot(x_values2, slice_data2 + offset2, label=f'{coordinate_label2}', color=color, linestyle='-')
+
+                    if self.options_slice_output.uncertainty_to_plot:
+                        ax_x_x.errorbar(x_un, yx_un + offset2, yerr=profx_un, fmt='none', ecolor=color, capsize=3)
+                        ax_y_x.errorbar(x_un, yy_un + offset2, yerr=profy_un, fmt='none', ecolor=color, capsize=3)
+                        ax_mag_x.errorbar(x_un, y_un + offset2, yerr=prof_un, fmt='none', ecolor=color, capsize=3)
+
+                    # Accumulate data for saving
+                    all_slice_data_x_x.append(slice_data_x2)
+                    all_slice_data_y_x.append(slice_data_y2)
+                    all_slice_data_mag_x.append(slice_data2)
+
+                    offset_counter_x += 1 # Increase counter
+                    i += 1
+
+                # Finalize X slope plot (x slices)
+                ax_x_x.set_xlabel('Y Coordinate (meters)')
+                ax_x_x.set_ylabel('Slope Deviation (mrad)')
+                ax_x_x.set_title('X Slope Deviation (X slices)')
+                if self.options_slice_output.ylim is not None:
+                    ax_x_x.set_xlim(self.options_slice_output.ylim)
+                ax_x_x.legend()
+                ax_x_x.grid()
+                fig_x_x.savefig(f"{self.options_file_output.output_dir}/slope_deviation_slice_x_x_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_x_x)
+
+                # Finalize Y slope plot (x slices)
+                ax_y_x.set_xlabel('Y Coordinate (meters)')
+                ax_y_x.set_ylabel('Slope Deviation (mrad)')
+                ax_y_x.set_title('Y Slope Deviation (X slices)')
+                if self.options_slice_output.ylim is not None:
+                    ax_y_x.set_xlim(self.options_slice_output.ylim)
+                ax_y_x.legend()
+                ax_y_x.grid()
+                fig_y_x.savefig(f"{self.options_file_output.output_dir}/slope_deviation_slice_x_y_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_y_x)
+
+                # Finalize Magnitude plot (x slices)
+                ax_mag_x.set_xlabel('Y Coordinate (meters)')
+                ax_mag_x.set_ylabel('Slope Deviation (mrad)')
+                ax_mag_x.set_title('Slope Deviation Magnitude (X slices)')
+                if self.options_slice_output.ylim is not None:
+                    ax_mag_x.set_xlim(self.options_slice_output.ylim)
+                ax_mag_x.legend()
+                ax_mag_x.grid()
+                fig_mag_x.savefig(f"{self.options_file_output.output_dir}/slope_deviation_slice_x_mag_all.png", dpi=self.options_file_output.save_dpi)
+                plt.close(fig_mag_x)
+
+                # Convert accumulated lists to arrays (shape: num_slices x slice_length)
+                all_slice_data_x_x = np.array(all_slice_data_x_x)
+                all_slice_data_y_x = np.array(all_slice_data_y_x)
+                all_slice_data_mag_x = np.array(all_slice_data_mag_x)
+
+                # Save X slope data (all x slices) to CSV and HDF5
+                header_x_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
+                data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_x_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_x_x_all.csv",
+                        data_to_save, header=header_x_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_x_x_all.h5", 'w') as h5f:
+                    h5f.create_dataset('Y Values', data=y_vec.flatten())
+                    h5f.create_dataset('X Indices', data=np.array(x_indices))
+                    h5f.create_dataset('X Slope Deviation', data=all_slice_data_x_x)
+
+                # Save Y slope data (all x slices) to CSV and HDF5
+                header_y_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
+                data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_y_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_x_y_all.csv",
+                        data_to_save, header=header_y_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_x_y_all.h5", 'w') as h5f:
+                    h5f.create_dataset('Y Values', data=y_vec.flatten())
+                    h5f.create_dataset('X Indices', data=np.array(x_indices))
+                    h5f.create_dataset('Y Slope Deviation', data=all_slice_data_y_x)
+
+                # Save Magnitude data (all x slices) to CSV and HDF5
+                header_mag_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
+                data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_mag_x.T))
+                np.savetxt(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_x_mag_all.csv",
+                        data_to_save, header=header_mag_x, delimiter=",", fmt="%.6e")
+                with h5py.File(f"{self.options_file_output.output_dir}/slope_deviation_slice_data_x_mag_all.h5", 'w') as h5f:
+                    h5f.create_dataset('Y Values', data=y_vec.flatten())
+                    h5f.create_dataset('X Indices', data=np.array(x_indices))
+                    h5f.create_dataset('Slope Deviation Magnitude', data=all_slice_data_mag_x)
 
         else:
             lt.info('Do not have both measured and reference optic; skipping slope deviation plots.')
@@ -1089,8 +1729,8 @@ class StandardPlotOutput:
             y_coords = self.options_slice_output.slice_y_loc
             y_indices = coords_to_indices(y_coords, y_vec)
 
-            offset_x = self.options_slice_output.plot_x_offset # mrad offset between x slices
-            offset_y = self.options_slice_output.plot_y_offset # mrad offset between y slices
+            offset_x = self.options_slice_output.plot_x_curvature_offset # mrad offset between x slices
+            offset_y = self.options_slice_output.plot_y_curvature_offset # mrad offset between y slices
             offset_counter_x = 0 # Initialize counter
             offset_counter_y = 0 # Initialize counter
 
@@ -1145,7 +1785,7 @@ class StandardPlotOutput:
                 coordinate_label1 = f"Y Location = {y_vec[y_coordinate_index]:.4f}"
                 x_values1 = x_vec  # Use x_vec for x-axis           
 
-                offset1 = offset_counter_x * offset_x
+                offset1 = offset_counter_y * offset_y
 
                 if self.options_slice_output.uncertainty_to_plot:
                     # Define subset range for error bars
@@ -1179,34 +1819,40 @@ class StandardPlotOutput:
                 all_slice_data_y.append(slice_data_y1)
                 all_slice_data_mag.append(slice_data1)
 
-                offset_counter_x +=1 # Increase counter
+                offset_counter_y +=1 # Increase counter
                 i += 1
 
             # Finalize X curvature plot
             ax_x.set_xlabel('X Coordinate (meters)')
             ax_x.set_ylabel('Curvature (mrad/meter)')
-            ax_x.set_title('X Curvature')
+            ax_x.set_title('X Curvature (Y Slices)')
+            if self.options_slice_output.xlim is not None:
+                ax_x.set_xlim(self.options_slice_output.xlim)
             ax_x.legend()
             ax_x.grid()
-            fig_x.savefig(f"{self.options_file_output.output_dir}/curvature_plot_y_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_x.savefig(f"{self.options_file_output.output_dir}/curvature_slice_y_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_x)
 
             # Finalize Y curvature plot
             ax_y.set_xlabel('X Coordinate (meters)')
             ax_y.set_ylabel('Curvature (mrad/meter)')
-            ax_y.set_title('Y Curvature')
+            ax_y.set_title('Y Curvature (Y Slices)')
+            if self.options_slice_output.xlim is not None:
+                ax_y.set_xlim(self.options_slice_output.xlim)
             ax_y.legend()
             ax_y.grid()
-            fig_y.savefig(f"{self.options_file_output.output_dir}/curvature_plot_y_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_y.savefig(f"{self.options_file_output.output_dir}/curvature_slice_y_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_y)
 
             # Finalize Magnitude plot
             ax_mag.set_xlabel('X Coordinate (meters)')
             ax_mag.set_ylabel('Curvature (mrad/meter)')
-            ax_mag.set_title('Curvature Magnitude')
+            ax_mag.set_title('Curvature Magnitude (Y Slices)')
+            if self.options_slice_output.xlim is not None:
+                ax_mag.set_xlim(self.options_slice_output.xlim)
             ax_mag.legend()
             ax_mag.grid()
-            fig_mag.savefig(f"{self.options_file_output.output_dir}/curvature_plot_y_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_mag.savefig(f"{self.options_file_output.output_dir}/curvature_slice_y_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_mag)
 
             # Convert accumulated lists to arrays (shape: num_slices x slice_length)
@@ -1217,9 +1863,9 @@ class StandardPlotOutput:
             # Save X curvature data (all slices) to CSV and HDF5
             header_x = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
             data_to_save = np.column_stack((x_vec[1:].flatten(), all_slice_data_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/curvature_data_y_x_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/curvature_slice_data_y_x_all_{which_data}.csv",
                     data_to_save, header=header_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/curvature_data_y_x_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/curvature_slice_data_y_x_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('X Values', data=x_vec[1:].flatten())
                 h5f.create_dataset('Y Indices', data=np.array(y_indices))
                 h5f.create_dataset('X Curvature', data=all_slice_data_x)
@@ -1227,9 +1873,9 @@ class StandardPlotOutput:
             # Save Y curvature data (all slices) to CSV and HDF5
             header_y = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
             data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_y.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/curvature_data_y_y_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/curvature_slice_data_y_y_all_{which_data}.csv",
                     data_to_save, header=header_y, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/curvature_data_y_y_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/curvature_slice_data_y_y_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('X Values', data=x_vec.flatten())
                 h5f.create_dataset('Y Indices', data=np.array(y_indices))
                 h5f.create_dataset('Y Curvature', data=all_slice_data_y)
@@ -1237,9 +1883,9 @@ class StandardPlotOutput:
             # Save Magnitude data (all slices) to CSV and HDF5
             header_mag = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
             data_to_save = np.column_stack((x_vec[1:].flatten(), all_slice_data_mag.T))       
-            np.savetxt(f"{self.options_file_output.output_dir}/curvature_data_y_mag_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/curvature_slice_data_y_mag_all_{which_data}.csv",
                     data_to_save, header=header_mag, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/curvature_data_y_mag_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/curvature_slice_data_y_mag_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('X Values', data=x_vec[1:].flatten())
                 h5f.create_dataset('Y Indices', data=np.array(y_indices))
                 h5f.create_dataset('Curvature Magnitude', data=all_slice_data_mag)
@@ -1263,7 +1909,7 @@ class StandardPlotOutput:
                 coordinate_label2 = f"X Location = {x_vec[x_coordinate_index]:.4f}"
                 x_values2 = y_vec  # Use y_vec for x-axis
 
-                offset2 = offset_counter_y * offset_y
+                offset2 = offset_counter_x * offset_x
 
                 if self.options_slice_output.uncertainty_to_plot:
                     # Define subset range for error bars
@@ -1298,34 +1944,40 @@ class StandardPlotOutput:
                 all_slice_data_y_x.append(slice_data_y2)
                 all_slice_data_mag_x.append(slice_data2)
 
-                offset_counter_y += 1 # Increase counter
+                offset_counter_x += 1 # Increase counter
                 i += 1
                 
             # Finalize X curvature plot (x slices)
             ax_x_x.set_xlabel('Y Coordinate (meters)')
             ax_x_x.set_ylabel('Curvature (mrad/meter)')
             ax_x_x.set_title('X Curvature (X slices)')
+            if self.options_slice_output.ylim is not None:
+                ax_x_x.set_xlim(self.options_slice_output.ylim)
             ax_x_x.legend()
             ax_x_x.grid()
-            fig_x_x.savefig(f"{self.options_file_output.output_dir}/curvature_plot_x_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_x_x.savefig(f"{self.options_file_output.output_dir}/curvature_slice_x_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_x_x)
 
             # Finalize Y curvature plot (x slices)
             ax_y_x.set_xlabel('Y Coordinate (meters)')
             ax_x_x.set_ylabel('Curvature (mrad/meter)')
             ax_y_x.set_title('Y Curvature (X slices)')
+            if self.options_slice_output.ylim is not None:
+                ax_y_x.set_xlim(self.options_slice_output.ylim)
             ax_y_x.legend()
             ax_y_x.grid()
-            fig_y_x.savefig(f"{self.options_file_output.output_dir}/curvature_plot_x_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_y_x.savefig(f"{self.options_file_output.output_dir}/curvature_slice_x_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_y_x)
 
             # Finalize Magnitude plot (x slices)
             ax_mag_x.set_xlabel('Y Coordinate (meters)')
             ax_x_x.set_ylabel('Curvature (mrad/meter)')
             ax_mag_x.set_title('Curvature Magnitude (X slices)')
+            if self.options_slice_output.ylim is not None:
+                ax_mag_x.set_xlim(self.options_slice_output.ylim)
             ax_mag_x.legend()
             ax_mag_x.grid()
-            fig_mag_x.savefig(f"{self.options_file_output.output_dir}/curvature_plot_x_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_mag_x.savefig(f"{self.options_file_output.output_dir}/curvature_slice_x_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_mag_x)
 
             # Convert accumulated lists to arrays (shape: num_slices x slice_length)
@@ -1336,9 +1988,9 @@ class StandardPlotOutput:
             # Save X curvature data (all x slices) to CSV and HDF5
             header_x_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
             data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_x_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/curvature_data_x_x_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/curvature_slice_data_x_x_all_{which_data}.csv",
                     data_to_save, header=header_x_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/curvature_data_x_x_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/curvature_slice_data_x_x_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('Y Values', data=y_vec.flatten())
                 h5f.create_dataset('X Indices', data=np.array(x_indices))
                 h5f.create_dataset('X Curvature', data=all_slice_data_x_x)
@@ -1346,9 +1998,9 @@ class StandardPlotOutput:
             # Save Y curvature data (all x slices) to CSV and HDF5
             header_y_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
             data_to_save = np.column_stack((y_vec[1:].flatten(), all_slice_data_y_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/curvature_data_x_y_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/curvature_slice_data_x_y_all_{which_data}.csv",
                     data_to_save, header=header_y_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/curvature_data_x_y_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/curvature_slice_data_x_y_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('Y Values', data=y_vec[1:].flatten())
                 h5f.create_dataset('X Indices', data=np.array(x_indices))
                 h5f.create_dataset('Y Curvature', data=all_slice_data_y_x)
@@ -1356,9 +2008,9 @@ class StandardPlotOutput:
             # Save Magnitude data (all x slices) to CSV and HDF5
             header_mag_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
             data_to_save = np.column_stack((y_vec[1:].flatten(), all_slice_data_mag_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/curvature_data_x_mag_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/curvature_slice_data_x_mag_all_{which_data}.csv",
                     data_to_save, header=header_mag_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/curvature_data_x_mag_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/curvature_slice_data_x_mag_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('Y Values', data=y_vec[1:].flatten())
                 h5f.create_dataset('X Indices', data=np.array(x_indices))
                 h5f.create_dataset('Curvature Magnitude', data=all_slice_data_mag_x)
@@ -1477,8 +2129,8 @@ class StandardPlotOutput:
             y_coords = self.options_slice_output.slice_y_loc
             y_indices = coords_to_indices(y_coords, y_vec)
 
-            offset_x = self.options_slice_output.plot_x_offset # mrad offset between x slices
-            offset_y = self.options_slice_output.plot_y_offset # mrad offset between y slices
+            offset_x = self.options_slice_output.plot_x_slope_offset # mrad offset between x slices
+            offset_y = self.options_slice_output.plot_y_slope_offset # mrad offset between y slices
             offset_counter_x = 0 # Initialize counter
             offset_counter_y = 0 # Initialize counter
 
@@ -1567,7 +2219,7 @@ class StandardPlotOutput:
                 coordinate_label1 = f"Y Location = {y_vec[y_coordinate_index]:.4f}"
                 x_values1 = x_vec  # Use x_vec for x-axis           
 
-                offset1 = offset_counter_x * offset_x
+                offset1 = offset_counter_y * offset_y
 
                 if self.options_slice_output.uncertainty_to_plot:
 
@@ -1602,34 +2254,40 @@ class StandardPlotOutput:
                 all_slice_data_y.append(slice_data_y1)
                 all_slice_data_mag.append(slice_data1)
 
-                offset_counter_x +=1 # Increase counter
+                offset_counter_y +=1 # Increase counter
                 i += 1
                 
             # Finalize X slope plot
             ax_x.set_xlabel('X Coordinate (meters)')
             ax_x.set_ylabel('Slope (mrad)')
-            ax_x.set_title('X Slope')
+            ax_x.set_title('X Slope (Y Slices)')
+            if self.options_slice_output.xlim is not None:
+                ax_x.set_xlim(self.options_slice_output.xlim)
             ax_x.legend()
             ax_x.grid()
-            fig_x.savefig(f"{self.options_file_output.output_dir}/slope_plot_y_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_x.savefig(f"{self.options_file_output.output_dir}/slope_slice_y_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_x)
 
             # Finalize Y slope plot
             ax_y.set_xlabel('X Coordinate (meters)')
             ax_y.set_ylabel('Slope (mrad)')
-            ax_y.set_title('Y Slope')
+            ax_y.set_title('Y Slope (Y Slices)')
+            if self.options_slice_output.xlim is not None:
+                ax_y.set_xlim(self.options_slice_output.xlim)
             ax_y.legend()
             ax_y.grid()
-            fig_y.savefig(f"{self.options_file_output.output_dir}/slope_plot_y_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_y.savefig(f"{self.options_file_output.output_dir}/slope_slice_y_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_y)
 
             # Finalize Magnitude plot
             ax_mag.set_xlabel('X Coordinate (meters)')
             ax_mag.set_ylabel('Slope (mrad)')
-            ax_mag.set_title('Slope Magnitude')
+            ax_mag.set_title('Slope Magnitude (Y Slices)')
+            if self.options_slice_output.xlim is not None:
+                ax_mag.set_xlim(self.options_slice_output.xlim)
             ax_mag.legend()
             ax_mag.grid()
-            fig_mag.savefig(f"{self.options_file_output.output_dir}/slope_plot_y_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_mag.savefig(f"{self.options_file_output.output_dir}/slope_slice_y_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_mag)
 
             # Convert accumulated lists to arrays (shape: num_slices x slice_length)
@@ -1640,9 +2298,9 @@ class StandardPlotOutput:
             # Save X slope data (all slices) to CSV and HDF5
             header_x = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
             data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/slope_data_y_x_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/slope_slice_data_y_x_all_{which_data}.csv",
                     data_to_save, header=header_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/slope_data_y_x_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/slope_slice_data_y_x_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('X Values', data=x_vec.flatten())
                 h5f.create_dataset('Y Indices', data=np.array(y_indices))
                 h5f.create_dataset('X Slope', data=all_slice_data_x)
@@ -1650,9 +2308,9 @@ class StandardPlotOutput:
             # Save Y slope data (all slices) to CSV and HDF5
             header_y = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
             data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_y.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/slope_data_y_y_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/slope_slice_data_y_y_all_{which_data}.csv",
                     data_to_save, header=header_y, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/slope_data_y_y_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/slope_slice_data_y_y_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('X Values', data=x_vec.flatten())
                 h5f.create_dataset('Y Indices', data=np.array(y_indices))
                 h5f.create_dataset('Y Slope', data=all_slice_data_y)
@@ -1660,9 +2318,9 @@ class StandardPlotOutput:
             # Save Magnitude data (all slices) to CSV and HDF5
             header_mag = 'X Values,' + ','.join([f'Y Location = {y_vec[idx]:.4f}' for idx in y_indices])
             data_to_save = np.column_stack((x_vec.flatten(), all_slice_data_mag.T))       
-            np.savetxt(f"{self.options_file_output.output_dir}/slope_data_y_mag_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/slope_slice_data_y_mag_all_{which_data}.csv",
                     data_to_save, header=header_mag, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/slope_data_y_mag_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/slope_slice_data_y_mag_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('X Values', data=x_vec.flatten())
                 h5f.create_dataset('Y Indices', data=np.array(y_indices))
                 h5f.create_dataset('Slope Magnitude', data=all_slice_data_mag)
@@ -1686,17 +2344,18 @@ class StandardPlotOutput:
                 coordinate_label2 = f"X Location = {x_vec[x_coordinate_index]:.4f}"
                 x_values2 = y_vec  # Use y_vec for x-axis
 
-                offset2 = offset_counter_y * offset_y
+                offset2 = offset_counter_x * offset_x
 
-                # Define subset range for error bars
-                indx = [50, 150, 250, 350]
-                x_un = x_values2[indx]
-                yx_un = slice_data_x2[indx]
-                yy_un = slice_data_y2[indx]
-                y_un = slice_data2[indx]
-                profx_un = [1, 0.5, 1, 0.75]
-                profy_un = [1, 0.5, 1, 0.75]
-                prof_un = [1, 0.5, 1, 0.75]
+                if self.options_slice_output.uncertainty_to_plot:
+                    # Define subset range for error bars
+                    indx = [50, 150, 250, 350]
+                    x_un = x_values2[indx]
+                    yx_un = slice_data_x2[indx]
+                    yy_un = slice_data_y2[indx]
+                    y_un = slice_data2[indx]
+                    profx_un = [1, 0.5, 1, 0.75]
+                    profy_un = [1, 0.5, 1, 0.75]
+                    prof_un = [1, 0.5, 1, 0.75]
 
                 # Get color from colormap
                 color = cmap(i)
@@ -1709,43 +2368,50 @@ class StandardPlotOutput:
                 ax_y_x.plot(x_values2, slice_data_y2 + offset2, label=f'{coordinate_label2}', color=color, linestyle=linestyle)
                 ax_mag_x.plot(x_values2, slice_data2 + offset2, label=f'{coordinate_label2}', color=color, linestyle=linestyle)
 
-                ax_x_x.errorbar(x_un, yx_un + offset2, yerr=profx_un, fmt='none', ecolor=color, capsize=3)
-                ax_y_x.errorbar(x_un, yy_un + offset2, yerr=profy_un, fmt='none', ecolor=color, capsize=3)
-                ax_mag_x.errorbar(x_un, y_un + offset2, yerr=prof_un, fmt='none', ecolor=color, capsize=3)
+                if self.options_slice_output.uncertainty_to_plot:
+                    ax_x_x.errorbar(x_un, yx_un + offset2, yerr=profx_un, fmt='none', ecolor=color, capsize=3)
+                    ax_y_x.errorbar(x_un, yy_un + offset2, yerr=profy_un, fmt='none', ecolor=color, capsize=3)
+                    ax_mag_x.errorbar(x_un, y_un + offset2, yerr=prof_un, fmt='none', ecolor=color, capsize=3)
 
                 # Accumulate data for saving
                 all_slice_data_x_x.append(slice_data_x2)
                 all_slice_data_y_x.append(slice_data_y2)
                 all_slice_data_mag_x.append(slice_data2)
 
-                offset_counter_y += 1 # Increase counter
+                offset_counter_x += 1 # Increase counter
                 i += 1
 
             # Finalize X slope plot (x slices)
             ax_x_x.set_xlabel('Y Coordinate (meters)')
             ax_x_x.set_ylabel('Slope (mrad)')
             ax_x_x.set_title('X Slope (X slices)')
+            if self.options_slice_output.ylim is not None:
+                ax_x_x.set_xlim(self.options_slice_output.ylim)
             ax_x_x.legend()
             ax_x_x.grid()
-            fig_x_x.savefig(f"{self.options_file_output.output_dir}/slope_plot_x_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_x_x.savefig(f"{self.options_file_output.output_dir}/slope_slice_x_x_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_x_x)
 
             # Finalize Y slope plot (x slices)
             ax_y_x.set_xlabel('Y Coordinate (meters)')
             ax_y_x.set_ylabel('Slope (mrad)')
             ax_y_x.set_title('Y Slope (X slices)')
+            if self.options_slice_output.ylim is not None:
+                ax_y_x.set_xlim(self.options_slice_output.ylim)
             ax_y_x.legend()
             ax_y_x.grid()
-            fig_y_x.savefig(f"{self.options_file_output.output_dir}/slope_plot_x_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_y_x.savefig(f"{self.options_file_output.output_dir}/slope_slice_x_y_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_y_x)
 
             # Finalize Magnitude plot (x slices)
             ax_mag_x.set_xlabel('Y Coordinate (meters)')
             ax_mag_x.set_ylabel('Slope (mrad)')
             ax_mag_x.set_title('Slope Magnitude (X slices)')
+            if self.options_slice_output.ylim is not None:
+                ax_mag_x.set_xlim(self.options_slice_output.ylim)
             ax_mag_x.legend()
             ax_mag_x.grid()
-            fig_mag_x.savefig(f"{self.options_file_output.output_dir}/slope_plot_x_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
+            fig_mag_x.savefig(f"{self.options_file_output.output_dir}/slope_slice_x_mag_all_{which_data}.png", dpi=self.options_file_output.save_dpi)
             plt.close(fig_mag_x)
 
             # Convert accumulated lists to arrays (shape: num_slices x slice_length)
@@ -1756,9 +2422,9 @@ class StandardPlotOutput:
             # Save X slope data (all x slices) to CSV and HDF5
             header_x_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
             data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_x_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/slope_data_x_x_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/slope_slice_data_x_x_all_{which_data}.csv",
                     data_to_save, header=header_x_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/slope_data_x_x_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/slope_slice_data_x_x_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('Y Values', data=y_vec.flatten())
                 h5f.create_dataset('X Indices', data=np.array(x_indices))
                 h5f.create_dataset('X Slope', data=all_slice_data_x_x)
@@ -1766,9 +2432,9 @@ class StandardPlotOutput:
             # Save Y slope data (all x slices) to CSV and HDF5
             header_y_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
             data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_y_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/slope_data_x_y_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/slope_slice_data_x_y_all_{which_data}.csv",
                     data_to_save, header=header_y_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/slope_data_x_y_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/slope_slice_data_x_y_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('Y Values', data=y_vec.flatten())
                 h5f.create_dataset('X Indices', data=np.array(x_indices))
                 h5f.create_dataset('Y Slope', data=all_slice_data_y_x)
@@ -1776,9 +2442,9 @@ class StandardPlotOutput:
             # Save Magnitude data (all x slices) to CSV and HDF5
             header_mag_x = 'Y Values,' + ','.join([f'X location = {x_vec[idx]:.4f}' for idx in x_indices])
             data_to_save = np.column_stack((y_vec.flatten(), all_slice_data_mag_x.T))
-            np.savetxt(f"{self.options_file_output.output_dir}/slope_data_x_mag_all_{which_data}.csv",
+            np.savetxt(f"{self.options_file_output.output_dir}/slope_slice_data_x_mag_all_{which_data}.csv",
                     data_to_save, header=header_mag_x, delimiter=",", fmt="%.6e")
-            with h5py.File(f"{self.options_file_output.output_dir}/slope_data_x_mag_all_{which_data}.h5", 'w') as h5f:
+            with h5py.File(f"{self.options_file_output.output_dir}/slope_slice_data_x_mag_all_{which_data}.h5", 'w') as h5f:
                 h5f.create_dataset('Y Values', data=y_vec.flatten())
                 h5f.create_dataset('X Indices', data=np.array(x_indices))
                 h5f.create_dataset('Slope Magnitude', data=all_slice_data_mag_x)
