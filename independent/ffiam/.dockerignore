@@ -1,0 +1,49 @@
+# Build artifacts
+ffiam/build_vs/
+ffiam/build/
+ffiam/cmake-build-*/
+
+# IDE config
+.idea/
+ffiam/.idea/
+pyffiam/.idea/
+
+# Virtual environments
+pyffiam/.venv/
+pyffiam/envs/
+
+# Test/cache artifacts
+pyffiam/.pytest_cache/
+
+# Validation data and outputs — research tooling, not needed for runtime
+pyffiam/src/pyffiam/validation/
+
+# Prior analysis output
+pyffiam/src/pyffiam/out/
+
+# Prebuilt shared libraries — the image must build its own against the base
+# image's CUDA runtime. Copying a host-built .so in clobbers the in-container
+# build and ships a lib linked to the wrong libcudart (e.g. host CUDA 13 vs the
+# base image's CUDA 12), so the CUDA backend fails to load and falls back to CPU.
+pyffiam/src/pyffiam/external/libffiam_lib.so
+pyffiam/src/pyffiam/external/libffiam_lib_cpu.so
+
+# Windows-specific artifacts
+pyffiam/src/pyffiam/external/ffiam_lib.dll
+pyffiam/run_comparison.bat
+*.exe
+*.dll
+*.lib
+*.pdb
+*.obj
+
+# Documentation images
+docs/images/
+docs/superpowers/
+
+# Git history
+.git/
+
+# OS files
+Thumbs.db
+.DS_Store

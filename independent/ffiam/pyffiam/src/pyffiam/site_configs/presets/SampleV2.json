@@ -1,0 +1,36 @@
+{
+  "RunId": "Sample V2",
+  "SiteType": "Site_SampleV2",
+  "HelioDesign": {
+    "NumFacets": 25,
+    "NumCols": 5,
+    "FacetWidth": 1.0,
+    "FacetHeight": 1.0,
+    "FacetFile": "",
+    "bFacetsImported": false
+  },
+  "Field": {
+    "Latitude": 34.96,
+    "Longitude": -116.68,
+    "Timezone": -8.0,
+    "FieldRadius": 1000,
+    "MinHeight": 4,
+    "MaxHeight": 200,
+    "TowerPos": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+    "TowerHeight": 100,
+    "VoxelSize": 2,
+    "NumHelios": 6400,
+    "HelioCoordinateFile": ""
+  },
+  "DateTime": {
+    "Year": 2025,
+    "Month": 6,
+    "Day": 21,
+    "Hour": 13
+  },
+  "AimStrategy": {
+    "Type": "Aim_Point",
+    "Params": { "X": 0.0, "Y": 0.0, "Z": 100.0 },
+    "File": ""
+  }
+}

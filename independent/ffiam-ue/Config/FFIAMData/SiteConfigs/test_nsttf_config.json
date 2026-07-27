@@ -1,0 +1,36 @@
+﻿{
+  "RunId": "NSTTF with aiming",
+  "SiteType": "Site_Nsttf",
+  "HelioDesign": {
+    "NumFacets": 25,
+    "NumCols": 5,
+    "FacetWidth": 1.0,
+    "FacetHeight": 1.0,
+    "FacetFile": "NSTTF_Facet_Centroids.csv",
+    "bFacetsImported": false
+  },
+  "Field": {
+    "Latitude": 34.96,
+    "Longitude": -116.68,
+    "Timezone": -8.0,
+    "FieldRadius": 650,
+    "MinHeight": 4,
+    "MaxHeight": 100,
+    "TowerPos": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+    "TowerHeight": 61.5,
+    "VoxelSize": 2,
+    "NumHelios": 218,
+    "HelioCoordinateFile": "NSTTF_Heliostats_origin_at_torque_tube.csv"
+  },
+  "DateTime": {
+    "Year": 2025,
+    "Month": 6,
+    "Day": 21,
+    "Hour": 13
+  },
+  "AimStrategy": {
+    "Type": "Aim_Point",
+    "Params": { "X": 0.0, "Y": 0.0, "Z": 100.0 },
+    "File": ""
+  }
+}
