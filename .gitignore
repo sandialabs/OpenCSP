@@ -30,3 +30,7 @@ actual_output/
 
 # documentation generation
 doc/html/
+
+# user error logs and lookfast details
+de430t.bsp
+error_logs/
