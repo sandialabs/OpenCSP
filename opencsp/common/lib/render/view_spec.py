@@ -9,7 +9,6 @@ different projections of the 3-d coordinates.
 
 import numpy as np
 
-
 # COMMON VIEWS
 
 

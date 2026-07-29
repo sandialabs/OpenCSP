@@ -37,7 +37,6 @@ import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_
 import lib.UfacetScanPass as usp
 import opencsp.common.lib.render.view_spec as vs
 
-
 # -------------------------------------------------------------------------------------------------------
 # < FILL-IN NAME >
 #

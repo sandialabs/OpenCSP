@@ -8,7 +8,6 @@ from warnings import warn
 
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 
-
 # -------------------------------------------------------------------------------------------------------
 # HOMOGEONEOUS LINE CALCULATIONS
 #

@@ -26,7 +26,6 @@ from opencsp.common.lib.csp.SolarField import SolarField
 import lib.UfacetScanPass as usp
 import opencsp.common.lib.render.view_spec as vs
 
-
 # -------------------------------------------------------------------------------------------------------
 # UFACET SCANS
 #

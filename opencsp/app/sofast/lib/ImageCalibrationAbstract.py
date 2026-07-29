@@ -132,7 +132,7 @@ class ImageCalibrationAbstract(hdf5_tools.HDF5_IO_Abstract, aph.AbstractPlotHand
         value_0 = vals_sort[idx_0]
 
         # Get image indices of pixels of interest
-        (y, x) = np.where((im_1 >= value_0) * (im_1 <= value_1))
+        y, x = np.where((im_1 >= value_0) * (im_1 <= value_1))
 
         # Get ensemble of calibration curves
         camera_values = images_cal[y, x, :].astype(int)

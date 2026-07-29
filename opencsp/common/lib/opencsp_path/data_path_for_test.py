@@ -6,7 +6,6 @@ import os
 
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 
-
 # Sandia NSTTF
 #
 # Files related to the Sandia National Laboratories National Solar Thermal Test Facility.

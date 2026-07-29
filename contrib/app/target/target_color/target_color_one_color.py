@@ -12,7 +12,6 @@ import os
 import opencsp.app.target.target_color.target_color_bullseye_error
 import opencsp.common.lib.target.target_color_convert
 
-
 #    # Set to black
 #    for row in range(0,n_rows):
 #        for col in range(0,n_cols):

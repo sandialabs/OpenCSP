@@ -77,8 +77,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         quiver_density: float | None = None,
         quiver_scale: float | None = 10,
         quiver_color: str = "white",
-        return_data: bool = False  # New parameter
-
+        return_data: bool = False,  # New parameter
     ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:  # Updated return type
         """Plots slope difference with respect to a reference
         mirror on axes. Error defined as (self - reference).
@@ -173,7 +172,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         # Return data if requested
         if return_data:
             return x_vec, y_vec, image
-        
+
     def plot_orthorectified_slope(
         self,
         res: float = 0.1,
@@ -183,8 +182,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         quiver_density: float | None = None,
         quiver_scale: float | None = 50,
         quiver_color: str = "white",
-        return_data: bool = False  # New parameter
-
+        return_data: bool = False,  # New parameter
     ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:  # Updated return type
         """Plots orthorectified image of mirror slope
 
@@ -263,7 +261,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         # Return data if requested
         if return_data:
             return x_vec, y_vec, image
-        
+
     def plot_orthorectified_curvature(
         self,
         res: float = 0.1,
@@ -272,8 +270,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         axis: plt.Axes | None = None,
         processing: list[Literal["log", "smooth"]] = None,
         smooth_kernel_width: int = 1,
-        return_data: bool = False  # New parameter
-
+        return_data: bool = False,  # New parameter
     ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:  # Updated return type
         """Plots orthorectified curvature (1st derivative of slope) image
         on axes.
@@ -370,7 +367,6 @@ class VisualizeOrthorectifiedSlopeAbstract:
         # Return data if requested
         if return_data:
             return x_vec, y_vec, image
-        
 
     def plot_orthorectified_curvature_error(
         self,
@@ -381,7 +377,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
         axis: plt.Axes | None = None,
         processing: list[Literal["log", "smooth"]] = None,
         smooth_kernel_width: int = 1,
-        return_data: bool = False
+        return_data: bool = False,
     ) -> None | tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Plots curvature difference (error) image on axes.
@@ -468,6 +464,7 @@ class VisualizeOrthorectifiedSlopeAbstract:
             elif proc == "smooth":
                 ker = np.ones((smooth_kernel_width, smooth_kernel_width)) / smooth_kernel_width**2
                 from scipy.signal import convolve2d
+
                 image = convolve2d(image, ker, mode="same", boundary="symm")
 
         # Plot image on axes

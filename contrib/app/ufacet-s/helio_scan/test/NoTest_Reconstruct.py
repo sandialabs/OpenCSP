@@ -16,7 +16,6 @@ import lib.ufacet_heliostat_3d_analysis as uh3a
 import lib.DEPRECATED_specifications as Dspec  # ?? SCAFFOLDING RCB -- TEMPORARY
 import lib.DEPRECATED_utils as utils  # ?? SCAFFOLDING RCB -- TEMPORARY
 
-
 """
 Original reconstruction code, with test annotations added.
 

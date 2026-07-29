@@ -314,7 +314,7 @@ class KeyCorners:
             # Construct a new fnxl that combines both key frame search results.
             # Take care to ensure that both have the same set of heliostat names.
             # This can return None if there are no xy_lists with a common name.
-            (pair_projected_fnxl_or_None, mismatched) = self.construct_merged_fnxl_synchronizing_heliostat_names(
+            pair_projected_fnxl_or_None, mismatched = self.construct_merged_fnxl_synchronizing_heliostat_names(
                 local_logger, search_result_1.projected_fnxl(), search_result_2.projected_fnxl()
             )
 

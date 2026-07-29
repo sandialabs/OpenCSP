@@ -9,7 +9,6 @@ from opencsp.common.lib.cv.spot_analysis.image_processor import *
 import opencsp.common.lib.geometry.Pxy as p2
 import opencsp.common.lib.tool.file_tools as ft
 
-
 skip_msg = """
 There's an issue where matplotlib.close() doesn't fully release the plots from
 memory. In our case that is causing the plots generated with a single test case

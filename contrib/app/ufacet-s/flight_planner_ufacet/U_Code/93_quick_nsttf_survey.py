@@ -19,7 +19,6 @@ import opencsp.common.lib.uas.Scan as Scan
 import opencsp.common.lib.uas.ScanPass as sp
 from opencsp.common.lib.csp.SolarField import SolarField
 
-
 # -------------------------------------------------------------------------------------------------------
 # SECTION BREAK
 #

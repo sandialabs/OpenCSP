@@ -1,5 +1,4 @@
-"""Generates test data from measurement file for mirror type 'undefined'.
-"""
+"""Generates test data from measurement file for mirror type 'undefined'."""
 
 from os.path import join, dirname, exists
 

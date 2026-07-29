@@ -351,7 +351,7 @@ class CalibrationGUI:
             cam_name = self.var_cam_name.get()
 
             # Calibrate camera
-            (self._camera, self._r_cam_object, self._v_cam_object_cam, self._avg_reproj_error) = cc.calibrate_camera(
+            self._camera, self._r_cam_object, self._v_cam_object_cam, self._avg_reproj_error = cc.calibrate_camera(
                 self._p_object, self._p_image, self._img_size_xy, cam_name
             )
 
