@@ -157,11 +157,15 @@ class LightPath(dw.Drawable):
             If the given point or direction is not singular.
         """
         if not (issubclass(type(point), Vxyz) and issubclass(new_direction, Vxyz)):
-            raise TypeError(f"LightPath.add_step expects two parameters of the Vxyz class family\n \
-                            Parameter 1 is of type {type(point)} and parameter 2 is of type {type(new_direction)}.")
+            raise TypeError(
+                f"LightPath.add_step expects two parameters of the Vxyz class family\n \
+                            Parameter 1 is of type {type(point)} and parameter 2 is of type {type(new_direction)}."
+            )
         if len(point) != 1:
-            raise ValueError(f"parameter is not a single point. LightPath.add_step can only add one step at a time. \
-                             \nThe Pxyz given in parameter 1 was of length {len(point)}.")
+            raise ValueError(
+                f"parameter is not a single point. LightPath.add_step can only add one step at a time. \
+                             \nThe Pxyz given in parameter 1 was of length {len(point)}."
+            )
         if len(new_direction) != 1:
             raise ValueError(
                 f"parameter is not a single new direction. LightPath.add_step can only add one step at a time. \
