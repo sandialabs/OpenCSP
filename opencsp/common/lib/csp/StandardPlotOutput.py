@@ -611,7 +611,7 @@ class StandardPlotOutput:
             return [value] * 3
 
     def plot_combined_measured_reference_slopes(self, which_data: str):
-
+        """Plots combined measured reference slopes"""
         measured_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_x_all_Meas.csv"
         x1 = pd.read_csv(measured_x_csv)
         measured_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_y_x_all_Meas.csv"
