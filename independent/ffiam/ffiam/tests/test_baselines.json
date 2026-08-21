@@ -27,7 +27,7 @@
     "aim_params": [
       30.0,
       90.0,
-      0.0
+      90.0
     ],
     "date": {
       "year": 2025,
@@ -36,9 +36,9 @@
       "hour": 12
     },
     "threshold": 4,
-    "total_irrad": 1263449.0,
-    "peak_irrad": 3753.443115234375,
-    "n_glaring_voxels": 15544,
+    "total_irrad": 1321868.0,
+    "peak_irrad": 1577.4061279296875,
+    "n_glaring_voxels": 28702,
     "num_heliostats": 218
   },
   "samplev1_point": {

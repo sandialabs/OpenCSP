@@ -39,7 +39,6 @@ class AnalysisBaselineTests(unittest.TestCase):
         # Import after changing directory
         from pyffiam.analysis import analysis
         from pyffiam.ffiam_types import CspSite, AimType
-
         cls.analysis = analysis
         cls.CspSite = CspSite
         cls.AimType = AimType
@@ -74,10 +73,9 @@ class AnalysisBaselineTests(unittest.TestCase):
 
         diff_pct = abs(actual - expected) / expected * 100
         self.assertLessEqual(
-            diff_pct,
-            tolerance_pct,
+            diff_pct, tolerance_pct,
             f"{metric_name}: {actual} differs from baseline {expected} by {diff_pct:.1f}% "
-            f"(tolerance: {tolerance_pct}%)",
+            f"(tolerance: {tolerance_pct}%)"
         )
 
     def test_nsttf_point_aim_total_irradiance(self):
@@ -94,7 +92,9 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         # Total irradiance should match within 1%
-        self._assert_within_tolerance(baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad")
+        self._assert_within_tolerance(
+            baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad"
+        )
 
     def test_nsttf_point_aim_peak_irradiance(self):
         """Test NSTTF Point aim peak irradiance matches baseline."""
@@ -110,7 +110,9 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         # Peak irradiance should match within 2%
-        self._assert_within_tolerance(baseline["peak_irrad"], result.peak_irrad, 2.0, "peak_irrad")
+        self._assert_within_tolerance(
+            baseline["peak_irrad"], result.peak_irrad, 2.0, "peak_irrad"
+        )
 
     def test_nsttf_point_aim_glaring_voxels(self):
         """Test NSTTF Point aim glaring voxel count matches baseline."""
@@ -126,7 +128,9 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         # Glaring voxels should match within 5%
-        self._assert_within_tolerance(baseline["n_glaring_voxels"], result.n_glaring_voxels, 5.0, "n_glaring_voxels")
+        self._assert_within_tolerance(
+            baseline["n_glaring_voxels"], result.n_glaring_voxels, 5.0, "n_glaring_voxels"
+        )
 
     def test_nsttf_ring_aim_total_irradiance(self):
         """Test NSTTF Ring aim total irradiance matches baseline."""
@@ -141,7 +145,9 @@ class AnalysisBaselineTests(unittest.TestCase):
             hour=baseline["date"]["hour"],
         )
 
-        self._assert_within_tolerance(baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad")
+        self._assert_within_tolerance(
+            baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad"
+        )
 
     def test_nsttf_ring_aim_peak_irradiance(self):
         """Test NSTTF Ring aim produces lower peak than Point aim."""
@@ -160,11 +166,14 @@ class AnalysisBaselineTests(unittest.TestCase):
 
         # Ring aim should distribute irradiance, resulting in lower peak
         self.assertLess(
-            result.peak_irrad, baseline_point["peak_irrad"], "Ring aim should have lower peak irradiance than Point aim"
+            result.peak_irrad, baseline_point["peak_irrad"],
+            "Ring aim should have lower peak irradiance than Point aim"
         )
 
         # Should still match its own baseline
-        self._assert_within_tolerance(baseline_ring["peak_irrad"], result.peak_irrad, 2.0, "peak_irrad")
+        self._assert_within_tolerance(
+            baseline_ring["peak_irrad"], result.peak_irrad, 2.0, "peak_irrad"
+        )
 
     def test_nsttf_morning_reduced_irradiance(self):
         """Test that morning analysis produces less irradiance than noon."""
@@ -182,10 +191,15 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         # Morning should have less total irradiance than noon
-        self.assertLess(result.total_irrad, baseline_noon["total_irrad"], "Morning irradiance should be less than noon")
+        self.assertLess(
+            result.total_irrad, baseline_noon["total_irrad"],
+            "Morning irradiance should be less than noon"
+        )
 
         # Should match baseline within tolerance
-        self._assert_within_tolerance(baseline_morning["total_irrad"], result.total_irrad, 1.0, "total_irrad")
+        self._assert_within_tolerance(
+            baseline_morning["total_irrad"], result.total_irrad, 1.0, "total_irrad"
+        )
 
     def test_samplev1_point_aim_total_irradiance(self):
         """Test SampleV1 Point aim total irradiance matches baseline."""
@@ -200,7 +214,9 @@ class AnalysisBaselineTests(unittest.TestCase):
             hour=baseline["date"]["hour"],
         )
 
-        self._assert_within_tolerance(baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad")
+        self._assert_within_tolerance(
+            baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad"
+        )
 
     def test_samplev1_more_heliostats_more_irradiance(self):
         """Test that SampleV1 (more heliostats) produces more total irradiance."""
@@ -220,7 +236,8 @@ class AnalysisBaselineTests(unittest.TestCase):
         # SampleV1 has ~1936 heliostats vs NSTTF's 218
         # Should produce significantly more total irradiance
         self.assertGreater(
-            result.total_irrad, baseline_nsttf["total_irrad"], "SampleV1 should produce more irradiance than NSTTF"
+            result.total_irrad, baseline_nsttf["total_irrad"],
+            "SampleV1 should produce more irradiance than NSTTF"
         )
 
     def test_heliostat_count_matches_baseline(self):
@@ -237,9 +254,9 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            result.num_heliostats,
-            baseline["num_heliostats"],
-            f"Heliostat count mismatch: got {result.num_heliostats}, " f"expected {baseline['num_heliostats']}",
+            result.num_heliostats, baseline["num_heliostats"],
+            f"Heliostat count mismatch: got {result.num_heliostats}, "
+            f"expected {baseline['num_heliostats']}"
         )
 
     # =========================================================================
@@ -259,7 +276,9 @@ class AnalysisBaselineTests(unittest.TestCase):
             hour=baseline["date"]["hour"],
         )
 
-        self._assert_within_tolerance(baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad")
+        self._assert_within_tolerance(
+            baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad"
+        )
 
     def test_samplev3_point_aim_peak_irradiance(self):
         """Test SampleV3 peak irradiance matches baseline.
@@ -279,7 +298,9 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         # Higher tolerance for large fields due to variability in peak detection
-        self._assert_within_tolerance(baseline["peak_irrad"], result.peak_irrad, 5.0, "peak_irrad")
+        self._assert_within_tolerance(
+            baseline["peak_irrad"], result.peak_irrad, 5.0, "peak_irrad"
+        )
 
     def test_samplev3_heliostat_count(self):
         """Test SampleV3 has expected heliostat count (~11,000)."""
@@ -295,10 +316,9 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            result.num_heliostats,
-            baseline["num_heliostats"],
+            result.num_heliostats, baseline["num_heliostats"],
             f"SampleV3 heliostat count mismatch: got {result.num_heliostats}, "
-            f"expected {baseline['num_heliostats']}",
+            f"expected {baseline['num_heliostats']}"
         )
         # V3 should have ~11,000 heliostats
         self.assertGreater(result.num_heliostats, 10000)
@@ -320,7 +340,8 @@ class AnalysisBaselineTests(unittest.TestCase):
 
         # V3 has ~11,000 heliostats vs V1's ~1,936
         self.assertGreater(
-            result.total_irrad, baseline_v1["total_irrad"], "V3 field should produce more irradiance than V1"
+            result.total_irrad, baseline_v1["total_irrad"],
+            "V3 field should produce more irradiance than V1"
         )
 
     # =========================================================================
@@ -340,7 +361,9 @@ class AnalysisBaselineTests(unittest.TestCase):
             hour=baseline["date"]["hour"],
         )
 
-        self._assert_within_tolerance(baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad")
+        self._assert_within_tolerance(
+            baseline["total_irrad"], result.total_irrad, 1.0, "total_irrad"
+        )
 
     def test_radial_small_peak_irradiance(self):
         """Test radial (small) peak irradiance matches baseline."""
@@ -355,7 +378,9 @@ class AnalysisBaselineTests(unittest.TestCase):
             hour=baseline["date"]["hour"],
         )
 
-        self._assert_within_tolerance(baseline["peak_irrad"], result.peak_irrad, 2.0, "peak_irrad")
+        self._assert_within_tolerance(
+            baseline["peak_irrad"], result.peak_irrad, 2.0, "peak_irrad"
+        )
 
     def test_radial_small_heliostat_count(self):
         """Test radial (small) has expected heliostat count (6,400)."""
@@ -371,10 +396,9 @@ class AnalysisBaselineTests(unittest.TestCase):
         )
 
         self.assertEqual(
-            result.num_heliostats,
-            baseline["num_heliostats"],
+            result.num_heliostats, baseline["num_heliostats"],
             f"Radial-small heliostat count mismatch: got {result.num_heliostats}, "
-            f"expected {baseline['num_heliostats']}",
+            f"expected {baseline['num_heliostats']}"
         )
         # Radial (small) should have ~6,400 heliostats
         self.assertGreater(result.num_heliostats, 6000)
@@ -392,7 +416,9 @@ class AnalysisBaselineTests(unittest.TestCase):
             hour=baseline["date"]["hour"],
         )
 
-        self._assert_within_tolerance(baseline["n_glaring_voxels"], result.n_glaring_voxels, 5.0, "n_glaring_voxels")
+        self._assert_within_tolerance(
+            baseline["n_glaring_voxels"], result.n_glaring_voxels, 5.0, "n_glaring_voxels"
+        )
 
 
 class BaselineFileTests(unittest.TestCase):
@@ -404,7 +430,10 @@ class BaselineFileTests(unittest.TestCase):
         repo_root = test_dir.parent.parent
         baselines_path = repo_root / 'ffiam' / 'tests' / 'test_baselines.json'
 
-        self.assertTrue(baselines_path.exists(), f"Baselines file not found at {baselines_path}")
+        self.assertTrue(
+            baselines_path.exists(),
+            f"Baselines file not found at {baselines_path}"
+        )
 
     def test_baselines_file_valid_json(self):
         """Verify the baselines file contains valid JSON."""
@@ -436,7 +465,10 @@ class BaselineFileTests(unittest.TestCase):
 
         for name, baseline in data.items():
             for field in required_fields:
-                self.assertIn(field, baseline, f"Baseline '{name}' missing required field '{field}'")
+                self.assertIn(
+                    field, baseline,
+                    f"Baseline '{name}' missing required field '{field}'"
+                )
 
 
 if __name__ == '__main__':

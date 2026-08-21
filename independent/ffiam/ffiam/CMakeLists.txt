@@ -9,6 +9,16 @@ if(POLICY CMP0141)
     set(CMAKE_MSVC_DEBUG_INFORMATION_FORMAT "$<IF:$<AND:$<C_COMPILER_ID:MSVC>,$<CXX_COMPILER_ID:MSVC>>,$<$<CONFIG:Debug,RelWithDebInfo>:EditAndContinue>,$<$<CONFIG:Debug,RelWithDebInfo>:ProgramDatabase>>")
 endif()
 
+# Record whether the caller chose the CUDA architectures. This MUST be sampled
+# before project(), because project() unconditionally defines
+# CMAKE_CUDA_ARCHITECTURES with a default (52 -- Maxwell), after which "did the
+# user ask for this?" is no longer answerable.
+if(DEFINED CMAKE_CUDA_ARCHITECTURES)
+    set(FFIAM_CUDA_ARCHS_FROM_USER TRUE)
+else()
+    set(FFIAM_CUDA_ARCHS_FROM_USER FALSE)
+endif()
+
 project(ffiam LANGUAGES C CUDA CXX)
 
 set(CMAKE_CXX_STANDARD 20)
@@ -80,14 +90,40 @@ else()
     message(FATAL_ERROR "CUDA compiler not found. CUDA is required to build FFIAM.")
 endif()
 
+# Decide which CUDA architectures to build for.
+#
+# If the caller passed -DCMAKE_CUDA_ARCHITECTURES=..., honour it verbatim.
+# Otherwise pick a sane default -- NOT CMake's, which is 52 (Maxwell, 2014) and
+# silently leaves modern GPUs running JIT-compiled PTX.
+#
+# "native" builds only for the GPU in this machine, but CMake only understands
+# it from 3.24 (older versions pass it through unexpanded and nvcc dies with
+# "Unsupported gpu architecture 'compute_'"), and it needs a GPU visible at
+# configure time. Fall back to an explicit list, trimmed to what the detected
+# nvcc actually supports: sm_89 needs CUDA >= 11.8, sm_120 needs CUDA >= 12.8.
+if(FFIAM_CUDA_ARCHS_FROM_USER)
+    set(FFIAM_CUDA_ARCHS ${CMAKE_CUDA_ARCHITECTURES})
+    message(STATUS "FFIAM: using caller-supplied CUDA architectures: ${FFIAM_CUDA_ARCHS}")
+elseif(CMAKE_VERSION VERSION_GREATER_EQUAL 3.24)
+    set(FFIAM_CUDA_ARCHS native)
+    message(STATUS "FFIAM: CUDA architectures = native (this machine's GPU)")
+else()
+    set(FFIAM_CUDA_ARCHS 75)
+    if(CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 11.8)
+        list(APPEND FFIAM_CUDA_ARCHS 86 89)
+    endif()
+    if(CMAKE_CUDA_COMPILER_VERSION VERSION_GREATER_EQUAL 12.8)
+        list(APPEND FFIAM_CUDA_ARCHS 120)
+    endif()
+    message(STATUS "FFIAM: CMake ${CMAKE_VERSION} predates 'native' support (3.24); "
+                   "CUDA architectures = ${FFIAM_CUDA_ARCHS} "
+                   "(pass -DCMAKE_CUDA_ARCHITECTURES=... to override)")
+endif()
+
 # Helper function to configure CUDA targets
 function(configure_cuda_target target_name)
     target_link_libraries(${target_name} CUDA::cudart CUDA::cuda_driver)
-    if(DEFINED CMAKE_CUDA_ARCHITECTURES)
-        set_property(TARGET ${target_name} PROPERTY CUDA_ARCHITECTURES ${CMAKE_CUDA_ARCHITECTURES})
-    else()
-        set_property(TARGET ${target_name} PROPERTY CUDA_ARCHITECTURES native)
-    endif()
+    set_property(TARGET ${target_name} PROPERTY CUDA_ARCHITECTURES ${FFIAM_CUDA_ARCHS})
 endfunction()
 
 

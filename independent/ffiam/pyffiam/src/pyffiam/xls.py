@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Excel report generation for FFIAM analysis results."""
 
 from typing import Any, Optional
@@ -54,7 +56,13 @@ class ExcelWriter:
         return row + 1
 
     def _write_num(
-        self, sheet: Worksheet, row: int, title: str, val: float, unit: str = '', fmt: Optional[Format] = None
+        self,
+        sheet: Worksheet,
+        row: int,
+        title: str,
+        val: float,
+        unit: str = '',
+        fmt: Optional[Format] = None,
     ) -> int:
         """Write numeric parameter with label to worksheet."""
         if fmt is None:
@@ -77,7 +85,11 @@ class ExcelWriter:
             sheet.write_rich_string(row, UNIT_COL, 'kW/m', self.superscript_fmt, "2", self.center_fmt)
 
     def _write_position(
-        self, sheet: Worksheet, row: int, pos: NDArray[np.floating], fmt: Optional[Format] = None
+        self,
+        sheet: Worksheet,
+        row: int,
+        pos: NDArray[np.floating],
+        fmt: Optional[Format] = None,
     ) -> int:
         """Write XYZ position to worksheet row."""
         if fmt is None:
@@ -125,8 +137,9 @@ class ExcelWriter:
             sheet.write_number(row, VALUE_COL + 2, als.aim_parameters[2], self.bigfloat_fmt)
             row += 1
         elif als.aim_strategy in [AimType.Ring, AimType.SplitRing]:
-            row = self._write_num(sheet, row, "Ring offset", als.aim_parameters[0], unit='m')
-            row = self._write_num(sheet, row, "Ring height", als.aim_parameters[1], unit='m')
+            row = self._write_num(sheet, row, "Ring inner radius", als.aim_parameters[0], unit='m')
+            row = self._write_num(sheet, row, "Ring outer radius", als.aim_parameters[1], unit='m')
+            row = self._write_num(sheet, row, "Ring height", als.aim_parameters[2], unit='m')
         elif als.aim_strategy == AimType.Vector:
             sheet.write(row, TITLE_COL, "Aim vector")
             sheet.write(row, UNIT_COL, "m", self.unit_fmt)
@@ -139,9 +152,7 @@ class ExcelWriter:
         sheet.write(row, TITLE_COL, "HELIOSTAT PARAMETERS", self.bold_fmt)
         row += 1
         row = self._write_num(sheet, row, "Num facets", als.num_facets)
-        row = self._write_str(
-            sheet, row, "Facet rows x cols", f"{int(als.num_facets / als.num_facet_cols)} x {als.num_facet_cols}"
-        )
+        row = self._write_str(sheet, row, "Facet rows x cols", f"{int(als.num_facets / als.num_facet_cols)} x {als.num_facet_cols}")
         row = self._write_num(sheet, row, "Facet width", als.facet_width, 'm', self.smallfloat_fmt)
         row = self._write_num(sheet, row, "Facet height", als.facet_height, 'm', self.smallfloat_fmt)
         row = self._write_num(sheet, row, "Total movement", als.movement, 'deg')
@@ -161,9 +172,7 @@ class ExcelWriter:
         sheet.write(row, TITLE_COL, "IRRADIANCE RESULTS", self.bold_fmt)
         row += 1
 
-        sheet.write_rich_string(
-            row, TITLE_COL, "Voxels above specified thresholds (kW/m", self.superscript_fmt, "2", "):"
-        )
+        sheet.write_rich_string(row, TITLE_COL, "Voxels above specified thresholds (kW/m", self.superscript_fmt, "2", "):")
         row += 1
         row = self._write_num(sheet, row, f"# above {als.threshold} (custom)", np.nansum(als.irrads > als.threshold))
         row += 1

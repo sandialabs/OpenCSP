@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for AimType.FixedNormal aim strategy.
 
 Tests the new fixed-normal aim type where the heliostat surface normal
@@ -82,7 +84,9 @@ class TestReflectedBeamCalculation:
 
         reflected = self.compute_reflected(normal, sun_vec)
 
-        np.testing.assert_array_almost_equal(reflected, np.array([0.0, 0.0, 1.0]), decimal=5)
+        np.testing.assert_array_almost_equal(
+            reflected, np.array([0.0, 0.0, 1.0]), decimal=5
+        )
 
     def test_face_up_sun_from_east(self):
         """Face-up heliostat with sun from East reflects West and Up."""
@@ -106,9 +110,11 @@ class TestReflectedBeamCalculation:
         # Sun from Southeast at 55 deg elevation
         az_rad = np.radians(114.5)
         el_rad = np.radians(55.0)
-        sun_vec = np.array(
-            [np.cos(el_rad) * np.sin(az_rad), np.cos(el_rad) * np.cos(az_rad), np.sin(el_rad)]  # East  # North  # Up
-        )
+        sun_vec = np.array([
+            np.cos(el_rad) * np.sin(az_rad),  # East
+            np.cos(el_rad) * np.cos(az_rad),  # North
+            np.sin(el_rad),  # Up
+        ])
 
         normal = np.array([0.0, 0.0, 1.0])  # Face up
         reflected = self.compute_reflected(normal, sun_vec)
@@ -134,7 +140,11 @@ class TestReflectedBeamCalculation:
         # Sun from Southeast
         az_rad = np.radians(114.5)
         el_rad = np.radians(55.0)
-        sun_vec = np.array([np.cos(el_rad) * np.sin(az_rad), np.cos(el_rad) * np.cos(az_rad), np.sin(el_rad)])
+        sun_vec = np.array([
+            np.cos(el_rad) * np.sin(az_rad),
+            np.cos(el_rad) * np.cos(az_rad),
+            np.sin(el_rad),
+        ])
 
         normal = np.array([0.0, 0.0, 1.0])
         reflected = self.compute_reflected(normal, sun_vec)

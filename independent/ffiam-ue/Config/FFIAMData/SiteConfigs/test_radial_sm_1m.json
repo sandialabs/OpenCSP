@@ -1,0 +1,38 @@
+{
+  "RunId": "Radial (1 km, 1m voxels)",
+  "SortOrder": 20,
+  "SiteType": "Site_RadialSmall",
+  "HelioDesign": {
+    "NumFacets": 25,
+    "NumCols": 5,
+    "FacetWidth": 1.8,
+    "FacetHeight": 1.8,
+    "FacetFile": "",
+    "bFacetsImported": false
+  },
+  "Field": {
+    "Latitude": 35.0,
+    "Longitude": -115.0,
+    "Timezone": -8.0,
+    "FieldRadius": 1000,
+    "MinHeight": 4,
+    "MaxHeight": 200,
+    "TowerPos": { "X": 0.0, "Y": 0.0, "Z": 0.0 },
+    "TowerHeight": 100,
+    "VoxelSize": 1,
+    "NumHelios": 6400,
+    "HelioCoordinateFile": "",
+    "Layout": "radial"
+  },
+  "DateTime": {
+    "Year": 2025,
+    "Month": 6,
+    "Day": 21,
+    "Hour": 13
+  },
+  "AimStrategy": {
+    "Type": "Aim_Ring",
+    "Params": { "X": 60.0, "Y": 100.0, "Z": 20.0 },
+    "File": ""
+  }
+}

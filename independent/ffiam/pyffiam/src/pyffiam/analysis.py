@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 from pathlib import Path
 import logging
 
@@ -39,7 +41,10 @@ log.addHandler(console_handler)
 app_dir = Path(__file__).parent.resolve()
 
 
-def _generate_all_plots(als: AnalysisData, create_gifs: bool) -> None:
+def _generate_all_plots(
+    als: AnalysisData,
+    create_gifs: bool,
+) -> None:
     """Create and store EN, EU, and NU profile heatmaps (and optional GIFs) on the AnalysisData object."""
     # (dim1, dim2, suffix, needs_tower_height)
     dimension_pairs = [
@@ -75,7 +80,10 @@ def _generate_all_plots(als: AnalysisData, create_gifs: bool) -> None:
         setattr(als, f'{suffix}_heatmap_gif', heatmap_gif)
 
 
-def _generate_excel(als: AnalysisData, create_gifs: bool) -> xlsxwriter.Workbook:
+def _generate_excel(
+    als: AnalysisData,
+    create_gifs: bool,
+) -> xlsxwriter.Workbook:
     """Returns open workbook; caller must close."""
     workbook = xlsxwriter.Workbook(als.xls_file.as_posix())
     xls.initialize(workbook)
@@ -85,49 +93,54 @@ def _generate_excel(als: AnalysisData, create_gifs: bool) -> xlsxwriter.Workbook
     return workbook
 
 
-def analysis(
-    name: str = "",
-    year: int = 2025,
-    month: int = 6,
-    day: int = 21,
-    hour: float = 12.0,  # Supports fractional hours (e.g., 10.5 = 10:30 AM)
-    threshold: float = 4,
-    site: CspSite = CspSite.Custom,
-    lat: float = None,
-    lng: float = None,
-    timezone: float = -7,
-    field_r: float = 600,
-    n_helios: int = 2000,
-    min_height: float = 4,
-    max_height: float = 100,
-    tower_height: float = 100,
-    helio_file: str = "",
-    facet_file: str = "",
-    layout: int = 0,  # generation layout when no helio_file: 0=grid, 1=radial (FieldLayout)
-    n_facets: int = 35,
-    n_facet_cols: int = 5,
-    facet_w: float = 1.8,
-    facet_h: float = 1.8,
-    aim_strat: AimType = AimType.Point,
-    aim_params: np.array = None,
-    aim_file: str = "",
-    paths=None,
-    path_speeds=None,
-    create_xls=True,
-    create_gifs=True,
-    create_plots=True,
-    open_output_dir=True,
-    voxel_size: int = 2,
-    beta: float = 0.0094,  # Beam spread coefficient (radians)
-    ambient: float = 0.0,  # Ambient irradiance baseline [kW/m²] to add to all voxels
-    min_attenuation: float = 1.0,  # Hybrid blend floor (1.0 = disabled/original, 0.42 = UAS-calibrated)
-    irrad_exponent: float = 2.0,  # Beam concentration exponent (2.0 = original, 1.7 = UAS-calibrated)
-    n_rays_per_facet: float = 12.0,  # Rays per facet (12 = 9 core + 3 outer, 9 = core only)
-    flux_correction_scale: float = 1.0,  # Flux correction scale (1.0 = full, 0.0 = disabled)
-    pre_focal_scale: float = 1.0,  # Pre-focal attenuation scale (1.0 = original symmetric, 0.6 = UAS-calibrated)
-    force_cpu: bool = False,  # Use the CPU backend even when CUDA is available; also honored via FFIAM_FORCE_CPU=1
-    verbose=False,
-):
+def analysis(name: str = "",
+             year: int = 2025,
+             month: int = 6,
+             day: int = 21,
+             hour: float = 12.0,  # Supports fractional hours (e.g., 10.5 = 10:30 AM)
+             threshold: float = 4,
+
+             site: CspSite = CspSite.Custom,
+             lat: float = None,
+             lng: float = None,
+             timezone: float = -7,
+
+             field_r: float = 600,
+             n_helios: int = 2000,
+             min_height: float = 4,
+             max_height: float = 100,
+             tower_height: float = 100,
+             helio_file: str = "",
+             facet_file: str = "",
+             layout: int = 0,  # generation layout when no helio_file: 0=grid, 1=radial (FieldLayout)
+
+             n_facets: int = 35,
+             n_facet_cols: int = 5,
+             facet_w: float = 1.8,
+             facet_h: float = 1.8,
+
+             aim_strat: AimType = AimType.Point,
+             aim_params: np.array = None,
+             aim_file: str = "",
+
+             paths=None,
+             path_speeds=None,
+
+             create_xls=True,
+             create_gifs=True,
+             create_plots=True,
+             open_output_dir=True,
+
+             voxel_size: int = 2,
+             beta: float = 0.0094,  # Beam spread coefficient (radians)
+             ambient: float = 0.0,  # Ambient irradiance baseline [kW/m²] to add to all voxels
+             min_attenuation: float = 1.0,  # Hybrid blend floor (1.0 = disabled/original, 0.42 = UAS-calibrated)
+             irrad_exponent: float = 2.0,   # Beam concentration exponent (2.0 = original, 1.7 = UAS-calibrated)
+             n_rays_per_facet: float = 12.0,  # Rays per facet (12 = 9 core + 3 outer, 9 = core only)
+             flux_correction_scale: float = 1.0,  # Flux correction scale (1.0 = full, 0.0 = disabled)
+             pre_focal_scale: float = 1.0,  # Pre-focal attenuation scale (1.0 = original symmetric, 0.6 = UAS-calibrated)
+             force_cpu: bool = False,  # Use the CPU backend even when CUDA is available; also honored via FFIAM_FORCE_CPU=1
+             verbose=False):
     """Run a full FFIAM irradiance analysis and write plots/XLS output.
 
     Coordinates (x, y, z) = (east, north, up) with tower at origin. Distances in meters.
@@ -155,7 +168,11 @@ def analysis(
         facet_w: Individual facet width (m).
         facet_h: Individual facet height (m).
         aim_strat: Aiming strategy enum (AimType.Point, AimType.Horizontal, etc.).
-        aim_params: Strategy-specific aim parameters as a 3-element array (e.g. [x, y, z] aim point in meters for AimType.Point).
+        aim_params: Strategy-specific aim parameters as a 3-element array, all in meters. For AimType.Point,
+            [x, y, z] aim point. For AimType.Ring and AimType.SplitRing, [inner_radius, outer_radius, height]:
+            heliostats distribute their aim across the annulus [inner_radius, outer_radius] at the given height
+            (Ring spreads by heliostat index; SplitRing fans each azimuthal slice, so the same params yield a
+            different spatial distribution).
         aim_file: CSV filename (relative to pyffiam/data/) with per-heliostat aim data.
         paths: List of polyline paths, each a sequence of (x, y, z) waypoints (m), for UAS exposure analysis.
         path_speeds: Travel speed (m/s) for each path in `paths`.
@@ -195,68 +212,69 @@ def analysis(
         paths = []
         path_speeds = []
     else:
-        paths = np.array(paths)
-        path_speeds = np.array(path_speeds)
-        # must be list of list of points, even if only one path given
-        if len(paths.shape) != 3:
-            paths = paths[None]
+        # Polylines legitimately differ in waypoint count, so keep paths as a list of
+        # (Ni, 3) arrays; np.array() on a ragged list of polylines raises. Accept either
+        # a single polyline [(x,y,z), ...] or a list of such polylines.
+        if len(paths) and np.ndim(paths[0][0]) == 0:
+            paths = [np.asarray(paths, dtype=float)]        # single polyline -> one-element list
+        else:
+            paths = [np.asarray(p, dtype=float) for p in paths]
+        path_speeds = list(np.atleast_1d(path_speeds))
 
-    als = AnalysisData(
-        name=name,
-        year=year,
-        month=month,
-        day=day,
-        hour=hour,
-        threshold=threshold,
-        site=site,
-        latitude=lat,
-        longitude=lng,
-        timezone=timezone,
-        field_radius=field_r,
-        num_helios=n_helios,
-        min_height=min_height,
-        max_height=max_height,
-        tower_height=tower_height,
-        num_facets=n_facets,
-        num_facet_cols=n_facet_cols,
-        facet_width=facet_w,
-        facet_height=facet_h,
-        helio_file=helio_file,
-        aim_file=aim_file,
-        facet_file=facet_file,
-        layout=layout,
-        aim_strat=aim_strat,
-        aim_params=aim_params,
-        paths=paths,
-        path_speeds=path_speeds,
-        voxel_size=voxel_size,
-        beta=beta,
-        ambient=ambient,
-        min_attenuation=min_attenuation,
-        irrad_exponent=irrad_exponent,
-        n_rays_per_facet=n_rays_per_facet,
-        flux_correction_scale=flux_correction_scale,
-        pre_focal_scale=pre_focal_scale,
-        app_result_dir=app_data_path,
-        verbose=verbose,
-    )
+    als = AnalysisData(name=name,
+                       year=year,
+                       month=month,
+                       day=day,
+                       hour=hour,
+                       threshold=threshold,
 
-    als = lib_ffiam_analysis(
-        als, create_xls=create_xls, create_gifs=create_gifs, create_plots=create_plots, force_cpu=force_cpu
-    )
+                       site=site,
+                       latitude=lat,
+                       longitude=lng,
+                       timezone=timezone,
+                       field_radius=field_r,
+                       num_helios=n_helios,
+                       min_height=min_height,
+                       max_height=max_height,
+                       tower_height=tower_height,
+                       num_facets=n_facets,
+                       num_facet_cols=n_facet_cols,
+                       facet_width=facet_w,
+                       facet_height=facet_h,
+
+                       helio_file=helio_file,
+                       aim_file=aim_file,
+                       facet_file=facet_file,
+                       layout=layout,
+                       aim_strat=aim_strat,
+                       aim_params=aim_params,
+
+                       paths=paths,
+                       path_speeds=path_speeds,
+
+                       voxel_size=voxel_size,
+                       beta=beta,
+                       ambient=ambient,
+                       min_attenuation=min_attenuation,
+                       irrad_exponent=irrad_exponent,
+                       n_rays_per_facet=n_rays_per_facet,
+                       flux_correction_scale=flux_correction_scale,
+                       pre_focal_scale=pre_focal_scale,
+                       app_result_dir=app_data_path,
+                       verbose=verbose,
+                       )
+
+    als = lib_ffiam_analysis(als, create_xls=create_xls, create_gifs=create_gifs, create_plots=create_plots, force_cpu=force_cpu)
 
     if open_output_dir:
         import platform
-
         if platform.system() == "Windows":
             os.startfile(als.output_directory)
 
     return als
 
 
-def lib_ffiam_analysis(
-    als: AnalysisData, create_xls=False, create_gifs=False, create_plots=True, force_cpu: bool = False
-):
+def lib_ffiam_analysis(als: AnalysisData, create_xls=False, create_gifs=False, create_plots=True, force_cpu: bool = False):
     """Call the C++ library with a pre-built AnalysisData object and populate results in place."""
     params = AnalysisParams(
         year=als.year,
@@ -323,12 +341,10 @@ def lib_ffiam_analysis(
         movement=raw_results.movement,
     )
 
-    log.warning(
-        f'Python: total irradiance {als.total_irrad:,.0f}, '
-        f'Total irrad above threshold {als.total_irrad_threshold:,d}, '
-        f'Max irradiance {als.peak_irrad:,.0f}, '
-        f'Impacted voxels {als.n_glaring_voxels:,d}'
-    )
+    log.warning(f'Python: total irradiance {als.total_irrad:,.0f}, '
+                f'Total irrad above threshold {als.total_irrad_threshold:,d}, '
+                f'Max irradiance {als.peak_irrad:,.0f}, '
+                f'Impacted voxels {als.n_glaring_voxels:,d}')
 
     if create_plots and als.has_glare:
         log.info("Creating plots. Warning: if enabled, GIF creation may take awhile")
@@ -351,13 +367,9 @@ def lib_ffiam_analysis(
             path = PathData(path_id, path_vertices, als.path_speeds[i], parent_dir=als.output_directory)
             als.path_objects.append(path)
 
-            point_voxel_ids = utils.get_voxel_indexes_from_locs(
-                path.interpolated_points, als.voxel_size, als.field_radius, als.min_height
-            )
+            point_voxel_ids = utils.get_voxel_indexes_from_locs(path.interpolated_points, als.voxel_size, als.field_radius, als.min_height)
             point_voxel_ids = point_voxel_ids.astype(int)
-            path_voxel_locs = utils.get_voxel_locs_from_indexes(
-                point_voxel_ids, als.voxel_size, als.field_radius, als.min_height
-            )
+            path_voxel_locs = utils.get_voxel_locs_from_indexes(point_voxel_ids, als.voxel_size, als.field_radius, als.min_height)
 
             path_irrads = als.irrads[point_voxel_ids]
 
@@ -372,57 +384,48 @@ def lib_ffiam_analysis(
             if create_plots:
                 log.info(f"Creating plots for path {path_id}")
                 ne_filename = f"{slug(als.name)}_path{path_id}_NE"
-                path_plot_en_fpath, path_plot_en_zoom_fpath, _ = plots.create_profile_plots(
-                    als.helio_locs,
-                    path_voxel_locs,
-                    path_irrads,
-                    dim1=Direction.East,
-                    dim2=Direction.North,
-                    site=als.name,
-                    threshold=als.threshold,
-                    vox_size=als.voxel_size,
-                    hel_size=als.helio_width,
-                    aim_strat=als.aim_strategy,
-                    aim_params=als.aim_parameters,
-                    create_gif=False,
-                    filename=ne_filename,
-                    out_dir=path.output_directory,
-                )
+                path_plot_en_fpath, path_plot_en_zoom_fpath, _ = plots.create_profile_plots(als.helio_locs,
+                                                                                            path_voxel_locs,
+                                                                                            path_irrads,
+                                                                                            dim1=Direction.East,
+                                                                                            dim2=Direction.North,
+                                                                                            site=als.name,
+                                                                                            threshold=als.threshold,
+                                                                                            vox_size=als.voxel_size,
+                                                                                            hel_size=als.helio_width,
+                                                                                            aim_strat=als.aim_strategy,
+                                                                                            aim_params=als.aim_parameters,
+                                                                                            create_gif=False,
+                                                                                            filename=ne_filename,
+                                                                                            out_dir=path.output_directory,
+                                                                                            )
 
                 eu_filename = f"{slug(als.name)}_path{path_id}_EU"
-                path_plot_eu_fpath, path_plot_eu_zoom_fpath, _ = plots.create_profile_plots(
-                    als.helio_locs,
-                    path_voxel_locs,
-                    path_irrads,
-                    dim1=Direction.East,
-                    dim2=Direction.Up,
-                    site=als.name,
-                    threshold=als.threshold,
-                    vox_size=als.voxel_size,
-                    hel_size=als.helio_width,
-                    aim_strat=als.aim_strategy,
-                    aim_params=als.aim_parameters,
-                    tower_h=als.tower_height,
-                    create_gif=False,
-                    filename=eu_filename,
-                    out_dir=path.output_directory,
-                )
+                path_plot_eu_fpath, path_plot_eu_zoom_fpath, _ = plots.create_profile_plots(als.helio_locs,
+                                                                                            path_voxel_locs,
+                                                                                            path_irrads,
+                                                                                            dim1=Direction.East,
+                                                                                            dim2=Direction.Up,
+                                                                                            site=als.name,
+                                                                                            threshold=als.threshold,
+                                                                                            vox_size=als.voxel_size,
+                                                                                            hel_size=als.helio_width,
+                                                                                            aim_strat=als.aim_strategy,
+                                                                                            aim_params=als.aim_parameters,
+                                                                                            tower_h=als.tower_height,
+                                                                                            create_gif=False,
+                                                                                            filename=eu_filename,
+                                                                                            out_dir=path.output_directory)
 
-                cumsum_plot = plots.create_path_cumsum_plot(
-                    time_per_voxel=path.time_per_voxel,
-                    cumulative_exposures=path.exposures,
-                    site=als.name,
-                    path_id=path.id,
-                    out_dir=path.output_directory,
-                )
+                cumsum_plot = plots.create_path_cumsum_plot(time_per_voxel=path.time_per_voxel,
+                                                            cumulative_exposures=path.exposures,
+                                                            site=als.name,
+                                                            path_id=path.id,
+                                                            out_dir=path.output_directory)
 
-                path.set_plots(
-                    path_plot_en_fpath,
-                    path_plot_en_zoom_fpath,
-                    path_plot_eu_fpath,
-                    path_plot_eu_zoom_fpath,
-                    cumsum_plot,
-                )
+                path.set_plots(path_plot_en_fpath, path_plot_en_zoom_fpath,
+                               path_plot_eu_fpath, path_plot_eu_zoom_fpath,
+                               cumsum_plot)
 
             else:
                 log.info(f"Plot creation disabled - skipping path plots")
@@ -439,27 +442,31 @@ def lib_ffiam_analysis(
             agg_voxel_locs.append(path.voxel_locs)
             agg_irrads.append(path.irrads)
 
-        agg_voxel_locs = np.array(agg_voxel_locs).reshape(-1, 3)
-        agg_irrads = np.array(agg_irrads).flatten()
+
+        # Paths cross differing numbers of voxels, so per-path arrays are ragged;
+        # concatenate along the sample axis (reshape(-1,3) only works when every
+        # path is the same length, and raises on the inhomogeneous case).
+        agg_voxel_locs = (np.concatenate(agg_voxel_locs, axis=0)
+                          if agg_voxel_locs else np.empty((0, 3)))
+        agg_irrads = (np.concatenate([np.ravel(a) for a in agg_irrads])
+                      if agg_irrads else np.empty((0,)))
         eu_filename = f"aggregate_path_irradiance_east_up"
-        agg_path_plot_eu, _, _ = plots.create_profile_plots(
-            als.helio_locs,
-            agg_voxel_locs,
-            agg_irrads,
-            dim1=Direction.East,
-            dim2=Direction.Up,
-            site=als.name,
-            threshold=als.threshold,
-            vox_size=als.voxel_size,
-            hel_size=als.helio_width,
-            aim_strat=als.aim_strategy,
-            aim_params=als.aim_parameters,
-            tower_h=als.tower_height,
-            create_zoomed=False,
-            create_gif=False,
-            filename=eu_filename,
-            out_dir=als.output_directory,
-        )
+        agg_path_plot_eu, _, _ = plots.create_profile_plots(als.helio_locs,
+                                                            agg_voxel_locs,
+                                                            agg_irrads,
+                                                            dim1=Direction.East,
+                                                            dim2=Direction.Up,
+                                                            site=als.name,
+                                                            threshold=als.threshold,
+                                                            vox_size=als.voxel_size,
+                                                            hel_size=als.helio_width,
+                                                            aim_strat=als.aim_strategy,
+                                                            aim_params=als.aim_parameters,
+                                                            tower_h=als.tower_height,
+                                                            create_zoomed=False,
+                                                            create_gif=False,
+                                                            filename=eu_filename,
+                                                            out_dir=als.output_directory)
         als.agg_path_eu_heatmap = agg_path_plot_eu
         log.info(f"Aggregate path plots complete")
 

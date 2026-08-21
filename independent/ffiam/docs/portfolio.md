@@ -2,7 +2,7 @@
 
 FFIAM (Full-Field Irradiance Analysis Model) is a parameterized volumetric analysis library that assesses and summarizes the expected irradiance of a heliostat field in standby. It evaluates the irradiance profile of the entire field volume to find hotspot locations and flux impacts on avian paths.
 
-FFIAM is a C++ library, run from the command line or integrated into a workflow. Two integrations ship today: Visualization and Data. Each heliostat is a grid of facets with a focal point. Heliostat design and field layout are set by parameters, CSV import, or JSON config. Standby aim strategies include single-point, ring, and constant-vector.
+FFIAM is a C++ library, run from the command line or integrated into a workflow. Two integrations ship today: Visualization and Data. Each heliostat is a grid of facets with a focal point. Heliostat design and field layout are set by parameters, CSV import, or JSON config. Standby aim strategies include single-point, ring, split-ring, and constant-vector.
 
 Figures come from both flows. Sources are in [`docs/images/`](images/).
 
@@ -10,19 +10,20 @@ Figures come from both flows. Sources are in [`docs/images/`](images/).
 
 A custom 3D field renderer built with Unreal Engine. It renders the input CSP field and the expected flux voxels in real time, navigable by the user.
 
-| View                                      | Figure                                                       |
-|-------------------------------------------|--------------------------------------------------------------|
-| NSTTF field, aim point above tower        | ![NSTTF flux](images/ffiam-nsttf-nw.jpg)                     |
-| Radial field                              | ![UE field overview](images/ffiam-ue-field-overview.png)     |
-| Test grid site with live analysis readout | ![Test site overview](images/ffiam-ue-testsite-overview.png) |
+| View                                         | Figure                                                               |
+|----------------------------------------------|----------------------------------------------------------------------|
+| NSTTF field, standby flux above the receiver | ![NSTTF standby flux](images/ffiam-nsttf-flux.jpg)                   |
+| Radial field, point standby (top-down)       | ![Radial field, point standby](images/ffiam-field-point-topdown.jpg) |
 
 ### Aim strategies
 The model includes several aim strategies, and accepts per-heliostat CSV files for custom configurations.
 
-| View      | Figure |
-|-----------|--------|
-| Ring | ![UE ring top-down](images/ffiam-ue-ring-topdown.png) |
-| Point | ![UE ring close-up](images/ffiam-nsttf-point.jpg) |
+| Strategy | Description | Figure |
+|----------|-------------|--------|
+| Single-point | All heliostats aim at one location; flux converges into a concentrated column | ![Point standby](images/ffiam-aim-point.jpg) |
+| Ring | Aim distributed around an annulus above the tower; flux forms a broader elevated region | ![Ring standby](images/ffiam-aim-ring.jpg) |
+| Split-ring | Each azimuthal slice fans across the annulus, redistributing flux around the receiver | ![Split-ring standby](images/ffiam-aim-splitring.jpg) |
+| Constant-vector | All heliostats aim in a fixed direction (e.g. stow); flux spreads across the field | ![Vector standby](images/ffiam-aim-vector.jpg) |
 
 ### Voxel resolution
 
@@ -33,6 +34,7 @@ Depending on memory constraints, smaller sites can be set to 1 m voxel resolutio
 |---------------------------------|--------|
 | 4 m voxels (opaque for clarity) | ![4 m voxels](images/ffiam-ue-voxels-4m.png) |
 | 2 m voxels                      | ![2 m voxels](images/ffiam-ue-voxels-2m.png) |
+| 1 m voxels, flux detail         | ![1 m voxel detail](images/ffiam-voxels-detail.jpg) |
 
 ## Data flow
 

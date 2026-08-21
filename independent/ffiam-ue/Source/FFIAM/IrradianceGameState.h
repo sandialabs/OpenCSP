@@ -11,7 +11,7 @@ struct FSiteConfig;
 
 /** Shares Mode data with UI */
 UCLASS()
-class IRRADIANCE_API AIrradianceGameState : public AGameState
+class FFIAM_API AIrradianceGameState : public AGameState
 {
 	GENERATED_BODY()
 

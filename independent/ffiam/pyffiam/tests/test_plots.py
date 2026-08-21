@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for pyffiam.plots — focuses on the pure helper functions that
 don't require rendering. Heavy rendering paths (write_image, GIF generation)
 are exercised by integration tests in test_outputs.py; here we assert the
@@ -23,7 +25,6 @@ from pyffiam.plots import (
 # get_zoom_lims — axis limits for zoomed plots
 # =============================================================================
 
-
 class TestGetZoomLims:
 
     def test_point_aim_east(self):
@@ -47,21 +48,21 @@ class TestGetZoomLims:
         assert hi == pytest.approx(60.0 + ZOOM_SPAN / 2)
 
     def test_ring_aim_east_small_radius_uses_half_span(self):
-        """Ring with offset < half-span: bounds are ±half-span, not ±(offset+50)."""
-        aim = np.array([10.0, 60.0, 0.0])  # r=10, ht=60
+        """Ring with outer radius < half-span: bounds are ±half-span, not ±(outer+50)."""
+        aim = np.array([5.0, 10.0, 60.0])  # inner=5, outer=10, height=60
         lo, hi = get_zoom_lims(AimType.Ring, aim, Direction.East)
         assert lo == pytest.approx(-ZOOM_SPAN / 2)
         assert hi == pytest.approx(ZOOM_SPAN / 2)
 
     def test_ring_aim_east_large_radius_uses_offset_plus_pad(self):
-        """Ring with offset > half-span: bounds are ±(offset + 50)."""
-        aim = np.array([200.0, 60.0, 0.0])  # r=200 > 50
+        """Ring with outer radius > half-span: bounds are ±(outer + 50)."""
+        aim = np.array([100.0, 200.0, 60.0])  # inner=100, outer=200 > 50, height=60
         lo, hi = get_zoom_lims(AimType.Ring, aim, Direction.East)
         assert lo == pytest.approx(-200.0 - 50)
         assert hi == pytest.approx(200.0 + 50)
 
     def test_ring_aim_up(self):
-        aim = np.array([20.0, 75.0, 0.0])  # ht=75
+        aim = np.array([20.0, 40.0, 75.0])  # inner=20, outer=40, height=75
         lo, hi = get_zoom_lims(AimType.Ring, aim, Direction.Up)
         assert lo == -10
         assert hi == pytest.approx(75.0 + ZOOM_SPAN / 2)
@@ -71,29 +72,39 @@ class TestGetZoomLims:
 # _get_axis_plotting_data — slices the per-axis row out of (3, N) arrays
 # =============================================================================
 
-
 class TestGetAxisPlottingData:
 
     def setup_method(self):
         # Voxel locations: (3, 4) — east, north, up rows
-        self.vox = np.array([[1.0, 2.0, 3.0, 4.0], [5.0, 6.0, 7.0, 8.0], [9.0, 10.0, 11.0, 12.0]])  # E  # N  # U
-        self.hel = np.array([[-1.0, -2.0], [-3.0, -4.0], [-5.0, -6.0]])
+        self.vox = np.array([
+            [1.0, 2.0, 3.0, 4.0],   # E
+            [5.0, 6.0, 7.0, 8.0],   # N
+            [9.0, 10.0, 11.0, 12.0]  # U
+        ])
+        self.hel = np.array([
+            [-1.0, -2.0],
+            [-3.0, -4.0],
+            [-5.0, -6.0],
+        ])
 
     def test_east_returns_x_rows(self):
-        vox_row, hel_row, label, slug = _get_axis_plotting_data(Direction.East, self.hel, self.vox)
+        vox_row, hel_row, label, slug = _get_axis_plotting_data(
+            Direction.East, self.hel, self.vox)
         assert np.array_equal(vox_row, self.vox[0])
         assert np.array_equal(hel_row, self.hel[0])
         assert label == "East"
         assert slug == "E"
 
     def test_north_returns_y_rows(self):
-        vox_row, hel_row, label, slug = _get_axis_plotting_data(Direction.North, self.hel, self.vox)
+        vox_row, hel_row, label, slug = _get_axis_plotting_data(
+            Direction.North, self.hel, self.vox)
         assert np.array_equal(vox_row, self.vox[1])
         assert label == "North"
         assert slug == "N"
 
     def test_up_returns_z_rows(self):
-        vox_row, hel_row, label, slug = _get_axis_plotting_data(Direction.Up, self.hel, self.vox)
+        vox_row, hel_row, label, slug = _get_axis_plotting_data(
+            Direction.Up, self.hel, self.vox)
         assert np.array_equal(vox_row, self.vox[2])
         assert label == "Up"
         assert slug == "U"
@@ -102,7 +113,6 @@ class TestGetAxisPlottingData:
 # =============================================================================
 # _get_gif_depth_axis_data — picks the orthogonal axis for the GIF depth dim.
 # =============================================================================
-
 
 class TestGifDepthAxisData:
 
@@ -126,13 +136,13 @@ class TestGifDepthAxisData:
 
     def test_invalid_combination_raises(self):
         with pytest.raises(ValueError, match="Invalid dimension combination"):
-            _get_gif_depth_axis_data(Direction.Up, Direction.East, np.array([0.0]), np.array([0.0]), np.array([0.0]))
+            _get_gif_depth_axis_data(Direction.Up, Direction.East,
+                                     np.array([0.0]), np.array([0.0]), np.array([0.0]))
 
 
 # =============================================================================
 # _calculate_plot_parameters — marker size derivation from extent + pixel width.
 # =============================================================================
-
 
 class TestCalculatePlotParameters:
 
@@ -168,8 +178,10 @@ class TestCalculatePlotParameters:
         """Zoom marker sizes use ZOOM_SPAN, not the full extent — so they're
         identical for small vs. large input extents."""
         ys = np.array([0.0, 0.0])
-        _, _, hel_z_small, vox_z_small = _calculate_plot_parameters(np.array([-50.0, 50.0]), ys, 2.0, 2)
-        _, _, hel_z_large, vox_z_large = _calculate_plot_parameters(np.array([-500.0, 500.0]), ys, 2.0, 2)
+        _, _, hel_z_small, vox_z_small = _calculate_plot_parameters(
+            np.array([-50.0, 50.0]), ys, 2.0, 2)
+        _, _, hel_z_large, vox_z_large = _calculate_plot_parameters(
+            np.array([-500.0, 500.0]), ys, 2.0, 2)
         assert hel_z_small == pytest.approx(hel_z_large)
         assert vox_z_small == pytest.approx(vox_z_large)
 
@@ -179,11 +191,9 @@ class TestCalculatePlotParameters:
 # the kaleido + PIL path. Skipped if kaleido isn't installed properly.
 # =============================================================================
 
-
 def test_convert_fig_to_array_returns_rgb_array():
     import plotly.graph_objects as go
     from pyffiam.plots import convert_fig_to_array
-
     fig = go.Figure(data=go.Scatter(x=[0, 1], y=[0, 1]))
     try:
         arr = convert_fig_to_array(fig)

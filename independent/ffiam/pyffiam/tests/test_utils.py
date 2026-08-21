@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for pyffiam utility functions.
 
 These tests cover the core utility functions including voxel indexing,
@@ -57,9 +59,11 @@ class TestVoxelIndexing:
             field_r=small_voxel_params['field_r'],
             field_zmin=small_voxel_params['field_zmin'],
         )
-        expected = np.array(
-            [-small_voxel_params['field_r'], -small_voxel_params['field_r'], small_voxel_params['field_zmin']]
-        )
+        expected = np.array([
+            -small_voxel_params['field_r'],
+            -small_voxel_params['field_r'],
+            small_voxel_params['field_zmin'],
+        ])
         np.testing.assert_array_almost_equal(loc, expected)
 
     def test_get_voxel_loc_from_index_second_plane(self, small_voxel_params):
@@ -118,7 +122,7 @@ class TestVoxelIndexing:
     def test_voxel_z_coordinates_increase(self, small_voxel_params):
         """Test that z coordinates increase as expected with index."""
         n_per_side = small_voxel_params['field_r'] * 2 / small_voxel_params['vox_size']
-        n_per_plane = int(n_per_side**2)
+        n_per_plane = int(n_per_side ** 2)
 
         # Get locations at index 0 and n_per_plane (should be one z level up)
         loc0 = get_voxel_loc_from_index(

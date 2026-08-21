@@ -1,5 +1,6 @@
 ﻿{
-  "RunId": "NSTTF with aiming",
+  "RunId": "NSTTF",
+  "SortOrder": 90,
   "SiteType": "Site_Nsttf",
   "HelioDesign": {
     "NumFacets": 25,

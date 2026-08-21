@@ -1,11 +1,11 @@
 using System.IO;
 using UnrealBuildTool;
 
-public class Irradiance : ModuleRules
+public class FFIAM : ModuleRules
 {
 	private string ProjectRootPath => Path.Combine(ModuleDirectory, "");
 
-	public Irradiance(ReadOnlyTargetRules Target) : base(Target)
+	public FFIAM(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
 		bEnableExceptions = true; // nlohmann/json uses exceptions
@@ -17,7 +17,13 @@ public class Irradiance : ModuleRules
 			"Json",
 			"JsonUtilities",
 			"InputCore",
-			"SunPosition"
+			"SunPosition",
+			// HUD-toggle hotkey: UMG for UUserWidget/GetAllWidgetsOfClass;
+			// Slate/SlateCore/ApplicationCore for the global input pre-processor.
+			"UMG",
+			"Slate",
+			"SlateCore",
+			"ApplicationCore"
 		});
 
 		// FFIAM C++/CUDA headers. FFIAM_PATH = the FFIAM source root (include/,
@@ -27,7 +33,7 @@ public class Irradiance : ModuleRules
 		{
 			// Windows default kept for back-compat; Linux/macOS should set FFIAM_PATH.
 			ffiamPath = "T:/ffiam/ffiam/ffiam";
-			System.Console.WriteLine($"Irradiance: FFIAM_PATH not set, using default: {ffiamPath}");
+			System.Console.WriteLine($"FFIAM: FFIAM_PATH not set, using default: {ffiamPath}");
 		}
 
 		PublicIncludePaths.AddRange(new string[] {
@@ -37,7 +43,7 @@ public class Irradiance : ModuleRules
 			Path.Combine(ffiamPath, "external/fmt/include")
 		});
 
-		// Project root is two levels up from Source/Irradiance/.
+		// Project root is two levels up from Source/FFIAM/.
 		var projectDir = Path.GetFullPath(Path.Combine(ModuleDirectory, "../../"));
 
 		if (Target.Platform == UnrealTargetPlatform.Win64)
@@ -50,7 +56,7 @@ public class Irradiance : ModuleRules
 		}
 		else
 		{
-			System.Console.WriteLine($"Irradiance: WARNING - platform {Target.Platform} not configured for the FFIAM/CUDA libraries.");
+			System.Console.WriteLine($"FFIAM: WARNING - platform {Target.Platform} not configured for the FFIAM/CUDA libraries.");
 		}
 	}
 
@@ -60,7 +66,7 @@ public class Irradiance : ModuleRules
 		var cudaPath = System.Environment.GetEnvironmentVariable("CUDA_PATH");
 		if (string.IsNullOrEmpty(cudaPath))
 		{
-			System.Console.WriteLine("Irradiance: CUDA_PATH not set; using default CUDA v12.8 path.");
+			System.Console.WriteLine("FFIAM: CUDA_PATH not set; using default CUDA v12.8 path.");
 			cudaPath = "C:/Program Files/NVIDIA GPU Computing Toolkit/CUDA/v12.8";
 		}
 		PublicIncludePaths.Add(Path.Combine(cudaPath, "include"));
@@ -76,7 +82,7 @@ public class Irradiance : ModuleRules
 		if (File.Exists(dllSource))
 			File.Copy(dllSource, Path.Combine(binDir, "ffiam_lib.dll"), true);
 		else
-			System.Console.WriteLine($"Irradiance: WARNING - ffiam_lib.dll not found at {dllSource}. Build FFIAM first.");
+			System.Console.WriteLine($"FFIAM: WARNING - ffiam_lib.dll not found at {dllSource}. Build FFIAM first.");
 
 		if (File.Exists(libSource))
 		{
@@ -85,7 +91,7 @@ public class Irradiance : ModuleRules
 		}
 		else
 		{
-			System.Console.WriteLine($"Irradiance: WARNING - ffiam_lib.lib not found at {libSource}. Build FFIAM first.");
+			System.Console.WriteLine($"FFIAM: WARNING - ffiam_lib.lib not found at {libSource}. Build FFIAM first.");
 		}
 	}
 
@@ -126,7 +132,7 @@ public class Irradiance : ModuleRules
 		}
 		else
 		{
-			System.Console.WriteLine("Irradiance: WARNING - libffiam_lib.so not found. Set FFIAM_PATH (and build FFIAM via CMake) or FFIAM_LIB.");
+			System.Console.WriteLine("FFIAM: WARNING - libffiam_lib.so not found. Set FFIAM_PATH (and build FFIAM via CMake) or FFIAM_LIB.");
 		}
 	}
 }

@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Tests for fractional hour support."""
 
 import pytest
@@ -42,7 +44,7 @@ class TestFractionalHourParsing:
     def test_specific_time_10_08(self):
         """Test 10:08 AM (10.133...) converts correctly."""
         # 10:08 AM = 10 + 8/60 = 10.1333...
-        hour = 10 + 8 / 60
+        hour = 10 + 8/60
         hour_int = int(hour)
         minute_int = round((hour - hour_int) * 60)
 
@@ -52,7 +54,7 @@ class TestFractionalHourParsing:
     def test_specific_time_12_43(self):
         """Test 12:43 PM (12.7166...) converts correctly."""
         # 12:43 PM = 12 + 43/60
-        hour = 12 + 43 / 60
+        hour = 12 + 43/60
         hour_int = int(hour)
         minute_int = round((hour - hour_int) * 60)
 
@@ -62,7 +64,7 @@ class TestFractionalHourParsing:
     def test_specific_time_14_36(self):
         """Test 2:36 PM (14.6) converts correctly."""
         # 1:36 PM = 13 + 36/60 = 13.6
-        hour = 13 + 36 / 60
+        hour = 13 + 36/60
         hour_int = int(hour)
         minute_int = round((hour - hour_int) * 60)
 
@@ -162,23 +164,15 @@ class TestAnalysisDataFractionalHour:
         data = AnalysisData(
             name='Test',
             site=CspSite.Custom,
-            year=2025,
-            month=8,
-            day=8,
-            hour=10.0,
+            year=2025, month=8, day=8, hour=10.0,
             threshold=4,
-            latitude=34.96,
-            longitude=-106.51,
-            timezone=-7,
+            latitude=34.96, longitude=-106.51, timezone=-7,
             tower_height=61,
             field_radius=300,
             num_helios=24,
-            num_facets=25,
-            num_facet_cols=5,
-            facet_width=1.2,
-            facet_height=1.2,
-            min_height=0,
-            max_height=100,
+            num_facets=25, num_facet_cols=5,
+            facet_width=1.2, facet_height=1.2,
+            min_height=0, max_height=100,
             aim_strat=AimType.Point,
             aim_params=np.array([0, 0, 90]),
         )
@@ -192,23 +186,15 @@ class TestAnalysisDataFractionalHour:
         data = AnalysisData(
             name='Test',
             site=CspSite.Custom,
-            year=2025,
-            month=8,
-            day=8,
-            hour=10.5,
+            year=2025, month=8, day=8, hour=10.5,
             threshold=4,
-            latitude=34.96,
-            longitude=-106.51,
-            timezone=-7,
+            latitude=34.96, longitude=-106.51, timezone=-7,
             tower_height=61,
             field_radius=300,
             num_helios=24,
-            num_facets=25,
-            num_facet_cols=5,
-            facet_width=1.2,
-            facet_height=1.2,
-            min_height=0,
-            max_height=100,
+            num_facets=25, num_facet_cols=5,
+            facet_width=1.2, facet_height=1.2,
+            min_height=0, max_height=100,
             aim_strat=AimType.Point,
             aim_params=np.array([0, 0, 90]),
         )
@@ -219,27 +205,19 @@ class TestAnalysisDataFractionalHour:
 
     def test_datetime_conversion_specific_time(self):
         """Test datetime is correct for 10:08 AM."""
-        hour = 10 + 8 / 60  # 10:08 AM
+        hour = 10 + 8/60  # 10:08 AM
         data = AnalysisData(
             name='Test',
             site=CspSite.Custom,
-            year=2025,
-            month=8,
-            day=8,
-            hour=hour,
+            year=2025, month=8, day=8, hour=hour,
             threshold=4,
-            latitude=34.96,
-            longitude=-106.51,
-            timezone=-7,
+            latitude=34.96, longitude=-106.51, timezone=-7,
             tower_height=61,
             field_radius=300,
             num_helios=24,
-            num_facets=25,
-            num_facet_cols=5,
-            facet_width=1.2,
-            facet_height=1.2,
-            min_height=0,
-            max_height=100,
+            num_facets=25, num_facet_cols=5,
+            facet_width=1.2, facet_height=1.2,
+            min_height=0, max_height=100,
             aim_strat=AimType.Point,
             aim_params=np.array([0, 0, 90]),
         )
@@ -251,17 +229,14 @@ class TestAnalysisDataFractionalHour:
 class TestFlightTimeExamples:
     """Test with actual NSTTF validation flight times."""
 
-    @pytest.mark.parametrize(
-        "flight,expected_hour,expected_minute",
-        [
-            ("Flight_0001_low", 10, 8),  # 10:08 AM
-            ("Flight_0002", 11, 15),  # 11:15 AM
-            ("Flight_0004", 12, 43),  # 12:43 PM
-            ("Flight_0005", 12, 57),  # 12:57 PM
-            ("Flight_0006", 13, 36),  # 1:36 PM
-            ("Flight_0007", 14, 24),  # 2:24 PM
-        ],
-    )
+    @pytest.mark.parametrize("flight,expected_hour,expected_minute", [
+        ("Flight_0001_low", 10, 8),   # 10:08 AM
+        ("Flight_0002", 11, 15),       # 11:15 AM
+        ("Flight_0004", 12, 43),       # 12:43 PM
+        ("Flight_0005", 12, 57),       # 12:57 PM
+        ("Flight_0006", 13, 36),       # 1:36 PM
+        ("Flight_0007", 14, 24),       # 2:24 PM
+    ])
     def test_flight_times(self, flight, expected_hour, expected_minute):
         """Test that flight times convert correctly."""
         hour = expected_hour + expected_minute / 60
@@ -280,9 +255,9 @@ if __name__ == "__main__":
     test_cases = [
         (10.0, 10, 0, "10:00 AM"),
         (10.5, 10, 30, "10:30 AM"),
-        (10 + 8 / 60, 10, 8, "10:08 AM"),
-        (12 + 43 / 60, 12, 43, "12:43 PM"),
-        (13 + 36 / 60, 13, 36, "1:36 PM"),
+        (10 + 8/60, 10, 8, "10:08 AM"),
+        (12 + 43/60, 12, 43, "12:43 PM"),
+        (13 + 36/60, 13, 36, "1:36 PM"),
     ]
 
     for hour, exp_h, exp_m, desc in test_cases:

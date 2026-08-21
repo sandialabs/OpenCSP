@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for pyffiam config and results dataclasses.
 
 These tests cover the configuration classes and results processing,
@@ -20,7 +22,12 @@ from pyffiam.config import (
     OpticalConfig,
     AnalysisConfig,
 )
-from pyffiam.results import HeliostatResults, IrradianceResults, ThresholdResults, AnalysisResults
+from pyffiam.results import (
+    HeliostatResults,
+    IrradianceResults,
+    ThresholdResults,
+    AnalysisResults,
+)
 
 
 class TestTimeConfig:
@@ -89,7 +96,12 @@ class TestHeliostatConfig:
 
     def test_default_files(self):
         """Test default empty strings for file paths."""
-        config = HeliostatConfig(num_facets=25, num_facet_cols=5, facet_width=1.0, facet_height=1.0)
+        config = HeliostatConfig(
+            num_facets=25,
+            num_facet_cols=5,
+            facet_width=1.0,
+            facet_height=1.0,
+        )
         assert config.heliostat_file == ""
         assert config.facet_file == ""
 
@@ -100,11 +112,16 @@ class TestAimConfig:
     def test_creation(self, sample_aim_config):
         """Test basic creation and attribute access."""
         assert sample_aim_config.strategy == AimType.Point
-        np.testing.assert_array_equal(sample_aim_config.parameters, np.array([0.0, 0.0, 90.0]))
+        np.testing.assert_array_equal(
+            sample_aim_config.parameters, np.array([0.0, 0.0, 90.0])
+        )
 
     def test_default_aim_file(self):
         """Test default empty string for aim file."""
-        config = AimConfig(strategy=AimType.Point, parameters=np.array([0.0, 0.0, 90.0]))
+        config = AimConfig(
+            strategy=AimType.Point,
+            parameters=np.array([0.0, 0.0, 90.0]),
+        )
         assert config.aim_file == ""
 
 
@@ -128,7 +145,11 @@ class TestVoxelConfig:
 
     def test_compute_layout(self, sample_voxel_config):
         """Test voxel grid layout computation."""
-        layout = sample_voxel_config.compute_layout(field_radius=100, min_height=4, max_height=104)
+        layout = sample_voxel_config.compute_layout(
+            field_radius=100,
+            min_height=4,
+            max_height=104
+        )
         # num_x = 2 * 100 / 2 = 100
         # num_y = 2 * 100 / 2 = 100
         # num_z = (104 - 4) / 2 + 1 = 51
@@ -136,7 +157,11 @@ class TestVoxelConfig:
 
     def test_compute_num_voxels(self, sample_voxel_config):
         """Test total voxel count computation."""
-        n = sample_voxel_config.compute_num_voxels(field_radius=10, min_height=4, max_height=14)
+        n = sample_voxel_config.compute_num_voxels(
+            field_radius=10,
+            min_height=4,
+            max_height=14
+        )
         # layout = (10, 10, 6)
         # total = 10 * 10 * 6 = 600
         assert n == 600
@@ -359,7 +384,9 @@ class TestAnalysisResults:
 
         assert results.has_results is True
 
-    def test_convenience_accessors(self, sample_heliostat_results, sample_irradiance_results):
+    def test_convenience_accessors(
+        self, sample_heliostat_results, sample_irradiance_results
+    ):
         """Test convenience property accessors."""
         threshold = ThresholdResults(
             mask=np.array([True, False]),

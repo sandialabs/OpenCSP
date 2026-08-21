@@ -3,12 +3,12 @@
 using UnrealBuildTool;
 using System.Collections.Generic;
 
-public class IrradianceEditorTarget : TargetRules
+public class FFIAMEditorTarget : TargetRules
 {
-	public IrradianceEditorTarget(TargetInfo Target) : base(Target)
+	public FFIAMEditorTarget(TargetInfo Target) : base(Target)
 	{
 		Type = TargetType.Editor;
 		DefaultBuildSettings = BuildSettingsVersion.Latest;
-		ExtraModuleNames.Add("Irradiance");
+		ExtraModuleNames.Add("FFIAM");
 	}
 }

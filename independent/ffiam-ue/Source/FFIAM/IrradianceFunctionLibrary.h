@@ -12,7 +12,7 @@ class AIrradianceMode;
 struct FSiteConfig;
 
 UCLASS()
-class IRRADIANCE_API UIrradianceFunctionLibrary : public UBlueprintFunctionLibrary
+class FFIAM_API UIrradianceFunctionLibrary : public UBlueprintFunctionLibrary
 {
 	GENERATED_BODY()
 

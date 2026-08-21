@@ -276,10 +276,10 @@ from pyffiam.analysis import analysis
 from pyffiam.ffiam_types import CspSite, AimType
 import numpy as np
 
-# Ring params: (inner_radius=30m, outer_radius=90m, height=0 unused)
+# Ring params: (inner_radius=30m, outer_radius=90m, height=90m)
 result = analysis(site=CspSite.NSTTF,
                   aim_strat=AimType.Ring,
-                  aim_params=np.array([30, 90, 0]),
+                  aim_params=np.array([30, 90, 90]),
                   threshold=4,
                   create_plots=True, create_xls=True, create_gifs=False,
                   open_output_dir=False, output_dir='/output')
@@ -362,7 +362,8 @@ print(f'Path max irradiance: {max(result.path_results[0].irradiances):.1f} kW/m2
 | Strategy | Params (X, Y, Z) | Description |
 |----------|-------------------|-------------|
 | `AimType.Point` | (east, north, up) position in meters | All heliostats aim at a single point |
-| `AimType.Ring` | (inner_radius, outer_radius, 0) | Heliostats distribute aim around a ring at tower height |
+| `AimType.Ring` | (inner_radius, outer_radius, height) | Heliostats distribute aim across the annulus [inner_radius, outer_radius] at the given height |
+| `AimType.SplitRing` | (inner_radius, outer_radius, height) | Same params as Ring, but each azimuthal slice fans across the annulus (different spatial distribution) |
 | `AimType.Vector` | (x, y, z) unit direction | All heliostats aim in a fixed direction (e.g., stow = 0,0,1) |
 | `AimType.CsvData` | (0, 0, 0) + `aim_file` | Per-heliostat aim angles from CSV |
 
@@ -529,7 +530,7 @@ If the data-file parameters are not used, FFIAM will simulate a generic, uniform
                               lat=34.96348,
                               lng=-106.50964,
                               aim_strat=AimType.Ring,
-                              aim_params=np.array([30, 120, 0]),
+                              aim_params=np.array([30, 120, 90]),
                               create_plots=True,
                               create_gifs=False,
                               create_xls=True)
@@ -556,7 +557,7 @@ Note that the Cartesian data for each must be positioned on columns B, C, and D,
                            lat=34.96348,
                            lng=-106.50964,
                            aim_strat=AimType.Ring,
-                           aim_params=np.array([30, 120, 0]),
+                           aim_params=np.array([30, 120, 90]),
                            helio_file="demo_NSTTF_Heliostats.csv",
                            facet_file = "demo_NSTTF_Facet_Centroids.csv",
                            create_plots=True,
@@ -648,7 +649,7 @@ A custom site configuration requires additional sections:
   },
   "AimStrategy": {
     "Type": "Aim_Ring",
-    "Params": { "X": 30.0, "Y": 120.0, "Z": 0.0 },
+    "Params": { "X": 30.0, "Y": 120.0, "Z": 90.0 },
     "File": ""
   },
   "create_gifs": false,

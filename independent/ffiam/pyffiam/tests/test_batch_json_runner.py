@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for the batch-JSON runner pipeline:
 - pyffiam.utils.get_site_config_dict_from_json (the parser)
 - pyffiam.run_site_analysis_from_file.run_from_config_file (the loop)
@@ -26,7 +28,6 @@ import pytest
 # Helpers
 # =============================================================================
 
-
 def _full_json():
     """Minimum JSON matching the UE schema, parseable into analysis() kwargs."""
     return {
@@ -52,7 +53,11 @@ def _full_json():
             "HelioCoordinateFile": "nsttf.csv",
         },
         "DateTime": {"Year": 2025, "Month": 6, "Day": 21, "Hour": 13},
-        "AimStrategy": {"Type": "Aim_Point", "Params": {"X": 0.0, "Y": 0.0, "Z": 100.0}, "File": ""},
+        "AimStrategy": {
+            "Type": "Aim_Point",
+            "Params": {"X": 0.0, "Y": 0.0, "Z": 100.0},
+            "File": "",
+        },
     }
 
 
@@ -67,13 +72,11 @@ def _write_json(path: Path, content):
 # get_site_config_dict_from_json — JSON parser
 # =============================================================================
 
-
 class TestGetSiteConfigDictFromJson:
 
     def test_happy_path_yields_analysis_kwargs(self, tmp_path):
         from pyffiam.utils import get_site_config_dict_from_json
         from pyffiam.ffiam_types import CspSite, AimType
-
         f = tmp_path / "nsttf.json"
         _write_json(f, _full_json())
 
@@ -92,7 +95,6 @@ class TestGetSiteConfigDictFromJson:
 
     def test_malformed_json_raises(self, tmp_path):
         from pyffiam.utils import get_site_config_dict_from_json
-
         f = tmp_path / "bad.json"
         f.write_text("{not valid json")
         with pytest.raises(json.JSONDecodeError):
@@ -100,7 +102,6 @@ class TestGetSiteConfigDictFromJson:
 
     def test_list_json_returns_empty_dict(self, tmp_path, capsys):
         from pyffiam.utils import get_site_config_dict_from_json
-
         f = tmp_path / "list.json"
         _write_json(f, [{"RunId": "site1"}, {"RunId": "site2"}])
         result = get_site_config_dict_from_json(f)
@@ -113,16 +114,12 @@ class TestGetSiteConfigDictFromJson:
         """Each parser section is independent — missing ones leave the dict
         without those keys but don't raise."""
         from pyffiam.utils import get_site_config_dict_from_json
-
         f = tmp_path / "partial.json"
-        _write_json(
-            f,
-            {
-                "RunId": "Partial",
-                "SiteType": "Site_Custom",
-                # No HelioDesign, Field, DateTime, AimStrategy.
-            },
-        )
+        _write_json(f, {
+            "RunId": "Partial",
+            "SiteType": "Site_Custom",
+            # No HelioDesign, Field, DateTime, AimStrategy.
+        })
         result = get_site_config_dict_from_json(f)
         assert "site" in result
         assert "threshold" in result  # gets default 4
@@ -133,7 +130,6 @@ class TestGetSiteConfigDictFromJson:
 
     def test_custom_threshold_value_preserved(self, tmp_path):
         from pyffiam.utils import get_site_config_dict_from_json
-
         f = tmp_path / "thr.json"
         data = _full_json()
         data["Threshold"] = 7.5
@@ -143,7 +139,6 @@ class TestGetSiteConfigDictFromJson:
 
     def test_create_gifs_boolean_accepted(self, tmp_path):
         from pyffiam.utils import get_site_config_dict_from_json
-
         f = tmp_path / "g.json"
         data = _full_json()
         data["create_gifs"] = True
@@ -153,7 +148,6 @@ class TestGetSiteConfigDictFromJson:
 
     def test_create_gifs_non_boolean_falls_back_to_false(self, tmp_path):
         from pyffiam.utils import get_site_config_dict_from_json
-
         f = tmp_path / "g.json"
         data = _full_json()
         data["create_gifs"] = "yes"
@@ -166,14 +160,12 @@ class TestGetSiteConfigDictFromJson:
 # run_from_config_file — batch loop
 # =============================================================================
 
-
 class TestRunFromConfigFile:
 
     def test_missing_loaded_dir_prints_error_and_returns(self, tmp_path, monkeypatch, capsys):
         """The runner uses the script-relative path; if site_configs/loaded/
         doesn't exist, it prints an error and returns without raising."""
         from pyffiam import run_site_analysis_from_file as runner
-
         # Point __file__ at a directory with no site_configs/loaded.
         monkeypatch.setattr(runner, "__file__", str(tmp_path / "fake_module.py"))
         runner.run_from_config_file()
@@ -183,7 +175,6 @@ class TestRunFromConfigFile:
     def test_empty_loaded_dir_prints_message(self, tmp_path, monkeypatch, capsys):
         """Empty directory: prints "No configuration files found" and returns."""
         from pyffiam import run_site_analysis_from_file as runner
-
         # Create empty site_configs/loaded/ inside tmp.
         (tmp_path / "site_configs" / "loaded").mkdir(parents=True)
         monkeypatch.setattr(runner, "__file__", str(tmp_path / "fake_module.py"))
@@ -194,7 +185,6 @@ class TestRunFromConfigFile:
     def test_skips_non_json_files(self, tmp_path, monkeypatch, capsys):
         """Files without a .json extension are skipped with a message."""
         from pyffiam import run_site_analysis_from_file as runner
-
         loaded = tmp_path / "site_configs" / "loaded"
         loaded.mkdir(parents=True)
         (loaded / "readme.txt").write_text("not a config")
@@ -207,7 +197,6 @@ class TestRunFromConfigFile:
         """A malformed JSON file logs an error and the loop moves on. With one
         bad file and no good files, analysis() should never be called."""
         from pyffiam import run_site_analysis_from_file as runner
-
         loaded = tmp_path / "site_configs" / "loaded"
         loaded.mkdir(parents=True)
         (loaded / "bad.json").write_text("{not valid")
@@ -222,7 +211,6 @@ class TestRunFromConfigFile:
     def test_valid_json_calls_analysis_with_parsed_dict(self, tmp_path, monkeypatch, capsys):
         """A valid JSON file should reach analysis() with the parsed kwargs."""
         from pyffiam import run_site_analysis_from_file as runner
-
         loaded = tmp_path / "site_configs" / "loaded"
         loaded.mkdir(parents=True)
         _write_json(loaded / "site.json", _full_json())
@@ -242,7 +230,6 @@ class TestRunFromConfigFile:
         """If analysis() raises, the loop catches, logs, and continues to the
         next file."""
         from pyffiam import run_site_analysis_from_file as runner
-
         loaded = tmp_path / "site_configs" / "loaded"
         loaded.mkdir(parents=True)
         _write_json(loaded / "a.json", _full_json())

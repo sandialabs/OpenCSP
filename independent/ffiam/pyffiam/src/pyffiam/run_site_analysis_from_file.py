@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 import json
 from pathlib import Path
 
@@ -54,7 +56,6 @@ def run_from_config_file():
         except Exception as e:
             print(f"Error running analysis for {run_id}: {e}")
             import traceback
-
             traceback.print_exc()
 
 

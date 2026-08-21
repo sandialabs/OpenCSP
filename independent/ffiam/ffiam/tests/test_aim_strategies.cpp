@@ -1,3 +1,4 @@
+// Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
 // Unit tests for aim strategies: Point, Ring, SplitRing, Vector, CsvData.
 // FixedNormal is covered by test_aim_fixed_normal.cpp. aim_null asserts in
 // ComputeHeliostatConfigurations and is not tested here.
@@ -99,7 +100,8 @@ TEST(AimStrategies, Ring_PointsPerpendicularToReceiverAxis)
     FieldHarness h({{0.0f, -100.0f, 0.0f}}, 60.0f);
     const float ringRadius = 20.0f;
     const float ringHeight = 60.0f;
-    aim_strategy aimStrat{aim_ring, {ringRadius, ringHeight, 0.0f}, ""};
+    // params = (inner_radius, outer_radius, height); equal radii => single-radius ring
+    aim_strategy aimStrat{aim_ring, {ringRadius, ringRadius, ringHeight}, ""};
 
     ComputeHeliostatConfigurations(0, &h.field, &aimStrat, SunSE55(), 0, 1);
     const heliostat& he = h.helios[0];
@@ -117,15 +119,35 @@ TEST(AimStrategies, Ring_LargerRadiusYieldsLargerOffset)
 {
     FieldHarness h({{0.0f, -100.0f, 0.0f}}, 60.0f);
 
-    aim_strategy small{aim_ring, {5.0f, 60.0f, 0.0f}, ""};
+    // Single-radius rings (inner == outer); larger radius => larger horizontal offset.
+    aim_strategy small{aim_ring, {5.0f, 5.0f, 60.0f}, ""};
     ComputeHeliostatConfigurations(0, &h.field, &small, SunSE55(), 0, 1);
     const float smallOffsetX = std::abs(h.helios[0].refV.x);
 
-    aim_strategy large{aim_ring, {50.0f, 60.0f, 0.0f}, ""};
+    aim_strategy large{aim_ring, {50.0f, 50.0f, 60.0f}, ""};
     ComputeHeliostatConfigurations(0, &h.field, &large, SunSE55(), 0, 1);
     const float largeOffsetX = std::abs(h.helios[0].refV.x);
 
     EXPECT_TRUE(largeOffsetX > smallOffsetX);
+    return true;
+}
+
+TEST(AimStrategies, Ring_DistributesRadiusAcrossAnnulus)
+{
+    // Three heliostats at the same position; heliostat index spreads the aim
+    // radius linearly across the annulus [inner, outer], so the last heliostat
+    // (frac=1 -> r=outer) has a larger horizontal offset than the first
+    // (frac=0 -> r=inner).
+    FieldHarness h({{0.0f, -100.0f, 0.0f}, {0.0f, -100.0f, 0.0f}, {0.0f, -100.0f, 0.0f}}, 60.0f);
+    aim_strategy aimStrat{aim_ring, {10.0f, 100.0f, 60.0f}, ""};
+
+    for (int i = 0; i < h.field.nHelios; ++i)
+        ComputeHeliostatConfigurations(i, &h.field, &aimStrat, SunSE55(), 0, 1);
+
+    const float innerOffsetX = std::abs(h.helios[0].refV.x);  // frac=0 -> r=inner=10
+    const float outerOffsetX = std::abs(h.helios[2].refV.x);  // frac=1 -> r=outer=100
+
+    EXPECT_TRUE(outerOffsetX > innerOffsetX);
     return true;
 }
 
@@ -136,7 +158,7 @@ TEST(AimStrategies, SplitRing_EastAndWestMirror)
         {50.0f, -100.0f, 0.0f},
         {-50.0f, -100.0f, 0.0f},
     }, 60.0f);
-    aim_strategy aimStrat{aim_split_ring, {25.0f, 60.0f, 0.0f}, ""};
+    aim_strategy aimStrat{aim_split_ring, {25.0f, 40.0f, 60.0f}, ""};  // inner, outer, height
     const float3 sunVec = SunSE55();
 
     ComputeHeliostatConfigurations(0, &h.field, &aimStrat, sunVec, 0, 2);
@@ -163,7 +185,7 @@ TEST(AimStrategies, SplitRing_RowIdxShiftsAngle)
     std::vector<float3> positions(4, float3{50.0f, -100.0f, 0.0f});
     FieldHarness h1(positions, 60.0f);
     FieldHarness h2(positions, 60.0f);
-    aim_strategy aimStrat{aim_split_ring, {25.0f, 60.0f, 0.0f}, ""};
+    aim_strategy aimStrat{aim_split_ring, {25.0f, 40.0f, 60.0f}, ""};  // inner, outer, height
     const float3 sunVec = SunSE55();
 
     ComputeHeliostatConfigurations(0, &h1.field, &aimStrat, sunVec, 0, 4);

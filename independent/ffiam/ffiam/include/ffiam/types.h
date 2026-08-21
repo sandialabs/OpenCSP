@@ -1,3 +1,5 @@
+// Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 #pragma once
 
 #include <string>
@@ -116,7 +118,8 @@ struct aim_strategy
 
     // Interpretation varies by type:
     //   aim_point -> target location (m)
-    //   aim_ring  -> [offset, height, unused]
+    //   aim_ring  -> [inner_radius, outer_radius, height]
+    //   aim_split_ring -> [inner_radius, outer_radius, height]
     //   aim_vector -> shared aim unit vector
     float3 params;
 

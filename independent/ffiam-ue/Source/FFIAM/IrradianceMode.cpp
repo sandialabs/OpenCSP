@@ -4,7 +4,7 @@
 
 #include "AnalysisTask.h"
 #include "ffiam/ffiam.h"
-#include "Irradiance.h"
+#include "FFIAM.h"
 #include "IrradianceFunctionLibrary.h"
 #include "IrradianceGameState.h"
 #include "LogChannels.h"
@@ -12,6 +12,58 @@
 #include "Misc/Paths.h"             // For FPaths
 #include "SiteConfigTypes.h"
 #include "Async/TaskGraphInterfaces.h" // For FFunctionGraphTask
+#include "Blueprint/UserWidget.h"
+#include "Blueprint/WidgetBlueprintLibrary.h"
+#include "Blueprint/WidgetTree.h"
+#include "Components/ComboBoxString.h"
+#include "Framework/Application/SlateApplication.h"
+#include "Framework/Application/IInputProcessor.h"
+#include "Widgets/SWidget.h"
+#include "InputCoreTypes.h"
+#include "TimerManager.h"
+
+
+// Global Slate input pre-processor that toggles the HUD on a hotkey. Using a
+// pre-processor (rather than a PlayerController binding) makes the key work
+// regardless of the game's input mode / UI focus — but we deliberately ignore
+// it while an editable text field is focused, so numeric HUD entry isn't eaten.
+namespace
+{
+	class FHudToggleInputProcessor : public IInputProcessor
+	{
+	public:
+		TWeakObjectPtr<AIrradianceMode> Mode;
+		FKey ToggleKey = EKeys::H;
+
+		virtual void Tick(const float /*DeltaTime*/, FSlateApplication& /*SlateApp*/,
+		                  TSharedRef<ICursor> /*Cursor*/) override {}
+
+		virtual bool HandleKeyDownEvent(FSlateApplication& SlateApp,
+		                                const FKeyEvent& InKeyEvent) override
+		{
+			if (InKeyEvent.GetKey() != ToggleKey || InKeyEvent.IsRepeat())
+			{
+				return false;
+			}
+
+			// Don't steal the key while the user is typing into a HUD text box.
+			const TSharedPtr<SWidget> Focused = SlateApp.GetKeyboardFocusedWidget();
+			if (Focused.IsValid() && Focused->GetType().ToString().Contains(TEXT("EditableText")))
+			{
+				return false;
+			}
+
+			if (AIrradianceMode* M = Mode.Get())
+			{
+				M->ToggleHud();
+				return true; // consume the key
+			}
+			return false;
+		}
+
+		virtual const TCHAR* GetDebugName() const override { return TEXT("FfiamHudToggle"); }
+	};
+}
 
 
 AIrradianceMode::AIrradianceMode()
@@ -38,6 +90,18 @@ AIrradianceMode::~AIrradianceMode()
 
 	pool_free_all(&VoxelPool);
 	FMemory::Free(VoxelArena);
+}
+
+
+void AIrradianceMode::InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage)
+{
+	Super::InitGame(MapName, Options, ErrorMessage);
+
+	// InitGame runs before any actor's BeginPlay, so loading here guarantees the
+	// site configs exist when AFluxManager::BeginPlay calls SetSite(0). BeginPlay
+	// below still (re)loads + broadcasts OnSiteConfigsRefreshed so the HUD widget,
+	// which subscribes later, still gets its dropdown populated.
+	LoadSiteConfigFromJson();
 }
 
 
@@ -73,6 +137,117 @@ void AIrradianceMode::BeginPlay()
 	LoadSiteConfigFromJson();
 
 	State->LoadedSiteConfigs = LoadedSiteConfigs;
+
+	// Give the HUD's site combo a default selection once it has populated.
+	HudDefaultSiteTries = 0;
+	GetWorldTimerManager().SetTimer(HudDefaultSiteTimer, this,
+		&AIrradianceMode::SelectDefaultSiteInHud, 0.1f, true, 0.1f);
+
+	// Register the HUD-toggle hotkey (H). See FHudToggleInputProcessor above.
+	if (FSlateApplication::IsInitialized())
+	{
+		TSharedRef<FHudToggleInputProcessor> Processor = MakeShared<FHudToggleInputProcessor>();
+		Processor->Mode = this;
+		FSlateApplication::Get().RegisterInputPreProcessor(Processor);
+		HudToggleProcessor = Processor;
+		UE_LOG(LogFlux, Warning, TEXT("HUD-toggle hotkey registered (press H to hide/show the HUD)."));
+	}
+}
+
+
+void AIrradianceMode::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (HudToggleProcessor.IsValid() && FSlateApplication::IsInitialized())
+	{
+		FSlateApplication::Get().UnregisterInputPreProcessor(HudToggleProcessor.ToSharedRef());
+	}
+	HudToggleProcessor.Reset();
+
+	GetWorldTimerManager().ClearTimer(HudDefaultSiteTimer);
+
+	Super::EndPlay(EndPlayReason);
+}
+
+
+void AIrradianceMode::SelectDefaultSiteInHud()
+{
+	HudDefaultSiteTries++;
+
+	const int32 NumSites = LoadedSiteConfigs.Num();
+	if (NumSites > 0)
+	{
+		TArray<UUserWidget*> Widgets;
+		UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, Widgets, UUserWidget::StaticClass(), false);
+		for (UUserWidget* W : Widgets)
+		{
+			if (!IsValid(W)) continue;
+
+			// The site combo is "siteSelector"; fall back to the ComboBoxString
+			// whose option count matches the loaded site list (tells it apart from
+			// the aim-strategy combo).
+			UComboBoxString* Combo = Cast<UComboBoxString>(W->GetWidgetFromName(TEXT("siteSelector")));
+			if (!Combo && W->WidgetTree)
+			{
+				TArray<UWidget*> All;
+				W->WidgetTree->GetAllWidgets(All);
+				for (UWidget* Wid : All)
+				{
+					UComboBoxString* C = Cast<UComboBoxString>(Wid);
+					if (C && C->GetOptionCount() == NumSites) { Combo = C; break; }
+				}
+			}
+
+			if (Combo && Combo->GetOptionCount() > 0)
+			{
+				// SetSelectedIndex fires OnSelectionChanged -> SetSite(0), syncing
+				// the display with the FluxManager's default site.
+				if (Combo->GetSelectedIndex() < 0)
+				{
+					Combo->SetSelectedIndex(0);
+				}
+				GetWorldTimerManager().ClearTimer(HudDefaultSiteTimer);
+				return;
+			}
+		}
+	}
+
+	if (HudDefaultSiteTries >= 50)  // ~5s; give up rather than poll forever
+	{
+		GetWorldTimerManager().ClearTimer(HudDefaultSiteTimer);
+	}
+}
+
+
+void AIrradianceMode::ToggleHud()
+{
+	TArray<UUserWidget*> Widgets;
+	UWidgetBlueprintLibrary::GetAllWidgetsOfClass(this, Widgets, UUserWidget::StaticClass(), false);
+
+	bHudHidden = !bHudHidden;
+	if (bHudHidden)
+	{
+		// Remember each widget's current visibility, then collapse it.
+		SavedHudVisibility.Reset();
+		for (UUserWidget* W : Widgets)
+		{
+			if (!IsValid(W)) continue;
+			SavedHudVisibility.Add(W, static_cast<uint8>(W->GetVisibility()));
+			W->SetVisibility(ESlateVisibility::Collapsed);
+		}
+	}
+	else
+	{
+		// Restore each widget's remembered visibility.
+		for (UUserWidget* W : Widgets)
+		{
+			if (!IsValid(W)) continue;
+			const uint8* Saved = SavedHudVisibility.Find(W);
+			W->SetVisibility(Saved ? static_cast<ESlateVisibility>(*Saved) : ESlateVisibility::Visible);
+		}
+		SavedHudVisibility.Reset();
+	}
+
+	UE_LOG(LogFlux, Warning, TEXT("HUD %s (H)"), bHudHidden ? TEXT("hidden") : TEXT("shown"));
 }
 
 
@@ -113,8 +288,26 @@ FSiteConfig AIrradianceMode::GetSiteConfig(const int SiteIdx)
 }
 
 
-void AIrradianceMode::PrepMemoryForAnalysis()
+bool AIrradianceMode::PrepMemoryForAnalysis()
 {
+	// The library writes nVoxels floats into the Irrads chunk with no bounds
+	// check of its own, so a grid that outgrows the arena corrupts the heap and
+	// dies inside FieldAnalysis with a bare SIGSEGV. Refuse the run instead.
+	const size_t IrradsBytes = static_cast<size_t>(NativeField.nVoxels) * sizeof(float);
+	if (IrradsBytes > VoxelChunkSize)
+	{
+		UE_LOG(LogFlux, Error,
+			TEXT("Voxel grid too large: %d voxels need %.2f GiB but the voxel arena chunk is %.2f GiB. ")
+			TEXT("Raise NumVoxelMemory/VoxelChunkSize in IrradianceMode.h, increase VoxelSize, ")
+			TEXT("or reduce FieldRadius / MaxHeight. (If you just changed those constants, rebuild ")
+			TEXT("the FFIAM module and restart the editor -- site JSON is read at runtime but ")
+			TEXT("the pool sizes are compiled in.)"),
+			NativeField.nVoxels,
+			static_cast<double>(IrradsBytes) / (1024.0 * 1024.0 * 1024.0),
+			static_cast<double>(VoxelChunkSize) / (1024.0 * 1024.0 * 1024.0));
+		return false;
+	}
+
 	pool_free(&MemoryPool, NativeField.locs);
 	pool_free(&MemoryPool, NativeField.aimVs);
 	pool_free(&MemoryPool, NativeField.moveAngles);
@@ -132,6 +325,14 @@ void AIrradianceMode::PrepMemoryForAnalysis()
 	Misc3Data = static_cast<float3*>(pool_alloc(&MemoryPool));
 	
 	Irrads = static_cast<float*>(pool_alloc(&VoxelPool));
+
+	if (!Irrads)
+	{
+		UE_LOG(LogFlux, Error, TEXT("Voxel pool exhausted -- pool_alloc returned null for Irrads."));
+		return false;
+	}
+
+	return true;
 }
 
 
@@ -213,8 +414,11 @@ bool AIrradianceMode::DoAnalysisInternal(const ECspSite CspSiteType,
 	NativeField.voxelSize = Field.VoxelSize;
 	NativeField.nVoxels = Field.NumVoxels;
 
-	PrepMemoryForAnalysis();
-	
+	if (!PrepMemoryForAnalysis())
+	{
+		return false;
+	}
+
 	const auto OldCout = std::cout.rdbuf(&Stream);
 	std::cout << "Redirecting stdout" << std::endl;
 	
