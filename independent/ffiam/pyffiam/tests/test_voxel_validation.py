@@ -6,8 +6,13 @@ import pytest
 import numpy as np
 
 from pyffiam.app_config import (
-    MIN_VOXEL_SIZE, MAX_VOXEL_SIZE, MAX_VOXELS, VOXEL_POOL_SIZE,
-    MAX_FIELD_RADIUS, MAX_HEIGHT, GB
+    MIN_VOXEL_SIZE,
+    MAX_VOXEL_SIZE,
+    MAX_VOXELS,
+    VOXEL_POOL_SIZE,
+    MAX_FIELD_RADIUS,
+    MAX_HEIGHT,
+    GB,
 )
 from pyffiam.utils import estimate_voxel_memory, print_voxel_config_table
 
@@ -77,9 +82,7 @@ class TestMaxFieldSizeConstraints:
 
     def test_max_field_with_2m_voxels(self):
         """Test maximum field radius with default 2m voxels fits in memory."""
-        num_voxels, memory_gb, is_valid = estimate_voxel_memory(
-            MAX_FIELD_RADIUS, 0, MAX_HEIGHT, 2
-        )
+        num_voxels, memory_gb, is_valid = estimate_voxel_memory(MAX_FIELD_RADIUS, 0, MAX_HEIGHT, 2)
 
         # 1700m radius at 2m: 1700 voxels per side
         # 310m height at 2m: 156 levels
@@ -102,9 +105,7 @@ class TestMaxFieldSizeConstraints:
 
     def test_max_field_with_1m_voxels_fails(self):
         """Test that maximum field with 1m voxels exceeds limits."""
-        num_voxels, memory_gb, is_valid = estimate_voxel_memory(
-            MAX_FIELD_RADIUS, 0, MAX_HEIGHT, 1
-        )
+        num_voxels, memory_gb, is_valid = estimate_voxel_memory(MAX_FIELD_RADIUS, 0, MAX_HEIGHT, 1)
 
         # This should exceed memory limits
         # 1700m radius at 1m: 3400 voxels per side

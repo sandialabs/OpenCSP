@@ -13,20 +13,22 @@ from pyffiam import utils
 @dataclass
 class HeliostatResults:
     """Results related to heliostat positions and orientations."""
-    locations: np.ndarray           # (num_heliostats, 3) positions
-    aim_vectors: np.ndarray         # (num_heliostats, 3) aim directions
-    movement_angles: np.ndarray     # (num_heliostats,) rotation angles
-    facet_origins: np.ndarray       # (num_heliostats, num_facets, 3) facet positions
-    total_movement: float           # Total heliostat movement (degrees)
+
+    locations: np.ndarray  # (num_heliostats, 3) positions
+    aim_vectors: np.ndarray  # (num_heliostats, 3) aim directions
+    movement_angles: np.ndarray  # (num_heliostats,) rotation angles
+    facet_origins: np.ndarray  # (num_heliostats, num_facets, 3) facet positions
+    total_movement: float  # Total heliostat movement (degrees)
 
 
 @dataclass
 class IrradianceResults:
     """Results related to irradiance calculations."""
-    values: np.ndarray              # (num_voxels,) irradiance per voxel
-    total: int                      # Sum of all irradiance values
-    peak: float                     # Maximum irradiance value
-    num_impacted: int               # Number of voxels with non-zero irradiance
+
+    values: np.ndarray  # (num_voxels,) irradiance per voxel
+    total: int  # Sum of all irradiance values
+    peak: float  # Maximum irradiance value
+    num_impacted: int  # Number of voxels with non-zero irradiance
 
     @classmethod
     def from_array(cls, irrads: np.ndarray) -> 'IrradianceResults':
@@ -42,30 +44,24 @@ class IrradianceResults:
 @dataclass
 class ThresholdResults:
     """Results filtered by irradiance threshold."""
-    mask: np.ndarray                # Boolean mask where irrad > threshold
-    irradiances: np.ndarray         # Irradiance values above threshold
-    voxel_ids: np.ndarray           # Indices of threshold-exceeding voxels
-    voxel_locations: np.ndarray     # (N, 3) Cartesian positions of threshold voxels
-    total_irradiance: int           # Sum of above-threshold irradiance
-    num_voxels: int                 # Count of threshold-exceeding voxels
-    has_glare: bool                 # True if any voxel exceeds threshold
+
+    mask: np.ndarray  # Boolean mask where irrad > threshold
+    irradiances: np.ndarray  # Irradiance values above threshold
+    voxel_ids: np.ndarray  # Indices of threshold-exceeding voxels
+    voxel_locations: np.ndarray  # (N, 3) Cartesian positions of threshold voxels
+    total_irradiance: int  # Sum of above-threshold irradiance
+    num_voxels: int  # Count of threshold-exceeding voxels
+    has_glare: bool  # True if any voxel exceeds threshold
 
     @classmethod
     def from_irradiance(
-        cls,
-        irrads: np.ndarray,
-        threshold: float,
-        voxel_size: int,
-        field_radius: int,
-        min_height: int,
+        cls, irrads: np.ndarray, threshold: float, voxel_size: int, field_radius: int, min_height: int
     ) -> 'ThresholdResults':
         """Filter irradiance array to above-threshold voxels and compute their positions."""
         mask = irrads > threshold
         threshold_irrads = irrads[mask]
         voxel_ids = np.where(mask)[0]
-        voxel_locs = utils.get_voxel_locs_from_indexes(
-            voxel_ids, voxel_size, field_radius, min_height
-        )
+        voxel_locs = utils.get_voxel_locs_from_indexes(voxel_ids, voxel_size, field_radius, min_height)
 
         return cls(
             mask=mask,
@@ -85,13 +81,16 @@ class AnalysisResults:
     Coordinates (x, y, z) = (east, north, up) with tower at origin. Units: meters for distances,
     kW/m² for irradiance values.
     """
-    heliostats: HeliostatResults    # Heliostat positions, aim vectors, and tracking angles
-    irradiance: IrradianceResults   # Full volumetric irradiance array and summary stats (total, peak, impacted voxel count)
-    threshold: ThresholdResults     # Subset of irradiance data filtered to voxels exceeding the threshold
+
+    heliostats: HeliostatResults  # Heliostat positions, aim vectors, and tracking angles
+    irradiance: (
+        IrradianceResults  # Full volumetric irradiance array and summary stats (total, peak, impacted voxel count)
+    )
+    threshold: ThresholdResults  # Subset of irradiance data filtered to voxels exceeding the threshold
 
     # Voxel grid (derived from AnalysisConfig, stored here for convenience)
-    voxel_locations: np.ndarray     # (num_voxels, 3) center position of every voxel (m)
-    voxel_layout: tuple             # (nx, ny, nz) grid dimensions along east/north/up axes
+    voxel_locations: np.ndarray  # (num_voxels, 3) center position of every voxel (m)
+    voxel_layout: tuple  # (nx, ny, nz) grid dimensions along east/north/up axes
 
     @property
     def has_results(self) -> bool:
@@ -141,11 +140,7 @@ class AnalysisResults:
         irradiance = IrradianceResults.from_array(irrads)
 
         threshold_results = ThresholdResults.from_irradiance(
-            irrads=irrads,
-            threshold=threshold,
-            voxel_size=voxel_size,
-            field_radius=field_radius,
-            min_height=min_height,
+            irrads=irrads, threshold=threshold, voxel_size=voxel_size, field_radius=field_radius, min_height=min_height
         )
 
         return cls(

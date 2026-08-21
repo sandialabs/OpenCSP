@@ -12,6 +12,7 @@ from pyffiam.app_config import FFIAM_VERSION
 @dataclass
 class PlotPaths:
     """Paths to generated plot files for a single dimension pair."""
+
     heatmap: Optional[Path] = None
     heatmap_zoomed: Optional[Path] = None
     heatmap_gif: Optional[Path] = None
@@ -20,6 +21,7 @@ class PlotPaths:
 @dataclass
 class AnalysisOutput:
     """Generated output file paths from a FFIAM analysis run."""
+
     output_directory: Path
 
     xls_filename: Optional[str] = None
@@ -55,49 +57,26 @@ class AnalysisOutput:
         return self.xls_file is not None and self.xls_file.exists()
 
     @classmethod
-    def create_for_session(
-        cls,
-        app_result_dir: Path,
-        session_name: str,
-    ) -> 'AnalysisOutput':
+    def create_for_session(cls, app_result_dir: Path, session_name: str) -> 'AnalysisOutput':
         """Create an AnalysisOutput and mkdir the session output directory."""
         output_dir = app_result_dir / session_name
         output_dir.mkdir(parents=True, exist_ok=True)
 
         xls_filename = f"{session_name}.xlsx"
 
-        return cls(
-            output_directory=output_dir,
-            xls_filename=xls_filename,
-            xls_file=output_dir / xls_filename,
-        )
+        return cls(output_directory=output_dir, xls_filename=xls_filename, xls_file=output_dir / xls_filename)
 
-    def set_en_plots(
-        self,
-        heatmap: Optional[Path],
-        heatmap_zoomed: Optional[Path],
-        heatmap_gif: Optional[Path] = None,
-    ):
+    def set_en_plots(self, heatmap: Optional[Path], heatmap_zoomed: Optional[Path], heatmap_gif: Optional[Path] = None):
         self.en_heatmap = heatmap
         self.en_heatmap_zoomed = heatmap_zoomed
         self.en_heatmap_gif = heatmap_gif
 
-    def set_eu_plots(
-        self,
-        heatmap: Optional[Path],
-        heatmap_zoomed: Optional[Path],
-        heatmap_gif: Optional[Path] = None,
-    ):
+    def set_eu_plots(self, heatmap: Optional[Path], heatmap_zoomed: Optional[Path], heatmap_gif: Optional[Path] = None):
         self.eu_heatmap = heatmap
         self.eu_heatmap_zoomed = heatmap_zoomed
         self.eu_heatmap_gif = heatmap_gif
 
-    def set_nu_plots(
-        self,
-        heatmap: Optional[Path],
-        heatmap_zoomed: Optional[Path],
-        heatmap_gif: Optional[Path] = None,
-    ):
+    def set_nu_plots(self, heatmap: Optional[Path], heatmap_zoomed: Optional[Path], heatmap_gif: Optional[Path] = None):
         self.nu_heatmap = heatmap
         self.nu_heatmap_zoomed = heatmap_zoomed
         self.nu_heatmap_gif = heatmap_gif

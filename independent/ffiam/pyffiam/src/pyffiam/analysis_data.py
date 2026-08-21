@@ -23,6 +23,7 @@ class AnalysisData:
     Coordinates (x, y, z) = (east, north, up) with the tower at the origin. All distances in meters.
     Populated in two stages: construction sets inputs/geometry, add_results() sets computed metrics.
     """
+
     # Basic analysis parameters
     name: str
     slug: str
@@ -31,59 +32,59 @@ class AnalysisData:
     year: int
     month: int
     day: int
-    hour: float          # Decimal hours (e.g. 10.5 = 10:30 AM)
+    hour: float  # Decimal hours (e.g. 10.5 = 10:30 AM)
     analysis_dt: datetime
     analysis_dt_str: str
 
     # Site parameters
     site: 'CspSite'
-    latitude: float      # Degrees north
-    longitude: float     # Degrees east
-    timezone: float      # UTC offset (hours)
+    latitude: float  # Degrees north
+    longitude: float  # Degrees east
+    timezone: float  # UTC offset (hours)
     field_radius: float  # Heliostat field radius (m); sets x/y extent of voxel grid
     num_heliostats: int
-    min_height: float    # Lower airspace bound (m AGL)
-    max_height: float    # Upper airspace bound (m AGL)
+    min_height: float  # Lower airspace bound (m AGL)
+    max_height: float  # Upper airspace bound (m AGL)
     tower_height: float  # Receiver tower height (m); used for plot annotations
     reflectivity: float  # Heliostat mirror reflectivity (0–1)
-    peak_dni: float      # Peak direct normal irradiance (W/cm²)
-    sun_angle: float     # Solar disk half-angle (radians)
-    slope_error: float   # Mirror slope error (radians)
-    beta: float          # Beam spread coefficient (radians); controls flux falloff with distance
-    ambient: float       # Ambient irradiance baseline added to every voxel (kW/m²)
-    threshold: float     # Irradiance threshold for glare reporting (kW/m²); voxels below this are excluded
+    peak_dni: float  # Peak direct normal irradiance (W/cm²)
+    sun_angle: float  # Solar disk half-angle (radians)
+    slope_error: float  # Mirror slope error (radians)
+    beta: float  # Beam spread coefficient (radians); controls flux falloff with distance
+    ambient: float  # Ambient irradiance baseline added to every voxel (kW/m²)
+    threshold: float  # Irradiance threshold for glare reporting (kW/m²); voxels below this are excluded
 
     # File paths
-    heliostat_file: str          # CSV filename relative to pyffiam/data/ with heliostat positions
-    facet_file: str              # CSV filename relative to pyffiam/data/ with facet offsets
-    output_directory: Path       # Directory where plots, XLS, and logs are written
+    heliostat_file: str  # CSV filename relative to pyffiam/data/ with heliostat positions
+    facet_file: str  # CSV filename relative to pyffiam/data/ with facet offsets
+    output_directory: Path  # Directory where plots, XLS, and logs are written
 
     # Aiming parameters
     aim_strategy: 'AimType'
     aim_parameters: Optional[np.ndarray]  # 3-element strategy-specific params (e.g. aim point in m for AimType.Point)
-    aim_file: str                # CSV filename relative to pyffiam/data/ with per-heliostat aim data
+    aim_file: str  # CSV filename relative to pyffiam/data/ with per-heliostat aim data
 
     # Voxel grid parameters
-    voxel_size: int = 2          # Voxel edge length (m)
+    voxel_size: int = 2  # Voxel edge length (m)
 
     # Path parameters (optional UAS exposure analysis)
     has_paths: bool = False
-    paths: Optional[List] = None         # List of polyline paths, each a sequence of (x, y, z) waypoints (m)
-    path_speeds: Optional[List] = None   # Travel speed (m/s) for each path
+    paths: Optional[List] = None  # List of polyline paths, each a sequence of (x, y, z) waypoints (m)
+    path_speeds: Optional[List] = None  # Travel speed (m/s) for each path
     path_objects: Optional[List] = None  # PathData results, populated after analysis
 
     # Heliostat geometry (populated after C++ call)
-    helio_locs: np.ndarray = None        # (num_heliostats, 3) heliostat positions (m)
-    helio_aim_vs: np.ndarray = None      # (num_heliostats, 3) aim unit vectors
-    helio_angles: np.ndarray = None      # (num_heliostats,) tracking rotation angles (degrees)
+    helio_locs: np.ndarray = None  # (num_heliostats, 3) heliostat positions (m)
+    helio_aim_vs: np.ndarray = None  # (num_heliostats, 3) aim unit vectors
+    helio_angles: np.ndarray = None  # (num_heliostats,) tracking rotation angles (degrees)
     num_facets: Optional[int] = None
     num_facet_cols: Optional[int] = None
     facet_width: Optional[float] = None  # Individual facet width (m)
-    facet_height: Optional[float] = None # Individual facet height (m)
-    facet_origins: np.ndarray = None     # (num_heliostats, num_facets, 3) facet center positions (m)
-    helio_width: float = None            # Total heliostat width = facet_width * num_facet_cols (m)
-    voxel_layout: tuple = None           # (nx, ny, nz) voxel grid dimensions
-    num_voxels: int = None               # Total voxel count = nx * ny * nz
+    facet_height: Optional[float] = None  # Individual facet height (m)
+    facet_origins: np.ndarray = None  # (num_heliostats, num_facets, 3) facet center positions (m)
+    helio_width: float = None  # Total heliostat width = facet_width * num_facet_cols (m)
+    voxel_layout: tuple = None  # (nx, ny, nz) voxel grid dimensions
+    num_voxels: int = None  # Total voxel count = nx * ny * nz
     # (num_voxels, 3) voxel center positions (m). Materialized lazily by the
     # voxel_locs property -- see the note there; at 1 m grids this array is tens
     # of GB and most runs never touch it.
@@ -91,23 +92,23 @@ class AnalysisData:
     num_voxels_x: int = None
     num_voxels_y: int = None
     num_voxels_z: int = None
-    voxel_area: float = None             # Voxel face area (m²)
-    voxel_volume: float = None           # Voxel volume (m³)
+    voxel_area: float = None  # Voxel face area (m²)
+    voxel_volume: float = None  # Voxel volume (m³)
 
     # Analysis results (populated by add_results())
     has_results: bool = False
-    irrads: np.ndarray = None            # (num_voxels,) irradiance per voxel (kW/m²)
-    total_irrad: float = None            # Sum of all voxel irradiances (kW/m²)
-    peak_irrad: float = None             # Maximum single-voxel irradiance (kW/m²)
-    movement: float = None               # Total heliostat tracking movement (degrees)
+    irrads: np.ndarray = None  # (num_voxels,) irradiance per voxel (kW/m²)
+    total_irrad: float = None  # Sum of all voxel irradiances (kW/m²)
+    peak_irrad: float = None  # Maximum single-voxel irradiance (kW/m²)
+    movement: float = None  # Total heliostat tracking movement (degrees)
 
-    threshold_mask: np.ndarray = None        # Boolean mask: True where irrads > threshold
-    threshold_irrads: np.ndarray = None      # Irradiance values for above-threshold voxels (kW/m²)
-    total_irrad_threshold: float = None      # Sum of above-threshold irradiances (kW/m²)
-    n_glaring_voxels: int = None             # Count of voxels exceeding threshold
-    has_glare: bool = None                   # True if any voxel exceeds threshold
+    threshold_mask: np.ndarray = None  # Boolean mask: True where irrads > threshold
+    threshold_irrads: np.ndarray = None  # Irradiance values for above-threshold voxels (kW/m²)
+    total_irrad_threshold: float = None  # Sum of above-threshold irradiances (kW/m²)
+    n_glaring_voxels: int = None  # Count of voxels exceeding threshold
+    has_glare: bool = None  # True if any voxel exceeds threshold
 
-    threshold_voxel_ids: np.ndarray = None   # Flat indices into irrads array for above-threshold voxels
+    threshold_voxel_ids: np.ndarray = None  # Flat indices into irrads array for above-threshold voxels
     threshold_voxel_locs: np.ndarray = None  # (N, 3) Cartesian positions of above-threshold voxels (m)
 
     # Plot files (set in analysis function)
@@ -128,54 +129,50 @@ class AnalysisData:
 
     ffiam_version: str = FFIAM_VERSION
 
-    def __init__(self,
-                 name: str,
-                 year: int,
-                 month: int,
-                 day: int,
-                 hour: float,  # Decimal hours (e.g. 10.5 = 10:30 AM)
-                 threshold: float,
-
-                 site: CspSite,
-                 latitude: float,
-                 longitude: float,
-                 timezone: float,
-                 field_radius: float,
-                 num_helios: int,
-                 min_height: float,
-                 max_height: float,
-                 tower_height: float,
-                 num_facets: int,
-                 num_facet_cols: int,
-                 facet_width: float,
-                 facet_height: float,
-
-                 helio_file: str = "",
-                 facet_file: str = "",
-                 layout: int = FieldLayout.Grid.value,  # used only when no helio_file (0=grid, 1=radial)
-                 aim_strat: 'AimType' = None,
-                 aim_params: np.ndarray = None,
-                 aim_file: str = "",
-
-                 paths=None,
-                 path_speeds=None,
-
-                 voxel_size: int = 2,
-                 refl=0.9,
-                 peak_dni=0.1,
-                 sun_angle=0.0093,
-                 slope_error=0.0012,
-                 beta=0.0094,
-                 ambient: float = 0.0,          # Ambient irradiance baseline (kW/m²)
-                 min_attenuation: float = 1.0,  # Hybrid blend floor (1.0 = disabled, 0.42 = UAS-calibrated)
-                 irrad_exponent: float = 2.0,   # Beam concentration exponent (2.0 = default, 1.7 = UAS-calibrated)
-                 n_rays_per_facet: float = 12.0, # Rays per facet (12 = 9 core + 3 outer, 9 = core only)
-                 flux_correction_scale: float = 1.0,  # Flux correction scale (1.0 = full, 0.0 = disabled)
-                 pre_focal_scale: float = 1.0,  # Pre-focal attenuation scale (1.0 = symmetric default, 0.6 = UAS-calibrated)
-
-                 app_result_dir: Path = None,
-                 verbose: bool = False
-                 ):
+    def __init__(
+        self,
+        name: str,
+        year: int,
+        month: int,
+        day: int,
+        hour: float,  # Decimal hours (e.g. 10.5 = 10:30 AM)
+        threshold: float,
+        site: CspSite,
+        latitude: float,
+        longitude: float,
+        timezone: float,
+        field_radius: float,
+        num_helios: int,
+        min_height: float,
+        max_height: float,
+        tower_height: float,
+        num_facets: int,
+        num_facet_cols: int,
+        facet_width: float,
+        facet_height: float,
+        helio_file: str = "",
+        facet_file: str = "",
+        layout: int = FieldLayout.Grid.value,  # used only when no helio_file (0=grid, 1=radial)
+        aim_strat: 'AimType' = None,
+        aim_params: np.ndarray = None,
+        aim_file: str = "",
+        paths=None,
+        path_speeds=None,
+        voxel_size: int = 2,
+        refl=0.9,
+        peak_dni=0.1,
+        sun_angle=0.0093,
+        slope_error=0.0012,
+        beta=0.0094,
+        ambient: float = 0.0,  # Ambient irradiance baseline (kW/m²)
+        min_attenuation: float = 1.0,  # Hybrid blend floor (1.0 = disabled, 0.42 = UAS-calibrated)
+        irrad_exponent: float = 2.0,  # Beam concentration exponent (2.0 = default, 1.7 = UAS-calibrated)
+        n_rays_per_facet: float = 12.0,  # Rays per facet (12 = 9 core + 3 outer, 9 = core only)
+        flux_correction_scale: float = 1.0,  # Flux correction scale (1.0 = full, 0.0 = disabled)
+        pre_focal_scale: float = 1.0,  # Pre-focal attenuation scale (1.0 = symmetric default, 0.6 = UAS-calibrated)
+        app_result_dir: Path = None,
+        verbose: bool = False,
+    ):
         """Validate inputs, resolve preset site configs, and compute voxel grid geometry.
 
         Args:
@@ -304,12 +301,11 @@ class AnalysisData:
 
         if not (MIN_VOXEL_SIZE <= self.voxel_size <= MAX_VOXEL_SIZE):
             raise ValueError(
-                f"voxel_size must be between {MIN_VOXEL_SIZE} and {MAX_VOXEL_SIZE}m "
-                f"({self.voxel_size}m provided)"
+                f"voxel_size must be between {MIN_VOXEL_SIZE} and {MAX_VOXEL_SIZE}m " f"({self.voxel_size}m provided)"
             )
 
-        self.voxel_area = voxel_size ** 2
-        self.voxel_volume = voxel_size ** 3
+        self.voxel_area = voxel_size**2
+        self.voxel_volume = voxel_size**3
         self.num_voxels_z = int((self.max_height - self.min_height) / self.voxel_size + 1)
         self.num_voxels_y = int(2 * self.field_radius / self.voxel_size)
         self.num_voxels_x = int(2 * self.field_radius / self.voxel_size)
@@ -356,26 +352,32 @@ class AnalysisData:
         if self.heliostat_file != "":
             helio_file_fpath = data_dir / self.heliostat_file
             if not helio_file_fpath.exists():
-                log.error(f"File not found ({self.heliostat_file}). If providing a heliostat data-file, place it in the 'data' subdirectory.")
+                log.error(
+                    f"File not found ({self.heliostat_file}). If providing a heliostat data-file, place it in the 'data' subdirectory."
+                )
                 raise FileNotFoundError(helio_file_fpath)
 
         if self.aim_file != "":
             aim_file_fpath = data_dir / self.aim_file
             if not aim_file_fpath.exists():
-                log.error(f"File not found ({self.aim_file}). If providing a aim data-file, place it in the 'data' subdirectory.")
+                log.error(
+                    f"File not found ({self.aim_file}). If providing a aim data-file, place it in the 'data' subdirectory."
+                )
                 raise FileNotFoundError(aim_file_fpath)
 
         if self.facet_file != "":
             facet_file_fpath = data_dir / self.facet_file
             if not facet_file_fpath.exists():
-                log.error(f"File not found ({self.facet_file}). If providing a facet data-file, place it in the 'data' subdirectory.")
+                log.error(
+                    f"File not found ({self.facet_file}). If providing a facet data-file, place it in the 'data' subdirectory."
+                )
                 raise FileNotFoundError(facet_file_fpath)
 
         if verbose:
             import pprint
+
             print("Analysis parameters:")
             pprint.pprint(vars(self))
-
 
     @property
     def voxel_locs(self) -> np.ndarray:
@@ -398,15 +400,7 @@ class AnalysisData:
     def voxel_locs(self, value: np.ndarray) -> None:
         self._voxel_locs = value
 
-
-    def add_results(self,
-                    helio_locs,
-                    helio_aim_vs,
-                    helio_angles,
-                    facet_origins,
-                    irrads,
-                    movement,
-                    ):
+    def add_results(self, helio_locs, helio_aim_vs, helio_angles, facet_origins, irrads, movement):
         """Populate result fields from raw C++ output arrays and compute derived summary stats."""
         self.helio_locs = helio_locs
         self.helio_aim_vs = helio_aim_vs
@@ -425,10 +419,9 @@ class AnalysisData:
         self.has_glare = self.n_glaring_voxels > 0
 
         self.threshold_voxel_ids = np.where(self.threshold_mask)[0]
-        self.threshold_voxel_locs = utils.get_voxel_locs_from_indexes(self.threshold_voxel_ids,
-                                                                      self.voxel_size,
-                                                                      self.field_radius,
-                                                                      self.min_height)
+        self.threshold_voxel_locs = utils.get_voxel_locs_from_indexes(
+            self.threshold_voxel_ids, self.voxel_size, self.field_radius, self.min_height
+        )
 
         self.has_results = True
 
@@ -442,6 +435,7 @@ class AnalysisData:
 
 class PathData:
     """Irradiance results along a single polyline path."""
+
     id: int
     name: str
     points: np.ndarray
@@ -501,12 +495,7 @@ class PathData:
         self.exposures_over_time = np.cumsum(self.exposures)
         self.total_exposure = np.nansum(self.exposures)
 
-
-    def set_plots(self,
-                  en_heatmap, en_heatmap_zoomed,
-                  eu_heatmap, eu_heatmap_zoomed,
-                  cumsum_plot,
-                  ):
+    def set_plots(self, en_heatmap, en_heatmap_zoomed, eu_heatmap, eu_heatmap_zoomed, cumsum_plot):
         """Store generated plot file paths for this path."""
         self.en_heatmap = en_heatmap
         self.en_heatmap_zoomed = en_heatmap_zoomed

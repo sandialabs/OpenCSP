@@ -14,10 +14,11 @@ class CspSite(Enum):
 
     Values must match the C++ csp_site enum and UE ECspSite.
     """
+
     Custom = 0
     NSTTF = 1
-    RadialSmall = 2   # generated ~1 km radial field
-    Radial = 3        # generated ~1.6 km radial field
+    RadialSmall = 2  # generated ~1 km radial field
+    Radial = 3  # generated ~1.6 km radial field
     SampleV1 = 4
     SampleV2 = 5
     SampleV3 = 6
@@ -25,13 +26,15 @@ class CspSite(Enum):
 
 class FieldLayout(Enum):
     """Field generation type; mirrors C++ field_layout_type."""
-    Grid = 0    # square grid
+
+    Grid = 0  # square grid
     Radial = 1  # concentric staggered rings
 
     @staticmethod
     def from_str(s: str) -> "FieldLayout":
         return {"grid": FieldLayout.Grid, "radial": FieldLayout.Radial}.get(
-            (s or "grid").strip().lower(), FieldLayout.Grid)
+            (s or "grid").strip().lower(), FieldLayout.Grid
+        )
 
 
 class AimType(Enum):
@@ -44,6 +47,7 @@ class AimType(Enum):
         Heliostat surface normal is fixed (e.g., STOW/face-up position).
         The reflected beam direction depends on sun position via law of reflection.
     """
+
     Null = 0
     Point = 1
     Ring = 2
@@ -55,6 +59,7 @@ class AimType(Enum):
 
 class Direction(Enum):
     """Cartesian coordinate directions."""
+
     East = 0
     North = 1
     Up = 2

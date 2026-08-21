@@ -14,12 +14,7 @@ from .config import (
 )
 
 # Results classes (Phase 3)
-from .results import (
-    AnalysisResults,
-    HeliostatResults,
-    IrradianceResults,
-    ThresholdResults,
-)
+from .results import AnalysisResults, HeliostatResults, IrradianceResults, ThresholdResults
 
 # Output classes (Phase 3)
 from .output import AnalysisOutput
