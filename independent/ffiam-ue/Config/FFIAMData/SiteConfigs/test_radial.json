@@ -1,5 +1,6 @@
 {
   "RunId": "Radial (1.6 km)",
+  "SortOrder": 30,
   "SiteType": "Site_Radial",
   "HelioDesign": {
     "NumFacets": 25,
@@ -31,7 +32,7 @@
   },
   "AimStrategy": {
     "Type": "Aim_Ring",
-    "Params": { "X": 80.0, "Y": 20.0, "Z": 0 },
+    "Params": { "X": 60.0, "Y": 100.0, "Z": 20.0 },
     "File": ""
   }
 }

@@ -10,6 +10,7 @@ and compares numeric results. Reports all metrics before asserting.
 import json
 import logging
 import os
+import shlex
 import subprocess
 import unittest
 import numpy as np
@@ -20,6 +21,13 @@ from pyffiam.ffiam_types import CspSite, AimType
 log = logging.getLogger(__name__)
 
 DOCKER_IMAGE = "ffiam"
+
+# Docker run flags are env-overridable so the suite can run where the legacy
+# `--gpus all` flag or default networking don't apply. Defaults preserve the
+# standard host behavior. Example (CDI GPU setup requiring host networking):
+#   FFIAM_DOCKER_GPU_FLAGS="--device nvidia.com/gpu=all" FFIAM_DOCKER_RUN_ARGS="--network host"
+DOCKER_GPU_FLAGS = os.environ.get("FFIAM_DOCKER_GPU_FLAGS", "--gpus all")
+DOCKER_EXTRA_RUN_ARGS = os.environ.get("FFIAM_DOCKER_RUN_ARGS", "")
 
 # cross-platform tolerance (MSVC/arch52 vs GCC/arch75+)
 PEAK_RTOL = 0.005
@@ -46,12 +54,17 @@ RESULT_KEYS = ["peak", "total", "total_thresh", "glaring", "n_helios", "n_facets
 
 def _run_docker(params_str):
     snippet = _DOCKER_SNIPPET.format(params=params_str)
-    proc = subprocess.run(
-        ["docker", "run", "--rm", "--gpus", "all", DOCKER_IMAGE, "-c", snippet],
-        capture_output=True,
-        text=True,
-        timeout=300,
-    )
+    cmd = [
+        "docker",
+        "run",
+        "--rm",
+        *shlex.split(DOCKER_GPU_FLAGS),
+        *shlex.split(DOCKER_EXTRA_RUN_ARGS),
+        DOCKER_IMAGE,
+        "-c",
+        snippet,
+    ]
+    proc = subprocess.run(cmd, capture_output=True, text=True, timeout=300)
     if proc.returncode != 0:
         raise RuntimeError(f"Docker failed (exit {proc.returncode}):\n{proc.stdout[-3000:]}\n{proc.stderr[-3000:]}")
     for line in proc.stdout.splitlines():
@@ -128,13 +141,13 @@ CASES = [
             day=21,
             hour=13,
             aim_strat=AimType.Ring,
-            aim_params=np.array([30, 90, 0]),
+            aim_params=np.array([30, 90, 90]),
             threshold=4,
             voxel_size=4,
         ),
         "params_str": (
             "site=CspSite.NSTTF, year=2025, month=6, day=21, hour=13, "
-            "aim_strat=AimType.Ring, aim_params=np.array([30,90,0]), "
+            "aim_strat=AimType.Ring, aim_params=np.array([30,90,90]), "
             "threshold=4, voxel_size=4"
         ),
     },

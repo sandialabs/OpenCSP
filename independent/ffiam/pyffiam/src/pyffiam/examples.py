@@ -19,7 +19,7 @@ def assess_radial():
         # aim_strat=AimType.Point,
         # aim_params=np.array([0, 0, 120]),
         aim_strat=AimType.Ring,
-        aim_params=np.array([80, 120, 0]),
+        aim_params=np.array([60, 100, 120]),
         # aim_strat=AimType.Vector,
         # aim_params=np.array([0, 0, 1]),
         paths=[
@@ -61,7 +61,7 @@ def assess_radial_small():
         # aim_strat=AimType.Point,
         # aim_params=np.array([0, 0, 120]),
         aim_strat=AimType.Ring,
-        aim_params=np.array([80, 120, 0]),
+        aim_params=np.array([60, 100, 120]),
         # aim_strat=AimType.Vector,
         # aim_params=np.array([0, 0, 1]),
         paths=[
@@ -135,7 +135,7 @@ def assess_sample_v2():
         # aim_strat=AimType.Point,
         # aim_params=np.array([0, 0, 120]),
         aim_strat=AimType.Ring,
-        aim_params=np.array([30, 120, 0]),
+        aim_params=np.array([30, 90, 120]),
         open_output_dir=True,
     )
     print(f"Sample site total irradiance: {result.total_irrad:,.0f}")

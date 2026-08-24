@@ -199,6 +199,11 @@ struct FSiteConfig
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FFIAM Config")
     FString RunId;
 
+    // HUD site-list order: lower sorts earlier. Optional in JSON; configs without it
+    // default to 100, so they fall after explicitly-ordered presets. RunId breaks ties.
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FFIAM Config")
+    int32 SortOrder = 100;
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "FFIAM Config")
     FHeliostatDesign HelioDesign;
 

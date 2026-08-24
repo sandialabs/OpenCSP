@@ -81,3 +81,9 @@ Plugins/*/Intermediate/*
 
 # Cache files for the editor to use
 DerivedDataCache/*
+
+# UE-regenerated project files (host "Generate Project Files")
+.vscode/
+*.code-workspace
+/Makefile
+/.ignore

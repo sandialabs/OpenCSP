@@ -1,3 +1,5 @@
+// Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 #include "core/heliostat.h"
 #include "util/math.h"
 #include <cassert>
@@ -53,19 +55,37 @@ void ComputeHeliostatConfigurations(const int idx,
     }
     else if (aimStrat->type == aim_ring)
     {
-        // calc horizontal point offset from tower perpendicular to heliostat->tower vector, then add height
+        // Annular ring aim. params = (inner_radius, outer_radius, height).
+        // Each heliostat aims at a point on a circle whose radius is spread
+        // linearly across the annulus [innerR, outerR] by heliostat index, at a
+        // fixed height. The aim point is offset horizontally, perpendicular to
+        // the heliostat->tower vector (tangential offset).
+        const float innerR = aimStrat->params.x;
+        const float outerR = aimStrat->params.y;
+        const float height = aimStrat->params.z;
+
+        const float frac = (field->nHelios > 1)
+                               ? static_cast<float>(idx) / static_cast<float>(field->nHelios - 1)
+                               : 0.0f;
+        const float r = innerR + (outerR - innerR) * frac;
+
         float3 hV = {-onRefV.y, onRefV.x, 0};
         Norm(&hV);
-        float3 aimPt = hV * (aimStrat->params.x);
-        aimPt.z = aimStrat->params.y;
+        float3 aimPt = hV * r;
+        aimPt.z = height;
         refV = aimPt - helio->loc;
     }
     else if (aimStrat->type == aim_split_ring)
     {
+        // params = (inner_radius, outer_radius, height); shares the ring convention.
+        // Within each azimuthal "pizza slice" the aim radius fans across the annulus
+        // [inner, outer] (previously a single radius plus a fixed 8 m spread band).
         int nHelioPerRow = static_cast<int>(std::ceil(field->nHelios / nHelioRows));
         int nHelioPerSlice = static_cast<int>(std::ceil(nHelioPerRow / 2.0f)); // half of row east, half west
 
-        float radius = aimStrat->params.x;
+        const float innerR = aimStrat->params.x;
+        const float outerR = aimStrat->params.y;
+        const float height = aimStrat->params.z;
 
         // southernmost rows aim at southernmost edge of circle
         auto helioIndexIntoSlice = static_cast<float>(idx % nHelioPerSlice);
@@ -77,15 +97,14 @@ void ComputeHeliostatConfigurations(const int idx,
         // angle around semicircle; include offset to reduce hotspot
         angle -= 90.0f; // shift origin so counterclockwise from due south
 
-        // Also spread across radius
-        auto rSpan = 8.0f;
-        auto rAdj = radius + rSpan * hScaler;
+        // spread aim radius across the annulus within the slice
+        const float rAdj = innerR + (outerR - innerR) * hScaler;
 
         float isEast = helio->loc.x >= 0.0f ? 1.0f : -1.0f;
         float3 aimPt = {
             std::cos(DEG_TO_RAD * angle) * rAdj * isEast,
             std::sin(DEG_TO_RAD * angle) * rAdj,
-            aimStrat->params.y
+            height
         };
 
         refV = aimPt - helio->loc;

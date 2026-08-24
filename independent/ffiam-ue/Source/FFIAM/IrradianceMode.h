@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Irradiance.h"
+#include "FFIAM.h"
 #include "SiteConfigTypes.h"
 #include "LogStream.h"
 #include "memory/pool.h"
@@ -16,6 +16,8 @@
 
 
 class FAnalysisTask;
+class UUserWidget;
+class IInputProcessor;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnSitesRefreshedDelegate, const TArray<FSiteConfig>&, SiteConfigs);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAnalysisCompleteDelegate, bool, bSuccess);
 DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAnalysisProgressDelegate, float, Progress);
@@ -27,7 +29,7 @@ DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnAnalysisProgressDelegate, float, 
  * Keep all ffiam.h use (structs, etc.) contained within this class.
  */
 UCLASS()
-class IRRADIANCE_API AIrradianceMode : public AGameMode
+class FFIAM_API AIrradianceMode : public AGameMode
 {
 	GENERATED_BODY()
 
@@ -108,18 +110,30 @@ public:
 
 	UFUNCTION()
 	FSiteConfig GetSiteConfig(int SiteIdx);
-	
+
+	/**
+	 * Toggle visibility of all on-screen HUD widgets (overlay + stats readout).
+	 * Bound to the 'H' key via a Slate input pre-processor; lets you hide the
+	 * HUD for clean screenshots and restores each widget's prior visibility.
+	 */
+	void ToggleHud();
+
 protected:
 	friend FAnalysisTask;
-	
+
+	// Load site configs here (runs before any actor BeginPlay) so the FluxManager's
+	// BeginPlay -> SetSite(0) finds them ready instead of an empty list.
+	virtual void InitGame(const FString& MapName, const FString& Options, FString& ErrorMessage) override;
 	virtual void BeginPlay() override;
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
 
 
 	UFUNCTION()
 	void ReinitializePool();
 
 	UFUNCTION()
-	void PrepMemoryForAnalysis();
+	// Returns false if the voxel grid will not fit the arena; caller must abort.
+	bool PrepMemoryForAnalysis();
 
 	// Field data
 	void* MemoryArena;
@@ -148,8 +162,12 @@ private:
 	const size_t NumFieldMemory = GB(2);
 	const size_t FieldChunkSize = MB(256);
 	
-	const size_t NumVoxelMemory = GB(2);
-	const size_t VoxelChunkSize = MB(256*6);
+	// Irrads is the voxel pool's only allocation, so the arena is a single chunk
+	// (pool_alloc hands back the LAST chunk -- splitting the arena would put
+	// Irrads at a non-zero offset for no benefit). Must hold the largest grid we
+	// support: 1 km radial at 1 m voxels = 788M voxels = 2.94 GiB.
+	const size_t NumVoxelMemory = MB(4096);
+	const size_t VoxelChunkSize = NumVoxelMemory;
 
 	bool bPoolFirstInitialized = false;
 
@@ -178,6 +196,20 @@ private:
 	                        FAnalysisResult& OutResult);
 
 	void CleanupAnalysisTask();
+
+	// HUD-toggle state. SavedHudVisibility remembers each widget's visibility
+	// while hidden so ToggleHud() can restore it exactly (important: the overlay
+	// may be SelfHitTestInvisible so camera drags pass through it).
+	bool bHudHidden = false;
+	TMap<UUserWidget*, uint8> SavedHudVisibility;
+	TSharedPtr<IInputProcessor> HudToggleProcessor;
+
+	// Select site 0 in the HUD's site combo once it has populated, so it doesn't
+	// show a blank selection at startup. Retried on a short timer because the
+	// widget populates asynchronously (from the OnSiteConfigsRefreshed broadcast).
+	void SelectDefaultSiteInHud();
+	FTimerHandle HudDefaultSiteTimer;
+	int32 HudDefaultSiteTries = 0;
 };
 
 

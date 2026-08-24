@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for pyffiam.cpp_interface: MemoryPool lifecycle, AnalysisParams
 marshalling, library-load failure modes, and ctypes signature wiring.
 
@@ -215,8 +217,9 @@ def test_py_analysis_argtypes_count_matches_signature():
     # + 3 optical (refl, dni, beta)
     # + 7 analysis (voxelSize, ambient, minAttenuation, irradExponent,
     #              nRaysPerFacet, fluxCorrectionScale, preFocalScale)
-    # + 2 trailing flags (verbose, useCpu) = 39.
-    assert len(sig.argtypes) == 39
+    # + 2 trailing flags (verbose, useCpu)
+    # + 1 layout (field_layout_type: 0=grid, 1=radial) = 40.
+    assert len(sig.argtypes) == 40
     assert sig.restype is cts.c_int
 
 

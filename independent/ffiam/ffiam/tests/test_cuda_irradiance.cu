@@ -1,3 +1,4 @@
+// Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
 // CUDA-gated unit tests for Cuda_ComputeHeliostatIrradiance. Asserts CUDA↔CPU
 // parity at the kernel level for the scenarios covered by test_cpu_irradiance.
 // Built only when BUILD_CUDA_TESTS is set in CMakeLists.txt.

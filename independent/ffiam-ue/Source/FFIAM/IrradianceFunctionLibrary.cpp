@@ -5,6 +5,9 @@
 #include "IrradianceMode.h"
 #include "LogChannels.h"
 #include "SiteConfigTypes.h"
+
+// Voxel grid dimensions, straight from the library that allocates/writes Irrads.
+#include "core/voxel.h"
 #include "GameFramework/GameModeBase.h"
 #include "HAL/PlatformFileManager.h"
 #include "JsonObjectConverter.h"
@@ -89,10 +92,11 @@ bool UIrradianceFunctionLibrary::LoadSiteConfigFromJson(const FString& FilePath,
         HelioDesign.NumRows = HelioDesign.NumFacets / HelioDesign.NumCols;
 	    
         Field.VoxelArea = static_cast<int>(pow(Field.VoxelSize, 2));
-        const int NumVoxelsZ = (Field.MaxHeight - Field.MinHeight) / Field.VoxelSize;
-        const int NumVoxelsY = 2 * Field.Radius / Field.VoxelSize;
-        const int NumVoxelsX = 2 * Field.Radius / Field.VoxelSize;
-        Field.NumVoxels = NumVoxelsX * NumVoxelsY * NumVoxelsZ;
+
+        int NumVoxelsX = 0, NumVoxelsY = 0, NumVoxelsZ = 0;
+        Field.NumVoxels = ComputeVoxelGridDimensions(
+            Field.Radius, Field.MinHeight, Field.MaxHeight, Field.VoxelSize,
+            &NumVoxelsX, &NumVoxelsY, &NumVoxelsZ);
 	    
 		return true;
 	}
@@ -136,6 +140,15 @@ int32 UIrradianceFunctionLibrary::LoadAllSiteConfigsFromDirectory(const FString&
             SuccessfulLoads++;
         }
     }
+
+    // Deterministic HUD order: FindFiles returns arbitrary filesystem order, so sort by
+    // each config's SortOrder (RunId as a stable tiebreak). The HUD lists configs in this
+    // array order, so this is what controls the site-selector ordering.
+    OutLoadedConfigs.Sort([](const FSiteConfig& A, const FSiteConfig& B)
+    {
+        return A.SortOrder != B.SortOrder ? A.SortOrder < B.SortOrder
+                                          : A.RunId.Compare(B.RunId) < 0;
+    });
 
     UE_LOG(LogFlux, Log, TEXT("Finished loading configs. Successfully loaded %d out of %d files."), SuccessfulLoads, FoundFiles.Num());
     return SuccessfulLoads;

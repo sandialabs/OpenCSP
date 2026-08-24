@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Pytest fixtures for FFIAM testing.
 
 This module provides reusable fixtures for testing pyffiam components,
@@ -12,10 +14,30 @@ import pytest
 
 
 def _has_cuda_runtime() -> bool:
-    """Probe whether the CUDA runtime can be located on this machine."""
+    """Probe whether the FFIAM CUDA backend is actually usable on this machine.
+
+    Finding *a* cudart is not enough: the shipped libffiam_lib.so is linked
+    against whichever CUDA the build host had, so a box with a different major
+    version (e.g. the sandbox's 12.8 vs a host build's cudart 13) resolves
+    find_library() fine and then fails to dlopen. Load it for real instead.
+    """
+    import ctypes
+    from pathlib import Path
+
     name = "cudart64_12" if sys.platform == "win32" else "cudart"
     path = find_library(name)
-    return path is not None and "cudart" in path
+    if path is None or "cudart" not in path:
+        return False
+
+    gpu_lib = "ffiam_lib.dll" if sys.platform == "win32" else "libffiam_lib.so"
+    gpu_path = Path(__file__).parent.parent / "src" / "pyffiam" / "external" / gpu_lib
+    if not gpu_path.exists():
+        return False
+    try:
+        ctypes.CDLL(str(gpu_path))
+    except OSError:
+        return False
+    return True
 
 
 def pytest_configure(config):

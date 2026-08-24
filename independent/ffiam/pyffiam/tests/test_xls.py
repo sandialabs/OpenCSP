@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for pyffiam.xls.ExcelWriter — verifies the worksheet writes
 made by each public method by recording every Worksheet API call. Uses
 xlsxwriter for format objects (they're inert handles) but stubs Workbook
@@ -238,14 +240,27 @@ def test_write_results_point_aim_writes_three_components(wb):
     assert 56.0 in numbers
 
 
-def test_write_results_ring_aim_writes_offset_and_height(wb):
-    """Ring/SplitRing aim writes 'Ring offset' and 'Ring height' rows."""
-    als = _make_als_stub(aim_strategy=AimType.Ring, aim_parameters=np.array([25.0, 80.0, 0.0]))
+def test_write_results_ring_aim_writes_inner_outer_and_height(wb):
+    """Ring aim writes 'Ring inner radius', 'Ring outer radius', and 'Ring height' rows."""
+    als = _make_als_stub(aim_strategy=AimType.Ring, aim_parameters=np.array([25.0, 80.0, 90.0]))
     writer = ExcelWriter(wb)
     writer.write_results(als, has_gifs=False)
     sheet = wb.sheets[0]
     titles = [w.args[0] for w in sheet.writes if w.method == "write" and isinstance(w.args[0], str)]
-    assert "Ring offset" in titles
+    assert "Ring inner radius" in titles
+    assert "Ring outer radius" in titles
+    assert "Ring height" in titles
+
+
+def test_write_results_split_ring_aim_writes_inner_outer_and_height(wb):
+    """SplitRing aim shares the ring layout: inner radius, outer radius, height rows."""
+    als = _make_als_stub(aim_strategy=AimType.SplitRing, aim_parameters=np.array([25.0, 80.0, 90.0]))
+    writer = ExcelWriter(wb)
+    writer.write_results(als, has_gifs=False)
+    sheet = wb.sheets[0]
+    titles = [w.args[0] for w in sheet.writes if w.method == "write" and isinstance(w.args[0], str)]
+    assert "Ring inner radius" in titles
+    assert "Ring outer radius" in titles
     assert "Ring height" in titles
 
 

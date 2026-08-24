@@ -1,3 +1,5 @@
+// Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 #include "ffiam/ffiam.h"
 #include "solar/solar_position.h"
 #include "core/heliostat.h"
@@ -11,6 +13,7 @@
 
 #include <locale>
 #include <filesystem>
+#include <cerrno>
 #include <cmath>
 #include <cstdio>
 #include <cstring>
@@ -77,7 +80,15 @@ cudaError_t FieldAnalysis(field_layout* field,
 
     if (coutToFile)
     {
-        freopen("ffiamlog.txt", "w", stdout);
+        // freopen closes stdout before reopening, so on failure the stream is
+        // gone and any later log output is lost -- report that on stderr.
+        if (std::freopen("ffiamlog.txt", "w", stdout) == nullptr)
+        {
+            std::fprintf(stderr,
+                         "FFIAM: could not open ffiamlog.txt for logging (%s); stdout is now closed "
+                         "and analysis log output will be discarded.\n",
+                         std::strerror(errno));
+        }
     }
 
     Log("Beginning FieldAnalysis call");
@@ -580,13 +591,35 @@ extern "C" int InitAnalysis(void* arena,
     size_t chunkSize = MB(256);
 
     Pool voxelPool;
-    size_t voxelChunkSize = MB(256*6);
+
+    // The whole voxel arena is one chunk. irrads is the pool's only allocation,
+    // and pool_alloc hands back the LAST chunk while every caller (pyffiam's
+    // IRRADS_IDX, the UE readback) reads from the arena's start -- so those only
+    // agree when the arena holds exactly one chunk. Splitting it puts irrads at a
+    // non-zero offset and lets the write run off the end of the arena.
+    size_t voxelChunkSize = nVoxelMemory;
+
+    // Accumulate in size_t: the per-axis counts are int and their product
+    // overflows a 32-bit int beyond ~2.1e9 voxels.
+    int nvx = 0, nvy = 0, nvz = 0;
+    ComputeVoxelGridDimensions(radius, zMin, zMax, voxelSize, &nvx, &nvy, &nvz);
+    const size_t nVoxelsNeeded = static_cast<size_t>(nvx) * static_cast<size_t>(nvy) * static_cast<size_t>(nvz);
 
     std::cout << fmt::format("Memory: {} MB Pool, ({} MB / chunk)", static_cast<int>(nMemory / 1e6), static_cast<int>(chunkSize / 1e6)) <<
         std::endl;
     std::cout << fmt::format("Voxel Memory: {} MB Pool, ({} MB / chunk)", static_cast<int>(nVoxelMemory / 1e6),
                              static_cast<int>(voxelChunkSize / 1e6)) <<
         std::endl;
+
+    if (nVoxelsNeeded * sizeof(float) > static_cast<size_t>(nVoxelMemory))
+    {
+        std::cout << fmt::format(
+            "ERROR: voxel grid ({} x {} x {} = {} voxels) needs {} MB but the voxel arena is only {} MB. "
+            "Increase the arena, raise voxelSize, or reduce radius / altitude range.",
+            nvx, nvy, nvz, nVoxelsNeeded,
+            static_cast<int>(nVoxelsNeeded * sizeof(float) / 1e6), static_cast<int>(nVoxelMemory / 1e6)) << std::endl;
+        return 1;
+    }
 
     pool_init(&pool, arena, nMemory, chunkSize, DEFAULT_ALIGNMENT);
     pool_init(&voxelPool, voxelArena, nVoxelMemory, voxelChunkSize, DEFAULT_ALIGNMENT);

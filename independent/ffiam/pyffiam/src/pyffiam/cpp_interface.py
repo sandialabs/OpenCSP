@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """ctypes interface to the FFIAM C++ library: DLL loading, memory pools, and result extraction."""
 
 from __future__ import annotations
@@ -18,7 +20,7 @@ import logging
 
 import numpy as np
 
-from pyffiam.app_config import GB, MB
+from pyffiam.app_config import GB, MB, VOXEL_CHUNK_SIZE as _VOXEL_CHUNK_SIZE, VOXEL_POOL_SIZE as _VOXEL_POOL_SIZE
 
 log = logging.getLogger(__name__)
 
@@ -125,12 +127,23 @@ class MemoryPool:
 
     @property
     def size(self) -> c_uint:
-        """Return the pool size as a ctypes c_uint for passing to C."""
+        """Return the pool size as a ctypes c_uint for passing to C.
+
+        PyAnalysis() declares the arena size as `uint`, so a pool of 4 GiB or
+        more would silently wrap to a small (or zero) value. Fail loudly instead.
+        """
+        if self._size_bytes >= 2**32:
+            raise ValueError(
+                f"MemoryPool '{self._name}' is {self._size_bytes:,} bytes; PyAnalysis() "
+                f"takes the arena size as a C uint, so pools must stay under 4 GiB."
+            )
         return c_uint(self._size_bytes)
 
     def __enter__(self) -> 'MemoryPool':
-        raw_ptr = self._libc.malloc(c_uint(self._size_bytes))
-        if raw_ptr is None:
+        # malloc takes size_t; passing a c_uint leaves the upper half of the
+        # argument register undefined, which corrupts allocations over 2 GiB.
+        raw_ptr = self._libc.malloc(cts.c_size_t(self._size_bytes))
+        if not raw_ptr:
             raise MemoryError(f"Failed to allocate {self._size_bytes:,} bytes for {self._name}")
         self._ptr = cts.cast(raw_ptr, LPCVOID)
         log.debug(f"Allocated {self._size_bytes // MB} MB for {self._name}")
@@ -147,11 +160,12 @@ class MemoryPool:
 class FFIAMLibrary:
     """Loads the FFIAM DLL and exposes run_analysis()."""
 
-    # Memory configuration
+    # Memory configuration. Voxel sizes come from app_config so the pool, the
+    # chunk and the MAX_VOXELS guard can never drift apart.
     MAIN_POOL_SIZE = 2 * GB
     MAIN_CHUNK_SIZE = 256 * MB
-    VOXEL_POOL_SIZE = 2 * GB
-    VOXEL_CHUNK_SIZE = 256 * 6 * MB
+    VOXEL_POOL_SIZE = _VOXEL_POOL_SIZE
+    VOXEL_CHUNK_SIZE = _VOXEL_CHUNK_SIZE
 
     # Chunk indices for data extraction (chunks are used last-first)
     MAX_CHUNKS = 8
@@ -200,7 +214,10 @@ class FFIAMLibrary:
             cpu_name = 'libffiam_lib_cpu.so'
 
         self._libc = cts.CDLL(libc_name)
+        self._libc.malloc.argtypes = [cts.c_size_t]
         self._libc.malloc.restype = c_void_p
+        self._libc.free.argtypes = [c_void_p]
+        self._libc.free.restype = None
 
         use_cpu = self._force_cpu or not self._cuda_available()
 

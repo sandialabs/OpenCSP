@@ -1,6 +1,6 @@
 # Building on Linux
 
-The `Irradiance` module links the FFIAM C++/CUDA library, so you build that
+The `FFIAM` module links the FFIAM C++/CUDA library, so you build that
 first, then the Unreal Editor target. Tested with Unreal Engine 5.7 (source
 build) and CUDA 12.x / 13.x.
 
@@ -22,6 +22,19 @@ cmake --build build --target ffiam_lib -j"$(nproc)"
 # -> build/lib/libffiam_lib.so
 ```
 
+### GPU architectures
+
+Left alone, the build picks its own default and prints it at configure time:
+`native` (this machine's GPU) on CMake 3.24+, or an explicit `75;86;89;120` list
+on older CMake, trimmed to what your `nvcc` supports. Do **not** rely on CMake's
+own default — it is `52` (Maxwell, 2014), which builds no SASS for any modern
+card and leaves the GPU JIT-compiling PTX at runtime.
+
+Override for a specific card with `-DCMAKE_CUDA_ARCHITECTURES=native` (or e.g.
+`89`). Note this is sticky: once a build directory exists, the value is cached,
+so changing it needs `cmake -U CMAKE_CUDA_ARCHITECTURES -B build` or a fresh
+build directory.
+
 ## 2. Build the Unreal editor target
 
 Point `FFIAM_PATH` at the FFIAM C++ source root, then invoke your engine's
@@ -30,11 +43,11 @@ Point `FFIAM_PATH` at the FFIAM C++ source root, then invoke your engine's
 ```bash
 export FFIAM_PATH=/path/to/ffiam/ffiam/ffiam
 /path/to/UnrealEngine/Engine/Build/BatchFiles/Linux/Build.sh \
-    IrradianceEditor Linux Development \
-    -project="$PWD/Irradiance.uproject" -waitmutex
+    FFIAMEditor Linux Development \
+    -project="$PWD/FFIAM.uproject" -waitmutex
 ```
 
-`Irradiance.Build.cs` locates `libffiam_lib.so` at `$FFIAM_PATH/build/lib/` by
+`FFIAM.Build.cs` locates `libffiam_lib.so` at `$FFIAM_PATH/build/lib/` by
 default, copies it into `Binaries/Linux/`, and links the module against it. The
 module only uses `cudaError_t` at compile time; the CUDA runtime lives inside
 `libffiam_lib.so`, so the host's CUDA runtime version doesn't have to match the
@@ -53,8 +66,8 @@ export FFIAM_LIB=/path/to/libffiam_lib.so
 ## 3. Launch the editor
 
 ```bash
-/path/to/UnrealEngine/Engine/Binaries/Linux/UnrealEditor "$PWD/Irradiance.uproject"
+/path/to/UnrealEngine/Engine/Binaries/Linux/UnrealEditor "$PWD/FFIAM.uproject"
 ```
 
-`EngineAssociation` in `Irradiance.uproject` is empty, so the project builds and
+`EngineAssociation` in `FFIAM.uproject` is empty, so the project builds and
 launches with whatever engine you invoke above (the source-build convention).

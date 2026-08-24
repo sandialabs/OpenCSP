@@ -1,3 +1,4 @@
+// Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
 // Edge-branch tests for FieldAnalysis (src/main/ffiam.cu). All tests run with
 // useCpu=true; the pre-compute branches under test run identically on both
 // backends. Test target is CUDA-aware (ffiam.cu uses cudaError_t) — gated by

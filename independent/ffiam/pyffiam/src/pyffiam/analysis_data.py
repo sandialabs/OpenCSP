@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 import logging
 from dataclasses import dataclass
 from pathlib import Path
@@ -83,7 +85,10 @@ class AnalysisData:
     helio_width: float = None  # Total heliostat width = facet_width * num_facet_cols (m)
     voxel_layout: tuple = None  # (nx, ny, nz) voxel grid dimensions
     num_voxels: int = None  # Total voxel count = nx * ny * nz
-    voxel_locs: np.ndarray = None  # (num_voxels, 3) voxel center positions (m)
+    # (num_voxels, 3) voxel center positions (m). Materialized lazily by the
+    # voxel_locs property -- see the note there; at 1 m grids this array is tens
+    # of GB and most runs never touch it.
+    _voxel_locs: np.ndarray = None
     num_voxels_x: int = None
     num_voxels_y: int = None
     num_voxels_z: int = None
@@ -317,7 +322,7 @@ class AnalysisData:
                 f"({self.min_height}-{self.max_height}m), or increase voxel_size ({self.voxel_size}m)."
             )
 
-        self.voxel_locs = utils.compute_vox_locs(self.num_voxels, self.voxel_size, self.field_radius, self.min_height)
+        self._voxel_locs = None  # see the voxel_locs property
 
         self.has_paths = paths is not None
         self.paths = [] if paths is None else paths
@@ -373,6 +378,27 @@ class AnalysisData:
 
             print("Analysis parameters:")
             pprint.pprint(vars(self))
+
+    @property
+    def voxel_locs(self) -> np.ndarray:
+        """(num_voxels, 3) voxel center positions (m), computed on first access.
+
+        This is float64, so it costs 24 bytes per voxel -- six times the float32
+        irradiance array it describes. A 1 km site at 1 m voxels is 788M voxels,
+        i.e. ~18 GB for this array alone, which is why it is not built eagerly:
+        analysis, plotting and Excel export all work from `threshold_voxel_ids`
+        and only ever need the above-threshold subset. Prefer
+        `utils.get_voxel_locs_from_indexes(ids, ...)` over touching this.
+        """
+        if self._voxel_locs is None:
+            self._voxel_locs = utils.compute_vox_locs(
+                self.num_voxels, self.voxel_size, self.field_radius, self.min_height
+            )
+        return self._voxel_locs
+
+    @voxel_locs.setter
+    def voxel_locs(self, value: np.ndarray) -> None:
+        self._voxel_locs = value
 
     def add_results(self, helio_locs, helio_aim_vs, helio_angles, facet_origins, irrads, movement):
         """Populate result fields from raw C++ output arrays and compute derived summary stats."""

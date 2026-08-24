@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for pyffiam.plots — focuses on the pure helper functions that
 don't require rendering. Heavy rendering paths (write_image, GIF generation)
 are exercised by integration tests in test_outputs.py; here we assert the
@@ -47,21 +49,21 @@ class TestGetZoomLims:
         assert hi == pytest.approx(60.0 + ZOOM_SPAN / 2)
 
     def test_ring_aim_east_small_radius_uses_half_span(self):
-        """Ring with offset < half-span: bounds are ±half-span, not ±(offset+50)."""
-        aim = np.array([10.0, 60.0, 0.0])  # r=10, ht=60
+        """Ring with outer radius < half-span: bounds are ±half-span, not ±(outer+50)."""
+        aim = np.array([5.0, 10.0, 60.0])  # inner=5, outer=10, height=60
         lo, hi = get_zoom_lims(AimType.Ring, aim, Direction.East)
         assert lo == pytest.approx(-ZOOM_SPAN / 2)
         assert hi == pytest.approx(ZOOM_SPAN / 2)
 
     def test_ring_aim_east_large_radius_uses_offset_plus_pad(self):
-        """Ring with offset > half-span: bounds are ±(offset + 50)."""
-        aim = np.array([200.0, 60.0, 0.0])  # r=200 > 50
+        """Ring with outer radius > half-span: bounds are ±(outer + 50)."""
+        aim = np.array([100.0, 200.0, 60.0])  # inner=100, outer=200 > 50, height=60
         lo, hi = get_zoom_lims(AimType.Ring, aim, Direction.East)
         assert lo == pytest.approx(-200.0 - 50)
         assert hi == pytest.approx(200.0 + 50)
 
     def test_ring_aim_up(self):
-        aim = np.array([20.0, 75.0, 0.0])  # ht=75
+        aim = np.array([20.0, 40.0, 75.0])  # inner=20, outer=40, height=75
         lo, hi = get_zoom_lims(AimType.Ring, aim, Direction.Up)
         assert lo == -10
         assert hi == pytest.approx(75.0 + ZOOM_SPAN / 2)

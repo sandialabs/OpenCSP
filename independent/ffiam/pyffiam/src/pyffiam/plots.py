@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Heatmap plots and animated GIFs for irradiance analysis results."""
 
 import io
@@ -49,8 +51,19 @@ def get_zoom_lims(aim_strat: AimType, aim: NDArray[np.floating], dim: Direction)
             min_val = -10
             max_val = aim[dim.value] + half_span
 
+    elif aim_strat in (AimType.Ring, AimType.SplitRing):
+        # ring/split-ring: aim is [inner_radius, outer_radius, height]; extent set by outer radius
+        r = aim[1]
+        ht = aim[2]
+        if dim in [Direction.East, Direction.North]:
+            min_val = (-r - 50) if r > half_span else -half_span
+            max_val = (r + 50) if r > half_span else half_span
+        else:
+            min_val = -10
+            max_val = ht + half_span
+
     else:
-        # for ring: aim is [offset, height, _], offset is radius
+        # fallback (e.g. vector/csv/fixed-normal): center on aim[0]/aim[1]
         r = aim[0]
         ht = aim[1]
         if dim in [Direction.East, Direction.North]:

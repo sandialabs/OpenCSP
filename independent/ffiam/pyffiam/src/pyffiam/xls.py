@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Excel report generation for FFIAM analysis results."""
 
 from typing import Any, Optional
@@ -125,8 +127,9 @@ class ExcelWriter:
             sheet.write_number(row, VALUE_COL + 2, als.aim_parameters[2], self.bigfloat_fmt)
             row += 1
         elif als.aim_strategy in [AimType.Ring, AimType.SplitRing]:
-            row = self._write_num(sheet, row, "Ring offset", als.aim_parameters[0], unit='m')
-            row = self._write_num(sheet, row, "Ring height", als.aim_parameters[1], unit='m')
+            row = self._write_num(sheet, row, "Ring inner radius", als.aim_parameters[0], unit='m')
+            row = self._write_num(sheet, row, "Ring outer radius", als.aim_parameters[1], unit='m')
+            row = self._write_num(sheet, row, "Ring height", als.aim_parameters[2], unit='m')
         elif als.aim_strategy == AimType.Vector:
             sheet.write(row, TITLE_COL, "Aim vector")
             sheet.write(row, UNIT_COL, "m", self.unit_fmt)

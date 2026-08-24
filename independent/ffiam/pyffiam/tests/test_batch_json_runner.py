@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 """Unit tests for the batch-JSON runner pipeline:
 - pyffiam.utils.get_site_config_dict_from_json (the parser)
 - pyffiam.run_site_analysis_from_file.run_from_config_file (the loop)

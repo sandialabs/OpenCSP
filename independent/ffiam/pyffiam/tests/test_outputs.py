@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 import os
 from pathlib import Path
 import unittest
@@ -43,7 +45,7 @@ class OutputTestCase(unittest.TestCase):
         results = analysis(
             site=CspSite.SampleV2,
             aim_strat=AimType.Ring,
-            aim_params=np.array([80, 120, 0]),
+            aim_params=np.array([80, 80, 120]),
             threshold=4,
             create_plots=False,
             create_gifs=False,
@@ -59,7 +61,7 @@ class OutputTestCase(unittest.TestCase):
         results = analysis(
             site=CspSite.SampleV2,
             aim_strat=AimType.Ring,
-            aim_params=np.array([80, 120, 0]),
+            aim_params=np.array([80, 80, 120]),
             threshold=3,
             create_plots=True,
             create_gifs=False,
@@ -78,7 +80,7 @@ class OutputTestCase(unittest.TestCase):
         results = analysis(
             site=CspSite.SampleV2,
             aim_strat=AimType.Ring,
-            aim_params=np.array([80, 120, 0]),
+            aim_params=np.array([80, 80, 120]),
             threshold=3,
             create_plots=False,
             create_gifs=False,
@@ -123,7 +125,7 @@ class OutputTestCase(unittest.TestCase):
         results = analysis(
             site=CspSite.SampleV2,
             aim_strat=AimType.Ring,
-            aim_params=np.array([80, 120, 0]),
+            aim_params=np.array([80, 80, 120]),
             n_helios=10 * 10,
             threshold=50000,
             create_plots=True,

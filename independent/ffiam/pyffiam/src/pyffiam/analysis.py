@@ -1,3 +1,5 @@
+# Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 from pathlib import Path
 import logging
 
@@ -155,7 +157,11 @@ def analysis(
         facet_w: Individual facet width (m).
         facet_h: Individual facet height (m).
         aim_strat: Aiming strategy enum (AimType.Point, AimType.Horizontal, etc.).
-        aim_params: Strategy-specific aim parameters as a 3-element array (e.g. [x, y, z] aim point in meters for AimType.Point).
+        aim_params: Strategy-specific aim parameters as a 3-element array, all in meters. For AimType.Point,
+            [x, y, z] aim point. For AimType.Ring and AimType.SplitRing, [inner_radius, outer_radius, height]:
+            heliostats distribute their aim across the annulus [inner_radius, outer_radius] at the given height
+            (Ring spreads by heliostat index; SplitRing fans each azimuthal slice, so the same params yield a
+            different spatial distribution).
         aim_file: CSV filename (relative to pyffiam/data/) with per-heliostat aim data.
         paths: List of polyline paths, each a sequence of (x, y, z) waypoints (m), for UAS exposure analysis.
         path_speeds: Travel speed (m/s) for each path in `paths`.
@@ -195,11 +201,14 @@ def analysis(
         paths = []
         path_speeds = []
     else:
-        paths = np.array(paths)
-        path_speeds = np.array(path_speeds)
-        # must be list of list of points, even if only one path given
-        if len(paths.shape) != 3:
-            paths = paths[None]
+        # Polylines legitimately differ in waypoint count, so keep paths as a list of
+        # (Ni, 3) arrays; np.array() on a ragged list of polylines raises. Accept either
+        # a single polyline [(x,y,z), ...] or a list of such polylines.
+        if len(paths) and np.ndim(paths[0][0]) == 0:
+            paths = [np.asarray(paths, dtype=float)]  # single polyline -> one-element list
+        else:
+            paths = [np.asarray(p, dtype=float) for p in paths]
+        path_speeds = list(np.atleast_1d(path_speeds))
 
     als = AnalysisData(
         name=name,
@@ -439,8 +448,11 @@ def lib_ffiam_analysis(
             agg_voxel_locs.append(path.voxel_locs)
             agg_irrads.append(path.irrads)
 
-        agg_voxel_locs = np.array(agg_voxel_locs).reshape(-1, 3)
-        agg_irrads = np.array(agg_irrads).flatten()
+        # Paths cross differing numbers of voxels, so per-path arrays are ragged;
+        # concatenate along the sample axis (reshape(-1,3) only works when every
+        # path is the same length, and raises on the inhomogeneous case).
+        agg_voxel_locs = np.concatenate(agg_voxel_locs, axis=0) if agg_voxel_locs else np.empty((0, 3))
+        agg_irrads = np.concatenate([np.ravel(a) for a in agg_irrads]) if agg_irrads else np.empty((0,))
         eu_filename = f"aggregate_path_irradiance_east_up"
         agg_path_plot_eu, _, _ = plots.create_profile_plots(
             als.helio_locs,

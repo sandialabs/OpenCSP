@@ -1,3 +1,5 @@
+// Copyright 2026 National Technology & Engineering Solutions of Sandia, LLC (NTESS). Under the terms of Contract DE-NA0003525 with NTESS, the U.S. Government retains certain rights in this software.
+
 /*
  *  This file loads CUDA-related header files, math, etc.
  *  Do not include any project-specific files here.
