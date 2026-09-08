@@ -538,8 +538,8 @@ class StandardPlotOutput:
             self._plot_slope_reference_optic()
 
             # Call the combined slope plotting function after individual plots
-            if self.options_slice_output.to_plot:
-                self.plot_combined_measured_reference_slopes('MeasRef')
+#            if self.options_slice_output.to_plot:
+#                self.plot_combined_measured_reference_slopes('MeasRef')
 
         else:
             lt.info('Slope plotting turned off; skipping measured/reference optic slope plots.')
@@ -610,6 +610,7 @@ class StandardPlotOutput:
         else:
             return [value] * 3
 
+    '''
     def plot_combined_measured_reference_slopes(self, which_data: str):
         """Plots combined measured reference slopes"""
         measured_x_csv = f"{self.options_file_output.output_dir}/slope_slice_data_x_x_all_Meas.csv"
@@ -777,6 +778,7 @@ class StandardPlotOutput:
             f"{self.options_file_output.output_dir}/combined_slope_x_magnitude_{which_data}.png",
             dpi=self.options_file_output.save_dpi,
         )
+    '''
 
     def _plot_curvature_deviation(self):
         # Plots curvature deviation
