@@ -538,8 +538,8 @@ class StandardPlotOutput:
             self._plot_slope_reference_optic()
 
             # Call the combined slope plotting function after individual plots
-#            if self.options_slice_output.to_plot:
-#                self.plot_combined_measured_reference_slopes('MeasRef')
+        #            if self.options_slice_output.to_plot:
+        #                self.plot_combined_measured_reference_slopes('MeasRef')
 
         else:
             lt.info('Slope plotting turned off; skipping measured/reference optic slope plots.')
