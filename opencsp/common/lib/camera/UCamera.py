@@ -18,7 +18,6 @@ import sys
 
 import opencsp.common.lib.file.CsvInterface as csvi
 
-
 # -------------------------------------------------------------------------------------------------------
 # SIMPLIFIED CAMERA MODEL
 #

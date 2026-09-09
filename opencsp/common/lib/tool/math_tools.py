@@ -17,7 +17,6 @@ from opencsp.common.lib.tool.typing_tools import strict_types
 
 import opencsp.common.lib.tool.log_tools as lt
 
-
 INVERSE_TRIG_TOLERANCE: float = 1.0e-6
 
 

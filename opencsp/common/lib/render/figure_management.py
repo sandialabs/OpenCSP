@@ -24,7 +24,6 @@ import opencsp.common.lib.render.view_spec as vs
 import opencsp.common.lib.render.View3d as v3d
 import opencsp.common.lib.tool.log_tools as lt
 
-
 # Global index used for tile control.
 figure_tile_idx = 0
 show_figures = True

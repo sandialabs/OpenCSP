@@ -1,11 +1,7 @@
-"""
-
-
-"""
+""" """
 
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
-
 
 # Constants
 DEFAULT_heading_scale = 2  # m

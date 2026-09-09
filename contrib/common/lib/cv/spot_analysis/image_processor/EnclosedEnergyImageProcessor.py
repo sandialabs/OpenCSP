@@ -21,7 +21,6 @@ from opencsp.common.lib.cv.spot_analysis.image_processor.AbstractSpotAnalysisIma
 import opencsp.common.lib.tool.log_tools as lt
 import matplotlib.pyplot as plt
 
-
 if TYPE_CHECKING:
     # import here to avoid cyclic imports
     import contrib.common.lib.cv.annotations.EnclosedEnergyAnnotations as eeanno

@@ -15,7 +15,6 @@ import re
 from PIL import Image, ImageTk
 import tkinter as tk
 
-
 # import math
 from datetime import datetime
 from typing import Iterable
@@ -26,7 +25,6 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 from scipy.spatial.transform import Rotation as Rotation
-
 
 # from sympy import Symbol, diff
 # from opencsp.common.lib.geometry.Vxy import Vxy

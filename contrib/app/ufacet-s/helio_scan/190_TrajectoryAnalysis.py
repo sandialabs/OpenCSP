@@ -275,7 +275,7 @@ class TrajectoryAnalysis:
         # ?? SCAFFOLDING RCB -- NOTE THAT THIS IS NOT GENERAL.  MY CURRENT THINKING IS THAT IT SHOULD PROBABLY BE REPLACED BY AN EARLIER COMPUTATION THAT SUPPORTS KEY FRAME IDENTIFICATION, FOR EXAMPLE.  SEE COMMENTS IN ROUTINE.
         print("In TrajectoryAnalysis.__init__(), initializing GPS-frame synchronization constants...")
         self.synchronization_pair_list = self.initialize_synchronization_pair_list()
-        (self.synchronization_slope, self.synchronization_intercept) = self.initialize_synchronization_constants()
+        self.synchronization_slope, self.synchronization_intercept = self.initialize_synchronization_constants()
         self.print_synchronization_pair_list()
         self.synchronization_constants_dir_body_ext = self.save_synchronization_constants()
 
@@ -975,7 +975,7 @@ class TrajectoryAnalysis:
         self, xyzt_list, n_start_margin, n_stop_margin
     ):  # ?? SCAFFOLDING RCB -- THIS START_MARGIN, STOP_MARGIN IS A STUB HACK.
         # Refine pass, collecting statistical variation data.
-        (stable_begin_xyzt, stable_end_xyzt, line_3d, inlier_xyzt_list, distance_to_line_list, rms_distance_to_line) = (
+        stable_begin_xyzt, stable_end_xyzt, line_3d, inlier_xyzt_list, distance_to_line_list, rms_distance_to_line = (
             self.refine_xyzt_list(xyzt_list, n_start_margin, n_stop_margin)
         )
         # Construct scan pass object.
@@ -1538,7 +1538,7 @@ class TrajectoryAnalysis:
             elevation_from_model_end,
         ) = self.compute_model_azimuth_elevation(hel_name, time_begin, time_mid, time_end)
         # Compute heliostat (azimuth, elevation) that will bring camera pass into parallel alignment with GPS pass.
-        (azimuth_from_alignment, elevation_from_alignment, alignment_angle_error) = (
+        azimuth_from_alignment, elevation_from_alignment, alignment_angle_error = (
             self.compute_alignment_azimuth_elevation(
                 gps_pass, camera_pass, azimuth_from_model_mid, elevation_from_model_mid
             )
@@ -1636,7 +1636,7 @@ class TrajectoryAnalysis:
         return gps_camera_analysis_dict
 
     def compute_model_azimuth_elevation(self, hel_name, time_begin, time_mid, time_end):
-        (azimuth_begin, elevation_begin) = self.compute_model_azimuth_elevation_given_time(hel_name, time_begin)
+        azimuth_begin, elevation_begin = self.compute_model_azimuth_elevation_given_time(hel_name, time_begin)
         azimuth_mid, elevation_mid = self.compute_model_azimuth_elevation_given_time(hel_name, time_mid)
         azimuth_end, elevation_end = self.compute_model_azimuth_elevation_given_time(hel_name, time_end)
         # Return.
@@ -1726,13 +1726,13 @@ class TrajectoryAnalysis:
         return delta_uxyz
 
     def compute_log_azimuth_elevation(self, hel_name, time_begin, time_mid, time_end):
-        (azimuth_begin, elevation_begin, azimuth_target_begin, elevation_target_begin) = (
+        azimuth_begin, elevation_begin, azimuth_target_begin, elevation_target_begin = (
             self.compute_log_azimuth_elevation_given_time(hel_name, time_begin)
         )
-        (azimuth_mid, elevation_mid, azimuth_target_mid, elevation_target_mid) = (
+        azimuth_mid, elevation_mid, azimuth_target_mid, elevation_target_mid = (
             self.compute_log_azimuth_elevation_given_time(hel_name, time_mid)
         )
-        (azimuth_end, elevation_end, azimuth_target_end, elevation_target_end) = (
+        azimuth_end, elevation_end, azimuth_target_end, elevation_target_end = (
             self.compute_log_azimuth_elevation_given_time(hel_name, time_end)
         )
         # Return.
@@ -3671,7 +3671,7 @@ class TrajectoryAnalysis:
     def save_enhanced_flight_log(self):
         if not (os.path.exists(self.output_data_dir)):
             os.makedirs(self.output_data_dir)
-            (input_flight_log_dir, input_flight_log_body, input_flight_log_ext) = ft.path_components(
+            input_flight_log_dir, input_flight_log_body, input_flight_log_ext = ft.path_components(
                 self.input_flight_log_dir_body_ext
             )
             output_flight_log_plus_body_ext = input_flight_log_body + "_plus" + input_flight_log_ext
