@@ -17,7 +17,6 @@ import lib.ufacet_heliostat_3d_analysis as uh3a
 import lib.DEPRECATED_specifications as Dspec  # ?? SCAFFOLDING RCB -- TEMPORARY
 import lib.DEPRECATED_utils as utils  # ?? SCAFFOLDING RCB -- TEMPORARY
 
-
 """
 A new approach to estimating the 3-d heliostat shape given tracked corners.
 

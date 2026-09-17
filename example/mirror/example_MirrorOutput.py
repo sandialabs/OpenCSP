@@ -40,7 +40,6 @@ from opencsp.common.lib.csp.MirrorParametric import MirrorParametric
 from opencsp.common.lib.csp.SolarField import SolarField
 import opencsp.common.lib.geo.lon_lat_nsttf as lln
 
-
 PI = np.pi
 DEG2RAD = PI / 180
 UP = Vxyz([0, 0, 1])

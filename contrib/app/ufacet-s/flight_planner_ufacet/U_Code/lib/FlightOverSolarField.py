@@ -1,7 +1,4 @@
-"""
-
-
-"""
+""" """
 
 import opencsp.common.lib.render.figure_management as fm
 import opencsp.common.lib.render_control.RenderControlAxis as rca

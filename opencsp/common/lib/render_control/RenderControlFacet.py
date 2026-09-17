@@ -7,7 +7,6 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
 import opencsp.common.lib.render_control.RenderControlMirror as rcm
 
-
 # Constants
 DEFAULT_SURFACE_NORMAL_LENGTH = 2  # m
 DEFAULT_CORNER_NORMAL_LENGTH = 1  # m

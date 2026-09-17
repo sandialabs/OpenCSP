@@ -20,7 +20,6 @@ import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rct
 import opencsp.common.lib.render.view_spec as vs
 
-
 # -------------------------------------------------------------------------------------------------------
 # RENDERING CONSTRAINT ANALYSIS
 #

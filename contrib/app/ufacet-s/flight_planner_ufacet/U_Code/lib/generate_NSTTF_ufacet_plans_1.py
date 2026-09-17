@@ -13,7 +13,6 @@ import opencsp.app.ufacets.flight_planner_ufacet.U_Code.lib.plan_and_render_scan
 import opencsp.common.lib.render_control.RenderControlFigure as rcfg
 import opencsp.app.ufacets.flight_planner_ufacet.U_Code.lib.RenderControlTopLevel as rctl
 
-
 # -------------------------------------------------------------------------------------------------------
 #  GENERATE NSTTF PLANS
 #

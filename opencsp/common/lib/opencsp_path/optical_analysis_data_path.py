@@ -8,7 +8,6 @@ import os
 
 import opencsp.common.lib.opencsp_path.opencsp_root_path as orp
 
-
 # DEPRECATED
 #
 # Text...

@@ -975,7 +975,7 @@ def ensquared_energy(pts: Vxy, semi_width_max: float, res: int = 50) -> tuple[np
     fracs = []
     num_pts = float(len(pts))
     for w in ws:
-        (x1, x2, y1, y2) = (-w, w, -w, w)
+        x1, x2, y1, y2 = (-w, w, -w, w)
         mask = (pts.x > x1) * (pts.x < x2) * (pts.y > y1) * (pts.y < y2)
         fracs.append(float(mask.sum()) / num_pts)
     return np.array(fracs), ws

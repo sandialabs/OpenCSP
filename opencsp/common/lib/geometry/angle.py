@@ -8,7 +8,6 @@ import numpy as np
 import numpy.typing as npt
 from typing import Iterable, overload
 
-
 # CONVERTING RADIANS TO DEGREES
 
 # Use numpy.rad2deg(x) for scalars.

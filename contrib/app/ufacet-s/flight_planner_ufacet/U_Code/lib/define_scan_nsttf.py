@@ -5,7 +5,7 @@ These are shorthand routines for setting up some relevant test NSTTF configurati
 
 This file was created to move cruft out of the toplevel experiment file.  It is not intended to be final code.
 
-Later these should be eliminated by defining input configuration files, and also a 
+Later these should be eliminated by defining input configuration files, and also a
 test suite for checking various standard cases.
 
 

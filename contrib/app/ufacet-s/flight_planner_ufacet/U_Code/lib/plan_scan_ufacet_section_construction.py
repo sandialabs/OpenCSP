@@ -76,7 +76,7 @@ def select_min_w_reject_nearby_p(candidate_heliostat_name_pqw_list, ufacet_scan_
     remaining_heliostat_name_pqw_list = candidate_heliostat_name_pqw_list
     # Recursive calculation to select the heliostats near the selection plane,
     # eliminate close-p clusters, and return both selected and rejected heliostats.
-    (selected_heliostat_name_pqw_list, rejected_heliostat_name_pqw_list, remaining_heliostat_name_pqw_list) = (
+    selected_heliostat_name_pqw_list, rejected_heliostat_name_pqw_list, remaining_heliostat_name_pqw_list = (
         select_min_w_reject_nearby_p_aux(
             selected_heliostat_name_pqw_list,
             rejected_heliostat_name_pqw_list,
@@ -99,7 +99,7 @@ def construct_ufacet_section(solar_field, best_fit_segment_xy, ufacet_scan_param
     # Sort by w.
     sort_heliostat_name_pqw_list_by_w(candidate_heliostat_name_pqw_list)
     # Select heliostats close to section plane, and discard close neighbors.
-    (selected_heliostat_name_pqw_list, rejected_heliostat_name_pqw_list) = select_min_w_reject_nearby_p(
+    selected_heliostat_name_pqw_list, rejected_heliostat_name_pqw_list = select_min_w_reject_nearby_p(
         candidate_heliostat_name_pqw_list, ufacet_scan_parameters
     )
     # Sort in order of ascending p.

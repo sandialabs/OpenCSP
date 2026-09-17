@@ -16,7 +16,6 @@ import opencsp.app.sofast.lib.spatial_processing as sp
 from opencsp.common.lib.tool.hdf5_tools import load_hdf5_datasets, save_hdf5_datasets
 import opencsp.common.lib.tool.file_tools as ft
 
-
 _regenerate = False
 
 
@@ -74,7 +73,7 @@ class TestCameraCalibration(unittest.TestCase):
         img_size = images[0].shape
 
         # Calibrate camera
-        (camera, r_cam_object, v_cam_object_cam, calibration_error) = cc.calibrate_camera(
+        camera, r_cam_object, v_cam_object_cam, calibration_error = cc.calibrate_camera(
             p_object, p_image, img_size, cam_name
         )
 

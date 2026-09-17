@@ -11,7 +11,6 @@ import os
 import opencsp.common.lib.target.target_color_convert as tcc
 import opencsp.common.lib.target.target_image as ti
 
-
 #    # Red spectrum
 #    for row in range(0,n_rows):
 #        for col in range(0,n_cols):

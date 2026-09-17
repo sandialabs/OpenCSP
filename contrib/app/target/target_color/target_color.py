@@ -16,7 +16,6 @@ import opencsp.common.lib.target.target_color_convert
 import opencsp.common.lib.target.target_color_1d_gradient
 import opencsp.common.lib.target.target_image
 
-
 if __name__ == "__main__":
     plt.close("all")
 

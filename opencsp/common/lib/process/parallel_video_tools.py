@@ -138,7 +138,7 @@ def parallel_video_to_frames(
 
     # remove any duplicates
     duplicates_handler = vh.VideoHandler.VideoCreator(dst_frames_dir_serv, None, None, frame_control)
-    (non_duplicate_frame_files, duplicate_frame_files) = duplicates_handler.identify_duplicate_frames(0, 0)
+    non_duplicate_frame_files, duplicate_frame_files = duplicates_handler.identify_duplicate_frames(0, 0)
     for dup_frame in duplicate_frame_files:
         dup_frame = os.path.join(dst_frames_dir_serv, dup_frame)
         ft.delete_file(dup_frame)

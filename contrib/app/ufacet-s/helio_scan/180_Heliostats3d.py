@@ -126,11 +126,11 @@ class Heliostats3d:
             self.specifications.heliostat_design_name
         )
         # Nearest.
-        (self.nearest_smooth_dir_body_ext, self.nearest_design_dir_body_ext) = (
+        self.nearest_smooth_dir_body_ext, self.nearest_design_dir_body_ext = (
             self.construct_save_and_analyze_key_heliostats(self.specifications.heliostat_design_name, "Nearest")
         )
         # Farthest.
-        (self.farthest_smooth_dir_body_ext, self.farthest_design_dir_body_ext) = (
+        self.farthest_smooth_dir_body_ext, self.farthest_design_dir_body_ext = (
             self.construct_save_and_analyze_key_heliostats(self.specifications.heliostat_design_name, "Farthest")
         )
         # Demonstration heliostat.

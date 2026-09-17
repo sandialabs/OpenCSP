@@ -11,7 +11,6 @@ import numpy as np
 import opencsp.common.lib.geometry.geometry_2d as g2d
 import opencsp.common.lib.render.view_spec as vs
 
-
 # -------------------------------------------------------------------------------------------------------
 # CONSTRAINT ANALYSIS
 #

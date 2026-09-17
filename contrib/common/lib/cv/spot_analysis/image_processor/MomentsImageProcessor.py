@@ -15,7 +15,6 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.image_tools as it
 import opencsp.common.lib.tool.log_tools as lt
 
-
 if TYPE_CHECKING:
     # import here to avoid cyclic import loop
     from contrib.common.lib.cv.annotations.MomentsAnnotation import MomentsAnnotation

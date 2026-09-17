@@ -11,7 +11,6 @@ import os
 import opencsp.common.lib.target.target_color_convert
 import opencsp.app.target.target_color.target_color_bullseye_error
 
-
 #    # Bullseye color bar (Gen 1 version)
 #    def bullseye_color_bar_gen_1(discrete_or_continuous):
 #        for row in range(0,n_rows):

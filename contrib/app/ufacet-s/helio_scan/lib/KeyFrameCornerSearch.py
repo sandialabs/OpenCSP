@@ -81,9 +81,9 @@ class KeyFrameCornerSearch:
         # Facet boundaries
         self.frame["boundaries"], self.frame["boundaries_img"] = self.facet_boundaries()
         # Connected_components
-        (self.frame["components"], self.frame["components_img"]) = self.connected_components()
+        self.frame["components"], self.frame["components_img"] = self.connected_components()
         # Filtered connected_components
-        (self.frame["filt_components"], self.frame["filt_components_img"]) = self.filter_connected_components()
+        self.frame["filt_components"], self.frame["filt_components_img"] = self.filter_connected_components()
         # TODO BGB make sure none of the components bridge the gap between mirrors
         # Fitted lines connected components
         self.frame["fitted_lines_components"] = self.fitted_lines_connected_components()
@@ -94,7 +94,7 @@ class KeyFrameCornerSearch:
         # Facets
         self.frame["facets"] = self.facets()
         # Filter facets based on polygons
-        (self.frame["filtered_facets"], self.frame["heliostats"]) = (
+        self.frame["filtered_facets"], self.frame["heliostats"] = (
             self.filter_facets_polygons()
         )  # Initial setting of self.frame['heliostats']
         # Top row
@@ -1025,7 +1025,7 @@ class KeyFrameCornerSearch:
 
     def facets(self):
         print("In KeyFrameCornerSearch.facets()...")  # ?? SCAFFOLDING RCB -- TEMPORARY
-        (top_left_corners, top_right_corners, bottom_right_corners, bottom_left_corners) = self.frame["corners"]
+        top_left_corners, top_right_corners, bottom_right_corners, bottom_left_corners = self.frame["corners"]
         already_matched_corners = []
         facets = []
         # For each Top Left corner

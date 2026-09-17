@@ -3,7 +3,6 @@ import opencsp.common.lib.render_control.RenderControlFacet as rcf
 import opencsp.common.lib.render_control.RenderControlPointSeq as rcps
 import opencsp.common.lib.render_control.RenderControlText as rctxt
 
-
 # Constants
 DEFAULT_SURFACE_NORMAL_LENGTH = 4  # m
 DEFAULT_CORNER_NORMAL_LENGTH = 2  # m

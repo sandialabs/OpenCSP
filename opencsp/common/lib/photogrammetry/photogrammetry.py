@@ -64,7 +64,7 @@ def find_aruco_marker(
 
     # Find targets
     arcuoDetector = aruco.ArucoDetector(aruco_dict, detectorParams=aruco_detect_params)
-    (corners, ids, _) = arcuoDetector.detectMarkers(image)
+    corners, ids, _ = arcuoDetector.detectMarkers(image)
 
     # Refine corner locations (inaccurate using cv.cornerSubPix)
     #     criteria = (cv.TERM_CRITERIA_EPS + cv.TermCriteria_COUNT, max_iterations, precision)

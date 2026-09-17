@@ -23,7 +23,6 @@ import opencsp.common.lib.tool.file_tools as ft
 import opencsp.common.lib.tool.log_tools as lt
 import opencsp.common.lib.tool.string_tools as st
 
-
 ProcOrImg = TypeVar("ProcOrImage", AbstractSpotAnalysisImageProcessor, CacheableImage, str, np.ndarray, PIL.Image.Image)
 
 

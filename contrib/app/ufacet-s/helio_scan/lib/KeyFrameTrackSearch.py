@@ -246,7 +246,7 @@ class KeyFrameTrackSearch:
                     stop_track_flags[hel_indx] = True
                     continue
                 """Confirm Corners"""
-                (projected_corners, confirmed_corners, num_non_None_confirmed_corners) = self.confirm_corners(
+                projected_corners, confirmed_corners, num_non_None_confirmed_corners = self.confirm_corners(
                     img,
                     predicted_corners,
                     iterations=self.iterations,

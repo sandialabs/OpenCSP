@@ -1,5 +1,5 @@
 """
-A data structure for estimating a heliostat's 3d shape given an ideal heliostat model and 
+A data structure for estimating a heliostat's 3d shape given an ideal heliostat model and
 a series of frame observations with associated tracked corners.
 
 
@@ -304,7 +304,7 @@ class HeliostatInfer3d:
             previous_error = current_overall_error
             for facet_idx in range(0, n_facets):
                 if not facet_is_converged[facet_idx]:
-                    (best_var_name, best_min_error, best_min_error_del_var) = self.find_best_variable_xyz_rot_z(
+                    best_var_name, best_min_error, best_min_error_del_var = self.find_best_variable_xyz_rot_z(
                         search_heliostat_spec,
                         facet_to_adjust_idx=facet_idx,
                         n_steps_one_direction=n_steps_one_direction,
@@ -367,7 +367,7 @@ class HeliostatInfer3d:
             previous_error = current_overall_error
             for facet_idx in range(0, n_facets):
                 if not facet_is_converged[facet_idx]:
-                    (best_var_name, best_min_error, best_min_error_del_var) = self.find_best_variable_rot_xy(
+                    best_var_name, best_min_error, best_min_error_del_var = self.find_best_variable_rot_xy(
                         search_heliostat_spec,
                         facet_to_adjust_idx=facet_idx,
                         n_steps_one_direction=n_steps_one_direction,

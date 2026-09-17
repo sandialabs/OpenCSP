@@ -39,7 +39,6 @@ import opencsp.common.lib.csp.SolarField as sf
 import opencsp.common.lib.csp.sun_track as sun_track  # "st" is taken by string_tools.
 import opencsp.common.lib.render.view_spec as vs
 
-
 # -------------------------------------------------------------------------------------------------------
 # SECTION BREAK
 #

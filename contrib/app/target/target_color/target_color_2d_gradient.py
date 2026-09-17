@@ -7,7 +7,6 @@ Demonstrate Solar Field Plotting Routines
 
 import matplotlib.pyplot as plt
 
-
 #    # Red cross green
 #    for row in range(0,n_rows):
 #        for col in range(0,n_cols):
